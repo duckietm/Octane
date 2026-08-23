@@ -1,6 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import { followFreeFlowAnchor, getChatViewerHeight, resolveFreeFlowLayout } from './freeFlowChatLayout';
 
+const countOverlaps = (
+    bubbles: Array<{ id: number; left: number; top: number; width: number; height: number }>,
+    positions: ReturnType<typeof resolveFreeFlowLayout>
+) => {
+    const positioned = bubbles.map((bubble) => ({ ...bubble, ...positions.find((position) => position.id === bubble.id) }));
+    let overlaps = 0;
+
+    for (let firstIndex = 0; firstIndex < positioned.length; firstIndex++) {
+        for (let secondIndex = firstIndex + 1; secondIndex < positioned.length; secondIndex++) {
+            const first = positioned[firstIndex];
+            const second = positioned[secondIndex];
+            const firstWidth = Math.max(240, first.width);
+            const secondWidth = Math.max(240, second.width);
+            const firstLeft = first.left - (firstWidth - first.width) / 2;
+            const secondLeft = second.left - (secondWidth - second.width) / 2;
+            const overlapsHorizontally = firstLeft < secondLeft + secondWidth && firstLeft + firstWidth > secondLeft;
+            const overlapsVertically = first.top < second.top + second.height && first.top + first.height > second.top;
+
+            if (overlapsHorizontally && overlapsVertically) overlaps++;
+        }
+    }
+
+    return overlaps;
+};
 describe('resolveFreeFlowLayout', () => {
     it('separates a shallow horizontal collision before stacking bubbles vertically', () => {
         const result = resolveFreeFlowLayout([
@@ -42,6 +66,28 @@ describe('resolveFreeFlowLayout', () => {
             { id: 1, top: 89 },
             { id: 2, top: 120 }
         ]);
+    });
+
+    it('fully separates tall bubbles without relying on a fixed iteration budget', () => {
+        const bubbles = [
+            { id: 1, left: 0, top: 100, width: 240, height: 200, anchorX: 120 },
+            { id: 2, left: 0, top: 100, width: 240, height: 200, anchorX: 120 }
+        ];
+
+        expect(countOverlaps(bubbles, resolveFreeFlowLayout(bubbles))).toBe(0);
+    });
+
+    it('leaves no overlaps after a dense burst of chat bubbles', () => {
+        const bubbles = Array.from({ length: 25 }, (_, index) => ({
+            id: index + 1,
+            left: 0,
+            top: 100,
+            width: 240,
+            height: 26,
+            anchorX: 120
+        }));
+
+        expect(countOverlaps(bubbles, resolveFreeFlowLayout(bubbles))).toBe(0);
     });
 });
 

@@ -4,7 +4,7 @@ import { ChatBubbleMessage, GetConfigurationValue } from '../../../../api';
 import { UserIdentityView } from '../../../../common';
 import { useOnClickChat } from '../../../../hooks';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
-import { CHAT_TEXT_SIZE_PIXELS, ChatTextSize, getStoredChatTextSize } from '../chat-input/chatTextSize';
+import { CHAT_TEXT_SIZE_PIXELS } from '../chat-input/chatTextSize';
 import { highlightMentions } from './highlightMentions';
 
 interface ChatWidgetMessageViewProps {
@@ -20,7 +20,6 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
 }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isReady, setIsReady] = useState(false);
-    const [chatTextSize] = useState<ChatTextSize>(() => getStoredChatTextSize());
     const elementRef = useRef<HTMLDivElement>(null);
     const { onClickChat } = useOnClickChat();
     const { userName: ownUsername = '' } = useUserDataSnapshot();
@@ -79,7 +78,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
         setIsReady(true);
 
         if (isVisible && (previousWidth !== width || previousHeight !== height) && makeRoom) makeRoom(chat);
-    }, [chat, chat.formattedText, chat.originalFormattedText, chat.showTranslation, chat.translatedFormattedText, chatTextSize, isVisible, makeRoom]);
+    }, [chat, chat.formattedText, chat.originalFormattedText, chat.showTranslation, chat.translatedFormattedText, chat.textSize, isVisible, makeRoom]);
 
     useEffect(() => {
         return () => {
@@ -100,15 +99,13 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
         <div
             ref={elementRef}
             className={`bubble-container newbubblehe chat-text-size ${isVisible ? 'visible' : 'invisible'} w-max absolute select-none pointer-events-auto`}
-            style={{ '--chat-text-size': `${CHAT_TEXT_SIZE_PIXELS[chatTextSize]}px` } as CSSProperties}
+            style={{ '--chat-text-size': `${CHAT_TEXT_SIZE_PIXELS[chat.textSize]}px` } as CSSProperties}
             onClick={() => GetRoomEngine().selectRoomObject(chat.roomId, chat.senderId, RoomObjectCategory.UNIT)}
         >
             {chat.styleId === 0 && (
                 <div className="absolute -top-px left-px w-[30px] h-[calc(100%-0.5px)] rounded-[7px] z-1" style={{ backgroundColor: chat.color }} />
             )}
-            <div
-                className={`chat-bubble bubble-${chat.styleId} type-${chat.type} ${getBubbleWidth} relative z-1 wrap-break-word min-h-[26px]`}
-            >
+            <div className={`chat-bubble bubble-${chat.styleId} type-${chat.type} ${getBubbleWidth} relative z-1 wrap-break-word min-h-[26px]`}>
                 <div className="user-container flex items-center justify-center h-full max-h-[24px] overflow-hidden">
                     {chat.imageUrl && chat.imageUrl.length > 0 && (
                         <div
@@ -153,10 +150,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
                         </div>
                     )}
                 </div>
-                <div
-                    className="pointer absolute translate-x-[-50%] w-[9px] h-[6px] bottom-[-5px]"
-                    style={{ left: 'var(--chat-pointer-x, 50%)' }}
-                />
+                <div className="pointer absolute translate-x-[-50%] w-[9px] h-[6px] bottom-[-5px]" style={{ left: 'var(--chat-pointer-x, 50%)' }} />
             </div>
         </div>
     );

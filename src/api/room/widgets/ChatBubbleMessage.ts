@@ -1,3 +1,5 @@
+import { ChatTextSize, getStoredChatTextSize } from './ChatTextSize';
+
 export class ChatBubbleMessage {
     public static BUBBLE_COUNTER: number = 0;
 
@@ -13,6 +15,7 @@ export class ChatBubbleMessage {
     public prefixFont: string = '';
     public nickIcon: string = '';
     public displayOrder: string = 'icon-prefix-name';
+    public textSize: ChatTextSize;
     public originalText: string = '';
     public originalFormattedText: string = '';
     public translatedText: string = '';
@@ -38,6 +41,7 @@ export class ChatBubbleMessage {
         public color: string = null
     ) {
         this.id = ++ChatBubbleMessage.BUBBLE_COUNTER;
+        this.textSize = getStoredChatTextSize();
         this.originalText = text;
         this.originalFormattedText = formattedText;
     }

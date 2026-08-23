@@ -8,6 +8,7 @@ export * from './BotSkillsEnum';
 export * from './ChatBubbleMessage';
 export * from './ChatBubbleUtilities';
 export * from './ChatMessageTypeEnum';
+export * from './ChatTextSize';
 export * from './ChooserSelectionVisualizer';
 export * from './CommandDefinition';
 export * from './DimmerFurnitureWidgetPresetItem';

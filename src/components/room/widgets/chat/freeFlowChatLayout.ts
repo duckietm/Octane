@@ -16,7 +16,6 @@ export interface FreeFlowLayoutPosition {
 
 const MINIMUM_COLLIDER_WIDTH = 240;
 const MAX_COLLISION_SIDEWAYS_IMPULSE = 15;
-const MAX_ITERATIONS = 20;
 const POINTER_LEFT_MARGIN = 28;
 const POINTER_RIGHT_MARGIN = 15;
 const DEFAULT_VIEWPORT_HEIGHT_PERCENTAGE = 0.25;
@@ -61,45 +60,41 @@ export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]):
         return layoutBubble;
     });
 
-    for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
-        let moved = false;
+    for (let firstIndex = 0; firstIndex < resolved.length; firstIndex++) {
+        for (let secondIndex = firstIndex + 1; secondIndex < resolved.length; secondIndex++) {
+            const first = resolved[firstIndex];
+            const second = resolved[secondIndex];
 
-        for (let firstIndex = 0; firstIndex < resolved.length; firstIndex++) {
-            for (let secondIndex = firstIndex + 1; secondIndex < resolved.length; secondIndex++) {
-                const first = resolved[firstIndex];
-                const second = resolved[secondIndex];
+            if (!intersects(first, second)) continue;
 
-                if (!intersects(first, second)) continue;
+            const left = first.colliderLeft < second.colliderLeft ? first : second;
+            const right = left === first ? second : first;
+            const horizontalOverlap = (left.colliderLeft + left.colliderWidth - right.colliderLeft) / 2;
 
-                const left = first.left < second.left ? first : second;
-                const right = left === first ? second : first;
-                const horizontalOverlap = Math.abs(left.colliderLeft + left.colliderWidth - right.colliderLeft) / 2;
+            if (horizontalOverlap > MAX_COLLISION_SIDEWAYS_IMPULSE) continue;
 
-                if (horizontalOverlap <= MAX_COLLISION_SIDEWAYS_IMPULSE) {
-                    left.left -= horizontalOverlap;
-                    right.left += horizontalOverlap + 1;
-                    refreshCollider(left);
-                    refreshCollider(right);
-                    moved = true;
-                } else {
-                    if (Math.trunc(first.top) === Math.trunc(second.top)) {
-                        const older = first.id < second.id ? first : second;
-
-                        older.top -= Math.min(8, older.colliderHeight);
-                    } else {
-                        const top = first.top < second.top ? first : second;
-                        const bottom = top === first ? second : first;
-                        const verticalOverlap = top.top + top.colliderHeight - bottom.top + 1;
-
-                        top.top -= Math.min(8, verticalOverlap);
-                    }
-                    moved = true;
-                }
-            }
+            left.left -= horizontalOverlap;
+            right.left += horizontalOverlap + 1;
+            refreshCollider(left);
+            refreshCollider(right);
         }
-
-        if (!moved) break;
     }
+
+    const stackingOrder = [...resolved].sort((first, second) => second.top - first.top || second.id - first.id);
+    const placed: LayoutBubble[] = [];
+
+    stackingOrder.forEach((bubble) => {
+        placed.forEach((lowerBubble) => {
+            const overlapsHorizontally =
+                bubble.colliderLeft < lowerBubble.colliderLeft + lowerBubble.colliderWidth &&
+                bubble.colliderLeft + bubble.colliderWidth > lowerBubble.colliderLeft;
+            const overlapsVertically = bubble.top < lowerBubble.top + lowerBubble.colliderHeight && bubble.top + bubble.colliderHeight > lowerBubble.top;
+
+            if (overlapsHorizontally && overlapsVertically) bubble.top = lowerBubble.top - bubble.colliderHeight - 1;
+        });
+
+        placed.push(bubble);
+    });
 
     return resolved.map((bubble) => ({
         id: bubble.id,
