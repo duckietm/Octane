@@ -89,6 +89,31 @@ describe('resolveFreeFlowLayout', () => {
 
         expect(countOverlaps(bubbles, resolveFreeFlowLayout(bubbles))).toBe(0);
     });
+
+    it('rechecks mixed bubbles in their final vertical order', () => {
+        const bubbles = [
+            { id: 1, left: 548, top: 246, width: 231, height: 38, anchorX: 466 },
+            { id: 2, left: -61, top: 264, width: 102, height: 132, anchorX: 53 },
+            { id: 3, left: 4, top: 210, width: 500, height: 111, anchorX: 210 },
+            { id: 4, left: 154, top: -100, width: 107, height: 128, anchorX: 260 },
+            { id: 5, left: -128, top: 118, width: 164, height: 212, anchorX: 574 },
+            { id: 6, left: 307, top: 255, width: 304, height: 200, anchorX: 92 },
+            { id: 7, left: -44, top: 96, width: 210, height: 38, anchorX: 303 },
+            { id: 8, left: 53, top: -26, width: 443, height: 54, anchorX: 593 },
+            { id: 9, left: 143, top: -37, width: 130, height: 65, anchorX: 375 },
+            { id: 10, left: 569, top: -94, width: 175, height: 176, anchorX: 332 },
+            { id: 11, left: 254, top: 290, width: 127, height: 152, anchorX: 700 },
+            { id: 12, left: -89, top: 31, width: 503, height: 224, anchorX: 251 },
+            { id: 13, left: -32, top: -28, width: 572, height: 30, anchorX: 687 },
+            { id: 14, left: 461, top: 16, width: 507, height: 202, anchorX: 663 },
+            { id: 15, left: 484, top: 214, width: 281, height: 102, anchorX: 59 },
+            { id: 16, left: -147, top: 116, width: 298, height: 109, anchorX: 550 },
+            { id: 17, left: 50, top: 190, width: 316, height: 231, anchorX: 610 },
+            { id: 18, left: -84, top: -21, width: 292, height: 131, anchorX: 169 }
+        ];
+
+        expect(countOverlaps(bubbles, resolveFreeFlowLayout(bubbles))).toBe(0);
+    });
 });
 
 describe('getChatViewerHeight', () => {

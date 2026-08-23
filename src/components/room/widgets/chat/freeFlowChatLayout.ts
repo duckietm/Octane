@@ -84,7 +84,9 @@ export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]):
     const placed: LayoutBubble[] = [];
 
     stackingOrder.forEach((bubble) => {
-        placed.forEach((lowerBubble) => {
+        const lowerBubbles = [...placed].sort((first, second) => second.top - first.top || second.id - first.id);
+
+        lowerBubbles.forEach((lowerBubble) => {
             const overlapsHorizontally =
                 bubble.colliderLeft < lowerBubble.colliderLeft + lowerBubble.colliderWidth &&
                 bubble.colliderLeft + bubble.colliderWidth > lowerBubble.colliderLeft;

@@ -4,7 +4,7 @@ import { RoomChatSettings } from '@nitrots/nitro-renderer';
 import { act, cleanup, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatBubbleMessage } from '../../../../api/room/widgets/ChatBubbleMessage';
-import { CHAT_TEXT_SIZE_PIXELS, CHAT_TEXT_SIZE_STORAGE_KEY, ChatTextSize, setStoredChatTextSize } from '../chat-input/chatTextSize';
+import { CHAT_TEXT_SIZE_STORAGE_KEY, ChatTextSize, setStoredChatTextSize } from '../chat-input/chatTextSize';
 import { ChatWidgetMessageView } from './ChatWidgetMessageView';
 
 vi.mock('@nitrots/nitro-renderer', () => {
@@ -85,7 +85,13 @@ describe('ChatWidgetMessageView text size', () => {
         expect(getBubbleContainer(container)?.style.getPropertyValue('--chat-text-size')).toBe('14px');
     });
 
-    it.each(Object.entries(CHAT_TEXT_SIZE_PIXELS) as Array<[ChatTextSize, number]>)('uses the gradual scale for a newly created %s bubble', (size, pixels) => {
+    it.each<[ChatTextSize, number]>([
+        ['s', 12],
+        ['m', 14],
+        ['l', 16],
+        ['xl', 18],
+        ['xxl', 21]
+    ])('uses the gradual scale for a newly created %s bubble', (size, pixels) => {
         window.localStorage.setItem(CHAT_TEXT_SIZE_STORAGE_KEY, size);
 
         const { container } = renderMessage();

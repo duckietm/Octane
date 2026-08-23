@@ -15,7 +15,7 @@ export class ChatBubbleMessage {
     public prefixFont: string = '';
     public nickIcon: string = '';
     public displayOrder: string = 'icon-prefix-name';
-    public textSize: ChatTextSize;
+    public readonly textSize: ChatTextSize;
     public originalText: string = '';
     public originalFormattedText: string = '';
     public translatedText: string = '';
