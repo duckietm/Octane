@@ -4,7 +4,6 @@ import { ChatBubbleMessage, GetConfigurationValue, GetRoomObjectScreenLocation }
 import { useChatWidget, useChatWindow } from '../../../../hooks';
 import IntervalWebWorker from '../../../../workers/IntervalWebWorker';
 import { WorkerBuilder } from '../../../../workers/WorkerBuilder';
-import { CHAT_TEXT_SIZE_EVENT } from '../chat-input/chatTextSize';
 import { ChatWidgetMessageView } from './ChatWidgetMessageView';
 import { ChatWidgetWindowView } from './ChatWidgetWindowView';
 import { followFreeFlowAnchor, getChatViewerHeight, resolveFreeFlowLayout } from './freeFlowChatLayout';
@@ -244,22 +243,6 @@ export const ChatWidgetView: FC<{}> = (props) => {
             worker.terminate();
         };
     }, [getScrollSpeed, refreshChatMeasurements, removeHiddenChats, resolveOverlappingChats, setChatMessages]);
-
-    useEffect(() => {
-        const onTextSizeChange = () => {
-            window.requestAnimationFrame(() => {
-                window.requestAnimationFrame(() => {
-                    refreshChatMeasurements();
-                    resolveOverlappingChats();
-                    removeHiddenChats();
-                });
-            });
-        };
-
-        window.addEventListener(CHAT_TEXT_SIZE_EVENT, onTextSizeChange);
-
-        return () => window.removeEventListener(CHAT_TEXT_SIZE_EVENT, onTextSizeChange);
-    }, [refreshChatMeasurements, removeHiddenChats, resolveOverlappingChats]);
 
     return (
         <div

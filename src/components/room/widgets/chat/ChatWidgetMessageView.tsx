@@ -4,7 +4,7 @@ import { ChatBubbleMessage, GetConfigurationValue } from '../../../../api';
 import { UserIdentityView } from '../../../../common';
 import { useOnClickChat } from '../../../../hooks';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
-import { CHAT_TEXT_SIZE_EVENT, CHAT_TEXT_SIZE_PIXELS, ChatTextSize, getStoredChatTextSize } from '../chat-input/chatTextSize';
+import { CHAT_TEXT_SIZE_PIXELS, ChatTextSize, getStoredChatTextSize } from '../chat-input/chatTextSize';
 import { highlightMentions } from './highlightMentions';
 
 interface ChatWidgetMessageViewProps {
@@ -20,7 +20,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
 }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isReady, setIsReady] = useState(false);
-    const [chatTextSize, setChatTextSize] = useState<ChatTextSize>(() => getStoredChatTextSize());
+    const [chatTextSize] = useState<ChatTextSize>(() => getStoredChatTextSize());
     const elementRef = useRef<HTMLDivElement>(null);
     const { onClickChat } = useOnClickChat();
     const { userName: ownUsername = '' } = useUserDataSnapshot();
@@ -80,16 +80,6 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
 
         if (isVisible && (previousWidth !== width || previousHeight !== height) && makeRoom) makeRoom(chat);
     }, [chat, chat.formattedText, chat.originalFormattedText, chat.showTranslation, chat.translatedFormattedText, chatTextSize, isVisible, makeRoom]);
-
-    useEffect(() => {
-        const onChatTextSizeChange = (event: Event) => {
-            setChatTextSize((event as CustomEvent<ChatTextSize>).detail || getStoredChatTextSize());
-        };
-
-        window.addEventListener(CHAT_TEXT_SIZE_EVENT, onChatTextSizeChange);
-
-        return () => window.removeEventListener(CHAT_TEXT_SIZE_EVENT, onChatTextSizeChange);
-    }, []);
 
     useEffect(() => {
         return () => {

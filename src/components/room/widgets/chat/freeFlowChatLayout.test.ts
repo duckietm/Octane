@@ -20,26 +20,26 @@ describe('resolveFreeFlowLayout', () => {
         expect(result.pointerX).toBe(28);
     });
 
-    it('moves the older bubble upward in eight-pixel impulses when horizontal separation is too large', () => {
+    it('separates the full visible height when two bubbles start at the same position', () => {
         const result = resolveFreeFlowLayout([
             { id: 1, left: 0, top: 100, width: 240, height: 26, anchorX: 120 },
             { id: 2, left: 0, top: 100, width: 240, height: 26, anchorX: 120 }
         ]);
 
         expect(result.map(({ id, top }) => ({ id, top }))).toEqual([
-            { id: 1, top: 84 },
+            { id: 1, top: 73 },
             { id: 2, top: 100 }
         ]);
     });
 
-    it('allows the ten-pixel visual overlap reserved by the bubble artwork', () => {
+    it('removes visible overlap when the DOM measurement excludes the absolute pointer', () => {
         const result = resolveFreeFlowLayout([
             { id: 1, left: 0, top: 100, width: 240, height: 30, anchorX: 120 },
             { id: 2, left: 0, top: 120, width: 240, height: 30, anchorX: 120 }
         ]);
 
         expect(result.map(({ id, top }) => ({ id, top }))).toEqual([
-            { id: 1, top: 100 },
+            { id: 1, top: 89 },
             { id: 2, top: 120 }
         ]);
     });

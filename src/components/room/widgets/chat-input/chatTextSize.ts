@@ -1,7 +1,6 @@
 export type ChatTextSize = 's' | 'm' | 'l' | 'xl' | 'xxl';
 
 export const CHAT_TEXT_SIZE_STORAGE_KEY = 'nitro.chat.text_size';
-export const CHAT_TEXT_SIZE_EVENT = 'nitro-chat-text-size-change';
 export const CHAT_TEXT_SIZES: ChatTextSize[] = ['s', 'm', 'l', 'xl', 'xxl'];
 
 const CHAT_TEXT_SIZE_LABELS: Record<ChatTextSize, string> = {
@@ -13,11 +12,11 @@ const CHAT_TEXT_SIZE_LABELS: Record<ChatTextSize, string> = {
 };
 
 export const CHAT_TEXT_SIZE_PIXELS: Record<ChatTextSize, number> = {
-    s: 11,
+    s: 12,
     m: 14,
-    l: 18,
-    xl: 22,
-    xxl: 25
+    l: 16,
+    xl: 18,
+    xxl: 21
 };
 
 export const isChatTextSize = (value: string): value is ChatTextSize => CHAT_TEXT_SIZES.includes(value as ChatTextSize);
@@ -36,5 +35,4 @@ export const setStoredChatTextSize = (size: ChatTextSize) => {
     if (typeof window === 'undefined') return;
 
     window.localStorage.setItem(CHAT_TEXT_SIZE_STORAGE_KEY, size);
-    window.dispatchEvent(new CustomEvent<ChatTextSize>(CHAT_TEXT_SIZE_EVENT, { detail: size }));
 };

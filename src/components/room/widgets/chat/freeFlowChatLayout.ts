@@ -40,7 +40,7 @@ interface LayoutBubble extends FreeFlowLayoutBubble {
 
 const refreshCollider = (bubble: LayoutBubble) => {
     bubble.colliderWidth = Math.max(MINIMUM_COLLIDER_WIDTH, bubble.width);
-    bubble.colliderHeight = Math.max(1, bubble.height - 10);
+    bubble.colliderHeight = Math.max(1, bubble.height);
     bubble.colliderLeft = bubble.left - (bubble.colliderWidth - bubble.width) / 2;
 };
 
@@ -82,9 +82,17 @@ export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]):
                     refreshCollider(right);
                     moved = true;
                 } else {
-                    const older = first.id < second.id ? first : second;
+                    if (Math.trunc(first.top) === Math.trunc(second.top)) {
+                        const older = first.id < second.id ? first : second;
 
-                    older.top -= Math.min(8, older.colliderHeight);
+                        older.top -= Math.min(8, older.colliderHeight);
+                    } else {
+                        const top = first.top < second.top ? first : second;
+                        const bottom = top === first ? second : first;
+                        const verticalOverlap = top.top + top.colliderHeight - bottom.top + 1;
+
+                        top.top -= Math.min(8, verticalOverlap);
+                    }
                     moved = true;
                 }
             }
