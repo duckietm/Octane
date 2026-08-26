@@ -738,14 +738,18 @@
 /* The listing names itself on its first line; that line becomes the card header,
    so the body carries no heading of its own. */
 .notification-command-search {
+    --notification-command-search-bg: #fff;
+    --notification-command-search-border: #a8a8a8;
+    --notification-command-search-border-focus: #4a72b8;
+
     position: sticky;
     top: 0;
     z-index: 1;
     width: 100%;
     margin-bottom: 4px;
     padding: 3px 7px;
-    background: #fff;
-    border: 1px solid #a8a8a8;
+    background: var(--notification-command-search-bg);
+    border: 1px solid var(--notification-command-search-border);
     border-radius: 3px;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
     color: inherit;
@@ -754,7 +758,7 @@
 }
 
 .notification-command-search:focus {
-    border-color: #4a72b8;
+    border-color: var(--notification-command-search-border-focus);
     outline: none;
 }
 

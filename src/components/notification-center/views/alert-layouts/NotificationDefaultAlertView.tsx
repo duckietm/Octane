@@ -15,6 +15,7 @@ interface NotificationDefaultAlertViewProps extends LayoutNotificationAlertViewP
 }
 
 const COMMAND_LINE_PATTERN = /^\s*:[\w.-]+(?:\s.*)?$/;
+const COMMAND_HEADING_PATTERN = /^Your Commands\s*\(\d+\)\s*:?$/i;
 
 interface CommandTemplateEntry {
     command: string;
@@ -22,6 +23,22 @@ interface CommandTemplateEntry {
     description: string;
     raw: string;
 }
+
+interface CommandFilterInputProps {
+    value: string;
+    onChange: (value: string) => void;
+}
+
+const CommandFilterInput: FC<CommandFilterInputProps> = ({ value, onChange }) => (
+    <input
+        className="notification-command-search"
+        type="text"
+        value={value}
+        spellCheck={false}
+        placeholder={LocalizeText('generic.search')}
+        onChange={(event) => onChange(event.target.value)}
+    />
+);
 
 export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps> = (props) => {
     const { item = null, title = (props.item && props.item.title) || '', onClose = null, classNames = [], ...rest } = props;
@@ -32,7 +49,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
     const hasCommandTemplate = useMemo(() => {
         const commandLines = alertLines.filter((line) => COMMAND_LINE_PATTERN.test(line));
 
-        return commandLines.length >= 4 || alertLines.some((line) => /^Your Commands\(\d+\):?/i.test(line.trim()));
+        return commandLines.length >= 4 || alertLines.some((line) => COMMAND_HEADING_PATTERN.test(line.trim()));
     }, [alertLines]);
     const commandTemplateContent = useMemo(() => {
         const intro: string[] = [];
@@ -86,15 +103,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
     // The listing arrives on the MOTD channel, so the window would be headed
     // "Messages for you". Its own first line names it better - promote that to
     // the card header instead of drawing a second heading inside the body.
-    const commandTitle = useMemo(() => {
-        if (!hasCommandTemplate) return null;
-
-        const heading = commandTemplateContent.intro[0];
-
-        if (!heading) return null;
-
-        return heading.replace(/:\s*$/, '').replace(/\s*\(\s*/, ' (');
-    }, [hasCommandTemplate, commandTemplateContent]);
+    const hasCommandHeading = hasCommandTemplate && COMMAND_HEADING_PATTERN.test(commandTemplateContent.intro[0] ?? '');
 
     const visibleCommands = useMemo(() => {
         const needle = commandFilter.trim().toLowerCase();
@@ -108,6 +117,19 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                 entry.description.toLowerCase().includes(needle)
         );
     }, [commandFilter, commandTemplateContent]);
+
+    // Only promote the heading when it really is the "Your Commands(n):" line;
+    // an alert that merely contains several :command lines keeps its own title.
+    // The count tracks the filter so the header reflects what is on screen.
+    const commandTitle = useMemo(() => {
+        if (!hasCommandHeading) return null;
+
+        const heading = commandTemplateContent.intro[0].replace(/:\s*$/, '');
+        const total = commandTemplateContent.commands.length;
+        const shown = visibleCommands.length;
+
+        return heading.replace(/\s*\(\s*\d+\s*\)/, shown === total ? ` (${total})` : ` (${shown}/${total})`);
+    }, [hasCommandHeading, commandTemplateContent, visibleCommands]);
 
     return (
         <LayoutNotificationAlertView
@@ -132,19 +154,12 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                 <div className={['notification-text overflow-y-auto flex flex-col w-full', item.clickUrl && !hasFrank ? 'justify-center' : ''].join(' ')}>
                     {hasCommandTemplate && (
                         <div className="notification-command-template">
-                            {commandTemplateContent.intro.slice(commandTitle ? 1 : 0).map((text, index) => (
+                            {commandTemplateContent.intro.slice(hasCommandHeading ? 1 : 0).map((text, index) => (
                                 <div key={index} className="notification-command-copy">
                                     {text}
                                 </div>
                             ))}
-                            <input
-                                className="notification-command-search"
-                                type="text"
-                                value={commandFilter}
-                                spellCheck={false}
-                                placeholder={LocalizeText('generic.search')}
-                                onChange={(event) => setCommandFilter(event.target.value)}
-                            />
+                            <CommandFilterInput value={commandFilter} onChange={setCommandFilter} />
                             {!visibleCommands.length && <div className="notification-command-copy">{LocalizeText('generic.no_results_found')}</div>}
                             {visibleCommands.map((entry, index) => (
                                 <button
