@@ -26,6 +26,7 @@ interface CommandTemplateEntry {
 export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps> = (props) => {
     const { item = null, title = (props.item && props.item.title) || '', onClose = null, classNames = [], ...rest } = props;
     const [imageFailed, setImageFailed] = useState<boolean>(false);
+    const [commandFilter, setCommandFilter] = useState<string>('');
 
     const alertLines = useMemo(() => item.messages.flatMap((message) => message.split(/\r\n|\r|\n/g)), [item.messages]);
     const hasCommandTemplate = useMemo(() => {
@@ -82,9 +83,35 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
     const hasFrank = item.alertType === NotificationAlertType.DEFAULT;
     const alertClassNames = hasCommandTemplate ? [...classNames, 'nitro-alert-command-list'] : classNames;
 
+    // The listing arrives on the MOTD channel, so the window would be headed
+    // "Messages for you". Its own first line names it better - promote that to
+    // the card header instead of drawing a second heading inside the body.
+    const commandTitle = useMemo(() => {
+        if (!hasCommandTemplate) return null;
+
+        const heading = commandTemplateContent.intro[0];
+
+        if (!heading) return null;
+
+        return heading.replace(/:\s*$/, '').replace(/\s*\(\s*/, ' (');
+    }, [hasCommandTemplate, commandTemplateContent]);
+
+    const visibleCommands = useMemo(() => {
+        const needle = commandFilter.trim().toLowerCase();
+
+        if (!needle.length) return commandTemplateContent.commands;
+
+        return commandTemplateContent.commands.filter(
+            (entry) =>
+                entry.command.toLowerCase().includes(needle) ||
+                entry.args.toLowerCase().includes(needle) ||
+                entry.description.toLowerCase().includes(needle)
+        );
+    }, [commandFilter, commandTemplateContent]);
+
     return (
         <LayoutNotificationAlertView
-            title={title}
+            title={commandTitle ?? title}
             onClose={onClose}
             classNames={alertClassNames}
             {...rest}
@@ -105,12 +132,21 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                 <div className={['notification-text overflow-y-auto flex flex-col w-full', item.clickUrl && !hasFrank ? 'justify-center' : ''].join(' ')}>
                     {hasCommandTemplate && (
                         <div className="notification-command-template">
-                            {commandTemplateContent.intro.map((text, index) => (
-                                <div key={index} className={index === 0 ? 'notification-command-heading' : 'notification-command-copy'}>
+                            {commandTemplateContent.intro.slice(commandTitle ? 1 : 0).map((text, index) => (
+                                <div key={index} className="notification-command-copy">
                                     {text}
                                 </div>
                             ))}
-                            {commandTemplateContent.commands.map((entry, index) => (
+                            <input
+                                className="notification-command-search"
+                                type="text"
+                                value={commandFilter}
+                                spellCheck={false}
+                                placeholder={LocalizeText('generic.search')}
+                                onChange={(event) => setCommandFilter(event.target.value)}
+                            />
+                            {!visibleCommands.length && <div className="notification-command-copy">{LocalizeText('generic.no_results_found')}</div>}
+                            {visibleCommands.map((entry, index) => (
                                 <button
                                     key={`${entry.command}-${index}`}
                                     className="notification-command-row"

@@ -735,20 +735,27 @@
     overflow-x: hidden;
 }
 
-.notification-command-heading {
+/* The listing names itself on its first line; that line becomes the card header,
+   so the body carries no heading of its own. */
+.notification-command-search {
     position: sticky;
     top: 0;
     z-index: 1;
+    width: 100%;
     margin-bottom: 4px;
-    padding: 5px 8px;
-    background: linear-gradient(180deg, #4a72b8 0%, #2d4a82 100%);
-    border-bottom: 2px solid #1c2a4a;
-    border-radius: 4px 4px 0 0;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    color: #fff;
-    font-weight: 700;
-    font-size: 12px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+    padding: 3px 7px;
+    background: #fff;
+    border: 1px solid #a8a8a8;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+    color: inherit;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.notification-command-search:focus {
+    border-color: #4a72b8;
+    outline: none;
 }
 
 .notification-command-copy {
