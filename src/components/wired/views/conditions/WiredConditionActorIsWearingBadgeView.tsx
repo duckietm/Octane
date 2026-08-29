@@ -8,9 +8,15 @@ import { WiredConditionBaseView } from './WiredConditionBaseView';
 
 interface WiredConditionActorIsWearingBadgeViewProps {
     negative?: boolean;
+    /**
+     * The gender and room-rights conditions share this dialog because they need the same user source
+     * and quantifier — but their answer comes from the user, not from something you type. They pass
+     * false so the badge-code field stays out of the window.
+     */
+    showBadge?: boolean;
 }
 
-export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWearingBadgeViewProps> = ({ negative = false }) => {
+export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWearingBadgeViewProps> = ({ negative = false, showBadge = true }) => {
     const [badge, setBadge] = useState('');
     const [quantifier, setQuantifier] = useState(1);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
@@ -20,7 +26,7 @@ export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWear
     });
 
     const save = () => {
-        setStringParam(badge);
+        setStringParam(showBadge ? badge : '');
         setIntParams([userSource, quantifier]);
     };
 
@@ -53,10 +59,12 @@ export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWear
                     </label>
                 ))}
             </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.badgecode', 'Badge code')}</Text>
-                <NitroInput type="text" value={badge} onChange={(event) => setBadge(event.target.value)} />
-            </div>
+            {showBadge && (
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.badgecode', 'Badge code')}</Text>
+                    <NitroInput type="text" value={badge} onChange={(event) => setBadge(event.target.value)} />
+                </div>
+            )}
         </WiredConditionBaseView>
     );
 };
