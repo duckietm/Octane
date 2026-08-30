@@ -27,4 +27,10 @@ export class WiredTriggerLayout {
     public static PRESS_KEYBIND: number = 26;
     public static TRANSACTION_COMPLETE: number = 27;
     public static TRANSACTION_FAIL: number = 28;
+    /**
+     * Team wins and team loses take no settings. They used to answer CUSTOM, which shares code 13
+     * with the bot-reached trigger, so the window asked them which bot had arrived.
+     */
+    public static TEAM_GAME_RESULT: number = 29;
+
 }
