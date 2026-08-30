@@ -145,6 +145,10 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionTeleportView />;
         case WiredActionLayoutCode.WALK_TO_FURNI:
             return <WiredActionTeleportView />;
+        case WiredActionLayoutCode.USER_TARGET:
+            return <WiredActionKickFromRoomView />;
+        case WiredActionLayoutCode.MOVE_USER_TILES:
+            return <WiredActionMoveRotateUserView />;
         case WiredActionLayoutCode.FURNI_TO_FURNI:
             return <WiredActionFurniToFurniView />;
         case WiredActionLayoutCode.SET_ALTITUDE:
