@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -36,7 +36,37 @@ const parseAltitude = (value: string) => {
     return clampAltitude(parsed);
 };
 
-export const WiredConditionHasAltitudeView: FC<{}> = () => {
+/**
+ * Seven conditions borrowed this dialog and inherited things that belong to the altitude check alone.
+ * The worst was the counter-only furni gate: it refuses every furni that is not a game counter, which
+ * makes "furni in range", "owns furni" and "same height" impossible to configure. They also inherited
+ * the altitude label for what is really a radius, a furni source picker where a user source is meant,
+ * and a comparison operator two of them never read.
+ */
+type AltitudeVariant = 'altitude' | 'userRange' | 'furniRange' | 'furniProperty';
+
+const VARIANTS: Record<
+    AltitudeVariant,
+    { counterOnly: boolean; comparison: boolean; value: 'altitude' | 'radius' | null; users: boolean }
+> = {
+    altitude: { counterOnly: true, comparison: true, value: 'altitude', users: false },
+    userRange: { counterOnly: false, comparison: true, value: 'radius', users: true },
+    furniRange: { counterOnly: false, comparison: true, value: 'radius', users: false },
+    furniProperty: { counterOnly: false, comparison: false, value: null, users: false }
+};
+
+const VALUE_LABELS = {
+    altitude: { key: 'wiredfurni.params.setaltitude', fallback: 'Altitude' },
+    radius: { key: 'wiredfurni.params.setradius', fallback: 'Radius in tiles' }
+};
+
+interface WiredConditionHasAltitudeViewProps {
+    variant?: AltitudeVariant;
+}
+
+export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProps> = ({ variant = 'altitude' }) => {
+    const spec = VARIANTS[variant];
+
     const { trigger = null, setIntParams = null, setStringParam = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
     const [comparison, setComparison] = useState(1);
     const [furniSource, setFurniSource] = useState<number>(() => {
@@ -49,6 +79,8 @@ export const WiredConditionHasAltitudeView: FC<{}> = () => {
     const [altitudeInput, setAltitudeInput] = useState('0');
 
     useEffect(() => {
+        if (!spec.counterOnly) return;
+
         setAllowedInteractionTypes(COUNTER_INTERACTION_TYPES);
         setAllowedInteractionErrorKey('wiredfurni.error.require_counter_furni');
 
@@ -56,20 +88,28 @@ export const WiredConditionHasAltitudeView: FC<{}> = () => {
             setAllowedInteractionTypes(null);
             setAllowedInteractionErrorKey(null);
         };
-    }, [setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
+    }, [spec.counterOnly, setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
 
     useEffect(() => {
         if (!trigger) return;
 
-        setComparison(trigger.intData.length > 0 ? trigger.intData[0] : 1);
-        setFurniSource(trigger.intData.length > 1 ? trigger.intData[1] : (trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0);
-        setQuantifier(trigger.intData.length > 2 ? trigger.intData[2] : 0);
-        setShowAdvanced(trigger.intData.length > 1 ? trigger.intData[1] !== 0 || trigger.intData[2] !== 0 : false);
+        const sourceSlot = spec.comparison ? 1 : 0;
+        const quantifierSlot = sourceSlot + 1;
+        const fallbackSource = (trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0;
+
+        setComparison(spec.comparison && trigger.intData.length > 0 ? trigger.intData[0] : 1);
+        setFurniSource(trigger.intData.length > sourceSlot ? trigger.intData[sourceSlot] : fallbackSource);
+        setQuantifier(trigger.intData.length > quantifierSlot ? trigger.intData[quantifierSlot] : 0);
+        setShowAdvanced(
+            trigger.intData.length > sourceSlot
+                ? trigger.intData[sourceSlot] !== 0 || trigger.intData[quantifierSlot] !== 0
+                : false
+        );
 
         const nextAltitude = parseAltitude(trigger.stringData);
         setAltitude(nextAltitude);
         setAltitudeInput(formatAltitude(nextAltitude));
-    }, [trigger]);
+    }, [spec.comparison, trigger]);
 
     const updateAltitude = (value: number) => {
         const nextValue = clampAltitude(value);
@@ -101,8 +141,9 @@ export const WiredConditionHasAltitudeView: FC<{}> = () => {
     };
 
     const save = () => {
-        setIntParams([comparison, furniSource, quantifier]);
-        setStringParam(formatAltitude(altitude));
+        // furniProperty reads [source, quantifier]; the others keep the comparison in slot 0.
+        setIntParams(spec.comparison ? [comparison, furniSource, quantifier] : [furniSource, quantifier]);
+        setStringParam(spec.value ? formatAltitude(altitude) : '');
     };
 
     return (
@@ -131,49 +172,59 @@ export const WiredConditionHasAltitudeView: FC<{}> = () => {
                                                 type="radio"
                                                 onChange={() => setQuantifier(value)}
                                             />
-                                            <Text>{LocalizeText(`wiredfurni.params.quantifier.furni.${value}`)}</Text>
+                                            <Text>{LocalizeText(`wiredfurni.params.quantifier.${spec.users ? 'users' : 'furni'}.${value}`)}</Text>
                                         </div>
                                     );
                                 })}
                             </div>
-                            <WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />
+                            {spec.users ? (
+                                <WiredSourcesSelector showUsers={true} userSource={furniSource} onChangeUsers={setFurniSource} />
+                            ) : (
+                                <WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />
+                            )}
                         </>
                     )}
                 </div>
             }
         >
-            <div className="flex flex-col gap-2">
-                {[0, 1, 2].map((value) => {
-                    return (
-                        <div key={value} className="flex items-center gap-1">
-                            <input
-                                checked={comparison === value}
-                                className="form-check-input"
-                                id={`altitudeComparison${value}`}
-                                name="altitudeComparison"
-                                type="radio"
-                                onChange={() => setComparison(value)}
-                            />
-                            <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.setaltitude')}</Text>
-                <input
-                    className="form-control form-control-sm"
-                    inputMode="decimal"
-                    type="text"
-                    value={altitudeInput}
-                    onBlur={() => setAltitudeInput(formatAltitude(altitude))}
-                    onChange={(event) => updateAltitudeInput(event.target.value)}
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
-                <Text small>{formatAltitude(altitude)}</Text>
-            </div>
+            {spec.comparison && (
+                <div className="flex flex-col gap-2">
+                    {[0, 1, 2].map((value) => {
+                        return (
+                            <div key={value} className="flex items-center gap-1">
+                                <input
+                                    checked={comparison === value}
+                                    className="form-check-input"
+                                    id={`altitudeComparison${value}`}
+                                    name="altitudeComparison"
+                                    type="radio"
+                                    onChange={() => setComparison(value)}
+                                />
+                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+            {spec.value && (
+                <>
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback(VALUE_LABELS[spec.value].key, VALUE_LABELS[spec.value].fallback)}</Text>
+                        <input
+                            className="form-control form-control-sm"
+                            inputMode="decimal"
+                            type="text"
+                            value={altitudeInput}
+                            onBlur={() => setAltitudeInput(formatAltitude(altitude))}
+                            onChange={(event) => updateAltitudeInput(event.target.value)}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
+                        <Text small>{formatAltitude(altitude)}</Text>
+                    </div>
+                </>
+            )}
         </WiredConditionBaseView>
     );
 };

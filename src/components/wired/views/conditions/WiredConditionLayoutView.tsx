@@ -82,6 +82,12 @@ export const WiredConditionLayoutView = (code: number) => {
             return <WiredConditionActorIsWearingBadgeView field={null} />;
         case WiredConditionlayout.NOT_USER_ATTRIBUTE:
             return <WiredConditionActorIsWearingBadgeView field={null} negative={true} />;
+        case WiredConditionlayout.USER_RANGE:
+            return <WiredConditionHasAltitudeView variant="userRange" />;
+        case WiredConditionlayout.FURNI_RANGE:
+            return <WiredConditionHasAltitudeView variant="furniRange" />;
+        case WiredConditionlayout.FURNI_PROPERTY:
+            return <WiredConditionHasAltitudeView variant="furniProperty" />;
         case WiredConditionlayout.USER_TAG:
             return <WiredConditionActorIsWearingBadgeView field="tag" />;
         case WiredConditionlayout.NOT_USER_TAG:
