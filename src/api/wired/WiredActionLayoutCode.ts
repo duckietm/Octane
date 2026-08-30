@@ -132,4 +132,10 @@ export class WiredActionLayoutCode {
     public static EFFECT_ID: number = 121;
     public static EFFECT_MESSAGE: number = 122;
     public static EFFECT_TEXT: number = 123;
+    /**
+     * Everyone in the room leaves their game, so there is nobody to pick. The stored source still
+     * decides whether the stack needs a triggering user, so it keeps its slot - it is just no longer
+     * a question the window asks.
+     */
+    public static ALL_USERS_LEAVE_TEAM: number = 124;
 }
