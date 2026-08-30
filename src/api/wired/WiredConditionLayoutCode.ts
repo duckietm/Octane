@@ -73,4 +73,12 @@ export class WiredConditionlayout {
     public static USER_TAG: number = 54;
     public static NOT_USER_TAG: number = 55;
     public static USER_MOTTO: number = 56;
+    /**
+     * The three shapes that borrowed the altitude dialog. They inherited its counter-only furni gate,
+     * which refuses every furni that is not a game counter — and with it a radius labelled as an
+     * altitude, a furni picker where a user source is meant, and a comparison two of them never read.
+     */
+    public static USER_RANGE: number = 57;
+    public static FURNI_RANGE: number = 58;
+    public static FURNI_PROPERTY: number = 59;
 }
