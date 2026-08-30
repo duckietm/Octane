@@ -121,4 +121,15 @@ export class WiredActionLayoutCode {
     public static USER_TARGET: number = 116;
     /** Move a user N tiles — the fourth slot the move/rotate window never sent. */
     public static MOVE_USER_TILES: number = 117;
+    /**
+     * The shapes that borrowed the chat composer. They store one string and a user source like the
+     * chat effects do, but the bubble style and the visibility choice mean nothing to them, and what
+     * the textarea held was never a message.
+     */
+    public static EFFECT_AMOUNT: number = 118;
+    public static EFFECT_BADGE: number = 119;
+    public static EFFECT_TAG: number = 120;
+    public static EFFECT_ID: number = 121;
+    public static EFFECT_MESSAGE: number = 122;
+    public static EFFECT_TEXT: number = 123;
 }

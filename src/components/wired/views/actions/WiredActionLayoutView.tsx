@@ -145,6 +145,13 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionTeleportView />;
         case WiredActionLayoutCode.WALK_TO_FURNI:
             return <WiredActionTeleportView />;
+        case WiredActionLayoutCode.EFFECT_AMOUNT:
+        case WiredActionLayoutCode.EFFECT_BADGE:
+        case WiredActionLayoutCode.EFFECT_TAG:
+        case WiredActionLayoutCode.EFFECT_ID:
+        case WiredActionLayoutCode.EFFECT_MESSAGE:
+        case WiredActionLayoutCode.EFFECT_TEXT:
+            return <WiredActionChatView />;
         case WiredActionLayoutCode.USER_TARGET:
             return <WiredActionKickFromRoomView />;
         case WiredActionLayoutCode.MOVE_USER_TILES:
