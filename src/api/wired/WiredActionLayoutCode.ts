@@ -112,4 +112,9 @@ export class WiredActionLayoutCode {
     public static CONTRACT_TRADE: number = 112;
     public static CUSTOM_CONTRACT: number = 113;
     public static CHANGE_OPACITY: number = 114;
+    /**
+     * Walking to a furni borrowed TELEPORT, whose window offers a "teleport instantly" checkbox that
+     * this effect never reads — it walks. Same three slots, one control fewer.
+     */
+    public static WALK_TO_FURNI: number = 115;
 }

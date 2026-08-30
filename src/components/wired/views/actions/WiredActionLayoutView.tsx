@@ -143,6 +143,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionControlClockView />;
         case WiredActionLayoutCode.FURNI_TO_USER:
             return <WiredActionTeleportView />;
+        case WiredActionLayoutCode.WALK_TO_FURNI:
+            return <WiredActionTeleportView />;
         case WiredActionLayoutCode.FURNI_TO_FURNI:
             return <WiredActionFurniToFurniView />;
         case WiredActionLayoutCode.SET_ALTITUDE:
