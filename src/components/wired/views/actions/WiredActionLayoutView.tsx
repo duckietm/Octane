@@ -176,6 +176,7 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionJoinTeamView />;
         case WiredActionLayoutCode.KICK_FROM_ROOM:
             return <WiredActionKickFromRoomView />;
+        case WiredActionLayoutCode.ALL_USERS_LEAVE_TEAM:
         case WiredActionLayoutCode.LEAVE_TEAM:
             return <WiredActionLeaveTeamView />;
         case WiredActionLayoutCode.MOVE_FURNI:
