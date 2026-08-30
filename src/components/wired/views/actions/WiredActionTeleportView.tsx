@@ -10,6 +10,9 @@ export const WiredActionTeleportView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null } = useWired();
     const isTeleportEffect = trigger?.code === WiredActionLayoutCode.TELEPORT;
     const isUserToFurniEffect = trigger?.code === WiredActionLayoutCode.USER_TO_FURNI;
+    /** Same three slots as the teleport, but it walks — so no "teleport instantly" to offer. */
+    const isWalkToFurni = trigger?.code === WiredActionLayoutCode.WALK_TO_FURNI;
+    const usesTeleportSlots = isTeleportEffect || isWalkToFurni;
     const [fastTeleport, setFastTeleport] = useState<boolean>(() => {
         if (isTeleportEffect && trigger?.intData?.length >= 3) return trigger.intData[0] === 1;
         return false;
@@ -20,14 +23,14 @@ export const WiredActionTeleportView: FC<{}> = (props) => {
     });
 
     const [furniSource, setFurniSource] = useState<number>(() => {
-        if (isTeleportEffect && trigger?.intData?.length >= 3) return trigger.intData[1];
+        if (usesTeleportSlots && trigger?.intData?.length >= 3) return trigger.intData[1];
         if (isUserToFurniEffect && trigger?.intData?.length >= 3) return trigger.intData[0];
         if (trigger?.intData?.length >= 1) return trigger.intData[0];
         return (trigger?.selectedItems?.length ?? 0) > 0 ? 100 : 0;
     });
 
     const [userSource, setUserSource] = useState<number>(() => {
-        if (isTeleportEffect && trigger?.intData?.length >= 3) return trigger.intData[2];
+        if (usesTeleportSlots && trigger?.intData?.length >= 3) return trigger.intData[2];
         if (isUserToFurniEffect && trigger?.intData?.length >= 3) return trigger.intData[1];
         if (trigger?.intData?.length >= 2) return trigger.intData[1];
         return 0;
@@ -36,7 +39,7 @@ export const WiredActionTeleportView: FC<{}> = (props) => {
     useEffect(() => {
         if (!trigger) return;
 
-        if (isTeleportEffect && trigger.intData.length >= 3) {
+        if (usesTeleportSlots && trigger.intData.length >= 3) {
             setFastTeleport(trigger.intData[0] === 1);
             setFurniSource(trigger.intData[1]);
             setUserSource(trigger.intData[2]);
@@ -60,13 +63,13 @@ export const WiredActionTeleportView: FC<{}> = (props) => {
 
         if (trigger.intData.length >= 2) setUserSource(trigger.intData[1]);
         else setUserSource(0);
-    }, [isTeleportEffect, isUserToFurniEffect, trigger]);
+    }, [isUserToFurniEffect, isWalkToFurni, usesTeleportSlots, trigger]);
 
     const onChangeFurniSource = (next: number) => setFurniSource(next);
 
     const save = () =>
         setIntParams(
-            isTeleportEffect
+            usesTeleportSlots
                 ? [fastTeleport ? 1 : 0, furniSource, userSource]
                 : isUserToFurniEffect
                   ? [furniSource, userSource, walkMode]
