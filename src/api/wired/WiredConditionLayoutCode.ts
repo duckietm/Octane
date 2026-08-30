@@ -66,4 +66,11 @@ export class WiredConditionlayout {
      */
     public static USER_STATE: number = 52;
     public static NOT_USER_STATE: number = 53;
+    /**
+     * Text read off the user that is not a badge code. The field is genuinely used by these boxes —
+     * it was only labelled "Badge code", with the badge's length limit instead of its own.
+     */
+    public static USER_TAG: number = 54;
+    public static NOT_USER_TAG: number = 55;
+    public static USER_MOTTO: number = 56;
 }
