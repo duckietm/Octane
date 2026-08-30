@@ -1,11 +1,17 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { WiredActionLayoutCode, WiredFurniType } from '../../../../api';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
 export const WiredActionLeaveTeamView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null } = useWired();
+    /**
+     * "All users leave team" walks every habbo in the room, so the source picker never chose its
+     * targets. The saved value is still sent back untouched, because it decides whether the stack
+     * needs a triggering user.
+     */
+    const showSource = trigger?.code !== WiredActionLayoutCode.ALL_USERS_LEAVE_TEAM;
     const [userSource, setUserSource] = useState<number>(() => {
         if (trigger?.intData?.length >= 1) return trigger.intData[0];
         return 0;
@@ -24,7 +30,7 @@ export const WiredActionLeaveTeamView: FC<{}> = (props) => {
             hasSpecialInput={true}
             requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
             save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            footer={showSource ? <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} /> : null}
         />
     );
 };
