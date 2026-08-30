@@ -54,4 +54,10 @@ export class WiredConditionlayout {
      */
     public static USER_ATTRIBUTE: number = 49;
     public static NOT_USER_ATTRIBUTE: number = 50;
+    /**
+     * A threshold on something the user holds — inventory items, credits, diamonds, duckets. Same
+     * dialog as the team score minus the team colour and the comparison operator, neither of which
+     * those boxes consult, and with the amount ceiling the server actually enforces.
+     */
+    public static USER_AMOUNT: number = 51;
 }
