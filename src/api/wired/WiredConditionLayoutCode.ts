@@ -60,4 +60,10 @@ export class WiredConditionlayout {
      * those boxes consult, and with the amount ceiling the server actually enforces.
      */
     public static USER_AMOUNT: number = 51;
+    /**
+     * A boolean state the user is in — frozen. Same dialog as the wearing-effect conditions minus the
+     * effect id, which those boxes show and never read.
+     */
+    public static USER_STATE: number = 52;
+    public static NOT_USER_STATE: number = 53;
 }

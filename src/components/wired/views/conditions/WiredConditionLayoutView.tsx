@@ -72,6 +72,10 @@ export const WiredConditionLayoutView = (code: number) => {
             return <WiredConditionActorIsWearingBadgeView />;
         case WiredConditionlayout.NOT_ACTOR_WEARS_BADGE:
             return <WiredConditionActorIsWearingBadgeView negative={true} />;
+        case WiredConditionlayout.USER_STATE:
+            return <WiredConditionActorIsWearingEffectView showEffect={false} />;
+        case WiredConditionlayout.NOT_USER_STATE:
+            return <WiredConditionActorIsWearingEffectView negative={true} showEffect={false} />;
         case WiredConditionlayout.USER_AMOUNT:
             return <WiredConditionTeamHasScoreView scoped={false} />;
         case WiredConditionlayout.USER_ATTRIBUTE:
