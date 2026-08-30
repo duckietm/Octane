@@ -41,7 +41,10 @@ const parseAltitude = (value: string) => {
  * The worst was the counter-only furni gate: it refuses every furni that is not a game counter, which
  * makes "furni in range", "owns furni" and "same height" impossible to configure. They also inherited
  * the altitude label for what is really a radius, a furni source picker where a user source is meant,
- * and a comparison operator two of them never read.
+ * and a comparison operator four of them never read.
+ *
+ * The four range boxes read it now. Their middle option is inclusive — "within the radius", the
+ * behaviour they always had — so it gets its own label instead of the altitude box's "Equals".
  */
 type AltitudeVariant = 'altitude' | 'userRange' | 'furniRange' | 'furniProperty';
 
@@ -53,6 +56,12 @@ const VARIANTS: Record<
     userRange: { counterOnly: false, comparison: true, value: 'radius', users: true },
     furniRange: { counterOnly: false, comparison: true, value: 'radius', users: false },
     furniProperty: { counterOnly: false, comparison: false, value: null, users: false }
+};
+
+const RANGE_COMPARISON_LABELS: Record<number, { key: string; fallback: string }> = {
+    0: { key: 'wiredfurni.params.range.comparison.0', fallback: 'Closer than' },
+    1: { key: 'wiredfurni.params.range.comparison.1', fallback: 'Within the radius' },
+    2: { key: 'wiredfurni.params.range.comparison.2', fallback: 'Further than' }
 };
 
 const VALUE_LABELS = {
@@ -200,7 +209,11 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
                                     type="radio"
                                     onChange={() => setComparison(value)}
                                 />
-                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                                <Text>
+                                    {spec.value === 'radius'
+                                        ? localizeWithFallback(RANGE_COMPARISON_LABELS[value].key, RANGE_COMPARISON_LABELS[value].fallback)
+                                        : LocalizeText(`wiredfurni.params.comparison.${value}`)}
+                                </Text>
                             </div>
                         );
                     })}
