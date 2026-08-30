@@ -103,6 +103,7 @@ import { WiredActionResetView } from './WiredActionResetView';
 import { WiredActionSendSignalView } from './WiredActionSendSignalView';
 import { WiredActionSetAltitudeView } from './WiredActionSetAltitudeView';
 import { WiredActionSetFurniStateToView } from './WiredActionSetFurniStateToView';
+import { WiredActionOverrideHeightView } from './WiredActionOverrideHeightView';
 import { WiredActionSetRollerSpeedView } from './WiredActionSetRollerSpeedView';
 import { WiredActionSetRoomAdView } from './WiredActionSetRoomAdView';
 import { WiredActionTeleportView } from './WiredActionTeleportView';
@@ -295,6 +296,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionSendSignalView />;
         case WiredActionLayoutCode.NEG_SEND_SIGNAL:
             return <WiredActionSendSignalView />;
+        case WiredActionLayoutCode.OVERRIDE_HEIGHT:
+            return <WiredActionOverrideHeightView />;
         case WiredActionLayoutCode.SET_ROLLER_SPEED:
             return <WiredActionSetRollerSpeedView />;
         case WiredActionLayoutCode.BOT_DANCE:

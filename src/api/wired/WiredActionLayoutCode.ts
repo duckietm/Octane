@@ -138,4 +138,6 @@ export class WiredActionLayoutCode {
      * a question the window asks.
      */
     public static ALL_USERS_LEAVE_TEAM: number = 124;
+    /** The official override-height action: a two-way choice and a 0..8000 thousandths slider. */
+    public static OVERRIDE_HEIGHT: number = 125;
 }
