@@ -68,6 +68,7 @@ export const WiredTriggerLayoutView = (code: number) => {
             return <WiredTriggeExecutePeriodicallyLongView />;
         case WiredTriggerLayout.GAME_ENDS:
             return <WiredTriggerGameEndsView />;
+        case WiredTriggerLayout.TEAM_GAME_RESULT:
         case WiredTriggerLayout.GAME_STARTS:
             return <WiredTriggerGameStartsView />;
         case WiredTriggerLayout.SCORE_ACHIEVED:
