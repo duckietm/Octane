@@ -117,4 +117,8 @@ export class WiredActionLayoutCode {
      * this effect never reads — it walks. Same three slots, one control fewer.
      */
     public static WALK_TO_FURNI: number = 115;
+    /** Sit, lie down, fast walk: they only need to know which users, not a kick message. */
+    public static USER_TARGET: number = 116;
+    /** Move a user N tiles — the fourth slot the move/rotate window never sent. */
+    public static MOVE_USER_TILES: number = 117;
 }
