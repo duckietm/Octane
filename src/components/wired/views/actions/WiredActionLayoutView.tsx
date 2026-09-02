@@ -108,6 +108,7 @@ import { WiredActionSetRollerSpeedView } from './WiredActionSetRollerSpeedView';
 import { WiredActionSetRoomAdView } from './WiredActionSetRoomAdView';
 import { WiredActionTeleportView } from './WiredActionTeleportView';
 import { WiredActionToggleFurniStateView } from './WiredActionToggleFurniStateView';
+import { WiredActionToggleToRandomStateView } from './WiredActionToggleToRandomStateView';
 import { WiredActionUnfreezeView } from './WiredActionUnfreezeView';
 
 export const WiredActionLayoutView = (code: number) => {
@@ -200,6 +201,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionTeleportView />;
         case WiredActionLayoutCode.TOGGLE_FURNI_STATE:
             return <WiredActionToggleFurniStateView />;
+        case WiredActionLayoutCode.TOGGLE_TO_RANDOM_STATE:
+            return <WiredActionToggleToRandomStateView />;
         case WiredActionLayoutCode.UNFREEZE:
             return <WiredActionUnfreezeView />;
         case WiredActionLayoutCode.USER_TO_FURNI:
