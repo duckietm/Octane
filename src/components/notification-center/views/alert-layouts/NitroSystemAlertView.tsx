@@ -45,6 +45,9 @@ export const NitroSystemAlertView: FC<NotificationDefaultAlertViewProps> = (prop
                             <Text center bold small>
                                 v3.6.0
                             </Text>
+                            <Text center small>
+                                Hôtel : DevHBB (Valentin ×͜×)
+                            </Text>
                             <Button fullWidth onClick={(event) => window.open('https://github.com/duckietm/Octane')}>
                                 Cool UI Git
                             </Button>

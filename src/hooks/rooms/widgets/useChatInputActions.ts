@@ -209,6 +209,16 @@ export const useChatInputActions = () => {
 
                         return null;
                     }
+                    case ':pileouface':
+                    case ':pof':
+                    case ':coinflip': {
+                        // Coin flip, broadcast to everyone in the room.
+                        const coinResult = Math.random() < 0.5 ? 'Heads' : 'Tails';
+
+                        roomSession?.sendChatMessage(`* flips a coin... ${coinResult}! *`, styleId);
+
+                        return null;
+                    }
                     case ':client':
                     case ':nitro':
                     case ':billsonnn':
