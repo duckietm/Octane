@@ -1,10 +1,10 @@
-import { NitroEventType } from '@nitrots/nitro-renderer';
+import { OctaneEventType } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { AvatarEditorThumbnailsHelper, GetClubMemberLevel, GetConfigurationValue, IAvatarEditorCategoryPartItem } from '../../../api';
 import hcSmallSrc from '../../../assets/images/avatareditor/air/hc-small.png';
 import { LayoutCurrencyIcon, LayoutGridItemProps } from '../../../common';
 import { useAvatarEditor } from '../../../hooks';
-import { useNitroEvent } from '../../../hooks/events';
+import { useOctaneEvent } from '../../../hooks/events';
 import { InfiniteGrid } from '../../../layout';
 import { AvatarEditorIcon } from '../AvatarEditorIcon';
 
@@ -37,7 +37,7 @@ export const AvatarEditorFigureSetItemView: FC<
 
     assetUrlRef.current = assetUrl;
 
-    useNitroEvent(NitroEventType.AVATAR_ASSET_LOADED, () => {
+    useOctaneEvent(OctaneEventType.AVATAR_ASSET_LOADED, () => {
         if (!isHead || assetUrlRef.current || retryTimeoutRef.current) return;
 
         // Avatar libraries notify after their download callbacks. Give the

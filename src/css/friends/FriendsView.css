@@ -1,4 +1,4 @@
-.nitro-friends-spritesheet {
+.octane-friends-spritesheet {
     background: url('@/assets/images/friends/friends-spritesheet.png') transparent no-repeat;
 
     &.icon-friendbar-visit {
@@ -104,7 +104,7 @@
     height: 25px;
 }
 
-.nitro-friends {
+.octane-friends {
     width: min(332px, calc(100vw - 16px));
     height: 445px;
     min-width: 0;
@@ -121,18 +121,18 @@
         font-family: Ubuntu, sans-serif !important;
     }
 
-    & .nitro-card-content-shell {
+    & .octane-card-content-shell {
         padding: 0 !important;
         gap: 0 !important;
         background: #f3f3ef;
     }
 
-    & .nitro-card-accordion-set {
+    & .octane-card-accordion-set {
         background: transparent;
         border: 0;
     }
 
-    & .nitro-card-accordion-set-header {
+    & .octane-card-accordion-set-header {
         min-height: 24px;
         padding: 3px 7px !important;
         color: #111;
@@ -141,23 +141,23 @@
         border: 0 !important;
     }
 
-    & .nitro-card-accordion-set-header span {
+    & .octane-card-accordion-set-header span {
         font-size: 12px;
         color: #111 !important;
     }
 
-    & .nitro-card-accordion-set-header .fa-icon {
+    & .octane-card-accordion-set-header .fa-icon {
         width: 10px;
         height: 10px;
         color: #000;
     }
 
-    & .nitro-card-accordion-set.active {
+    & .octane-card-accordion-set.active {
         min-height: 0;
         border: 0 !important;
     }
 
-    & .nitro-card-accordion-set-content {
+    & .octane-card-accordion-set-content {
         overflow-y: auto !important;
     }
 
@@ -244,12 +244,12 @@
         gap: 3px;
     }
 
-    & .nitro-friends-spritesheet.icon-follow {
+    & .octane-friends-spritesheet.icon-follow {
         width: 15px;
         height: 14px;
     }
 
-    & .nitro-friends-spritesheet.icon-chat {
+    & .octane-friends-spritesheet.icon-chat {
         width: 17px;
         height: 16px;
     }
@@ -273,7 +273,7 @@
     }
 }
 
-.nitro-friends-room-invite {
+.octane-friends-room-invite {
     width: min(270px, calc(100vw - 16px));
     height: min(225px, calc(100vh - 16px));
     min-width: 0;
@@ -282,17 +282,17 @@
     max-height: calc(100vh - 16px);
     resize: none !important;
 
-    & .nitro-card-content-shell {
+    & .octane-card-content-shell {
         padding: 10px !important;
         gap: 8px !important;
     }
 }
 
-.nitro-friends-room-invite-content {
+.octane-friends-room-invite-content {
     height: 100%;
 }
 
-.nitro-friends-room-invite-summary {
+.octane-friends-room-invite-summary {
     padding: 6px 8px;
     color: #111;
     font-size: 13px;
@@ -303,7 +303,7 @@
     border-radius: 8px;
 }
 
-.nitro-friends-room-invite-textarea {
+.octane-friends-room-invite-textarea {
     width: 100%;
     height: 92px;
     padding: 7px 8px;
@@ -322,7 +322,7 @@
     }
 }
 
-.nitro-friends-room-invite-note {
+.octane-friends-room-invite-note {
     padding: 4px 6px;
     color: #111 !important;
     font-size: 12px !important;
@@ -331,13 +331,13 @@
     border-radius: 8px;
 }
 
-.nitro-friends-room-invite-actions {
+.octane-friends-room-invite-actions {
     display: flex;
     gap: 8px;
     margin-top: auto;
 }
 
-.nitro-friends-remove-confirmation {
+.octane-friends-remove-confirmation {
     width: min(270px, calc(100vw - 16px));
     height: min(225px, calc(100vh - 16px));
     min-width: 0;
@@ -347,7 +347,7 @@
     resize: none !important;
 }
 
-.nitro-friends-remove-confirmation-text {
+.octane-friends-remove-confirmation-text {
     color: #111;
     font-size: 13px;
     line-height: 1.35;
@@ -355,15 +355,15 @@
     overflow-wrap: anywhere;
 }
 
-.nitro-friends-remove-confirmation-content {
+.octane-friends-remove-confirmation-content {
     height: 100%;
 }
 
-.nitro-friends-remove-confirmation-names {
+.octane-friends-remove-confirmation-names {
     margin-top: 4px;
 }
 
-.nitro-friends-remove-confirmation-actions {
+.octane-friends-remove-confirmation-actions {
     display: flex;
     gap: 8px;
     margin-top: auto;
@@ -494,7 +494,7 @@
 }
 
 @media (max-width: 520px), (max-height: 470px) {
-    .nitro-friends {
+    .octane-friends {
         width: calc(100vw - 16px) !important;
         max-width: calc(100vw - 16px) !important;
         height: min(445px, calc(100vh - 16px)) !important;
@@ -517,7 +517,7 @@
         font-family: Ubuntu, sans-serif !important;
     }
 
-    & .nitro-card-content-shell {
+    & .octane-card-content-shell {
         padding: 0 !important;
         gap: 0 !important;
         background: #f3f3ef;
@@ -913,7 +913,7 @@
 }
 
 /* Category manager: keep the list scrollable */
-.nitro-friends-category-manager {
+.octane-friends-category-manager {
     width: min(270px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -921,14 +921,14 @@
     resize: none !important;
 }
 
-.nitro-friends-category-manager .nitro-card-content-shell {
+.octane-friends-category-manager .octane-card-content-shell {
     color: #111;
     background: #f3f3ef;
 }
 
-.nitro-friends-category-manager :where(input, select, textarea),
-.nitro-friends-room-invite :where(input, select, textarea),
-.nitro-friends-remove-confirmation :where(input, select, textarea) {
+.octane-friends-category-manager :where(input, select, textarea),
+.octane-friends-room-invite :where(input, select, textarea),
+.octane-friends-remove-confirmation :where(input, select, textarea) {
     min-height: 22px;
     border: 1px solid #858585 !important;
     border-radius: 3px !important;
@@ -938,21 +938,21 @@
     font-size: 11px !important;
 }
 
-.nitro-friends-category-manager :where(input:focus, select:focus, textarea:focus),
-.nitro-friends-room-invite :where(input:focus, select:focus, textarea:focus),
-.nitro-friends-remove-confirmation :where(input:focus, select:focus, textarea:focus) {
+.octane-friends-category-manager :where(input:focus, select:focus, textarea:focus),
+.octane-friends-room-invite :where(input:focus, select:focus, textarea:focus),
+.octane-friends-remove-confirmation :where(input:focus, select:focus, textarea:focus) {
     border-color: #4a7d8c !important;
     box-shadow: 0 0 0 2px rgba(74, 125, 140, 0.24), inset 0 1px 0 rgba(0, 0, 0, 0.14) !important;
     outline: none !important;
 }
 
-.nitro-friends-category-manager :where(.text-muted, .text-dark),
-.nitro-friends-room-invite :where(.text-muted, .text-dark),
-.nitro-friends-remove-confirmation :where(.text-muted, .text-dark) {
+.octane-friends-category-manager :where(.text-muted, .text-dark),
+.octane-friends-room-invite :where(.text-muted, .text-dark),
+.octane-friends-remove-confirmation :where(.text-muted, .text-dark) {
     color: #565656 !important;
 }
 
-.nitro-friends-category-manager .friends-category-list {
+.octane-friends-category-manager .friends-category-list {
     max-height: 220px;
     overflow-y: auto;
 }
@@ -1007,7 +1007,7 @@
     opacity: 0.7;
 }
 
-.nitro-friends .friends-list-avatar {
+.octane-friends .friends-list-avatar {
     position: relative !important;
     width: 23px;
     height: 23px;
@@ -1015,7 +1015,7 @@
     overflow: hidden;
 }
 
-.nitro-friends .friends-list-avatar .avatar-image {
+.octane-friends .friends-list-avatar .avatar-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -1027,8 +1027,8 @@
     image-rendering: auto !important;
 }
 
-.nitro-friends .nitro-card-accordion-set-header > div,
-.nitro-friends .nitro-card-accordion-set-header span {
+.octane-friends .octane-card-accordion-set-header > div,
+.octane-friends .octane-card-accordion-set-header span {
     font-size: 12px !important;
     font-weight: 700 !important;
     line-height: 1.15 !important;
@@ -1387,13 +1387,13 @@ button.swf-friends-section-header {
     gap: 3px;
 }
 
-.swf-friends-window .nitro-friends-spritesheet.icon-follow {
+.swf-friends-window .octane-friends-spritesheet.icon-follow {
     width: 16px;
     height: 14px;
     background: url("@/assets/images/friends/swf/follow_friend.png") center center / auto no-repeat !important;
 }
 
-.swf-friends-window .nitro-friends-spritesheet.icon-chat {
+.swf-friends-window .octane-friends-spritesheet.icon-chat {
     width: 17px;
     height: 16px;
     background: url("@/assets/images/friends/swf/friendlist_chat.png") center center / auto no-repeat !important;
@@ -1415,10 +1415,10 @@ button.swf-friends-section-header {
     border-top: 5px solid #000;
 }
 
-.swf-friends-window .nitro-friends-spritesheet.icon-heart,
-.swf-friends-window .nitro-friends-spritesheet.icon-smile,
-.swf-friends-window .nitro-friends-spritesheet.icon-bobba,
-.swf-friends-window .nitro-friends-spritesheet.icon-none {
+.swf-friends-window .octane-friends-spritesheet.icon-heart,
+.swf-friends-window .octane-friends-spritesheet.icon-smile,
+.swf-friends-window .octane-friends-spritesheet.icon-bobba,
+.swf-friends-window .octane-friends-spritesheet.icon-none {
     width: 16px;
     height: 14px;
 }
@@ -1795,7 +1795,7 @@ button.swf-friends-section-header {
 }
 /* END SWF_FRIENDS_EXACT_DOM */
 
-/* The friend list and messenger deliberately avoid generic Nitro cards. The
+/* The friend list and messenger deliberately avoid generic Octane cards. The
  * original SWF used fixed, pixel-aligned rows and nested plain containers. */
 .swf-friends-window .friends-list-profile {
     display: block;

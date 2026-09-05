@@ -14,16 +14,16 @@ export const CatalogAdminOfferPriceView: FC<CatalogAdminOfferPriceViewProps> = (
     if (credits <= 0 && points <= 0) return null;
 
     return (
-        <span className="nitro-catalog-admin-offer-price">
+        <span className="octane-catalog-admin-offer-price">
             {credits > 0 && (
-                <span className="nitro-catalog-admin-offer-price-entry">
+                <span className="octane-catalog-admin-offer-price-entry">
                     <span>{LocalizeShortNumber(credits)}</span>
                     <LayoutCurrencyIcon type={-1} />
                 </span>
             )}
             {points > 0 && (
-                <span className="nitro-catalog-admin-offer-price-entry">
-                    {credits > 0 && <span className="nitro-catalog-admin-offer-price-plus">+</span>}
+                <span className="octane-catalog-admin-offer-price-entry">
+                    {credits > 0 && <span className="octane-catalog-admin-offer-price-plus">+</span>}
                     <span>{LocalizeShortNumber(points)}</span>
                     <LayoutCurrencyIcon type={pointsType} />
                 </span>

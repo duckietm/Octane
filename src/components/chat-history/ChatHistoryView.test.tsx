@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { AddLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker } from '@octane/renderer';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatEntryType, IChatEntry } from '../../api';

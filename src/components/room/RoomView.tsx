@@ -1,4 +1,4 @@
-import { GetEventDispatcher, GetRenderer, RoomObjectMouseEvent, RoomObjectTileMouseEvent, RoomSession } from '@nitrots/nitro-renderer';
+import { GetEventDispatcher, GetRenderer, RoomObjectMouseEvent, RoomObjectTileMouseEvent, RoomSession } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useRef } from 'react';
 import { DispatchMouseEvent, DispatchTouchEvent } from '../../api';
@@ -68,7 +68,7 @@ export const RoomView: FC<{}> = (props) => {
 
             const feedback = document.createElement('div');
 
-            feedback.className = 'nitro-room-touch-feedback';
+            feedback.className = 'octane-room-touch-feedback';
             feedback.style.left = `${lastTileTap.x}px`;
             feedback.style.top = `${lastTileTap.y}px`;
 

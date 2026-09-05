@@ -1,4 +1,4 @@
-import { GetRoomEngine, IRoomObject, IRoomObjectSpriteVisualization, RoomObjectCategory, WiredFilter } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, IRoomObject, IRoomObjectSpriteVisualization, RoomObjectCategory, WiredFilter } from '@octane/renderer';
 
 export class WiredSelectionVisualizer {
     private static _selectionShader: WiredFilter = new WiredFilter({

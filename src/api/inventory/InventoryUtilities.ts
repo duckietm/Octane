@@ -6,8 +6,8 @@ import {
     RoomObjectCategory,
     RoomObjectPlacementSource,
     RoomObjectType
-} from '@nitrots/nitro-renderer';
-import { SendMessageComposer } from '../nitro';
+} from '@octane/renderer';
+import { SendMessageComposer } from '../octane';
 import { FurniCategory } from './FurniCategory';
 import { GroupItem } from './GroupItem';
 import { IBotItem } from './IBotItem';

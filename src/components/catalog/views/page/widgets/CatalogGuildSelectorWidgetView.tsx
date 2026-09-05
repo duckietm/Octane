@@ -1,4 +1,4 @@
-import { CreateLinkEvent, GetSessionDataManager, StringDataType } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GetSessionDataManager, StringDataType } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText } from '../../../../../api';
 import { Button, Flex } from '../../../../../common';
@@ -63,7 +63,7 @@ export const CatalogGuildSelectorWidgetView: FC<CatalogGuildSelectorWidgetViewPr
             <div className="bg-[#5da0aa] rounded-lg p-2 text-black text-center">
                 {LocalizeText('catalog.guild_selector.members_only')}
                 <div className="mt-1">
-                    <Button classNames={['nitro-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
+                    <Button classNames={['octane-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
                         {LocalizeText('catalog.guild_selector.find_groups')}
                     </Button>
                 </div>

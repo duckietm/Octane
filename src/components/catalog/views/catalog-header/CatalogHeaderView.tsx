@@ -10,7 +10,7 @@ export const CatalogHeaderView: FC<CatalogHeaderViewProps> = (props) => {
     const displayImageUrl = imageUrl ?? GetConfigurationValue<string>('catalog.asset.image.url').replace('%name%', 'catalog_header_roombuilder');
 
     return (
-        <div className="flex justify-center items-center w-full nitro-catalog-header">
+        <div className="flex justify-center items-center w-full octane-catalog-header">
             <img
                 alt=""
                 src={displayImageUrl}

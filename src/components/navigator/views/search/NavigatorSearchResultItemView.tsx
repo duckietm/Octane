@@ -1,4 +1,4 @@
-import { GetSessionDataManager, RoomDataParser } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, RoomDataParser } from '@octane/renderer';
 import { FC, KeyboardEvent, MouseEvent } from 'react';
 import { CreateRoomSession, DoorStateType, TryVisitRoom } from '../../../../api';
 import { LayoutBadgeImageView, LayoutRoomThumbnailView } from '../../../../common';
@@ -19,9 +19,9 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
     const title = eventTitle && roomData.roomAdName ? roomData.roomAdName : roomData.roomName;
 
     const doorClass = () => {
-        if (roomData.doorMode === RoomDataParser.DOORBELL_STATE) return 'nitro-navigator-air__door nitro-navigator-air__door--doorbell';
-        if (roomData.doorMode === RoomDataParser.PASSWORD_STATE) return 'nitro-navigator-air__door nitro-navigator-air__door--password';
-        if (roomData.doorMode === RoomDataParser.INVISIBLE_STATE) return 'nitro-navigator-air__door nitro-navigator-air__door--invisible';
+        if (roomData.doorMode === RoomDataParser.DOORBELL_STATE) return 'octane-navigator-air__door octane-navigator-air__door--doorbell';
+        if (roomData.doorMode === RoomDataParser.PASSWORD_STATE) return 'octane-navigator-air__door octane-navigator-air__door--password';
+        if (roomData.doorMode === RoomDataParser.INVISIBLE_STATE) return 'octane-navigator-air__door octane-navigator-air__door--invisible';
 
         return '';
     };
@@ -74,19 +74,19 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
                 role="button"
                 tabIndex={0}
                 aria-label={title}
-                className={`nitro-navigator-air__tile${stripe ? ' is-stripe' : ''}`}
+                className={`octane-navigator-air__tile${stripe ? ' is-stripe' : ''}`}
                 onClick={visitRoom}
                 onKeyDown={handleKeyDown}
                 onMouseEnter={retargetPopup}
             >
-                <LayoutRoomThumbnailView className="nitro-navigator-air__tile-thumb" customUrl={roomData.officialRoomPicRef} roomId={roomData.roomId}>
+                <LayoutRoomThumbnailView className="octane-navigator-air__tile-thumb" customUrl={roomData.officialRoomPicRef} roomId={roomData.roomId}>
                     {roomData.habboGroupId > 0 && (
-                        <LayoutBadgeImageView badgeCode={roomData.groupBadgeCode} className="nitro-navigator-air__tile-badge" isGroup={true} />
+                        <LayoutBadgeImageView badgeCode={roomData.groupBadgeCode} className="octane-navigator-air__tile-badge" isGroup={true} />
                     )}
                     <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
-                    {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`nitro-navigator-air__tile-door ${doorClass()}`} />}
+                    {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__tile-door ${doorClass()}`} />}
                 </LayoutRoomThumbnailView>
-                <div className="nitro-navigator-air__tile-name">
+                <div className="octane-navigator-air__tile-name">
                     <span>{title}</span>
                     <NavigatorSearchResultItemInfoView roomData={roomData} thumbnail={true} />
                 </div>
@@ -98,15 +98,15 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
             role="button"
             tabIndex={0}
             aria-label={title}
-            className={`nitro-navigator-air__row${stripe ? ' is-stripe' : ''}`}
+            className={`octane-navigator-air__row${stripe ? ' is-stripe' : ''}`}
             onClick={visitRoom}
             onKeyDown={handleKeyDown}
             onMouseEnter={retargetPopup}
         >
             <NavigatorUserCountView userCount={roomData.userCount} maxUserCount={roomData.maxUserCount} />
-            <span className="nitro-navigator-air__row-name">{title}</span>
-            {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`nitro-navigator-air__row-door ${doorClass()}`} />}
-            {roomData.habboGroupId > 0 && <i className="nitro-navigator-air__row-group nitro-navigator-air__group" />}
+            <span className="octane-navigator-air__row-name">{title}</span>
+            {roomData.doorMode !== RoomDataParser.OPEN_STATE && <i className={`octane-navigator-air__row-door ${doorClass()}`} />}
+            {roomData.habboGroupId > 0 && <i className="octane-navigator-air__row-group octane-navigator-air__group" />}
             <NavigatorSearchResultItemInfoView roomData={roomData} />
         </div>
     );

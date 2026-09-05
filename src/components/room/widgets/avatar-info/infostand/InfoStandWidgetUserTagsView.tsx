@@ -1,4 +1,4 @@
-import { CreateLinkEvent, NavigatorSearchComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, NavigatorSearchComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { SendMessageComposer } from '../../../../../api';
 import { Flex, Text } from '../../../../../common';

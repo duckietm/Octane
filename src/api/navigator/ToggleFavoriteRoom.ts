@@ -1,4 +1,4 @@
-import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer } from '@nitrots/nitro-renderer';
+import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer } from '@octane/renderer';
 import { SendMessageComposer } from '..';
 
 export const ToggleFavoriteRoom = (roomId: number, isFavorite: boolean): void => {

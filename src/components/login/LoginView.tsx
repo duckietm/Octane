@@ -1,4 +1,4 @@
-import { GetAvatarRenderManager, GetConfiguration } from '@nitrots/nitro-renderer';
+import { GetAvatarRenderManager, GetConfiguration } from '@octane/renderer';
 import { FC, useActionState, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { FaDice } from 'react-icons/fa';
@@ -30,8 +30,8 @@ const interpolate = (value: string | null | undefined): string => {
     } catch {}
 
     return output.replace(/\$\{([^}]+)\}/g, (_, key: string) => {
-        if (key === 'api.url' && typeof (window as any).NitroSecureApiUrl === 'string') {
-            const secureApiUrl = (window as any).NitroSecureApiUrl.replace(/\/$/, '');
+        if (key === 'api.url' && typeof (window as any).OctaneSecureApiUrl === 'string') {
+            const secureApiUrl = (window as any).OctaneSecureApiUrl.replace(/\/$/, '');
 
             if (secureApiUrl) return secureApiUrl;
         }
@@ -385,7 +385,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-Requested-With': 'NitroLoginView'
+                'X-Requested-With': 'OctaneLoginView'
             },
             body: JSON.stringify(body)
         });
@@ -639,7 +639,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
     );
 
     return (
-        <div className="nitro-login-view" style={backgroundColor ? { background: backgroundColor } : undefined}>
+        <div className="octane-login-view" style={backgroundColor ? { background: backgroundColor } : undefined}>
             {background ? <img className="login-background login-layer login-layer-img" src={background} alt="" draggable={false} /> : null}
             {sun ? <img className="login-sun login-layer login-layer-img" src={sun} alt="" draggable={false} /> : null}
             {drape ? <img className="login-drape login-layer login-layer-img" src={drape} alt="" draggable={false} /> : null}
@@ -688,13 +688,13 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
 
             {newsUrl && <NewsWindow newsUrl={newsUrl} />}
 
-            <div className="login-language-picker nitro-card-shell">
-                <div className="login-language-header nitro-card-header-shell">
-                    <label className="nitro-card-title" htmlFor="login-language-select">
+            <div className="login-language-picker octane-card-shell">
+                <div className="login-language-header octane-card-header-shell">
+                    <label className="octane-card-title" htmlFor="login-language-select">
                         {localeApplying ? t('nitro.login.language.loading', 'Loading...') : t('nitro.login.language.title', 'Language')}
                     </label>
                 </div>
-                <div className="login-language-content nitro-card-content-shell">
+                <div className="login-language-content octane-card-content-shell">
                     <div className="login-language-select-wrap">
                         <img src={selectedLocale.flag} alt="" draggable={false} />
                         <select
@@ -717,11 +717,11 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
             </div>
 
             <div className="login-stack">
-                <div className="nitro-login-card nitro-card-shell login-auth-card">
-                    <div className="card-title nitro-card-header-shell">
-                        <span className="nitro-card-title">{t('nitro.login.card.title', "What's your Habbo called?")}</span>
+                <div className="octane-login-card octane-card-shell login-auth-card">
+                    <div className="card-title octane-card-header-shell">
+                        <span className="octane-card-title">{t('nitro.login.card.title', "What's your Habbo called?")}</span>
                     </div>
-                    <form className="card-body nitro-card-content-shell" action={submitLoginAction} autoComplete="on">
+                    <form className="card-body octane-card-content-shell" action={submitLoginAction} autoComplete="on">
                         <div className="field">
                             <label htmlFor="login-username">{t('login.username', 'Name of your Habbo')}</label>
                             <input
@@ -779,11 +779,11 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                     </form>
                 </div>
 
-                <div className="nitro-login-card nitro-card-shell login-register-card">
-                    <div className="card-title nitro-card-header-shell">
-                        <span className="nitro-card-title">{t('nitro.login.firsttime.title', 'First time here?')}</span>
+                <div className="octane-login-card octane-card-shell login-register-card">
+                    <div className="card-title octane-card-header-shell">
+                        <span className="octane-card-title">{t('nitro.login.firsttime.title', 'First time here?')}</span>
                     </div>
-                    <div className="card-body nitro-card-content-shell register-card-body">
+                    <div className="card-body octane-card-content-shell register-card-body">
                         <span>{t('nitro.login.firsttime.text', "Don't have a Habbo yet?")}</span>
                         <button type="button" className="register-link" onClick={() => setMode('register')}>
                             {t('nitro.login.firsttime.link', 'You can create one here')}
@@ -1365,8 +1365,8 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
             onClose={closeAndSaveDraft}
         >
             {step === 'credentials' && (
-                <form className="card-body nitro-card-content-shell" action={submitCredentialsAction} autoComplete="on">
-                    <div className="register-intro nitro-card-panel">
+                <form className="card-body octane-card-content-shell" action={submitCredentialsAction} autoComplete="on">
+                    <div className="register-intro octane-card-panel">
                         {t(
                             'nitro.login.register.intro.credentials',
                             "Let's create your account. Enter your email and pick a password — we'll check that email isn't already in use."
@@ -1439,8 +1439,8 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
             )}
 
             {step === 'avatar' && (
-                <form className="card-body nitro-card-content-shell" action={submitAvatarAction} autoComplete="on">
-                    <div className="register-intro nitro-card-panel">
+                <form className="card-body octane-card-content-shell" action={submitAvatarAction} autoComplete="on">
+                    <div className="register-intro octane-card-panel">
                         {t(
                             'nitro.login.register.intro.avatar',
                             "Now it's time to make your own Habbo character! To make your own Habbo, please start by choosing your Habbo Name."
@@ -1547,8 +1547,8 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
             )}
 
             {step === 'room' && (
-                <form className="card-body nitro-card-content-shell" action={submitRoomAction} autoComplete="off">
-                    <div className="register-intro nitro-card-panel">
+                <form className="card-body octane-card-content-shell" action={submitRoomAction} autoComplete="off">
+                    <div className="register-intro octane-card-panel">
                         {t('nitro.login.register.intro.room', 'Last step — pick a starter room, or skip and create your own later.')}
                     </div>
 
@@ -1683,7 +1683,7 @@ const ForgotDialog: FC<ForgotDialogProps> = (props) => {
             closeLabel={t('generic.close', 'Close')}
             onClose={onCancel}
         >
-            <form className="card-body nitro-card-content-shell" action={submitForgotAction} autoComplete="on">
+            <form className="card-body octane-card-content-shell" action={submitForgotAction} autoComplete="on">
                 <div className="field">
                     <label htmlFor="forgot-email">{t('nitro.login.forgot.email.label', 'Email address')}</label>
                     <input

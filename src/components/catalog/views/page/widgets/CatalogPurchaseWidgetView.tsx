@@ -1,4 +1,4 @@
-import { CreateLinkEvent, PurchaseFromCatalogComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, PurchaseFromCatalogComposer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     BuilderFurniPlaceableStatus,
@@ -322,8 +322,8 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     const isOfferUnavailable = !canPurchaseCatalogOffer(currentOffer);
 
     const PurchaseButton = () => {
-        const standardButtonClassNames = ['nitro-catalog-standard-button'];
-        const purchaseButtonClassNames = [...standardButtonClassNames, 'nitro-catalog-standard-buy-button'];
+        const standardButtonClassNames = ['octane-catalog-standard-button'];
+        const purchaseButtonClassNames = [...standardButtonClassNames, 'octane-catalog-standard-buy-button'];
 
         if (isBuildersClubPlaceable) {
             const hasMissingExtraParam = purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length);
@@ -452,7 +452,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
             {!isBuildersClubOffer && !noGiftOption && !currentOffer.isRentOffer && (
                 <button
                     type="button"
-                    className="nitro-catalog-standard-button nitro-catalog-standard-gift-button"
+                    className="octane-catalog-standard-button octane-catalog-standard-gift-button"
                     disabled={
                         purchaseOptions.quantity > 1 ||
                         isOfferUnavailable ||

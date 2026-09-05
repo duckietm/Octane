@@ -1,4 +1,4 @@
-import { BadgeImageReadyEvent, GetEventDispatcher, GetSessionDataManager, NitroSprite, TextureUtils } from '@nitrots/nitro-renderer';
+import { BadgeImageReadyEvent, GetEventDispatcher, GetSessionDataManager, OctaneSprite, TextureUtils } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -122,7 +122,7 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
             if (event.badgeId !== badgeCode) return;
 
             if (isGroup) {
-                const element = await TextureUtils.generateImage({ target: new NitroSprite(event.image), resolution: 1 });
+                const element = await TextureUtils.generateImage({ target: new OctaneSprite(event.image), resolution: 1 });
 
                 if (element.complete && element.naturalWidth) setImageElement(element);
                 else element.onload = () => setImageElement(element);
@@ -146,7 +146,7 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
         if (texture && !didSetBadge) {
             if (isGroup) {
                 (async () => {
-                    const element = await TextureUtils.generateImage({ target: new NitroSprite(texture), resolution: 1 });
+                    const element = await TextureUtils.generateImage({ target: new OctaneSprite(texture), resolution: 1 });
 
                     if (element.complete && element.naturalWidth) setImageElement(element);
                     else element.onload = () => setImageElement(element);

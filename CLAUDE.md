@@ -23,7 +23,7 @@ fork as backup; do not force-push it.)
 to `src/hooks/rooms/widgets/useDoorState.ts`, 9 UI flags moved to a Zustand
 `navigatorUiStore`, search migrated to a query hook, and 5 sub-views wrapped
 in `WidgetErrorBoundary`. **Caveat**: duckietm patched `useNavigatorSearch`
-post-merge (`05d71dd1`) — see the `useNitroQuery` fragility note below.
+post-merge (`05d71dd1`) — see the `useOctaneQuery` fragility note below.
 
 When syncing upstream, expect conflicts in `App.tsx` / `bootstrap.ts` /
 `LoginView.tsx` on React 19 imports — always keep the modernized version.
@@ -53,7 +53,7 @@ read that before starting anything non-trivial.
 ## Setup walkthrough
 
 1. **Clone the renderer SDK as a sibling of this repo.**
-   `vite.config.mjs` resolves the `@nitrots/*` aliases against
+   `vite.config.mjs` resolves the `@octane/*` aliases against
    `../octane-renderer` (preferred) or `../renderer` (legacy). If neither
    exists, the dev server and build now fail fast with a message
    pointing here.
@@ -80,7 +80,7 @@ read that before starting anything non-trivial.
    - Dev: `yarn start` (Vite, HMR, includes the renderer source).
    - Production preview: `yarn build && yarn preview`.
 
-The renderer SDK (`@nitrots/nitro-renderer`) is consumed via a filesystem
+The renderer SDK (`@octane/renderer`) is consumed via a filesystem
 link to a sibling working tree — `../octane-renderer` (preferred) or
 `../renderer` (legacy). Without it, `yarn typecheck` reports TS2307 across
 the codebase — that's expected on a sandbox without the renderer, not a
@@ -129,7 +129,7 @@ src/api/                                 → cross-cutting helpers (LocalizeText
 src/common/                              → reusable UI primitives + error boundary
 src/state/                               → Zustand stores (cross-feature only)
 src/**/*.test.{ts,tsx}                   → Vitest suites co-located next to their subject (e.g. `Foo.ts` + `Foo.test.ts`)
-src/nitro-renderer.mock.ts               → hand-written renderer-SDK stub for tests (aliased over `@nitrots/nitro-renderer`)
+src/octane-renderer.mock.ts               → hand-written renderer-SDK stub for tests (aliased over `@octane/renderer`)
 src/test-setup.ts                        → Vitest setupFiles entry (jest-dom matchers, etc.)
 ```
 
@@ -149,7 +149,7 @@ canonical pattern.
 ### `useSessionSnapshots` (renderer snapshot pattern, React-side — OPT-IN)
 
 For state that lives on a renderer Manager and is invalidated through
-`NitroEventType.*_UPDATED`, the file
+`OctaneEventType.*_UPDATED`, the file
 `src/hooks/session/useSessionSnapshots.ts` exposes eight consumer hooks
 backed by `useSyncExternalStore`:
 
@@ -204,13 +204,13 @@ lifecycle behavior. A CI gate (`yarn lint:hooks` →
 `react-hooks/rules-of-hooks: error`) blocks any future commit that
 reintroduces hook-order issues.
 
-### `useNitroEventState` / `useMessageEventState`
+### `useOctaneEventState` / `useMessageEventState`
 
 For "derived state from a single event" replace the two-step
-`useState + useNitroEvent(e => setState(...))` with a single call:
+`useState + useOctaneEvent(e => setState(...))` with a single call:
 
 ```ts
-const foo = useNitroEventState(SomeEvent, e => e.payload, initial);
+const foo = useOctaneEventState(SomeEvent, e => e.payload, initial);
 const data = useMessageEventState(SomeParser, e => e.getParser()?.field ?? null, null);
 ```
 
@@ -218,13 +218,13 @@ The selector is held in a `useLayoutEffect`-refreshed ref so the listener
 stays registered across renders. Both hooks are exported from
 `src/hooks/events`.
 
-### `useNitroQuery`
+### `useOctaneQuery`
 
 For composer/parser request-response pairs:
 
 ```ts
-const { data } = useNitroQuery<SomeParser, SomeData>({
-    key: ['nitro', 'domain', 'request', ...args],
+const { data } = useOctaneQuery<SomeParser, SomeData>({
+    key: ['octane', 'domain', 'request', ...args],
     request: () => new SomeComposer(args),
     parser: SomeParser,
     select: e => e.getParser()?.data,
@@ -235,22 +235,22 @@ const { data } = useNitroQuery<SomeParser, SomeData>({
 
 Already wired up; `QueryClientProvider` is mounted in `src/index.tsx`.
 
-Companion `useNitroEventInvalidator(eventType, queryKey, accept?)` —
-import from `src/api/nitro-query`. Subscribes to the renderer event
+Companion `useOctaneEventInvalidator(eventType, queryKey, accept?)` —
+import from `src/api/octane-query`. Subscribes to the renderer event
 and invalidates the query slot on every push, so server-driven
 refresh paths work the same as the initial request/response (e.g.
 ClubGiftInfoEvent firing again after the user claims a gift).
 
-**⚠️ Fragility — do NOT use `useNitroQuery` for primary visible data.**
-The one-shot listener inside `awaitNitroResponse` (register listener →
+**⚠️ Fragility — do NOT use `useOctaneQuery` for primary visible data.**
+The one-shot listener inside `awaitOctaneResponse` (register listener →
 await one matching response → remove itself) is fragile against
 renderer-bundle quirks: for some parsers the event fires but the listener
 never matches, so the promise never resolves and `query.data` stays
 `undefined` forever — the UI shows the server's response arriving in logs
 but renders blank. This bit **ModTools Room/CFH chatlog** (reverted to
 `useMessageEvent + useEffect`) and then **Navigator search** (P2 shipped
-with `useNitroQuery`, duckietm reverted it in `05d71dd1` to the god-hook
-pattern). **Rule: reserve `useNitroQuery` for config / secondary fetches
+with `useOctaneQuery`, duckietm reverted it in `05d71dd1` to the god-hook
+pattern). **Rule: reserve `useOctaneQuery` for config / secondary fetches
 where a brief blank is tolerable. For anything that is the primary visible
 content of a panel, use `useMessageEvent + useState/useEffect`** — that's
 what the rest of the codebase does and it's robust.
@@ -295,9 +295,9 @@ store, while the registered source owns listeners and effects once.
 For cross-feature UI state (avoid module-level `let`):
 
 ```ts
-import { createNitroStore } from '@/state/createNitroStore';
+import { createOctaneStore } from '@/state/createOctaneStore';
 
-export const useFooStore = createNitroStore<FooState>()((set) => ({
+export const useFooStore = createOctaneStore<FooState>()((set) => ({
     ...
 }));
 ```
@@ -313,7 +313,7 @@ Adoptions: `src/components/navigator/views/navigatorRoomCreatorStore.ts` (create
 ### `WidgetErrorBoundary`
 
 Wrap any in-room widget tree so a crash degrades gracefully (logs to
-NitroLogger, falls back to `null`). Already applied at `RoomWidgetsView`
+OctaneLogger, falls back to `null`). Already applied at `RoomWidgetsView`
 as an umbrella; per-widget wrapping is a follow-up.
 
 ```tsx
@@ -341,7 +341,7 @@ read `asset.url`, `login.endpoint`, … against an empty store before
 
 Game assets (`bundled/`, `c_images/`, `gamedata/`, `swf/...`) are NOT
 copied or symlinked under `public/`. They're served by a custom Vite
-plugin (`nitroAssetsServer` in `vite.config.mjs`) that mounts `sirv`
+plugin (`octaneAssetsServer` in `vite.config.mjs`) that mounts `sirv`
 on `/nitro-assets` and `/swf`, reading from
 `E:\Users\simol\Desktop\DEV\Nitro-Files\`. sirv is a connect-style
 middleware that bypasses chokidar entirely, so the ~177k asset files
@@ -354,23 +354,23 @@ into `configurePreviewServer` so `yarn preview` keeps working.
 |---|---|
 | Renderer snapshot consumer hooks (`useSessionSnapshots`) | `useSessionInfo` (userFigure / userRespectRemaining / petRespectRemaining via `useUserDataSnapshot`), `useChatWidget.ownUserId` (via `useUserDataSnapshot`), `AvatarInfoWidgetAvatarView` Ignore/Unignore (via `useIsUserIgnored`), `ModToolsView` selected-user presence dot (via `useRoomUserListSnapshot` — green when still in the active room, gray when they've left). The 8 hooks (userData / activeRoomSession / ignoredUsers / groupBadges / soundVolumes / roomUserList / isUserIgnored / groupBadge) keep their typeof-guard defensive fallbacks for stale-renderer paths. |
 | Reactive event-driven local state (companion to snapshots — when there is no manager-snapshot to read from yet) | `AvatarInfoWidgetAvatarView` Give/Remove Rights — local `controllerLevel` initialized from `avatarInfo.targetRoomControllerLevel`, kept reactive via `useMessageEvent<FlatControllerAddedEvent>` / `FlatControllerRemovedEvent` filtered by `parser.data.userId === avatarInfo.webID`, plus optimistic bump on click so the moderate submenu flips immediately. Same shape as `useIsUserIgnored` but the source is the renderer event bus, not a snapshot getter — use this when adding a manager-side snapshot for the same data isn't justified. |
-| `useNitroEventState` + companions (Reducer, ExternalSnapshot) | `OfferView`, `useAvatarInfoWidget` (figure/badges/group reducer), `useInventoryFurni` (pure reducers + fragments useRef) |
-| `useNitroQuery` + `useNitroEventInvalidator` | `OfferView`, `CatalogLayoutRoomAdsView`, `ModToolsChatlogView`, `CfhChatlogView`, `useGiftConfiguration`, `useUserGroups`, `useClubOffers(windowId)`, `useSellablePetPalette(breed)`, `useMarketplaceConfiguration`, `useClubGifts` (with invalidator) |
+| `useOctaneEventState` + companions (Reducer, ExternalSnapshot) | `OfferView`, `useAvatarInfoWidget` (figure/badges/group reducer), `useInventoryFurni` (pure reducers + fragments useRef) |
+| `useOctaneQuery` + `useOctaneEventInvalidator` | `OfferView`, `CatalogLayoutRoomAdsView`, `ModToolsChatlogView`, `CfhChatlogView`, `useGiftConfiguration`, `useUserGroups`, `useClubOffers(windowId)`, `useSellablePetPalette(breed)`, `useMarketplaceConfiguration`, `useClubGifts` (with invalidator) |
 | Zustand | `NavigatorRoomCreatorView` (`useRoomCreatorStore`), `WiredCreatorToolsView` (`useWiredCreatorToolsUiStore` — every panel-lifecycle-relevant flag, snapshot, selection, highlight, inline editor, picker chain hoisted; what's left in the component as `useState` is genuinely transient: keepSelected, globalClock, roomEnteredAt, selectedMonitorErrorType, selectedMonitorLogDetails) |
 | God-hook split (state + actions + shim) | `doorbell`, `poll`, `furni-chooser`, `user-chooser`, `friend-request`, `chat-input` |
 | God-hook split (Zustand-backed shared source + state filter + actions filter + shim) | `wired-tools`, `translation`, `notification`, `friends`, `catalog` (three-way: `useCatalogData` / `useCatalogUiState` / `useCatalogActions` — all 48 consumers migrated, deprecated `useCatalog` shim removed) |
-| Navigator modernization (merged to main 2026-05-28, PRs #168/#169/#170) | 492-line `useNavigator` god-hook split into a Zustand-backed shared `useNavigatorStore` + flat filters `useNavigatorData` / `useNavigatorUiState` / `useNavigatorSearch`; door bell/password lifecycle extracted to `src/hooks/rooms/widgets/useDoorState.ts` (dual-subscribes `GetGuestRoomResultEvent` + `GenericErrorEvent` alongside the nav store, each filtering by branch/errorCode); 9 UI flags + `currentTabCode`/`currentFilter` in Zustand `navigatorUiStore` (`src/hooks/navigator/navigatorUiStore.ts`); all 5 Navigator sub-views wrapped in `WidgetErrorBoundary`; old shim deleted. **`useNavigatorSearch` was reverted by duckietm (`05d71dd1`) from `useNitroQuery` to `useMessageEvent + useEffect`** — see the useNitroQuery fragility note. Specs/plans under `docs/superpowers/`. |
+| Navigator modernization (merged to main 2026-05-28, PRs #168/#169/#170) | 492-line `useNavigator` god-hook split into a Zustand-backed shared `useNavigatorStore` + flat filters `useNavigatorData` / `useNavigatorUiState` / `useNavigatorSearch`; door bell/password lifecycle extracted to `src/hooks/rooms/widgets/useDoorState.ts` (dual-subscribes `GetGuestRoomResultEvent` + `GenericErrorEvent` alongside the nav store, each filtering by branch/errorCode); 9 UI flags + `currentTabCode`/`currentFilter` in Zustand `navigatorUiStore` (`src/hooks/navigator/navigatorUiStore.ts`); all 5 Navigator sub-views wrapped in `WidgetErrorBoundary`; old shim deleted. **`useNavigatorSearch` was reverted by duckietm (`05d71dd1`) from `useOctaneQuery` to `useMessageEvent + useEffect`** — see the useOctaneQuery fragility note. Specs/plans under `docs/superpowers/`. |
 | `WidgetErrorBoundary` | `RoomWidgetsView` umbrella + per-widget wrap on all 13 room widgets and all 20 furniture widgets (so a crash in one widget no longer takes down its siblings) |
-| Vitest | 207/207 cases — pure helpers (incl. 4 new on `getPetPackageNameError`) + 2 Zustand store suites (`navigatorRoomCreatorStore`, `wiredCreatorToolsUiStore` with 45 cases including the picker-chain hoists) + 2 component-/hook-level pilots (WidgetErrorBoundary, useDoorbellState) on top of the renderer-SDK mock at `src/nitro-renderer.mock.ts`, 34 cases on the catalog pure helpers, 4 contract cases on the catalog filters. **Tests are co-located** under `src/`, alongside their subject. |
+| Vitest | 207/207 cases — pure helpers (incl. 4 new on `getPetPackageNameError`) + 2 Zustand store suites (`navigatorRoomCreatorStore`, `wiredCreatorToolsUiStore` with 45 cases including the picker-chain hoists) + 2 component-/hook-level pilots (WidgetErrorBoundary, useDoorbellState) on top of the renderer-SDK mock at `src/octane-renderer.mock.ts`, 34 cases on the catalog pure helpers, 4 contract cases on the catalog filters. **Tests are co-located** under `src/`, alongside their subject. |
 | Form Actions | Login / Register / Forgot (LoginView.tsx) |
 | Upstream `origin/Dev` absorbed (merge `779a98c`) | Through `b2318b9` (2026-05-18): JSON5, user-settings reset password/email/username, wear-badge popup fix, login screen fix, About, offer-selection refactor |
 
 | Not yet | Notes |
 |---|---|
-| Split `useChatWidget` / `useAvatarInfoWidget` (data/actions) | Both state-driven via events with no clean imperative actions to extract — split still skip-motivated, but `useAvatarInfoWidget` got a typed `__nitroAvatarClickControl` accessor + module-scope DEBOUNCE const in 2026-05-18 (commit `05ff7df`). `useChatWidget.ownUserId` reactive migration re-applied 2026-05-19 in `d28819d` via `useUserDataSnapshot`. |
+| Split `useChatWidget` / `useAvatarInfoWidget` (data/actions) | Both state-driven via events with no clean imperative actions to extract — split still skip-motivated, but `useAvatarInfoWidget` got a typed `__octaneAvatarClickControl` accessor + module-scope DEBOUNCE const in 2026-05-18 (commit `05ff7df`). `useChatWidget.ownUserId` reactive migration re-applied 2026-05-19 in `d28819d` via `useUserDataSnapshot`. |
 | Split `usePetPackageWidget` / `useWordQuizWidget` / `useChatCommandSelector` (data/actions) | Data/actions split remains a bad fit, but all three got real modernization in 2026-05-18 instead: usePetPackageWidget → useReducer + extracted `getPetPackageNameError` pure helper + 4 tests; useWordQuizWidget → fixed stale-closure bug in `setUserAnswers` updater + `useRef` for the timeout handle; useChatCommandSelector → module-level `let` cache replaced with a Zustand store. |
 | Migrate more consumers to renderer snapshot hooks | **Unblocked.** Three pilot consumers shipped 2026-05-19 (`d28819d`), pattern documented above. Next candidates: any code reading from `GetSessionDataManager().userId / userName / clubLevel / securityLevel`, `GetRoomSessionManager().getActiveSession()`, or `GetSoundManager().<volume>` synchronously — those don't re-render today when the value changes. CI gate `yarn lint:hooks` and `src/hooks/session/useSessionSnapshots.test.tsx` guard hook correctness. |
-| Widen the component / hook test coverage | Mock layer is in place (`src/nitro-renderer.mock.ts`) and 3+ hook/component pilots pass. Good follow-up targets: `LoginView` Form Actions happy/error paths, `OfferView` with `useNitroQuery`. (Acceptable only as a side-effect of a real change — coverage growth on its own is deprioritized per session feedback.) |
+| Widen the component / hook test coverage | Mock layer is in place (`src/octane-renderer.mock.ts`) and 3+ hook/component pilots pass. Good follow-up targets: `LoginView` Form Actions happy/error paths, `OfferView` with `useOctaneQuery`. (Acceptable only as a side-effect of a real change — coverage growth on its own is deprioritized per session feedback.) |
 
 ## Known open logic bugs
 
@@ -403,10 +403,10 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
 - Test runner config: `vitest.config.mts` (separate from `vite.config.mjs`)
 - Test setup: `src/test-setup.ts`
 - Test convention: co-located under `src/` next to the subject (`src/<path>/Foo.ts` ↔ `src/<path>/Foo.test.ts`). No separate `tests/` tree.
-- React Query adapter: `src/api/nitro-query/createNitroQuery.ts`
-- Zustand factory: `src/state/createNitroStore.ts`
+- React Query adapter: `src/api/octane-query/createOctaneQuery.ts`
+- Zustand factory: `src/state/createOctaneStore.ts`
 - Error boundary: `src/common/error-boundary/WidgetErrorBoundary.tsx`
-- Event hooks (`useNitroEvent`, `useMessageEvent`, `useNitroEventState`,
+- Event hooks (`useOctaneEvent`, `useMessageEvent`, `useOctaneEventState`,
   `useMessageEventState`): `src/hooks/events/`
 - Wired-tools split (types/constants/helpers + 3 tab views):
   `src/components/wired-tools/`
@@ -414,7 +414,7 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `src/components/user-settings/UserAccountSettingsView.tsx`
 - Access-token persistence helper (used by login + remember + rotate):
   `src/api/auth/accessToken.ts` (`persistAccessTokenFromPayload`)
-- Asset middleware: `nitroAssetsServer()` in `vite.config.mjs`
+- Asset middleware: `octaneAssetsServer()` in `vite.config.mjs`
 - Configuration pre-init: `src/bootstrap.ts` (`await GetConfiguration().init()`
   before `import('./index')`)
 - Catalog pure helpers: `src/hooks/catalog/useCatalog.helpers.ts`
@@ -430,9 +430,9 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `useNavigatorSearch.ts` (filters), `navigatorUiStore.ts` (Zustand UI
   flags + `setTab`/`setFilter`). Door lifecycle: `src/hooks/rooms/widgets/useDoorState.ts`.
   Specs/plans: `docs/superpowers/specs/2026-05-2*-navigator-*.md`
-- Renderer-SDK mock for Vitest: `src/nitro-renderer.mock.ts`
-  (aliased over `@nitrots/nitro-renderer` via `vitest.config.mts`).
-  Hosts the explicit `NitroLogger` mock, the `mockEventDispatcher` /
+- Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
+  (aliased over `@octane/renderer` via `vitest.config.mts`).
+  Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /
   `clearMockEventDispatcher` helpers used by hook tests, the
   `RoomSessionDoorbellEvent` stub, and a long list of placeholder
   classes/enums kept around just so the `src/api/*` barrel cascade
@@ -443,7 +443,7 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
 
 Furni name/description are furnidata-driven (`FurnitureData` by classname) — the
 client does NOT get furni display names from the server. The 3 furni surfaces
-refresh live on the window event `nitro-localization-updated`: catalog
+refresh live on the window event `octane-localization-updated`: catalog
 (`useCatalog.ts`), inventory (`useInventoryFurni.ts`), infostand
 (`useAvatarInfoWidget.ts`). The renderer's `FurnitureDataReload` packet (header
 10047) dispatches that event on server-pushed furnidata changes — no client code

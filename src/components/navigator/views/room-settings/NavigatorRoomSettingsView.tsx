@@ -1,7 +1,7 @@
-import { RoomBannedUsersComposer, RoomDataParser, RoomSettingsDataEvent, SaveRoomSettingsComposer } from '@nitrots/nitro-renderer';
+import { RoomBannedUsersComposer, RoomDataParser, RoomSettingsDataEvent, SaveRoomSettingsComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { CreateLinkEvent, IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { NavigatorRoomSettingsAccessTabView } from './NavigatorRoomSettingsAccessTabView';
 import { NavigatorRoomSettingsBasicTabView } from './NavigatorRoomSettingsBasicTabView';
@@ -216,12 +216,12 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
     if (!roomData) return null;
 
     return (
-        <NitroCardView
-            className="nitro-room-settings min-w-0 w-[min(341px,calc(100vw-16px))] h-[min(520px,calc(100vh-16px))] max-w-[calc(100vw-16px)]"
+        <OctaneCardView
+            className="octane-room-settings min-w-0 w-[min(341px,calc(100vw-16px))] h-[min(520px,calc(100vh-16px))] max-w-[calc(100vw-16px)]"
             isResizable={false}
-            uniqueKey="nitro-room-settings"
+            uniqueKey="octane-room-settings"
         >
-            <NitroCardHeaderView
+            <OctaneCardHeaderView
                 headerText={LocalizeText('navigator.roomsettings')}
                 isInfoToHabboPages={currentTab === TABS[3]}
                 onClickInfoHabboPages={() => {
@@ -229,22 +229,22 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
                 }}
                 onCloseClick={onClose}
             />
-            <NitroCardTabsView>
+            <OctaneCardTabsView>
                 {TABS.map((tab) => {
                     return (
-                        <NitroCardTabsItemView key={tab} isActive={currentTab === tab} onClick={(event) => setCurrentTab(tab)}>
+                        <OctaneCardTabsItemView key={tab} isActive={currentTab === tab} onClick={(event) => setCurrentTab(tab)}>
                             {LocalizeText(tab)}
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     );
                 })}
-            </NitroCardTabsView>
-            <NitroCardContentView overflow="auto">
+            </OctaneCardTabsView>
+            <OctaneCardContentView overflow="auto">
                 {currentTab === TABS[0] && <NavigatorRoomSettingsBasicTabView handleChange={handleChange} roomData={roomData} onClose={onClose} />}
                 {currentTab === TABS[1] && <NavigatorRoomSettingsAccessTabView handleChange={handleChange} roomData={roomData} />}
                 {currentTab === TABS[2] && <NavigatorRoomSettingsRightsTabView handleChange={handleChange} roomData={roomData} />}
                 {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView handleChange={handleChange} roomData={roomData} />}
                 {currentTab === TABS[4] && <NavigatorRoomSettingsModTabView handleChange={handleChange} roomData={roomData} />}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

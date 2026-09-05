@@ -3,7 +3,7 @@ import {
     GetMarketplaceOffersMessageComposer,
     MarketPlaceOffersEvent,
     MarketplaceBuyOfferResultEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import {
     IMarketplaceSearchOptions,
@@ -199,7 +199,7 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                 <Text shrink truncate fontWeight="bold">
                     {LocalizeText('catalog.marketplace.items_found', ['count'], [offers.size.toString()])}
                 </Text>
-                <Column className="nitro-catalog-layout-marketplace-grid" overflow="auto">
+                <Column className="octane-catalog-layout-marketplace-grid" overflow="auto">
                     {Array.from(offers.values()).map((entry, index) => (
                         <CatalogLayoutMarketplaceItemView key={index} offerData={entry} type={PUBLIC_OFFER} onClick={purchaseItem} />
                     ))}

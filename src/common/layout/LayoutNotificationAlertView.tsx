@@ -1,8 +1,8 @@
 import { FC, useEffect, useMemo, useRef } from 'react';
 import { NotificationAlertType } from '../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView, NitroCardViewProps } from '../card';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, OctaneCardViewProps } from '../card';
 
-export interface LayoutNotificationAlertViewProps extends NitroCardViewProps {
+export interface LayoutNotificationAlertViewProps extends OctaneCardViewProps {
     title?: string;
     type?: string;
     /**
@@ -32,9 +32,9 @@ export const LayoutNotificationAlertView: FC<LayoutNotificationAlertViewProps> =
     }, [autoCloseSeconds]);
 
     const getClassNames = useMemo(() => {
-        const newClassNames: string[] = ['nitro-alert'];
+        const newClassNames: string[] = ['octane-alert'];
 
-        newClassNames.push('nitro-alert-' + type);
+        newClassNames.push('octane-alert-' + type);
 
         if (classNames.length) newClassNames.push(...classNames);
 
@@ -42,11 +42,11 @@ export const LayoutNotificationAlertView: FC<LayoutNotificationAlertViewProps> =
     }, [classNames, type]);
 
     return (
-        <NitroCardView classNames={getClassNames} theme="primary-slim" {...rest}>
-            <NitroCardHeaderView headerText={title} onCloseClick={onClose} />
-            <NitroCardContentView grow className="text-black" gap={0} justifyContent="between" overflow="hidden">
+        <OctaneCardView classNames={getClassNames} theme="primary-slim" {...rest}>
+            <OctaneCardHeaderView headerText={title} onCloseClick={onClose} />
+            <OctaneCardContentView grow className="text-black" gap={0} justifyContent="between" overflow="hidden">
                 {children}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

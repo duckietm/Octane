@@ -17,8 +17,8 @@ describe('catalog grid personalization', () => {
     it('keeps each density tile width while allowing responsive column counts', () => {
         const css = readFileSync(resolve(process.cwd(), 'src/css/catalog/CatalogExperience.css'), 'utf8');
 
-        expect(css).toContain('--nitro-grid-column-min-width: 53px');
-        expect(css).toContain('--nitro-grid-column-min-width: 45px');
-        expect(css).toContain('--nitro-grid-column-min-width: 68px');
+        expect(css).toContain('--octane-grid-column-min-width: 53px');
+        expect(css).toContain('--octane-grid-column-min-width: 45px');
+        expect(css).toContain('--octane-grid-column-min-width: 68px');
     });
 });

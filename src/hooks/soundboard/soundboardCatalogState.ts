@@ -49,7 +49,7 @@ const isAllowedCatalogUrl = (value: string): boolean => {
     if (!url || url.length > 255 || /[\u0000-\u0020]/.test(url)) return false;
 
     try {
-        const parsed = new URL(url, 'https://nitro.invalid');
+        const parsed = new URL(url, 'https://octane.invalid');
 
         return parsed.protocol === 'http:' || parsed.protocol === 'https:';
     } catch {

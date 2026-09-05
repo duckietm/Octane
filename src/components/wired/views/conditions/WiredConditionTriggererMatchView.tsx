@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
@@ -146,7 +146,7 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
                     />
                     <Text>{LocalizeText('wiredfurni.params.certainavatar')}</Text>
                 </div>
-                {needsUsername && <NitroInput type="text" value={username} onChange={(event) => setUsername(event.target.value)} />}
+                {needsUsername && <OctaneInput type="text" value={username} onChange={(event) => setUsername(event.target.value)} />}
             </div>
         </WiredConditionBaseView>
     );

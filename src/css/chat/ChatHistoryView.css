@@ -1,13 +1,13 @@
-.nitro-chat-history {
+.octane-chat-history {
     position: absolute;
     inset: 0 auto 54px 0;
     width: min(413px, calc(100vw - 18px));
     z-index: 70;
     pointer-events: auto;
-    animation: nitro-chat-history-open 140ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    animation: octane-chat-history-open 140ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.nitro-chat-history-tray-bar {
+.octane-chat-history-tray-bar {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -17,13 +17,13 @@
     box-shadow: inset -1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.nitro-chat-history-content {
+.octane-chat-history-content {
     position: absolute;
     inset: 0 21px 0 21px;
     background: rgba(34, 35, 32, 0.72);
 }
 
-.nitro-chat-history-scroll {
+.octane-chat-history-scroll {
     position: absolute;
     inset: 0;
     overflow-x: hidden;
@@ -31,7 +31,7 @@
     padding: 10px 8px 18px 8px;
 }
 
-.nitro-chat-history-row {
+.octane-chat-history-row {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -39,7 +39,7 @@
     margin: 0 0 6px 0;
 }
 
-.nitro-chat-history-time {
+.octane-chat-history-time {
     flex: 0 0 54px;
     margin: 6px 0 0 0;
     color: rgba(255, 255, 255, 0.72);
@@ -49,14 +49,14 @@
     text-shadow: 0 1px #000000;
 }
 
-.nitro-chat-history-message {
+.octane-chat-history-message {
     display: flex;
     align-items: flex-start;
     max-width: 100%;
     min-width: 0;
 }
 
-.nitro-chat-history-bubble-wrap {
+.octane-chat-history-bubble-wrap {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -64,7 +64,7 @@
     max-width: 100%;
 }
 
-.nitro-chat-history-bubble-wrap .chat-bubble {
+.octane-chat-history-bubble-wrap .chat-bubble {
     margin: 0;
     filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35));
     white-space: normal;
@@ -72,19 +72,19 @@
     word-break: break-word;
 }
 
-.nitro-chat-history-bubble-wrap .chat-content {
+.octane-chat-history-bubble-wrap .chat-content {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 }
 
-.nitro-chat-history-bubble-wrap .message {
+.octane-chat-history-bubble-wrap .message {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 }
 
-.nitro-chat-history-room-info {
+.octane-chat-history-room-info {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -99,7 +99,7 @@
     line-height: 16px;
 }
 
-.nitro-chat-history-handle {
+.octane-chat-history-handle {
     position: absolute;
     right: 0;
     bottom: 165px;
@@ -113,7 +113,7 @@
     cursor: pointer;
 }
 
-.nitro-chat-history-handle::before {
+.octane-chat-history-handle::before {
     content: '';
     position: absolute;
     left: 7px;
@@ -125,11 +125,11 @@
     transform: rotate(45deg);
 }
 
-.nitro-chat-history-handle:hover {
+.octane-chat-history-handle:hover {
     filter: brightness(1.15);
 }
 
-@keyframes nitro-chat-history-open {
+@keyframes octane-chat-history-open {
     from {
         width: 0;
     }
@@ -140,7 +140,7 @@
 }
 
 @media (max-width: 768px) {
-    .nitro-chat-history {
+    .octane-chat-history {
         bottom: 48px;
     }
 }

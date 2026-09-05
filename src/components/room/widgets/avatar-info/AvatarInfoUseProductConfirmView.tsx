@@ -7,10 +7,10 @@ import {
     PetFigureData,
     RoomObjectCategory,
     RoomObjectVariable
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText, UseProductItem } from '../../../../api';
-import { Button, Column, Flex, LayoutPetImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Column, Flex, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useRoom } from '../../../../hooks';
 
 interface AvatarInfoUseProductConfirmViewProps {
@@ -255,9 +255,9 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
     if (!petData) return null;
 
     return (
-        <NitroCardView className="nitro-use-product-confirmation">
-            <NitroCardHeaderView headerText={LocalizeText('useproduct.widget.title', ['name'], [petData.name])} onCloseClick={onClose} />
-            <NitroCardContentView center>
+        <OctaneCardView className="octane-use-product-confirmation">
+            <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title', ['name'], [petData.name])} onCloseClick={onClose} />
+            <OctaneCardContentView center>
                 <Flex gap={2} overflow="hidden">
                     <div className="flex flex-col">
                         <div className="product-preview cursor-pointer" onClick={selectRoomObject}>
@@ -319,7 +319,7 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
                         </div>
                     </Column>
                 </Flex>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

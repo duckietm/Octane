@@ -1,4 +1,4 @@
-import { IFurnitureData } from '@nitrots/nitro-renderer';
+import { IFurnitureData } from '@octane/renderer';
 import { CatalogType } from '../../../../../api';
 
 export const CATALOG_SEARCH_MIN_LENGTH = 3;

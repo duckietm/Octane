@@ -1,4 +1,4 @@
-import { WiredActionDefinition } from '@nitrots/nitro-renderer';
+import { WiredActionDefinition } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect } from 'react';
 import { WiredFurniType } from '../../../../api';
 import { useWired } from '../../../../hooks';

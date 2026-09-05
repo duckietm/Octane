@@ -1,7 +1,7 @@
-import { GetRoomEngine, GetSessionDataManager, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, GetSessionDataManager, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@octane/renderer';
 import { useState } from 'react';
 import { GetRoomSession, IsOwnerOfFurniture } from '../../../../api';
-import { useNitroEvent } from '../../../events';
+import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
 const useFurnitureStickieWidgetState = () => {
@@ -37,7 +37,7 @@ const useFurnitureStickieWidgetState = () => {
 
     const trash = () => GetRoomEngine().deleteRoomObject(objectId, category);
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_STICKIE, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_STICKIE, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject) return;

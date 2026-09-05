@@ -1,9 +1,9 @@
-import { GetAvatarRenderManager, GetSessionDataManager, HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
+import { GetAvatarRenderManager, GetSessionDataManager, HabboClubLevelEnum, RoomControllerLevel } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { GetClubMemberLevel, GetRoomSession, LocalizeText, MannequinUtilities } from '../../../../api';
-import { Button, Column, LayoutAvatarImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Column, LayoutAvatarImageView, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFurnitureMannequinWidget, useHasPermission } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 
 const MODE_NONE: number = -1;
 const MODE_CONTROLLER: number = 0;
@@ -87,9 +87,9 @@ export const FurnitureMannequinView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView className="nitro-mannequin no-resize" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('mannequin.widget.title')} onCloseClick={onClose} />
-            <NitroCardContentView center>
+        <OctaneCardView className="octane-mannequin no-resize" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('mannequin.widget.title')} onCloseClick={onClose} />
+            <OctaneCardContentView center>
                 <div className="flex w-full gap-2 overflow-hidden">
                     <div className="flex flex-col">
                         <div className="relative mannequin-preview">
@@ -100,7 +100,7 @@ export const FurnitureMannequinView: FC<{}> = (props) => {
                     <Column grow justifyContent="between" overflow="auto">
                         {mode === MODE_CONTROLLER && (
                             <>
-                                <NitroInput type="text" value={name} onBlur={saveName} onChange={(event) => setName(event.target.value)} />
+                                <OctaneInput type="text" value={name} onBlur={saveName} onChange={(event) => setName(event.target.value)} />
                                 <div className="flex flex-col gap-1">
                                     <Button variant="success" onClick={(event) => setMode(MODE_UPDATE)}>
                                         {LocalizeText('mannequin.widget.style')}
@@ -146,7 +146,7 @@ export const FurnitureMannequinView: FC<{}> = (props) => {
                         {mode === MODE_WRONG_GENDER && <Text>{LocalizeText('mannequin.widget.wronggender')}</Text>}
                     </Column>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

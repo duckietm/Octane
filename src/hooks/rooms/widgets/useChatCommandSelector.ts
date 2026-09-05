@@ -1,7 +1,7 @@
-import { AvailableCommandsEvent, GetCommunication } from '@nitrots/nitro-renderer';
+import { AvailableCommandsEvent, GetCommunication } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CommandDefinition, LocalizeText } from '../../../api';
-import { createNitroStore } from '../../../state/createNitroStore';
+import { createOctaneStore } from '../../../state/createOctaneStore';
 import { useMessageEvent } from '../../events';
 
 // Client-only commands are static; safe to keep at module scope. The
@@ -32,7 +32,7 @@ const CLIENT_COMMANDS: { key: string; descriptionKey: string }[] = [
     { key: 'settings', descriptionKey: 'chatcmd.client.settings' },
     // Info
     { key: 'client', descriptionKey: 'chatcmd.client.info' },
-    { key: 'nitro', descriptionKey: 'chatcmd.client.info' }
+    { key: 'octane', descriptionKey: 'chatcmd.client.info' }
 ];
 
 /**
@@ -54,7 +54,7 @@ interface ChatCommandStore {
     markListenerRegistered: () => void;
 }
 
-const useChatCommandStore = createNitroStore<ChatCommandStore>()((set) => ({
+const useChatCommandStore = createOctaneStore<ChatCommandStore>()((set) => ({
     serverCommands: [],
     isListenerRegistered: false,
     setServerCommands: (commands) => set({ serverCommands: commands }),

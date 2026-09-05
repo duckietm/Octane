@@ -31,7 +31,7 @@ import {
     RoomObjectVariable,
     RoomPreviewer,
     Vector3d
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
@@ -69,7 +69,7 @@ import {
     CatalogPurchaseSoldOutEvent,
     InventoryFurniAddedEvent
 } from '../../events';
-import { useConnectionState, useMessageEvent, useNitroEvent, useUiEvent } from '../events';
+import { useConnectionState, useMessageEvent, useOctaneEvent, useUiEvent } from '../events';
 import { useNotification } from '../notification';
 import {
     buildCatalogNodeTree,
@@ -855,7 +855,7 @@ const useCatalogStore = () => {
 
     useUiEvent<CatalogPurchasedEvent>(CatalogPurchasedEvent.PURCHASE_SUCCESS, (event) => PlaySound(SoundNames.CREDITS));
 
-    useNitroEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectPlacedEvent.PLACED, (event) => {
+    useOctaneEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectPlacedEvent.PLACED, (event) => {
         if (!objectMoverRequested || event.type !== RoomEngineObjectPlacedEvent.PLACED) return;
 
         resetPlacedOfferData(true);
@@ -1108,9 +1108,9 @@ const useCatalogStore = () => {
             });
         };
 
-        window.addEventListener('nitro-localization-updated', refreshCatalogLocalization);
+        window.addEventListener('octane-localization-updated', refreshCatalogLocalization);
 
-        return () => window.removeEventListener('nitro-localization-updated', refreshCatalogLocalization);
+        return () => window.removeEventListener('octane-localization-updated', refreshCatalogLocalization);
     }, []);
 
     useEffect(() => {

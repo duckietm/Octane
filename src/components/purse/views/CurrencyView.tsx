@@ -29,12 +29,12 @@ export const CurrencyView: FC<CurrencyViewProps> = (props) => {
 
     const element = useMemo(() => {
         return (
-            <Flex justifyContent="end" pointer gap={1} className={`nitro-purse-button allcurrencypurse nitro-purse-button currency-info currency-${type}`}>
-                <Text truncate textEnd variant="white" grow className="nitro-purse-button__amount currency-text">
+            <Flex justifyContent="end" pointer gap={1} className={`octane-purse-button allcurrencypurse octane-purse-button currency-info currency-${type}`}>
+                <Text truncate textEnd variant="white" grow className="octane-purse-button__amount currency-text">
                     {displayAmount}
                 </Text>
                 {airIcon
-                    ? <img src={ airIcon } alt="" className="nitro-purse-air-currency" />
+                    ? <img src={ airIcon } alt="" className="octane-purse-air-currency" />
                     : <LayoutCurrencyIcon type={ type } />}
             </Flex>
         );

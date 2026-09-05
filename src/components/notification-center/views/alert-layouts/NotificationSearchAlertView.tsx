@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, NotificationAlertItem, OpenUrl } from '../../../../api';
 import { AutoGrid, Button, Column, Flex, LayoutNotificationAlertView, LayoutNotificationAlertViewProps } from '../../../../common';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 
 interface NotificationDefaultAlertViewProps extends LayoutNotificationAlertViewProps {
     item: NotificationAlertItem;
@@ -35,7 +35,7 @@ export const NotificationSeachAlertView: FC<NotificationDefaultAlertViewProps> =
     return (
         <LayoutNotificationAlertView title={title} onClose={onClose} {...rest}>
             <Flex fullWidth alignItems="center" position="relative">
-                <NitroInput
+                <OctaneInput
                     placeholder={LocalizeText('generic.search')}
                     type="text"
                     value={searchValue}

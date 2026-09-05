@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
@@ -55,7 +55,7 @@ export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWear
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.badgecode', 'Badge code')}</Text>
-                <NitroInput type="text" value={badge} onChange={(event) => setBadge(event.target.value)} />
+                <OctaneInput type="text" value={badge} onChange={(event) => setBadge(event.target.value)} />
             </div>
         </WiredConditionBaseView>
     );

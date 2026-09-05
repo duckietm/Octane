@@ -1,4 +1,4 @@
-.nitro-room-settings {
+.octane-room-settings {
     --room-settings-bg: #e9e9e1;
     --room-settings-panel: #f7f7f2;
     --room-settings-line: #959595;
@@ -25,13 +25,13 @@
         }
     }
 
-    .nitro-room-settings-section {
+    .octane-room-settings-section {
         border: 1px solid var(--room-settings-line);
         background: var(--room-settings-panel);
         padding: 6px;
     }
 
-    .nitro-room-settings-section > :first-child {
+    .octane-room-settings-section > :first-child {
         color: #111;
         font-size: 11px;
         font-weight: 700;
@@ -44,7 +44,7 @@
         font-weight: 700;
     }
 
-    .nitro-card-content-shell {
+    .octane-card-content-shell {
         flex: 1 1 0;
         min-height: 0;
         overflow: auto !important;
@@ -102,11 +102,11 @@
 }
 
 @media (max-width: 520px), (max-height: 520px) {
-    .nitro-room-settings {
+    .octane-room-settings {
         width: calc(100vw - 16px);
         height: calc(100vh - 16px);
 
-        .nitro-card-content-shell {
+        .octane-card-content-shell {
             max-height: none;
         }
 

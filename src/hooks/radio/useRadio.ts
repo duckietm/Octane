@@ -1,4 +1,4 @@
-import { loadGamedata } from '@nitrots/nitro-renderer';
+import { loadGamedata } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetConfigurationValue, IsTouchDevice } from '../../api';

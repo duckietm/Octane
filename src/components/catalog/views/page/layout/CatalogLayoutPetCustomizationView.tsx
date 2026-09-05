@@ -26,15 +26,15 @@ export const CatalogLayoutPetCustomizationView: FC<CatalogLayoutProps> = ({ page
     }, [roomPreviewer, selectedOffer]);
 
     return (
-        <div className="nitro-catalog-pet-customization-layout">
-            <div className="nitro-catalog-pet-customization-preview">
+        <div className="octane-catalog-pet-customization-layout">
+            <div className="octane-catalog-pet-customization-preview">
                 {selectedOffer ? (
                     <>
                         <LayoutRoomPreviewerView height={240} roomPreviewer={roomPreviewer} />
-                        <div className="nitro-catalog-pet-customization-copy">
+                        <div className="octane-catalog-pet-customization-copy">
                             <CatalogProductDetailsView offer={selectedOffer} />
                         </div>
-                        <div className="nitro-catalog-pet-customization-price">
+                        <div className="octane-catalog-pet-customization-price">
                             <CatalogTotalPriceWidget />
                         </div>
                     </>
@@ -45,10 +45,10 @@ export const CatalogLayoutPetCustomizationView: FC<CatalogLayoutProps> = ({ page
                     </>
                 )}
             </div>
-            <div className="nitro-catalog-pet-customization-grid">
+            <div className="octane-catalog-pet-customization-grid">
                 <CatalogItemGridWidgetView columnCount={6} columnMinHeight={74} columnMinWidth={53} />
             </div>
-            <div className="nitro-catalog-pet-customization-purchase">{selectedOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
+            <div className="octane-catalog-pet-customization-purchase">{selectedOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
         </div>
     );
 };

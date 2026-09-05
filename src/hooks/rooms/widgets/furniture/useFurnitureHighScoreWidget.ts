@@ -1,6 +1,6 @@
-import { GetRoomEngine, HighScoreDataType, ObjectDataFactory, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, HighScoreDataType, ObjectDataFactory, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@octane/renderer';
 import { useState } from 'react';
-import { useNitroEvent } from '../../../events';
+import { useOctaneEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
 
 const SCORE_TYPES = ['perteam', 'mostwins', 'classic'];
@@ -13,7 +13,7 @@ const useFurnitureHighScoreWidgetState = () => {
     const getScoreType = (type: number) => SCORE_TYPES[type];
     const getClearType = (type: number) => CLEAR_TYPES[type];
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_HIGH_SCORE_DISPLAY, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_HIGH_SCORE_DISPLAY, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject) return;
@@ -32,7 +32,7 @@ const useFurnitureHighScoreWidgetState = () => {
         });
     });
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_HIDE_HIGH_SCORE_DISPLAY, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_HIDE_HIGH_SCORE_DISPLAY, (event) => {
         if (event.roomId !== roomSession.roomId) return;
 
         setStuffDatas((prevValue) => {

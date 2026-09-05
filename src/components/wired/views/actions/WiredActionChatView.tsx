@@ -56,7 +56,7 @@ export const WiredActionChatView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
                 <textarea
-                    className="form-control form-control-sm nitro-wired__resizable-textarea"
+                    className="form-control form-control-sm octane-wired__resizable-textarea"
                     maxLength={maxMessageLength}
                     rows={4}
                     value={message}

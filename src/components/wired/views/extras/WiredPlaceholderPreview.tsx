@@ -57,7 +57,7 @@ export const WiredPlaceholderPreview: FC<WiredPlaceholderPreviewProps> = (props)
     };
 
     return (
-        <button type="button" className={`nitro-wired__placeholder-preview ${copied ? 'is-copied' : ''}`} onClick={handleCopy}>
+        <button type="button" className={`octane-wired__placeholder-preview ${copied ? 'is-copied' : ''}`} onClick={handleCopy}>
             <Text dangerouslySetInnerHTML={{ __html: previewHtml }} />
         </button>
     );

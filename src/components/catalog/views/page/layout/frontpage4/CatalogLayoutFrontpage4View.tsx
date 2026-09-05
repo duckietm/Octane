@@ -1,4 +1,4 @@
-import { CreateLinkEvent, FrontPageItem } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, FrontPageItem } from '@octane/renderer';
 import { FC, useCallback, useEffect } from 'react';
 import { Column, Grid } from '../../../../../../common';
 import { useCatalogData } from '../../../../../../hooks';

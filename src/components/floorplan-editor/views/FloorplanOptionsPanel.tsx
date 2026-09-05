@@ -39,7 +39,7 @@ export const FloorplanOptionsPanel: FC<Props> = ({ state, dispatch }) => {
                         data-testid="entry-dir"
                         pointer
                         title={`Direction ${state.door.dir}/7 (click to rotate)`}
-                        className={`nitro-icon icon-door-direction-${state.door.dir} mx-1`}
+                        className={`octane-icon icon-door-direction-${state.door.dir} mx-1`}
                         onClick={() => setDir(rotateDir(state.door.dir, 1))}
                     />
                     <Base

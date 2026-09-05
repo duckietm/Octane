@@ -285,7 +285,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
 
     if (!editingPageData || !targetNode) return null;
 
-    const inputClass = 'nitro-catalog-admin-input';
+    const inputClass = 'octane-catalog-admin-input';
     const previewName = resolveCatalogAdminPageDisplayName(
         caption,
         editingPageDetails?.caption,
@@ -376,23 +376,23 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
             widthClassName="w-[540px]"
             onClose={smartSave.requestClose}
         >
-            <div className="nitro-catalog-admin-form">
-                <div className="nitro-catalog-admin-form-sheet">
-                    <div className="nitro-catalog-admin-form-scroll">
-                        <div className="nitro-catalog-admin-form-hero">
-                            <span className="nitro-catalog-admin-page-preview-icon">{iconImage > 0 ? <CatalogIconView icon={iconImage} /> : null}</span>
-                            <div className="nitro-catalog-admin-page-preview-info">
-                                <span className="nitro-catalog-admin-page-preview-name" title={previewName}>
+            <div className="octane-catalog-admin-form">
+                <div className="octane-catalog-admin-form-sheet">
+                    <div className="octane-catalog-admin-form-scroll">
+                        <div className="octane-catalog-admin-form-hero">
+                            <span className="octane-catalog-admin-page-preview-icon">{iconImage > 0 ? <CatalogIconView icon={iconImage} /> : null}</span>
+                            <div className="octane-catalog-admin-page-preview-info">
+                                <span className="octane-catalog-admin-page-preview-name" title={previewName}>
                                     {previewName}
                                 </span>
-                                <span className="nitro-catalog-admin-page-preview-sub">
+                                <span className="octane-catalog-admin-page-preview-sub">
                                     {localizeWithFallback('catalog.admin.page.id', 'Page ID')} {effectivePageId ?? '—'} · {pageLayout} · {catalogMode}
                                 </span>
                             </div>
                         </div>
 
                         {isReadOnlyPage && (
-                            <div className="nitro-catalog-admin-form-note is-readonly">
+                            <div className="octane-catalog-admin-form-note is-readonly">
                                 {localizeWithFallback(
                                     'catalog.admin.page.readonly',
                                     `This page uses the "${editingPageDetails?.layout}" layout, whose offers are generated per user. Only these page settings are editable — there are no offers to manage.`
@@ -400,11 +400,11 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                             </div>
                         )}
 
-                        <section className="nitro-catalog-admin-form-section">
-                            <div className="nitro-catalog-admin-section-title">{localizeWithFallback('catalog.admin.page.section.identity', 'Identity')}</div>
-                            <div className="nitro-catalog-admin-form-grid is-2col">
-                                <div className="nitro-catalog-admin-form-field is-span-2">
-                                    <label className="nitro-catalog-admin-label is-field">
+                        <section className="octane-catalog-admin-form-section">
+                            <div className="octane-catalog-admin-section-title">{localizeWithFallback('catalog.admin.page.section.identity', 'Identity')}</div>
+                            <div className="octane-catalog-admin-form-grid is-2col">
+                                <div className="octane-catalog-admin-form-field is-span-2">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.caption', 'Caption')}
                                     </label>
                                     <input
@@ -414,16 +414,16 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         value={caption}
                                         onChange={(e) => setCaption(e.target.value)}
                                     />
-                                    {smartSave.fieldErrors.caption && <span className="nitro-catalog-admin-field-error">{smartSave.fieldErrors.caption}</span>}
+                                    {smartSave.fieldErrors.caption && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.caption}</span>}
                                 </div>
-                                <div className="nitro-catalog-admin-form-field is-span-2">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field is-span-2">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.caption.save', 'Localisation key')}
                                     </label>
                                     <input className={inputClass} value={captionSave} onChange={(e) => setCaptionSave(e.target.value)} />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.min.rank', 'Min rank')}
                                     </label>
                                     <input
@@ -434,8 +434,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         onChange={(e) => setMinRank(parseInt(e.target.value) || 1)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.icon.image', 'Icon image')}
                                     </label>
                                     <input
@@ -446,8 +446,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         onChange={(e) => setIconImage(parseInt(e.target.value) || 0)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.icon.color', 'Icon color')}
                                     </label>
                                     <input
@@ -461,11 +461,11 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                             </div>
                         </section>
 
-                        <section className="nitro-catalog-admin-form-section">
-                            <div className="nitro-catalog-admin-section-title">{localizeWithFallback('catalog.admin.page.section.display', 'Display')}</div>
-                            <div className="nitro-catalog-admin-form-grid is-3col">
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.mode', 'Mode')}</label>
+                        <section className="octane-catalog-admin-form-section">
+                            <div className="octane-catalog-admin-section-title">{localizeWithFallback('catalog.admin.page.section.display', 'Display')}</div>
+                            <div className="octane-catalog-admin-form-grid is-3col">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.mode', 'Mode')}</label>
                                     <select className={inputClass} value={catalogMode} onChange={(e) => setCatalogMode(e.target.value)}>
                                         {MODE_OPTIONS.map((option) => (
                                             <option key={option.value} value={option.value}>
@@ -474,8 +474,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.layout', 'Layout')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.layout', 'Layout')}</label>
                                     <select className={inputClass} value={pageLayout} onChange={(e) => setPageLayout(e.target.value)}>
                                         {CATALOG_STUDIO_LAYOUT_CODES.map((l) => (
                                             <option key={l} value={l}>
@@ -484,12 +484,12 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
                                     <input className={inputClass} type="number" value={orderNum} onChange={(e) => setOrderNum(parseInt(e.target.value) || 0)} />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.parent.id', 'Parent ID')}
                                     </label>
                                     <input
@@ -500,31 +500,31 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         onChange={(e) => setParentId(parseInt(e.target.value) || -1)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field is-span-2">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field is-span-2">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.visibility', 'Visibility')}
                                     </label>
-                                    <div className="nitro-catalog-admin-form-toggles">
-                                        <label className="nitro-catalog-admin-form-toggle">
+                                    <div className="octane-catalog-admin-form-toggles">
+                                        <label className="octane-catalog-admin-form-toggle">
                                             <input checked={visible === '1'} type="checkbox" onChange={(e) => setVisible(e.target.checked ? '1' : '0')} />
                                             {LocalizeText('catalog.admin.visible')}
                                         </label>
-                                        <label className="nitro-catalog-admin-form-toggle">
+                                        <label className="octane-catalog-admin-form-toggle">
                                             <input checked={enabled === '1'} type="checkbox" onChange={(e) => setEnabled(e.target.checked ? '1' : '0')} />
                                             {LocalizeText('catalog.admin.enabled')}
                                         </label>
-                                        <label className="nitro-catalog-admin-form-toggle">
+                                        <label className="octane-catalog-admin-form-toggle">
                                             <input checked={clubOnly === '1'} type="checkbox" onChange={(e) => setClubOnly(e.target.checked ? '1' : '0')} />
                                             {localizeWithFallback('catalog.admin.page.club.only', 'HC only')}
                                         </label>
-                                        <label className="nitro-catalog-admin-form-toggle">
+                                        <label className="octane-catalog-admin-form-toggle">
                                             <input checked={vipOnly === '1'} type="checkbox" onChange={(e) => setVipOnly(e.target.checked ? '1' : '0')} />
                                             {localizeWithFallback('catalog.admin.page.vip.only', 'VIP only')}
                                         </label>
                                     </div>
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.room.id', 'Room ID')}
                                     </label>
                                     <input
@@ -535,8 +535,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         onChange={(e) => setRoomId(parseInt(e.target.value) || 0)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.includes', 'Included page IDs')}
                                     </label>
                                     <input className={inputClass} placeholder="1;2;3" value={includes} onChange={(e) => setIncludes(e.target.value)} />
@@ -544,35 +544,35 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                             </div>
                         </section>
 
-                        <section className="nitro-catalog-admin-form-section">
-                            <div className="nitro-catalog-admin-section-title">{localizeWithFallback('catalog.admin.page.section.content', 'Content')}</div>
-                            <div className="nitro-catalog-admin-form-grid is-2col">
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                        <section className="octane-catalog-admin-form-section">
+                            <div className="octane-catalog-admin-section-title">{localizeWithFallback('catalog.admin.page.section.content', 'Content')}</div>
+                            <div className="octane-catalog-admin-form-grid is-2col">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.headline', 'Headline image')}
                                     </label>
                                     <input className={inputClass} value={pageHeadline} onChange={(e) => setPageHeadline(e.target.value)} />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.teaser', 'Teaser image')}
                                     </label>
                                     <input className={inputClass} value={pageTeaser} onChange={(e) => setPageTeaser(e.target.value)} />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field is-span-2">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field is-span-2">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.special', 'Special image')}
                                     </label>
                                     <input className={inputClass} value={pageSpecial} onChange={(e) => setPageSpecial(e.target.value)} />
                                 </div>
                             </div>
-                            <div className="nitro-catalog-admin-form-field">
+                            <div className="octane-catalog-admin-form-field">
                                 <div className="flex items-center justify-between gap-2">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.text.1', 'Page text')}
                                     </label>
                                     <button
-                                        className="nitro-catalog-admin-button is-ghost is-compact"
+                                        className="octane-catalog-admin-button is-ghost is-compact"
                                         disabled={isTranslating || !pageText1.trim().length}
                                         title={localizeWithFallback('catalog.admin.translate.title', 'Translate via Google Translate')}
                                         type="button"
@@ -583,7 +583,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     </button>
                                 </div>
                                 {showTranslate && (
-                                    <div className="nitro-catalog-admin-translate-bar">
+                                    <div className="octane-catalog-admin-translate-bar">
                                         <select
                                             className={`${inputClass} flex-1 min-w-[120px]`}
                                             disabled={isTranslating || languagesLoading}
@@ -602,7 +602,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                             ))}
                                         </select>
                                         <button
-                                            className="nitro-catalog-admin-button is-primary"
+                                            className="octane-catalog-admin-button is-primary"
                                             disabled={isTranslating || !translateTargetLanguage || !pageText1.trim().length}
                                             type="button"
                                             onClick={runTranslate}
@@ -614,7 +614,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                             )}
                                         </button>
                                         <button
-                                            className="nitro-catalog-admin-button is-muted"
+                                            className="octane-catalog-admin-button is-muted"
                                             disabled={isTranslating}
                                             type="button"
                                             onClick={() => {
@@ -626,17 +626,17 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                         </button>
                                     </div>
                                 )}
-                                {translateError && <span className="nitro-catalog-admin-translate-error">{translateError}</span>}
+                                {translateError && <span className="octane-catalog-admin-translate-error">{translateError}</span>}
                                 <textarea className={`${inputClass} min-h-[80px] resize-y`} value={pageText1} onChange={(e) => setPageText1(e.target.value)} />
                             </div>
-                            <div className="nitro-catalog-admin-form-field">
-                                <label className="nitro-catalog-admin-label is-field">
+                            <div className="octane-catalog-admin-form-field">
+                                <label className="octane-catalog-admin-label is-field">
                                     {localizeWithFallback('catalog.admin.page.text.2', 'Secondary text')}
                                 </label>
                                 <textarea className={`${inputClass} min-h-[70px] resize-y`} value={pageText2} onChange={(e) => setPageText2(e.target.value)} />
                             </div>
-                            <div className="nitro-catalog-admin-form-field">
-                                <label className="nitro-catalog-admin-label is-field">
+                            <div className="octane-catalog-admin-form-field">
+                                <label className="octane-catalog-admin-label is-field">
                                     {localizeWithFallback('catalog.admin.page.text.details', 'Details text')}
                                 </label>
                                 <textarea
@@ -645,8 +645,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     onChange={(e) => setPageTextDetails(e.target.value)}
                                 />
                             </div>
-                            <div className="nitro-catalog-admin-form-field">
-                                <label className="nitro-catalog-admin-label is-field">
+                            <div className="octane-catalog-admin-form-field">
+                                <label className="octane-catalog-admin-label is-field">
                                     {localizeWithFallback('catalog.admin.page.text.teaser', 'Teaser text')}
                                 </label>
                                 <textarea
@@ -658,29 +658,29 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                         </section>
                     </div>
 
-                    <div className={`nitro-catalog-admin-savebar is-${smartSave.status}`}>
-                        <div className="nitro-catalog-admin-savebar-status" aria-live="polite">
+                    <div className={`octane-catalog-admin-savebar is-${smartSave.status}`}>
+                        <div className="octane-catalog-admin-savebar-status" aria-live="polite">
                             <span>{validationError || smartSave.message || interaction.message || saveStatusText}</span>
                             <small>Ctrl+S</small>
                         </div>
-                        <div className="nitro-catalog-admin-savebar-actions">
+                        <div className="octane-catalog-admin-savebar-actions">
                             {!isRoot && !isNewPage && (
-                                <button className="nitro-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
+                                <button className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
                                     <FaTrash className="text-[8px]" /> {LocalizeText('catalog.admin.delete')}
                                 </button>
                             )}
                             <button
-                                className="nitro-catalog-admin-button is-muted"
+                                className="octane-catalog-admin-button is-muted"
                                 disabled={!smartSave.isDirty || !!smartSave.inFlight}
                                 type="button"
                                 onClick={smartSave.reset}
                             >
                                 <FaUndo className="text-[8px]" /> Reset
                             </button>
-                            <button className="nitro-catalog-admin-button is-muted" disabled={!canSubmit} type="button" onClick={() => handleSave(true)}>
+                            <button className="octane-catalog-admin-button is-muted" disabled={!canSubmit} type="button" onClick={() => handleSave(true)}>
                                 Save and close
                             </button>
-                            <button className="nitro-catalog-admin-button is-primary" disabled={!canSubmit} type="button" onClick={() => handleSave(false)}>
+                            <button className="octane-catalog-admin-button is-primary" disabled={!canSubmit} type="button" onClick={() => handleSave(false)}>
                                 {smartSave.status === 'saving' ? <FaSpinner className="text-[8px] animate-spin" /> : <FaSave className="text-[8px]" />}{' '}
                                 {isNewPage ? LocalizeText('catalog.admin.create') : LocalizeText('catalog.admin.save')}
                             </button>

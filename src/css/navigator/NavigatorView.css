@@ -1,4 +1,4 @@
-.nitro-navigator-air {
+.octane-navigator-air {
     --navigator-air-orange: #fba800;
     --navigator-air-row: #d6eeff;
     --navigator-air-row-alt: #ffffff;
@@ -23,28 +23,28 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air button,
-.nitro-navigator-air input,
-.nitro-navigator-air select {
+.octane-navigator-air button,
+.octane-navigator-air input,
+.octane-navigator-air select {
     appearance: none;
     font-family: inherit;
     -webkit-appearance: none;
 }
 
-.nitro-navigator-air button::before,
-.nitro-navigator-air button::after {
+.octane-navigator-air button::before,
+.octane-navigator-air button::after {
     content: none !important;
     display: none !important;
 }
 
-.nitro-navigator-air.is-quick-links {
+.octane-navigator-air.is-quick-links {
     width: 578px;
     min-width: 578px;
     max-width: 578px;
     zoom: min(1, calc((100vw - 16px) / 578), calc((100dvh - 70px - env(safe-area-inset-bottom, 0px)) / 628));
 }
 
-.nitro-navigator-air__skin {
+.octane-navigator-air__skin {
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -62,7 +62,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__tab-shelf {
+.octane-navigator-air__tab-shelf {
     position: absolute;
     top: 31px;
     right: 1px;
@@ -73,7 +73,7 @@
     background: #ffffff;
 }
 
-.nitro-navigator-air__tab-shelf::after {
+.octane-navigator-air__tab-shelf::after {
     content: "";
     position: absolute;
     top: 33px;
@@ -83,7 +83,7 @@
     background: #242424;
 }
 
-.nitro-navigator-air__caption {
+.octane-navigator-air__caption {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -92,7 +92,7 @@
     height: 27px;
 }
 
-.nitro-navigator-air__title {
+.octane-navigator-air__title {
     display: block;
     overflow: hidden;
     color: #ffffff;
@@ -107,7 +107,7 @@
     padding: 3px 28px 0 8px;
 }
 
-.nitro-navigator-air__close {
+.octane-navigator-air__close {
     position: absolute;
     top: 2px;
     right: 0;
@@ -126,15 +126,15 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__close:hover {
+.octane-navigator-air__close:hover {
     background-image: url("@/assets/images/habbo-skin/slices/close-3-hover.png") !important;
 }
 
-.nitro-navigator-air__close:active {
+.octane-navigator-air__close:active {
     background-image: url("@/assets/images/habbo-skin/slices/close-3-pressed.png") !important;
 }
 
-.nitro-navigator-air__tabs {
+.octane-navigator-air__tabs {
     position: absolute;
     top: 35px;
     right: 10px;
@@ -149,11 +149,11 @@
     gap: 0;
 }
 
-.nitro-navigator-air.is-quick-links .nitro-navigator-air__tabs {
+.octane-navigator-air.is-quick-links .octane-navigator-air__tabs {
     left: 118px;
 }
 
-.nitro-navigator-air__body {
+.octane-navigator-air__body {
     position: absolute;
     top: 61px;
     right: auto;
@@ -169,11 +169,11 @@
     overflow: visible;
 }
 
-.nitro-navigator-air.is-quick-links .nitro-navigator-air__body {
+.octane-navigator-air.is-quick-links .octane-navigator-air__body {
     left: 162px;
 }
 
-.nitro-navigator-air__tab {
+.octane-navigator-air__tab {
     box-sizing: border-box;
     flex: 0 0 88px !important;
     width: 88px !important;
@@ -208,26 +208,26 @@
     cursor: pointer;
 }
 
-.nitro-navigator-air__tab:hover {
+.octane-navigator-air__tab:hover {
     background-image:
         url("@/assets/images/habbo-skin/slices/tab-3-hover-left.png"),
         url("@/assets/images/habbo-skin/slices/tab-3-hover-mid.png"),
         url("@/assets/images/habbo-skin/slices/tab-3-hover-right.png") !important;
 }
 
-.nitro-navigator-air__tab.is-active,
-.nitro-navigator-air__tab.is-active:hover {
+.octane-navigator-air__tab.is-active,
+.octane-navigator-air__tab.is-active:hover {
     background-image:
         url("@/assets/images/habbo-skin/slices/tab-3-selected-left.png"),
         url("@/assets/images/habbo-skin/slices/tab-3-selected-mid.png"),
         url("@/assets/images/habbo-skin/slices/tab-3-selected-right.png") !important;
 }
 
-.nitro-navigator-air__quick-toggle,
-.nitro-navigator-air__icon-button,
-.nitro-navigator-air__room-info,
-.nitro-navigator-air__search-clear,
-.nitro-navigator-air__search-refresh {
+.octane-navigator-air__quick-toggle,
+.octane-navigator-air__icon-button,
+.octane-navigator-air__room-info,
+.octane-navigator-air__search-clear,
+.octane-navigator-air__search-refresh {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -238,7 +238,7 @@
     padding: 0;
 }
 
-.nitro-navigator-air__quick-toggle {
+.octane-navigator-air__quick-toggle {
     position: absolute;
     top: 40px;
     left: 17px;
@@ -253,19 +253,19 @@
     box-shadow: none !important;
 }
 
-.nitro-navigator-air__quick-toggle img {
+.octane-navigator-air__quick-toggle img {
     display: block;
     width: 18px;
     height: 18px;
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__quick-toggle img,
-.nitro-navigator-air__icon-button img {
+.octane-navigator-air__quick-toggle img,
+.octane-navigator-air__icon-button img {
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__workspace {
+.octane-navigator-air__workspace {
     position: relative;
     display: block;
     flex: 1 1 0;
@@ -275,7 +275,7 @@
     overflow: visible;
 }
 
-.nitro-navigator-air__quick-links {
+.octane-navigator-air__quick-links {
     position: absolute;
     top: 10px;
     left: -153px;
@@ -325,7 +325,7 @@
     background: #fff;
 }
 
-.nitro-navigator-search-saves-result {
+.octane-navigator-search-saves-result {
     position: relative;
     display: flex;
     box-sizing: border-box;
@@ -337,7 +337,7 @@
     background: #fff;
 }
 
-.nitro-navigator-search-saves-result__header {
+.octane-navigator-search-saves-result__header {
     position: relative;
     box-sizing: border-box;
     width: 141px;
@@ -384,7 +384,7 @@
     background: var(--navigator-air-orange);
 }
 
-.nitro-navigator-search-saves-result__header-icon {
+.octane-navigator-search-saves-result__header-icon {
     position: absolute;
     top: 3px;
     left: 3px;
@@ -394,7 +394,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-search-saves-result__header-label {
+.octane-navigator-search-saves-result__header-label {
     position: absolute;
     top: 2px;
     left: 20px;
@@ -409,7 +409,7 @@
     white-space: nowrap;
 }
 
-.nitro-navigator-search-saves-result__list {
+.octane-navigator-search-saves-result__list {
     box-sizing: border-box;
     width: 136px;
     height: 100%;
@@ -422,14 +422,14 @@
     background: #fff;
 }
 
-.nitro-navigator-search-saves-result__empty {
+.octane-navigator-search-saves-result__empty {
     display: flex;
     padding: 16px 0;
     justify-content: center;
     opacity: 0.3;
 }
 
-.nitro-navigator-search-saves-result__empty img {
+.octane-navigator-search-saves-result__empty img {
     image-rendering: pixelated;
 }
 
@@ -492,7 +492,7 @@
     pointer-events: auto;
 }
 
-.nitro-navigator-air__main {
+.octane-navigator-air__main {
     display: flex;
     position: relative;
     box-sizing: border-box;
@@ -504,7 +504,7 @@
     overflow: hidden;
 }
 
-.nitro-navigator-air__search {
+.octane-navigator-air__search {
     display: flex;
     box-sizing: border-box;
     flex: 0 0 36px;
@@ -519,7 +519,7 @@
     gap: 13px;
 }
 
-.nitro-navigator-air__filter {
+.octane-navigator-air__filter {
     position: relative;
     flex: 0 0 116px;
     width: 116px;
@@ -528,7 +528,7 @@
     z-index: 6;
 }
 
-.nitro-navigator-air__filter-button {
+.octane-navigator-air__filter-button {
     position: relative;
     display: flex;
     box-sizing: border-box;
@@ -559,14 +559,14 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__filter-button span {
+.octane-navigator-air__filter-button span {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.nitro-navigator-air__filter-button img {
+.octane-navigator-air__filter-button img {
     position: absolute;
     top: 2px;
     right: 2px;
@@ -578,11 +578,11 @@
     pointer-events: none;
 }
 
-.nitro-navigator-air__filter-button:hover img {
+.octane-navigator-air__filter-button:hover img {
     content: url('@/assets/images/habbo-skin/slices/dropmenu-arrow-hover.png');
 }
 
-.nitro-navigator-air__filter-list {
+.octane-navigator-air__filter-list {
     position: absolute;
     top: 23px;
     left: 0;
@@ -603,7 +603,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__filter-list button {
+.octane-navigator-air__filter-list button {
     display: block;
     box-sizing: border-box;
     width: 100%;
@@ -620,12 +620,12 @@
     cursor: pointer;
 }
 
-.nitro-navigator-air__filter-list button:hover,
-.nitro-navigator-air__filter-list button.is-selected {
+.octane-navigator-air__filter-list button:hover,
+.octane-navigator-air__filter-list button.is-selected {
     background: #d6eeff !important;
 }
 
-.nitro-navigator-air__search-field {
+.octane-navigator-air__search-field {
     position: relative;
     box-sizing: border-box;
     flex: 0 0 235px;
@@ -646,7 +646,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__search-input {
+.octane-navigator-air__search-input {
     width: 100%;
     height: 100%;
     min-height: 0;
@@ -663,12 +663,12 @@
     outline: 0;
 }
 
-.nitro-navigator-air__search-field.is-placeholder .nitro-navigator-air__search-input {
+.octane-navigator-air__search-field.is-placeholder .octane-navigator-air__search-input {
     color: #9f9f9f;
     font-style: italic;
 }
 
-.nitro-navigator-air__search-clear {
+.octane-navigator-air__search-clear {
     position: absolute;
     top: 2px;
     right: 2px;
@@ -676,21 +676,21 @@
     height: 20px;
 }
 
-.nitro-navigator-air__search-clear img,
-.nitro-navigator-air__search-refresh img {
+.octane-navigator-air__search-clear img,
+.octane-navigator-air__search-refresh img {
     display: block;
     width: 16px;
     height: 16px;
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__search-refresh {
+.octane-navigator-air__search-refresh {
     flex: 0 0 25px;
     width: 25px;
     height: 25px;
 }
 
-.nitro-navigator-air__results {
+.octane-navigator-air__results {
     position: relative;
     flex: 1 1 0;
     min-height: 0;
@@ -701,7 +701,7 @@
     overflow: auto;
 }
 
-.nitro-navigator-air__busy-mask {
+.octane-navigator-air__busy-mask {
     position: absolute;
     inset: 0;
     z-index: 2;
@@ -709,7 +709,7 @@
     pointer-events: none;
 }
 
-.nitro-navigator-air__empty {
+.octane-navigator-air__empty {
     width: 286px;
     margin: 0 0 0 51px;
     color: #111;
@@ -720,14 +720,14 @@
     text-align: center;
 }
 
-.nitro-navigator-air__category {
+.octane-navigator-air__category {
     width: 396px;
     max-width: 396px;
     margin: 0 0 9px 2px;
     background: #ffffff;
 }
 
-.nitro-navigator-air__category-header {
+.octane-navigator-air__category-header {
     display: flex;
     box-sizing: border-box;
     width: 396px;
@@ -740,7 +740,7 @@
     background: #fff;
 }
 
-.nitro-navigator-air__category-toggle {
+.octane-navigator-air__category-toggle {
     position: relative;
     display: flex;
     min-width: 0;
@@ -757,7 +757,7 @@
     text-align: left;
 }
 
-.nitro-navigator-air__category-toggle img {
+.octane-navigator-air__category-toggle img {
     position: absolute;
     top: 7px;
     left: 5px;
@@ -768,26 +768,26 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__category-toggle span {
+.octane-navigator-air__category-toggle span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.nitro-navigator-air__category-controls {
+.octane-navigator-air__category-controls {
     display: flex;
     height: 18px;
     align-items: center;
     gap: 5px;
 }
 
-.nitro-navigator-air__icon-button {
+.octane-navigator-air__icon-button {
     width: 11px;
     height: 18px;
     overflow: hidden;
 }
 
-.nitro-navigator-air__icon-button img {
+.octane-navigator-air__icon-button img {
     display: block;
     width: 11px;
     height: 19px;
@@ -796,7 +796,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__rows {
+.octane-navigator-air__rows {
     display: flex;
     width: 387px;
     max-width: 387px;
@@ -805,7 +805,7 @@
     gap: 0;
 }
 
-.nitro-navigator-air__tiles {
+.octane-navigator-air__tiles {
     display: flex;
     width: 387px;
     max-width: 387px;
@@ -816,7 +816,7 @@
     row-gap: 5px;
 }
 
-.nitro-navigator-air__usercount {
+.octane-navigator-air__usercount {
     display: flex;
     box-sizing: border-box;
     flex: 0 0 40px;
@@ -860,7 +860,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__usercount img {
+.octane-navigator-air__usercount img {
     flex: 0 0 13px;
     width: 13px;
     height: 14px;
@@ -868,14 +868,14 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__usercount span {
+.octane-navigator-air__usercount span {
     color: #fff !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     line-height: 14px !important;
 }
 
-.nitro-navigator-air__row {
+.octane-navigator-air__row {
     position: relative;
     box-sizing: border-box;
     flex: 0 0 20px;
@@ -916,17 +916,17 @@
     cursor: pointer;
 }
 
-.nitro-navigator-air__row.is-stripe {
+.octane-navigator-air__row.is-stripe {
     background: var(--navigator-air-row-alt);
 }
 
-.nitro-navigator-air__row .nitro-navigator-air__usercount {
+.octane-navigator-air__row .octane-navigator-air__usercount {
     position: absolute;
     top: 1px;
     left: 0;
 }
 
-.nitro-navigator-air__row-name {
+.octane-navigator-air__row-name {
     position: absolute;
     top: 1px;
     left: 44px;
@@ -940,25 +940,25 @@
     white-space: nowrap;
 }
 
-.nitro-navigator-air__row-door {
+.octane-navigator-air__row-door {
     position: absolute;
     top: 2px;
     left: 325px;
 }
 
-.nitro-navigator-air__row-group {
+.octane-navigator-air__row-group {
     position: absolute;
     top: 4px;
     left: 342px;
 }
 
-.nitro-navigator-air__row .nitro-navigator-air__room-info {
+.octane-navigator-air__row .octane-navigator-air__room-info {
     position: absolute;
     top: 0;
     left: 359px;
 }
 
-.nitro-navigator-air__tile {
+.octane-navigator-air__tile {
     position: relative;
     box-sizing: border-box;
     width: 122px;
@@ -1011,7 +1011,7 @@
     filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2));
 }
 
-.nitro-navigator-air__tile-thumb {
+.octane-navigator-air__tile-thumb {
     position: absolute !important;
     top: 7px;
     left: 8px;
@@ -1025,19 +1025,19 @@
     background-repeat: no-repeat;
 }
 
-.nitro-navigator-air__tile-thumb .nitro-navigator-air__usercount {
+.octane-navigator-air__tile-thumb .octane-navigator-air__usercount {
     position: absolute;
     top: 85px;
     left: 31px;
 }
 
-.nitro-navigator-air__tile-door {
+.octane-navigator-air__tile-door {
     position: absolute;
     top: 87px;
     left: 84px;
 }
 
-.nitro-navigator-air__tile-badge {
+.octane-navigator-air__tile-badge {
     position: absolute !important;
     top: -11px;
     left: -5px;
@@ -1046,7 +1046,7 @@
     height: 61px;
 }
 
-.nitro-navigator-air__tile-name {
+.octane-navigator-air__tile-name {
     position: absolute;
     top: 116px;
     left: 0;
@@ -1060,20 +1060,20 @@
     line-height: 12px;
 }
 
-.nitro-navigator-air__tile-name span {
+.octane-navigator-air__tile-name span {
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
 
-.nitro-navigator-air__tile .nitro-navigator-air__room-info {
+.octane-navigator-air__tile .octane-navigator-air__room-info {
     position: absolute;
     top: 4px;
     left: 98px;
 }
 
-.nitro-navigator-air__room-info {
+.octane-navigator-air__room-info {
     width: 18px;
     height: 18px;
     background-image: url("@/assets/images/navigator/air/show-room-info.png");
@@ -1082,7 +1082,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__door {
+.octane-navigator-air__door {
     display: block;
     width: 13px;
     height: 16px;
@@ -1091,19 +1091,19 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__door--doorbell {
+.octane-navigator-air__door--doorbell {
     background-image: url("@/assets/images/navigator/air/doormode-doorbell.png");
 }
 
-.nitro-navigator-air__door--password {
+.octane-navigator-air__door--password {
     background-image: url("@/assets/images/navigator/air/doormode-password.png");
 }
 
-.nitro-navigator-air__door--invisible {
+.octane-navigator-air__door--invisible {
     background-image: url("@/assets/images/navigator/air/doormode-invisible.png");
 }
 
-.nitro-navigator-air__group {
+.octane-navigator-air__group {
     display: block;
     width: 13px;
     height: 11px;
@@ -1111,7 +1111,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__room-bubble {
+.octane-navigator-air__room-bubble {
     position: fixed;
     z-index: 1070;
     box-sizing: border-box;
@@ -1133,7 +1133,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__room-bubble::before {
+.octane-navigator-air__room-bubble::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -1145,7 +1145,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__room-bubble-content {
+.octane-navigator-air__room-bubble-content {
     display: flex;
     width: 345px;
     max-width: 100%;
@@ -1153,7 +1153,7 @@
     gap: 3px;
 }
 
-.nitro-navigator-air__room-popover-header {
+.octane-navigator-air__room-popover-header {
     display: grid;
     box-sizing: border-box;
     grid-template-columns: 112px minmax(0, 219px);
@@ -1164,7 +1164,7 @@
     background: #fff;
 }
 
-.nitro-navigator-air__room-popover-thumbnail {
+.octane-navigator-air__room-popover-thumbnail {
     position: relative;
     width: 110px !important;
     height: 110px !important;
@@ -1176,7 +1176,7 @@
     background-repeat: no-repeat !important;
 }
 
-.nitro-navigator-air__room-badge {
+.octane-navigator-air__room-badge {
     position: absolute !important;
     top: 1px;
     left: 1px;
@@ -1185,13 +1185,13 @@
     height: 48px;
 }
 
-.nitro-navigator-air__room-popover-copy {
+.octane-navigator-air__room-popover-copy {
     min-width: 0;
     height: 112px;
     padding: 0 0 0 6px;
 }
 
-.nitro-navigator-air__room-popover-title {
+.octane-navigator-air__room-popover-title {
     min-height: 16px;
     max-height: 33px;
     overflow: hidden;
@@ -1201,7 +1201,7 @@
     line-height: 16px;
 }
 
-.nitro-navigator-air__room-popover-description {
+.octane-navigator-air__room-popover-description {
     max-height: 80px;
     overflow: hidden;
     color: #333;
@@ -1209,7 +1209,7 @@
     line-height: 13px;
 }
 
-.nitro-navigator-air__room-popover-owner-row {
+.octane-navigator-air__room-popover-owner-row {
     display: flex;
     box-sizing: border-box;
     width: 344px;
@@ -1220,8 +1220,8 @@
     padding: 3px 5px 0;
 }
 
-.nitro-navigator-air__room-owner,
-.nitro-navigator-air__room-group {
+.octane-navigator-air__room-owner,
+.octane-navigator-air__room-group {
     display: inline-flex;
     max-width: 170px;
     align-items: center;
@@ -1237,7 +1237,7 @@
     text-decoration: underline;
 }
 
-.nitro-navigator-air__room-popover-details {
+.octane-navigator-air__room-popover-details {
     display: grid;
     grid-template-columns: 166px 170px;
     width: 344px;
@@ -1245,7 +1245,7 @@
     min-height: 80px;
 }
 
-.nitro-navigator-air__room-popover-properties {
+.octane-navigator-air__room-popover-properties {
     display: grid;
     grid-template-columns: 70px 85px;
     grid-auto-rows: 20px;
@@ -1253,18 +1253,18 @@
     font-size: 11px;
 }
 
-.nitro-navigator-air__room-popover-properties .is-label {
+.octane-navigator-air__room-popover-properties .is-label {
     font-weight: 700;
 }
 
-.nitro-navigator-air__room-popover-actions {
+.octane-navigator-air__room-popover-actions {
     display: flex;
     min-width: 0;
     flex-direction: column;
     padding-left: 12px;
 }
 
-.nitro-navigator-air__room-popover-actions button {
+.octane-navigator-air__room-popover-actions button {
     display: flex;
     width: 170px;
     height: 20px;
@@ -1278,7 +1278,7 @@
     text-align: left;
 }
 
-.nitro-navigator-air__room-popover-actions button > i {
+.octane-navigator-air__room-popover-actions button > i {
     display: block;
     width: 20px;
     height: 20px;
@@ -1288,42 +1288,42 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__room-popover-actions .icon-navigator-favorite-room {
+.octane-navigator-air__room-popover-actions .icon-navigator-favorite-room {
     background-image: url("@/assets/images/navigator/air/icon-fav-no.png");
 }
 
-.nitro-navigator-air__room-popover-actions .icon-navigator-favorite-room.active {
+.octane-navigator-air__room-popover-actions .icon-navigator-favorite-room.active {
     background-image: url("@/assets/images/navigator/air/icon-fav-yes.png");
 }
 
-.nitro-navigator-air__room-popover-actions .icon-navigator-my-room {
+.octane-navigator-air__room-popover-actions .icon-navigator-my-room {
     background-image: url("@/assets/images/navigator/air/icon-home-no.png");
 }
 
-.nitro-navigator-air__room-popover-actions .icon-navigator-my-room.active {
+.octane-navigator-air__room-popover-actions .icon-navigator-my-room.active {
     background-image: url("@/assets/images/navigator/air/icon-home-yes.png");
 }
 
-.nitro-navigator-air__room-popover-actions .icon-navigator-room-settings {
+.octane-navigator-air__room-popover-actions .icon-navigator-room-settings {
     background-image: url("@/assets/images/navigator/air/room-settings.png");
 }
 
-.nitro-navigator-air__room-popover-actions .icon-navigator-room-report {
+.octane-navigator-air__room-popover-actions .icon-navigator-room-report {
     background-image: url("@/assets/images/navigator/air/report-room.png");
 }
 
-.nitro-navigator-air__room-popover-actions button:hover span,
-.nitro-navigator-air__room-popover-actions button:focus-visible span {
+.octane-navigator-air__room-popover-actions button:hover span,
+.octane-navigator-air__room-popover-actions button:focus-visible span {
     text-decoration: underline;
 }
 
-.nitro-navigator-air__room-popover-tags {
+.octane-navigator-air__room-popover-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
 }
 
-.nitro-navigator-air__tag {
+.octane-navigator-air__tag {
     padding: 0;
     border: 0;
     background: transparent;
@@ -1333,7 +1333,7 @@
     text-decoration: underline;
 }
 
-.nitro-navigator-air__room-popover-event {
+.octane-navigator-air__room-popover-event {
     display: grid;
     box-sizing: border-box;
     grid-template-columns: 48px minmax(0, 1fr);
@@ -1346,7 +1346,7 @@
     color: #fff;
 }
 
-.nitro-navigator-air__room-popover-event-icon {
+.octane-navigator-air__room-popover-event-icon {
     width: 38px;
     height: 38px;
     align-self: center;
@@ -1355,13 +1355,13 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__room-popover-event-copy {
+.octane-navigator-air__room-popover-event-copy {
     min-width: 0;
     padding: 3px 2px 2px 0;
 }
 
-.nitro-navigator-air__room-popover-event-name,
-.nitro-navigator-air__room-popover-event-description {
+.octane-navigator-air__room-popover-event-name,
+.octane-navigator-air__room-popover-event-description {
     display: block;
     overflow: hidden;
     color: #fff;
@@ -1369,17 +1369,17 @@
     line-height: 16px;
 }
 
-.nitro-navigator-air__room-popover-event-name {
+.octane-navigator-air__room-popover-event-name {
     height: 16px;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.nitro-navigator-air__room-popover-event-description {
+.octane-navigator-air__room-popover-event-description {
     max-height: 36px;
 }
 
-.nitro-navigator-air__actions {
+.octane-navigator-air__actions {
     position: relative;
     box-sizing: border-box;
     flex: 0 0 60px;
@@ -1393,7 +1393,7 @@
     overflow: visible;
 }
 
-.nitro-navigator-air__action {
+.octane-navigator-air__action {
     position: absolute;
     top: 0;
     left: 0;
@@ -1416,16 +1416,16 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__action--create {
+.octane-navigator-air__action--create {
     left: 0;
 }
 
-.nitro-navigator-air__action--random,
-.nitro-navigator-air__action--promote {
+.octane-navigator-air__action--random,
+.octane-navigator-air__action--promote {
     left: 205px;
 }
 
-.nitro-navigator-air__action img {
+.octane-navigator-air__action img {
     position: absolute;
     top: 2px;
     left: 2px;
@@ -1437,7 +1437,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__action span {
+.octane-navigator-air__action span {
     position: absolute;
     top: 22px;
     left: 60px;
@@ -1455,7 +1455,7 @@
     pointer-events: none;
 }
 
-.nitro-navigator-air__action-border {
+.octane-navigator-air__action-border {
     position: absolute;
     inset: 0;
     z-index: 3;
@@ -1472,23 +1472,23 @@
     image-rendering: pixelated;
 }
 
-.nitro-navigator-air__action--random .nitro-navigator-air__action-border,
-.nitro-navigator-air__action--promote .nitro-navigator-air__action-border {
+.octane-navigator-air__action--random .octane-navigator-air__action-border,
+.octane-navigator-air__action--promote .octane-navigator-air__action-border {
     border-width: 5px;
     border-image-source: url("@/assets/images/habbo-skin/slices/border-5.png");
     border-image-slice: 5;
     border-image-width: 5px;
 }
 
-.nitro-navigator-air__action:focus-visible,
-.nitro-navigator-air__icon-button:focus-visible,
-.nitro-navigator-air__quick-toggle:focus-visible,
+.octane-navigator-air__action:focus-visible,
+.octane-navigator-air__icon-button:focus-visible,
+.octane-navigator-air__quick-toggle:focus-visible,
 .saved-search-row button:focus-visible {
     outline: 2px solid #ffd95a;
     outline-offset: 1px;
 }
 
-.nitro-room-creator-air {
+.octane-room-creator-air {
     position: relative;
     box-sizing: border-box;
     width: 585px;
@@ -1511,21 +1511,21 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air button,
-.nitro-room-creator-air input,
-.nitro-room-creator-air textarea {
+.octane-room-creator-air button,
+.octane-room-creator-air input,
+.octane-room-creator-air textarea {
     appearance: none;
     font-family: inherit;
     -webkit-appearance: none;
 }
 
-.nitro-room-creator-air button::before,
-.nitro-room-creator-air button::after {
+.octane-room-creator-air button::before,
+.octane-room-creator-air button::after {
     content: none !important;
     display: none !important;
 }
 
-.nitro-room-creator-air__skin {
+.octane-room-creator-air__skin {
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -1543,7 +1543,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__caption {
+.octane-room-creator-air__caption {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -1552,7 +1552,7 @@
     height: 27px;
 }
 
-.nitro-room-creator-air__title {
+.octane-room-creator-air__title {
     display: block;
     overflow: hidden;
     color: #ffffff;
@@ -1568,7 +1568,7 @@
     -webkit-font-smoothing: antialiased;
 }
 
-.nitro-room-creator-air__close {
+.octane-room-creator-air__close {
     position: absolute;
     top: 2px;
     right: 0;
@@ -1587,15 +1587,15 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__close:hover {
+.octane-room-creator-air__close:hover {
     background-image: url("@/assets/images/habbo-skin/slices/close-3-hover.png") !important;
 }
 
-.nitro-room-creator-air__close:active {
+.octane-room-creator-air__close:active {
     background-image: url("@/assets/images/habbo-skin/slices/close-3-pressed.png") !important;
 }
 
-.nitro-room-creator-air__label {
+.octane-room-creator-air__label {
     position: absolute;
     z-index: 2;
     height: 13px;
@@ -1607,37 +1607,37 @@
     white-space: nowrap;
 }
 
-.nitro-room-creator-air__label--name {
+.octane-room-creator-air__label--name {
     top: 40px;
     left: 16px;
 }
 
-.nitro-room-creator-air__label--desc {
+.octane-room-creator-air__label--desc {
     top: 90px;
     left: 16px;
 }
 
-.nitro-room-creator-air__label--category {
+.octane-room-creator-air__label--category {
     top: 180px;
     left: 16px;
 }
 
-.nitro-room-creator-air__label--visitors {
+.octane-room-creator-air__label--visitors {
     top: 230px;
     left: 16px;
 }
 
-.nitro-room-creator-air__label--trade {
+.octane-room-creator-air__label--trade {
     top: 280px;
     left: 16px;
 }
 
-.nitro-room-creator-air__label--layout {
+.octane-room-creator-air__label--layout {
     top: 40px;
     left: 276px;
 }
 
-.nitro-room-creator-air__field {
+.octane-room-creator-air__field {
     position: absolute;
     z-index: 2;
     box-sizing: border-box;
@@ -1657,21 +1657,21 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__field--name {
+.octane-room-creator-air__field--name {
     top: 60px;
     height: 19px;
 }
 
-.nitro-room-creator-air__field--desc {
+.octane-room-creator-air__field--desc {
     top: 110px;
     height: 60px;
 }
 
-.nitro-room-creator-air__field.is-invalid .nitro-room-creator-air__input {
+.octane-room-creator-air__field.is-invalid .octane-room-creator-air__input {
     background: #f18f9b !important;
 }
 
-.nitro-room-creator-air__input {
+.octane-room-creator-air__input {
     display: block;
     box-sizing: border-box;
     width: 100%;
@@ -1691,13 +1691,13 @@
     -webkit-font-smoothing: none;
 }
 
-.nitro-room-creator-air__input--multiline {
+.octane-room-creator-air__input--multiline {
     overflow-y: auto;
     white-space: pre-wrap;
     word-break: break-word;
 }
 
-.nitro-room-creator-air__error {
+.octane-room-creator-air__error {
     position: absolute;
     top: 30px;
     left: 136px;
@@ -1706,7 +1706,7 @@
     pointer-events: none;
 }
 
-.nitro-room-creator-air__error-border {
+.octane-room-creator-air__error-border {
     box-sizing: border-box;
     height: 23px;
     padding: 4px 8px 0;
@@ -1725,7 +1725,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__error-arrow {
+.octane-room-creator-air__error-arrow {
     display: block;
     width: 11px;
     height: 11px;
@@ -1733,7 +1733,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__dropmenu {
+.octane-room-creator-air__dropmenu {
     position: absolute;
     z-index: 3;
     left: 16px;
@@ -1741,23 +1741,23 @@
     height: 21px;
 }
 
-.nitro-room-creator-air__dropmenu.is-open {
+.octane-room-creator-air__dropmenu.is-open {
     z-index: 8;
 }
 
-.nitro-room-creator-air__dropmenu--category {
+.octane-room-creator-air__dropmenu--category {
     top: 200px;
 }
 
-.nitro-room-creator-air__dropmenu--visitors {
+.octane-room-creator-air__dropmenu--visitors {
     top: 250px;
 }
 
-.nitro-room-creator-air__dropmenu--trade {
+.octane-room-creator-air__dropmenu--trade {
     top: 300px;
 }
 
-.nitro-room-creator-air__dropmenu-button {
+.octane-room-creator-air__dropmenu-button {
     position: relative;
     display: flex;
     box-sizing: border-box;
@@ -1788,14 +1788,14 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__dropmenu-button span {
+.octane-room-creator-air__dropmenu-button span {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.nitro-room-creator-air__dropmenu-button img {
+.octane-room-creator-air__dropmenu-button img {
     position: absolute;
     top: 0;
     right: 2px;
@@ -1807,11 +1807,11 @@
     pointer-events: none;
 }
 
-.nitro-room-creator-air__dropmenu-button:hover img {
+.octane-room-creator-air__dropmenu-button:hover img {
     content: url('@/assets/images/habbo-skin/slices/dropmenu-arrow-hover.png');
 }
 
-.nitro-room-creator-air__dropmenu-list {
+.octane-room-creator-air__dropmenu-list {
     position: absolute;
     top: 20px;
     left: 0;
@@ -1834,7 +1834,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__dropmenu-list button {
+.octane-room-creator-air__dropmenu-list button {
     display: block;
     box-sizing: border-box;
     width: 100%;
@@ -1852,12 +1852,12 @@
     cursor: pointer;
 }
 
-.nitro-room-creator-air__dropmenu-list button:hover,
-.nitro-room-creator-air__dropmenu-list button.is-selected {
+.octane-room-creator-air__dropmenu-list button:hover,
+.octane-room-creator-air__dropmenu-list button.is-selected {
     background: #d6eeff !important;
 }
 
-.nitro-room-creator-air__button {
+.octane-room-creator-air__button {
     position: absolute;
     top: 330px;
     z-index: 2;
@@ -1882,7 +1882,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__button--create {
+.octane-room-creator-air__button--create {
     left: 16px;
     border-width: 4px !important;
     border-image-source: url("@/assets/images/habbo-skin/slices/button-thick-default.png") !important;
@@ -1890,15 +1890,15 @@
     border-image-width: 4px !important;
 }
 
-.nitro-room-creator-air__button--create:hover {
+.octane-room-creator-air__button--create:hover {
     border-image-source: url("@/assets/images/habbo-skin/slices/button-thick-hover.png") !important;
 }
 
-.nitro-room-creator-air__button--create:active {
+.octane-room-creator-air__button--create:active {
     border-image-source: url("@/assets/images/habbo-skin/slices/button-thick-pressed.png") !important;
 }
 
-.nitro-room-creator-air__button--cancel {
+.octane-room-creator-air__button--cancel {
     left: 156px;
     border-width: 3px !important;
     border-image-source: url("@/assets/images/habbo-skin/slices/button-default.png") !important;
@@ -1906,15 +1906,15 @@
     border-image-width: 3px !important;
 }
 
-.nitro-room-creator-air__button--cancel:hover {
+.octane-room-creator-air__button--cancel:hover {
     border-image-source: url("@/assets/images/habbo-skin/slices/button-hover.png") !important;
 }
 
-.nitro-room-creator-air__button--cancel:active {
+.octane-room-creator-air__button--cancel:active {
     border-image-source: url("@/assets/images/habbo-skin/slices/button-pressed.png") !important;
 }
 
-.nitro-room-creator-air__layouts {
+.octane-room-creator-air__layouts {
     position: absolute;
     top: 60px;
     left: 276px;
@@ -1934,13 +1934,13 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__layout-rows {
+.octane-room-creator-air__layout-rows {
     display: flex;
     width: 274px;
     flex-wrap: wrap;
 }
 
-.nitro-room-creator-air__thumbnail {
+.octane-room-creator-air__thumbnail {
     position: relative;
     box-sizing: border-box;
     width: 137px;
@@ -1952,7 +1952,7 @@
     cursor: pointer;
 }
 
-.nitro-room-creator-air__thumbnail-bg {
+.octane-room-creator-air__thumbnail-bg {
     position: absolute;
     top: 0;
     left: 0;
@@ -1970,11 +1970,11 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__thumbnail.is-selected .nitro-room-creator-air__thumbnail-bg {
+.octane-room-creator-air__thumbnail.is-selected .octane-room-creator-air__thumbnail-bg {
     border-image-source: url("@/assets/images/habbo-skin/slices/border-white-6f8285.png");
 }
 
-.nitro-room-creator-air__thumbnail-pic {
+.octane-room-creator-air__thumbnail-pic {
     position: absolute;
     top: 0;
     left: 0;
@@ -1987,7 +1987,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__thumbnail-tile-icon {
+.octane-room-creator-air__thumbnail-tile-icon {
     position: absolute;
     top: 80px;
     left: 5px;
@@ -1998,7 +1998,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__thumbnail-tiles {
+.octane-room-creator-air__thumbnail-tiles {
     position: absolute;
     top: 78px;
     left: 25px;
@@ -2014,12 +2014,12 @@
     pointer-events: none;
 }
 
-.nitro-room-creator-air__thumbnail.is-selected .nitro-room-creator-air__thumbnail-tiles {
+.octane-room-creator-air__thumbnail.is-selected .octane-room-creator-air__thumbnail-tiles {
     background: #6e8184;
     color: #ffffff;
 }
 
-.nitro-room-creator-air__thumbnail-club {
+.octane-room-creator-air__thumbnail-club {
     position: absolute;
     top: 5px;
     left: 109px;
@@ -2030,7 +2030,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__vip-promo {
+.octane-room-creator-air__vip-promo {
     position: relative;
     box-sizing: border-box;
     width: 272px;
@@ -2046,7 +2046,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__vip-promo-icon {
+.octane-room-creator-air__vip-promo-icon {
     position: absolute;
     top: 3px;
     left: 5px;
@@ -2056,7 +2056,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-creator-air__vip-promo-text {
+.octane-room-creator-air__vip-promo-text {
     position: absolute;
     top: 0;
     left: 46px;
@@ -2069,7 +2069,7 @@
     line-height: 12px;
 }
 
-.nitro-room-creator-air__vip-promo-link {
+.octane-room-creator-air__vip-promo-link {
     position: absolute;
     top: 24px;
     left: 46px;
@@ -2089,29 +2089,29 @@
     cursor: pointer;
 }
 
-.nitro-room-creator-air__button:focus-visible,
-.nitro-room-creator-air__close:focus-visible,
-.nitro-room-creator-air__thumbnail:focus-visible,
-.nitro-room-creator-air__dropmenu-button:focus-visible {
+.octane-room-creator-air__button:focus-visible,
+.octane-room-creator-air__close:focus-visible,
+.octane-room-creator-air__thumbnail:focus-visible,
+.octane-room-creator-air__dropmenu-button:focus-visible {
     outline: 2px solid #ffd95a;
     outline-offset: 1px;
 }
 
-.nitro-navigator-air__link-field {
+.octane-navigator-air__link-field {
     display: flex;
     gap: 5px;
     margin-top: 5px;
 }
 
-.nitro-navigator-air__link-field input {
+.octane-navigator-air__link-field input {
     min-height: 28px;
 }
 
-.nitro-navigator-air__door-state {
+.octane-navigator-air__door-state {
     gap: 10px;
 }
 
-.nitro-navigator-search-save {
+.octane-navigator-search-save {
     display: inline-flex;
     width: 18px;
     height: 18px;
@@ -2120,7 +2120,7 @@
     cursor: pointer;
 }
 
-.nitro-navigator-search-save img {
+.octane-navigator-search-save img {
     width: 18px;
     height: 18px;
     image-rendering: pixelated;

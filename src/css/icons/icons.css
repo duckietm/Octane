@@ -1,4 +1,4 @@
-.nitro-icon {
+.octane-icon {
     display: inline-block;
     background: transparent;
     background-position: center;
@@ -6,103 +6,103 @@
     outline: 0;
 }
 
-.nitro-icon:hover {
+.octane-icon:hover {
     transform: translate(-1px, -1px);
     filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
 }
 
-.nitro-icon:active {
+.octane-icon:active {
     transform: none;
     filter: none;
 }
 
-.nitro-icon.icon-nitro-light {
-    background-image: url("@/assets/images/nitro/nitro-n-light.svg");
+.octane-icon.icon-octane-light {
+    background-image: url("@/assets/images/octane/octane-n-light.svg");
 }
 
-.nitro-icon.icon-nitro-dark {
-    background-image: url("@/assets/images/nitro/nitro-n-dark.svg");
+.octane-icon.icon-octane-dark {
+    background-image: url("@/assets/images/octane/octane-n-dark.svg");
 }
 
-.nitro-icon.icon-nitro-light,
-.nitro-icon.icon-nitro-dark {
+.octane-icon.icon-octane-light,
+.octane-icon.icon-octane-dark {
     width: 100%;
     height: 40px;
 }
 
-.nitro-icon.icon-catalog {
+.octane-icon.icon-catalog {
     background-image: url("@/assets/images/toolbar/air/shop.png");
     width: 37px;
     height: 37px;
 }
 
-.nitro-icon.icon-mentions {
+.octane-icon.icon-mentions {
     background-image: url("@/assets/images/toolbar/icons/mentions.png");
     background-size: contain;
     width: 36px;
     height: 32px;
 }
 
-.nitro-icon.icon-buildersclub {
+.octane-icon.icon-buildersclub {
     background-image: url("@/assets/images/toolbar/air/buildersclub.png");
     width: 32px;
     height: 33px;
 }
 
-.nitro-icon.icon-progression {
+.octane-icon.icon-progression {
     background-image: url("@/assets/images/toolbar/air/progression.png");
     width: 32px;
     height: 35px;
 }
 
-.nitro-icon.icon-game {
+.octane-icon.icon-game {
     background-image: url("@/assets/images/toolbar/air/games.png");
     width: 25px;
     height: 37px;
 }
 
-.nitro-icon.icon-stories {
+.octane-icon.icon-stories {
     background-image: url("@/assets/images/toolbar/air/stories.png");
     width: 35px;
     height: 39px;
 }
 
-.nitro-icon.icon-rooms {
+.octane-icon.icon-rooms {
     background-image: url("@/assets/images/toolbar/air/navigator.png");
     width: 44px;
     height: 30px;
 }
 
-.nitro-icon.icon-house {
+.octane-icon.icon-house {
     background-image: url("@/assets/images/toolbar/air/home.png");
     width: 32px;
     height: 30px;
 }
 
-.nitro-icon.gray {
+.octane-icon.gray {
     opacity: 0.5;
 }
 
-.nitro-icon.icon-inventory {
+.octane-icon.icon-inventory {
     background-image: url("@/assets/images/toolbar/air/inventory.png");
     width: 44px;
     height: 41px;
 }
 
-.nitro-icon.icon-modtools {
+.octane-icon.icon-modtools {
     background-image: url("@/assets/images/toolbar/icons/modtools.png");
     width: 29px;
     height: 34px;
 }
 
-.nitro-icon.icon-rare-values {
+.octane-icon.icon-rare-values {
     background-image: url("@/assets/images/toolbar/icons/catalog.png");
     width: 37px;
     height: 36px;
     filter: hue-rotate(280deg) saturate(1.4);
 }
 
-.nitro-icon.icon-fortune-wheel {
+.octane-icon.icon-fortune-wheel {
     background-image: url("@/assets/images/toolbar/icons/fortune-wheel.svg");
     background-size: contain;
     background-repeat: no-repeat;
@@ -111,7 +111,7 @@
     height: 40px;
 }
 
-.nitro-icon.icon-housekeeping {
+.octane-icon.icon-housekeeping {
     background-image: url("@/assets/images/toolbar/icons/housekeeping.svg");
     background-size: contain;
     background-repeat: no-repeat;
@@ -120,73 +120,73 @@
     height: 40px;
 }
 
-.nitro-icon.icon-furnieditor {
+.octane-icon.icon-furnieditor {
     background-image: url("@/assets/images/toolbar/icons/furnieditor.png");
     width: 30px;
     height: 34px;
 }
 
-.nitro-icon.icon-friendall {
+.octane-icon.icon-friendall {
     background-image: url("@/assets/images/toolbar/air/all-friends.png");
     width: 32px;
     height: 33px;
 }
 
-.nitro-icon.icon-friendsearch {
+.octane-icon.icon-friendsearch {
     background-image: url("@/assets/images/toolbar/air/search-habbos.png");
     width: 29px;
     height: 33px;
 }
 
-.nitro-icon.icon-sendmessage {
+.octane-icon.icon-sendmessage {
     background-image: url("@/assets/images/toolbar/icons/sendmessage.png");
     width: 20px;
     height: 21px;
 }
 
-.nitro-icon.icon-me-talents {
+.octane-icon.icon-me-talents {
     background-image: url("@/assets/images/toolbar/icons/me-menu/talents.png");
     width: 32px;
     height: 30px;
 }
 
-.nitro-icon.icon-me-helper-tool {
+.octane-icon.icon-me-helper-tool {
     background-image: url("@/assets/images/toolbar/icons/me-menu/helper-tool.png");
     width: 32px;
     height: 30px;
 }
 
-.nitro-icon.icon-me-profile {
+.octane-icon.icon-me-profile {
     background-image: url("@/assets/images/toolbar/icons/me-menu/profile.png");
     width: 32px;
     height: 30px;
 }
 
-.nitro-icon.icon-me-forums {
+.octane-icon.icon-me-forums {
     background-image: url("@/assets/images/toolbar/icons/me-menu/forums.png");
     width: 32px;
     height: 30px;
 }
 
-.nitro-icon.icon-me-rooms {
+.octane-icon.icon-me-rooms {
     background-image: url("@/assets/images/toolbar/icons/me-menu/my-rooms.png");
     width: 30px;
     height: 30px;
 }
 
-.nitro-icon.icon-me-achievements {
+.octane-icon.icon-me-achievements {
     background-image: url("@/assets/images/toolbar/icons/me-menu/achievements.png");
     width: 31px;
     height: 30px;
 }
 
-.nitro-icon.icon-me-clothing {
+.octane-icon.icon-me-clothing {
     background-image: url("@/assets/images/toolbar/icons/me-menu/clothing.png");
     width: 27px;
     height: 30px;
 }
 
-.nitro-icon.icon-me-badge-creator {
+.octane-icon.icon-me-badge-creator {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='b' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%23ffd966'/><stop offset='1' stop-color='%23e69138'/></linearGradient></defs><path d='M5 7 Q5 5 7 5 L19 5 Q21 5 21 7 L21 18 Q21 22 13 26 Q5 22 5 18 Z' fill='url(%23b)' stroke='%23222' stroke-width='1.6' stroke-linejoin='round'/><polygon points='13,8 14.4,12 18.6,12 15.2,14.6 16.5,18.6 13,16.2 9.5,18.6 10.8,14.6 7.4,12 11.6,12' fill='%23ffffff' stroke='%23222' stroke-width='0.7' stroke-linejoin='round'/><g transform='rotate(40 24 22)'><rect x='17' y='20' width='12' height='4' fill='%23ffd84d' stroke='%23222' stroke-width='1.2' rx='0.5'/><rect x='25' y='20' width='3' height='4' fill='%23ec5e5e' stroke='%23222' stroke-width='1.2'/><polygon points='17,20 17,24 13,22' fill='%23222'/><polygon points='15,21.4 17,21.4 17,22.6 15,22.6' fill='%23ffeb3b'/></g></svg>");
     background-repeat: no-repeat;
     background-position: center;
@@ -195,95 +195,95 @@
     height: 32px;
 }
 
-.nitro-icon.icon-me-settings {
+.octane-icon.icon-me-settings {
     background-image: url("@/assets/images/toolbar/icons/me-menu/cog.png");
     width: 28px;
     height: 34px;
 }
 
-.nitro-icon.icon-cog {
+.octane-icon.icon-cog {
     background: url("@/assets/images/icons/icon_cog.png");
     width: 14px;
     height: 15px;
 }
 
-.nitro-icon.icon-help {
+.octane-icon.icon-help {
     background: url("@/assets/images/icons/help.png");
     width: 13px;
     height: 23px;
 }
 
-.nitro-icon.icon-joinroom {
+.octane-icon.icon-joinroom {
     background-image: url("@/assets/images/toolbar/icons/joinroom.png");
     width: 21px;
     height: 21px;
 }
 
-.nitro-icon.icon-habbo {
+.octane-icon.icon-habbo {
     background-image: url("@/assets/images/toolbar/air/logo.png");
     width: 28px;
     height: 28px;
 }
 
-.nitro-icon.icon-camera {
+.octane-icon.icon-camera {
     background-image: url("@/assets/images/toolbar/air/camera.png");
     width: 38px;
     height: 45px;
 }
 
-.nitro-icon.icon-youtube {
+.octane-icon.icon-youtube {
     background-image: url("@/assets/images/toolbar/icons/youtube.svg");
     background-size: contain;
     width: 36px;
     height: 36px;
 }
 
-.nitro-icon.icon-soundboard {
+.octane-icon.icon-soundboard {
     background-image: url("@/assets/images/toolbar/icons/soundboard.png");
     width: 32px;
     height: 38px;
 }
 
-.nitro-icon.icon-message {
+.octane-icon.icon-message {
     background-image: url("@/assets/images/toolbar/air/messenger.png");
     width: 26px;
     height: 32px;
 }
 
-.nitro-icon.icon-wired-tools {
+.octane-icon.icon-wired-tools {
     background-image: url("@/assets/images/toolbar/air/wired.png");
     width: 40px;
     height: 40px;
 }
 
-.nitro-icon.icon-message.is-notify-0 {
+.octane-icon.icon-message.is-notify-0 {
     background-image: url("@/assets/images/toolbar/air/messenger-notify-0.png");
 }
 
-.nitro-icon.icon-message.is-notify-1,
-.nitro-icon.icon-message.is-unseen {
+.octane-icon.icon-message.is-notify-1,
+.octane-icon.icon-message.is-unseen {
     background-image: url("@/assets/images/toolbar/air/messenger-notify-1.png");
 }
 
-.nitro-icon.icon-wired-trigger {
+.octane-icon.icon-wired-trigger {
     background-image: url("@/assets/images/wired/icon_trigger.png");
     width: 13px;
     height: 14px;
 }
 
-.nitro-icon.icon-wired-condition {
+.octane-icon.icon-wired-condition {
     background-image: url("@/assets/images/wired/icon_condition.png");
     width: 13px;
     height: 14px;
 }
 
-.nitro-icon.icon-wired-action {
+.octane-icon.icon-wired-action {
     background-image: url("@/assets/images/wired/icon_action.png");
     width: 13px;
     height: 14px;
 }
 
-.nitro-icon.chatstyles-icon {
+.octane-icon.chatstyles-icon {
     background-image: url("@/assets/images/chat/styles-icon.png");
     width: 17px;
     height: 19px;
@@ -299,215 +299,215 @@
   vertical-align: top;
 }
 
-.nitro-icon.chatstyles-icon:hover {
+.octane-icon.chatstyles-icon:hover {
     filter: grayscale(0%);
 }
 
-.nitro-icon.pencil-icon {
+.octane-icon.pencil-icon {
     background-image: url("@/assets/images/infostand/pencil-icon.png");
     width: 17px;
     height: 18px;
 }
 
-.nitro-icon.disk-icon {
+.octane-icon.disk-icon {
     background-image: url("@/assets/images/infostand/disk-icon.png");
     width: 14px;
     height: 14px;
 }
 
-.nitro-icon.disk-creator {
+.octane-icon.disk-creator {
     background-image: url("@/assets/images/infostand/disk-creator.png");
     width: 14px;
     height: 14px;
 }
 
-.nitro-icon.trade-locked-icon {
+.octane-icon.trade-locked-icon {
     background-image: url("@/assets/images/inventory/trading/locked-icon.png");
     width: 29px;
     height: 43px;
 }
 
-.nitro-icon.trade-unlocked-icon {
+.octane-icon.trade-unlocked-icon {
     background-image: url("@/assets/images/inventory/trading/unlocked-icon.png");
     width: 29px;
     height: 43px;
 }
 
-.nitro-icon.modtool-room-icon {
+.octane-icon.modtool-room-icon {
     background-image: url("@/assets/images/modtool/room.png");
     width: 20px;
     height: 15px;
 }
 
-.nitro-icon.modtool-chatlog-icon {
+.octane-icon.modtool-chatlog-icon {
     background-image: url("@/assets/images/modtool/chatlog.gif");
     width: 20px;
     height: 15px;
 }
 
-.nitro-icon.modtool-user-icon {
+.octane-icon.modtool-user-icon {
     background-image: url("@/assets/images/modtool/user.gif");
     width: 20px;
     height: 15px;
 }
 
-.nitro-icon.modtool-reports-icon {
+.octane-icon.modtool-reports-icon {
     background-image: url("@/assets/images/modtool/reports.png");
     width: 20px;
     height: 15px;
 }
 
-.nitro-icon.modtool-wrench-icon {
+.octane-icon.modtool-wrench-icon {
     background-image: url("@/assets/images/modtool/wrench.gif");
     width: 20px;
     height: 15px;
 }
 
-.nitro-icon.modtool-key-icon {
+.octane-icon.modtool-key-icon {
     background-image: url("@/assets/images/modtool/key.gif");
     width: 20px;
     height: 15px;
 }
 
-.nitro-icon.icon-catalogue-hc_small {
+.octane-icon.icon-catalogue-hc_small {
     background-image: url("@/assets/images/catalog/hc_small.png");
     width: 15px;
     height: 15px;
 }
 
-.nitro-icon.icon-catalogue-hc_big {
+.octane-icon.icon-catalogue-hc_big {
     background: url("@/assets/images/catalog/hc_big.png");
     width: 68px;
     height: 40px;
 }
 
-.nitro-icon.icon-sign-exclamation {
+.octane-icon.icon-sign-exclamation {
     background: url("@/assets/images/icons/sign-exclamation.png");
     width: 7px;
     height: 17px;
 }
 
-.nitro-icon.icon-sign-heart {
+.octane-icon.icon-sign-heart {
     background: url("@/assets/images/icons/sign-heart.png");
     width: 15px;
     height: 13px;
 }
 
-.nitro-icon.icon-sign-red {
+.octane-icon.icon-sign-red {
     background: url("@/assets/images/icons/sign-red.png");
     width: 11px;
     height: 19px;
 }
 
-.nitro-icon.icon-sign-yellow {
+.octane-icon.icon-sign-yellow {
     background: url("@/assets/images/icons/sign-yellow.png");
     width: 11px;
     height: 19px;
 }
 
-.nitro-icon.icon-sign-skull {
+.octane-icon.icon-sign-skull {
     background: url("@/assets/images/icons/sign-skull.png");
     width: 12px;
     height: 12px;
 }
 
-.nitro-icon.icon-sign-smile {
+.octane-icon.icon-sign-smile {
     background: url("@/assets/images/icons/sign-smile.png");
     width: 7px;
     height: 14px;
 }
 
-.nitro-icon.icon-sign-soccer {
+.octane-icon.icon-sign-soccer {
     background: url("@/assets/images/icons/sign-soccer.png");
     width: 20px;
     height: 20px;
 }
 
-.nitro-icon.icon-house-small {
+.octane-icon.icon-house-small {
     background: url("@/assets/images/icons/house-small.png");
     width: 19px;
     height: 14px;
 }
 
-.nitro-icon.icon-camera-small {
+.octane-icon.icon-camera-small {
     background: url("@/assets/images/icons/camera-small.png");
     width: 17px;
     height: 15px;
 }
 
-.nitro-icon.icon-small-room {
+.octane-icon.icon-small-room {
     background: url("@/assets/images/icons/small-room.png");
     width: 17px;
     height: 16px;
 }
 
-.nitro-icon.icon-cog {
+.octane-icon.icon-cog {
     background: url("@/assets/images/icons/cog.png");
     width: 21px;
     height: 21px;
 }
 
-.nitro-icon.icon-chat-history {
+.octane-icon.icon-chat-history {
     background: url("@/assets/images/icons/chat-history.png");
     width: 17px;
     height: 21px;
 }
 
-.nitro-icon.icon-room-link {
+.octane-icon.icon-room-link {
     background: url("@/assets/images/icons/room-link.png");
     width: 17px;
     height: 15px;
 }
 
-.nitro-icon.icon-room-history-enabled {
+.octane-icon.icon-room-history-enabled {
     background: url("@/assets/images/icons/room-history-enabled.png");
     width: 33px;
     height: 35px;
 }
 
-.nitro-icon.icon-room-history-disabled {
+.octane-icon.icon-room-history-disabled {
     background: url("@/assets/images/icons/room-history-disabled.png");
     width: 33px;
     height: 35px;
 }
 
-.nitro-icon.icon-room-history-back-enabled {
+.octane-icon.icon-room-history-back-enabled {
     background: url("@/assets/images/icons/room-history-back-enabled.png");
     width: 34px;
     height: 31px;
 }
 
-.nitro-icon.icon-room-history-back-disabled {
+.octane-icon.icon-room-history-back-disabled {
     background: url("@/assets/images/icons/room-history-back-disabled.png");
     width: 34px;
     height: 31px;
 }
 
-.nitro-icon.icon-room-history-next-enabled {
+.octane-icon.icon-room-history-next-enabled {
     background: url("@/assets/images/icons/room-history-next-enabled.png");
     width: 34px;
     height: 31px;
 }
 
-.nitro-icon.icon-room-history-next-disabled {
+.octane-icon.icon-room-history-next-disabled {
     background: url("@/assets/images/icons/room-history-next-disabled.png");
     width: 34px;
     height: 31px;
 }
 
-.nitro-icon.icon-zoom-more {
+.octane-icon.icon-zoom-more {
     background: url("@/assets/images/icons/zoom-more.png");
     width: 12px;
     height: 22px;
 }
 
-.nitro-icon.icon-zoom-less {
+.octane-icon.icon-zoom-less {
     background: url("@/assets/images/icons/zoom-less.png");
     width: 12px;
     height: 22px;
 }
 
-.nitro-icon.icon-like-room {
+.octane-icon.icon-like-room {
     background: url("@/assets/images/icons/like-room.png");
     width: 20px;
     height: 22px;
@@ -525,306 +525,306 @@
 	 height: 21px;
 }
 
-.nitro-icon.icon-arrows {
+.octane-icon.icon-arrows {
     background: url("@/assets/images/icons/arrows.png");
     width: 17px;
     height: 15px;
 }
 
-.nitro-icon.icon-camera-colormatrix {
+.octane-icon.icon-camera-colormatrix {
     background: url("@/assets/images/icons/camera-colormatrix.png");
     width: 32px;
     height: 21px;
 }
 
-.nitro-icon.icon-camera-composite {
+.octane-icon.icon-camera-composite {
     background: url("@/assets/images/icons/camera-composite.png");
     width: 32px;
     height: 21px;
 }
 
-.nitro-icon.icon-pf-online {
+.octane-icon.icon-pf-online {
     background: url("@/assets/images/profile/icons/online.gif");
     width: 40px;
     height: 16px;
 }
 
-.nitro-icon.icon-pf-offline {
+.octane-icon.icon-pf-offline {
     background: url("@/assets/images/profile/icons/offline.png");
     width: 39px;
     height: 16px;
 }
 
-.nitro-icon.icon-pf-tick {
+.octane-icon.icon-pf-tick {
     background: url("@/assets/images/profile/icons/tick.png");
     width: 11px;
     height: 10px;
 }
 
-.nitro-icon.icon-group-type-0 {
+.octane-icon.icon-group-type-0 {
     background: url("@/assets/images/groups/icons/grouptype_icon_0.png");
     width: 16px;
     height: 16px;
 }
 
-.nitro-icon.icon-group-type-1 {
+.octane-icon.icon-group-type-1 {
     background: url("@/assets/images/groups/icons/grouptype_icon_1.png");
     width: 16px;
     height: 16px;
 }
 
-.nitro-icon.icon-group-type-2 {
+.octane-icon.icon-group-type-2 {
     background: url("@/assets/images/groups/icons/grouptype_icon_2.png");
     width: 16px;
     height: 16px;
 }
 
-.nitro-icon.icon-group-decorate {
+.octane-icon.icon-group-decorate {
     background: url("@/assets/images/groups/icons/group_decorate_icon.png");
     width: 15px;
     height: 15px;
 }
 
-.nitro-icon.icon-group-member {
+.octane-icon.icon-group-member {
     background: url("@/assets/images/groups/icons/group_icon_big_member.png");
     width: 20px;
     height: 20px;
 }
 
-.nitro-icon.icon-group-admin {
+.octane-icon.icon-group-admin {
     background: url("@/assets/images/groups/icons/group_icon_big_admin.png");
     width: 20px;
     height: 20px;
 }
 
-.nitro-icon.icon-group-owner {
+.octane-icon.icon-group-owner {
     background: url("@/assets/images/groups/icons/group_icon_big_owner.png");
     width: 20px;
     height: 20px;
 }
 
-.nitro-icon.icon-group-favorite {
+.octane-icon.icon-group-favorite {
     background: url("@/assets/images/groups/icons/group_favorite.png");
     width: 14px;
     height: 14px;
 }
 
-.nitro-icon.icon-group-not-favorite {
+.octane-icon.icon-group-not-favorite {
     background: url("@/assets/images/groups/icons/group_notfavorite.png");
     width: 14px;
     height: 14px;
 }
 
-.nitro-icon.icon-group-small-admin {
+.octane-icon.icon-group-small-admin {
     background: url("@/assets/images/groups/icons/group_icon_admin.png");
     width: 11px;
     height: 13px;
 }
 
-.nitro-icon.icon-group-small-not-admin {
+.octane-icon.icon-group-small-not-admin {
     background: url("@/assets/images/groups/icons/group_icon_not_admin.png");
     width: 11px;
     height: 13px;
 }
 
-.nitro-icon.icon-group-small-owner {
+.octane-icon.icon-group-small-owner {
     background: url("@/assets/images/groups/icons/group_icon_small_owner.png");
     width: 13px;
     height: 13px;
 }
 
-.nitro-icon.icon-navigator-info {
+.octane-icon.icon-navigator-info {
     background: url("@/assets/images/navigator/air/show-room-info.png");
     width: 18px;
     height: 18px;
 }
 
-.nitro-icon.icon-navigator-room-locked {
+.octane-icon.icon-navigator-room-locked {
     background: url("@/assets/images/navigator/air/doormode-doorbell.png");
     width: 13px;
     height: 16px;
 }
 
-.nitro-icon.icon-navigator-room-password {
+.octane-icon.icon-navigator-room-password {
     background: url("@/assets/images/navigator/air/doormode-password.png");
     width: 13px;
     height: 16px;
 }
 
-.nitro-icon.icon-navigator-room-invisible {
+.octane-icon.icon-navigator-room-invisible {
     background: url("@/assets/images/navigator/air/doormode-invisible.png");
     width: 13px;
     height: 16px;
 }
 
-.nitro-icon.icon-navigator-room-group {
+.octane-icon.icon-navigator-room-group {
     background: url("@/assets/images/navigator/air/icon-group.png");
     width: 13px;
     height: 11px;
 }
 
-.nitro-icon.icon-youtube-next {
+.octane-icon.icon-youtube-next {
     background: url("@/assets/images/room-widgets/youtube-widget/next.png");
     width: 21px;
     height: 16px;
 }
 
-.nitro-icon.icon-youtube-prev {
+.octane-icon.icon-youtube-prev {
     background: url("@/assets/images/room-widgets/youtube-widget/prev.png");
     width: 21px;
     height: 16px;
 }
 
-.nitro-icon.icon-hc-banner {
+.octane-icon.icon-hc-banner {
     background: url("@/assets/images/catalog/hc_big.png");
     width: 68px;
     height: 40px;
 }
 
-.nitro-icon.icon-set-tile {
+.octane-icon.icon-set-tile {
     background-image: url("@/assets/images/floorplaneditor/icon-tile-set.png");
     width: 40px;
     height: 40px;
 }
 
-.nitro-icon.icon-unset-tile {
+.octane-icon.icon-unset-tile {
     background-image: url("@/assets/images/floorplaneditor/icon-tile-unset.png");
     width: 40px;
     height: 40px;
 }
 
-.nitro-icon.icon-increase-height {
+.octane-icon.icon-increase-height {
     background-image: url("@/assets/images/floorplaneditor/icon-tile-up.png");
     width: 40px;
     height: 40px;
 }
 
-.nitro-icon.icon-decrease-height {
+.octane-icon.icon-decrease-height {
     background-image: url("@/assets/images/floorplaneditor/icon-tile-down.png");
     width: 40px;
     height: 40px;
 }
 
-.nitro-icon.icon-set-door {
+.octane-icon.icon-set-door {
     background-image: url("@/assets/images/floorplaneditor/icon-door.png");
     width: 40px;
     height: 40px;
 }
 
-.nitro-icon.icon-door-direction-0 {
+.octane-icon.icon-door-direction-0 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-0.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-door-direction-1 {
+.octane-icon.icon-door-direction-1 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-1.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-door-direction-2 {
+.octane-icon.icon-door-direction-2 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-2.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-door-direction-3 {
+.octane-icon.icon-door-direction-3 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-3.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-door-direction-4 {
+.octane-icon.icon-door-direction-4 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-4.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-door-direction-5 {
+.octane-icon.icon-door-direction-5 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-5.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-door-direction-6 {
+.octane-icon.icon-door-direction-6 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-6.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-door-direction-7 {
+.octane-icon.icon-door-direction-7 {
     background-image: url("@/assets/images/floorplaneditor/door-direction-7.png");
     width: 80px;
     height: 45px;
 }
 
-.nitro-icon.icon-set-select {
+.octane-icon.icon-set-select {
 	background-image: url('@/assets/images/floorplaneditor/icon-select.png');
 	width: 40px;
 	height: 40px;
 }
 	
-.nitro-icon.icon-set-deselect {
+.octane-icon.icon-set-deselect {
 	background-image: url('@/assets/images/floorplaneditor/icon-deselect.png');
 	width: 40px;
 	height: 40px;
 }
 	
-.nitro-icon.icon-set-squaresselect {
+.octane-icon.icon-set-squaresselect {
 	background-image: url('@/assets/images/floorplaneditor/icon-squaresselect.png');
 	width: 40px;
 	height: 40px;
 }
 	
-.nitro-icon.icon-set-active-squaresselect {
+.octane-icon.icon-set-active-squaresselect {
 	background-image: url('@/assets/images/floorplaneditor/icon-squaresselect.png');
 	width: 40px;
 	height: 40px;
 }
 
-.nitro-icon.icon-tickets {
+.octane-icon.icon-tickets {
     background-image: url("@/assets/images/icons/tickets.png");
     width: 17px;
     height: 17px;
 }
 
-.nitro-icon.icon-avatar-anonymous {
+.octane-icon.icon-avatar-anonymous {
     background-image: url("@/assets/images/icons/avatar-anonymous.png");
     width: 16px;
     height: 17px;
 }
 
-.nitro-icon.icon-user {
+.octane-icon.icon-user {
     background-image: url("@/assets/images/icons/user.png");
     width: 18px;
     height: 19px;
 }
 
-.nitro-icon.icon-loading {
+.octane-icon.icon-loading {
     background-image: url("@/assets/images/ui/loading_icon.png");
 }
 
-.nitro-icon.icon-loading.with-size {
+.octane-icon.icon-loading.with-size {
     width: 16px;
     height: 16px;
 }
 
-.nitro-icon.icon-navigator-search-delete {
+.octane-icon.icon-navigator-search-delete {
     background-image: url("@/assets/images/navigator/saves-search/delete_search.png");
     width: 18px;
     height: 18px;
 }
 
-.nitro-icon.icon-navigator-search-delete:hover {
+.octane-icon.icon-navigator-search-delete:hover {
     background-image: url("@/assets/images/navigator/saves-search/delete_search_hover.png");
 }
 
-.nitro-icon.icon-navigator-search-delete:active {
+.octane-icon.icon-navigator-search-delete:active {
     background-image: url("@/assets/images/navigator/saves-search/delete_search_click.png");
 }
 
-.nitro-icon.icon-buildheight {
+.octane-icon.icon-buildheight {
     background-image: url("@/assets/images/toolbar/icons/buildheight.svg");
     background-size: contain;
     background-repeat: no-repeat;

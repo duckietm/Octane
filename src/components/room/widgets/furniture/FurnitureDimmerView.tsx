@@ -1,19 +1,19 @@
-import { RoomEngineTriggerWidgetEvent } from '@nitrots/nitro-renderer';
+import { RoomEngineTriggerWidgetEvent } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { ColorUtils, FurnitureDimmerUtilities, GetConfigurationValue, LocalizeText } from '../../../../api';
 import {
     Button,
     Column,
     Grid,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardTabsItemView,
-    NitroCardTabsView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardTabsItemView,
+    OctaneCardTabsView,
+    OctaneCardView,
     Slider,
     Text
 } from '../../../../common';
-import { useFurnitureDimmerWidget, useNitroEvent } from '../../../../hooks';
+import { useFurnitureDimmerWidget, useOctaneEvent } from '../../../../hooks';
 import { classNames } from '../../../../layout';
 
 export const FurnitureDimmerView: FC<{}> = (props) => {
@@ -41,7 +41,7 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
         setIsVisible(false);
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REMOVE_DIMMER, (event) => setIsVisible(false));
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REMOVE_DIMMER, (event) => setIsVisible(false));
 
     useEffect(() => {
         if (!presets || !presets.length) return;
@@ -54,18 +54,18 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-room-widget-dimmer">
-            <NitroCardHeaderView headerText={LocalizeText('widget.dimmer.title')} onCloseClick={onClose} />
+        <OctaneCardView className="octane-room-widget-dimmer">
+            <OctaneCardHeaderView headerText={LocalizeText('widget.dimmer.title')} onCloseClick={onClose} />
             {dimmerState === 1 && (
-                <NitroCardTabsView>
+                <OctaneCardTabsView>
                     {presets.map((preset) => (
-                        <NitroCardTabsItemView key={preset.id} isActive={selectedPresetId === preset.id} onClick={(event) => selectPresetId(preset.id)}>
+                        <OctaneCardTabsItemView key={preset.id} isActive={selectedPresetId === preset.id} onClick={(event) => selectPresetId(preset.id)}>
                             {LocalizeText(`widget.dimmer.tab.${preset.id}`)}
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     ))}
-                </NitroCardTabsView>
+                </OctaneCardTabsView>
             )}
-            <NitroCardContentView>
+            <OctaneCardContentView>
                 {dimmerState === 0 && (
                     <Column alignItems="center">
                         <div className="dimmer-banner" />
@@ -136,7 +136,7 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
                         </div>
                     </>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

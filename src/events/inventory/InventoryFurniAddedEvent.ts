@@ -1,6 +1,6 @@
-import { NitroEvent } from '@nitrots/nitro-renderer';
+import { OctaneEvent } from '@octane/renderer';
 
-export class InventoryFurniAddedEvent extends NitroEvent {
+export class InventoryFurniAddedEvent extends OctaneEvent {
     public static FURNI_ADDED: string = 'IFAE_FURNI_ADDED';
 
     constructor(

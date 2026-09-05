@@ -1,4 +1,4 @@
-import { GroupSaveBadgeComposer } from '@nitrots/nitro-renderer';
+import { GroupSaveBadgeComposer } from '@octane/renderer';
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { GroupBadgePart, IGroupData, SendMessageComposer } from '../../../../api';
 import { Column, Flex, Grid, LayoutBadgeImageView } from '../../../../common';

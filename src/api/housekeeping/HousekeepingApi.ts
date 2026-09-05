@@ -34,9 +34,9 @@ import {
     HousekeepingUserDetailData,
     HousekeepingUserDetailEvent,
     IMessageComposer
-} from '@nitrots/nitro-renderer';
-import { awaitMessageEvent } from '../nitro/awaitMessageEvent';
-import { SendMessageComposer } from '../nitro/SendMessageComposer';
+} from '@octane/renderer';
+import { awaitMessageEvent } from '../octane/awaitMessageEvent';
+import { SendMessageComposer } from '../octane/SendMessageComposer';
 import {
     IHousekeepingActionLogEntry,
     IHousekeepingActionResult,

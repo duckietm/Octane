@@ -1,4 +1,4 @@
-import { CreateLinkEvent, MarkMentionsReadComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, MarkMentionsReadComposer } from '@octane/renderer';
 import { FC, MouseEvent } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { formatMentionTime, LocalizeText, MentionNotificationBubbleItem, MentionType, SendMessageComposer } from '../../../../api';

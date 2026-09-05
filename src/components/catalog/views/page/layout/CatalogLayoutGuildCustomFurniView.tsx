@@ -1,4 +1,4 @@
-import { StringDataType } from '@nitrots/nitro-renderer';
+import { StringDataType } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaExchangeAlt, FaSyncAlt } from 'react-icons/fa';
 import { Column } from '../../../../../common';
@@ -54,7 +54,7 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
                     <div className="relative shrink-0 overflow-hidden">
                         <button
                             aria-label="Rotate preview"
-                            className="nitro-catalog-preview-btn nitro-catalog-preview-rotate"
+                            className="octane-catalog-preview-btn octane-catalog-preview-rotate"
                             type="button"
                             onClick={() => roomPreviewer?.changeRoomObjectDirection()}
                         >
@@ -62,7 +62,7 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
                         </button>
                         <button
                             aria-label="Change preview state"
-                            className="nitro-catalog-preview-btn nitro-catalog-preview-state"
+                            className="octane-catalog-preview-btn octane-catalog-preview-state"
                             type="button"
                             onClick={() => roomPreviewer?.changeRoomObjectState()}
                         >
@@ -72,13 +72,13 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
                         <div className="absolute bottom-1 left-1 z-10">
                             <CatalogGuildBadgeWidgetView />
                         </div>
-                        <div className="nitro-catalog-preview-price absolute bottom-1 right-1">
+                        <div className="octane-catalog-preview-price absolute bottom-1 right-1">
                             <CatalogTotalPriceWidget alignItems="end" />
                         </div>
                     </div>
                 )}
                 <div className="grow! min-h-0 overflow-auto">
-                    <CatalogItemGridWidgetView className="nitro-catalog-grid" columnCount={6} columnMinHeight={80} columnMinWidth={55} tintColor={tintColor} />
+                    <CatalogItemGridWidgetView className="octane-catalog-grid" columnCount={6} columnMinHeight={80} columnMinWidth={55} tintColor={tintColor} />
                 </div>
                 {!!currentOffer && (
                     <div className="flex shrink-0 flex-col gap-1">

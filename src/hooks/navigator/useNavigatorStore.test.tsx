@@ -4,8 +4,8 @@ import { SharedHookRegistry } from '../../state/useSharedHook';
 import { useNavigatorData, useNavigatorUiState } from './index';
 import { useNavigatorUiStore } from './navigatorUiStore';
 
-vi.mock('@nitrots/nitro-renderer', async () => {
-    const actual = await vi.importActual<typeof import('@nitrots/nitro-renderer')>('@nitrots/nitro-renderer');
+vi.mock('@octane/renderer', async () => {
+    const actual = await vi.importActual<typeof import('@octane/renderer')>('@octane/renderer');
 
     return {
         ...actual,

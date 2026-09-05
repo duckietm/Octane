@@ -135,15 +135,15 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
 
     return (
         <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="nitro-wired__give-var nitro-wired__give-var--trigger-variable">
-                <div className="nitro-wired__give-var-heading">
+            <div className="octane-wired__give-var octane-wired__give-var--trigger-variable">
+                <div className="octane-wired__give-var-heading">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="nitro-wired__give-var-targets">
+                    <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
                             <button
                                 key={button.key}
                                 type="button"
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
+                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
                                 onClick={() => {
                                     if (targetType === button.key) return;
 
@@ -164,7 +164,7 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
                     onSelect={(entry) => setVariableToken(entry.token)}
                 />
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
                 <div className="flex flex-col gap-1">
                     <Text bold>{LocalizeText('wiredfurni.params.variables.trigger_options')}</Text>

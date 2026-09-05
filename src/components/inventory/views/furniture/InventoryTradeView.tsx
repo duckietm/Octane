@@ -1,4 +1,4 @@
-import { IObjectData, TradingListAddItemComposer, TradingListAddItemsComposer } from '@nitrots/nitro-renderer';
+import { IObjectData, TradingListAddItemComposer, TradingListAddItemsComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaLock, FaUnlock } from 'react-icons/fa';
 import {

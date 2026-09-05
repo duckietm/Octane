@@ -1,4 +1,4 @@
-import { GetConfiguration } from '@nitrots/nitro-renderer';
+import { GetConfiguration } from '@octane/renderer';
 import { getAccessToken } from '../auth';
 
 export type BadgeRarityKey = 'common' | 'rare' | 'epic' | 'legendary' | 'mythical' | 'unique';
@@ -58,7 +58,7 @@ const getUrl = (): string => {
 const authHeaders = (): Record<string, string> => {
     const headers: Record<string, string> = {
         Accept: 'application/json',
-        'X-Requested-With': 'NitroBadgeLeaderboard'
+        'X-Requested-With': 'OctaneBadgeLeaderboard'
     };
 
     const token = getAccessToken();

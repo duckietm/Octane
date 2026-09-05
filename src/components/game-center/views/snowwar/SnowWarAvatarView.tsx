@@ -1,4 +1,4 @@
-import { AvatarAction, AvatarScaleType, AvatarSetType, GetAvatarRenderManager } from '@nitrots/nitro-renderer';
+import { AvatarAction, AvatarScaleType, AvatarSetType, GetAvatarRenderManager } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import { LayoutAvatarImageView } from '../../../../common';
 

@@ -1,4 +1,4 @@
-import { IssueMessageData } from '@nitrots/nitro-renderer';
+import { IssueMessageData } from '@octane/renderer';
 import { FC } from 'react';
 import { FaClock, FaInbox, FaUser, FaUserShield } from 'react-icons/fa';
 import { GetIssueCategoryName, LocalizeText } from '../../../../api';

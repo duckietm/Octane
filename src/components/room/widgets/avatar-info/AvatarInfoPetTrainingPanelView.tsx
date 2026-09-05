@@ -1,7 +1,7 @@
-import { IRoomUserData, PetTrainingMessageParser, PetTrainingPanelMessageEvent } from '@nitrots/nitro-renderer';
+import { IRoomUserData, PetTrainingMessageParser, PetTrainingPanelMessageEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText } from '../../../../api';
-import { Button, Column, Flex, Grid, LayoutPetImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Column, Flex, Grid, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useMessageEvent, useRoom, useSessionInfo } from '../../../../hooks';
 
 export const AvatarInfoPetTrainingPanelView: FC<{}> = (props) => {
@@ -32,9 +32,9 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = (props) => {
     if (!petData || !petTrainInformation) return null;
 
     return (
-        <NitroCardView className="user-settings-window no-resize" theme="primary-slim" uniqueKey="user-settings">
-            <NitroCardHeaderView headerText={LocalizeText('widgets.pet.commands.title')} onCloseClick={() => setPetTrainInformation(null)} />
-            <NitroCardContentView className="text-black">
+        <OctaneCardView className="user-settings-window no-resize" theme="primary-slim" uniqueKey="user-settings">
+            <OctaneCardHeaderView headerText={LocalizeText('widgets.pet.commands.title')} onCloseClick={() => setPetTrainInformation(null)} />
+            <OctaneCardContentView className="text-black">
                 <Flex alignItems="center" gap={2} justifyContent="center">
                     <Grid columnCount={2}>
                         <Column fullWidth className="body-image pet p-1" overflow="hidden">
@@ -58,7 +58,7 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = (props) => {
                             </Button>
                         ))}
                 </Grid>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

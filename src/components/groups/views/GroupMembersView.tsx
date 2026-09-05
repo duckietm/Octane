@@ -15,7 +15,7 @@ import {
     GroupRemoveMemberComposer,
     ILinkEventTracker,
     RemoveLinkEventTracker
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../api';
@@ -26,9 +26,9 @@ import {
     Grid,
     LayoutAvatarImageView,
     LayoutBadgeImageView,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardView,
     Text
 } from '../../../common';
 import { useMessageEvent, useNotification } from '../../../hooks';
@@ -182,38 +182,38 @@ export const GroupMembersView: FC<{}> = (props) => {
     if (groupId === -1 || !membersData) return null;
 
     return (
-        <NitroCardView className="nitro-groups-window nitro-group-members" theme="primary-slim" isResizable={false}>
-            <NitroCardHeaderView
+        <OctaneCardView className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
+            <OctaneCardHeaderView
                 headerText={LocalizeText('group.members.title', ['groupName'], [membersData ? membersData.groupTitle : ''])}
                 onCloseClick={(event) => setGroupId(-1)}
             />
-            <NitroCardContentView className="nitro-groups-content" overflow="hidden">
-                <div className="nitro-group-members-search flex gap-2">
-                    <Flex center className="group-badge nitro-group-members-search__badge">
+            <OctaneCardContentView className="octane-groups-content" overflow="hidden">
+                <div className="octane-group-members-search flex gap-2">
+                    <Flex center className="group-badge octane-group-members-search__badge">
                         <LayoutBadgeImageView badgeCode={membersData.badge} className="mx-auto block" isGroup={true} />
                     </Flex>
-                    <Column fullWidth gap={1} className="nitro-group-members-search__controls">
+                    <Column fullWidth gap={1} className="octane-group-members-search__controls">
                         <input
-                            className="nitro-groups-input min-h-[calc(1.5em+.5rem+2px)] px-[.5rem] py-[.25rem] text-[.7875rem] rounded-[.2rem] w-full"
+                            className="octane-groups-input min-h-[calc(1.5em+.5rem+2px)] px-[.5rem] py-[.25rem] text-[.7875rem] rounded-[.2rem] w-full"
                             placeholder={LocalizeText('group.members.searchinfo')}
                             type="text"
                             value={searchQuery}
                             onChange={(event) => setSearchQuery(event.target.value)}
                         />
-                        <select className="nitro-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
+                        <select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
                             <option value="0">{LocalizeText('group.members.search.all')}</option>
                             <option value="1">{LocalizeText('group.members.search.admins')}</option>
                             <option value="2">{LocalizeText('group.members.search.pending')}</option>
                         </select>
                     </Column>
                 </div>
-                <Grid className="nitro-group-members-list-grid" columnCount={2} overflow="auto">
+                <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
                     {membersData.result.map((member, index) => {
                         return (
-                            <Flex key={index} alignItems="center" className="nitro-group-member-row" gap={0} overflow="hidden">
-                                <div className="nitro-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
+                            <Flex key={index} alignItems="center" className="octane-group-member-row" gap={0} overflow="hidden">
+                                <div className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
                                     <LayoutAvatarImageView
-                                        className="nitro-group-member-row__head"
+                                        className="octane-group-member-row__head"
                                         direction={2}
                                         figure={member.figure}
                                         headOnly={true}
@@ -222,22 +222,22 @@ export const GroupMembersView: FC<{}> = (props) => {
                                         compactHeadPadding={0}
                                     />
                                 </div>
-                                <Column className="nitro-group-member-row__copy" grow gap={0}>
-                                    <Text bold pointer small className="nitro-group-member-row__name" onClick={(event) => GetUserProfile(member.id)}>
+                                <Column className="octane-group-member-row__copy" grow gap={0}>
+                                    <Text bold pointer small className="octane-group-member-row__name" onClick={(event) => GetUserProfile(member.id)}>
                                         {member.name}
                                     </Text>
                                     {member.rank !== GroupRank.REQUESTED && (
-                                        <Text italics small variant="muted" className="nitro-group-member-row__since">
+                                        <Text italics small variant="muted" className="octane-group-member-row__since">
                                             {LocalizeText('group.members.since', ['date'], [member.joinedAt])}
                                         </Text>
                                     )}
                                 </Column>
-                                <div className="nitro-group-member-row__actions">
+                                <div className="octane-group-member-row__actions">
                                     {member.rank !== GroupRank.REQUESTED && (
                                         <div className="flex items-center justify-center">
                                             <div
                                                 className={classNames(
-                                                    `nitro-icon icon-group-small-${member.rank === GroupRank.OWNER ? 'owner' : member.rank === GroupRank.ADMIN ? 'admin' : membersData.admin && member.rank === GroupRank.MEMBER ? 'not-admin' : ''}`,
+                                                    `octane-icon icon-group-small-${member.rank === GroupRank.OWNER ? 'owner' : member.rank === GroupRank.ADMIN ? 'admin' : membersData.admin && member.rank === GroupRank.MEMBER ? 'not-admin' : ''}`,
                                                     membersData.admin && 'cursor-pointer'
                                                 )}
                                                 title={LocalizeText(getRankDescription(member))}
@@ -248,7 +248,7 @@ export const GroupMembersView: FC<{}> = (props) => {
                                     {membersData.admin && member.rank === GroupRank.REQUESTED && (
                                         <Flex alignItems="center">
                                             <div
-                                                className="cursor-pointer nitro-friends-spritesheet icon-accept"
+                                                className="cursor-pointer octane-friends-spritesheet icon-accept"
                                                 title={LocalizeText('group.members.accept')}
                                                 onClick={(event) => acceptMembership(member)}
                                             />
@@ -257,7 +257,7 @@ export const GroupMembersView: FC<{}> = (props) => {
                                     {membersData.admin && member.rank !== GroupRank.OWNER && member.id !== GetSessionDataManager().userId && (
                                         <Flex alignItems="center">
                                             <div
-                                                className="cursor-pointer nitro-friends-spritesheet icon-deny"
+                                                className="cursor-pointer octane-friends-spritesheet icon-deny"
                                                 title={LocalizeText(member.rank === GroupRank.REQUESTED ? 'group.members.reject' : 'group.members.kick')}
                                                 onClick={(event) => removeMemberOrDeclineMembership(member)}
                                             />
@@ -268,16 +268,16 @@ export const GroupMembersView: FC<{}> = (props) => {
                         );
                     })}
                 </Grid>
-                <Flex alignItems="center" gap={1} justifyContent="between" className="nitro-groups-footer nitro-group-members-footer">
-                    <Button className="nitro-groups-button nitro-groups-button--pager" disabled={pageId <= 0} onClick={(event) => setPageId((prevValue) => Math.max(0, prevValue - 1))}>
+                <Flex alignItems="center" gap={1} justifyContent="between" className="octane-groups-footer octane-group-members-footer">
+                    <Button className="octane-groups-button octane-groups-button--pager" disabled={pageId <= 0} onClick={(event) => setPageId((prevValue) => Math.max(0, prevValue - 1))}>
                         <FaChevronLeft className="fa-icon" />
                     </Button>
-                    <div className="nitro-group-members-footer__page">
-                        <Text small className="nitro-group-members-footer__label">
+                    <div className="octane-group-members-footer__page">
+                        <Text small className="octane-group-members-footer__label">
                             {membersData.totalMembersCount} Habbo Membri. Pagina
                         </Text>
                         <input
-                            className="nitro-group-members-footer__input"
+                            className="octane-group-members-footer__input"
                             type="number"
                             min={1}
                             max={Math.max(1, totalPages)}
@@ -287,19 +287,19 @@ export const GroupMembersView: FC<{}> = (props) => {
                                 setPageId(value - 1);
                             }}
                         />
-                        <Text small className="nitro-group-members-footer__total">
+                        <Text small className="octane-group-members-footer__total">
                             / {Math.max(1, totalPages)}
                         </Text>
                     </div>
                     <Button
-                        className="nitro-groups-button nitro-groups-button--pager"
+                        className="octane-groups-button octane-groups-button--pager"
                         disabled={totalPages === 0 || pageId >= totalPages - 1}
                         onClick={(event) => setPageId((prevValue) => Math.min(totalPages - 1, prevValue + 1))}
                     >
                         <FaChevronRight className="fa-icon" />
                     </Button>
                 </Flex>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -4,7 +4,7 @@ type SecureSession = {
     fingerprint: string;
 };
 
-export type NitroClientMode = {
+export type OctaneClientMode = {
     distObfuscationEnabled: boolean;
     secureAssetsEnabled: boolean;
     secureApiEnabled: boolean;
@@ -13,7 +13,7 @@ export type NitroClientMode = {
     plainGamedataBaseUrl?: string;
 };
 
-const CLIENT_MODE_DEFAULTS: NitroClientMode = {
+const CLIENT_MODE_DEFAULTS: OctaneClientMode = {
     distObfuscationEnabled: true,
     secureAssetsEnabled: true,
     secureApiEnabled: true
@@ -21,7 +21,7 @@ const CLIENT_MODE_DEFAULTS: NitroClientMode = {
 
 const getDeployBaseUrl = (): string => {
     try {
-        const loaderBase = (window as any).__nitroLoaderBase;
+        const loaderBase = (window as any).__octaneLoaderBase;
         if (typeof loaderBase === 'string' && loaderBase.length) return new URL('..', loaderBase).toString();
     } catch {}
 
@@ -53,23 +53,23 @@ const isDebugEnabled = (): boolean => {
 
 const setDebugState = (message: string): void => {
     try {
-        (window as any).__nitroSecureDebug = message;
-        const log = Array.isArray((window as any).__nitroSecureDebugLog) ? (window as any).__nitroSecureDebugLog : [];
+        (window as any).__octaneSecureDebug = message;
+        const log = Array.isArray((window as any).__octaneSecureDebugLog) ? (window as any).__octaneSecureDebugLog : [];
 
         log.push(message);
-        (window as any).__nitroSecureDebugLog = log.slice(-50);
+        (window as any).__octaneSecureDebugLog = log.slice(-50);
 
         if (!isDebugEnabled()) return;
 
-        const existing = document.getElementById('nitro-secure-debug');
+        const existing = document.getElementById('octane-secure-debug');
 
         if (existing) {
-            existing.textContent = (window as any).__nitroSecureDebugLog.slice(-8).join('\n');
+            existing.textContent = (window as any).__octaneSecureDebugLog.slice(-8).join('\n');
             return;
         }
 
         const node = document.createElement('div');
-        node.id = 'nitro-secure-debug';
+        node.id = 'octane-secure-debug';
         node.style.position = 'fixed';
         node.style.left = '8px';
         node.style.bottom = '8px';
@@ -81,7 +81,7 @@ const setDebugState = (message: string): void => {
         node.style.font = '12px monospace';
         node.style.whiteSpace = 'pre-wrap';
         node.style.pointerEvents = 'none';
-        node.textContent = (window as any).__nitroSecureDebugLog.slice(-8).join('\n');
+        node.textContent = (window as any).__octaneSecureDebugLog.slice(-8).join('\n');
         document.body.appendChild(node);
     } catch {}
 };
@@ -97,13 +97,13 @@ let secureSessionCreatedAt = 0;
 const SECURE_SESSION_TTL_MS = 5 * 60 * 1000;
 const REKEY_ENDPOINTS = new Set(['/api/auth/login', '/api/auth/remember', '/api/auth/logout']);
 
-let clientModeCache: NitroClientMode | null = null;
+let clientModeCache: OctaneClientMode | null = null;
 
-export const getClientMode = (): NitroClientMode => {
+export const getClientMode = (): OctaneClientMode => {
     if (clientModeCache) return clientModeCache;
 
     try {
-        const configured = (window as any).__nitroClientMode;
+        const configured = (window as any).__octaneClientMode;
 
         if (configured && typeof configured === 'object') {
             clientModeCache = {
@@ -192,7 +192,7 @@ const getApiBase = (): string => {
     const mode = getClientMode();
     if (typeof mode.apiBaseUrl === 'string' && mode.apiBaseUrl.length) return mode.apiBaseUrl.replace(/\/$/, '');
 
-    const configured = (window as any).NitroSecureApiUrl;
+    const configured = (window as any).OctaneSecureApiUrl;
 
     if (typeof configured === 'string' && configured.length) return configured.replace(/\/$/, '');
 
@@ -207,7 +207,7 @@ const getPlainAssetBase = (kind: 'config' | 'gamedata'): string => {
 
     if (kind === 'config') return new URL('configuration/', getDeployBaseUrl()).toString();
 
-    return `${window.location.origin}/nitro/gamedata/`;
+    return `${window.location.origin}/octane/gamedata/`;
 };
 
 const mapSecureAssetRequestToPlainUrl = (requestUrl: string): string => {

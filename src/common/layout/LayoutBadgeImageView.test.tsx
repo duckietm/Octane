@@ -3,17 +3,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LayoutBadgeImageView } from './LayoutBadgeImageView';
 
 const rendererMocks = vi.hoisted(() => {
-    class NitroSprite {
+    class OctaneSprite {
         public constructor(public readonly texture: unknown) {}
     }
 
     return {
-        NitroSprite,
+        OctaneSprite,
         generateImage: vi.fn()
     };
 });
 
-vi.mock('@nitrots/nitro-renderer', () => ({
+vi.mock('@octane/renderer', () => ({
     BadgeImageReadyEvent: class {
         public static IMAGE_READY = 'badge_image_ready';
     },
@@ -22,7 +22,7 @@ vi.mock('@nitrots/nitro-renderer', () => ({
         getBadgeImage: () => null,
         getGroupBadgeImage: () => ({ id: 'group-texture' })
     }),
-    NitroSprite: rendererMocks.NitroSprite,
+    OctaneSprite: rendererMocks.OctaneSprite,
     TextureUtils: { generateImage: rendererMocks.generateImage }
 }));
 
@@ -61,8 +61,8 @@ describe('group badge image', () => {
         const [options] = rendererMocks.generateImage.mock.calls[0];
 
         expect(options).toMatchObject({ resolution: 1 });
-        expect(options.target).toBeInstanceOf(rendererMocks.NitroSprite);
-        expect((options.target as InstanceType<typeof rendererMocks.NitroSprite>).texture).toEqual({ id: 'group-texture' });
+        expect(options.target).toBeInstanceOf(rendererMocks.OctaneSprite);
+        expect((options.target as InstanceType<typeof rendererMocks.OctaneSprite>).texture).toEqual({ id: 'group-texture' });
 
         const badge = container.firstElementChild as HTMLElement;
 

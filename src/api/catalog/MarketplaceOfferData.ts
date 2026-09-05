@@ -1,4 +1,4 @@
-import { IObjectData } from '@nitrots/nitro-renderer';
+import { IObjectData } from '@octane/renderer';
 
 export class MarketplaceOfferData {
     public static readonly TYPE_FLOOR: number = 1;

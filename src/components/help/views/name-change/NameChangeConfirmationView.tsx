@@ -1,4 +1,4 @@
-import { ChangeUserNameMessageComposer, GetSessionDataManager, UserNameChangeMessageEvent } from '@nitrots/nitro-renderer';
+import { ChangeUserNameMessageComposer, GetSessionDataManager, UserNameChangeMessageEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { useMessageEvent } from '../../../../hooks';
@@ -27,7 +27,7 @@ export const NameChangeConfirmationView: FC<NameChangeLayoutViewProps> = (props)
 
     return (
         <div className="flex flex-col gap-4 h-full">
-            <div className="nitro-card-panel p-2 text-center">{LocalizeText('tutorial.name_change.info.confirm')}</div>
+            <div className="octane-card-panel p-2 text-center">{LocalizeText('tutorial.name_change.info.confirm')}</div>
             <div className="flex flex-col items-center gap-1 h-full">
                 <div>{LocalizeText('tutorial.name_change.confirm')}</div>
                 <div className="font-bold	">{username}</div>

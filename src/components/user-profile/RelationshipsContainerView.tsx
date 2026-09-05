@@ -1,4 +1,4 @@
-import { RelationshipStatusEnum, RelationshipStatusInfoMessageParser } from '@nitrots/nitro-renderer';
+import { RelationshipStatusEnum, RelationshipStatusInfoMessageParser } from '@octane/renderer';
 import { FC } from 'react';
 import { CreateLinkEvent, GetUserProfile, LocalizeText } from '../../api';
 import { Flex, LayoutAvatarImageView } from '../../common';
@@ -19,14 +19,14 @@ export const RelationshipsContainerView: FC<RelationshipsContainerViewProps> = (
         const relationshipName = RelationshipStatusEnum.RELATIONSHIP_NAMES[type].toLocaleLowerCase();
 
         return (
-            <div className="nitro-extended-profile__relationship">
-                <Flex center className="nitro-extended-profile__relationship-icon">
-                    <i className={`nitro-friends-spritesheet icon-${relationshipName}`} />
+            <div className="octane-extended-profile__relationship">
+                <Flex center className="octane-extended-profile__relationship-icon">
+                    <i className={`octane-friends-spritesheet icon-${relationshipName}`} />
                 </Flex>
-                <div className="nitro-extended-profile__relationship-copy">
-                    <div className="nitro-extended-profile__relationship-box">
+                <div className="octane-extended-profile__relationship-copy">
+                    <div className="octane-extended-profile__relationship-box">
                         <p
-                            className="nitro-extended-profile__relationship-name"
+                            className="octane-extended-profile__relationship-name"
                             onClick={(event) =>
                                 relationshipInfo && relationshipInfo.randomFriendId >= 1
                                     ? GetUserProfile(relationshipInfo.randomFriendId)
@@ -37,12 +37,12 @@ export const RelationshipsContainerView: FC<RelationshipsContainerViewProps> = (
                             {relationshipInfo && relationshipInfo.friendCount >= 1 && relationshipInfo.randomFriendName}
                         </p>
                         {relationshipInfo && relationshipInfo.friendCount >= 1 && (
-                            <div className="nitro-extended-profile__relationship-head">
+                            <div className="octane-extended-profile__relationship-head">
                                 <LayoutAvatarImageView direction={2} figure={relationshipInfo.randomFriendFigure} headOnly={true} />
                             </div>
                         )}
                     </div>
-                    <p className="nitro-extended-profile__relationship-subcopy">
+                    <p className="octane-extended-profile__relationship-subcopy">
                         {(!relationshipInfo || relationshipInfo.friendCount === 0) && LocalizeText('extendedprofile.no.friends.in.this.category')}
                         {relationshipInfo &&
                             relationshipInfo.friendCount > 1 &&

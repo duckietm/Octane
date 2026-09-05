@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { SoundboardCatalogEvent, SoundboardCatalogResultEvent } from '@nitrots/nitro-renderer';
+import { SoundboardCatalogEvent, SoundboardCatalogResultEvent } from '@octane/renderer';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSoundboardCatalog } from './useSoundboardCatalog';
@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
     sendMessage: vi.fn()
 }));
 
-vi.mock('@nitrots/nitro-renderer', () => {
+vi.mock('@octane/renderer', () => {
     class SoundboardCatalogEvent {}
     class SoundboardCatalogResultEvent {}
     class SoundboardCatalogRequestComposer {}

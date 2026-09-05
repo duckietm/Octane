@@ -1,13 +1,13 @@
 /* @vitest-environment jsdom */
 
-import { NitroLogger } from '@nitrots/nitro-renderer';
+import { OctaneLogger } from '@octane/renderer';
 import { cleanup, render, screen } from '@testing-library/react';
 import { FC } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WidgetErrorBoundary } from './WidgetErrorBoundary';
 
-// `import { NitroLogger } from '@nitrots/nitro-renderer'` resolves to
-// `src/nitro-renderer.mock.ts` via the alias in vitest.config.mts.
+// `import { OctaneLogger } from '@octane/renderer'` resolves to
+// `src/octane-renderer.mock.ts` via the alias in vitest.config.mts.
 // The SUT imports the same path, so both reach the same vi.fn instance.
 
 describe('WidgetErrorBoundary', () => {
@@ -48,8 +48,8 @@ describe('WidgetErrorBoundary', () => {
         // Default fallback is `() => null` → boundary subtree is empty.
         expect(container).toBeEmptyDOMElement();
 
-        expect(NitroLogger.error).toHaveBeenCalledTimes(1);
-        const [message, err] = (NitroLogger.error as ReturnType<typeof vi.fn>).mock.calls[0];
+        expect(OctaneLogger.error).toHaveBeenCalledTimes(1);
+        const [message, err] = (OctaneLogger.error as ReturnType<typeof vi.fn>).mock.calls[0];
         expect(message).toBe('[Widget:Boom] crashed');
         expect(err).toBeInstanceOf(Error);
         expect((err as Error).message).toBe('kaboom');
@@ -80,7 +80,7 @@ describe('WidgetErrorBoundary', () => {
             </WidgetErrorBoundary>
         );
 
-        expect(NitroLogger.error).toHaveBeenCalledTimes(1);
-        expect((NitroLogger.error as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe('[Widget:unknown] crashed');
+        expect(OctaneLogger.error).toHaveBeenCalledTimes(1);
+        expect((OctaneLogger.error as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe('[Widget:unknown] crashed');
     });
 });

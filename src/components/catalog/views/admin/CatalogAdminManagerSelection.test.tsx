@@ -20,9 +20,9 @@ vi.mock('../../../../api', () => ({
 }));
 
 vi.mock('../../../../common', () => ({
-    NitroCardView: ({ children }: any) => <div>{children}</div>,
-    NitroCardHeaderView: () => null,
-    NitroCardContentView: ({ children }: any) => <div>{children}</div>
+    OctaneCardView: ({ children }: any) => <div>{children}</div>,
+    OctaneCardHeaderView: () => null,
+    OctaneCardContentView: ({ children }: any) => <div>{children}</div>
 }));
 
 vi.mock('../../../../hooks', () => ({
@@ -167,7 +167,7 @@ describe('CatalogAdminManagerView selection synchronization', () => {
 
         render(<CatalogAdminManagerView />);
 
-        expect(screen.getByText('Offer Two').closest('.nitro-catalog-admin-offer-row')).toHaveClass('is-selected');
+        expect(screen.getByText('Offer Two').closest('.octane-catalog-admin-offer-row')).toHaveClass('is-selected');
     });
 
     it('updates the normal catalog when an offer is selected in the manager', () => {
@@ -190,7 +190,7 @@ describe('CatalogAdminManagerView selection synchronization', () => {
 
         render(<CatalogAdminManagerView />);
 
-        const row = screen.getByText('Offer Two').closest('.nitro-catalog-admin-offer-row');
+        const row = screen.getByText('Offer Two').closest('.octane-catalog-admin-offer-row');
         const buttons = within(row as HTMLElement).getAllByRole('button', { name: /Edit Furni/ });
         expect(buttons).toHaveLength(2);
         fireEvent.click(buttons[1]);

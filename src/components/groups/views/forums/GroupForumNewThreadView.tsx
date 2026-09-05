@@ -1,4 +1,4 @@
-import { ExtendedForumData, PostMessageMessageComposer, PostThreadMessageEvent } from '@nitrots/nitro-renderer';
+import { ExtendedForumData, PostMessageMessageComposer, PostThreadMessageEvent } from '@octane/renderer';
 import { FC, useCallback, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, Text } from '../../../../common';

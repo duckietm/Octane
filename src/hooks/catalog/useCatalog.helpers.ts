@@ -1,4 +1,4 @@
-import { NodeData, RoomControllerLevel, RoomObjectCategory, RoomObjectType } from '@nitrots/nitro-renderer';
+import { NodeData, RoomControllerLevel, RoomObjectCategory, RoomObjectType } from '@octane/renderer';
 import { BuilderFurniPlaceableStatus, CatalogNode, CatalogPage, CatalogType, ICatalogNode, ICatalogPage, IPurchasableOffer } from '../../api';
 
 /**

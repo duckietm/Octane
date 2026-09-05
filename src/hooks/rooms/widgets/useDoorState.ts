@@ -6,7 +6,7 @@ import {
     GetSessionDataManager,
     RoomDataParser,
     RoomDoorbellAcceptedEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { DoorStateType, GenericErrorCode } from '../../../api';

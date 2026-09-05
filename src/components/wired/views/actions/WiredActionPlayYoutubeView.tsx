@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
 const PLAYBACK_OPTIONS = [
@@ -38,7 +38,7 @@ export const WiredActionPlayYoutubeView: FC<{}> = props =>
             <div className="flex flex-col gap-1">
                 <Text bold>YouTube video id / url</Text>
                 <Text small>The room must have YouTube enabled. Empty value (or "Stop") clears the video.</Text>
-                <NitroInput maxLength={ 100 } type="text" value={ videoId } onChange={ event => setVideoId(event.target.value) } />
+                <OctaneInput maxLength={ 100 } type="text" value={ videoId } onChange={ event => setVideoId(event.target.value) } />
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>Action</Text>

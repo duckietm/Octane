@@ -6,12 +6,12 @@ import {
     ILinkEventTracker,
     loadGamedata,
     RemoveLinkEventTracker
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaSearch } from 'react-icons/fa';
 import { LocalizeText } from '../../api';
 import { useAvatarEffects } from '../../hooks';
-import { Button, Column, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { AvatarEffectPreviewView } from './AvatarEffectPreviewView';
 
 interface EffectMapEntry {
@@ -171,9 +171,9 @@ export const AvatarEffectsView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-avatar-effects w-[640px] h-[480px]" isResizable={false} uniqueKey="avatar-effects" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('product.type.effect') || 'Avatar effect'} onCloseClick={onClose} />
-            <NitroCardContentView className="flex flex-row gap-3 text-black">
+        <OctaneCardView className="octane-avatar-effects w-[640px] h-[480px]" isResizable={false} uniqueKey="avatar-effects" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('product.type.effect') || 'Avatar effect'} onCloseClick={onClose} />
+            <OctaneCardContentView className="flex flex-row gap-3 text-black">
                 <Column overflow="hidden" className="w-[220px] items-center justify-between">
                     <div className="figure-preview-container overflow-hidden relative w-full h-[280px] bg-gradient-to-b from-[#1a1a1a] to-black rounded-md shadow-inner">
                         <AvatarEffectPreviewView figure={figure} gender={gender} direction={direction} effect={selectedId} height={280} zoom={2} />
@@ -305,7 +305,7 @@ export const AvatarEffectsView: FC<{}> = () => {
                         )}
                     </div>
                 </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

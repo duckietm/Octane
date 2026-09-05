@@ -1,4 +1,4 @@
-import { IObjectData, IRoomEngine } from '@nitrots/nitro-renderer';
+import { IObjectData, IRoomEngine } from '@octane/renderer';
 import { LocalizeText } from '../utils';
 import { FurniCategory } from './FurniCategory';
 import { FurnitureItem } from './FurnitureItem';

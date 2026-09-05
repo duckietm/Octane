@@ -58,8 +58,8 @@ export const CatalogNavigationView: FC<CatalogNavigationViewProps> = (props) => 
     return (
         <ClassicScrollAreaView
             aria-label="Catalog categories"
-            className="nitro-catalog-navigation-scroll-area"
-            contentClassName={`nitro-catalog-navigation-list ${catalogType === CatalogType.BUILDER ? 'is-builders-club' : 'is-normal'}`}
+            className="octane-catalog-navigation-scroll-area"
+            contentClassName={`octane-catalog-navigation-list ${catalogType === CatalogType.BUILDER ? 'is-builders-club' : 'is-normal'}`}
             role="tree"
         >
             {searchResult &&

@@ -44,15 +44,15 @@ export const CatalogStudioTransferPanel: FC = () => {
         studio.exportDocument('SQL');
     };
 
-    return <div className="nitro-catalog-admin-import-export">
-        <div className="nitro-catalog-admin-section-head">
+    return <div className="octane-catalog-admin-import-export">
+        <div className="octane-catalog-admin-section-head">
             <div>
                 <strong>Import or export the full catalog</strong>
                 <span>Pages and offers travel together in one validated SQL file. Statements are parsed safely and never executed directly.</span>
             </div>
         </div>
-        <div className="nitro-catalog-admin-import-toolbar">
-            <label className="nitro-catalog-admin-btn" htmlFor="catalog-studio-file-import">
+        <div className="octane-catalog-admin-import-toolbar">
+            <label className="octane-catalog-admin-btn" htmlFor="catalog-studio-file-import">
                 <FaFileImport /> Import file
             </label>
             <input
@@ -63,18 +63,18 @@ export const CatalogStudioTransferPanel: FC = () => {
                 aria-label="Import catalog SQL file"
                 onChange={importFile}
             />
-            <button className="nitro-catalog-admin-btn" disabled={studio.loading} onClick={requestDownload}>
+            <button className="octane-catalog-admin-btn" disabled={studio.loading} onClick={requestDownload}>
                 <FaDownload /> Download full catalog
             </button>
             <button
-                className="nitro-catalog-admin-btn"
+                className="octane-catalog-admin-btn"
                 disabled={studio.loading || !document.trim()}
                 onClick={() => studio.dryRunDocument('SQL', document)}
             >
                 Validate and dry-run
             </button>
             <button
-                className="nitro-catalog-admin-btn is-publish"
+                className="octane-catalog-admin-btn is-publish"
                 disabled={studio.loading || result?.code !== 'DRY_RUN_READY' || result.changedEntities === 0}
                 onClick={() => result && studio.applyDocument('SQL', document, result.fingerprint, 'Import catalog SQL file')}
             >
@@ -88,16 +88,16 @@ export const CatalogStudioTransferPanel: FC = () => {
             aria-label="SQL catalog document"
             placeholder="Import a .sql file or paste a complete catalog export here."
         />
-        {result && <div role="status" className={`nitro-catalog-admin-publish-status ${result.success ? 'is-ready' : 'is-blocked'}`}>
+        {result && <div role="status" className={`octane-catalog-admin-publish-status ${result.success ? 'is-ready' : 'is-blocked'}`}>
             {result.message} &middot; {result.changedEntities} change(s)
         </div>}
-        {!!result?.changes.length && <div className="nitro-catalog-admin-validation-list" aria-label="SQL field diff">
-            <div className="nitro-catalog-admin-publish-changes-head">Dry-run field diff</div>
+        {!!result?.changes.length && <div className="octane-catalog-admin-validation-list" aria-label="SQL field diff">
+            <div className="octane-catalog-admin-publish-changes-head">Dry-run field diff</div>
             {result.changes.map(change => <div
-                className="nitro-catalog-admin-history-row"
+                className="octane-catalog-admin-history-row"
                 key={`${change.catalogType}-${change.entityType}-${change.entityId}-${change.operation}`}
             >
-                <div className="nitro-catalog-admin-history-main">
+                <div className="octane-catalog-admin-history-main">
                     <strong>{change.operation} {change.entityType} #{change.entityId}</strong>
                     <span>{change.catalogType} &middot; {change.fields.length ? change.fields.join(', ') : 'no field changes'}</span>
                 </div>

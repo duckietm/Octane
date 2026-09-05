@@ -1,7 +1,7 @@
-import { GroupInformationEvent, GroupInformationParser } from '@nitrots/nitro-renderer';
+import { GroupInformationEvent, GroupInformationParser } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText } from '../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useMessageEvent } from '../../../hooks';
 import { GroupInformationView } from './GroupInformationView';
 
@@ -17,11 +17,11 @@ export const GroupInformationStandaloneView: FC<{}> = (props) => {
     if (!groupInformation) return null;
 
     return (
-        <NitroCardView className="nitro-groups-window nitro-group-information-standalone" theme="primary-slim" isResizable={false}>
-            <NitroCardHeaderView headerText={LocalizeText('group.window.title')} onCloseClick={(event) => setGroupInformation(null)} />
-            <NitroCardContentView className="nitro-groups-content">
+        <OctaneCardView className="octane-groups-window octane-group-information-standalone" theme="primary-slim" isResizable={false}>
+            <OctaneCardHeaderView headerText={LocalizeText('group.window.title')} onCloseClick={(event) => setGroupInformation(null)} />
+            <OctaneCardContentView className="octane-groups-content">
                 <GroupInformationView groupInformation={groupInformation} onClose={() => setGroupInformation(null)} />
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

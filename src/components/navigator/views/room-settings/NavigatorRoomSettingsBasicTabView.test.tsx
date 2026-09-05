@@ -7,7 +7,7 @@ import { NavigatorRoomSettingsBasicTabView } from './NavigatorRoomSettingsBasicT
 const sendMessageComposer = vi.fn();
 const setSoundboardRoomEnabled = vi.fn();
 
-vi.mock('@nitrots/nitro-renderer', () => ({
+vi.mock('@octane/renderer', () => ({
     RoomDeleteComposer: class {},
     RoomSettingsSaveErrorEvent: class {},
     RoomSettingsSaveErrorParser: class {},

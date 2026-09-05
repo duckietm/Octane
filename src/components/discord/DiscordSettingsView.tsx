@@ -3,11 +3,11 @@ import {
     GetSessionDataManager,
     ILinkEventTracker,
     RemoveLinkEventTracker,
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
 import { GetConfigurationValue, LocalizeText, OpenUrl } from '../../api';
-import { LayoutAvatarImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { DiscordPreferences, useDiscordSettings } from '../../hooks';
 
 const localizeWithFallback = (key: string, fallback: string) => {
@@ -181,8 +181,8 @@ export const DiscordSettingsView: FC = () => {
     const subOptionDisabled = !preferences.showHabbo || !preferences.shareActivity;
 
     return (
-        <NitroCardView className="discord-settings-window w-[390px]" theme="primary-slim" uniqueKey="discord-settings">
-            <NitroCardHeaderView
+        <OctaneCardView className="discord-settings-window w-[390px]" theme="primary-slim" uniqueKey="discord-settings">
+            <OctaneCardHeaderView
                 headerText={localizeWithFallback('discord.settings.title', 'Impostazioni Discord')}
                 onCloseClick={() => setIsVisible(false)}
             />
@@ -201,7 +201,7 @@ export const DiscordSettingsView: FC = () => {
                 </div>
             </div>
 
-            <NitroCardContentView className="flex flex-col gap-2 text-black">
+            <OctaneCardContentView className="flex flex-col gap-2 text-black">
                 <DiscordPresencePreview preferences={preferences} />
 
                 <CheckboxRow
@@ -261,7 +261,7 @@ export const DiscordSettingsView: FC = () => {
                         configKey="origins.discord.link"
                     />
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

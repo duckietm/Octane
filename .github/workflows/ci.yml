@@ -36,7 +36,7 @@ jobs:
     name: Type check + tests
     runs-on: ubuntu-latest
     steps:
-      # The build/dev/typecheck setup expects the Nitro renderer SDK to
+      # The build/dev/typecheck setup expects the Octane renderer SDK to
       # live as a sibling of this repo (see CLAUDE.md → Setup walkthrough).
       # Mirror that here by checking the client into <workspace>/octane
       # and the renderer into <workspace>/octane-renderer.
@@ -108,7 +108,7 @@ jobs:
         run: corepack yarn install --immutable
 
       # The renderer SDK is consumed via a filesystem symlink in
-      # node_modules/@nitrots/nitro-renderer; create it AFTER yarn
+      # node_modules/@octane/renderer; create it AFTER yarn
       # install (otherwise yarn would clean it up since the package
       # isn't declared in package.json). tsgo (TS 7 native preview)
       # then resolves the tsconfig `include` entry pointing at the
@@ -121,10 +121,10 @@ jobs:
       # exist and makes tsgo report TS2307 across the entire src/.
       - name: Symlink renderer into client node_modules
         run: |
-          mkdir -p octane/node_modules/@nitrots
-          ln -sfn "${{ github.workspace }}/octane-renderer" octane/node_modules/@nitrots/nitro-renderer
-          ls -la octane/node_modules/@nitrots/
-          ls octane/node_modules/@nitrots/nitro-renderer/packages/api/src/ | head -5
+          mkdir -p octane/node_modules/@octane
+          ln -sfn "${{ github.workspace }}/octane-renderer" octane/node_modules/@octane/renderer
+          ls -la octane/node_modules/@octane/
+          ls octane/node_modules/@octane/renderer/packages/api/src/ | head -5
 
       - name: Type check (tsgo)
         working-directory: octane

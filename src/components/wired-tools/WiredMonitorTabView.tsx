@@ -22,7 +22,7 @@ export interface WiredMonitorTabViewProps {
  * parent's inline JSX. The three modal overlays that used to live
  * inside this block were dead code (`{ false && ... }`) and have been
  * dropped; the live versions of those modals (Monitor History, Monitor
- * Info, Error Info) are mounted outside the NitroCardView by the parent.
+ * Info, Error Info) are mounted outside the OctaneCardView by the parent.
  */
 export const WiredMonitorTabView = (props: WiredMonitorTabViewProps) => {
     const { monitorStats, monitorLogs, monitorHistoryRows, onOpenMonitorInfo, onOpenMonitorHistory, onClearMonitorLogs, onOpenMonitorLogDetails } = props;

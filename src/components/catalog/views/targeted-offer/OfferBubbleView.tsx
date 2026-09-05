@@ -1,4 +1,4 @@
-import { TargetedOfferData } from '@nitrots/nitro-renderer';
+import { TargetedOfferData } from '@octane/renderer';
 import { Dispatch, SetStateAction } from 'react';
 import { GetConfigurationValue } from '../../../../api';
 import { LayoutNotificationBubbleView, Text } from '../../../../common';
@@ -10,7 +10,7 @@ export const OfferBubbleView = (props: { offer: TargetedOfferData; setOpen: Disp
 
     return (
         <LayoutNotificationBubbleView fadesOut={false} gap={2} onClick={(evt) => setOpen(true)} onClose={null}>
-            <div className="nitro-targeted-offer-icon" style={{ backgroundImage: `url(${GetConfigurationValue('image.library.url') + offer.iconImageUrl})` }} />
+            <div className="octane-targeted-offer-icon" style={{ backgroundImage: `url(${GetConfigurationValue('image.library.url') + offer.iconImageUrl})` }} />
             <Text className="ubuntu-bold" variant="light">
                 {offer.title}
             </Text>

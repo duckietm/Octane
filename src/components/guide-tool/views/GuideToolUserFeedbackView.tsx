@@ -1,4 +1,4 @@
-import { GuideSessionFeedbackMessageComposer } from '@nitrots/nitro-renderer';
+import { GuideSessionFeedbackMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../api';
 import { Button, Column, Flex, Text } from '../../../common';
@@ -14,7 +14,7 @@ export const GuideToolUserFeedbackView: FC<GuideToolUserFeedbackViewProps> = (pr
 
     return (
         <div className="flex flex-col">
-            <Flex className="nitro-card-panel p-2" gap={1} justifyContent="between">
+            <Flex className="octane-card-panel p-2" gap={1} justifyContent="between">
                 <Column gap={0}>
                     <Text bold>{userName}</Text>
                     <Text>{LocalizeText('guide.help.request.user.feedback.guide.desc')}</Text>
@@ -29,7 +29,7 @@ export const GuideToolUserFeedbackView: FC<GuideToolUserFeedbackViewProps> = (pr
             </div>
             {userName && userName.length > 0 && (
                 <>
-                    <hr className="nitro-card-divider m-0 mt-auto" />
+                    <hr className="octane-card-divider m-0 mt-auto" />
                     <div className="flex flex-col">
                         <Text bold center>
                             {LocalizeText('guide.help.request.user.feedback.question')}

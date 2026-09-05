@@ -1,4 +1,4 @@
-import { WiredActionDefinition } from '@nitrots/nitro-renderer';
+import { WiredActionDefinition } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect } from 'react';
 import { GetWiredTimeLocale, LocalizeText, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
@@ -49,9 +49,9 @@ export const WiredActionBaseView: FC<PropsWithChildren<WiredActionBaseViewProps>
             selectionPreview={selectionPreview}
         >
             {children}
-            {!hideDelay && !!children && <div className="nitro-wired__divider" />}
+            {!hideDelay && !!children && <div className="octane-wired__divider" />}
             {!hideDelay && (
-                <div className="flex flex-col nitro-wired__section nitro-wired__section--delay">
+                <div className="flex flex-col octane-wired__section octane-wired__section--delay">
                     <Text bold>{LocalizeText('wiredfurni.params.delay', ['seconds'], [GetWiredTimeLocale(actionDelay)])}</Text>
                     <Slider max={20} min={0} value={actionDelay} onChange={(event) => setActionDelay(event)} />
                 </div>

@@ -5,11 +5,11 @@ import {
     GetGuestRoomResultEvent,
     RoomDataParser,
     RoomDoorbellAcceptedEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { DoorStateType } from '../../../api';
-import { clearMockEventDispatcher, mockEventDispatcher } from '../../../nitro-renderer.mock';
+import { clearMockEventDispatcher, mockEventDispatcher } from '../../../octane-renderer.mock';
 import { SharedHookRegistry } from '../../../state/useSharedHook';
 import { useDoorState } from './useDoorState';
 

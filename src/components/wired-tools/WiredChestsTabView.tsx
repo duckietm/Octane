@@ -13,10 +13,10 @@ import {
     WiredChestRoomLogsEvent,
     WiredChestTransactionDetailsComposer,
     WiredChestTransactionDetailsEvent,
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, Fragment, JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { localizeWithFallback, ProductImageUtility, SendMessageComposer } from '../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useMessageEvent, useNotification, useRoom } from '../../hooks';
 
 /** Rows per request. The preview and the detail window share one page size, so one response shape
@@ -390,12 +390,12 @@ const WiredChestTransactionsWindow: FC<WiredChestTransactionsWindowProps> = (pro
     } = props;
 
     return (
-        <NitroCardView className="min-w-[720px] max-w-[720px]" theme="primary-slim" uniqueKey="wired-chest-transactions">
-            <NitroCardHeaderView
+        <OctaneCardView className="min-w-[720px] max-w-[720px]" theme="primary-slim" uniqueKey="wired-chest-transactions">
+            <OctaneCardHeaderView
                 headerText={localizeWithFallback('wiredchests.logs.room_title', 'Room transactions')}
                 onCloseClick={onClose}
             />
-            <NitroCardContentView>
+            <OctaneCardContentView>
                 <div className="flex flex-col gap-2">
                     <div className="max-h-[320px] overflow-y-auto border border-[#d1ccbf] rounded bg-white">
                         <table className="w-full text-[12px]">
@@ -485,7 +485,7 @@ const WiredChestTransactionsWindow: FC<WiredChestTransactionsWindowProps> = (pro
                         </Button>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -1,8 +1,8 @@
-import { BotSkillSaveComposer } from '@nitrots/nitro-renderer';
+import { BotSkillSaveComposer } from '@octane/renderer';
 import { FC, useMemo, useState } from 'react';
 import { BotSkillsEnum, GetRoomObjectBounds, GetRoomSession, LocalizeText, RoomWidgetUpdateRentableBotChatEvent, SendMessageComposer } from '../../../../api';
 import { Button, Column, DraggableWindow, DraggableWindowPosition, Flex, Text } from '../../../../common';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { ContextMenuHeaderView } from '../context-menu/ContextMenuHeaderView';
 
 interface AvatarInfoRentableBotChatViewProps {
@@ -36,7 +36,7 @@ export const AvatarInfoRentableBotChatView: FC<AvatarInfoRentableBotChatViewProp
             handleSelector=".drag-handler"
             windowPosition={DraggableWindowPosition.NOTHING}
         >
-            <div className="nitro-context-menu bot-chat">
+            <div className="octane-context-menu bot-chat">
                 <ContextMenuHeaderView className="drag-handler">{LocalizeText('bot.skill.chatter.configuration.title')}</ContextMenuHeaderView>
                 <Column className="p-1">
                     <div className="flex flex-col gap-1">
@@ -76,7 +76,7 @@ export const AvatarInfoRentableBotChatView: FC<AvatarInfoRentableBotChatViewProp
                             <Text fullWidth variant="white">
                                 {LocalizeText('bot.skill.chatter.configuration.chat.delay')}
                             </Text>
-                            <NitroInput type="number" value={chatDelay} onChange={(event) => setChatDelay(event.target.valueAsNumber)} />
+                            <OctaneInput type="number" value={chatDelay} onChange={(event) => setChatDelay(event.target.valueAsNumber)} />
                         </Flex>
                     </div>
                     <Flex alignItems="center" gap={1} justifyContent="between">

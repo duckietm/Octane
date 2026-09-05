@@ -28,7 +28,7 @@ afterEach(() => {
     mocks.showInspectButton = true;
 });
 
-vi.mock('@nitrots/nitro-renderer', () => ({
+vi.mock('@octane/renderer', () => ({
     AvatarAction: { POSTURE_STAND: 'std', POSTURE_SWIM: 'swim' },
     AvatarExpressionEnum: {
         BLOW: { ordinal: 2 },
@@ -119,9 +119,9 @@ describe('AIR own-avatar menu', () => {
     it('uses the own-menu variant, AIR anchor rules, XML row order, and then Polaris extras', () => {
         renderMenu();
 
-        const menu = document.querySelector('.nitro-avatar-action-menu--own');
+        const menu = document.querySelector('.octane-avatar-action-menu--own');
 
-        expect(menu).toHaveClass('nitro-avatar-action-menu');
+        expect(menu).toHaveClass('octane-avatar-action-menu');
         expect(menu).toHaveAttribute('data-tall-avatar-offset', '25');
         expect(menu).toHaveAttribute('data-maximum-vertical-lead-ratio', '0.05');
         expect(menu).toHaveAttribute('data-freeze-position-on-hover', 'true');

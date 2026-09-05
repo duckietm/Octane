@@ -1,4 +1,4 @@
-import { AvatarFigurePartType, FigureDataContainer } from '@nitrots/nitro-renderer';
+import { AvatarFigurePartType, FigureDataContainer } from '@octane/renderer';
 import { FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory } from '../../api';
 import { LayoutCurrencyIcon } from '../../common';
@@ -58,7 +58,7 @@ export const AvatarEditorNftView: FC<{
     }, [activeSetType, resolvedSetType, selectSet, selectedColorParts]);
 
     if (!categories.length || !activeCategory) {
-        return <div className="nitro-avatar-editor-empty-state">No NFT items available.</div>;
+        return <div className="octane-avatar-editor-empty-state">No NFT items available.</div>;
     }
 
     const hasPagedSubcategories = categories.length + (resolvedSetType === AvatarFigurePartType.HEAD ? 2 : 0) > 5;
@@ -68,8 +68,8 @@ export const AvatarEditorNftView: FC<{
     };
 
     return (
-        <div className="nitro-avatar-editor-model nitro-avatar-editor-nft-model">
-            <div ref={subcategoryRef} className={`nitro-avatar-editor-subcategories${hasPagedSubcategories ? ' is-paged' : ''}`}>
+        <div className="octane-avatar-editor-model octane-avatar-editor-nft-model">
+            <div ref={subcategoryRef} className={`octane-avatar-editor-subcategories${hasPagedSubcategories ? ' is-paged' : ''}`}>
                 {categories.map((category) => (
                     <Fragment key={category.setType}>
                         <button
@@ -97,33 +97,33 @@ export const AvatarEditorNftView: FC<{
                 <>
                     <button
                         type="button"
-                        className="nitro-avatar-editor-nft-category-scroll is-left"
+                        className="octane-avatar-editor-nft-category-scroll is-left"
                         aria-label="Previous NFT categories"
                         onClick={() => scrollSubcategories(-1)}
                     />
                     <button
                         type="button"
-                        className="nitro-avatar-editor-nft-category-scroll is-right"
+                        className="octane-avatar-editor-nft-category-scroll is-right"
                         aria-label="Next NFT categories"
                         onClick={() => scrollSubcategories(1)}
                     />
                 </>
             )}
 
-            <div className="nitro-avatar-editor-parts-grid">
+            <div className="octane-avatar-editor-parts-grid">
                 <AvatarEditorFigureSetView category={activeCategory} columnCount={6} />
             </div>
 
             <button
                 type="button"
-                className={`nitro-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
+                className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                 onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
             >
                 Advanced Color
                 <LayoutCurrencyIcon type="hc" />
             </button>
 
-            <div className={`nitro-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
+            <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
                 {maxPaletteCount >= 1 && (
                     <div className="avatar-editor-palette-set-view">
                         {advancedColorMode ? (

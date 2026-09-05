@@ -1,4 +1,4 @@
-import { GetAvatarRenderManager, GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetAvatarRenderManager, GetSessionDataManager } from '@octane/renderer';
 import { cleanup, render, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useCatalogData, useCatalogUiState } from '../../../../../hooks';

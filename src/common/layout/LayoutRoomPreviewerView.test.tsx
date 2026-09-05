@@ -14,13 +14,13 @@ const previewMocks = vi.hoisted(() => ({
     render: vi.fn()
 }));
 
-vi.mock('@nitrots/nitro-renderer', () => ({
+vi.mock('@octane/renderer', () => ({
     GetRenderer: () => ({
         render: previewMocks.render,
         texture: { getPixels: previewMocks.getPixels }
     }),
     GetTicker: () => ({ add: previewMocks.add, remove: previewMocks.remove }),
-    NitroLogger: { error: vi.fn() },
+    OctaneLogger: { error: vi.fn() },
     TextureUtils: { createRenderTexture: previewMocks.createRenderTexture }
 }));
 

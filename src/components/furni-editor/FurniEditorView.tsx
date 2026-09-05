@@ -1,6 +1,6 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { useHasPermission } from '../../hooks';
 import { useFurniEditor } from '../../hooks/furni-editor';
 import { FurniEditorEditView } from './views/FurniEditorEditView';
@@ -125,17 +125,17 @@ export const FurniEditorView: FC<{}> = () => {
     if (!isVisible || !isMod) return null;
 
     return (
-        <NitroCardView uniqueKey="furni-editor" className="w-[620px] h-[520px]">
-            <NitroCardHeaderView headerText="Furni Editor" onCloseClick={handleClose} />
-            <NitroCardTabsView>
-                <NitroCardTabsItemView isActive={activeTab === TAB_SEARCH} onClick={() => setActiveTab(TAB_SEARCH)}>
+        <OctaneCardView uniqueKey="furni-editor" className="w-[620px] h-[520px]">
+            <OctaneCardHeaderView headerText="Furni Editor" onCloseClick={handleClose} />
+            <OctaneCardTabsView>
+                <OctaneCardTabsItemView isActive={activeTab === TAB_SEARCH} onClick={() => setActiveTab(TAB_SEARCH)}>
                     Search
-                </NitroCardTabsItemView>
-                <NitroCardTabsItemView isActive={activeTab === TAB_EDIT} onClick={() => selectedItem && setActiveTab(TAB_EDIT)}>
+                </OctaneCardTabsItemView>
+                <OctaneCardTabsItemView isActive={activeTab === TAB_EDIT} onClick={() => selectedItem && setActiveTab(TAB_EDIT)}>
                     Edit
-                </NitroCardTabsItemView>
-            </NitroCardTabsView>
-            <NitroCardContentView>
+                </OctaneCardTabsItemView>
+            </OctaneCardTabsView>
+            <OctaneCardContentView>
                 {error && (
                     <div className="bg-[#f8d7da] border border-[#f5c6cb] rounded p-2 text-[#721c24] text-xs mb-1 flex justify-between items-center">
                         <span>{error}</span>
@@ -166,7 +166,7 @@ export const FurniEditorView: FC<{}> = () => {
                         importResult={importResult}
                     />
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

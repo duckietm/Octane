@@ -1,8 +1,8 @@
-import { ChatRecordData, GetRoomChatlogMessageComposer, RoomChatlogEvent } from '@nitrots/nitro-renderer';
+import { ChatRecordData, GetRoomChatlogMessageComposer, RoomChatlogEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
-import { DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { ChatlogView } from '../chatlog/ChatlogView';
 
@@ -28,13 +28,13 @@ export const ModToolsChatlogView: FC<ModToolsChatlogViewProps> = (props) => {
     }, [roomId]);
 
     return (
-        <NitroCardView
-            className="nitro-mod-tools-chatlog min-w-0 w-[min(520px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-mod-tools-chatlog min-w-0 w-[min(520px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
-            <NitroCardHeaderView headerText={LocalizeText('modtools.room.chatlog.title')} onCloseClick={onCloseClick} />
-            <NitroCardContentView className="text-black" gap={1} overflow="auto">
+            <OctaneCardHeaderView headerText={LocalizeText('modtools.room.chatlog.title')} onCloseClick={onCloseClick} />
+            <OctaneCardContentView className="text-black" gap={1} overflow="auto">
                 {roomChatlog ? (
                     <ChatlogView records={[roomChatlog]} />
                 ) : (
@@ -43,7 +43,7 @@ export const ModToolsChatlogView: FC<ModToolsChatlogViewProps> = (props) => {
                         <span>{LocalizeText('modtools.user.chatlog.loading')}</span>
                     </div>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

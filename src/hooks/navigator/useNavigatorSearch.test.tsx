@@ -1,9 +1,9 @@
 /* @vitest-environment jsdom */
 
-import { NavigatorSearchEvent, NavigatorSearchResultSet } from '@nitrots/nitro-renderer';
+import { NavigatorSearchEvent, NavigatorSearchResultSet } from '@octane/renderer';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockEventDispatcher } from '../../nitro-renderer.mock';
+import { mockEventDispatcher } from '../../octane-renderer.mock';
 import { useNavigatorUiStore } from './navigatorUiStore';
 import { useNavigatorSearch } from './useNavigatorSearch';
 
@@ -11,7 +11,7 @@ import { useNavigatorSearch } from './useNavigatorSearch';
 // Helpers
 // ---------------------------------------------------------------------------
 
-// NOTE: useNavigatorSearch uses useMessageEvent + useState (NOT useNitroQuery).
+// NOTE: useNavigatorSearch uses useMessageEvent + useState (NOT useOctaneQuery).
 // The one-shot query pattern was reverted upstream (05d71dd1) because it left
 // the UI blank when the listener never matched. These tests exercise the
 // event-driven implementation directly — no QueryClient scaffolding.

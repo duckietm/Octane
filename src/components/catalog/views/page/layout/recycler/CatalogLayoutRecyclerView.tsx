@@ -7,7 +7,7 @@ import {
     RecycleItemsMessageComposer,
     RecyclerFinishedMessageEvent,
     RecyclerStatusMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../../api';
 import { useInventoryFurni, useMessageEvent } from '../../../../../../hooks';
@@ -125,13 +125,13 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
             : LocalizeText('recycler.info.ready');
 
     return (
-        <div className="nitro-catalog-recycler-layout">
-            <header className="nitro-catalog-recycler-header">
+        <div className="octane-catalog-recycler-layout">
+            <header className="octane-catalog-recycler-header">
                 {!!page.localization.getImage(0) && <img alt="" src={page.localization.getImage(0)} />}
                 <p>{statusText}</p>
             </header>
 
-            <div aria-label={LocalizeText('catalog.recycler.button.recycle')} className="nitro-catalog-recycler-slots" role="list">
+            <div aria-label={LocalizeText('catalog.recycler.button.recycle')} className="octane-catalog-recycler-slots" role="list">
                 {Array.from({ length: slotCount }, (_, index) => {
                     const slot = slots[index];
 
@@ -139,7 +139,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
                         <button
                             key={index}
                             aria-label={slot?.name ?? `${index + 1}`}
-                            className={`nitro-catalog-recycler-slot${slot ? ' is-filled' : ''}`}
+                            className={`octane-catalog-recycler-slot${slot ? ' is-filled' : ''}`}
                             disabled={processing || !slot}
                             role="listitem"
                             type="button"
@@ -151,7 +151,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
                 })}
             </div>
 
-            <div className="nitro-catalog-recycler-inventory">
+            <div className="octane-catalog-recycler-inventory">
                 {choices.length ? (
                     choices.map((choice) => (
                         <button key={choice.itemId} disabled={processing || slots.length >= slotCount} type="button" onClick={() => addChoice(choice)}>
@@ -160,12 +160,12 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
                         </button>
                     ))
                 ) : (
-                    <span className="nitro-catalog-specialized-empty">{LocalizeText('inventory.furni.preview.not_recyclable')}</span>
+                    <span className="octane-catalog-specialized-empty">{LocalizeText('inventory.furni.preview.not_recyclable')}</span>
                 )}
             </div>
 
             <button
-                className="nitro-catalog-standard-button nitro-catalog-recycler-action"
+                className="octane-catalog-standard-button octane-catalog-recycler-action"
                 disabled={processing || !enabled || secondsLeft > 0 || slots.length !== slotCount}
                 type="button"
                 onClick={recycle}

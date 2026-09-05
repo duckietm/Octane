@@ -12,7 +12,7 @@ export const NavigatorRoomSettingsSectionView: FC<NavigatorRoomSettingsSectionVi
     const { title = null, gap = 2, className = '', children = null } = props;
 
     return (
-        <Column gap={gap} className={`nitro-room-settings-section ${className}`.trim()}>
+        <Column gap={gap} className={`octane-room-settings-section ${className}`.trim()}>
             {title && (
                 <Text bold small>
                     {title}

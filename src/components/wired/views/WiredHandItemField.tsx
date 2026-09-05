@@ -1,4 +1,4 @@
-import { RoomObjectVariable } from '@nitrots/nitro-renderer';
+import { RoomObjectVariable } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { GetOwnRoomObject, LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';

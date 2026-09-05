@@ -1,4 +1,4 @@
-import { PressKeybindComposer } from '@nitrots/nitro-renderer';
+import { PressKeybindComposer } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { SendMessageComposer } from '../../../api';
 

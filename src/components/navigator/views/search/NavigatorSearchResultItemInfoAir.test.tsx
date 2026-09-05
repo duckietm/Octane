@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useNavigatorRoomInfoPopupStore } from '../../../../hooks';
 import { NavigatorRoomInfoPopupView } from './NavigatorRoomInfoPopupView';
 
-vi.mock('@nitrots/nitro-renderer', async () => {
-    const actual = await vi.importActual<typeof import('@nitrots/nitro-renderer')>('@nitrots/nitro-renderer');
+vi.mock('@octane/renderer', async () => {
+    const actual = await vi.importActual<typeof import('@octane/renderer')>('@octane/renderer');
 
     return {
         ...actual,
@@ -74,7 +74,7 @@ describe('AIR navigator room popover', () => {
     it('keeps the official 374px bubble width so metadata and actions do not collapse', () => {
         renderPopup();
 
-        expect(screen.getByRole('dialog')).toHaveClass('nitro-navigator-air__room-bubble');
+        expect(screen.getByRole('dialog')).toHaveClass('octane-navigator-air__room-bubble');
         expect(screen.getByRole('dialog')).toHaveStyle({ width: '374px' });
     });
 

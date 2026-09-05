@@ -1,7 +1,7 @@
 import { FC, MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { HabbiconEntry, HabbiconSet, localizeHabbiconName, localizeWithFallback } from '../../../../api';
 import { HabbiconFavorite, HabbiconHeaderPattern, HabbiconsLogo } from '../../../../assets/images/habbicons';
-import { DraggableWindowPosition, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { DraggableWindowPosition, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 
 type HabbiconHubViewProps = {
     baseUrl: string;
@@ -57,8 +57,8 @@ export const HabbiconHubView: FC<HabbiconHubViewProps> = ({ baseUrl, sets, favor
     const popupFavorite = popupEntry ? favoriteIds.includes(popupEntry.id) : false;
 
     return (
-        <NitroCardView classNames={['habbicon-hub-window']} isResizable={false} uniqueKey="habbicon-hub" windowPosition={DraggableWindowPosition.CENTER}>
-            <NitroCardHeaderView headerText={localizeWithFallback('habbicon_book.title', 'Habbicon Book')} onCloseClick={onClose} />
+        <OctaneCardView classNames={['habbicon-hub-window']} isResizable={false} uniqueKey="habbicon-hub" windowPosition={DraggableWindowPosition.CENTER}>
+            <OctaneCardHeaderView headerText={localizeWithFallback('habbicon_book.title', 'Habbicon Book')} onCloseClick={onClose} />
             <div className="habbicon-hub-body">
                 <div className="habbicon-hub-header">
                     <img alt="" className="habbicon-hub-header-pattern" src={HabbiconHeaderPattern} />
@@ -206,6 +206,6 @@ export const HabbiconHubView: FC<HabbiconHubViewProps> = ({ baseUrl, sets, favor
                     </div>
                 )}
             </div>
-        </NitroCardView>
+        </OctaneCardView>
     );
 };

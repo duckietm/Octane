@@ -1,4 +1,4 @@
-import { RelationshipStatusInfoMessageParser } from '@nitrots/nitro-renderer';
+import { RelationshipStatusInfoMessageParser } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText } from '../../api';
 import { RelationshipsContainerView } from './RelationshipsContainerView';

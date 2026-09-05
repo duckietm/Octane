@@ -1,4 +1,4 @@
-import { GetRoomEngine, IWheelPrize } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, IWheelPrize } from '@octane/renderer';
 import { ReactNode } from 'react';
 import { Column, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutImage } from '../../common';
 

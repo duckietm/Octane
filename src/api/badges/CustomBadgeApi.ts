@@ -1,4 +1,4 @@
-import { GetConfiguration, GetLocalizationManager } from '@nitrots/nitro-renderer';
+import { GetConfiguration, GetLocalizationManager } from '@octane/renderer';
 import { clearAccessToken, getAccessToken } from '../auth';
 
 export interface CustomBadgeRecord {
@@ -46,7 +46,7 @@ const buildUrl = (key: string, fallback: string, badgeId?: string): string => {
 const authHeaders = (): Record<string, string> => {
     const headers: Record<string, string> = {
         Accept: 'application/json',
-        'X-Requested-With': 'NitroCustomBadges'
+        'X-Requested-With': 'OctaneCustomBadges'
     };
     const token = getAccessToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;

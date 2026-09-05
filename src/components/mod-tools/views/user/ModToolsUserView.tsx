@@ -4,11 +4,11 @@ import {
     ModeratorActionResultMessageEvent,
     ModeratorUserInfoData,
     ModeratorUserInfoEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaBan, FaCommentDots, FaDoorOpen, FaEnvelope, FaExchangeAlt, FaExclamationTriangle, FaGavel, FaSync } from 'react-icons/fa';
 import { FriendlyTime, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useMessageEvent, useRoomUserListSnapshot } from '../../../../hooks';
 import { ModToolsUserModActionView } from './ModToolsUserModActionView';
 import { ModToolsUserRoomVisitsView } from './ModToolsUserRoomVisitsView';
@@ -119,16 +119,16 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = (props) => {
 
     return (
         <>
-            <NitroCardView
-                className="nitro-mod-tools-user min-w-0 w-[min(480px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+            <OctaneCardView
+                className="octane-mod-tools-user min-w-0 w-[min(480px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 windowPosition={DraggableWindowPosition.TOP_LEFT}
             >
-                <NitroCardHeaderView
+                <OctaneCardHeaderView
                     headerText={LocalizeText('modtools.userinfo.title', ['username'], [userInfo.userName])}
                     onCloseClick={() => onCloseClick()}
                 />
-                <NitroCardContentView className="text-black" gap={2}>
+                <OctaneCardContentView className="text-black" gap={2}>
                     {/* Identity header: name + presence pill + manual refresh */}
                     <div className="flex items-center gap-2 bg-gradient-to-r from-sky-50 to-transparent rounded p-2 border border-sky-100">
                         <div className="flex flex-col grow min-w-0">
@@ -221,8 +221,8 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = (props) => {
                             <FaGavel size={12} /> {LocalizeText('modtools.userinfo.button.mod.action')}
                         </Button>
                     </div>
-                </NitroCardContentView>
-            </NitroCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
             {sendMessageVisible && (
                 <ModToolsUserSendMessageView user={{ userId: userId, username: userInfo.userName }} onCloseClick={() => setSendMessageVisible(false)} />
             )}

@@ -1,4 +1,4 @@
-import type { IHotelViewLandingScene, IHotelViewLandingSlot } from '@nitrots/nitro-renderer';
+import type { IHotelViewLandingScene, IHotelViewLandingSlot } from '@octane/renderer';
 import {
     CreateLinkEvent,
     GetSessionDataManager,
@@ -8,7 +8,7 @@ import {
     HotelViewLandingSaveComposer,
     HotelViewLandingSaveSceneComposer,
     HotelViewLandingVoteComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { CSSProperties, FC, FormEvent, PointerEvent, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, SendMessageComposer } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
@@ -501,7 +501,7 @@ export const HotelView: FC = () => {
     };
 
     return (
-        <div ref={containerRef} className="nitro-hotel-view block fixed w-full h-[calc(100%-55px)]" style={containerStyle}>
+        <div ref={containerRef} className="octane-hotel-view block fixed w-full h-[calc(100%-55px)]" style={containerStyle}>
             {scene.leftUrl
                 ? <div className="hotelview-edge hotelview-edge-left"><img src={resolveImageUrl(scene.leftUrl, imageLibraryUrl, assetUrl)} alt="" /><LayoutAvatarImageView classNames={['hotelview-avatar']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} /></div>
                 : <LayoutAvatarImageView classNames={['hotelview-avatar hotelview-avatar-fallback']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} />}

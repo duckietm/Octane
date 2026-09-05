@@ -49,8 +49,8 @@ describe('catalog offer tile', () => {
         const { container } = render(<CatalogOfferTileView offer={clubOffer} selectOffer={() => undefined} />);
 
         expect(screen.getByLabelText('Habbo Club')).toBeInTheDocument();
-        expect(container.querySelector('.nitro-catalog-grid-price')).toHaveClass('is-multi-price');
-        expect(container.querySelectorAll('.nitro-catalog-grid-price-entry')).toHaveLength(2);
+        expect(container.querySelector('.octane-catalog-grid-price')).toHaveClass('is-multi-price');
+        expect(container.querySelectorAll('.octane-catalog-grid-price-entry')).toHaveLength(2);
         expect(screen.getByText('5')).toBeInTheDocument();
         expect(screen.getByText('200')).toBeInTheDocument();
         expect(screen.getByText('+')).toBeInTheDocument();

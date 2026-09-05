@@ -1,4 +1,4 @@
-import { ForumData, ForumsListMessageEvent, GetForumsListMessageComposer } from '@nitrots/nitro-renderer';
+import { ForumData, ForumsListMessageEvent, GetForumsListMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Column, Flex, LayoutBadgeImageView, Text } from '../../../../common';

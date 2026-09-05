@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -34,7 +34,7 @@ export const WiredActionKickFromRoomView: FC<{}> = (props) => {
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
-                <NitroInput
+                <OctaneInput
                     maxLength={GetConfigurationValue<number>('wired.action.kick.from.room.max.length', 100)}
                     type="text"
                     value={message}

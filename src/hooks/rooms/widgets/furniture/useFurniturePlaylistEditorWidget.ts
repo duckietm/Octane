@@ -18,10 +18,10 @@ import {
     RoomControllerLevel,
     RoomEngineTriggerWidgetEvent,
     SongDiskInventoryReceivedEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useState } from 'react';
 import { IsOwnerOfFurniture, LocalizeText, NotificationAlertType, NotificationBubbleType, SendMessageComposer } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useNotification } from '../../../notification';
 import { useFurniRemovedEvent } from '../../engine';
 import { useRoom } from '../../useRoom';
@@ -46,7 +46,7 @@ const useFurniturePlaylistEditorWidgetState = () => {
 
     const togglePlayPause = useCallback((furniId: number, position: number) => SendMessageComposer(new FurnitureMultiStateComposer(furniId, position)), []);
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_PLAYLIST_EDITOR, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_PLAYLIST_EDITOR, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject) return;
@@ -72,26 +72,26 @@ const useFurniturePlaylistEditorWidgetState = () => {
         onClose();
     });
 
-    useNitroEvent<NowPlayingEvent>(NowPlayingEvent.NPE_SONG_CHANGED, (event) => {
+    useOctaneEvent<NowPlayingEvent>(NowPlayingEvent.NPE_SONG_CHANGED, (event) => {
         setCurrentPlayingIndex(event.position);
     });
 
-    useNitroEvent<NotifyPlayedSongEvent>(NotifyPlayedSongEvent.NOTIFY_PLAYED_SONG, (event) => {
+    useOctaneEvent<NotifyPlayedSongEvent>(NotifyPlayedSongEvent.NOTIFY_PLAYED_SONG, (event) => {
         showSingleBubble(
             LocalizeText('soundmachine.notification.playing', ['songname', 'songauthor'], [event.name, event.creator]),
             NotificationBubbleType.SOUNDMACHINE
         );
     });
 
-    useNitroEvent<SongDiskInventoryReceivedEvent>(SongDiskInventoryReceivedEvent.SDIR_SONG_DISK_INVENTORY_RECEIVENT_EVENT, (event) => {
+    useOctaneEvent<SongDiskInventoryReceivedEvent>(SongDiskInventoryReceivedEvent.SDIR_SONG_DISK_INVENTORY_RECEIVENT_EVENT, (event) => {
         setDiskInventory(GetSoundManager().musicController?.songDiskInventory.clone());
     });
 
-    useNitroEvent<PlayListStatusEvent>(PlayListStatusEvent.PLUE_PLAY_LIST_UPDATED, (event) => {
+    useOctaneEvent<PlayListStatusEvent>(PlayListStatusEvent.PLUE_PLAY_LIST_UPDATED, (event) => {
         setPlaylist(GetSoundManager().musicController?.getRoomItemPlaylist()?.entries.concat());
     });
 
-    useNitroEvent<PlayListStatusEvent>(PlayListStatusEvent.PLUE_PLAY_LIST_FULL, (event) => {
+    useOctaneEvent<PlayListStatusEvent>(PlayListStatusEvent.PLUE_PLAY_LIST_FULL, (event) => {
         simpleAlert(
             LocalizeText('playlist.editor.alert.playlist.full'),
             NotificationAlertType.ALERT,

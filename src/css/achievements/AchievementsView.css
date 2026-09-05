@@ -12,7 +12,7 @@
     font-weight: 700;
 }
 
-.nitro-card-shell.nitro-achievements-air {
+.octane-card-shell.octane-achievements-air {
     position: relative;
     box-sizing: border-box;
     width: 389px !important;
@@ -29,7 +29,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-card-shell.nitro-achievements-air::after {
+.octane-card-shell.octane-achievements-air::after {
     position: absolute;
     inset: 0;
     z-index: 50;
@@ -39,19 +39,19 @@
     pointer-events: none;
 }
 
-.draggable-window:has(> .nitro-achievements-air) {
+.draggable-window:has(> .octane-achievements-air) {
     width: 389px;
     min-width: 389px;
     max-width: 389px;
     height: auto;
 }
 
-.nitro-achievements-air,
-.nitro-achievements-air * {
+.octane-achievements-air,
+.octane-achievements-air * {
     box-sizing: border-box;
 }
 
-.nitro-achievements-air > .nitro-card-header-shell {
+.octane-achievements-air > .octane-card-header-shell {
     min-height: 33px !important;
     max-height: 33px !important;
     height: 33px !important;
@@ -59,12 +59,12 @@
     background: #418db0;
 }
 
-.nitro-achievements-air > .nitro-card-header-shell .nitro-card-title {
+.octane-achievements-air > .octane-card-header-shell .octane-card-title {
     min-height: 33px;
     line-height: 33px;
 }
 
-.nitro-achievements-air .air-achievements-content.nitro-card-content-shell {
+.octane-achievements-air .air-achievements-content.octane-card-content-shell {
     display: flex;
     width: 389px;
     height: auto !important;
@@ -670,14 +670,14 @@
 }
 
 @media (max-width: 405px) {
-    .nitro-card-shell.nitro-achievements-air,
-    .draggable-window:has(> .nitro-achievements-air) {
+    .octane-card-shell.octane-achievements-air,
+    .draggable-window:has(> .octane-achievements-air) {
         width: calc(100vw - 16px) !important;
         min-width: 0 !important;
         max-width: calc(100vw - 16px) !important;
     }
 
-    .nitro-achievements-air .air-achievements-content.nitro-card-content-shell {
+    .octane-achievements-air .air-achievements-content.octane-card-content-shell {
         width: 100%;
         overflow-x: auto;
         overflow-y: visible;

@@ -10,7 +10,7 @@ export const ContextMenuCaretView: FC<CaretViewProps> = (props) => {
     const { justifyContent = 'center', alignItems = 'center', classNames = [], collapsed = true, showIcon = true, ...rest } = props;
 
     const getClassNames = useMemo(() => {
-        const newClassNames: string[] = ['menu-footer nitro-context-menu-footer'];
+        const newClassNames: string[] = ['menu-footer octane-context-menu-footer'];
 
         if (classNames.length) newClassNames.push(...classNames);
 

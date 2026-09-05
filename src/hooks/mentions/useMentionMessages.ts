@@ -1,4 +1,4 @@
-import { MentionReceivedEvent, MentionsListEvent, RequestMentionsComposer } from '@nitrots/nitro-renderer';
+import { MentionReceivedEvent, MentionsListEvent, RequestMentionsComposer } from '@octane/renderer';
 import { useCallback, useEffect } from 'react';
 import { GetConfigurationValue, IMentionEntry, PlaySound, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';

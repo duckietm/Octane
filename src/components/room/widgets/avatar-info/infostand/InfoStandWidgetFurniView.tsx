@@ -17,7 +17,7 @@ import {
     SongInfoReceivedEvent,
     StringDataType,
     UpdateFurniturePositionComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCrosshairs, FaTimes } from 'react-icons/fa';
 import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
@@ -34,8 +34,8 @@ import {
     Text,
     UserProfileIconView
 } from '../../../../../common';
-import { useHasPermission, useMessageEvent, useNitroEvent, useRareValues, useRoom, useWiredTools } from '../../../../../hooks';
-import { NitroInput } from '../../../../../layout';
+import { useHasPermission, useMessageEvent, useOctaneEvent, useRareValues, useRoom, useWiredTools } from '../../../../../hooks';
+import { OctaneInput } from '../../../../../layout';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
 
 interface InfoStandWidgetFurniViewProps {
@@ -222,7 +222,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         [furniLocationZ, sendUpdate]
     );
 
-    useNitroEvent<NowPlayingEvent>(
+    useOctaneEvent<NowPlayingEvent>(
         NowPlayingEvent.NPE_SONG_CHANGED,
         (event) => {
             setSongId(event.id);
@@ -230,7 +230,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         isJukeBox || isSongDisk
     );
 
-    useNitroEvent<NowPlayingEvent>(
+    useOctaneEvent<NowPlayingEvent>(
         SongInfoReceivedEvent.SIR_TRAX_SONG_INFO_RECEIVED,
         (event) => {
             if (event.id !== songId) return;
@@ -1000,7 +1000,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                                         <Text small wrap align="end" className="col-span-4" variant="white">
                                                             {key}
                                                         </Text>
-                                                        <NitroInput
+                                                        <OctaneInput
                                                             type="text"
                                                             className="text-black"
                                                             style={{ color: '#000' }}
@@ -1025,7 +1025,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                                 <Text small wrap align="end" className="col-span-4" variant="white">
                                                     {key}
                                                 </Text>
-                                                <NitroInput
+                                                <OctaneInput
                                                     type="text"
                                                     className="text-black"
                                                     style={{ color: '#000' }}

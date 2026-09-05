@@ -250,7 +250,7 @@ export const HousekeepingUsersTab: FC = () => {
                                     headOnly={true}
                                 />
                             ) : (
-                                <span className="absolute inset-0 m-auto nitro-icon nitro-icon-hk-hero icon-modtools" />
+                                <span className="absolute inset-0 m-auto octane-icon octane-icon-hk-hero icon-modtools" />
                             )}
                         </div>
                         <div className="grow min-w-0">

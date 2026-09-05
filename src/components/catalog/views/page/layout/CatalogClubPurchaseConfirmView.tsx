@@ -1,7 +1,7 @@
-import { ClubOfferData } from '@nitrots/nitro-renderer';
+import { ClubOfferData } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../../../api';
-import { LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../../common';
+import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 
 interface CatalogClubPurchaseConfirmViewProps {
     offer: ClubOfferData;
@@ -22,36 +22,36 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
     const title = LocalizeText('catalog.club.buy.confirm');
 
     return (
-        <NitroCardView
+        <OctaneCardView
             aria-label={title}
             aria-modal="true"
-            classNames={['nitro-club-purchase-confirm']}
+            classNames={['octane-club-purchase-confirm']}
             frameStyle={3}
             isResizable={false}
             role="dialog"
             theme="primary-slim"
         >
-            <NitroCardHeaderView headerText={title} onCloseClick={onCancel} />
-            <NitroCardContentView
-                classNames={['nitro-club-purchase-confirm-content', disclaimerEnabled ? 'has-disclaimer' : ''].filter(Boolean)}
+            <OctaneCardHeaderView headerText={title} onCloseClick={onCancel} />
+            <OctaneCardContentView
+                classNames={['octane-club-purchase-confirm-content', disclaimerEnabled ? 'has-disclaimer' : ''].filter(Boolean)}
                 overflow="hidden"
             >
-                <div className="nitro-club-purchase-confirm-product">
-                    <span aria-hidden="true" className="nitro-club-purchase-confirm-icon" />
-                    <div className="nitro-club-purchase-confirm-copy">
+                <div className="octane-club-purchase-confirm-product">
+                    <span aria-hidden="true" className="octane-club-purchase-confirm-icon" />
+                    <div className="octane-club-purchase-confirm-copy">
                         <strong>{productText}</strong>
                         <span>{validUntilText}</span>
-                        <div className="nitro-club-purchase-confirm-cost-row">
+                        <div className="octane-club-purchase-confirm-cost-row">
                             <span>{LocalizeText('catalog.purchase.confirmation.dialog.cost')}</span>
-                            <span className="nitro-club-purchase-confirm-price">
+                            <span className="octane-club-purchase-confirm-price">
                                 {showCredits && (
-                                    <span className="nitro-club-purchase-confirm-price-part" data-currency-type="-1">
+                                    <span className="octane-club-purchase-confirm-price-part" data-currency-type="-1">
                                         <strong>{offer.priceCredits}</strong>
                                         <LayoutCurrencyIcon type={-1} />
                                     </span>
                                 )}
                                 {offer.priceActivityPoints > 0 && (
-                                    <span className="nitro-club-purchase-confirm-price-part" data-currency-type={offer.priceActivityPointsType}>
+                                    <span className="octane-club-purchase-confirm-price-part" data-currency-type={offer.priceActivityPointsType}>
                                         <strong>{`${offer.priceCredits > 0 ? '+ ' : ''}${offer.priceActivityPoints}`}</strong>
                                         <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
                                     </span>
@@ -62,21 +62,21 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
                 </div>
 
                 {disclaimerEnabled && (
-                    <label className="nitro-club-purchase-confirm-disclaimer">
+                    <label className="octane-club-purchase-confirm-disclaimer">
                         <input checked={disclaimerAccepted} type="checkbox" onChange={(event) => setDisclaimerAccepted(event.target.checked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}
 
-                <div className="nitro-club-purchase-confirm-actions">
-                    <button className="nitro-club-purchase-confirm-cancel" type="button" onClick={onCancel}>
+                <div className="octane-club-purchase-confirm-actions">
+                    <button className="octane-club-purchase-confirm-cancel" type="button" onClick={onCancel}>
                         {LocalizeText('cancel')}
                     </button>
-                    <button className="nitro-club-purchase-confirm-submit" disabled={!disclaimerAccepted} type="button" onClick={onConfirm}>
+                    <button className="octane-club-purchase-confirm-submit" disabled={!disclaimerAccepted} type="button" onClick={onConfirm}>
                         {LocalizeText('catalog.club.buy.subscribe')}
                     </button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

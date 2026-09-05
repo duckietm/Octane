@@ -1,6 +1,6 @@
 import { FC, useMemo, useState } from 'react';
 import { LocalizeText } from '../../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { HelpNameChangeEvent } from '../../../../events';
 import { useUiEvent } from '../../../../hooks';
 import { NameChangeConfirmationView } from './NameChangeConfirmationView';
@@ -51,13 +51,13 @@ export const NameChangeView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-change-username" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText(titleKey)} onCloseClick={() => onAction('close')} />
-            <NitroCardContentView className="text-black">
+        <OctaneCardView className="octane-change-username" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText(titleKey)} onCloseClick={() => onAction('close')} />
+            <OctaneCardContentView className="text-black">
                 {layout === INIT && <NameChangeInitView onAction={onAction} />}
                 {layout === INPUT && <NameChangeInputView onAction={onAction} />}
                 {layout === CONFIRMATION && <NameChangeConfirmationView username={newUsername} onAction={onAction} />}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

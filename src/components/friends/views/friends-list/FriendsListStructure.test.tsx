@@ -2,7 +2,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { AddLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker } from '@octane/renderer';
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFriends } from '../../../../hooks';

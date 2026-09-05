@@ -2,7 +2,7 @@
     "news": [
         {
             "id": 1,
-            "title": "Welcome to Nitro local mode",
+            "title": "Welcome to Octane local mode",
             "body": "This news card is loaded from public/configuration/news.json while yarn start is running.",
             "image": "${image.library.url}web_promo_small/spromo_Canal_Bundle.png",
             "link": "",

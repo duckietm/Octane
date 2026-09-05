@@ -7,7 +7,7 @@ import {
     GetGameListMessageComposer,
     LoadGameUrlEvent,
     RoomEnterEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetRoomSession, SendMessageComposer, setSnowWarReturnRoom, VisitDesktop } from '../../api';

@@ -57,7 +57,7 @@ export const WiredExtraVariableTextConnectorView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <Text bold>{LocalizeText('wiredfurni.params.variables.connect_text.title')}</Text>
                 <textarea
-                    className="form-control form-control-sm nitro-wired__resizable-textarea"
+                    className="form-control form-control-sm octane-wired__resizable-textarea"
                     maxLength={MAX_CONNECTOR_CHARACTERS}
                     placeholder={placeholderText}
                     value={mappingsText}

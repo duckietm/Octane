@@ -7,8 +7,8 @@ fallback automatico al default (solo quel pezzo).
 
 ## Dove vivono
 - **Questa cartella (`custom-themes/`) è solo il TEMPLATE di riferimento**, versionata su git.
-- I temi **veri** stanno sul server in `public/nitro/custom-themes/` (serviti via
-  l'url configurato in ui-config `theme.base.url`, es. `/client/nitro/custom-themes`).
+- I temi **veri** stanno sul server in `public/octane/custom-themes/` (serviti via
+  l'url configurato in ui-config `theme.base.url`, es. `/client/octane/custom-themes`).
   NON vanno su git → vedi `.gitignore` (`public/custom-themes/`).
 
 ## Struttura
@@ -26,7 +26,7 @@ custom-themes/
 2. Modifica `theme.json` (nome + elenco pezzi).
 3. Scrivi i CSS dei pezzi (override con `!important`, caricati dopo il base).
 4. Aggiungi `{ "id": "<id>", "name": "..." }` a `index.json`.
-5. Carica la cartella in `public/nitro/custom-themes/` sul server. **Nessun rebuild.**
+5. Carica la cartella in `public/octane/custom-themes/` sul server. **Nessun rebuild.**
 
 ## Default hotel-wide (admin)
 In `ui-config.json`:

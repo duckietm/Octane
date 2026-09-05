@@ -1,8 +1,8 @@
-import { EditEventMessageComposer } from '@nitrots/nitro-renderer';
+import { EditEventMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../../common';
-import { NitroInput } from '../../../../../layout';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
+import { OctaneInput } from '../../../../../layout';
 
 interface RoomPromoteEditWidgetViewProps {
     eventId: number;
@@ -22,12 +22,12 @@ export const RoomPromoteEditWidgetView: FC<RoomPromoteEditWidgetViewProps> = (pr
     };
 
     return (
-        <NitroCardView className="nitro-guide-tool nitro-room-promote-edit min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('navigator.eventsettings.editcaption')} onCloseClick={() => setIsEditingPromote(false)} />
-            <NitroCardContentView className="text-black">
+        <OctaneCardView className="octane-guide-tool octane-room-promote-edit min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('navigator.eventsettings.editcaption')} onCloseClick={() => setIsEditingPromote(false)} />
+            <OctaneCardContentView className="text-black">
                 <div className="flex flex-col">
                     <Text bold>{LocalizeText('navigator.eventsettings.name')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         maxLength={64}
                         placeholder={LocalizeText('navigator.eventsettings.name')}
                         type="text"
@@ -55,7 +55,7 @@ export const RoomPromoteEditWidgetView: FC<RoomPromoteEditWidgetViewProps> = (pr
                         {LocalizeText('navigator.eventsettings.edit')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

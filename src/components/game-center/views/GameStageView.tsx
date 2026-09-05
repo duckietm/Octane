@@ -1,4 +1,4 @@
-import { Game2ExitGameMessageComposer } from '@nitrots/nitro-renderer';
+import { Game2ExitGameMessageComposer } from '@octane/renderer';
 import { useEffect, useRef, useState } from 'react';
 import { SendMessageComposer } from '../../../api';
 import { useGameCenter } from '../../../hooks';

@@ -282,7 +282,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
         deleteOffer(effectiveOfferId);
     };
 
-    const inputClass = 'nitro-catalog-admin-input';
+    const inputClass = 'octane-catalog-admin-input';
     const previewIconUrl = isNewOffer ? null : getOfferIconUrl(editingOffer);
     const previewName =
         catalogName || editingOffer.localizationName || (isNewOffer ? localizeWithFallback('catalog.admin.offer.new', 'New offer') : `#${effectiveOfferId}`);
@@ -296,11 +296,11 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
             widthClassName="w-[500px]"
             onClose={smartSave.requestClose}
         >
-            <div className="nitro-catalog-admin-form">
-                <div className="nitro-catalog-admin-form-sheet">
-                    <div className="nitro-catalog-admin-form-scroll">
-                        <div className="nitro-catalog-admin-form-hero">
-                            <span className="nitro-catalog-admin-offer-preview-icon">
+            <div className="octane-catalog-admin-form">
+                <div className="octane-catalog-admin-form-sheet">
+                    <div className="octane-catalog-admin-form-scroll">
+                        <div className="octane-catalog-admin-form-hero">
+                            <span className="octane-catalog-admin-offer-preview-icon">
                                 {previewIconUrl ? (
                                     <img
                                         alt=""
@@ -313,30 +313,30 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         }}
                                     />
                                 ) : (
-                                    <FaCubes className="nitro-catalog-admin-offer-preview-icon-empty" />
+                                    <FaCubes className="octane-catalog-admin-offer-preview-icon-empty" />
                                 )}
                             </span>
-                            <div className="nitro-catalog-admin-offer-preview-info">
-                                <span className="nitro-catalog-admin-offer-preview-name" title={previewName}>
+                            <div className="octane-catalog-admin-offer-preview-info">
+                                <span className="octane-catalog-admin-offer-preview-name" title={previewName}>
                                     {previewName}
                                 </span>
-                                <span className="nitro-catalog-admin-offer-preview-sub">
+                                <span className="octane-catalog-admin-offer-preview-sub">
                                     {isNewOffer
                                         ? localizeWithFallback('catalog.admin.offer.new', 'New offer')
                                         : `${localizeWithFallback('catalog.admin.offer.id', 'Offer ID')} #${effectiveOfferId}`}
                                     {amount > 1 ? ` · x${amount}` : ''}
                                 </span>
-                                <span className="nitro-catalog-admin-offer-preview-price">
+                                <span className="octane-catalog-admin-offer-preview-price">
                                     <CatalogAdminOfferPriceView credits={costCredits} points={costPoints} pointsType={pointsType} />
                                     {costCredits <= 0 && costPoints <= 0 && <span className="is-free">{localizeWithFallback('generic.free', 'Free')}</span>}
                                 </span>
                             </div>
                         </div>
 
-                        <section className="nitro-catalog-admin-form-section">
-                            <div className="nitro-catalog-admin-section-title">{localizeWithFallback('catalog.admin.offer.section.details', 'Details')}</div>
-                            <div className="nitro-catalog-admin-form-field">
-                                <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.name')}</label>
+                        <section className="octane-catalog-admin-form-section">
+                            <div className="octane-catalog-admin-section-title">{localizeWithFallback('catalog.admin.offer.section.details', 'Details')}</div>
+                            <div className="octane-catalog-admin-form-field">
+                                <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.name')}</label>
                                 <input
                                     ref={catalogNameInputRef}
                                     aria-invalid={!!smartSave.fieldErrors.catalogName}
@@ -346,11 +346,11 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                     value={catalogName}
                                     onChange={(e) => setCatalogName(e.target.value)}
                                 />
-                                {smartSave.fieldErrors.catalogName && <span className="nitro-catalog-admin-field-error">{smartSave.fieldErrors.catalogName}</span>}
+                                {smartSave.fieldErrors.catalogName && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.catalogName}</span>}
                             </div>
-                            <div className="nitro-catalog-admin-form-grid is-3col">
-                                <div className="nitro-catalog-admin-form-field is-span-3">
-                                    <label className="nitro-catalog-admin-label is-field">
+                            <div className="octane-catalog-admin-form-grid is-3col">
+                                <div className="octane-catalog-admin-form-field is-span-3">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.offer.item.ids', 'Item IDs')}
                                     </label>
                                     <input
@@ -362,10 +362,10 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         value={itemIds}
                                         onChange={(e) => setItemIds(e.target.value)}
                                     />
-                                    {smartSave.fieldErrors.itemIds && <span className="nitro-catalog-admin-field-error">{smartSave.fieldErrors.itemIds}</span>}
+                                    {smartSave.fieldErrors.itemIds && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.itemIds}</span>}
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.quantity')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.quantity')}</label>
                                     <input
                                         ref={limitedStackInputRef}
                                         aria-invalid={!!smartSave.fieldErrors.limitedStack}
@@ -376,8 +376,8 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         onChange={(e) => setAmount(parseInt(e.target.value) || 1)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
                                     <input
                                         className={inputClass}
                                         type="number"
@@ -385,8 +385,8 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         onChange={(e) => setOrderNumber(parseInt(e.target.value) || 0)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.offer.id', 'Offer ID')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.offer.id', 'Offer ID')}</label>
                                     <input
                                         className={inputClass}
                                         type="number"
@@ -397,11 +397,11 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                             </div>
                         </section>
 
-                        <section className="nitro-catalog-admin-form-section">
-                            <div className="nitro-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.prices')}</div>
-                            <div className="nitro-catalog-admin-form-grid is-3col">
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.credits')}</label>
+                        <section className="octane-catalog-admin-form-section">
+                            <div className="octane-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.prices')}</div>
+                            <div className="octane-catalog-admin-form-grid is-3col">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.credits')}</label>
                                     <input
                                         className={inputClass}
                                         min={0}
@@ -410,8 +410,8 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         onChange={(e) => setCostCredits(parseInt(e.target.value) || 0)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points')}</label>
                                     <input
                                         className={inputClass}
                                         min={0}
@@ -420,8 +420,8 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         onChange={(e) => setCostPoints(parseInt(e.target.value) || 0)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points.type')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points.type')}</label>
                                     <select className={inputClass} value={pointsType} onChange={(e) => setPointsType(parseInt(e.target.value))}>
                                         {currencyTypes.map((type) => (
                                             <option key={type} value={type}>
@@ -433,18 +433,18 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                             </div>
                         </section>
 
-                        <section className="nitro-catalog-admin-form-section">
-                            <div className="nitro-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.options')}</div>
-                            <div className="nitro-catalog-admin-form-grid is-3col">
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.club.only')}</label>
+                        <section className="octane-catalog-admin-form-section">
+                            <div className="octane-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.options')}</div>
+                            <div className="octane-catalog-admin-form-grid is-3col">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.club.only')}</label>
                                     <select className={inputClass} value={clubOnly} onChange={(e) => setClubOnly(e.target.value)}>
                                         <option value="0">{localizeWithFallback('generic.no', 'No')}</option>
                                         <option value="1">{localizeWithFallback('generic.yes', 'Yes')}</option>
                                     </select>
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.offer.limited.stack', 'Limited stack')}
                                     </label>
                                     <input
@@ -454,18 +454,18 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         value={limitedStack}
                                         onChange={(e) => setLimitedStack(parseInt(e.target.value) || 0)}
                                     />
-                                    {smartSave.fieldErrors.limitedStack && <span className="nitro-catalog-admin-field-error">{smartSave.fieldErrors.limitedStack}</span>}
+                                    {smartSave.fieldErrors.limitedStack && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.limitedStack}</span>}
                                 </div>
                                 {!isNewOffer && (
-                                    <div className="nitro-catalog-admin-form-field">
-                                        <label className="nitro-catalog-admin-label is-field">
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">
                                             {localizeWithFallback('catalog.admin.offer.limited.sold', 'Already sold')}
                                         </label>
                                         <input className={inputClass} readOnly type="number" value={limitedSells} />
                                     </div>
                                 )}
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.extradata')}</label>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.extradata')}</label>
                                     <input
                                         className={inputClass}
                                         placeholder={LocalizeText('catalog.admin.offer.extradata')}
@@ -474,8 +474,8 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         onChange={(e) => setExtradata(e.target.value)}
                                     />
                                 </div>
-                                <div className="nitro-catalog-admin-form-field">
-                                    <label className="nitro-catalog-admin-label is-field">
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.offer.song.id', 'Song ID')}
                                     </label>
                                     <input
@@ -487,7 +487,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                     />
                                 </div>
                             </div>
-                            <label className="nitro-catalog-admin-form-toggle">
+                            <label className="octane-catalog-admin-form-toggle">
                                 <input
                                     checked={haveOffer === '1'}
                                     id="haveOffer"
@@ -499,19 +499,19 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                         </section>
                     </div>
 
-                    <div className={`nitro-catalog-admin-savebar is-${smartSave.status}`}>
-                        <div className="nitro-catalog-admin-savebar-status" aria-live="polite">
+                    <div className={`octane-catalog-admin-savebar is-${smartSave.status}`}>
+                        <div className="octane-catalog-admin-savebar-status" aria-live="polite">
                             <span>{validationError || smartSave.message || interaction.message || saveStatusText}</span>
                             <small>Ctrl+S</small>
                         </div>
-                        <div className="nitro-catalog-admin-savebar-actions">
+                        <div className="octane-catalog-admin-savebar-actions">
                             {!isNewOffer && (
-                                <button className="nitro-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
+                                <button className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
                                     <FaTrash className="text-[8px]" /> {LocalizeText('catalog.admin.delete')}
                                 </button>
                             )}
                             <button
-                                className="nitro-catalog-admin-button is-muted"
+                                className="octane-catalog-admin-button is-muted"
                                 disabled={!smartSave.isDirty || !!smartSave.inFlight}
                                 type="button"
                                 onClick={smartSave.reset}
@@ -519,7 +519,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                 <FaUndo className="text-[8px]" /> Reset
                             </button>
                             <button
-                                className="nitro-catalog-admin-button is-muted"
+                                className="octane-catalog-admin-button is-muted"
                                 disabled={!canSubmit}
                                 type="button"
                                 onClick={() => handleSave(true)}
@@ -527,7 +527,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                 Save and close
                             </button>
                             <button
-                                className="nitro-catalog-admin-button is-primary"
+                                className="octane-catalog-admin-button is-primary"
                                 disabled={!canSubmit}
                                 type="button"
                                 onClick={() => handleSave(false)}

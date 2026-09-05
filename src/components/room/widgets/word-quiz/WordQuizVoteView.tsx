@@ -1,4 +1,4 @@
-import { RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
 import { VALUE_KEY_DISLIKE } from '../../../../api';
 import { BaseProps } from '../../../../common';

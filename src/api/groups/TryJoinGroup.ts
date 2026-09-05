@@ -1,4 +1,4 @@
-import { GroupJoinComposer } from '@nitrots/nitro-renderer';
-import { SendMessageComposer } from '../nitro';
+import { GroupJoinComposer } from '@octane/renderer';
+import { SendMessageComposer } from '../octane';
 
 export const TryJoinGroup = (groupId: number) => SendMessageComposer(new GroupJoinComposer(groupId));

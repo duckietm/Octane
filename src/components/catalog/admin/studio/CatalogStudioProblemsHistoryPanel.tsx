@@ -81,14 +81,14 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
         undo(groupId);
     };
 
-    return <div className="nitro-catalog-admin-publish">
-        <div className="nitro-catalog-admin-validation-list">
-            <div className="nitro-catalog-admin-publish-changes-head">
+    return <div className="octane-catalog-admin-publish">
+        <div className="octane-catalog-admin-validation-list">
+            <div className="octane-catalog-admin-publish-changes-head">
                 Current catalog problems
-                <span className="nitro-catalog-admin-validation-meta">
+                <span className="octane-catalog-admin-validation-meta">
                     {checkedAt ? `checked at ${formatTime(checkedAt)}` : 'not checked yet'}
                     {revalidate && <button
-                        className="nitro-catalog-admin-btn is-small"
+                        className="octane-catalog-admin-btn is-small"
                         type="button"
                         disabled={loading}
                         onClick={revalidate}
@@ -98,13 +98,13 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                     </button>}
                 </span>
             </div>
-            {!issues.length && <div className="nitro-catalog-admin-placeholder is-small">No structural problems found.</div>}
+            {!issues.length && <div className="octane-catalog-admin-placeholder is-small">No structural problems found.</div>}
             {ruleGroups.map(group => {
                 const isOpen = expandedRules.includes(group.code);
 
-                return <div key={group.code} className="nitro-catalog-admin-validation-group">
+                return <div key={group.code} className="octane-catalog-admin-validation-group">
                     <button
-                        className="nitro-catalog-admin-validation-group-head"
+                        className="octane-catalog-admin-validation-group-head"
                         type="button"
                         aria-expanded={isOpen}
                         onClick={() => toggleRule(group.code)}
@@ -112,12 +112,12 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                         {isOpen ? <FaChevronDown /> : <FaChevronRight />}
                         <FaExclamationTriangle />
                         <strong>{group.label}</strong>
-                        <span className="nitro-catalog-admin-validation-count">{group.issues.length}</span>
+                        <span className="octane-catalog-admin-validation-count">{group.issues.length}</span>
                     </button>
-                    {isOpen && <div className="nitro-catalog-admin-validation-group-body">
+                    {isOpen && <div className="octane-catalog-admin-validation-group-body">
                         {group.issues.slice(0, MAX_ROWS_PER_RULE).map((issue, index) => <button
                             key={`${issue.entityType}-${issue.entityId}-${issue.field}-${index}`}
-                            className="nitro-catalog-admin-validation-row"
+                            className="octane-catalog-admin-validation-row"
                             type="button"
                             disabled={!onSelectEntity || issue.entityType !== SELECTABLE_ENTITY_TYPE}
                             onClick={() => onSelectEntity && onSelectEntity(issue)}
@@ -127,7 +127,7 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                                 <span>{issue.field} &middot; {issue.message}</span>
                             </div>
                         </button>)}
-                        {group.issues.length > MAX_ROWS_PER_RULE && <div className="nitro-catalog-admin-placeholder is-small">
+                        {group.issues.length > MAX_ROWS_PER_RULE && <div className="octane-catalog-admin-placeholder is-small">
                             {group.issues.length - MAX_ROWS_PER_RULE} more not listed
                         </div>}
                     </div>}
@@ -135,16 +135,16 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
             })}
         </div>
 
-        <div className="nitro-catalog-admin-publish-changes">
-            <div className="nitro-catalog-admin-publish-changes-head"><FaHistory /> Live operation history</div>
-            {!history.length && <div className="nitro-catalog-admin-placeholder is-small">No recorded operations.</div>}
-            {history.map(group => <div key={group.id} className="nitro-catalog-admin-history-row">
-                <div className="nitro-catalog-admin-history-main">
+        <div className="octane-catalog-admin-publish-changes">
+            <div className="octane-catalog-admin-publish-changes-head"><FaHistory /> Live operation history</div>
+            {!history.length && <div className="octane-catalog-admin-placeholder is-small">No recorded operations.</div>}
+            {history.map(group => <div key={group.id} className="octane-catalog-admin-history-row">
+                <div className="octane-catalog-admin-history-main">
                     <strong>{group.summary}</strong>
                     <span>{group.entries.length} affected item(s) &middot; {group.actorName || `User #${group.actorId}`}</span>
                 </div>
                 <button
-                    className="nitro-catalog-admin-btn is-small"
+                    className="octane-catalog-admin-btn is-small"
                     disabled={loading}
                     aria-label={`Undo ${group.summary}`}
                     onClick={() => setUndoCandidate(group)}
@@ -154,15 +154,15 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
             </div>)}
         </div>
 
-        {undoCandidate && <div className="nitro-catalog-admin-publish-confirmation" role="dialog" aria-modal="true" aria-label="Confirm operation undo">
+        {undoCandidate && <div className="octane-catalog-admin-publish-confirmation" role="dialog" aria-modal="true" aria-label="Confirm operation undo">
             <FaUndo />
             <div>
                 <strong>Undo &ldquo;{undoCandidate.summary}&rdquo;?</strong>
                 <span>The complete live operation will be reversed and recorded in history.</span>
             </div>
-            <div className="nitro-catalog-admin-publish-actions">
-                <button className="nitro-catalog-admin-btn" onClick={() => setUndoCandidate(null)}>Cancel</button>
-                <button className="nitro-catalog-admin-btn is-publish" onClick={undoNow}>Undo operation</button>
+            <div className="octane-catalog-admin-publish-actions">
+                <button className="octane-catalog-admin-btn" onClick={() => setUndoCandidate(null)}>Cancel</button>
+                <button className="octane-catalog-admin-btn is-publish" onClick={undoNow}>Undo operation</button>
             </div>
         </div>}
     </div>;

@@ -1,4 +1,4 @@
-import { StringDataType } from '@nitrots/nitro-renderer';
+import { StringDataType } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { BaseProps, LayoutBadgeImageView } from '../../../../../common';
 import { useCatalogData, useCatalogUiState } from '../../../../../hooks';

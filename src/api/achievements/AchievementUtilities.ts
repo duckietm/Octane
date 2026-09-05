@@ -1,5 +1,5 @@
-import { AchievementData, GetLocalizationManager } from '@nitrots/nitro-renderer';
-import { GetConfigurationValue } from '../nitro';
+import { AchievementData, GetLocalizationManager } from '@octane/renderer';
+import { GetConfigurationValue } from '../octane';
 import { IAchievementCategory } from './IAchievementCategory';
 
 export class AchievementUtilities {

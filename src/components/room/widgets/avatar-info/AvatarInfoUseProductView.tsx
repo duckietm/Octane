@@ -1,4 +1,4 @@
-import { RoomObjectCategory, RoomObjectType } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory, RoomObjectType } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText, UseProductItem } from '../../../../api';
 import { useRoom } from '../../../../hooks';

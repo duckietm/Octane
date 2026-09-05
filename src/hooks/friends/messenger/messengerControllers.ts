@@ -1,4 +1,4 @@
-import { MarkMessengerReadComposer, RequestMessengerHistoryComposer, SendMessengerMessageComposer } from '@nitrots/nitro-renderer';
+import { MarkMessengerReadComposer, RequestMessengerHistoryComposer, SendMessengerMessageComposer } from '@octane/renderer';
 import { MessengerMessage, MessengerState, selectMessageByClientId, selectMessages } from '../../../api';
 import { MessengerAction } from '../../../api/friends/messenger/messengerReducer';
 

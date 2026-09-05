@@ -1,9 +1,9 @@
-import { IWheelAdminPrize, IWheelAdminPrizeEdit } from '@nitrots/nitro-renderer';
+import { IWheelAdminPrize, IWheelAdminPrizeEdit } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText } from '../../api';
 import { Column, Flex, Text } from '../../common';
 import { useFortuneWheel } from '../../hooks';
-import { NitroCard } from '../../layout';
+import { OctaneCard } from '../../layout';
 
 interface EditRow {
     id: number;
@@ -103,9 +103,9 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
         });
 
     return (
-        <NitroCard className="w-[480px] h-[520px]" uniqueKey="fortune-wheel-settings">
-            <NitroCard.Header headerText={LocalizeText('wheel.settings.title')} onCloseClick={onClose} />
-            <NitroCard.Content>
+        <OctaneCard className="w-[480px] h-[520px]" uniqueKey="fortune-wheel-settings">
+            <OctaneCard.Header headerText={LocalizeText('wheel.settings.title')} onCloseClick={onClose} />
+            <OctaneCard.Content>
                 <Column gap={1} className="h-full p-1">
                     <Flex gap={1} className="px-1 text-[11px] font-bold text-black/60">
                         <span className="w-28">{LocalizeText('rarevalues.editor.type')}</span>
@@ -180,7 +180,7 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                         {LocalizeText('rarevalues.editor.save')}
                     </button>
                 </Column>
-            </NitroCard.Content>
-        </NitroCard>
+            </OctaneCard.Content>
+        </OctaneCard>
     );
 };

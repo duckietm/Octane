@@ -1,6 +1,6 @@
-# Nitro V3 — Cold-load performance
+# Octane V3 — Cold-load performance
 
-Practical recipe to take a Nitro V3 cold load from the typical
+Practical recipe to take a Octane V3 cold load from the typical
 60-90 s (and intermittent "Session expired") baseline down to ~4 s.
 The wins compound: each section below has measurable impact, in
 roughly the order of cost vs benefit.
@@ -15,7 +15,7 @@ CMS contract.
 
 ---
 
-## 1. The three Nitro-side changes that matter
+## 1. The three Octane-side changes that matter
 
 1. **Granular code split** (`vite.config.mjs`) — a 1 MB vendor bundle
    is replaced by ~12 smaller chunks the browser fetches in parallel
@@ -42,7 +42,7 @@ Default `yarn build` ships:
 - `vendor` ~1 MB (react + tanstack-query + framer-motion + jodit +
   emoji-mart + react-icons + howler + zustand + jsonc — everything
   merged)
-- `nitro-renderer` ~2.5 MB (renderer source + pixi.js inlined)
+- `octane-renderer` ~2.5 MB (renderer source + pixi.js inlined)
 - `src` ~1.7 MB (app code)
 
 The vendor blob forces the browser to wait on the slowest dependency
@@ -64,15 +64,15 @@ manualChunks: id => {
     if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
     if(id.includes('octane-renderer') || id.includes(`${ rendererRoot }`)) {
-        if(id.includes('/packages/avatar/'))        return 'nitro-renderer-avatar';
-        if(id.includes('/packages/communication/')) return 'nitro-renderer-comm';
-        if(id.includes('/packages/room/'))          return 'nitro-renderer-room';
-        if(id.includes('/packages/assets/'))        return 'nitro-renderer-assets';
-        return 'nitro-renderer';
+        if(id.includes('/packages/avatar/'))        return 'octane-renderer-avatar';
+        if(id.includes('/packages/communication/')) return 'octane-renderer-comm';
+        if(id.includes('/packages/room/'))          return 'octane-renderer-room';
+        if(id.includes('/packages/assets/'))        return 'octane-renderer-assets';
+        return 'octane-renderer';
     }
 
     if(id.includes('node_modules')) {
-        if(id.includes('@nitrots/nitro-renderer') || id.includes('renderer3')) return 'nitro-renderer';
+        if(id.includes('@octane/renderer') || id.includes('renderer3')) return 'octane-renderer';
         if(id.match(/\/react(-dom)?\/|\/scheduler\//) || id.includes('react-error-boundary')) return 'vendor-react';
         if(id.includes('framer-motion')) return 'vendor-motion';
         if(id.includes('@tanstack'))     return 'vendor-query';
@@ -94,7 +94,7 @@ Two practical points the comments don't make obvious:
 
 - **Pixi often stays inlined.** Rollup keeps a module in the chunk
   of its sole importer, and `pixi.js` is consumed only through the
-  `@nitrots/nitro-renderer` umbrella. Expect `vendor-pixi` to be
+  `@octane/renderer` umbrella. Expect `vendor-pixi` to be
   near-empty until something *outside* the renderer also imports
   pixi. This is fine — pixi gets the renderer chunk's cache lifetime
   anyway.
@@ -102,7 +102,7 @@ Two practical points the comments don't make obvious:
 Verify after `yarn build`:
 
 ```
-dist/assets/nitro-renderer-*.js          ~2.5 MB raw, ~765 KB gzip
+dist/assets/octane-renderer-*.js          ~2.5 MB raw, ~765 KB gzip
 dist/assets/vendor-*.js                  ~12 chunks, 4-430 KB each
 dist/assets/src-*.js                     ~1.7 MB raw, ~550 KB gzip
 ```
@@ -152,7 +152,7 @@ const bumpProgress = useCallback((value: number, task?: string) => {
 | % | Stage | Default label |
 |---|---|---|
 | 5 | App start | `Avvio in corso...` |
-| 10 | NitroConfig validated | `Verifica sessione` |
+| 10 | OctaneConfig validated | `Verifica sessione` |
 | 20 | Renderer constructed | `Inizializzazione renderer` |
 | 25 | Config init done | `Caricamento contenuti...` |
 | 36, 47, 58, 70 | each warmup task resolves | per-task (`Sto caricando il guardaroba`, …) |
@@ -170,7 +170,7 @@ file for the full list).
 
 Logo and background are also configurable via the same mechanism —
 `loading.logo.url`, `loading.background`, `loading.progress.color`.
-Leaving them empty keeps the shipped dark-blue radial + Nitro V3
+Leaving them empty keeps the shipped dark-blue radial + Octane V3
 logo top-left.
 
 ### 3.1 The pre-React shell (asset-loader.js)
@@ -196,7 +196,7 @@ the same (now empty) ticket and falls through to "Session expired"
 after 2-7 attempts.
 
 The CMS issues a UUID family token when it serves `/client`, and
-passes it on the iframe URL as `&token=<uuid>&token_exp=<unix>`. Nitro
+passes it on the iframe URL as `&token=<uuid>&token_exp=<unix>`. Octane
 captures it on first boot:
 
 ```ts
@@ -243,7 +243,7 @@ the CMS isn't passing `token=` on the iframe URL. Check
 
 ## 5. Server-side: nginx gzip + long cache (the single biggest win)
 
-The Nitro client ships ~4.3 MB raw across the main bundle, renderer
+The Octane client ships ~4.3 MB raw across the main bundle, renderer
 chunk and vendor splits. If the server doesn't compress and doesn't
 let the browser cache, every visitor pays the full price on every
 load — that's exactly the 60-90 s baseline you avoid by configuring
@@ -294,7 +294,7 @@ on the wire (~17×), and the renderer JS bundle from 2.5 MB to 765 KB
 
 ```bash
 curl -sI -H 'Accept-Encoding: gzip' \
-  'https://<your-domain>/nitro/assets/nitro-renderer-XXXXX.js' \
+  'https://<your-domain>/octane/assets/octane-renderer-XXXXX.js' \
   | grep -i 'content-encoding'
 # expected: content-encoding: gzip
 ```
@@ -340,7 +340,7 @@ cache-bust by filename.
 
 For the JS / CSS chunks the filenames are content-hashed by Vite, so
 a long cache is safe — apply the same `Cache-Control: max-age=2592000`
-to the `/nitro/assets/` location.
+to the `/octane/assets/` location.
 
 ### 5.3 The `try_files → manifest.jsonc` fallback
 
@@ -560,7 +560,7 @@ correctly tuned.
 ```bash
 # 1. Build artefact has the granular chunks
 yarn build
-ls dist/assets/ | grep -E '^(vendor|nitro-renderer)-' | wc -l
+ls dist/assets/ | grep -E '^(vendor|octane-renderer)-' | wc -l
 # expected: ~12-14 chunks
 
 # 2. Server is compressing JSONC (or JS — pick either)

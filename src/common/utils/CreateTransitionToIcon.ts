@@ -1,10 +1,10 @@
-import { GetEventDispatcher, NitroToolbarAnimateIconEvent } from '@nitrots/nitro-renderer';
+import { GetEventDispatcher, OctaneToolbarAnimateIconEvent } from '@octane/renderer';
 
 export const CreateTransitionToIcon = (image: HTMLImageElement, fromElement: HTMLElement, icon: string) => {
     const bounds = fromElement.getBoundingClientRect();
     const x = bounds.x + bounds.width / 2;
     const y = bounds.y + bounds.height / 2;
-    const event = new NitroToolbarAnimateIconEvent(image, x, y);
+    const event = new OctaneToolbarAnimateIconEvent(image, x, y);
 
     event.iconName = icon;
 

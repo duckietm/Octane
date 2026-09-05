@@ -1,3 +1,3 @@
-import { NitroVersion } from '@nitrots/nitro-renderer';
+import { OctaneVersion } from '@octane/renderer';
 
-export const GetRendererVersion = () => NitroVersion.RENDERER_VERSION;
+export const GetRendererVersion = () => OctaneVersion.RENDERER_VERSION;

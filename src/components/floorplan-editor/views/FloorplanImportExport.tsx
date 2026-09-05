@@ -1,6 +1,6 @@
 import { Dispatch, FC, useState } from 'react';
 import { LocalizeText } from '../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { serializeTilemap } from '../state/encoding';
 import { FloorplanAction, FloorplanState } from '../state/types';
 
@@ -30,9 +30,9 @@ export const FloorplanImportExport: FC<Props> = ({ state, dispatch, onClose, onS
     };
 
     return (
-        <NitroCardView uniqueKey="floorplan-import-export" theme="primary-slim" className="w-[630px] h-[475px]">
-            <NitroCardHeaderView headerText={LocalizeText('floor.plan.editor.import.export')} onCloseClick={onClose} />
-            <NitroCardContentView className="flex flex-col gap-2">
+        <OctaneCardView uniqueKey="floorplan-import-export" theme="primary-slim" className="w-[630px] h-[475px]">
+            <OctaneCardHeaderView headerText={LocalizeText('floor.plan.editor.import.export')} onCloseClick={onClose} />
+            <OctaneCardContentView className="flex flex-col gap-2">
                 <textarea className="form-control w-full flex-1 font-mono" value={raw} onChange={(e) => setRaw(e.target.value)} />
                 <div className="flex gap-2 justify-end">
                     <Button data-testid="import-revert" onClick={revert}>
@@ -45,7 +45,7 @@ export const FloorplanImportExport: FC<Props> = ({ state, dispatch, onClose, onS
                         {LocalizeText('floor.plan.editor.save')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

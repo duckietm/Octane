@@ -12,12 +12,12 @@ import {
     RoomOccupiedTilesMessageEvent,
     RoomVisualizationSettingsEvent,
     UpdateFloorPropertiesMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBolt, FaBoxOpen, FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { LocalizeText, SendMessageComposer } from '../../api';
-import { Button, ButtonGroup, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
-import { useMessageEvent, useNitroEvent } from '../../hooks';
+import { Button, ButtonGroup, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
+import { useMessageEvent, useOctaneEvent } from '../../hooks';
 import { useFloorplanLiveSync } from '../../hooks/rooms/widgets/useFloorplanLiveSync';
 import { useFloorplanReducer } from './hooks/useFloorplanReducer';
 import { MAX_WALL_HEIGHT, MIN_WALL_HEIGHT } from './state/constants';
@@ -70,7 +70,7 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
 
     const { setBaseline, mergeBaseline, revert: revertLivePreview } = useFloorplanLiveSync({ enabled: !isExternal && liveSync && isVisible, state });
 
-    useNitroEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, () => {
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, () => {
         if (!isExternal) setRoomVisible(false);
     });
 
@@ -263,9 +263,9 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
     return (
         <>
             {isVisible && (
-                <NitroCardView uniqueKey="floorpan-editor" className="w-[820px] h-[620px]" theme="primary-slim">
-                    <NitroCardHeaderView headerText={externalSession?.title ?? LocalizeText('floor.plan.editor.title')} onCloseClick={closeEditor} />
-                    <NitroCardContentView overflow="hidden" className="flex flex-col gap-2">
+                <OctaneCardView uniqueKey="floorpan-editor" className="w-[820px] h-[620px]" theme="primary-slim">
+                    <OctaneCardHeaderView headerText={externalSession?.title ?? LocalizeText('floor.plan.editor.title')} onCloseClick={closeEditor} />
+                    <OctaneCardContentView overflow="hidden" className="flex flex-col gap-2">
                         <FloorplanToolbar
                             state={state}
                             dispatch={dispatch}
@@ -333,8 +333,8 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                 <Button onClick={saveFloorChanges}>{LocalizeText('floor.plan.editor.save')}</Button>
                             </ButtonGroup>
                         </Flex>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
             {importExportVisible && (
                 <FloorplanImportExport

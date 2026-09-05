@@ -22,7 +22,7 @@ const sound = vi.hoisted(() => {
     return { currentOffer, musicController };
 });
 
-vi.mock('@nitrots/nitro-renderer', () => ({
+vi.mock('@octane/renderer', () => ({
     GetOfficialSongIdMessageComposer: class {},
     GetSoundManager: () => ({ musicController: sound.musicController }),
     MusicPriorities: { PRIORITY_PURCHASE_PREVIEW: 3 },
@@ -42,10 +42,10 @@ vi.mock('../../../../../hooks', () => ({
     useCatalogData: () => ({ currentOffer: sound.currentOffer }),
     useCatalogDisplayPreferences: () => ({ density: 'standard', showTilePrices: true }),
     useMessageEvent: vi.fn(),
-    useNitroEvent: vi.fn()
+    useOctaneEvent: vi.fn()
 }));
 
-vi.mock('../../../../../layout', () => ({ NitroButton: ({ children, ...props }: any) => <button {...props}>{children}</button> }));
+vi.mock('../../../../../layout', () => ({ OctaneButton: ({ children, ...props }: any) => <button {...props}>{children}</button> }));
 vi.mock('../widgets/CatalogItemGridWidgetView', () => ({ CatalogItemGridWidgetView: () => <div /> }));
 vi.mock('../widgets/CatalogPriceDisplayWidgetView', () => ({ CatalogPriceDisplayWidgetView: () => <div /> }));
 vi.mock('../widgets/CatalogPurchaseSelectionPrompt', () => ({ CatalogPurchaseSelectionPrompt: () => <div /> }));

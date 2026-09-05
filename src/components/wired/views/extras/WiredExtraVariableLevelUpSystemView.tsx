@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
 const MODE_LINEAR = 1;
@@ -309,17 +309,17 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
 
     return (
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 260 }}>
-            <div className="nitro-wired__levelup">
-                <div className="nitro-wired__levelup-section">
-                    <button type="button" className="nitro-wired__levelup-section-header" onClick={() => setIsModeSectionOpen((value) => !value)}>
+            <div className="octane-wired__levelup">
+                <div className="octane-wired__levelup-section">
+                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsModeSectionOpen((value) => !value)}>
                         <Text bold>{LocalizeText('wiredfurni.params.levelup.mode')}</Text>
-                        <span className={`nitro-wired__levelup-chevron ${isModeSectionOpen ? 'is-open' : ''}`}>^</span>
+                        <span className={`octane-wired__levelup-chevron ${isModeSectionOpen ? 'is-open' : ''}`}>^</span>
                     </button>
 
                     {isModeSectionOpen && (
-                        <div className="nitro-wired__levelup-section-body">
-                            <div className={`nitro-wired__levelup-mode-block ${mode === MODE_LINEAR ? 'is-active' : 'is-inactive'}`}>
-                                <label className="nitro-wired__levelup-mode-label">
+                        <div className="octane-wired__levelup-section-body">
+                            <div className={`octane-wired__levelup-mode-block ${mode === MODE_LINEAR ? 'is-active' : 'is-inactive'}`}>
+                                <label className="octane-wired__levelup-mode-label">
                                     <input
                                         checked={mode === MODE_LINEAR}
                                         className="form-check-input"
@@ -329,21 +329,21 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                     />
                                     <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.1', 'Lineare')}</Text>
                                 </label>
-                                <div className="nitro-wired__levelup-fields">
-                                    <div className="nitro-wired__levelup-field-row">
+                                <div className="octane-wired__levelup-fields">
+                                    <div className="octane-wired__levelup-field-row">
                                         <Text>{LocalizeText('wiredfurni.params.levelup.step_size')}</Text>
-                                        <NitroInput
-                                            className="nitro-wired__levelup-number"
+                                        <OctaneInput
+                                            className="octane-wired__levelup-number"
                                             disabled={mode !== MODE_LINEAR}
                                             type="number"
                                             value={stepSizeInput}
                                             onChange={(event) => setStepSizeInput(event.target.value)}
                                         />
                                     </div>
-                                    <div className="nitro-wired__levelup-field-row">
+                                    <div className="octane-wired__levelup-field-row">
                                         <Text>{LocalizeText('wiredfurni.params.levelup.max_level')}</Text>
-                                        <NitroInput
-                                            className="nitro-wired__levelup-number"
+                                        <OctaneInput
+                                            className="octane-wired__levelup-number"
                                             disabled={mode !== MODE_LINEAR}
                                             type="number"
                                             value={maxLevelInput}
@@ -353,8 +353,8 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                 </div>
                             </div>
 
-                            <div className={`nitro-wired__levelup-mode-block ${mode === MODE_EXPONENTIAL ? 'is-active' : 'is-inactive'}`}>
-                                <label className="nitro-wired__levelup-mode-label">
+                            <div className={`octane-wired__levelup-mode-block ${mode === MODE_EXPONENTIAL ? 'is-active' : 'is-inactive'}`}>
+                                <label className="octane-wired__levelup-mode-label">
                                     <input
                                         checked={mode === MODE_EXPONENTIAL}
                                         className="form-check-input"
@@ -364,31 +364,31 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                     />
                                     <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.2', 'Esponenziale')}</Text>
                                 </label>
-                                <div className="nitro-wired__levelup-fields">
-                                    <div className="nitro-wired__levelup-field-row">
+                                <div className="octane-wired__levelup-fields">
+                                    <div className="octane-wired__levelup-field-row">
                                         <Text>{LocalizeText('wiredfurni.params.levelup.first_level_xp')}</Text>
-                                        <NitroInput
-                                            className="nitro-wired__levelup-number"
+                                        <OctaneInput
+                                            className="octane-wired__levelup-number"
                                             disabled={mode !== MODE_EXPONENTIAL}
                                             type="number"
                                             value={firstLevelXpInput}
                                             onChange={(event) => setFirstLevelXpInput(event.target.value)}
                                         />
                                     </div>
-                                    <div className="nitro-wired__levelup-field-row">
+                                    <div className="octane-wired__levelup-field-row">
                                         <Text>{LocalizeText('wiredfurni.params.levelup.increase_factor')}</Text>
-                                        <NitroInput
-                                            className="nitro-wired__levelup-number"
+                                        <OctaneInput
+                                            className="octane-wired__levelup-number"
                                             disabled={mode !== MODE_EXPONENTIAL}
                                             type="number"
                                             value={increaseFactorInput}
                                             onChange={(event) => setIncreaseFactorInput(event.target.value)}
                                         />
                                     </div>
-                                    <div className="nitro-wired__levelup-field-row">
+                                    <div className="octane-wired__levelup-field-row">
                                         <Text>{LocalizeText('wiredfurni.params.levelup.max_level')}</Text>
-                                        <NitroInput
-                                            className="nitro-wired__levelup-number"
+                                        <OctaneInput
+                                            className="octane-wired__levelup-number"
                                             disabled={mode !== MODE_EXPONENTIAL}
                                             type="number"
                                             value={maxLevelInput}
@@ -398,8 +398,8 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                 </div>
                             </div>
 
-                            <div className={`nitro-wired__levelup-mode-block ${mode === MODE_MANUAL ? 'is-active' : 'is-inactive'}`}>
-                                <label className="nitro-wired__levelup-mode-label">
+                            <div className={`octane-wired__levelup-mode-block ${mode === MODE_MANUAL ? 'is-active' : 'is-inactive'}`}>
+                                <label className="octane-wired__levelup-mode-label">
                                     <input
                                         checked={mode === MODE_MANUAL}
                                         className="form-check-input"
@@ -415,7 +415,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                     </Text>
                                 </label>
                                 <textarea
-                                    className="form-control form-control-sm nitro-wired__levelup-textarea"
+                                    className="form-control form-control-sm octane-wired__levelup-textarea"
                                     disabled={mode !== MODE_MANUAL}
                                     placeholder={interpolationPlaceholder}
                                     value={interpolationText}
@@ -426,18 +426,18 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                     )}
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__levelup-section">
-                    <button type="button" className="nitro-wired__levelup-section-header" onClick={() => setIsPreviewSectionOpen((value) => !value)}>
+                <div className="octane-wired__levelup-section">
+                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsPreviewSectionOpen((value) => !value)}>
                         <Text bold>{LocalizeText('wiredfurni.params.levelup.preview')}</Text>
-                        <span className={`nitro-wired__levelup-chevron ${isPreviewSectionOpen ? 'is-open' : ''}`}>^</span>
+                        <span className={`octane-wired__levelup-chevron ${isPreviewSectionOpen ? 'is-open' : ''}`}>^</span>
                     </button>
 
                     {isPreviewSectionOpen && (
-                        <div className="nitro-wired__levelup-preview">
+                        <div className="octane-wired__levelup-preview">
                             {previewEntries.map((entry) => (
-                                <div key={entry.level} className="nitro-wired__levelup-preview-entry">
+                                <div key={entry.level} className="octane-wired__levelup-preview-entry">
                                     {localizeOrFallback(
                                         'wiredfurni.params.levelup.preview.entry',
                                         `Livello: ${entry.level} - XP: ${entry.requiredXp}`,
@@ -450,19 +450,19 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                     )}
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__levelup-section">
-                    <button type="button" className="nitro-wired__levelup-section-header" onClick={() => setIsSubvariablesSectionOpen((value) => !value)}>
+                <div className="octane-wired__levelup-section">
+                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsSubvariablesSectionOpen((value) => !value)}>
                         <Text bold>{LocalizeText('wiredfurni.params.create_subvariables')}</Text>
-                        <span className={`nitro-wired__levelup-chevron ${isSubvariablesSectionOpen ? 'is-open' : ''}`}>^</span>
+                        <span className={`octane-wired__levelup-chevron ${isSubvariablesSectionOpen ? 'is-open' : ''}`}>^</span>
                     </button>
 
                     {isSubvariablesSectionOpen && (
-                        <div className="nitro-wired__levelup-subvariables">
+                        <div className="octane-wired__levelup-subvariables">
                             {subvariableOptions.map((subvariable) => (
-                                <div key={subvariable.key} className="nitro-wired__levelup-subvariable-row">
-                                    <label className="nitro-wired__levelup-subvariable-label">
+                                <div key={subvariable.key} className="octane-wired__levelup-subvariable-row">
+                                    <label className="octane-wired__levelup-subvariable-label">
                                         <input
                                             checked={selectedSubvariables.includes(subvariable.key)}
                                             className="form-check-input"
@@ -471,7 +471,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                                         />
                                         <Text>{LocalizeText(`wiredfurni.params.levelup.subvariable.${subvariable.key}`)}</Text>
                                     </label>
-                                    <input className="nitro-wired__levelup-subvariable-token" readOnly tabIndex={-1} type="text" value={subvariable.suffix} />
+                                    <input className="octane-wired__levelup-subvariable-token" readOnly tabIndex={-1} type="text" value={subvariable.suffix} />
                                 </div>
                             ))}
                         </div>

@@ -12,7 +12,7 @@ import {
     RoomSessionChatEvent,
     RoomUserData,
     SystemChatStyleEnum
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ChatBubbleMessage,
@@ -28,7 +28,7 @@ import {
 } from '../../../api';
 import { SoundboardRoomMessageEvent } from '../../../events';
 import { useChatHistory } from './../../chat-history';
-import { useMessageEvent, useNitroEvent, useUiEvent } from '../../events';
+import { useMessageEvent, useOctaneEvent, useUiEvent } from '../../events';
 import { useUserDataSnapshot } from '../../session/useSessionSnapshots';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
@@ -118,7 +118,7 @@ const useChatWidgetState = () => {
         }
     }, [chatSettings]);
 
-    useNitroEvent<RoomSessionChatEvent>(RoomSessionChatEvent.CHAT_EVENT, async (event) => {
+    useOctaneEvent<RoomSessionChatEvent>(RoomSessionChatEvent.CHAT_EVENT, async (event) => {
         const roomObject = GetRoomEngine().getRoomObject(roomSession.roomId, event.objectId, RoomObjectCategory.UNIT);
         const bubbleLocation = roomObject ? GetRoomObjectScreenLocation(roomSession.roomId, roomObject?.id, RoomObjectCategory.UNIT) : { x: 0, y: 0 };
         const userData = roomObject ? roomSession.userDataManager.getUserDataByIndex(event.objectId) : new RoomUserData(-1);
@@ -345,7 +345,7 @@ const useChatWidgetState = () => {
         });
     });
 
-    useNitroEvent<RoomDragEvent>(RoomDragEvent.ROOM_DRAG, (event) => {
+    useOctaneEvent<RoomDragEvent>(RoomDragEvent.ROOM_DRAG, (event) => {
         if (!chatMessages.length || event.roomId !== roomSession.roomId) return;
 
         const offsetX = event.offsetX;

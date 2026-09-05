@@ -1,4 +1,4 @@
-import { CreateFlatMessageComposer } from '@nitrots/nitro-renderer';
+import { CreateFlatMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { CreateLinkEvent, GetConfigurationValue, IRoomModel, LocalizeText, SendMessageComposer } from '../../../api';
 import dropmenuArrow from '../../../assets/images/habbo-skin/slices/dropmenu-arrow.png';
@@ -61,10 +61,10 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
     }, [open]);
 
     return (
-        <div ref={rootRef} className={`nitro-room-creator-air__dropmenu ${className}${open ? ' is-open' : ''}`}>
+        <div ref={rootRef} className={`octane-room-creator-air__dropmenu ${className}${open ? ' is-open' : ''}`}>
             <button
                 type="button"
-                className="nitro-room-creator-air__dropmenu-button"
+                className="octane-room-creator-air__dropmenu-button"
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 aria-label={label}
@@ -74,7 +74,7 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
                 <img src={dropmenuArrow} alt="" width={22} height={20} />
             </button>
             {open && (
-                <ul className="nitro-room-creator-air__dropmenu-list" role="listbox">
+                <ul className="octane-room-creator-air__dropmenu-list" role="listbox">
                     {options.map((option, index) => (
                         <li key={`${index}-${option}`}>
                             <button
@@ -187,23 +187,23 @@ export const NavigatorRoomCreatorView: FC = () => {
     const showVipPromo = effectiveClubLevel < 2 && !hcDisabled;
 
     return (
-        <DraggableWindow uniqueKey="navigator-room-creator" handleSelector=".nitro-room-creator-air__caption">
-            <div className="nitro-room-creator-air" data-air-frame="ubuntu-3">
-                <div className="nitro-room-creator-air__skin" aria-hidden="true" />
-                <div className="nitro-room-creator-air__caption">
-                    <span className="nitro-room-creator-air__title">{LocalizeText('navigator.createroom.title')}</span>
+        <DraggableWindow uniqueKey="navigator-room-creator" handleSelector=".octane-room-creator-air__caption">
+            <div className="octane-room-creator-air" data-air-frame="ubuntu-3">
+                <div className="octane-room-creator-air__skin" aria-hidden="true" />
+                <div className="octane-room-creator-air__caption">
+                    <span className="octane-room-creator-air__title">{LocalizeText('navigator.createroom.title')}</span>
                     <button
                         type="button"
-                        className="nitro-room-creator-air__close"
+                        className="octane-room-creator-air__close"
                         aria-label={LocalizeText('generic.close')}
                         onClick={closeCreator}
                     />
                 </div>
 
-                <span className="nitro-room-creator-air__label nitro-room-creator-air__label--name">{LocalizeText('navigator.roomname')}</span>
-                <div className={`nitro-room-creator-air__field nitro-room-creator-air__field--name${nameError ? ' is-invalid' : ''}`}>
+                <span className="octane-room-creator-air__label octane-room-creator-air__label--name">{LocalizeText('navigator.roomname')}</span>
+                <div className={`octane-room-creator-air__field octane-room-creator-air__field--name${nameError ? ' is-invalid' : ''}`}>
                     <input
-                        className="nitro-room-creator-air__input"
+                        className="octane-room-creator-air__input"
                         maxLength={25}
                         type="text"
                         value={nameTouched ? name : namePlaceholder}
@@ -216,18 +216,18 @@ export const NavigatorRoomCreatorView: FC = () => {
                     />
                 </div>
                 {nameError && (
-                    <div className="nitro-room-creator-air__error" role="alert">
-                        <div className="nitro-room-creator-air__error-border">
+                    <div className="octane-room-creator-air__error" role="alert">
+                        <div className="octane-room-creator-air__error-border">
                             <span>{nameError}</span>
                         </div>
-                        <img className="nitro-room-creator-air__error-arrow" src={popupArrowDown} alt="" width={11} height={11} />
+                        <img className="octane-room-creator-air__error-arrow" src={popupArrowDown} alt="" width={11} height={11} />
                     </div>
                 )}
 
-                <span className="nitro-room-creator-air__label nitro-room-creator-air__label--desc">{LocalizeText('navigator.roomdesc')}</span>
-                <div className="nitro-room-creator-air__field nitro-room-creator-air__field--desc">
+                <span className="octane-room-creator-air__label octane-room-creator-air__label--desc">{LocalizeText('navigator.roomdesc')}</span>
+                <div className="octane-room-creator-air__field octane-room-creator-air__field--desc">
                     <textarea
-                        className="nitro-room-creator-air__input nitro-room-creator-air__input--multiline"
+                        className="octane-room-creator-air__input octane-room-creator-air__input--multiline"
                         maxLength={128}
                         value={descriptionTouched ? description : descriptionPlaceholder}
                         onFocus={() => setDescriptionTouched(true)}
@@ -235,52 +235,52 @@ export const NavigatorRoomCreatorView: FC = () => {
                     />
                 </div>
 
-                <span className="nitro-room-creator-air__label nitro-room-creator-air__label--category">{LocalizeText('navigator.category')}</span>
+                <span className="octane-room-creator-air__label octane-room-creator-air__label--category">{LocalizeText('navigator.category')}</span>
                 <RoomCreatorDropmenu
-                    className="nitro-room-creator-air__dropmenu--category"
+                    className="octane-room-creator-air__dropmenu--category"
                     label={LocalizeText('navigator.category')}
                     options={selectableCategories.map((category) => LocalizeText(category.name))}
                     value={safeCategoryIndex}
                     onChange={setCategoryIndex}
                 />
 
-                <span className="nitro-room-creator-air__label nitro-room-creator-air__label--visitors">{LocalizeText('navigator.maxvisitors')}</span>
+                <span className="octane-room-creator-air__label octane-room-creator-air__label--visitors">{LocalizeText('navigator.maxvisitors')}</span>
                 <RoomCreatorDropmenu
-                    className="nitro-room-creator-air__dropmenu--visitors"
+                    className="octane-room-creator-air__dropmenu--visitors"
                     label={LocalizeText('navigator.maxvisitors')}
                     options={visitorOptions}
                     value={safeVisitorsIndex}
                     onChange={setVisitorsIndex}
                 />
 
-                <span className="nitro-room-creator-air__label nitro-room-creator-air__label--trade">{LocalizeText('navigator.tradesettings')}</span>
+                <span className="octane-room-creator-air__label octane-room-creator-air__label--trade">{LocalizeText('navigator.tradesettings')}</span>
                 <RoomCreatorDropmenu
-                    className="nitro-room-creator-air__dropmenu--trade"
+                    className="octane-room-creator-air__dropmenu--trade"
                     label={LocalizeText('navigator.tradesettings')}
                     options={AIR_TRADE_KEYS.map((key) => LocalizeText(key))}
                     value={tradeIndex}
                     onChange={setTradeIndex}
                 />
 
-                <button type="button" className="nitro-room-creator-air__button nitro-room-creator-air__button--create" onClick={createRoom}>
+                <button type="button" className="octane-room-creator-air__button octane-room-creator-air__button--create" onClick={createRoom}>
                     {LocalizeText('navigator.createroom.create')}
                 </button>
-                <button type="button" className="nitro-room-creator-air__button nitro-room-creator-air__button--cancel" onClick={closeCreator}>
+                <button type="button" className="octane-room-creator-air__button octane-room-creator-air__button--cancel" onClick={closeCreator}>
                     {LocalizeText('generic.cancel')}
                 </button>
 
-                <span className="nitro-room-creator-air__label nitro-room-creator-air__label--layout">
+                <span className="octane-room-creator-air__label octane-room-creator-air__label--layout">
                     {LocalizeText('navigator.createroom.chooselayoutcaption')}
                 </span>
-                <div className="nitro-room-creator-air__layouts">
-                    <div className="nitro-room-creator-air__layout-rows">
+                <div className="octane-room-creator-air__layouts">
+                    <div className="octane-room-creator-air__layout-rows">
                         {visibleModels.map((model) => {
                             const isSelected = selectedModelName === model.name;
 
                             return (
                                 <div
                                     key={model.name}
-                                    className={`nitro-room-creator-air__thumbnail${isSelected ? ' is-selected' : ''}`}
+                                    className={`octane-room-creator-air__thumbnail${isSelected ? ' is-selected' : ''}`}
                                     role="button"
                                     tabIndex={0}
                                     aria-pressed={isSelected}
@@ -289,31 +289,31 @@ export const NavigatorRoomCreatorView: FC = () => {
                                         if (event.key === 'Enter' || event.key === ' ') selectModel(model);
                                     }}
                                 >
-                                    <span className="nitro-room-creator-air__thumbnail-bg" aria-hidden="true" />
-                                    <img className="nitro-room-creator-air__thumbnail-pic" src={getRoomModelImage(model.name)} alt="" />
+                                    <span className="octane-room-creator-air__thumbnail-bg" aria-hidden="true" />
+                                    <img className="octane-room-creator-air__thumbnail-pic" src={getRoomModelImage(model.name)} alt="" />
                                     <img
-                                        className="nitro-room-creator-air__thumbnail-tile-icon"
+                                        className="octane-room-creator-air__thumbnail-tile-icon"
                                         src={isSelected ? tileIconWhite : tileIconBlack}
                                         alt=""
                                         width={18}
                                         height={10}
                                     />
-                                    <span className="nitro-room-creator-air__thumbnail-tiles">
+                                    <span className="octane-room-creator-air__thumbnail-tiles">
                                         {model.tileSize} {tileSizeLabel}
                                     </span>
                                     {model.clubLevel > 0 && (
-                                        <img className="nitro-room-creator-air__thumbnail-club" src={vipIconSmall} alt="" width={19} height={10} />
+                                        <img className="octane-room-creator-air__thumbnail-club" src={vipIconSmall} alt="" width={19} height={10} />
                                     )}
                                 </div>
                             );
                         })}
                         {showVipPromo && (
-                            <div className="nitro-room-creator-air__vip-promo">
-                                <img className="nitro-room-creator-air__vip-promo-icon" src={vipIconBig} alt="" width={37} height={37} />
-                                <span className="nitro-room-creator-air__vip-promo-text">{LocalizeText('navigator.createroom.vippromo.text')}</span>
+                            <div className="octane-room-creator-air__vip-promo">
+                                <img className="octane-room-creator-air__vip-promo-icon" src={vipIconBig} alt="" width={37} height={37} />
+                                <span className="octane-room-creator-air__vip-promo-text">{LocalizeText('navigator.createroom.vippromo.text')}</span>
                                 <button
                                     type="button"
-                                    className="nitro-room-creator-air__vip-promo-link"
+                                    className="octane-room-creator-air__vip-promo-link"
                                     onClick={() => CreateLinkEvent('habboUI/open/hccenter')}
                                 >
                                     {LocalizeText('navigator.createroom.vippromo.link')}

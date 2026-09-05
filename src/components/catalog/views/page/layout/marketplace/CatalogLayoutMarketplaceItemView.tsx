@@ -42,7 +42,7 @@ export const CatalogLayoutMarketplaceItemView: FC<MarketplaceItemViewProps> = (p
 
     return (
         <LayoutGridItem shrink alignItems="center" center={false} className="p-1" column={false}>
-            <Column className="nitro-catalog-marketplace-item-icon">
+            <Column className="octane-catalog-marketplace-item-icon">
                 <LayoutGridItem
                     column={false}
                     itemImage={GetImageIconUrlForProduct(

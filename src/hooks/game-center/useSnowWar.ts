@@ -41,7 +41,7 @@ import {
     SnowWarWalkComposer,
     WeeklyCompetitiveFriendsLeaderboardEvent,
     WeeklyCompetitiveLeaderboardEvent,
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { PlaySound, SendMessageComposer, SoundNames, TryVisitRoom } from '../../api';

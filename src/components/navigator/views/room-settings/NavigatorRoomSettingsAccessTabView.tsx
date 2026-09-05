@@ -1,4 +1,4 @@
-import { RoomDataParser } from '@nitrots/nitro-renderer';
+import { RoomDataParser } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { IRoomData, LocalizeText } from '../../../../api';
 import { Column, Flex, Text } from '../../../../common';

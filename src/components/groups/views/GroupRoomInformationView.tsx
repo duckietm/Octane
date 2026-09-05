@@ -8,7 +8,7 @@ import {
     GroupRemoveMemberComposer,
     HabboGroupDeactivatedMessageEvent,
     RoomEntryInfoMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { GetGroupInformation, GetGroupManager, GroupMembershipType, GroupType, LocalizeText, SendMessageComposer, TryJoinGroup } from '../../../api';
 import groupBaseIcon from '../../../assets/images/groups/swf/group_base_icon.png';
@@ -152,29 +152,29 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
     if (!groupInformation) return null;
 
     return (
-        <div className={`nitro-group-room-info pointer-events-auto ml-auto mt-[6px] overflow-hidden ${isOpen ? 'is-open' : 'is-closed'}`}>
-            <div className="nitro-group-room-info__contracted" onClick={() => setIsOpen((value) => !value)}>
-                <img src={groupBaseIcon} alt="" className="nitro-group-room-info__base-icon" draggable={false} />
-                <Text variant="white" className="nitro-group-room-info__title">
+        <div className={`octane-group-room-info pointer-events-auto ml-auto mt-[6px] overflow-hidden ${isOpen ? 'is-open' : 'is-closed'}`}>
+            <div className="octane-group-room-info__contracted" onClick={() => setIsOpen((value) => !value)}>
+                <img src={groupBaseIcon} alt="" className="octane-group-room-info__base-icon" draggable={false} />
+                <Text variant="white" className="octane-group-room-info__title">
                     {LocalizeText('group.homeroominfo.title')}
                 </Text>
-                <span className="nitro-group-room-info__toggle" />
+                <span className="octane-group-room-info__toggle" />
             </div>
-            <div className="nitro-group-room-info__content">
-                <Flex pointer alignItems="center" className="nitro-group-room-info__main" onClick={() => GetGroupInformation(groupInformation.id)}>
-                    <div className="nitro-group-room-info__badge">
+            <div className="octane-group-room-info__content">
+                <Flex pointer alignItems="center" className="octane-group-room-info__main" onClick={() => GetGroupInformation(groupInformation.id)}>
+                    <div className="octane-group-room-info__badge">
                         <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} />
                     </div>
-                    <Text wrap variant="white" className="nitro-group-room-info__group-name">
+                    <Text wrap variant="white" className="octane-group-room-info__group-name">
                         {groupInformation.title}
                     </Text>
                 </Flex>
                 {(groupInformation.type !== GroupType.PRIVATE || isRealOwner) && (
-                    <div className="nitro-group-room-info__button-wrap">
+                    <div className="octane-group-room-info__button-wrap">
                         <Button
                             fullWidth
                             disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING}
-                            className="nitro-groups-button nitro-group-room-info__button"
+                            className="octane-groups-button octane-group-room-info__button"
                             onClick={handleButtonClick}
                         >
                             {LocalizeText(getButtonText())}

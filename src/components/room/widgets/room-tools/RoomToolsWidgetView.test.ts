@@ -33,7 +33,7 @@ const css = readFileSync(join(process.cwd(), 'src/css/room/RoomWidgets.css'), 'u
     });
 
     it('keeps the collapse handle mounted while the rail is collapsed', () => {
-        expect(source).toContain("classNames('nitro-room-tools-container', !isToolsOpen && 'is-collapsed')");
+        expect(source).toContain("classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')");
         expect(source.indexOf('room-tools-collapse-toggle')).toBeLessThan(source.indexOf('{isToolsOpen && ('));
         expect(source).not.toContain('initial={{ opacity: 0, x: -12 }}');
     });

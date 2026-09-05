@@ -1,4 +1,4 @@
-import { CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, JumpBy, Motions, NitroToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait, YouTubeRoomSettingsEvent } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { CSSProperties, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { GetConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useNitroEvent, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useOctaneEvent, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -268,7 +268,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     {
         const measure = () =>
         {
-            const roomTools = document.querySelector('.nitro-room-tools-container') as HTMLElement | null;
+            const roomTools = document.querySelector('.octane-room-tools-container') as HTMLElement | null;
             const next = roomTools
                 ? Math.max(8, Math.round(window.innerHeight - roomTools.getBoundingClientRect().top + 15))
                 : null;
@@ -295,7 +295,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
         setUseGuideTool(event.getParser().isAllowed(PerkEnum.USE_GUIDE_TOOL));
     });
 
-    useNitroEvent<NitroToolbarAnimateIconEvent>(NitroToolbarAnimateIconEvent.ANIMATE_ICON, event =>
+    useOctaneEvent<OctaneToolbarAnimateIconEvent>(OctaneToolbarAnimateIconEvent.ANIMATE_ICON, event =>
     {
         const animationIconToToolbar = (iconName: string, image: HTMLImageElement, x: number, y: number) =>
         {
@@ -353,7 +353,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 animate={ visibilityVariant }
                 variants={ shellVariants }
                 transition={ SHELL_TRANSITION }
-                className={ `nitro-toolbar nitro-toolbar-hobba absolute bottom-0 left-0 right-0 z-[70] h-[46px] ${ desktopBlockClasses }` } />
+                className={ `octane-toolbar octane-toolbar-hobba absolute bottom-0 left-0 right-0 z-[70] h-[46px] ${ desktopBlockClasses }` } />
 
             <motion.div
                 ref={ leftDockRef }
@@ -518,7 +518,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 animate={ visibilityVariant }
                 variants={ mobileNavVariants }
                 transition={ NAV_TRANSITION }
-                className={ `absolute left-1/2 bottom-0 z-[71] flex w-[95vw] -translate-x-1/2 items-center overflow-visible ${ mobileOnlyClasses } ${ isInRoom ? 'nitro-toolbar-mobile-hobba px-[6px] py-[4px] mb-[3px]' : '' }` }>
+                className={ `absolute left-1/2 bottom-0 z-[71] flex w-[95vw] -translate-x-1/2 items-center overflow-visible ${ mobileOnlyClasses } ${ isInRoom ? 'octane-toolbar-mobile-hobba px-[6px] py-[4px] mb-[3px]' : '' }` }>
                 <motion.div
                     variants={ containerVariants }
                     className="tb-bar-scroll flex h-full min-w-0 flex-1 items-center gap-2 overflow-x-auto overflow-y-visible px-1">

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../api';
-import { Button, Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Slider, Text } from '../../../common';
+import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../common';
 import { useBuildHeight } from '../../../hooks';
 
 const STEP = 0.1;
@@ -15,9 +15,9 @@ export const BuildHeightWidgetView: FC<{}> = () => {
     const clamp = (value: number) => Math.min(maxHeight, Math.max(minHeight, Math.round(value / STEP) * STEP));
 
     return (
-        <NitroCardView className="nitro-build-height-widget" theme="primary-slim" uniqueKey="build-height">
-            <NitroCardHeaderView headerText={LocalizeText('widget.buildheight.title')} onCloseClick={close} />
-            <NitroCardContentView className="gap-2">
+        <OctaneCardView className="octane-build-height-widget" theme="primary-slim" uniqueKey="build-height">
+            <OctaneCardHeaderView headerText={LocalizeText('widget.buildheight.title')} onCloseClick={close} />
+            <OctaneCardContentView className="gap-2">
                 <Text center>{LocalizeText('widget.buildheight.description')}</Text>
                 <Flex alignItems="center" justifyContent="center" gap={2}>
                     <Button variant="secondary" onClick={() => applyHeight(clamp(height - STEP))}>-</Button>
@@ -38,7 +38,7 @@ export const BuildHeightWidgetView: FC<{}> = () => {
                     </Flex>
                     <Button variant="danger" onClick={close}>{LocalizeText('widget.buildheight.reset')}</Button>
                 </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -5,10 +5,10 @@ import {
     RedeemItemClothingComposer,
     RoomObjectCategory,
     UserFigureComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { BuildPurchasableClothingFigure, GetFurnitureDataForRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
-import { Button, Column, LayoutAvatarImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../../common';
+import { Button, Column, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
 import { useRoom } from '../../../../../hooks';
 
 interface PurchasableClothingConfirmViewProps {
@@ -74,9 +74,9 @@ export const PurchasableClothingConfirmView: FC<PurchasableClothingConfirmViewPr
     if (mode === MODE_DEFAULT) return null;
 
     return (
-        <NitroCardView className="nitro-use-product-confirmation">
-            <NitroCardHeaderView headerText={LocalizeText('useproduct.widget.title.bind_clothing')} onCloseClick={onClose} />
-            <NitroCardContentView center>
+        <OctaneCardView className="octane-use-product-confirmation">
+            <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.bind_clothing')} onCloseClick={onClose} />
+            <OctaneCardContentView center>
                 <div className="flex overflow-hidden gap-2">
                     <div className="flex flex-col">
                         <div className="mannequin-preview">
@@ -98,7 +98,7 @@ export const PurchasableClothingConfirmView: FC<PurchasableClothingConfirmViewPr
                         </div>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -1,4 +1,4 @@
-import { BotRemoveComposer } from '@nitrots/nitro-renderer';
+import { BotRemoveComposer } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { AvatarInfoRentableBot, BotSkillsEnum, LocalizeText, SendMessageComposer } from '../../../../../api';
@@ -26,7 +26,7 @@ export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewPr
 
     return (
         <div className="flex flex-col gap-1">
-            <div className="flex flex-col nitro-infostand rounded">
+            <div className="flex flex-col octane-infostand rounded">
                 <div className="flex flex-col gap-1 overflow-visible container-fluid content-area">
                     <div className="flex flex-col gap-1">
                         <Flex alignItems="center" gap={1} justifyContent="between">

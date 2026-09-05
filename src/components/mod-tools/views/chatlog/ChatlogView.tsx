@@ -1,4 +1,4 @@
-import { ChatRecordData, CreateLinkEvent } from '@nitrots/nitro-renderer';
+import { ChatRecordData, CreateLinkEvent } from '@octane/renderer';
 import { FC, Fragment, useMemo, useState } from 'react';
 import { FaCommentDots, FaDoorOpen, FaSearch, FaSignInAlt, FaTimes, FaTools } from 'react-icons/fa';
 import { LocalizeText, TryVisitRoom } from '../../../../api';

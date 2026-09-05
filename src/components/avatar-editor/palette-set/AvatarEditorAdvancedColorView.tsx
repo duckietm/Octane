@@ -1,4 +1,4 @@
-import { IPartColor } from '@nitrots/nitro-renderer';
+import { IPartColor } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { ColorUtils, GetClubMemberLevel, IAvatarEditorCategory } from '../../../api';
 import { useAvatarEditor } from '../../../hooks';

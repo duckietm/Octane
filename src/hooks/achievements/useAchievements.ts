@@ -1,4 +1,4 @@
-import { AchievementData, AchievementEvent, AchievementsEvent, AchievementsScoreEvent, RequestAchievementsMessageComposer } from '@nitrots/nitro-renderer';
+import { AchievementData, AchievementEvent, AchievementsEvent, AchievementsScoreEvent, RequestAchievementsMessageComposer } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { AchievementCategory, AchievementUtilities, CloneObject, SendMessageComposer } from '../../api';

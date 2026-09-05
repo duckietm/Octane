@@ -106,11 +106,11 @@ export const NewsWindow: FC<NewsWindowProps> = ({ newsUrl }) => {
     return (
         <div className="login-news-stack">
             <div className="news-card-wrapper" key={current.id}>
-                <div className="nitro-login-card nitro-card-shell nitro-news-card">
-                    <div className="card-title nitro-card-header-shell">
-                        <span className="nitro-card-title">{t('nitro.login.news.title', 'Hotel News')}</span>
+                <div className="octane-login-card octane-card-shell octane-news-card">
+                    <div className="card-title octane-card-header-shell">
+                        <span className="octane-card-title">{t('nitro.login.news.title', 'Hotel News')}</span>
                     </div>
-                    <div className="card-body nitro-card-content-shell news-body">
+                    <div className="card-body octane-card-content-shell news-body">
                         {safeImageSrc && (
                             <div className="news-image">
                                 <img

@@ -1,15 +1,15 @@
-.nitro-vault-content {
+.octane-vault-content {
     min-height: 0;
     overflow-y: auto;
 }
 
 @media (max-width: 460px) {
-    .nitro-vault-content > div {
+    .octane-vault-content > div {
         align-items: stretch;
         flex-wrap: wrap;
     }
 
-    .nitro-vault-content > div > button {
+    .octane-vault-content > div > button {
         margin-left: auto;
     }
 }

@@ -1,4 +1,4 @@
-import { GetSessionDataManager, RoomSettingsComposer, UpdateHomeRoomMessageComposer } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, RoomSettingsComposer, UpdateHomeRoomMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { FriendlyTime, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, ReportType, SendMessageComposer } from '../../../../api';
 import { LayoutBadgeImageView, LayoutRoomThumbnailView, UserProfileIconView } from '../../../../common';
@@ -47,28 +47,28 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
         <div
             role="dialog"
             aria-label={LocalizeText('navigator.room.info.popup.title')}
-            className="nitro-navigator-air__room-bubble"
+            className="octane-navigator-air__room-bubble"
             style={bubbleStyle}
             onMouseEnter={() => useNavigatorRoomInfoPopupStore.getState().setHovered(true)}
             onMouseLeave={() => useNavigatorRoomInfoPopupStore.getState().setHovered(false)}
             onClick={(event) => event.stopPropagation()}
         >
-            <div className="nitro-navigator-air__room-bubble-content">
-                <div className="nitro-navigator-air__room-popover-header">
-                    <LayoutRoomThumbnailView className="nitro-navigator-air__room-popover-thumbnail" customUrl={room.officialRoomPicRef} roomId={room.roomId}>
-                        {hasGroup && <LayoutBadgeImageView badgeCode={room.groupBadgeCode} className="nitro-navigator-air__room-badge" isGroup={true} />}
+            <div className="octane-navigator-air__room-bubble-content">
+                <div className="octane-navigator-air__room-popover-header">
+                    <LayoutRoomThumbnailView className="octane-navigator-air__room-popover-thumbnail" customUrl={room.officialRoomPicRef} roomId={room.roomId}>
+                        {hasGroup && <LayoutBadgeImageView badgeCode={room.groupBadgeCode} className="octane-navigator-air__room-badge" isGroup={true} />}
                     </LayoutRoomThumbnailView>
-                    <div className="nitro-navigator-air__room-popover-copy">
-                        <div className="nitro-navigator-air__room-popover-title">{room.roomName}</div>
-                        {room.description && <div className="nitro-navigator-air__room-popover-description">{room.description}</div>}
+                    <div className="octane-navigator-air__room-popover-copy">
+                        <div className="octane-navigator-air__room-popover-title">{room.roomName}</div>
+                        {room.description && <div className="octane-navigator-air__room-popover-description">{room.description}</div>}
                     </div>
                 </div>
                 {(showOwner || hasGroup) && (
-                    <div className="nitro-navigator-air__room-popover-owner-row">
+                    <div className="octane-navigator-air__room-popover-owner-row">
                         {showOwner && (
                             <button
                                 type="button"
-                                className="nitro-navigator-air__room-owner"
+                                className="octane-navigator-air__room-owner"
                                 onClick={() => {
                                     GetUserProfile(room.ownerId);
                                     closePopup();
@@ -81,20 +81,20 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                         {hasGroup && (
                             <button
                                 type="button"
-                                className="nitro-navigator-air__room-group"
+                                className="octane-navigator-air__room-group"
                                 onClick={() => {
                                     GetGroupInformation(room.habboGroupId);
                                     closePopup();
                                 }}
                             >
-                                <i className="nitro-navigator-air__group" />
+                                <i className="octane-navigator-air__group" />
                                 <span>{room.groupName}</span>
                             </button>
                         )}
                     </div>
                 )}
-                <div className="nitro-navigator-air__room-popover-details">
-                    <div className="nitro-navigator-air__room-popover-properties">
+                <div className="octane-navigator-air__room-popover-details">
+                    <div className="octane-navigator-air__room-popover-properties">
                         <span className="is-label">{LocalizeText('navigator.roompopup.property.trading')}</span>
                         <span>{getTradeModeText(room.tradeMode)}</span>
                         {rankingEnabled && (
@@ -106,7 +106,7 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                         <span className="is-label">{LocalizeText('navigator.roompopup.property.max_users')}</span>
                         <span>{room.maxUserCount}</span>
                     </div>
-                    <div className="nitro-navigator-air__room-popover-actions">
+                    <div className="octane-navigator-air__room-popover-actions">
                         <button type="button" onClick={() => toggleFavourite()}>
                             <i className={classNames('icon icon-navigator-favorite-room', isFavourite ? 'active' : '')} />
                             <span>{LocalizeText('navigator.room.popup.room.info.favorite')}</span>
@@ -149,22 +149,22 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                     </div>
                 </div>
                 {room.tags && room.tags.length > 0 && (
-                    <div className="nitro-navigator-air__room-popover-tags">
+                    <div className="octane-navigator-air__room-popover-tags">
                         {room.tags.map((tag) => (
-                            <button key={tag} type="button" className="nitro-navigator-air__tag" onClick={() => searchTag(tag)}>
+                            <button key={tag} type="button" className="octane-navigator-air__tag" onClick={() => searchTag(tag)}>
                                 #{tag}
                             </button>
                         ))}
                     </div>
                 )}
                 {hasActiveRoomAd && (
-                    <div className="nitro-navigator-air__room-popover-event">
-                        <i className="nitro-navigator-air__room-popover-event-icon" aria-hidden="true" />
-                        <div className="nitro-navigator-air__room-popover-event-copy">
-                            <span className="nitro-navigator-air__room-popover-event-name">
+                    <div className="octane-navigator-air__room-popover-event">
+                        <i className="octane-navigator-air__room-popover-event-icon" aria-hidden="true" />
+                        <div className="octane-navigator-air__room-popover-event-copy">
+                            <span className="octane-navigator-air__room-popover-event-name">
                                 {LocalizeText('navigator.eventsettings.name')}: {room.roomAdName}
                             </span>
-                            <span className="nitro-navigator-air__room-popover-event-description">
+                            <span className="octane-navigator-air__room-popover-event-description">
                                 {LocalizeText('navigator.eventsettings.desc')}: {room.roomAdDescription}
                                 <br />
                                 {LocalizeText('roomad.event.expiration_time')} {FriendlyTime.format(room.roomAdExpiresInMin * 60)}

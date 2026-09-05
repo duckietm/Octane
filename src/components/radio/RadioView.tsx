@@ -45,7 +45,7 @@ export const RadioView: FC<{}> = () => {
     if (hidden) return null;
 
     return (
-        <DraggableWindow uniqueKey="nitro-radio" windowPosition={DraggableWindowPosition.TOP_LEFT}>
+        <DraggableWindow uniqueKey="octane-radio" windowPosition={DraggableWindowPosition.TOP_LEFT}>
             <div className="radio-widget w-[244px] max-w-[64vw] select-none overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[rgba(22,24,30,0.94)] to-[rgba(10,11,14,0.94)] text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-sm">
                 <div className="drag-handler flex cursor-move items-center gap-2 border-b border-white/10 px-3 py-1.5">
                     <FaBroadcastTower className={`text-[11px] ${isPlaying ? 'text-sky-400' : 'text-white/45'}`} />

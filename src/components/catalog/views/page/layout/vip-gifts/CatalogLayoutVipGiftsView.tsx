@@ -1,4 +1,4 @@
-import { SelectClubGiftComposer } from '@nitrots/nitro-renderer';
+import { SelectClubGiftComposer } from '@octane/renderer';
 import { FC, useCallback, useMemo } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../../api';
 import { AutoGrid, Text } from '../../../../../../common';
@@ -36,7 +36,7 @@ export const CatalogLayoutVipGiftsView: FC<CatalogLayoutProps> = (props) => {
 
                     // The server replies with a fresh ClubGiftInfoEvent after
                     // accepting the selection; useClubGifts subscribes to that
-                    // event via useNitroEventInvalidator, so giftsAvailable
+                    // event via useOctaneEventInvalidator, so giftsAvailable
                     // refreshes from the authoritative source — no need to
                     // mutate the parser locally.
                     SendMessageComposer(new SelectClubGiftComposer(localizationId));
@@ -60,7 +60,7 @@ export const CatalogLayoutVipGiftsView: FC<CatalogLayoutProps> = (props) => {
             <Text shrink truncate fontWeight="bold">
                 {giftsAvailable()}
             </Text>
-            <AutoGrid className="nitro-catalog-layout-vip-gifts-grid" columnCount={1}>
+            <AutoGrid className="octane-catalog-layout-vip-gifts-grid" columnCount={1}>
                 {clubGifts &&
                     clubGifts.offers.length > 0 &&
                     sortGifts.map((offer) => (

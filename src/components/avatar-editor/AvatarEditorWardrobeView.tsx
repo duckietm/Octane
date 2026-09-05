@@ -1,4 +1,4 @@
-import { GetAvatarRenderManager, HabboClubLevelEnum, IAvatarFigureContainer, SaveWardrobeOutfitMessageComposer } from '@nitrots/nitro-renderer';
+import { GetAvatarRenderManager, HabboClubLevelEnum, IAvatarFigureContainer, SaveWardrobeOutfitMessageComposer } from '@octane/renderer';
 import { FC, useCallback, useMemo } from 'react';
 import { GetClubMemberLevel, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
 import hcIconSrc from '../../assets/images/avatareditor/air/wardrobe-hc.png';
@@ -71,14 +71,14 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
     );
 
     return (
-        <aside className="nitro-avatar-editor-wardrobe" aria-label={LocalizeText('avatareditor.wardrobe.title')}>
-            <div className="nitro-avatar-editor-wardrobe-header">
-                <span className="nitro-avatar-editor-wardrobe-title">{LocalizeText('avatareditor.wardrobe.title')}</span>
-                <img src={hcIconSrc} alt="" draggable={false} className="nitro-avatar-editor-wardrobe-hc" />
+        <aside className="octane-avatar-editor-wardrobe" aria-label={LocalizeText('avatareditor.wardrobe.title')}>
+            <div className="octane-avatar-editor-wardrobe-header">
+                <span className="octane-avatar-editor-wardrobe-title">{LocalizeText('avatareditor.wardrobe.title')}</span>
+                <img src={hcIconSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-hc" />
             </div>
-            <div className="nitro-avatar-editor-wardrobe-slots">
+            <div className="octane-avatar-editor-wardrobe-slots">
                 {columns.map((column, columnIndex) => (
-                    <div className="nitro-avatar-editor-wardrobe-column" key={`wardrobe-col-${columnIndex}`}>
+                    <div className="octane-avatar-editor-wardrobe-column" key={`wardrobe-col-${columnIndex}`}>
                         {column.map((item, rowIndex) => {
                             const index = columnIndex * SLOTS_PER_COL + rowIndex;
                             const [figureContainer, slotGender] = item;
@@ -86,12 +86,12 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
                             const figureString = figureContainer?.getFigureString() ?? '';
 
                             return (
-                                <div className={`nitro-avatar-editor-wardrobe-slot${enabled ? '' : ' is-locked'}`} key={`wardrobe-slot-${index}`}>
-                                    <div className="nitro-avatar-editor-wardrobe-slot-shade" />
+                                <div className={`octane-avatar-editor-wardrobe-slot${enabled ? '' : ' is-locked'}`} key={`wardrobe-slot-${index}`}>
+                                    <div className="octane-avatar-editor-wardrobe-slot-shade" />
                                     {enabled && (
                                         <button
                                             type="button"
-                                            className="nitro-avatar-editor-wardrobe-slot-set"
+                                            className="octane-avatar-editor-wardrobe-slot-set"
                                             aria-label={LocalizeText('avatareditor.wardrobe.save')}
                                             onClick={() => saveFigureAtWardrobeIndex(index)}
                                         />
@@ -99,14 +99,14 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
                                     {enabled && figureContainer && (
                                         <button
                                             type="button"
-                                            className="nitro-avatar-editor-wardrobe-slot-get"
+                                            className="octane-avatar-editor-wardrobe-slot-get"
                                             aria-label={LocalizeText('widget.generic_usable.button.use')}
                                             onClick={() => wearFigureAtIndex(index)}
                                         />
                                     )}
                                     <button
                                         type="button"
-                                        className="nitro-avatar-editor-wardrobe-slot-figure"
+                                        className="octane-avatar-editor-wardrobe-slot-figure"
                                         disabled={!enabled || !figureContainer}
                                         aria-label={LocalizeText('widget.generic_usable.button.use')}
                                         onClick={() => wearFigureAtIndex(index)}
@@ -114,7 +114,7 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
                                         {figureContainer ? (
                                             <LayoutAvatarImageView direction={4} figure={figureString} gender={slotGender} fit />
                                         ) : (
-                                            <img src={emptySlotSrc} alt="" draggable={false} className="nitro-avatar-editor-wardrobe-empty" />
+                                            <img src={emptySlotSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-empty" />
                                         )}
                                     </button>
                                 </div>

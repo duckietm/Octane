@@ -1,4 +1,4 @@
-import { createNitroStore } from '../../../state/createNitroStore';
+import { createOctaneStore } from '../../../state/createOctaneStore';
 
 const CREATE_LOCKOUT_MS = 5000;
 
@@ -7,7 +7,7 @@ interface RoomCreatorState {
     beginCreate: () => void;
 }
 
-export const useRoomCreatorStore = createNitroStore<RoomCreatorState>()((set) => {
+export const useRoomCreatorStore = createOctaneStore<RoomCreatorState>()((set) => {
     let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
     return {

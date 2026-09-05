@@ -1,4 +1,4 @@
-import { GetRenderer, GetRoomEngine, NitroTexture, TextureUtils } from '@nitrots/nitro-renderer';
+import { GetRenderer, GetRoomEngine, OctaneTexture, TextureUtils } from '@octane/renderer';
 import { FC, useEffect, useRef } from 'react';
 import { blitRoomCanvasToViewfinder, CameraPicture, GetRoomSession, getViewfinderRoomFrame, LocalizeText, PlaySound, SoundNames } from '../../../api';
 import { Button, Column, DraggableWindow } from '../../../common';
@@ -62,12 +62,12 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
 
         const markStreamReady = () => {
             streamIsReady = true;
-            video.classList.add('nitro-camera-viewfinder__stream--ready');
+            video.classList.add('octane-camera-viewfinder__stream--ready');
         };
 
         const markStreamUnavailable = () => {
             streamIsReady = false;
-            video.classList.remove('nitro-camera-viewfinder__stream--ready');
+            video.classList.remove('octane-camera-viewfinder__stream--ready');
         };
 
         try {
@@ -116,7 +116,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
             video.removeEventListener('error', markStreamUnavailable);
             video.pause();
             video.srcObject = null;
-            video.classList.remove('nitro-camera-viewfinder__stream--ready');
+            video.classList.remove('octane-camera-viewfinder__stream--ready');
             stream?.getTracks().forEach((track) => track.stop());
         };
     }, [selectedPicture]);
@@ -161,7 +161,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
         isTakingPictureRef.current = true;
 
         const targetSlot = activePictureSlotIndex >= 0 && activePictureSlotIndex < CAMERA_ROLL_LIMIT ? activePictureSlotIndex : 0;
-        let texture: NitroTexture = null;
+        let texture: OctaneTexture = null;
 
         try {
             texture = GetRoomEngine().createTextureFromRoom(GetRoomSession().roomId, 1, frame);
@@ -169,10 +169,10 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
             if (!texture) return;
 
             PlaySound(SoundNames.CAMERA_SHUTTER);
-            flashRef.current?.classList.remove('nitro-camera-capture__flash--active');
+            flashRef.current?.classList.remove('octane-camera-capture__flash--active');
             // Restart the CSS flash even when two photographs are taken quickly.
             void flashRef.current?.offsetWidth;
-            flashRef.current?.classList.add('nitro-camera-capture__flash--active');
+            flashRef.current?.classList.add('octane-camera-capture__flash--active');
 
             const imageUrl = await TextureUtils.generateImageUrl(texture);
 
@@ -212,25 +212,25 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
 
     return (
         <DraggableWindow>
-            <Column center className="nitro-camera-capture" gap={0}>
-                <div className="nitro-camera-capture__body drag-handler">
-                    <div className="nitro-camera-capture__title">{LocalizeText('camera.interface.title')}</div>
-                    <button type="button" className="nitro-camera-capture__close" aria-label={LocalizeText('generic.close')} onClick={onClose} />
-                    <div className="nitro-camera-viewfinder">
+            <Column center className="octane-camera-capture" gap={0}>
+                <div className="octane-camera-capture__body drag-handler">
+                    <div className="octane-camera-capture__title">{LocalizeText('camera.interface.title')}</div>
+                    <button type="button" className="octane-camera-capture__close" aria-label={LocalizeText('generic.close')} onClick={onClose} />
+                    <div className="octane-camera-viewfinder">
                         {!selectedPicture && (
                             <>
-                                <canvas ref={elementRef} className="nitro-camera-viewfinder__fallback" width={320} height={320} />
-                                <video ref={videoRef} className="nitro-camera-viewfinder__stream" aria-hidden="true" muted playsInline />
+                                <canvas ref={elementRef} className="octane-camera-viewfinder__fallback" width={320} height={320} />
+                                <video ref={videoRef} className="octane-camera-viewfinder__stream" aria-hidden="true" muted playsInline />
                             </>
                         )}
-                        {selectedPicture && <img alt="" className="nitro-camera-viewfinder__photo" src={selectedPicture.imageUrl} />}
+                        {selectedPicture && <img alt="" className="octane-camera-viewfinder__photo" src={selectedPicture.imageUrl} />}
                     </div>
-                    {!selectedPicture && <div className="nitro-camera-capture__crosshair" aria-hidden="true" />}
-                    <div ref={flashRef} className="nitro-camera-capture__flash" aria-hidden="true" />
+                    {!selectedPicture && <div className="octane-camera-capture__crosshair" aria-hidden="true" />}
+                    <div ref={flashRef} className="octane-camera-capture__flash" aria-hidden="true" />
                     {selectedPicture && (
-                        <div className="nitro-camera-capture__preview-actions">
+                        <div className="octane-camera-capture__preview-actions">
                             <Button
-                                className="nitro-camera-capture__editor-button"
+                                className="octane-camera-capture__editor-button"
                                 title={LocalizeText('camera.editor.button.tooltip')}
                                 variant="success"
                                 onClick={onEdit}
@@ -241,22 +241,22 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
                     )}
                     <button
                         type="button"
-                        className="nitro-camera-capture__shutter"
+                        className="octane-camera-capture__shutter"
                         aria-label={LocalizeText('camera.take.photo.button.tooltip')}
                         title={LocalizeText('camera.take.photo.button.tooltip')}
                         onClick={takePicture}
                     />
                 </div>
-                <div className={`nitro-camera-roll${hasPictures ? '' : ' nitro-camera-roll--hidden'}`} aria-hidden={!hasPictures}>
+                <div className={`octane-camera-roll${hasPictures ? '' : ' octane-camera-roll--hidden'}`} aria-hidden={!hasPictures}>
                     {Array.from({ length: CAMERA_ROLL_LIMIT }, (_, index) => {
                         const picture = cameraRoll[index];
                         const isActive = index === activeSlotIndex;
 
                         return (
-                            <div key={index} className={`nitro-camera-roll__slot${isActive ? ' nitro-camera-roll__slot--active' : ''}`}>
+                            <div key={index} className={`octane-camera-roll__slot${isActive ? ' octane-camera-roll__slot--active' : ''}`}>
                                 <button
                                     type="button"
-                                    className="nitro-camera-roll__slot-button"
+                                    className="octane-camera-roll__slot-button"
                                     aria-label={picture ? LocalizeText('camera.editor.button.tooltip') : LocalizeText('camera.take.photo.button.tooltip')}
                                     onClick={() => {
                                         if (isTakingPictureRef.current) return;
@@ -270,7 +270,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
                                 {picture && selectedPictureIndex === index && (
                                     <button
                                         type="button"
-                                        className="nitro-camera-roll__delete"
+                                        className="octane-camera-roll__delete"
                                         aria-label={LocalizeText('camera.delete.button.text')}
                                         title={LocalizeText('camera.delete.button.text')}
                                         onClick={() => {

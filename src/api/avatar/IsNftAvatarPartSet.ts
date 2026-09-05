@@ -1,4 +1,4 @@
-import { IFigurePartSet } from '@nitrots/nitro-renderer';
+import { IFigurePartSet } from '@octane/renderer';
 
 export const IsNftAvatarPartSet = (
     partSet: IFigurePartSet,

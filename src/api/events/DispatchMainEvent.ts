@@ -1,4 +1,4 @@
-import { GetEventDispatcher, NitroEvent } from '@nitrots/nitro-renderer';
+import { GetEventDispatcher, OctaneEvent } from '@octane/renderer';
 import { DispatchEvent } from './DispatchEvent';
 
-export const DispatchMainEvent = (event: NitroEvent) => DispatchEvent(GetEventDispatcher(), event);
+export const DispatchMainEvent = (event: OctaneEvent) => DispatchEvent(GetEventDispatcher(), event);

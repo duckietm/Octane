@@ -1,4 +1,4 @@
-import { createNitroStore } from '@/state/createNitroStore';
+import { createOctaneStore } from '@/state/createOctaneStore';
 
 export type HotelAlertToastVariant = 'broadcast' | 'staff';
 
@@ -17,7 +17,7 @@ interface HotelAlertToastState {
 
 let nextToastId = 0;
 
-export const useHotelAlertToastStore = createNitroStore<HotelAlertToastState>()((set) => ({
+export const useHotelAlertToastStore = createOctaneStore<HotelAlertToastState>()((set) => ({
     toasts: [],
     pushToast: (message, title, variant) => set((state) => ({ toasts: [...state.toasts, { id: ++nextToastId, message, title, variant }] })),
     dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) }))

@@ -6,7 +6,7 @@ import {
     UserSubscriptionComposer,
     UserSubscriptionEvent,
     UserSubscriptionParser
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { CloneObject, ClubStatus, GetConfigurationValue, IPurse, PlaySound, Purse, SendMessageComposer, SoundNames } from '../../api';

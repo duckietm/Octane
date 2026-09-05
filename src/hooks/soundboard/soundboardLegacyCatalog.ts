@@ -1,4 +1,4 @@
-import { ISoundboardSound } from '@nitrots/nitro-renderer';
+import { ISoundboardSound } from '@octane/renderer';
 
 const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 

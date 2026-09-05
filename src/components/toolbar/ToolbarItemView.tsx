@@ -8,5 +8,5 @@ type ToolbarItemViewProps = PropsWithChildren<{
     DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
 export const ToolbarItemView = ({ ref, icon = null, className = null, ...rest }: ToolbarItemViewProps) => {
-    return <div ref={ref} className={classNames('cursor-pointer relative', `nitro-icon icon-${icon}`, className)} {...rest} />;
+    return <div ref={ref} className={classNames('cursor-pointer relative', `octane-icon icon-${icon}`, className)} {...rest} />;
 };

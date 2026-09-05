@@ -1,4 +1,4 @@
-import { ClubOfferData, CreateLinkEvent, PurchaseFromCatalogComposer } from '@nitrots/nitro-renderer';
+import { ClubOfferData, CreateLinkEvent, PurchaseFromCatalogComposer } from '@octane/renderer';
 import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { CatalogPurchaseState, DispatchUiEvent, GetConfigurationValue, LocalizeText, OpenUrl, SanitizeHtml, SendMessageComposer } from '../../../../../api';
 import vipIconMedium from '../../../../../assets/images/catalog/air/vip-icon-medium.png';
@@ -251,7 +251,7 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
     const renderPrice = (offer: ClubOfferData) => {
         if (!isVipPage) {
             return (
-                <span className="nitro-club-offer-prices is-compact-text">
+                <span className="octane-club-offer-prices is-compact-text">
                     {offer.priceCredits > 0 && LocalizeText('catalog.club.price', ['price'], [offer.priceCredits.toString()])}
                     {offer.priceCredits > 0 && offer.priceActivityPoints > 0 && ' + '}
                     {offer.priceActivityPoints > 0 && `${offer.priceActivityPoints} ${getActivityPointName(offer.priceActivityPointsType)}`}
@@ -260,17 +260,17 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
         }
 
         return (
-            <span className="nitro-club-offer-prices">
+            <span className="octane-club-offer-prices">
                 {offer.priceCredits > 0 && (
-                    <span className="nitro-club-offer-price" data-currency-type="-1">
+                    <span className="octane-club-offer-price" data-currency-type="-1">
                         <span>{offer.priceCredits}</span>
                         <LayoutCurrencyIcon type={-1} />
                     </span>
                 )}
                 {offer.priceActivityPoints > 0 && (
                     <>
-                        {offer.priceCredits > 0 && <span className="nitro-club-price-separator">+</span>}
-                        <span className="nitro-club-offer-price" data-currency-type={offer.priceActivityPointsType}>
+                        {offer.priceCredits > 0 && <span className="octane-club-price-separator">+</span>}
+                        <span className="octane-club-offer-price" data-currency-type={offer.priceActivityPointsType}>
                             <span>{offer.priceActivityPoints}</span>
                             <LayoutCurrencyIcon type={offer.priceActivityPointsType} />
                         </span>
@@ -286,26 +286,26 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
         return (
             <article
                 key={offer.offerId}
-                className={`nitro-club-offer ${isVipPage ? 'is-wide' : 'is-compact'} ${offer.vip ? 'is-vip' : 'is-hc'}`}
+                className={`octane-club-offer ${isVipPage ? 'is-wide' : 'is-compact'} ${offer.vip ? 'is-vip' : 'is-hc'}`}
                 data-offer-id={offer.offerId}
             >
-                <header className="nitro-club-offer-header">
+                <header className="octane-club-offer-header">
                     {isVipPage ? (
-                        <img alt="" aria-hidden="true" className="nitro-club-vip-medium-mark" draggable={false} src={vipIconMedium} />
+                        <img alt="" aria-hidden="true" className="octane-club-vip-medium-mark" draggable={false} src={vipIconMedium} />
                     ) : (
-                        <span aria-hidden="true" className={`nitro-club-compact-mark ${offer.vip ? 'is-vip' : 'is-hc'}`} />
+                        <span aria-hidden="true" className={`octane-club-compact-mark ${offer.vip ? 'is-vip' : 'is-hc'}`} />
                     )}
                     <strong>{getOfferText(offer)}</strong>
                 </header>
-                <div className="nitro-club-offer-footer">
+                <div className="octane-club-offer-footer">
                     {renderPrice(offer)}
-                    <div className="nitro-club-offer-actions">
+                    <div className="octane-club-offer-actions">
                         {isVipPage && giftConfiguration?.isEnabled && offer.giftable && (
-                            <Button classNames={['nitro-club-offer-action']} disabled={isPurchasingRef.current} onClick={() => startGift(offer)}>
+                            <Button classNames={['octane-club-offer-action']} disabled={isPurchasingRef.current} onClick={() => startGift(offer)}>
                                 {LocalizeText('catalog.purchase_confirmation.gift')}
                             </Button>
                         )}
-                        <Button classNames={['nitro-club-offer-action', 'is-buy']} disabled={isPurchasingRef.current} onClick={() => startPurchase(offer)}>
+                        <Button classNames={['octane-club-offer-action', 'is-buy']} disabled={isPurchasingRef.current} onClick={() => startPurchase(offer)}>
                             {isPending && purchaseState === CatalogPurchaseState.PURCHASE ? (
                                 <LayoutLoadingSpinnerView />
                             ) : (
@@ -335,19 +335,19 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
         membership.tier === 'vip' ? LocalizeText('catalog.vip.extend.info', ['days'], [membership.totalDays.toString()]) : LocalizeText('catalog.vip.buy.info');
 
     return (
-        <div className={`nitro-club-purchase-layout ${isVipPage ? 'is-vip-page' : 'is-club-page'}`}>
+        <div className={`octane-club-purchase-layout ${isVipPage ? 'is-vip-page' : 'is-club-page'}`}>
             {isVipPage ? (
                 <>
-                    <div className="nitro-club-vip-intro">
-                        {teaserImage ? <img alt="" className="nitro-club-teaser" src={teaserImage} /> : <span className="nitro-club-teaser" />}
-                        <div className="nitro-club-vip-copy">
+                    <div className="octane-club-vip-intro">
+                        {teaserImage ? <img alt="" className="octane-club-teaser" src={teaserImage} /> : <span className="octane-club-teaser" />}
+                        <div className="octane-club-vip-copy">
                             <strong>{LocalizeText(vipTitleKey)}</strong>
                             <span>{vipInfo}</span>
                         </div>
                     </div>
-                    <div className="nitro-club-vip-offers">{offerGroups.vip.map(renderOffer)}</div>
+                    <div className="octane-club-vip-offers">{offerGroups.vip.map(renderOffer)}</div>
                     <div
-                        className="nitro-club-center-link"
+                        className="octane-club-center-link"
                         dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('catalog.vip.buy.hccenter')) }}
                         role="link"
                         tabIndex={0}
@@ -365,27 +365,27 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
                 </>
             ) : (
                 <>
-                    <header className="nitro-club-membership-header">
+                    <header className="octane-club-membership-header">
                         <strong>{LocalizeText(membershipHeaderKey)}</strong>
                     </header>
-                    <p className="nitro-club-membership-info">{LocalizeText(membershipInfoKey)}</p>
-                    <div className="nitro-club-emblem" aria-hidden="true">
-                        <span className="nitro-club-vip-emblem" />
+                    <p className="octane-club-membership-info">{LocalizeText(membershipInfoKey)}</p>
+                    <div className="octane-club-emblem" aria-hidden="true">
+                        <span className="octane-club-vip-emblem" />
                     </div>
-                    <div className="nitro-club-columns">
-                        <section className="nitro-club-hc-column">
+                    <div className="octane-club-columns">
+                        <section className="octane-club-hc-column">
                             {offerGroups.hc.map(renderOffer)}
                             {membership.tier === 'vip' && (
-                                <div className="nitro-club-info-card">
+                                <div className="octane-club-info-card">
                                     <strong>{LocalizeText('catalog.club.info.header')}</strong>
                                     <span>{LocalizeText('catalog.club.info.content')}</span>
                                 </div>
                             )}
                         </section>
-                        <section className="nitro-club-vip-column">{offerGroups.vip.map(renderOffer)}</section>
+                        <section className="octane-club-vip-column">{offerGroups.vip.map(renderOffer)}</section>
                     </div>
-                    {membership.active && <div className="nitro-club-remaining">{LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}</div>}
-                    <button className="nitro-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
+                    {membership.active && <div className="octane-club-remaining">{LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}</div>}
+                    <button className="octane-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
                         {LocalizeText('catalog.club.buy.link')}
                     </button>
                 </>

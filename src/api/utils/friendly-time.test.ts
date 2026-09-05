@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 /**
- * Mock LocalizeText (which transitively imports @nitrots/nitro-renderer)
+ * Mock LocalizeText (which transitively imports @octane/renderer)
  * with a deterministic stub. The stub returns `key|amount` so each test
  * can assert both the bucket FriendlyTime chose AND the value it computed.
  */

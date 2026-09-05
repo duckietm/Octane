@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { FaCheck, FaCopy } from 'react-icons/fa';
 import { CopyToClipboard, GetConfigurationValue, LocalizeText } from '../../../api';
-import { Button, LayoutRoomThumbnailView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
+import { Button, LayoutRoomThumbnailView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { useNavigatorData } from '../../../hooks';
 
 export class NavigatorRoomLinkViewProps {
@@ -25,12 +25,12 @@ export const NavigatorRoomLinkView: FC<NavigatorRoomLinkViewProps> = (props) => 
     if (!navigatorData.enteredGuestRoom) return null;
 
     return (
-        <NitroCardView
-            className="nitro-room-link min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-room-link min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
         >
-            <NitroCardHeaderView headerText={LocalizeText('navigator.embed.title')} onCloseClick={onCloseClick} />
-            <NitroCardContentView className="text-black flex items-center max-h-[calc(100vh-72px)]" overflow="auto">
+            <OctaneCardHeaderView headerText={LocalizeText('navigator.embed.title')} onCloseClick={onCloseClick} />
+            <OctaneCardContentView className="text-black flex items-center max-h-[calc(100vh-72px)]" overflow="auto">
                 <div className="flex flex-col sm:flex-row gap-2 min-w-0">
                     <LayoutRoomThumbnailView customUrl={navigatorData.enteredGuestRoom.officialRoomPicRef} roomId={navigatorData.enteredGuestRoom.roomId} />
                     <div className="flex flex-col min-w-0">
@@ -38,7 +38,7 @@ export const NavigatorRoomLinkView: FC<NavigatorRoomLinkViewProps> = (props) => 
                             {LocalizeText('navigator.embed.headline')}
                         </Text>
                         <Text>{LocalizeText('navigator.embed.info')}</Text>
-                        <div className="nitro-navigator-air__link-field">
+                        <div className="octane-navigator-air__link-field">
                             <input
                                 readOnly
                                 className="form-control form-control-sm w-full min-w-0"
@@ -56,7 +56,7 @@ export const NavigatorRoomLinkView: FC<NavigatorRoomLinkViewProps> = (props) => 
                         </div>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

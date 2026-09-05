@@ -4,11 +4,11 @@ import {
     ModerateRoomMessageComposer,
     ModeratorActionMessageComposer,
     ModeratorRoomInfoEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaBullhorn, FaCommentDots, FaDoorOpen, FaExclamationTriangle, FaSignInAlt, FaSync, FaUserShield, FaUsers } from 'react-icons/fa';
 import { LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api';
-import { Button, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 
 interface ModToolsRoomViewProps {
@@ -77,13 +77,13 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
     const ownerDotClass = ownerInRoom ? 'bg-emerald-500' : 'bg-zinc-400';
 
     return (
-        <NitroCardView
-            className="nitro-mod-tools-room min-w-0 w-[min(460px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-mod-tools-room min-w-0 w-[min(460px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
-            <NitroCardHeaderView headerText={LocalizeText('modtools.roominfo.title')} onCloseClick={() => onCloseClick()} />
-            <NitroCardContentView className="text-black" gap={2}>
+            <OctaneCardHeaderView headerText={LocalizeText('modtools.roominfo.title')} onCloseClick={() => onCloseClick()} />
+            <OctaneCardContentView className="text-black" gap={2}>
                 {/* Identity header */}
                 <div className="flex items-center gap-2 bg-gradient-to-r from-sky-50 to-transparent rounded p-2 border border-sky-100">
                     <FaDoorOpen className="text-sky-600 shrink-0" size={16} />
@@ -180,7 +180,7 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                         </Button>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

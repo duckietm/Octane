@@ -1,4 +1,4 @@
-import { GetConfiguration } from '@nitrots/nitro-renderer';
+import { GetConfiguration } from '@octane/renderer';
 import { getAccessToken } from '../auth';
 
 export interface EmuStatsOverview {
@@ -137,7 +137,7 @@ const getUrl = (): string => {
 const buildHeaders = (): Record<string, string> => {
     const headers: Record<string, string> = {
         Accept: 'application/json',
-        'X-Requested-With': 'NitroEmuStats'
+        'X-Requested-With': 'OctaneEmuStats'
     };
 
     const token = getAccessToken();

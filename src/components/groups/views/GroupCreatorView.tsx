@@ -1,7 +1,7 @@
-import { GroupBadgePartsComposer, GroupBuyComposer, GroupBuyDataComposer, GroupBuyDataEvent } from '@nitrots/nitro-renderer';
+import { GroupBadgePartsComposer, GroupBuyComposer, GroupBuyDataComposer, GroupBuyDataEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { HasHabboClub, IGroupData, LocalizeText, SendMessageComposer } from '../../../api';
-import { Button, Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
+import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { useMessageEvent } from '../../../hooks';
 import { GroupTabBadgeView } from './tabs/GroupTabBadgeView';
 import { GroupTabColorsView } from './tabs/GroupTabColorsView';
@@ -120,9 +120,9 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
     if (!groupData) return null;
 
     return (
-        <NitroCardView className="nitro-groups-window nitro-group-creator h-[355px] w-[390px]" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('group.create.title')} onCloseClick={onCloseClose} />
-            <NitroCardContentView className="nitro-groups-content">
+        <OctaneCardView className="octane-groups-window octane-group-creator h-[355px] w-[390px]" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('group.create.title')} onCloseClick={onCloseClose} />
+            <OctaneCardContentView className="octane-groups-content">
                 <div className="flex items-center justify-center creator-tabs">
                     {TABS.map((tab, index) => {
                         return (
@@ -164,12 +164,12 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
                         {currentTab === 3 && <GroupTabColorsView groupData={groupData} setCloseAction={setCloseAction} setGroupData={setGroupData} />}
                         {currentTab === 4 && <GroupTabCreatorConfirmationView groupData={groupData} purchaseCost={purchaseCost} setGroupData={setGroupData} />}
                     </Column>
-                    <div className="nitro-groups-footer flex justify-between">
-                        <Button className="nitro-groups-button" variant="link" onClick={previousStep}>
+                    <div className="octane-groups-footer flex justify-between">
+                        <Button className="octane-groups-button" variant="link" onClick={previousStep}>
                             {LocalizeText(currentTab === 1 ? 'generic.cancel' : 'group.create.previousstep')}
                         </Button>
                         <Button
-                            className="nitro-groups-button nitro-groups-button--primary"
+                            className="octane-groups-button octane-groups-button--primary"
                             disabled={currentTab === 4 && !HasHabboClub()}
                             variant={currentTab === 4 ? (HasHabboClub() ? 'success' : 'danger') : 'primary'}
                             onClick={nextStep}
@@ -180,7 +180,7 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
                         </Button>
                     </div>
                 </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

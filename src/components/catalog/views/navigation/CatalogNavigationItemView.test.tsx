@@ -54,6 +54,6 @@ describe('catalog navigation item accessibility', () => {
 
         expect(css).toMatch(/--catalog-standard-select:\s*#63c5e9/);
         expect(css).toMatch(/--catalog-standard-select-outer:\s*#82d1ed/);
-        expect(css).toMatch(/nitro-catalog-navigation-list\.is-builders-club[\s\S]*--catalog-standard-select:\s*var\(--catalog-standard-bc\)/);
+        expect(css).toMatch(/octane-catalog-navigation-list\.is-builders-club[\s\S]*--catalog-standard-select:\s*var\(--catalog-standard-bc\)/);
     });
 });

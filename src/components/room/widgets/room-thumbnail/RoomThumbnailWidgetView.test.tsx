@@ -12,8 +12,8 @@ const mocks = vi.hoisted(() => ({
     uiHandler: null as null | ((event: { type: string }) => void)
 }));
 
-vi.mock('@nitrots/nitro-renderer', async () => {
-    const actual = await vi.importActual<typeof import('@nitrots/nitro-renderer')>('@nitrots/nitro-renderer');
+vi.mock('@octane/renderer', async () => {
+    const actual = await vi.importActual<typeof import('@octane/renderer')>('@octane/renderer');
 
     return {
         ...actual,

@@ -30,18 +30,18 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
         GetConfigurationValue<boolean>('catalog.multiple.purchase.enabled', true);
 
     return (
-        <div className="nitro-catalog-default-layout flex flex-col h-full gap-2">
-            <div className="nitro-catalog-product-view">
+        <div className="octane-catalog-default-layout flex flex-col h-full gap-2">
+            <div className="octane-catalog-product-view">
                 {currentOffer && (
-                    <div className="nitro-catalog-offer-panel flex gap-0">
+                    <div className="octane-catalog-offer-panel flex gap-0">
                         <div
-                            className={`nitro-catalog-offer-preview relative flex items-center justify-center ${currentOffer.product.productType === ProductTypeEnum.BADGE ? 'is-badge' : ''}`}
+                            className={`octane-catalog-offer-preview relative flex items-center justify-center ${currentOffer.product.productType === ProductTypeEnum.BADGE ? 'is-badge' : ''}`}
                             style={{ flex: '1 1 auto', minWidth: 0, width: '100%' }}
                         >
-                            <div className="nitro-catalog-preview-details">
+                            <div className="octane-catalog-preview-details">
                                 <CatalogProductDetailsView offer={currentOffer} />
                             </div>
-                            <div className="nitro-catalog-preview-limited">
+                            <div className="octane-catalog-preview-limited">
                                 <CatalogLimitedItemWidgetView />
                             </div>
                             {currentOffer.product.productType !== ProductTypeEnum.BADGE && (
@@ -57,7 +57,7 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
                 )}
 
                 {!currentOffer && (
-                    <div className={`nitro-catalog-welcome flex items-center gap-3 ${hasTeaserText ? '' : 'justify-center is-image-only'}`}>
+                    <div className={`octane-catalog-welcome flex items-center gap-3 ${hasTeaserText ? '' : 'justify-center is-image-only'}`}>
                         {!!page.localization.getImage(1) && (
                             <img alt="" className="w-[70px] h-[70px] object-contain rounded shrink-0" src={page.localization.getImage(1)} />
                         )}
@@ -66,30 +66,30 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
                 )}
             </div>
 
-            <div className="nitro-catalog-grid-shell flex-1 overflow-auto min-h-0">
+            <div className="octane-catalog-grid-shell flex-1 overflow-auto min-h-0">
                 {GetConfigurationValue('catalog.headers') && <CatalogHeaderView imageUrl={currentPage.localization.getImage(0)} />}
                 <CatalogItemGridWidgetView
-                    className={`nitro-catalog-grid nitro-catalog-grid-density-${density}`}
+                    className={`octane-catalog-grid octane-catalog-grid-density-${density}`}
                     showPrices={showTilePrices}
                     {...gridMetrics}
                 />
             </div>
 
             {showBundlePurchase && (
-                <div className="nitro-catalog-price-row flex items-center justify-between gap-2">
-                    <div className="nitro-catalog-spinner-slot">
+                <div className="octane-catalog-price-row flex items-center justify-between gap-2">
+                    <div className="octane-catalog-spinner-slot">
                         <CatalogSpinnerWidgetView />
                     </div>
-                    <div className="nitro-catalog-total-price-slot">
-                        <span className="nitro-catalog-total-price-label">{LocalizeText('catalog.bundlewidget.price')}</span>
-                        <CatalogTotalPriceWidget classNames={['nitro-catalog-total-price-value']} />
+                    <div className="octane-catalog-total-price-slot">
+                        <span className="octane-catalog-total-price-label">{LocalizeText('catalog.bundlewidget.price')}</span>
+                        <CatalogTotalPriceWidget classNames={['octane-catalog-total-price-value']} />
                     </div>
                 </div>
             )}
 
-            <div className="nitro-catalog-purchase-row flex items-start justify-end">
+            <div className="octane-catalog-purchase-row flex items-start justify-end">
                 {currentOffer ? (
-                    <div className="nitro-catalog-offer-actions flex gap-1.5">
+                    <div className="octane-catalog-offer-actions flex gap-1.5">
                         <CatalogPurchaseWidgetView />
                     </div>
                 ) : (

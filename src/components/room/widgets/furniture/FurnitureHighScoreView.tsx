@@ -1,4 +1,4 @@
-import { RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Column, DraggableWindow, Text } from '../../../../common';
@@ -16,7 +16,7 @@ export const FurnitureHighScoreView: FC<{}> = (props) => {
             {Array.from(stuffDatas.entries()).map(([objectId, stuffData], index) => {
                 return (
                     <DraggableWindow key={index} uniqueKey={`high-score-${objectId}`}>
-                        <Column className="nitro-widget-high-score nitro-context-menu bg-[#1e1f23] p-2 w-[280px] max-w-[280px] h-[320px]" gap={0}>
+                        <Column className="octane-widget-high-score octane-context-menu bg-[#1e1f23] p-2 w-[280px] max-w-[280px] h-[320px]" gap={0}>
                             <ContextMenuHeaderView classNames={['drag-handler cursor-move']}>
                                 {LocalizeText(
                                     'high.score.display.caption',

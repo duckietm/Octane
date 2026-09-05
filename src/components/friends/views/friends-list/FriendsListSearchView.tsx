@@ -1,4 +1,4 @@
-import { HabboSearchComposer, HabboSearchResultData, HabboSearchResultEvent } from '@nitrots/nitro-renderer';
+import { HabboSearchComposer, HabboSearchResultData, HabboSearchResultEvent } from '@octane/renderer';
 import { FC, FormEvent, useState } from 'react';
 import { LocalizeText, OpenMessengerChat, SendMessageComposer } from '../../../../api';
 import { LayoutAvatarImageView, UserProfileIconView } from '../../../../common';

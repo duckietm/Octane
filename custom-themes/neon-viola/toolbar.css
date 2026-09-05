@@ -2,7 +2,7 @@
    Best-effort: ricolora la barra strumenti in basso. Se i selettori non
    matchano nella tua build, il pezzo non ha effetto (fallback sicuro). */
 
-.nitro-toolbar,
+.octane-toolbar,
 [class*="toolbar-container"] {
     background: linear-gradient(180deg, #2a0a4a 0%, #1a0730 100%) !important;
     box-shadow: 0 -2px 10px rgba(124, 58, 237, .4) !important;

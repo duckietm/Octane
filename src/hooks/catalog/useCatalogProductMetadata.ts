@@ -2,7 +2,7 @@ import {
     CatalogProductMetadataComposer,
     CatalogProductMetadataEntry,
     CatalogProductMetadataEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useRef, useState } from 'react';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';

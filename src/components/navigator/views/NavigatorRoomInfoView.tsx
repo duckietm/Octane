@@ -10,7 +10,7 @@ import {
     RoomSettingsComposer,
     ToggleStaffPickMessageComposer,
     UpdateHomeRoomMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { DispatchUiEvent, GetGroupInformation, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
 import weblinkIcon from '../../../assets/images/navigator/air/icon-weblink.png';
@@ -19,9 +19,9 @@ import {
     Flex,
     LayoutBadgeImageView,
     LayoutRoomThumbnailView,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardView,
     Text,
     UserProfileIconView
 } from '../../../common';
@@ -138,18 +138,18 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
     if (!navigatorData?.enteredGuestRoom) return null;
 
     return (
-        <NitroCardView
-            className="nitro-room-info min-w-0 w-[min(236px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-room-info min-w-0 w-[min(236px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             isResizable={false}
         >
-            <NitroCardHeaderView headerText={LocalizeText('navigator.roomsettings.roominfo')} onCloseClick={() => processAction('close')} />
-            <NitroCardContentView className="nitro-room-info__content text-black max-h-[calc(100vh-72px)]" overflow="auto">
-                <div className="nitro-room-info__heading">
+            <OctaneCardHeaderView headerText={LocalizeText('navigator.roomsettings.roominfo')} onCloseClick={() => processAction('close')} />
+            <OctaneCardContentView className="octane-room-info__content text-black max-h-[calc(100vh-72px)]" overflow="auto">
+                <div className="octane-room-info__heading">
                     <Text bold>{navigatorData.enteredGuestRoom.roomName}</Text>
                     <button
                         type="button"
                         className={classNames(
-                            'nitro-room-info__home shrink-0',
+                            'octane-room-info__home shrink-0',
                             navigatorData.homeRoomId === navigatorData.enteredGuestRoom.roomId && 'is-home'
                         )}
                         title={LocalizeText('navigator.room.popup.room.info.home')}
@@ -157,36 +157,36 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                     />
                 </div>
                 {navigatorData.enteredGuestRoom.showOwner && (
-                    <Flex alignItems="center" gap={1} className="nitro-room-info__meta">
+                    <Flex alignItems="center" gap={1} className="octane-room-info__meta">
                         <Text small bold variant="muted">{LocalizeText('navigator.roomownercaption')}</Text>
                         <UserProfileIconView userId={navigatorData.enteredGuestRoom.ownerId} />
                         <Text small>{navigatorData.enteredGuestRoom.ownerName}</Text>
                     </Flex>
                 )}
-                <Flex alignItems="center" gap={1} className="nitro-room-info__meta">
+                <Flex alignItems="center" gap={1} className="octane-room-info__meta">
                     <Text small bold variant="muted">{LocalizeText('navigator.roomrating')}</Text>
                     <Text small>{navigatorData.currentRoomRating}</Text>
                 </Flex>
-                <Text className="nitro-room-info__description">{navigatorData.enteredGuestRoom.description}</Text>
+                <Text className="octane-room-info__description">{navigatorData.enteredGuestRoom.description}</Text>
                 <LayoutRoomThumbnailView
-                    className="nitro-room-info__thumbnail"
+                    className="octane-room-info__thumbnail"
                     customUrl={navigatorData.enteredGuestRoom.officialRoomPicRef}
                     roomId={navigatorData.enteredGuestRoom.roomId}
                 >
                     {hasPermission('settings') && canUseRoomThumbnailCamera && (
                         <button
                             type="button"
-                            className="nitro-room-info__camera nitro-icon icon-camera-small absolute bottom-0 right-0 m-1"
+                            className="octane-room-info__camera octane-icon icon-camera-small absolute bottom-0 right-0 m-1"
                             aria-label={LocalizeText('navigator.thumbnail.camera.title')}
                             title={LocalizeText('navigator.thumbnail.camera.title')}
                             onClick={() => processAction('open_room_thumbnail_camera')}
                         />
                     )}
                 </LayoutRoomThumbnailView>
-                <Flex className="nitro-room-info__quick-actions" gap={1} justifyContent="center">
+                <Flex className="octane-room-info__quick-actions" gap={1} justifyContent="center">
                     {GetSessionDataManager().userId !== navigatorData.enteredGuestRoom.ownerId && (
                         <i
-                            className={classNames('nitro-icon cursor-pointer', isRoomInFavouritesList ? 'icon-group-favorite' : 'icon-group-not-favorite')}
+                            className={classNames('octane-icon cursor-pointer', isRoomInFavouritesList ? 'icon-group-favorite' : 'icon-group-not-favorite')}
                             title={LocalizeText('navigator.room.popup.room.info.favorite')}
                             onClick={() => processAction('room_favourite')}
                         />
@@ -202,47 +202,47 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                         </button>
                     )}
                 </Flex>
-                <Flex pointer alignItems="center" gap={1} className="nitro-room-info__room-link" onClick={() => processAction('toggle_room_link')}>
+                <Flex pointer alignItems="center" gap={1} className="octane-room-info__room-link" onClick={() => processAction('toggle_room_link')}>
                     <img src={weblinkIcon} alt="" />
                     <Text small underline>{LocalizeText('navigator.embed.caption')}</Text>
                 </Flex>
                 {navigatorData.enteredGuestRoom.habboGroupId > 0 && (
-                    <Flex pointer alignItems="center" gap={1} className="nitro-room-info__group" onClick={() => processAction('open_group_info')}>
+                    <Flex pointer alignItems="center" gap={1} className="octane-room-info__group" onClick={() => processAction('open_group_info')}>
                         <LayoutBadgeImageView badgeCode={navigatorData.enteredGuestRoom.groupBadgeCode} className="flex-none" isGroup={true} />
                         <Text small underline>{LocalizeText('navigator.guildbase', ['groupName'], [navigatorData.enteredGuestRoom.groupName])}</Text>
                     </Flex>
                 )}
-                <div className="nitro-room-info__actions">
+                <div className="octane-room-info__actions">
                     {hasPermission('settings') && (
-                        <button type="button" className="nitro-room-info__action habbo-btn-primary" onClick={() => processAction('open_room_settings')}>
+                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_room_settings')}>
                             {LocalizeText('navigator.roomsettings')}
                         </button>
                     )}
                     {hasPermission('settings') && (
-                        <button type="button" className="nitro-room-info__action habbo-btn-primary" onClick={() => processAction('room_filter')}>
+                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('room_filter')}>
                             {LocalizeText('navigator.roomsettings.roomfilter')}
                         </button>
                     )}
                     {(hasPermission('settings') || hasPermission('floor')) && (
-                        <button type="button" className="nitro-room-info__action habbo-btn-primary" onClick={() => processAction('open_floorplan_editor')}>
+                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_floorplan_editor')}>
                             {LocalizeText('open.floor.plan.editor')}
                         </button>
                     )}
                     {hasPermission('staff_pick') && (
-                        <button type="button" className="nitro-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_pick')}>
+                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_pick')}>
                             {LocalizeText(isRoomPicked ? 'navigator.staffpicks.unpick' : 'navigator.staffpicks.pick')}
                         </button>
                     )}
-                    <button type="button" className="nitro-room-info__action habbo-btn-danger" onClick={() => processAction('report_room')}>
+                    <button type="button" className="octane-room-info__action habbo-btn-danger" onClick={() => processAction('report_room')}>
                         {LocalizeText('help.emergency.main.report.room')}
                     </button>
                     {hasPermission('settings') && (
-                        <button type="button" className="nitro-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_mute')}>
+                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_mute')}>
                             {LocalizeText(isRoomMuted ? 'navigator.muteall_on' : 'navigator.muteall_off')}
                         </button>
                     )}
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

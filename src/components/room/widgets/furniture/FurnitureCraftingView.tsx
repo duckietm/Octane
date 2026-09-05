@@ -1,4 +1,4 @@
-import { GetRoomEngine, RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomObjectCategory } from '@octane/renderer';
 import { FC, ReactElement, useEffect, useMemo, useState } from 'react';
 import { IsOwnerOfFurniture, LocalizeText } from '../../../../api';
 import {
@@ -7,9 +7,9 @@ import {
     Column,
     LayoutGridItem,
     LayoutLoadingSpinnerView,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardView
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardView
 } from '../../../../common';
 import { useFurnitureCraftingWidget, useRoom } from '../../../../hooks';
 
@@ -63,9 +63,9 @@ export const FurnitureCraftingView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView className="nitro-widget-crafting" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('crafting.title')} onCloseClick={onClose} />
-            <NitroCardContentView>
+        <OctaneCardView className="octane-widget-crafting" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('crafting.title')} onCloseClick={onClose} />
+            <OctaneCardContentView>
                 <div className="crafting-widget-layout flex grow! gap-2 overflow-hidden">
                     <div className="crafting-widget-pane flex flex-col w-full gap-2 min-w-0">
                         <Column fullHeight overflow="hidden">
@@ -162,7 +162,7 @@ export const FurnitureCraftingView: FC<{}> = (props) => {
                         )}
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

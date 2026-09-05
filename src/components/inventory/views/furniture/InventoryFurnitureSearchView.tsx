@@ -1,7 +1,7 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { GroupItem, LocalizeText } from '../../../../api';
-import { NitroButton, NitroInput } from '../../../../layout';
+import { OctaneButton, OctaneInput } from '../../../../layout';
 
 export const InventoryFurnitureSearchView: FC<{
     groupItems: GroupItem[];
@@ -30,10 +30,10 @@ export const InventoryFurnitureSearchView: FC<{
 
     return (
         <div className="flex gap-1">
-            <NitroInput placeholder={LocalizeText('generic.search')} value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
-            <NitroButton>
+            <OctaneInput placeholder={LocalizeText('generic.search')} value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
+            <OctaneButton>
                 <FaSearch className="fa-icon" />
-            </NitroButton>
+            </OctaneButton>
         </div>
     );
 };

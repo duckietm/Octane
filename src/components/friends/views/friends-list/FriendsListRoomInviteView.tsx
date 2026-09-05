@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { LocalizeText } from '../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 
 interface FriendsRoomInviteViewProps {
     selectedFriendsIds: number[];
@@ -13,27 +13,27 @@ export const FriendsRoomInviteView: FC<FriendsRoomInviteViewProps> = (props) => 
     const [roomInviteMessage, setRoomInviteMessage] = useState<string>('');
 
     return (
-        <NitroCardView
-            className="nitro-friends-room-invite min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-friends-room-invite min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
-            uniqueKey="nitro-friends-room-invite"
+            uniqueKey="octane-friends-room-invite"
             isResizable={false}
         >
-            <NitroCardHeaderView headerText={LocalizeText('friendlist.invite.title')} onCloseClick={onCloseClick} />
-            <NitroCardContentView className="nitro-friends-room-invite-content text-black" gap={2}>
-                <Text className="nitro-friends-room-invite-summary">
+            <OctaneCardHeaderView headerText={LocalizeText('friendlist.invite.title')} onCloseClick={onCloseClick} />
+            <OctaneCardContentView className="octane-friends-room-invite-content text-black" gap={2}>
+                <Text className="octane-friends-room-invite-summary">
                     {LocalizeText('friendlist.invite.summary', ['count'], [selectedFriendsIds.length.toString()])}
                 </Text>
                 <textarea
-                    className="nitro-friends-room-invite-textarea"
+                    className="octane-friends-room-invite-textarea"
                     maxLength={255}
                     value={roomInviteMessage}
                     onChange={(event) => setRoomInviteMessage(event.target.value)}
                 ></textarea>
-                <Text center className="nitro-friends-room-invite-note">
+                <Text center className="octane-friends-room-invite-note">
                     {LocalizeText('friendlist.invite.note')}
                 </Text>
-                <div className="nitro-friends-room-invite-actions">
+                <div className="octane-friends-room-invite-actions">
                     <Button
                         fullWidth
                         disabled={roomInviteMessage.length === 0 || selectedFriendsIds.length === 0}
@@ -46,7 +46,7 @@ export const FriendsRoomInviteView: FC<FriendsRoomInviteViewProps> = (props) => 
                         {LocalizeText('generic.cancel')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

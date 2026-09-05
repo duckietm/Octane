@@ -1,4 +1,4 @@
-import { GroupBadgePartsComposer, GroupBadgePartsEvent } from '@nitrots/nitro-renderer';
+import { GroupBadgePartsComposer, GroupBadgePartsEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { IGroupCustomize, SendMessageComposer } from '../../api';

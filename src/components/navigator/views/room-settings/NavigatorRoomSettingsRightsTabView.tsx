@@ -6,7 +6,7 @@ import {
     RoomGiveRightsComposer,
     RoomTakeRightsComposer,
     RoomUsersWithRightsComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
@@ -113,7 +113,7 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
                         [filteredUsersWithRights.size.toString(), filteredUsersWithRights.size.toString()]
                     )}
                 >
-                    <Flex overflow="hidden" className="nitro-card-panel p-2 list-container">
+                    <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
                         <Column fullWidth overflow="auto" gap={1}>
                             {Array.from(filteredUsersWithRights.entries()).map(([id, name], index) => {
                                 return (
@@ -148,7 +148,7 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
                         [friendsWithoutRights.length.toString(), allFriends.length.toString()]
                     )}
                 >
-                    <Flex overflow="hidden" className="nitro-card-panel p-2 list-container">
+                    <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
                         <Column fullWidth overflow="auto" gap={1}>
                             {friendsWithoutRights.map((friend, index) => {
                                 return (

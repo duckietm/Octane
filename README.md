@@ -39,9 +39,9 @@ The installer walks through these steps:
 [1/9] Check prerequisites (node >= 18, yarn, git)
 [2/9] Clone octane-renderer
 [3/9] Setup renderer (yarn install + yarn link)
-[4/9] Setup client (yarn install + yarn link "@nitrots/nitro-renderer")
+[4/9] Setup client (yarn install + yarn link "@octane/renderer")
 [5/9] Copy public/configuration/*.example -> *.json
-[6/9] Choose JSON parsing mode (jsonc recommended) -> writes .nitro-build.json
+[6/9] Choose JSON parsing mode (jsonc recommended) -> writes .octane-build.json
 [7/9] Configure URLs (interactive, validated)
 [8/9] Build (yarn build)
 [9/9] Summary
@@ -174,7 +174,7 @@ Both styles work; you can migrate one gamedata file at a time.
 	-   `git clone https://github.com/duckietm/Octane-Renderer.git`
 	-   Install the dependencies for the renderer : cd C:\Github\octane-renderer
     	-   `yarn install`
-	-	Now we will create a Link for the Octane Renderer : `yarn link` This will give you a link address `yarn link "@nitrots/nitro-renderer"`
+	-	Now we will create a Link for the Octane Renderer : `yarn link` This will give you a link address `yarn link "@octane/renderer"`
     -   Install the dependencies for Cool UI : cd C:\Github\octane
 	-   `yarn install`
  -  -   Rename a few files
@@ -187,7 +187,7 @@ Both styles work; you can migrate one gamedata file at a time.
     -   Open `public/configuration/ui-config.json`
         -   Update `camera.url, thumbnails.url, url.prefix, habbopages.url`
 	-   `yarn build` <== the final step to build the DIST folder this is where your browser needs to point / or upload this to your /client if you do the compile on a other machine (preferd)
-    -   You can override any variable by passing it to `NitroConfig` in the index.html
+    -   You can override any variable by passing it to `OctaneConfig` in the index.html
 
 ## JSON / JSONC configuration mode
 
@@ -218,7 +218,7 @@ which mode to use:
 Choice [1=JSONC]:
 ```
 
-Your choice is stored in `.nitro-build.json` at the project root (gitignored, so
+Your choice is stored in `.octane-build.json` at the project root (gitignored, so
 each deployment keeps its own setting). Subsequent builds reuse it silently.
 
 ### Changing the mode later
@@ -237,7 +237,7 @@ NITRO_JSON_MODE=legacy yarn build
 NITRO_JSON_MODE=jsonc  yarn build
 
 # write the choice persistently
-echo '{"jsonMode":"legacy"}' > .nitro-build.json
+echo '{"jsonMode":"legacy"}' > .octane-build.json
 ```
 
 The recognized values are `legacy`, `jsonc`, and `auto` (auto = try strict JSON
@@ -246,10 +246,10 @@ first, fall back to JSONC — equivalent to the original Render V3 behaviour).
 ### How it propagates
 
 The chosen mode is injected at build time as the compile-time constant
-`__NITRO_JSON_MODE__`. It is honoured by:
+`__OCTANE_JSON_MODE__`. It is honoured by:
 
 -   `src/bootstrap.ts` when loading `client-mode.json`
--   `@nitrots/utils` → `JsonParser.ts` in Render V3, used for every config file
+-   `@octane/utils` → `JsonParser.ts` in Render V3, used for every config file
     and every gamedata JSON loaded by the renderer
 
 In `legacy` mode, an invalid file produces a clear error that suggests switching
@@ -257,8 +257,8 @@ to JSONC; nothing is silently coerced.
 
 ## Usage
 
--   To use Octane you need `.nitro` assets generated, see [nitro-converter](https://git.krews.org/nitro/nitro-converter) for instructions
--   See [Morningstar Websockets](https://git.krews.org/nitro/ms-websockets) for instructions on configuring websockets on your server
+-   To use Octane you need `.nitro` assets generated, see [octane-converter](https://git.krews.org/octane/octane-converter) for instructions
+-   See [Morningstar Websockets](https://git.krews.org/octane/ms-websockets) for instructions on configuring websockets on your server
 
 ### Development
 

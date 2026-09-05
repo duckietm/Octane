@@ -1,9 +1,9 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { AchievementUtilities, LocalizeText } from '../../api';
 import { DraggableWindowPosition } from '../../common';
 import { useAchievements } from '../../hooks';
-import { NitroCard } from '../../layout';
+import { OctaneCard } from '../../layout';
 import { AchievementCategoryView } from './AchievementCategoryView';
 import { AirAchievementProgressBar } from './AirAchievementProgressBar';
 import { AchievementsCategoryListView } from './category-list';
@@ -50,15 +50,15 @@ export const AchievementsView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <NitroCard
-            className="nitro-achievements-air"
+        <OctaneCard
+            className="octane-achievements-air"
             uniqueKey="achievements"
             windowPosition={DraggableWindowPosition.TOP_CENTER}
             offsetTop={-30}
             data-view={selectedCategory ? 'category' : 'categories'}
         >
-            <NitroCard.Header headerText={LocalizeText('inventory.achievements')} onCloseClick={() => setIsVisible(false)} />
-            <NitroCard.Content className="air-achievements-content">
+            <OctaneCard.Header headerText={LocalizeText('inventory.achievements')} onCloseClick={() => setIsVisible(false)} />
+            <OctaneCard.Content className="air-achievements-content">
                 {!selectedCategory && (
                     <>
                         <AchievementsCategoryListView
@@ -111,7 +111,7 @@ export const AchievementsView: FC<{}> = (props) => {
                         <AchievementCategoryView category={selectedCategory} />
                     </>
                 )}
-            </NitroCard.Content>
-        </NitroCard>
+            </OctaneCard.Content>
+        </OctaneCard>
     );
 };

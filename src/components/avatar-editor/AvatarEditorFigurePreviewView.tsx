@@ -1,4 +1,4 @@
-import { AvatarDirectionAngle } from '@nitrots/nitro-renderer';
+import { AvatarDirectionAngle } from '@octane/renderer';
 import { FC, useState } from 'react';
 import rotateSrc from '../../assets/images/avatareditor/air/rotate.png';
 import { LayoutAvatarImageView } from '../../common';
@@ -23,11 +23,11 @@ export const AvatarEditorFigurePreviewView: FC<{}> = (props) => {
     };
 
     return (
-        <div className="nitro-avatar-editor-preview-shell">
+        <div className="octane-avatar-editor-preview-shell">
             <div className="figure-preview-container">
                 <LayoutAvatarImageView direction={direction} figure={getFigureString} gender={gender} />
             </div>
-            <button type="button" className="nitro-avatar-editor-rotate" aria-label="Rotate avatar" onClick={() => rotateFigure(direction + 1)}>
+            <button type="button" className="octane-avatar-editor-rotate" aria-label="Rotate avatar" onClick={() => rotateFigure(direction + 1)}>
                 <img src={rotateSrc} alt="" draggable={false} />
             </button>
         </div>

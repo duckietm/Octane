@@ -1,4 +1,4 @@
-import { GetConfiguration } from '@nitrots/nitro-renderer';
+import { GetConfiguration } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import octaneLogo from '@/assets/images/loading/octane-logo.png';
 import { Base, Column, Text } from '../../common';

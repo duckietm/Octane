@@ -1,4 +1,4 @@
-import { NavigatorSearchComposer, NavigatorSearchResultSet } from '@nitrots/nitro-renderer';
+import { NavigatorSearchComposer, NavigatorSearchResultSet } from '@octane/renderer';
 import { FC, FormEvent, useEffect, useState } from 'react';
 import { INavigatorSearchFilter, LocalizeText, SearchFilterOptions, SendMessageComposer } from '../../../../api';
 import refreshIcon from '../../../../assets/images/navigator/air/refresh-search.png';
@@ -70,11 +70,11 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
     };
 
     return (
-        <form onSubmit={onSubmit} className="nitro-navigator-air__search">
+        <form onSubmit={onSubmit} className="octane-navigator-air__search">
             <NavigatorFilterChipsView value={searchFilterIndex} onChange={setSearchFilterIndex} />
-            <div className={`nitro-navigator-air__search-field${hasQuery ? '' : ' is-placeholder'}`}>
+            <div className={`octane-navigator-air__search-field${hasQuery ? '' : ' is-placeholder'}`}>
                 <input
-                    className="nitro-navigator-air__search-input"
+                    className="octane-navigator-air__search-input"
                     name="q"
                     placeholder={placeholder}
                     type="text"
@@ -83,7 +83,7 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
                 />
                 <button
                     type={hasQuery ? 'button' : 'submit'}
-                    className="nitro-navigator-air__search-clear"
+                    className="octane-navigator-air__search-clear"
                     aria-label={hasQuery ? LocalizeText('generic.clear') : placeholder}
                     onClick={hasQuery ? clearSearch : undefined}
                 >
@@ -91,7 +91,7 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
                 </button>
             </div>
             {hasQuery && (
-                <button type="button" className="nitro-navigator-air__search-refresh" aria-label={LocalizeText('generic.refresh')} onClick={refreshSearch}>
+                <button type="button" className="octane-navigator-air__search-refresh" aria-label={LocalizeText('generic.refresh')} onClick={refreshSearch}>
                     <img src={refreshIcon} alt="" />
                 </button>
             )}

@@ -6,11 +6,11 @@ const view = readFileSync(join(process.cwd(), 'src/components/navigator/Navigato
 
 describe('navigator shell', () => {
     it('exposes a collapsible quick-links navigation beside the browsing workspace', () => {
-        expect(view).toContain('nitro-navigator-air__skin');
-        expect(view).toContain('nitro-navigator-air__quick-links');
+        expect(view).toContain('octane-navigator-air__skin');
+        expect(view).toContain('octane-navigator-air__quick-links');
         expect(view).toContain('aria-label={quickLinksLabel}');
         expect(view).toContain('aria-expanded={isOpenSavesSearches}');
         expect(view).toContain('aria-label={navigatorLabel}');
-        expect(view).toContain('nitro-navigator-air__quick-toggle');
+        expect(view).toContain('octane-navigator-air__quick-toggle');
     });
 });

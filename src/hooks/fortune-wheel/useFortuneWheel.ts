@@ -12,7 +12,7 @@ import {
     WheelRecentWinsEvent,
     WheelResultEvent,
     WheelSpinComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';

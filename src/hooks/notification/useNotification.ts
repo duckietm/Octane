@@ -28,7 +28,7 @@ import {
     UserBannedMessageEvent,
     Vector3d,
     WiredRewardResultMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
@@ -160,7 +160,7 @@ const useNotificationStore = () => {
         []
     );
 
-    const showNitroAlert = useCallback(() => simpleAlert(null, NotificationAlertType.NITRO), [simpleAlert]);
+    const showOctaneAlert = useCallback(() => simpleAlert(null, NotificationAlertType.OCTANE), [simpleAlert]);
 
     const showSingleBubble = useCallback(
         (message: string, type: string, imageUrl: string = null, internalLink: string = null, senderName: string = '') => {
@@ -327,7 +327,7 @@ const useNotificationStore = () => {
 
         if (raw.startsWith(sentinel)) {
             const body = raw.substring(sentinel.length).replace(/^[\r\n]+/, '');
-            simpleAlert(body, NotificationAlertType.NITRO_INFO, null, null, LocalizeText('nitro.info.title'));
+            simpleAlert(body, NotificationAlertType.OCTANE_INFO, null, null, LocalizeText('nitro.info.title'));
             return;
         }
 
@@ -697,7 +697,7 @@ const useNotificationStore = () => {
         bubbleAlerts,
         confirms,
         simpleAlert,
-        showNitroAlert,
+        showOctaneAlert,
         showTradeAlert,
         showConfirm,
         showSingleBubble,
@@ -724,12 +724,12 @@ export const useNotificationState = () => {
 };
 
 export const useNotificationActions = () => {
-    const { simpleAlert, showNitroAlert, showTradeAlert, showConfirm, showSingleBubble, showMentionBubble, closeAlert, closeBubbleAlert, closeConfirm } =
+    const { simpleAlert, showOctaneAlert, showTradeAlert, showConfirm, showSingleBubble, showMentionBubble, closeAlert, closeBubbleAlert, closeConfirm } =
         useSharedHook(useNotificationStore);
 
     return {
         simpleAlert,
-        showNitroAlert,
+        showOctaneAlert,
         showTradeAlert,
         showConfirm,
         showSingleBubble,

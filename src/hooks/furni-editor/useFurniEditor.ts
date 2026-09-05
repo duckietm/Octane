@@ -13,7 +13,7 @@ import {
     FurniEditorSearchResultEvent,
     FurniEditorUpdateComposer,
     FurniEditorUpdateFurnidataComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useRef, useState } from 'react';
 import { NotificationAlertType, SendMessageComposer } from '../../api';
 import { useMessageEvent, useNotification } from '../../hooks';

@@ -5,7 +5,7 @@ import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import {
     buildWiredVariablePickerEntries,
@@ -198,7 +198,7 @@ export const WiredExtraVariableEchoView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         maxLength={MAX_NAME_LENGTH}
                         type="text"
                         value={variableName}
@@ -207,14 +207,14 @@ export const WiredExtraVariableEchoView: FC<{}> = () => {
                     />
                 </div>
 
-                <div className="nitro-wired__give-var-heading">
+                <div className="octane-wired__give-var-heading">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="nitro-wired__give-var-targets">
+                    <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
                             <button
                                 key={button.key}
                                 type="button"
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${sourceTargetType === button.key ? 'is-active' : ''}`}
+                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${sourceTargetType === button.key ? 'is-active' : ''}`}
                                 onClick={() => handleTargetTypeChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />

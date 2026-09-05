@@ -1,9 +1,9 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WIRED_STRING_DELIMETER, WiredFurniType } from '../../../../api';
 import { Button, LayoutAvatarImageView, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { BOT_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -52,7 +52,7 @@ export const WiredActionBotChangeFigureView: FC<{}> = (props) => {
             {botSource === 100 && (
                 <div className="flex flex-col gap-1">
                     <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
-                    <NitroInput maxLength={32} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
+                    <OctaneInput maxLength={32} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
                 </div>
             )}
             <div className="flex items-center justify-center">

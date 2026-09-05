@@ -5,7 +5,7 @@ import {
     GuildForumThreadsEvent,
     ModerateThreadMessageComposer,
     PostThreadMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, LayoutBadgeImageView, Text } from '../../../../common';

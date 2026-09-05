@@ -1,4 +1,4 @@
-import { loadGamedata } from '@nitrots/nitro-renderer';
+import { loadGamedata } from '@octane/renderer';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetConfigurationValue } from '../../api';

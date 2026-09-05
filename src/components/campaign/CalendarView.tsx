@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { CalendarItemState, ICalendarItem, LocalizeText } from '../../api';
-import { Button, Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { Button, Column, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useHasPermission } from '../../hooks';
 import { CalendarItemView } from './CalendarItemView';
 
@@ -97,9 +97,9 @@ export const CalendarView: FC<CalendarViewProps> = (props) => {
     };
 
     return (
-        <NitroCardView className="nitro-campaign-calendar" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText(`campaign.calendar.${campaignName}.title`)} onCloseClick={onClose} />
-            <NitroCardContentView>
+        <OctaneCardView className="octane-campaign-calendar" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText(`campaign.calendar.${campaignName}.title`)} onCloseClick={onClose} />
+            <OctaneCardContentView>
                 <Grid alignItems="center" fullHeight={false} justifyContent="between">
                     <Column size={1} />
                     <Column size={10}>
@@ -146,7 +146,7 @@ export const CalendarView: FC<CalendarViewProps> = (props) => {
                         <div className="campaign-spritesheet next cursor-pointer" onClick={onClickNext} />
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

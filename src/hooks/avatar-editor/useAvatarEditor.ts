@@ -12,7 +12,7 @@ import {
     IPartColor,
     SetType,
     UserWardrobePageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {

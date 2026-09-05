@@ -14,7 +14,7 @@ export const InfoStandWidgetBotView: FC<InfoStandWidgetBotViewProps> = (props) =
     if (!avatarInfo) return null;
 
     return (
-        <Column className="nitro-infostand rounded">
+        <Column className="octane-infostand rounded">
             <Column className="container-fluid content-area" gap={1} overflow="visible">
                 <div className="flex flex-col gap-1">
                     <Flex alignItems="center" gap={1} justifyContent="between">

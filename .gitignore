@@ -29,13 +29,15 @@
 .DS_Store
 Thumbs.db
 
-# Nitro
+# Octane
 /build
 *.zip
 .env
 .claude/
 
 # Per-deploy build configuration (yarn configure)
+/.octane-build.json
+# Legacy name, still read as a fallback
 /.nitro-build.json
 
 # Local runtime config copies

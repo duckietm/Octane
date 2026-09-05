@@ -11,10 +11,10 @@ import {
     GetRoomEngine,
     RoomEngineTriggerWidgetEvent,
     RoomWidgetEnum
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { ICraftingIngredient, ICraftingRecipe, LocalizeText, SendMessageComposer } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useInventoryFurni } from '../../../inventory';
 import { useNotification } from './../../../notification';
 
@@ -57,7 +57,7 @@ const useFurnitureCraftingWidgetState = () => {
         if (!cache) SendMessageComposer(new GetCraftingRecipeComposer(recipe.name));
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.OPEN_WIDGET, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.OPEN_WIDGET, (event) => {
         if (event.widget !== RoomWidgetEnum.CRAFTING) return;
 
         setObjectId(event.objectId);

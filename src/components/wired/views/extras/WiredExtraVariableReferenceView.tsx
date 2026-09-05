@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
 const TARGET_USER = 0;
@@ -197,7 +197,7 @@ export const WiredExtraVariableReferenceView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         maxLength={MAX_NAME_LENGTH}
                         type="text"
                         value={variableName}

@@ -1,4 +1,4 @@
-import { RelationshipStatusEnum, RelationshipStatusInfoMessageParser } from '@nitrots/nitro-renderer';
+import { RelationshipStatusEnum, RelationshipStatusInfoMessageParser } from '@octane/renderer';
 import { FC } from 'react';
 import { InfoStandWidgetUserRelationshipsRelationshipItemView } from './InfoStandWidgetUserRelationshipItemView';
 

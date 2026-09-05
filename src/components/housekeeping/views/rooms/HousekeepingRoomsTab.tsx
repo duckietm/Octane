@@ -97,7 +97,7 @@ export const HousekeepingRoomsTab: FC = () => {
                 <div className="relative overflow-hidden rounded-lg border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-violet-50 p-3 shadow-sm">
                     <div className="flex items-start gap-3">
                         <div className="rounded-full bg-sky-100 p-2 shrink-0 flex items-center justify-center">
-                            <span className="nitro-icon nitro-icon-hk-hero icon-rooms" />
+                            <span className="octane-icon octane-icon-hk-hero icon-rooms" />
                         </div>
                         <div className="grow min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">

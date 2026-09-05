@@ -3,7 +3,7 @@ import {
     FurnitureListAddOrUpdateEvent,
     FurnitureListItemParser,
     FurnitureListRemovedEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import {
     addFurnitureItem,
     attemptItemPlacement,

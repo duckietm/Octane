@@ -27,8 +27,8 @@ describe('catalog tab strip', () => {
         // A tab that could shrink to fit the current window would report that squeezed width
         // back as the width the window should have.
         const base = stylesheet.slice(
-            stylesheet.indexOf('.nitro-catalog-window .nitro-catalog-tabs-shell .nitro-card-tab-item {'),
-            stylesheet.indexOf('.nitro-catalog-window .nitro-catalog-tabs-shell.is-condensed')
+            stylesheet.indexOf('.octane-catalog-window .octane-catalog-tabs-shell .octane-card-tab-item {'),
+            stylesheet.indexOf('.octane-catalog-window .octane-catalog-tabs-shell.is-condensed')
         );
 
         expect(base).toContain('flex-shrink: 0');
@@ -37,7 +37,7 @@ describe('catalog tab strip', () => {
     });
 
     it('lets the tabs condense only once the window cannot widen any further', () => {
-        const condensed = stylesheet.slice(stylesheet.indexOf('.nitro-catalog-window .nitro-catalog-tabs-shell.is-condensed'));
+        const condensed = stylesheet.slice(stylesheet.indexOf('.octane-catalog-window .octane-catalog-tabs-shell.is-condensed'));
 
         expect(condensed).toContain('flex-shrink: 1');
         // Shrunk down to its icon a tab is still a target; shrunk to nothing it is not.

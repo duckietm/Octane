@@ -7,13 +7,13 @@ import {
     PurchaseFromCatalogComposer,
     RoomContentLoadedEvent,
     SellablePetPaletteData
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaCheck, FaLock, FaTimes } from 'react-icons/fa';
 import { DispatchUiEvent, GetPetAvailableColors, GetPetIndexFromLocalization, LocalizeText, SendMessageComposer } from '../../../../../../api';
 import { LayoutPetImageView } from '../../../../../../common';
 import { CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../../events';
-import { useCatalogData, useCatalogUiState, useMessageEvent, useNitroEvent, useSellablePetPalette, useUiEvent, useUserDataSnapshot } from '../../../../../../hooks';
+import { useCatalogData, useCatalogUiState, useMessageEvent, useOctaneEvent, useSellablePetPalette, useUiEvent, useUserDataSnapshot } from '../../../../../../hooks';
 import { CatalogScrollAreaView } from '../../common/CatalogScrollAreaView';
 import { CatalogAddOnBadgeWidgetView } from '../../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogTotalPriceWidget } from '../../widgets/CatalogTotalPriceWidget';
@@ -84,7 +84,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
         GetRoomContentLoader().downloadAsset(petTypeName);
     }, [petTypeName]);
 
-    useNitroEvent<RoomContentLoadedEvent>(
+    useOctaneEvent<RoomContentLoadedEvent>(
         RoomContentLoadedEvent.RCLE_SUCCESS,
         (event) => {
             if (event.contentType !== petTypeName) return;
@@ -241,11 +241,11 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
 
     return (
         <div
-            className={`nitro-catalog-pet-layout ${legacyPet ? 'nitro-catalog-pet-layout--legacy' : 'nitro-catalog-pet-layout--new'}`}
+            className={`octane-catalog-pet-layout ${legacyPet ? 'octane-catalog-pet-layout--legacy' : 'octane-catalog-pet-layout--new'}`}
         >
-            <div className="nitro-catalog-pet-preview relative h-[240px] min-h-[240px] overflow-hidden">
+            <div className="octane-catalog-pet-preview relative h-[240px] min-h-[240px] overflow-hidden">
                 {selectedPalette && (
-                    <div className="nitro-catalog-pet-preview-image">
+                    <div className="octane-catalog-pet-preview-image">
                         <LayoutPetImageView
                             direction={legacyPet || petIndex === 15 ? 2 : 3}
                             paletteId={selectedPalette.paletteId}
@@ -255,20 +255,20 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                         />
                     </div>
                 )}
-                <CatalogAddOnBadgeWidgetView className="nitro-catalog-pet-preview-badge" />
-                <div className="nitro-catalog-pet-preview-price">
+                <CatalogAddOnBadgeWidgetView className="octane-catalog-pet-preview-badge" />
+                <div className="octane-catalog-pet-preview-price">
                     <CatalogTotalPriceWidget />
                 </div>
             </div>
 
-            <div className="nitro-catalog-pet-editor">
+            <div className="octane-catalog-pet-editor">
                 {legacyPet ? (
                     <>
-                        <div className="nitro-catalog-pet-field">
+                        <div className="octane-catalog-pet-field">
                             <span>{colorLabel}</span>
                             <CatalogScrollAreaView
-                                className="nitro-catalog-pet-color-grid"
-                                contentClassName="nitro-catalog-pet-color-grid-content"
+                                className="octane-catalog-pet-color-grid"
+                                contentClassName="octane-catalog-pet-color-grid-content"
                                 aria-label={colorLabel}
                                 role="group"
                             >
@@ -277,7 +277,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                         key={`${colors[0]}-${index}`}
                                         aria-label={`${colorLabel} ${index + 1}`}
                                         aria-pressed={selectedColorIndex === index}
-                                        className="nitro-catalog-pet-color-swatch"
+                                        className="octane-catalog-pet-color-swatch"
                                         disabled={controlsDisabled}
                                         style={{ backgroundColor: ColorConverter.int2rgb(colors[0]) }}
                                         type="button"
@@ -287,7 +287,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                             </CatalogScrollAreaView>
                         </div>
                         {selectablePalettes.length > 1 && (
-                            <label className="nitro-catalog-pet-breed-selector">
+                            <label className="octane-catalog-pet-breed-selector">
                                 <span>{LocalizeText('catalog.pets.choose.breed')}</span>
                                 <select
                                     value={selectedPaletteIndex}
@@ -309,11 +309,11 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                         )}
                     </>
                 ) : (
-                    <div className="nitro-catalog-pet-field">
+                    <div className="octane-catalog-pet-field">
                         <span>{colorLabel}</span>
                         <CatalogScrollAreaView
-                            className="nitro-catalog-pet-color-grid"
-                            contentClassName="nitro-catalog-pet-color-grid-content"
+                            className="octane-catalog-pet-color-grid"
+                            contentClassName="octane-catalog-pet-color-grid-content"
                             aria-label={colorLabel}
                             role="group"
                         >
@@ -332,14 +332,14 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                         key={choice.palette.paletteId}
                                         aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`}
                                         aria-pressed={selectedPaletteIndex === index}
-                                        className={`nitro-catalog-pet-color-swatch${locked ? ' nitro-catalog-pet-color-swatch--locked' : ''}`}
+                                        className={`octane-catalog-pet-color-swatch${locked ? ' octane-catalog-pet-color-swatch--locked' : ''}`}
                                         disabled={controlsDisabled || locked}
                                         style={style}
                                         title={locked ? hcOnlyLabel : undefined}
                                         type="button"
                                         onClick={() => setSelectedPaletteIndex(index)}
                                     >
-                                        {locked && <FaLock className="nitro-catalog-pet-swatch-lock" />}
+                                        {locked && <FaLock className="octane-catalog-pet-swatch-lock" />}
                                     </button>
                                 );
                             })}
@@ -347,8 +347,8 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                     </div>
                 )}
 
-                <div className="nitro-catalog-pet-purchase mt-auto">
-                    <label className="nitro-catalog-pet-name-field">
+                <div className="octane-catalog-pet-purchase mt-auto">
+                    <label className="octane-catalog-pet-name-field">
                         <span>{LocalizeText('widgets.petpackage.name.title')}</span>
                         <span className="relative flex-1">
                             <input
@@ -359,19 +359,19 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 value={petName}
                                 onChange={(event) => setPetName(event.target.value)}
                             />
-                            {approvalResult === 0 && <FaCheck className="nitro-catalog-pet-name-status text-success" />}
-                            {approvalResult > 0 && <FaTimes className="nitro-catalog-pet-name-status text-danger" />}
+                            {approvalResult === 0 && <FaCheck className="octane-catalog-pet-name-status text-success" />}
+                            {approvalResult > 0 && <FaTimes className="octane-catalog-pet-name-status text-danger" />}
                         </span>
                     </label>
-                    {approvalResult > 0 && <span className="nitro-catalog-pet-name-error">{validationErrorMessage}</span>}
+                    {approvalResult > 0 && <span className="octane-catalog-pet-name-error">{validationErrorMessage}</span>}
                     {isBreedLocked(selectedPalette) && (
-                        <span className="nitro-catalog-pet-hc-note">
+                        <span className="octane-catalog-pet-hc-note">
                             <FaLock /> {hcOnlyLabel}
                         </span>
                     )}
-                    <div className="nitro-catalog-pet-purchase-row">
+                    <div className="octane-catalog-pet-purchase-row">
                         <button
-                            className="nitro-catalog-standard-button nitro-catalog-standard-buy-button"
+                            className="octane-catalog-standard-button octane-catalog-standard-buy-button"
                             disabled={controlsDisabled || !purchaseExtraData}
                             onClick={requestPurchase}
                         >

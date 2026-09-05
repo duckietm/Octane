@@ -4,7 +4,7 @@ import { getPrefixEffectStyle, getPrefixFontStyle, IPrefixItem, LocalizeText, pa
 import { GetNickIconUrl } from '../../../../assets/images/user_custom/nick_icons';
 import { Button } from '../../../../common';
 import { useInventoryNickIcons, useInventoryPrefixes, useNotification } from '../../../../hooks';
-import { NitroButton } from '../../../../layout';
+import { OctaneButton } from '../../../../layout';
 
 type InventoryIdentityTab = 'prefixes' | 'icons';
 
@@ -215,16 +215,16 @@ export const InventoryPrefixView: FC<{}> = () => {
                                     />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <NitroButton
+                                    <OctaneButton
                                         className="grow"
                                         onClick={() => (selectedPrefix.active ? deactivatePrefix() : activatePrefix(selectedPrefix.id))}
                                     >
                                         {selectedPrefix.active ? 'Deactivate' : 'Activate'}
-                                    </NitroButton>
+                                    </OctaneButton>
                                     {!selectedPrefix.active && (
-                                        <NitroButton className="bg-danger! hover:bg-danger/80! p-1" onClick={attemptDeletePrefix}>
+                                        <OctaneButton className="bg-danger! hover:bg-danger/80! p-1" onClick={attemptDeletePrefix}>
                                             <FaTrashAlt className="fa-icon" />
-                                        </NitroButton>
+                                        </OctaneButton>
                                     )}
                                 </div>
                             </div>

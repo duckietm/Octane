@@ -1,4 +1,4 @@
-import { AvatarDirectionAngle, GetAvatarRenderManager, IPartColor } from '@nitrots/nitro-renderer';
+import { AvatarDirectionAngle, GetAvatarRenderManager, IPartColor } from '@octane/renderer';
 import { FC, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import { AvatarEditorThumbnailsHelper } from '../../../api';
 import faceTabIcon from '../../../assets/images/wardrobe/hd.png';

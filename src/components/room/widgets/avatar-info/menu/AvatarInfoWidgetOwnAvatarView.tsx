@@ -6,7 +6,7 @@ import {
     RoomObjectCategory,
     RoomObjectVariable,
     RoomUnitDropHandItemComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { Dispatch, FC, ReactNode, SetStateAction, useState } from 'react';
 import {
     AvatarInfoUser,
@@ -219,7 +219,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
     return (
         <ContextMenuView
             category={RoomObjectCategory.UNIT}
-            classNames={['nitro-avatar-action-menu', 'nitro-avatar-action-menu--own']}
+            classNames={['octane-avatar-action-menu', 'octane-avatar-action-menu--own']}
             collapsable={true}
             freezePositionOnHover={true}
             maximumVerticalLeadRatio={0.05}

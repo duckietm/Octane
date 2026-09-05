@@ -1,4 +1,4 @@
-import type { NodeData } from '@nitrots/nitro-renderer';
+import type { NodeData } from '@octane/renderer';
 import { CatalogNode } from '../../../../api/catalog/CatalogNode';
 import type { ICatalogNode } from '../../../../api/catalog/ICatalogNode';
 import type { CatalogStudioCatalogType, CatalogStudioPageSnapshot } from '../../admin/studio/CatalogStudioTypes';

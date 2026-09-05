@@ -5,7 +5,7 @@ import {
     AvatarEffectExpiredEvent,
     AvatarEffectSelectedEvent,
     AvatarEffectsEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';

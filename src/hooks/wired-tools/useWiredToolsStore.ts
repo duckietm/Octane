@@ -8,7 +8,7 @@ import {
     WiredUserVariablesDataEvent,
     WiredUserVariablesRequestComposer,
     WiredUserVariableUpdateComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook } from '@/state/useSharedHook';
 import { createPacketCooldownGate, LocalizeText, NotificationAlertType, SendMessageComposer } from '../../api';

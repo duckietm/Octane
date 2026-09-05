@@ -1,7 +1,7 @@
-import { GetRoomEngine, RoomEngineTriggerWidgetEvent } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomEngineTriggerWidgetEvent } from '@octane/renderer';
 import { useState } from 'react';
 import { IsOwnerOfFurniture } from '../../../../api';
-import { useNitroEvent } from '../../../events';
+import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
 const useFurnitureFootballGateWidgetState = () => {
@@ -13,7 +13,7 @@ const useFurnitureFootballGateWidgetState = () => {
         setCategory(-1);
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_CLOTHING_CHANGE, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_CLOTHING_CHANGE, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject || !IsOwnerOfFurniture(roomObject)) return;

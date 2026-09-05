@@ -1,4 +1,4 @@
-import { GetConfigurationValue } from '../nitro';
+import { GetConfigurationValue } from '../octane';
 import { IPageLocalization } from './IPageLocalization';
 
 export class PageLocalization implements IPageLocalization {

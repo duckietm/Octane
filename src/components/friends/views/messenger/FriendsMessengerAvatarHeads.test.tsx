@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { AddLinkEventTracker, GetAvatarRenderManager, GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, GetAvatarRenderManager, GetSessionDataManager } from '@octane/renderer';
 import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MessengerFriend, MessengerThread } from '../../../../api';

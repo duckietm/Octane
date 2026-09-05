@@ -1,7 +1,7 @@
-import { GetRoomEngine, RoomEngineObjectEvent, RoomObjectCategory, WiredFeatureCapabilitiesComposer, WiredFurniOpacityEvent } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomEngineObjectEvent, RoomObjectCategory, WiredFeatureCapabilitiesComposer, WiredFurniOpacityEvent } from '@octane/renderer';
 import { useEffect, useRef } from 'react';
 import { SendMessageComposer } from '../../api';
-import { useMessageEvent, useNitroEvent } from '../events';
+import { useMessageEvent, useOctaneEvent } from '../events';
 import { WiredFurniOpacityController } from './WiredFurniOpacityController';
 
 const WIRED_FEATURE_PROTOCOL_VERSION = 1;
@@ -32,7 +32,7 @@ export const useWiredFurniOpacity = (roomId: number): void => {
         controllerRef.current.apply(parser.roomId, parser.updates);
     });
 
-    useNitroEvent<RoomEngineObjectEvent>([RoomEngineObjectEvent.ADDED, RoomEngineObjectEvent.REMOVED], (event) => {
+    useOctaneEvent<RoomEngineObjectEvent>([RoomEngineObjectEvent.ADDED, RoomEngineObjectEvent.REMOVED], (event) => {
         if (event.category !== RoomObjectCategory.FLOOR && event.category !== RoomObjectCategory.WALL) return;
 
         if (event.type === RoomEngineObjectEvent.ADDED) {

@@ -5,7 +5,7 @@ import {
     SoundboardCatalogRequestComposer,
     SoundboardCatalogResultEvent,
     SoundboardCatalogUpsertComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useRef, useState } from 'react';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';

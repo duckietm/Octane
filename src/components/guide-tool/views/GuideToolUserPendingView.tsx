@@ -1,4 +1,4 @@
-import { GuideSessionRequesterCancelsMessageComposer } from '@nitrots/nitro-renderer';
+import { GuideSessionRequesterCancelsMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../api';
 import { Button, Column, Text } from '../../../common';
@@ -15,7 +15,7 @@ export const GuideToolUserPendingView: FC<GuideToolUserPendingViewProps> = (prop
 
     return (
         <div className="flex flex-col">
-            <Column className="nitro-card-panel p-2" gap={0}>
+            <Column className="octane-card-panel p-2" gap={0}>
                 <Text bold>{LocalizeText('guide.help.request.guide.accept.request.title')}</Text>
                 <Text variant="muted">{LocalizeText('guide.help.request.type.1')}</Text>
                 <Text textBreak wrap>

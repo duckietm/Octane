@@ -1,12 +1,12 @@
 import { InfiniteGrid } from '@layout/InfiniteGrid';
-import { GetSessionDataManager, IRoomSession, RoomPreviewer, Vector3d } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, IRoomSession, RoomPreviewer, Vector3d } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaPowerOff, FaSyncAlt, FaTrashAlt } from 'react-icons/fa';
 import { attemptItemPlacement, DispatchUiEvent, FurniCategory, getGroupItemKey, GroupItem, LocalizeText, UnseenItemCategory } from '../../../../api';
 import { LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, LayoutRoomPreviewerView } from '../../../../common';
 import { CatalogPostMarketplaceOfferEvent, DeleteItemConfirmEvent } from '../../../../events';
 import { useInventoryFurni, useInventoryUnseenTracker } from '../../../../hooks';
-import { NitroButton } from '../../../../layout';
+import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 
@@ -127,13 +127,13 @@ export const InventoryFurnitureView: FC<{
                     {selectedItem && (
                         <>
                             <button
-                                className="nitro-inventory-preview-btn nitro-inventory-preview-rotate"
+                                className="octane-inventory-preview-btn octane-inventory-preview-rotate"
                                 onClick={() => roomPreviewer?.changeRoomObjectDirection()}
                             >
                                 <FaSyncAlt /> Rotate
                             </button>
                             <button
-                                className="nitro-inventory-preview-btn nitro-inventory-preview-state"
+                                className="octane-inventory-preview-btn octane-inventory-preview-state"
                                 onClick={() => roomPreviewer?.changeRoomObjectState()}
                             >
                                 <FaPowerOff /> Toggle State
@@ -141,9 +141,9 @@ export const InventoryFurnitureView: FC<{
                         </>
                     )}
                     {selectedItem && (
-                        <NitroButton className="bg-danger! hover:bg-danger/80! absolute bottom-2 inset-e-2 p-1" onClick={() => attemptDeleteItem(selectedItem)}>
+                        <OctaneButton className="bg-danger! hover:bg-danger/80! absolute bottom-2 inset-e-2 p-1" onClick={() => attemptDeleteItem(selectedItem)}>
                             <FaTrashAlt className="fa-icon" />
-                        </NitroButton>
+                        </OctaneButton>
                     )}
                     {selectedItem && selectedItem.stuffData.isUnique && (
                         <LayoutLimitedEditionCompactPlateView
@@ -163,14 +163,14 @@ export const InventoryFurnitureView: FC<{
                         {selectedItem.description && <span className="text-xs truncate">{selectedItem.description}</span>}
                         <div className="flex flex-col gap-1">
                             {!!roomSession && (
-                                <NitroButton className="nitro-inventory-btn-place" onClick={(event) => attemptItemPlacement(selectedItem)}>
+                                <OctaneButton className="octane-inventory-btn-place" onClick={(event) => attemptItemPlacement(selectedItem)}>
                                     {LocalizeText('inventory.furni.placetoroom')}
-                                </NitroButton>
+                                </OctaneButton>
                             )}
                             {selectedItem.isSellable && (
-                                <NitroButton className="nitro-inventory-btn-sell" onClick={(event) => attemptPlaceMarketplaceOffer(selectedItem)}>
+                                <OctaneButton className="octane-inventory-btn-sell" onClick={(event) => attemptPlaceMarketplaceOffer(selectedItem)}>
                                     {LocalizeText('inventory.marketplace.sell')}
-                                </NitroButton>
+                                </OctaneButton>
                             )}
                         </div>
                     </div>

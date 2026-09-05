@@ -30,7 +30,7 @@ export const CatalogBundleGridWidgetView: FC<CatalogBundleGridWidgetViewProps> =
 
                     return (
                         <LayoutGridItem key={index} itemCount={product.productCount}>
-                            {iconUrl && <img alt="" className="nitro-catalog-grid-offer-icon" draggable={false} src={iconUrl} />}
+                            {iconUrl && <img alt="" className="octane-catalog-grid-offer-icon" draggable={false} src={iconUrl} />}
                         </LayoutGridItem>
                     );
                 })}

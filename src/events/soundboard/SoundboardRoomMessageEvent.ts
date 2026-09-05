@@ -1,6 +1,6 @@
-import { NitroEvent } from '@nitrots/nitro-renderer';
+import { OctaneEvent } from '@octane/renderer';
 
-export class SoundboardRoomMessageEvent extends NitroEvent {
+export class SoundboardRoomMessageEvent extends OctaneEvent {
     public static readonly ROOM_MESSAGE = 'SOUNDBOARD_ROOM_MESSAGE';
 
     constructor(

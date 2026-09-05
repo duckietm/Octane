@@ -1,4 +1,4 @@
-import { GetSessionDataManager, RoomObjectType } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, RoomObjectType } from '@octane/renderer';
 import { FC, useMemo, useState } from 'react';
 import { ChatEntryType, IReportedUser, LocalizeText, ReportState, SanitizeHtml } from '../../../api';
 import { AutoGrid, Button, Column, Flex, LayoutGridItem, Text } from '../../../common';

@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
 const CAPTION_MAX_LENGTH = 60;
@@ -39,12 +39,12 @@ export const WiredActionSetRoomAdView: FC<{}> = props =>
             save={ save }>
             <div className="flex flex-col gap-1">
                 <Text bold>Room ad caption</Text>
-                <NitroInput maxLength={ CAPTION_MAX_LENGTH } type="text" value={ caption } onChange={ event => setCaption(event.target.value) } />
+                <OctaneInput maxLength={ CAPTION_MAX_LENGTH } type="text" value={ caption } onChange={ event => setCaption(event.target.value) } />
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>Room ad description</Text>
                 <textarea
-                    className="form-control form-control-sm nitro-wired__resizable-textarea"
+                    className="form-control form-control-sm octane-wired__resizable-textarea"
                     maxLength={ DESCRIPTION_MAX_LENGTH }
                     rows={ 3 }
                     value={ description }

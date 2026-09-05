@@ -10,10 +10,10 @@ import {
     RoomEngineObjectPlacedEvent,
     RoomPreviewer,
     RoomSessionEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { isObjectMoverRequested, LocalizeBadgeName, LocalizeText, setObjectMoverRequested, UnseenItemCategory } from '../../api';
-import { NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
+import { OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import {
     useInventoryBadges,
     useInventoryFurni,
@@ -22,7 +22,7 @@ import {
     useWiredTrading,
     useInventoryUnseenTracker,
     useMessageEvent,
-    useNitroEvent
+    useOctaneEvent
 } from '../../hooks';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
@@ -111,7 +111,7 @@ export const InventoryView: FC<{}> = (props) => {
         setIsVisible(false);
     };
 
-    useNitroEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectEvent.PLACED, (event) => {
+    useOctaneEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectEvent.PLACED, (event) => {
         if (!isObjectMoverRequested()) return;
 
         setObjectMoverRequested(false);
@@ -119,7 +119,7 @@ export const InventoryView: FC<{}> = (props) => {
         if (!event.placedInRoom) setIsVisible(true);
     });
 
-    useNitroEvent<RoomSessionEvent>([RoomSessionEvent.CREATED, RoomSessionEvent.ENDED], (event) => {
+    useOctaneEvent<RoomSessionEvent>([RoomSessionEvent.CREATED, RoomSessionEvent.ENDED], (event) => {
         switch (event.type) {
             case RoomSessionEvent.CREATED:
                 setRoomSession(event.session);
@@ -190,28 +190,28 @@ export const InventoryView: FC<{}> = (props) => {
 
     return (
         <>
-            <NitroCardView
-                className="nitro-inventory-window min-w-0 w-[min(528px,calc(100vw-16px))] h-[min(420px,calc(100vh-16px))] min-h-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+            <OctaneCardView
+                className="octane-inventory-window min-w-0 w-[min(528px,calc(100vw-16px))] h-[min(420px,calc(100vh-16px))] min-h-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 uniqueKey="inventory"
             >
-                <NitroCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
+                <OctaneCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
                 {!isTrading && !isWiredTrading && (
                     <>
-                        <NitroCardTabsView classNames={['nitro-inventory-tabs-shell']}>
+                        <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
                             {TABS.map((name, index) => {
                                 return (
-                                    <NitroCardTabsItemView
+                                    <OctaneCardTabsItemView
                                         key={index}
                                         count={getCount(UNSEEN_CATEGORIES[index])}
                                         isActive={currentTab === name}
                                         onClick={(event) => setCurrentTab(name)}
                                     >
-                                        <span className="nitro-inventory-tab-label">{LocalizeText(name)}</span>
-                                    </NitroCardTabsItemView>
+                                        <span className="octane-inventory-tab-label">{LocalizeText(name)}</span>
+                                    </OctaneCardTabsItemView>
                                 );
                             })}
-                        </NitroCardTabsView>
-                        <div className="nitro-inventory-body flex flex-col overflow-hidden p-2 h-full gap-2">
+                        </OctaneCardTabsView>
+                        <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full gap-2">
                             {showFilter && (
                                 <InventoryCategoryFilterView
                                     currentTab={currentTab}
@@ -234,16 +234,16 @@ export const InventoryView: FC<{}> = (props) => {
                     </>
                 )}
                 {isTrading && (
-                    <div className="nitro-inventory-body flex flex-col overflow-hidden p-2 h-full">
+                    <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full">
                         <InventoryTradeView cancelTrade={onClose} />
                     </div>
                 )}
                 {!isTrading && isWiredTrading && (
-                    <div className="nitro-inventory-body flex flex-col overflow-hidden p-2 h-full">
+                    <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full">
                         <InventoryWiredTradeView />
                     </div>
                 )}
-            </NitroCardView>
+            </OctaneCardView>
             <InventoryFurnitureDeleteView />
         </>
     );

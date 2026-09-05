@@ -7,7 +7,7 @@ import {
     MessengerMessageFailedEvent,
     MessengerReadCursorEvent,
     RequestMessengerConversationsComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect } from 'react';
 import { MessengerMessage, SendMessageComposer as SendPacket } from '../../../api';
 import { useMessageEvent } from '../../events';

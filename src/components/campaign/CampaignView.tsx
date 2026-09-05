@@ -7,7 +7,7 @@ import {
     OpenCampaignCalendarDoorAsStaffComposer,
     OpenCampaignCalendarDoorComposer,
     RemoveLinkEventTracker
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { CalendarItem, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../../hooks';

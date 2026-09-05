@@ -1,7 +1,7 @@
-import { GetRoomEngine } from '@nitrots/nitro-renderer';
+import { GetRoomEngine } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
-import { Button, Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFurnitureAreaHideWidget } from '../../../../hooks';
 
 export const FurnitureAreaHideView: FC<{}> = (props) => {
@@ -21,12 +21,12 @@ export const FurnitureAreaHideView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView
+        <OctaneCardView
             theme="primary-slim"
-            className="nitro-room-widget-area-hide min-w-0 w-[min(400px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+            className="octane-room-widget-area-hide min-w-0 w-[min(400px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
         >
-            <NitroCardHeaderView headerText={LocalizeText('widget.areahide.title')} onCloseClick={onClose} />
-            <NitroCardContentView overflow="hidden" justifyContent="between">
+            <OctaneCardHeaderView headerText={LocalizeText('widget.areahide.title')} onCloseClick={onClose} />
+            <OctaneCardContentView overflow="hidden" justifyContent="between">
                 <Column gap={2}>
                     <Column gap={1}>
                         <Text bold>{LocalizeText('wiredfurni.params.area_selection')}</Text>
@@ -83,7 +83,7 @@ export const FurnitureAreaHideView: FC<{}> = (props) => {
                 <Button fullWidth variant="primary" onClick={saveChanges}>
                     {LocalizeText(isOn ? 'widget.dimmer.button.off' : 'widget.dimmer.button.on')}
                 </Button>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -1,4 +1,4 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { SendMessageComposer as SendPacket } from '../../../api';
 import { createMessengerActionsController } from './messengerControllers';
 import { useMessengerStore } from './useMessengerStore';

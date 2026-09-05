@@ -1,4 +1,4 @@
-.nitro-avatar-editor {
+.octane-avatar-editor {
     width: 490px;
     min-width: 490px;
     max-width: 490px;
@@ -8,19 +8,19 @@
     resize: none !important;
 }
 
-.nitro-avatar-editor.is-wardrobe-open {
+.octane-avatar-editor.is-wardrobe-open {
     width: 669px;
     min-width: 669px;
     max-width: 669px;
 }
 
-.nitro-avatar-editor > .nitro-card-header-shell {
+.octane-avatar-editor > .octane-card-header-shell {
     min-height: 33px !important;
     max-height: 33px !important;
     flex: 0 0 33px;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-content.nitro-card-content-shell {
+.octane-avatar-editor .octane-avatar-editor-content.octane-card-content-shell {
     position: absolute;
     left: 0;
     top: 33px;
@@ -36,7 +36,7 @@
     overflow: hidden !important;
 }
 
-.nitro-avatar-editor-stage {
+.octane-avatar-editor-stage {
     position: relative;
     width: 490px;
     height: 490px;
@@ -46,7 +46,7 @@
     background: #e9e9e1;
 }
 
-.nitro-avatar-editor-stage::before {
+.octane-avatar-editor-stage::before {
     content: '';
     position: absolute;
     left: 1px;
@@ -59,7 +59,7 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor-nameplate {
+.octane-avatar-editor-nameplate {
     position: absolute;
     left: 1px;
     top: 0;
@@ -71,7 +71,7 @@
     background: #0e3f52;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-nameplate span {
+.octane-avatar-editor .octane-avatar-editor-nameplate span {
     position: absolute;
     left: 40px;
     top: 15px;
@@ -89,7 +89,7 @@
     white-space: nowrap;
 }
 
-.nitro-avatar-editor-tab-row {
+.octane-avatar-editor-tab-row {
     position: absolute;
     left: 9px;
     top: 79px;
@@ -98,7 +98,7 @@
     height: 46px;
 }
 
-.nitro-avatar-editor .avatar-editor-tabs.nitro-card-tabs-shell {
+.octane-avatar-editor .avatar-editor-tabs.octane-card-tabs-shell {
     position: static;
     justify-content: flex-start !important;
     box-sizing: border-box;
@@ -113,7 +113,7 @@
     background: transparent;
 }
 
-.nitro-avatar-editor .avatar-editor-tabs .nitro-avatar-editor-main-tab {
+.octane-avatar-editor .avatar-editor-tabs .octane-avatar-editor-main-tab {
     box-sizing: border-box;
     width: 52px;
     min-width: 52px;
@@ -130,17 +130,17 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor .avatar-editor-tabs .nitro-avatar-editor-main-tab:hover {
+.octane-avatar-editor .avatar-editor-tabs .octane-avatar-editor-main-tab:hover {
     background-image: url('@/assets/images/avatareditor/air/tab-hover.png') !important;
 }
 
-.nitro-avatar-editor .avatar-editor-tabs .nitro-avatar-editor-main-tab.nitro-card-tab-item-active {
+.octane-avatar-editor .avatar-editor-tabs .octane-avatar-editor-main-tab.octane-card-tab-item-active {
     z-index: 2;
     background-image: url('@/assets/images/avatareditor/air/tab-selected.png') !important;
     box-shadow: none !important;
 }
 
-.nitro-avatar-editor .avatar-editor-tabs .nitro-avatar-editor-main-tab > .flex {
+.octane-avatar-editor .avatar-editor-tabs .octane-avatar-editor-main-tab > .flex {
     position: absolute;
     left: 0;
     top: 0;
@@ -151,7 +151,7 @@
     padding: 0;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-main-tab-icon {
+.octane-avatar-editor .octane-avatar-editor-main-tab-icon {
     position: absolute;
     left: 5px;
     top: 4px;
@@ -165,27 +165,27 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-main-tab.is-hd .nitro-avatar-editor-main-tab-icon {
+.octane-avatar-editor .octane-avatar-editor-main-tab.is-hd .octane-avatar-editor-main-tab-icon {
     left: 6px;
     top: 5px;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-main-tab.is-misc .nitro-avatar-editor-main-tab-icon {
+.octane-avatar-editor .octane-avatar-editor-main-tab.is-misc .octane-avatar-editor-main-tab-icon {
     left: 14px;
     top: 12px;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-main-tab.is-nft .nitro-avatar-editor-main-tab-icon {
+.octane-avatar-editor .octane-avatar-editor-main-tab.is-nft .octane-avatar-editor-main-tab-icon {
     left: 14px;
     top: 4px;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-main-tab.is-pets .nitro-avatar-editor-main-tab-icon {
+.octane-avatar-editor .octane-avatar-editor-main-tab.is-pets .octane-avatar-editor-main-tab-icon {
     left: 13px;
     top: 4px;
 }
 
-.nitro-avatar-editor-wardrobe-toggle {
+.octane-avatar-editor-wardrobe-toggle {
     appearance: none;
     position: absolute;
     left: 424px;
@@ -208,7 +208,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-wardrobe-toggle > img {
+.octane-avatar-editor-wardrobe-toggle > img {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -221,35 +221,35 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor-wardrobe-toggle:hover {
+.octane-avatar-editor-wardrobe-toggle:hover {
     border-image-source: var(--habbo-skin-shiny-hover);
 }
 
-.nitro-avatar-editor-wardrobe-toggle:active {
+.octane-avatar-editor-wardrobe-toggle:active {
     border-image-source: var(--habbo-skin-shiny-pressed);
 }
 
-.nitro-avatar-editor-wardrobe-toggle:focus-visible,
-.nitro-avatar-editor .category-item:focus-visible,
-.nitro-avatar-editor-rotate:focus-visible,
-.nitro-avatar-editor-advanced-color:focus-visible,
-.nitro-avatar-editor-secondary-actions > button:focus-visible,
-.nitro-avatar-editor-save:focus-visible {
-    outline: 2px solid var(--nitro-card-focus, #ffd95a);
+.octane-avatar-editor-wardrobe-toggle:focus-visible,
+.octane-avatar-editor .category-item:focus-visible,
+.octane-avatar-editor-rotate:focus-visible,
+.octane-avatar-editor-advanced-color:focus-visible,
+.octane-avatar-editor-secondary-actions > button:focus-visible,
+.octane-avatar-editor-save:focus-visible {
+    outline: 2px solid var(--octane-card-focus, #ffd95a);
     outline-offset: 1px;
 }
 
-.nitro-avatar-editor-main,
-.nitro-avatar-editor-model {
+.octane-avatar-editor-main,
+.octane-avatar-editor-model {
     position: absolute;
     inset: 0;
 }
 
-.nitro-avatar-editor-main {
+.octane-avatar-editor-main {
     z-index: 2;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-subcategories {
+.octane-avatar-editor .octane-avatar-editor-subcategories {
     position: absolute;
     left: 23px;
     top: 120px;
@@ -265,16 +265,16 @@
     overflow-y: hidden;
 }
 
-.nitro-avatar-editor-subcategories.is-gender {
+.octane-avatar-editor-subcategories.is-gender {
     gap: 0;
     padding-left: 0;
 }
 
-.nitro-avatar-editor-subcategories.is-paged {
+.octane-avatar-editor-subcategories.is-paged {
     width: 276px;
 }
 
-.nitro-avatar-editor-nft-category-scroll {
+.octane-avatar-editor-nft-category-scroll {
     appearance: none;
     position: absolute;
     top: 129px;
@@ -291,33 +291,33 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-nft-category-scroll.is-left {
+.octane-avatar-editor-nft-category-scroll.is-left {
     left: 299px;
     background-image: url('@/assets/images/scrollbar/left.png');
 }
 
-.nitro-avatar-editor-nft-category-scroll.is-left:hover {
+.octane-avatar-editor-nft-category-scroll.is-left:hover {
     background-image: url('@/assets/images/scrollbar/left_hover.png');
 }
 
-.nitro-avatar-editor-nft-category-scroll.is-left:active {
+.octane-avatar-editor-nft-category-scroll.is-left:active {
     background-image: url('@/assets/images/scrollbar/left_active.png');
 }
 
-.nitro-avatar-editor-nft-category-scroll.is-right {
+.octane-avatar-editor-nft-category-scroll.is-right {
     left: 316px;
     background-image: url('@/assets/images/scrollbar/right.png');
 }
 
-.nitro-avatar-editor-nft-category-scroll.is-right:hover {
+.octane-avatar-editor-nft-category-scroll.is-right:hover {
     background-image: url('@/assets/images/scrollbar/right_hover.png');
 }
 
-.nitro-avatar-editor-nft-category-scroll.is-right:active {
+.octane-avatar-editor-nft-category-scroll.is-right:active {
     background-image: url('@/assets/images/scrollbar/right_active.png');
 }
 
-.nitro-avatar-editor .category-item {
+.octane-avatar-editor .category-item {
     appearance: none;
     display: flex;
     box-sizing: border-box;
@@ -334,7 +334,7 @@
     background: transparent;
 }
 
-.nitro-avatar-editor .category-item.gender-category-item {
+.octane-avatar-editor .category-item.gender-category-item {
     position: relative;
     width: 100px;
     min-width: 100px;
@@ -348,17 +348,17 @@
     white-space: nowrap;
 }
 
-.nitro-avatar-editor .gender-category-item .avatar-editor-icon {
+.octane-avatar-editor .gender-category-item .avatar-editor-icon {
     position: absolute;
     left: 0;
     top: 0;
 }
 
-.nitro-avatar-editor .gender-category-item:first-child .avatar-editor-icon {
+.octane-avatar-editor .gender-category-item:first-child .avatar-editor-icon {
     left: 6px;
 }
 
-.nitro-avatar-editor .gender-category-item > span {
+.octane-avatar-editor .gender-category-item > span {
     position: absolute;
     left: 50px;
     top: 10px;
@@ -372,14 +372,14 @@
     text-overflow: ellipsis;
 }
 
-.nitro-avatar-editor .avatar-editor-icon {
+.octane-avatar-editor .avatar-editor-icon {
     width: 47px;
     min-width: 47px;
     height: 35px;
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor .avatar-editor-icon img {
+.octane-avatar-editor .avatar-editor-icon img {
     display: block;
     width: auto !important;
     max-width: 47px;
@@ -389,7 +389,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-parts-grid {
+.octane-avatar-editor-parts-grid {
     position: absolute;
     left: 21px;
     top: 168px;
@@ -398,17 +398,17 @@
     overflow: hidden;
 }
 
-.nitro-avatar-editor-parts-grid .nitro-classic-scroll-area-viewport {
+.octane-avatar-editor-parts-grid .octane-classic-scroll-area-viewport {
     box-sizing: border-box;
     padding-right: 17px;
 }
 
-.nitro-avatar-editor-parts-grid [data-index] {
+.octane-avatar-editor-parts-grid [data-index] {
     grid-template-columns: repeat(6, 50px) !important;
     justify-content: start;
 }
 
-.nitro-avatar-editor .avatar-parts {
+.octane-avatar-editor .avatar-parts {
     position: relative;
     box-sizing: border-box;
     width: 50px !important;
@@ -428,7 +428,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor .avatar-parts::before {
+.octane-avatar-editor .avatar-parts::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -439,17 +439,17 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor .avatar-parts:hover::before {
+.octane-avatar-editor .avatar-parts:hover::before {
     display: block;
     opacity: 0.5;
 }
 
-.nitro-avatar-editor .avatar-parts.part-selected::before {
+.octane-avatar-editor .avatar-parts.part-selected::before {
     display: block;
     opacity: 1;
 }
 
-.nitro-avatar-editor .avatar-parts.is-loading::after {
+.octane-avatar-editor .avatar-parts.is-loading::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -461,12 +461,12 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor .avatar-parts > * {
+.octane-avatar-editor .avatar-parts > * {
     position: relative;
     z-index: 1;
 }
 
-.nitro-avatar-editor .avatar-parts > img {
+.octane-avatar-editor .avatar-parts > img {
     display: block;
     width: auto;
     max-width: none;
@@ -476,7 +476,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor .avatar-parts > .avatar-editor-face-thumbnail {
+.octane-avatar-editor .avatar-parts > .avatar-editor-face-thumbnail {
     width: auto;
     max-width: none;
     height: auto;
@@ -484,26 +484,26 @@
     object-fit: contain;
 }
 
-.nitro-avatar-editor .avatar-parts > .avatar-editor-face-thumbnail.is-disabled {
+.octane-avatar-editor .avatar-parts > .avatar-editor-face-thumbnail.is-disabled {
     opacity: 0.2;
 }
 
-.nitro-avatar-editor .avatar-parts > .avatar-editor-icon.absolute {
+.octane-avatar-editor .avatar-parts > .avatar-editor-icon.absolute {
     position: absolute;
 }
 
-.nitro-avatar-editor .avatar-parts .avatar-editor-icon {
+.octane-avatar-editor .avatar-parts .avatar-editor-icon {
     width: 50px;
     min-width: 50px;
     height: 50px;
 }
 
-.nitro-avatar-editor .avatar-parts .avatar-editor-icon img {
+.octane-avatar-editor .avatar-parts .avatar-editor-icon img {
     max-width: 50px;
     max-height: 50px;
 }
 
-.nitro-avatar-editor .avatar-editor-part-hc {
+.octane-avatar-editor .avatar-editor-part-hc {
     position: absolute;
     right: 0;
     bottom: 1px;
@@ -512,7 +512,7 @@
     height: 9px;
 }
 
-.nitro-avatar-editor .avatar-parts > .avatar-editor-sellable-icon {
+.octane-avatar-editor .avatar-parts > .avatar-editor-sellable-icon {
     position: absolute;
     left: 0;
     right: auto;
@@ -523,24 +523,24 @@
     align-items: flex-end;
 }
 
-.nitro-avatar-editor .avatar-parts > .avatar-editor-sellable-icon img {
+.octane-avatar-editor .avatar-parts > .avatar-editor-sellable-icon img {
     width: 17px;
     height: 18px;
 }
 
-.nitro-avatar-editor .pet-sellable-locked {
+.octane-avatar-editor .pet-sellable-locked {
     cursor: not-allowed !important;
     opacity: 0.5;
 }
 
-.nitro-avatar-editor .pet-sellable-badge {
+.octane-avatar-editor .pet-sellable-badge {
     position: absolute;
     right: 1px;
     bottom: 1px;
     z-index: 3;
 }
 
-.nitro-avatar-editor-empty-state {
+.octane-avatar-editor-empty-state {
     position: absolute;
     left: 21px;
     top: 168px;
@@ -554,7 +554,7 @@
     text-align: center;
 }
 
-.nitro-avatar-editor-pet-equipped {
+.octane-avatar-editor-pet-equipped {
     display: flex;
     width: 250px;
     min-width: 0;
@@ -566,22 +566,22 @@
     font-size: 10px;
 }
 
-.nitro-avatar-editor-pet-equipped > img,
-.nitro-avatar-editor-pet-equipped > .avatar-editor-icon {
+.octane-avatar-editor-pet-equipped > img,
+.octane-avatar-editor-pet-equipped > .avatar-editor-icon {
     width: 35px;
     min-width: 35px;
     height: 35px;
     object-fit: contain;
 }
 
-.nitro-avatar-editor-pet-equipped > span {
+.octane-avatar-editor-pet-equipped > span {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.nitro-avatar-editor-pet-remove {
+.octane-avatar-editor-pet-remove {
     appearance: none;
     display: flex;
     width: 35px;
@@ -596,13 +596,13 @@
     background: transparent;
 }
 
-.nitro-avatar-editor-pet-remove .avatar-editor-icon {
+.octane-avatar-editor-pet-remove .avatar-editor-icon {
     width: 29px;
     min-width: 29px;
     height: 29px;
 }
 
-.nitro-avatar-editor-palettes {
+.octane-avatar-editor-palettes {
     position: absolute;
     left: 21px;
     top: 378px;
@@ -613,7 +613,7 @@
     overflow: hidden;
 }
 
-.nitro-avatar-editor-palettes .avatar-editor-palette-set-view {
+.octane-avatar-editor-palettes .avatar-editor-palette-set-view {
     width: 330px;
     height: 93px;
     flex: 0 0 330px;
@@ -621,7 +621,7 @@
     overflow: hidden;
 }
 
-.nitro-avatar-editor-palettes.dual-palette .avatar-editor-palette-set-view {
+.octane-avatar-editor-palettes.dual-palette .avatar-editor-palette-set-view {
     width: 160px;
     flex-basis: 160px;
 }
@@ -700,7 +700,7 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-advanced-color {
+.octane-avatar-editor .octane-avatar-editor-advanced-color {
     appearance: none;
     position: absolute;
     left: 357px;
@@ -727,16 +727,16 @@
     white-space: nowrap;
 }
 
-.nitro-avatar-editor-advanced-color:hover {
+.octane-avatar-editor-advanced-color:hover {
     border-image-source: var(--habbo-skin-button-hover);
 }
 
-.nitro-avatar-editor-advanced-color:active,
-.nitro-avatar-editor-advanced-color.is-active {
+.octane-avatar-editor-advanced-color:active,
+.octane-avatar-editor-advanced-color.is-active {
     border-image-source: var(--habbo-skin-button-pressed);
 }
 
-.nitro-avatar-editor-preview-shell {
+.octane-avatar-editor-preview-shell {
     position: absolute;
     left: 352px;
     top: 158px;
@@ -745,7 +745,7 @@
     height: 236px;
 }
 
-.nitro-avatar-editor .figure-preview-container {
+.octane-avatar-editor .figure-preview-container {
     position: relative;
     width: 125px;
     height: 210px;
@@ -753,7 +753,7 @@
     background: #677181;
 }
 
-.nitro-avatar-editor .figure-preview-container::after {
+.octane-avatar-editor .figure-preview-container::after {
     content: '';
     position: absolute;
     top: 75%;
@@ -768,7 +768,7 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor .figure-preview-container .avatar-image {
+.octane-avatar-editor .figure-preview-container .avatar-image {
     position: absolute;
     left: 18px;
     right: auto;
@@ -780,7 +780,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-rotate {
+.octane-avatar-editor-rotate {
     appearance: none;
     position: absolute;
     left: 38px;
@@ -794,7 +794,7 @@
     background: transparent;
 }
 
-.nitro-avatar-editor-rotate img {
+.octane-avatar-editor-rotate img {
     display: block;
     width: 44px;
     height: 29px;
@@ -802,7 +802,7 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor-secondary-actions {
+.octane-avatar-editor-secondary-actions {
     position: absolute;
     left: 357px;
     top: 405px;
@@ -813,7 +813,7 @@
     gap: 2px;
 }
 
-.nitro-avatar-editor-secondary-actions > button {
+.octane-avatar-editor-secondary-actions > button {
     appearance: none;
     display: flex;
     box-sizing: border-box;
@@ -838,20 +838,20 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-secondary-actions > button:hover {
+.octane-avatar-editor-secondary-actions > button:hover {
     border-image-source: var(--habbo-skin-shiny-hover);
 }
 
-.nitro-avatar-editor-secondary-actions > button:active {
+.octane-avatar-editor-secondary-actions > button:active {
     border-image-source: var(--habbo-skin-shiny-pressed);
 }
 
-.nitro-avatar-editor-secondary-actions > button .fa-icon {
+.octane-avatar-editor-secondary-actions > button .fa-icon {
     width: 14px;
     height: 14px;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-save {
+.octane-avatar-editor .octane-avatar-editor-save {
     appearance: none;
     position: absolute;
     left: 357px;
@@ -885,15 +885,15 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-save:hover {
+.octane-avatar-editor .octane-avatar-editor-save:hover {
     border-image-source: var(--habbo-skin-shiny-thick-hover) !important;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-save:active {
+.octane-avatar-editor .octane-avatar-editor-save:active {
     border-image-source: var(--habbo-skin-shiny-thick-pressed) !important;
 }
 
-.nitro-avatar-editor-wardrobe {
+.octane-avatar-editor-wardrobe {
     box-sizing: border-box;
     width: 182px;
     height: 490px;
@@ -905,7 +905,7 @@
     box-shadow: inset 1px 0 #000;
 }
 
-.nitro-avatar-editor-wardrobe-header {
+.octane-avatar-editor-wardrobe-header {
     display: flex;
     box-sizing: border-box;
     width: 168px;
@@ -915,7 +915,7 @@
     margin-top: 19px;
 }
 
-.nitro-avatar-editor .nitro-avatar-editor-wardrobe-title {
+.octane-avatar-editor .octane-avatar-editor-wardrobe-title {
     overflow: hidden;
     color: #83827e;
     font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
@@ -926,7 +926,7 @@
     white-space: nowrap;
 }
 
-.nitro-avatar-editor-wardrobe-hc {
+.octane-avatar-editor-wardrobe-hc {
     width: 15px;
     height: 15px;
     flex-shrink: 0;
@@ -934,7 +934,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-wardrobe-slots {
+.octane-avatar-editor-wardrobe-slots {
     position: relative;
     display: flex;
     box-sizing: border-box;
@@ -949,7 +949,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-wardrobe-slots::before {
+.octane-avatar-editor-wardrobe-slots::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -963,21 +963,21 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor-wardrobe-column {
+.octane-avatar-editor-wardrobe-column {
     display: flex;
     width: 64px;
     flex-direction: column;
     gap: 3px;
 }
 
-.nitro-avatar-editor-wardrobe-slot {
+.octane-avatar-editor-wardrobe-slot {
     position: relative;
     width: 56px;
     height: 56px;
     flex-shrink: 0;
 }
 
-.nitro-avatar-editor-wardrobe-slot-shade {
+.octane-avatar-editor-wardrobe-slot-shade {
     position: absolute;
     left: 29px;
     top: 3px;
@@ -987,8 +987,8 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor-wardrobe-slot-set,
-.nitro-avatar-editor-wardrobe-slot-get {
+.octane-avatar-editor-wardrobe-slot-set,
+.octane-avatar-editor-wardrobe-slot-get {
     appearance: none;
     position: absolute;
     width: 22px;
@@ -1003,28 +1003,28 @@
     image-rendering: pixelated;
 }
 
-.nitro-avatar-editor-wardrobe-slot-set {
+.octane-avatar-editor-wardrobe-slot-set {
     left: 3px;
     top: 3px;
     background-image: url('@/assets/images/avatareditor/wardrobe-arrow-save.png');
     background-position: center 12px;
 }
 
-.nitro-avatar-editor-wardrobe-slot-get {
+.octane-avatar-editor-wardrobe-slot-get {
     left: 2px;
     top: 28px;
     background-image: url('@/assets/images/avatareditor/wardrobe-arrow-wear.png');
     background-position: center 3px;
 }
 
-.nitro-avatar-editor-wardrobe-slot-set:focus-visible,
-.nitro-avatar-editor-wardrobe-slot-get:focus-visible,
-.nitro-avatar-editor-wardrobe-slot-figure:focus-visible {
-    outline: 2px solid var(--nitro-card-focus, #ffd95a);
+.octane-avatar-editor-wardrobe-slot-set:focus-visible,
+.octane-avatar-editor-wardrobe-slot-get:focus-visible,
+.octane-avatar-editor-wardrobe-slot-figure:focus-visible {
+    outline: 2px solid var(--octane-card-focus, #ffd95a);
     outline-offset: 1px;
 }
 
-.nitro-avatar-editor-wardrobe-slot-figure {
+.octane-avatar-editor-wardrobe-slot-figure {
     appearance: none;
     position: absolute;
     left: 30px;
@@ -1039,19 +1039,19 @@
     background: transparent;
 }
 
-.nitro-avatar-editor-wardrobe-slot-figure:disabled {
+.octane-avatar-editor-wardrobe-slot-figure:disabled {
     cursor: default;
 }
 
-.nitro-avatar-editor-wardrobe-slot-figure .avatar-image,
-.nitro-avatar-editor-wardrobe-slot-figure .avatar-image-fit {
+.octane-avatar-editor-wardrobe-slot-figure .avatar-image,
+.octane-avatar-editor-wardrobe-slot-figure .avatar-image-fit {
     position: absolute !important;
     inset: 0 !important;
     width: 22px !important;
     height: 48px !important;
 }
 
-.nitro-avatar-editor-wardrobe-empty {
+.octane-avatar-editor-wardrobe-empty {
     display: block;
     width: 17px;
     height: 43px;
@@ -1060,12 +1060,12 @@
     pointer-events: none;
 }
 
-.nitro-avatar-editor-wardrobe-slot.is-locked {
+.octane-avatar-editor-wardrobe-slot.is-locked {
     opacity: 0.85;
 }
 
 @media (max-width: 700px), (max-height: 540px) {
-    .nitro-avatar-editor {
+    .octane-avatar-editor {
         width: min(490px, calc(100vw - 16px)) !important;
         min-width: 0;
         max-width: calc(100vw - 16px) !important;
@@ -1074,13 +1074,13 @@
         max-height: calc(100vh - 16px) !important;
     }
 
-    .nitro-avatar-editor.is-wardrobe-open {
+    .octane-avatar-editor.is-wardrobe-open {
         width: min(669px, calc(100vw - 16px)) !important;
         min-width: 0;
         max-width: calc(100vw - 16px) !important;
     }
 
-    .nitro-avatar-editor .nitro-avatar-editor-content.nitro-card-content-shell {
+    .octane-avatar-editor .octane-avatar-editor-content.octane-card-content-shell {
         height: calc(100% - 33px) !important;
         max-height: calc(100% - 33px) !important;
         flex: none;

@@ -4618,60 +4618,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nitro-react@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "nitro-react@workspace:."
-  dependencies:
-    "@babel/runtime": "npm:^8.0.0"
-    "@biomejs/biome": "npm:^2.5.12"
-    "@emoji-mart/data": "npm:^1.2.1"
-    "@emoji-mart/react": "npm:^1.1.1"
-    "@radix-ui/react-popover": "npm:^1.1.23"
-    "@radix-ui/react-slider": "npm:^1.4.7"
-    "@tailwindcss/forms": "npm:^0.5.11"
-    "@tailwindcss/postcss": "npm:^4.3.3"
-    "@tanstack/react-query": "npm:5"
-    "@tanstack/react-query-devtools": "npm:5"
-    "@tanstack/react-virtual": "npm:^3.14.10"
-    "@testing-library/dom": "npm:^10.4.1"
-    "@testing-library/jest-dom": "npm:^7.0.1"
-    "@testing-library/react": "npm:^16.3.3"
-    "@types/node": "npm:^26.4.1"
-    "@types/react": "npm:^19.2.18"
-    "@types/react-dom": "npm:^19.2.7"
-    "@typescript-eslint/eslint-plugin": "npm:^8.69.0"
-    "@typescript-eslint/parser": "npm:^8.69.0"
-    "@typescript/native-preview": "npm:^7.0.0-dev.20260707.2"
-    "@vitejs/plugin-react": "npm:^6.1.1"
-    babel-plugin-react-compiler: "npm:^1.0.0"
-    dompurify: "npm:^3.4.14"
-    emoji-mart: "npm:^5.6.0"
-    eslint: "npm:^10.10.0"
-    eslint-plugin-react: "npm:^7.37.5"
-    eslint-plugin-react-compiler: "npm:19.1.0-rc.2"
-    eslint-plugin-react-hooks: "npm:^7.1.1"
-    framer-motion: "npm:^13.2.0"
-    jsdom: "npm:^30.0.1"
-    postcss: "npm:^8.5.28"
-    postcss-nested: "npm:^8.0.1"
-    react: "npm:^19.2.8"
-    react-colorful: "npm:^5.8.1"
-    react-dom: "npm:^19.2.8"
-    react-error-boundary: "npm:^6.1.4"
-    react-icons: "npm:^5.7.0"
-    react-player: "npm:^3.4.0"
-    sass: "npm:^1.104.0"
-    sirv: "npm:^3.0.2"
-    strip-json-comments: "npm:^5.0.3"
-    tailwindcss: "npm:^4.3.3"
-    typescript: "npm:^6.0.3"
-    typescript-eslint: "npm:^8.69.0"
-    vite: "npm:^8.2.2"
-    vitest: "npm:^5.0.0"
-    zustand: "npm:^5.0.15"
-  languageName: unknown
-  linkType: soft
-
 "node-addon-api@npm:^7.0.0":
   version: 7.1.1
   resolution: "node-addon-api@npm:7.1.1"
@@ -4808,6 +4754,60 @@ __metadata:
   checksum: 10c0/34a0ee97cd88573cfd97d384c2a79f07118ae5680d7e45d1de6e99c74eddefe145e8ca27a2db02195a1ee5fded5aa22b924869c842728c201b9f109a27d0ef19
   languageName: node
   linkType: hard
+
+"octane-react@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "octane-react@workspace:."
+  dependencies:
+    "@babel/runtime": "npm:^8.0.0"
+    "@biomejs/biome": "npm:^2.5.12"
+    "@emoji-mart/data": "npm:^1.2.1"
+    "@emoji-mart/react": "npm:^1.1.1"
+    "@radix-ui/react-popover": "npm:^1.1.23"
+    "@radix-ui/react-slider": "npm:^1.4.7"
+    "@tailwindcss/forms": "npm:^0.5.11"
+    "@tailwindcss/postcss": "npm:^4.3.3"
+    "@tanstack/react-query": "npm:5"
+    "@tanstack/react-query-devtools": "npm:5"
+    "@tanstack/react-virtual": "npm:^3.14.10"
+    "@testing-library/dom": "npm:^10.4.1"
+    "@testing-library/jest-dom": "npm:^7.0.1"
+    "@testing-library/react": "npm:^16.3.3"
+    "@types/node": "npm:^26.4.1"
+    "@types/react": "npm:^19.2.18"
+    "@types/react-dom": "npm:^19.2.7"
+    "@typescript-eslint/eslint-plugin": "npm:^8.69.0"
+    "@typescript-eslint/parser": "npm:^8.69.0"
+    "@typescript/native-preview": "npm:^7.0.0-dev.20260707.2"
+    "@vitejs/plugin-react": "npm:^6.1.1"
+    babel-plugin-react-compiler: "npm:^1.0.0"
+    dompurify: "npm:^3.4.14"
+    emoji-mart: "npm:^5.6.0"
+    eslint: "npm:^10.10.0"
+    eslint-plugin-react: "npm:^7.37.5"
+    eslint-plugin-react-compiler: "npm:19.1.0-rc.2"
+    eslint-plugin-react-hooks: "npm:^7.1.1"
+    framer-motion: "npm:^13.2.0"
+    jsdom: "npm:^30.0.1"
+    postcss: "npm:^8.5.28"
+    postcss-nested: "npm:^8.0.1"
+    react: "npm:^19.2.8"
+    react-colorful: "npm:^5.8.1"
+    react-dom: "npm:^19.2.8"
+    react-error-boundary: "npm:^6.1.4"
+    react-icons: "npm:^5.7.0"
+    react-player: "npm:^3.4.0"
+    sass: "npm:^1.104.0"
+    sirv: "npm:^3.0.2"
+    strip-json-comments: "npm:^5.0.3"
+    tailwindcss: "npm:^4.3.3"
+    typescript: "npm:^6.0.3"
+    typescript-eslint: "npm:^8.69.0"
+    vite: "npm:^8.2.2"
+    vitest: "npm:^5.0.0"
+    zustand: "npm:^5.0.15"
+  languageName: unknown
+  linkType: soft
 
 "optionator@npm:^0.9.3":
   version: 0.9.4

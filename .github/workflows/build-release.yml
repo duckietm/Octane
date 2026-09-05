@@ -10,8 +10,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-  NITRO_SINGLE_BUNDLE: '1'
-  NITRO_JSON_MODE: 'legacy'
+  OCTANE_SINGLE_BUNDLE: '1'
+  OCTANE_JSON_MODE: 'legacy'
 
 jobs:
   # The renderer lives in a private repo, so this workflow can only run where
@@ -74,8 +74,8 @@ jobs:
 
       - name: Link renderer into client
         run: |
-          mkdir -p octane/node_modules/@nitrots
-          ln -sfn "${{ github.workspace }}/octane-renderer" octane/node_modules/@nitrots/nitro-renderer
+          mkdir -p octane/node_modules/@octane
+          ln -sfn "${{ github.workspace }}/octane-renderer" octane/node_modules/@octane/renderer
 
       - name: Build client
         working-directory: octane

@@ -1,7 +1,7 @@
-import { IEventDispatcher, NitroEvent } from '@nitrots/nitro-renderer';
+import { IEventDispatcher, OctaneEvent } from '@octane/renderer';
 import { useEffect } from 'react';
 
-export const useEventDispatcher = <T extends NitroEvent>(
+export const useEventDispatcher = <T extends OctaneEvent>(
     type: string | string[],
     eventDispatcher: IEventDispatcher,
     handler: (event: T) => void,

@@ -1,4 +1,4 @@
-import { MouseEventType, NitroSoundEvent } from '@nitrots/nitro-renderer';
+import { MouseEventType, OctaneSoundEvent } from '@octane/renderer';
 import { DispatchMainEvent } from '../events';
 
 let canPlaySound = false;
@@ -6,7 +6,7 @@ let canPlaySound = false;
 export const PlaySound = (sampleCode: string) => {
     if (!canPlaySound) return;
 
-    DispatchMainEvent(new NitroSoundEvent(NitroSoundEvent.PLAY_SOUND, sampleCode));
+    DispatchMainEvent(new OctaneSoundEvent(OctaneSoundEvent.PLAY_SOUND, sampleCode));
 };
 
 const eventTypes = [MouseEventType.MOUSE_CLICK];

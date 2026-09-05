@@ -1,7 +1,7 @@
-import { AvatarFigurePartType, CreateLinkEvent } from '@nitrots/nitro-renderer';
+import { AvatarFigurePartType, CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFurnitureFootballGateWidget } from '../../../../hooks';
 
 export const FurnitureFootballGateView: FC<{}> = (props) => {
@@ -15,9 +15,9 @@ export const FurnitureFootballGateView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView className="nitro-football-gate w-[300px]" theme="primary-slim" uniqueKey="football-gate">
-            <NitroCardHeaderView headerText={LocalizeText('widget.furni.clothingchange.gender.title')} onCloseClick={onClose} />
-            <NitroCardContentView>
+        <OctaneCardView className="octane-football-gate w-[300px]" theme="primary-slim" uniqueKey="football-gate">
+            <OctaneCardHeaderView headerText={LocalizeText('widget.furni.clothingchange.gender.title')} onCloseClick={onClose} />
+            <OctaneCardContentView>
                 <div className="flex justify-center w-full">
                     <Text>{LocalizeText('widget.furni.clothingchange.gender.info')}</Text>
                 </div>
@@ -29,7 +29,7 @@ export const FurnitureFootballGateView: FC<{}> = (props) => {
                         {LocalizeText('widget.furni.clothingchange.gender.female')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -1,10 +1,10 @@
-import { RedeemVoucherMessageComposer, VoucherRedeemErrorMessageEvent, VoucherRedeemOkMessageEvent } from '@nitrots/nitro-renderer';
+import { RedeemVoucherMessageComposer, VoucherRedeemErrorMessageEvent, VoucherRedeemOkMessageEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { FaTag } from 'react-icons/fa';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button } from '../../../../../common';
 import { useMessageEvent, useNotification } from '../../../../../hooks';
-import { NitroInput } from '../../../../../layout';
+import { OctaneInput } from '../../../../../layout';
 
 export interface CatalogRedeemVoucherViewProps {
     text: string;
@@ -58,7 +58,7 @@ export const CatalogRedeemVoucherView: FC<CatalogRedeemVoucherViewProps> = (prop
 
     return (
         <div className="flex gap-1">
-            <NitroInput placeholder={text} value={voucher} onChange={(event) => setVoucher(event.target.value)} />
+            <OctaneInput placeholder={text} value={voucher} onChange={(event) => setVoucher(event.target.value)} />
             <Button disabled={isWaiting} variant="primary" onClick={redeemVoucher}>
                 <FaTag className="fa-icon" />
             </Button>

@@ -26,7 +26,7 @@ const footprint = (item: SnowWarEditorPlacement) =>
 };
 
 /**
- * SnowStorm uses every non-void height from Nitro's real floor-plan editor as
+ * SnowStorm uses every non-void height from Octane's real floor-plan editor as
  * playable ground. HEIGHT_SCHEME starts with x, followed by heights 0..q.
  */
 export const isSnowWarFloorTile = (cell?: string): boolean =>

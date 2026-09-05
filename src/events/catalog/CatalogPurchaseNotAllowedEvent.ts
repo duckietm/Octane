@@ -1,6 +1,6 @@
-import { NitroEvent } from '@nitrots/nitro-renderer';
+import { OctaneEvent } from '@octane/renderer';
 
-export class CatalogPurchaseNotAllowedEvent extends NitroEvent {
+export class CatalogPurchaseNotAllowedEvent extends OctaneEvent {
     public static NOT_ALLOWED: string = 'CPNAE_NOT_ALLOWED';
 
     private _code: number;

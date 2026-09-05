@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../api';
-import { NitroInput } from '../../../layout';
+import { OctaneInput } from '../../../layout';
 
 // Filter option keys (also consumed by InventoryView's useMemo derivation).
 export const FILTER_EVERYTHING = 'inventory.filter.option.everything';
@@ -21,9 +21,9 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
     const { currentTab = null, searchValue = '', filterType = FILTER_EVERYTHING, onSearchChange = null, onFilterTypeChange = null } = props;
 
     return (
-        <div className={`nitro-inventory-filter-bar flex gap-1 rounded p-1 shrink-0 ${currentTab === TAB_BADGES ? 'is-badges' : ''}`}>
+        <div className={`octane-inventory-filter-bar flex gap-1 rounded p-1 shrink-0 ${currentTab === TAB_BADGES ? 'is-badges' : ''}`}>
             <div className="relative flex flex-1 items-center">
-                <NitroInput
+                <OctaneInput
                     className="w-full"
                     placeholder={LocalizeText('catalog.search')}
                     value={searchValue}

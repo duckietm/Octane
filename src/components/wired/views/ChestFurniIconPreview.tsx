@@ -1,4 +1,4 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { localizeWithFallback, ProductTypeEnum } from '../../../api';
 import { LayoutFurniImageView, Text } from '../../../common';

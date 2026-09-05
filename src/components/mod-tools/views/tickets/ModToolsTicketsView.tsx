@@ -1,8 +1,8 @@
-import { GetSessionDataManager, IssueMessageData } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, IssueMessageData } from '@octane/renderer';
 import { FC, useMemo, useState } from 'react';
 import { FaCheckSquare, FaListUl, FaUserCheck } from 'react-icons/fa';
 import { LocalizeText } from '../../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../../../common';
 import { useModTools } from '../../../../hooks';
 import { ModToolsIssueInfoView } from './ModToolsIssueInfoView';
 import { ModToolsMyIssuesTabView } from './ModToolsMyIssuesTabView';
@@ -90,26 +90,26 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
 
     return (
         <>
-            <NitroCardView className="nitro-mod-tools-tickets min-w-0 w-[min(640px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]">
-                <NitroCardHeaderView headerText={LocalizeText('modtools.tickets.title')} onCloseClick={onCloseClick} />
-                <NitroCardTabsView>
-                    <NitroCardTabsItemView isActive={currentTab === 0} onClick={() => setCurrentTab(0)}>
+            <OctaneCardView className="octane-mod-tools-tickets min-w-0 w-[min(640px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]">
+                <OctaneCardHeaderView headerText={LocalizeText('modtools.tickets.title')} onCloseClick={onCloseClick} />
+                <OctaneCardTabsView>
+                    <OctaneCardTabsItemView isActive={currentTab === 0} onClick={() => setCurrentTab(0)}>
                         <TabLabel label={LocalizeText('modtools.tickets.tab.open')} count={openIssues.length} icon={<FaListUl size={10} />} tone="amber" />
-                    </NitroCardTabsItemView>
-                    <NitroCardTabsItemView isActive={currentTab === 1} onClick={() => setCurrentTab(1)}>
+                    </OctaneCardTabsItemView>
+                    <OctaneCardTabsItemView isActive={currentTab === 1} onClick={() => setCurrentTab(1)}>
                         <TabLabel label={LocalizeText('modtools.tickets.tab.mine')} count={myIssues.length} icon={<FaUserCheck size={10} />} tone="sky" />
-                    </NitroCardTabsItemView>
-                    <NitroCardTabsItemView isActive={currentTab === 2} onClick={() => setCurrentTab(2)}>
+                    </OctaneCardTabsItemView>
+                    <OctaneCardTabsItemView isActive={currentTab === 2} onClick={() => setCurrentTab(2)}>
                         <TabLabel
                             label={LocalizeText('modtools.tickets.tab.picked')}
                             count={pickedIssues.length}
                             icon={<FaCheckSquare size={10} />}
                             tone="zinc"
                         />
-                    </NitroCardTabsItemView>
-                </NitroCardTabsView>
-                <NitroCardContentView gap={1}>{renderTab()}</NitroCardContentView>
-            </NitroCardView>
+                    </OctaneCardTabsItemView>
+                </OctaneCardTabsView>
+                <OctaneCardContentView gap={1}>{renderTab()}</OctaneCardContentView>
+            </OctaneCardView>
             {issueInfoWindows &&
                 issueInfoWindows.length > 0 &&
                 issueInfoWindows.map((issueId) => <ModToolsIssueInfoView key={issueId} issueId={issueId} onIssueInfoClosed={closeIssue} />)}

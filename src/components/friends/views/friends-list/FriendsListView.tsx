@@ -1,4 +1,4 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveFriendComposer, RemoveLinkEventTracker, SendRoomInviteComposer } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveFriendComposer, RemoveLinkEventTracker, SendRoomInviteComposer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { CreateLinkEvent, filterFriendsByCategory, LocalizeText, MessengerFriend, SendMessageComposer } from '../../../../api';
 import { DraggableWindow, DraggableWindowPosition } from '../../../../common';
@@ -151,7 +151,7 @@ export const FriendsListView: FC<{}> = (props) => {
     return (
         <>
             <DraggableWindow
-                uniqueKey="nitro-friends"
+                uniqueKey="octane-friends"
                 handleSelector=".hfl-titlebar"
                 windowPosition={DraggableWindowPosition.TOP_LEFT}
                 offsetLeft={110}

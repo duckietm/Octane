@@ -1,4 +1,4 @@
-import { RequestBadgesComposer } from '@nitrots/nitro-renderer';
+import { RequestBadgesComposer } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { LocalizeText, NotificationBubbleItem, SendMessageComposer } from '../../../../api';
 import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';

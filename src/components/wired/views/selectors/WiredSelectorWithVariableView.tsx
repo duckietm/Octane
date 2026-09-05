@@ -6,7 +6,7 @@ import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -283,7 +283,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
 
     return (
         <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} hideDelay={true} cardStyle={{ width: 260 }}>
-            <div className="nitro-wired__give-var">
+            <div className="octane-wired__give-var">
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <WiredVariablePicker
@@ -294,7 +294,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                     />
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
                 <label className="flex items-center gap-2">
                     <input
@@ -308,7 +308,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                 </label>
 
                 <div className={`flex flex-col gap-2 ${!selectByValue ? 'opacity-60' : ''}`}>
-                    <div className="nitro-wired__divider" />
+                    <div className="octane-wired__divider" />
                     <div className="flex flex-col gap-1">
                         <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
                         <div className="flex flex-wrap items-center gap-2">
@@ -327,10 +327,10 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                         </div>
                     </div>
 
-                    <div className="nitro-wired__divider" />
-                    <div className="nitro-wired__give-var-section">
-                        <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
-                        <label className="nitro-wired__change-var-radio">
+                    <div className="octane-wired__divider" />
+                    <div className="octane-wired__give-var-section">
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
+                        <label className="octane-wired__change-var-radio">
                             <input
                                 checked={referenceMode === 'constant'}
                                 type="radio"
@@ -338,8 +338,8 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                                 onChange={() => setReferenceMode('constant')}
                             />
                             <Text>{LocalizeText('wiredfurni.params.operator.2')}</Text>
-                            <NitroInput
-                                className="nitro-wired__give-var-number"
+                            <OctaneInput
+                                className="octane-wired__give-var-number"
                                 type="number"
                                 value={referenceConstantValueInput}
                                 disabled={!selectByValue}
@@ -347,8 +347,8 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                             />
                         </label>
 
-                        <div className="nitro-wired__change-var-reference-block">
-                            <label className="nitro-wired__change-var-radio">
+                        <div className="octane-wired__change-var-reference-block">
+                            <label className="octane-wired__change-var-radio">
                                 <input
                                     checked={referenceMode === 'variable'}
                                     type="radio"
@@ -356,13 +356,13 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                                     onChange={() => setReferenceMode('variable')}
                                 />
                                 <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-                                <div className="nitro-wired__give-var-targets">
+                                <div className="octane-wired__give-var-targets">
                                     {TARGET_BUTTONS.map((button) => (
                                         <button
                                             key={`reference-${button.key}`}
                                             type="button"
                                             disabled={button.disabled || !selectByValue || referenceMode !== 'variable'}
-                                            className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
+                                            className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
                                             onClick={() => handleReferenceTargetChange(button.key)}
                                         >
                                             <img src={button.icon} alt={button.key} />
@@ -384,7 +384,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
 
                     {selectByValue && referenceMode === 'variable' && (
                         <>
-                            <div className="nitro-wired__divider" />
+                            <div className="octane-wired__divider" />
                             <WiredFurniSelectionSourceRow
                                 title="wiredfurni.params.sources.merged.title.variables_reference"
                                 options={referenceSourceOptions}
@@ -411,7 +411,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                     )}
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
                 <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
 

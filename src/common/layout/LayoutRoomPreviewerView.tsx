@@ -1,4 +1,4 @@
-import { GetRenderer, GetTicker, NitroLogger, RoomPreviewer, TextureUtils } from '@nitrots/nitro-renderer';
+import { GetRenderer, GetTicker, OctaneLogger, RoomPreviewer, TextureUtils } from '@octane/renderer';
 import { FC, useEffect, useRef } from 'react';
 
 export const LayoutRoomPreviewerView: FC<{
@@ -47,7 +47,7 @@ export const LayoutRoomPreviewerView: FC<{
             renderFailuresRef.current += 1;
 
             if (renderFailuresRef.current >= MAX_RENDER_FAILURES) {
-                NitroLogger.error(
+                OctaneLogger.error(
                     `LayoutRoomPreviewerView ${label} failed ${renderFailuresRef.current} times; disabling further renders for this preview`,
                     error
                 );

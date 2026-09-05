@@ -1,4 +1,4 @@
-import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useState } from 'react';
 import { BadgeLeaderboardBoard, BadgeLeaderboardEntry, BadgeRarityKey, fetchBadgeLeaderboard, getCachedBadgeLeaderboard, LocalizeText } from '../../api';
 import {
@@ -220,45 +220,45 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <div className="nitro-badge-leaderboard fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
+        <div className="octane-badge-leaderboard fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
             <DraggableWindow
                 uniqueKey="badge-leaderboard"
-                handleSelector=".nitro-badge-leaderboard__drag-handle"
+                handleSelector=".octane-badge-leaderboard__drag-handle"
                 windowPosition={DraggableWindowPosition.CENTER}
             >
                 <div
-                    className="nitro-badge-leaderboard__window pointer-events-auto"
+                    className="octane-badge-leaderboard__window pointer-events-auto"
                     style={{ '--badge-leaderboard-frame': `url(${currentPage?.frame || frameLeaderboardTotal})` } as CSSProperties}
                 >
-                    <div className="nitro-badge-leaderboard__frame" aria-hidden="true" />
-                    <div className="nitro-badge-leaderboard__drag-handle" />
+                    <div className="octane-badge-leaderboard__frame" aria-hidden="true" />
+                    <div className="octane-badge-leaderboard__drag-handle" />
                     <button
-                        className="nitro-badge-leaderboard__close"
+                        className="octane-badge-leaderboard__close"
                         type="button"
                         onPointerDown={(event) => event.stopPropagation()}
                         onClick={() => setIsVisible(false)}
                         aria-label="Close"
                     >
-                        <span className="nitro-badge-leaderboard__close-icon" style={{ backgroundImage: `url(${leaderboardButtonCloseSwf})` }} />
+                        <span className="octane-badge-leaderboard__close-icon" style={{ backgroundImage: `url(${leaderboardButtonCloseSwf})` }} />
                     </button>
-                    <div className="nitro-badge-leaderboard__header">
+                    <div className="octane-badge-leaderboard__header">
                         <button
-                            className="nitro-badge-leaderboard__category-button"
+                            className="octane-badge-leaderboard__category-button"
                             type="button"
                             onPointerDown={(event) => event.stopPropagation()}
                             onClick={() => setIsCategoryMenuVisible((value) => !value)}
                         >
-                            <Text className="nitro-badge-leaderboard__header-title">
+                            <Text className="octane-badge-leaderboard__header-title">
                                 {currentPage?.title() || LocalizeText('badge_leaderboard.title.total_badges')}
                             </Text>
-                            <img className="nitro-badge-leaderboard__header-arrow" src={leaderboardDropdownOpener} alt="" />
+                            <img className="octane-badge-leaderboard__header-arrow" src={leaderboardDropdownOpener} alt="" />
                         </button>
                         {isCategoryMenuVisible && (
-                            <div className="nitro-badge-leaderboard__category-menu" onPointerDown={(event) => event.stopPropagation()}>
+                            <div className="octane-badge-leaderboard__category-menu" onPointerDown={(event) => event.stopPropagation()}>
                                 {pages.map((page, index) => (
                                     <button
                                         key={page.key}
-                                        className={`nitro-badge-leaderboard__category-option ${index === categoryIndex ? 'is-active' : ''}`}
+                                        className={`octane-badge-leaderboard__category-option ${index === categoryIndex ? 'is-active' : ''}`}
                                         type="button"
                                         onClick={() => {
                                             setCategoryIndex(index);
@@ -271,18 +271,18 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                             </div>
                         )}
                     </div>
-                    <div className="nitro-badge-leaderboard__content">
-                        {isLoading && !leaderboard && <div className="nitro-badge-leaderboard__state">{LocalizeText('generic.loading')}</div>}
-                        {loadError && !leaderboard && <div className="nitro-badge-leaderboard__state nitro-badge-leaderboard__state--error">{loadError}</div>}
+                    <div className="octane-badge-leaderboard__content">
+                        {isLoading && !leaderboard && <div className="octane-badge-leaderboard__state">{LocalizeText('generic.loading')}</div>}
+                        {loadError && !leaderboard && <div className="octane-badge-leaderboard__state octane-badge-leaderboard__state--error">{loadError}</div>}
                         {currentPage && (
                             <>
-                                <div className="nitro-badge-leaderboard__info-card">
-                                    <img className="nitro-badge-leaderboard__info-icon" src={currentPage.emblem} alt="" />
-                                    <Text className="nitro-badge-leaderboard__info-text" small wrap>
+                                <div className="octane-badge-leaderboard__info-card">
+                                    <img className="octane-badge-leaderboard__info-icon" src={currentPage.emblem} alt="" />
+                                    <Text className="octane-badge-leaderboard__info-text" small wrap>
                                         {currentPage.info()}
                                     </Text>
                                 </div>
-                                <div className="nitro-badge-leaderboard__list">
+                                <div className="octane-badge-leaderboard__list">
                                     {pageEntries.map((entry, index) => (
                                         <LeaderboardRow
                                             key={`${currentPage.key}-${entry.userId}`}
@@ -296,10 +296,10 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                                         <LeaderboardRow entry={viewerEntry} emblem={currentPage.emblem} rowIndex={pageEntries.length} isCurrentUser={true} />
                                     )}
                                 </div>
-                                <img className="nitro-badge-leaderboard__divider" src={leaderboardDivider} alt="" />
-                                <Flex className="nitro-badge-leaderboard__footer" justifyContent="between" alignItems="center">
+                                <img className="octane-badge-leaderboard__divider" src={leaderboardDivider} alt="" />
+                                <Flex className="octane-badge-leaderboard__footer" justifyContent="between" alignItems="center">
                                     <button
-                                        className="nitro-badge-leaderboard__nav-button is-previous"
+                                        className="octane-badge-leaderboard__nav-button is-previous"
                                         disabled={clampedEntryPageIndex <= 0}
                                         onClick={() => setEntryPageIndex((value) => Math.max(0, value - 1))}
                                     >
@@ -312,7 +312,7 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                                         <Text className="opacity-70" small>{`${clampedEntryPageIndex + 1} / ${totalEntryPages}`}</Text>
                                     </Column>
                                     <button
-                                        className="nitro-badge-leaderboard__nav-button is-next"
+                                        className="octane-badge-leaderboard__nav-button is-next"
                                         disabled={clampedEntryPageIndex >= totalEntryPages - 1}
                                         onClick={() => setEntryPageIndex((value) => Math.min(totalEntryPages - 1, value + 1))}
                                     >
@@ -343,18 +343,18 @@ const LeaderboardRow: FC<LeaderboardRowProps> = (props) => {
     const rankClassName = entry.rank === 1 ? 'is-rank-1' : entry.rank === 2 ? 'is-rank-2' : entry.rank === 3 ? 'is-rank-3' : '';
 
     return (
-        <div className={`nitro-badge-leaderboard__row ${isCurrentUser ? 'is-current-user' : ''} ${rowIndex % 2 === 0 ? 'is-even' : 'is-odd'}`}>
-            <div className={`nitro-badge-leaderboard__rank ${rankClassName}`}>{entry.rank}</div>
-            <div className="nitro-badge-leaderboard__avatar">
+        <div className={`octane-badge-leaderboard__row ${isCurrentUser ? 'is-current-user' : ''} ${rowIndex % 2 === 0 ? 'is-even' : 'is-odd'}`}>
+            <div className={`octane-badge-leaderboard__rank ${rankClassName}`}>{entry.rank}</div>
+            <div className="octane-badge-leaderboard__avatar">
                 <LayoutAvatarImageView figure={entry.figure} headOnly direction={2} />
             </div>
-            <Text className="nitro-badge-leaderboard__username" bold>
+            <Text className="octane-badge-leaderboard__username" bold>
                 {entry.username}
             </Text>
-            <Text className="nitro-badge-leaderboard__score" bold>
+            <Text className="octane-badge-leaderboard__score" bold>
                 {entry.score}
             </Text>
-            <img className="nitro-badge-leaderboard__row-emblem" src={emblem} alt="" />
+            <img className="octane-badge-leaderboard__row-emblem" src={emblem} alt="" />
         </div>
     );
 };

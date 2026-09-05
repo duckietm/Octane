@@ -1,4 +1,4 @@
-.nitro-inventory-window {
+.octane-inventory-window {
     --inv-blue: #418db0;
     --inv-beige: #dfdfdf;
     --inv-tab: #b6bec5;
@@ -15,11 +15,11 @@
     background: var(--inv-beige) !important;
 }
 
-.nitro-inventory-window .nitro-inventory-tabs-shell {
+.octane-inventory-window .octane-inventory-tabs-shell {
     gap: 4px;
 }
 
-.nitro-inventory-window .nitro-inventory-tab-icon {
+.octane-inventory-window .octane-inventory-tab-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -28,51 +28,51 @@
     line-height: 1;
 }
 
-.nitro-inventory-window .nitro-inventory-body {
+.octane-inventory-window .octane-inventory-body {
     background: var(--inv-beige);
 }
 
-.nitro-inventory-window .nitro-inventory-filter-bar {
+.octane-inventory-window .octane-inventory-filter-bar {
     width: 100%;
     background: #fff;
     border: 2px solid var(--inv-border);
     border-radius: 4px;
 }
 
-.nitro-inventory-window .nitro-inventory-filter-bar.is-badges {
+.octane-inventory-window .octane-inventory-filter-bar.is-badges {
     width: min(320px, 100%);
 }
 
-.nitro-inventory-window .nitro-inventory-filter-bar select {
+.octane-inventory-window .octane-inventory-filter-bar select {
     background: var(--inv-beige);
     border: 2px solid var(--inv-border) !important;
     border-radius: 4px;
     font-weight: 700;
 }
 
-.nitro-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
+.octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
     background-color: var(--inv-beige) !important;
     color: #111 !important;
 }
 
-.nitro-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
+.octane-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
     border-color: var(--inv-line) !important;
 }
 
-.nitro-inventory-window .bg-card-grid-item-active {
+.octane-inventory-window .bg-card-grid-item-active {
     background-color: #fff !important;
 }
 
-.nitro-inventory-window .border-card-grid-item-active {
+.octane-inventory-window .border-card-grid-item-active {
     border-color: var(--inv-border) !important;
     box-shadow: 0 0 0 2px var(--inv-accent);
 }
 
-.nitro-inventory-window :where(.text-muted, .text-dark) {
+.octane-inventory-window :where(.text-muted, .text-dark) {
     color: #55544e !important;
 }
 
-.nitro-inventory-window :where(input, select, textarea) {
+.octane-inventory-window :where(input, select, textarea) {
     min-height: 22px;
     border: 1px solid var(--inv-border) !important;
     border-radius: 3px !important;
@@ -82,25 +82,25 @@
     font-size: 11px !important;
 }
 
-.nitro-inventory-window :where(input:focus, select:focus, textarea:focus) {
+.octane-inventory-window :where(input:focus, select:focus, textarea:focus) {
     border-color: var(--inv-accent) !important;
     box-shadow: 0 0 0 2px rgba(74, 125, 140, 0.28), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
     outline: none !important;
 }
 
-.nitro-inventory-window .bg-red-700 {
+.octane-inventory-window .bg-red-700 {
     background-color: #fff !important;
     color: var(--inv-accent) !important;
     border-color: #75746e !important;
 }
 
-.nitro-inventory-window .shadow-room-previewer {
+.octane-inventory-window .shadow-room-previewer {
     background-color: #fff;
     border: 2px solid var(--inv-line);
 }
 
-.nitro-inventory-window .nitro-inventory-btn-place,
-.nitro-inventory-window .nitro-inventory-btn-sell {
+.octane-inventory-window .octane-inventory-btn-place,
+.octane-inventory-window .octane-inventory-btn-sell {
     border: 2px solid var(--inv-border) !important;
     border-radius: 4px;
     color: #fff !important;
@@ -108,30 +108,30 @@
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
-.nitro-inventory-window .nitro-inventory-btn-place {
+.octane-inventory-window .octane-inventory-btn-place {
     background: var(--inv-place) !important;
     box-shadow: inset -2px -2px 0 var(--inv-place-dark), inset 2px 2px 0 var(--inv-place-light);
 }
 
-.nitro-inventory-window .nitro-inventory-btn-place:hover {
+.octane-inventory-window .octane-inventory-btn-place:hover {
     background: #67b94e !important;
 }
 
-.nitro-inventory-window .nitro-inventory-btn-sell {
+.octane-inventory-window .octane-inventory-btn-sell {
     background: var(--inv-sell) !important;
     box-shadow: inset -2px -2px 0 var(--inv-sell-dark), inset 2px 2px 0 var(--inv-sell-light);
 }
 
-.nitro-inventory-window .nitro-inventory-btn-sell:hover {
+.octane-inventory-window .octane-inventory-btn-sell:hover {
     background: #db4d40 !important;
 }
 
-.nitro-inventory-preview-btn {
+.octane-inventory-preview-btn {
     display: none;
 }
 
 @media (max-width: 1024px) and (min-width: 641px) {
-    .nitro-inventory-window {
+    .octane-inventory-window {
         width: min(calc(100vw - 24px), 640px) !important;
         min-width: 0 !important;
         max-width: calc(100vw - 24px) !important;
@@ -142,7 +142,7 @@
 }
 
 @media (max-width: 640px) {
-    .draggable-window:has(> .nitro-inventory-window) {
+    .draggable-window:has(> .octane-inventory-window) {
         inset: 0 !important;
         left: 0 !important;
         right: 0 !important;
@@ -153,7 +153,7 @@
         transform: none !important;
     }
 
-    .nitro-card-shell.nitro-inventory-window {
+    .octane-card-shell.octane-inventory-window {
         width: calc(100% - 40px) !important;
         min-width: 0 !important;
         max-width: calc(100% - 40px) !important;
@@ -163,44 +163,44 @@
         margin: 8px auto 0 auto !important;
     }
 
-    .nitro-inventory-window .nitro-inventory-tabs-shell {
+    .octane-inventory-window .octane-inventory-tabs-shell {
         flex-wrap: nowrap;
         overflow: hidden;
     }
 
-    .nitro-inventory-window .nitro-inventory-tabs-shell .nitro-card-tab-item {
+    .octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item {
         flex: 1 1 0;
         min-width: 0;
         padding: 8px 0;
         justify-content: center;
     }
 
-    .nitro-inventory-window .nitro-inventory-tab-label {
+    .octane-inventory-window .octane-inventory-tab-label {
         display: none;
     }
 
-    .nitro-inventory-window .nitro-inventory-tab-icon {
+    .octane-inventory-window .octane-inventory-tab-icon {
         margin-right: 0;
         font-size: 17px;
     }
 
-    .nitro-inventory-window .grid.grid-cols-12 {
+    .octane-inventory-window .grid.grid-cols-12 {
         grid-template-columns: minmax(0, 1fr) !important;
         grid-template-rows: minmax(0, 1fr) auto !important;
     }
 
-    .nitro-inventory-window .grid.grid-cols-12 > .col-span-7,
-    .nitro-inventory-window .grid.grid-cols-12 > .col-span-5 {
+    .octane-inventory-window .grid.grid-cols-12 > .col-span-7,
+    .octane-inventory-window .grid.grid-cols-12 > .col-span-5 {
         grid-column: 1 / -1 !important;
     }
 
-    .nitro-inventory-window .nitro-inventory-btn-place,
-    .nitro-inventory-window .nitro-inventory-btn-sell {
+    .octane-inventory-window .octane-inventory-btn-place,
+    .octane-inventory-window .octane-inventory-btn-sell {
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
     }
 
-    .nitro-inventory-window .nitro-inventory-preview-btn {
+    .octane-inventory-window .octane-inventory-preview-btn {
         position: absolute;
         top: 6px;
         z-index: 4;
@@ -217,15 +217,15 @@
         cursor: pointer;
     }
 
-    .nitro-inventory-window .nitro-inventory-preview-btn:active {
+    .octane-inventory-window .octane-inventory-preview-btn:active {
         background: rgba(0, 0, 0, 0.85);
     }
 
-    .nitro-inventory-window .nitro-inventory-preview-rotate {
+    .octane-inventory-window .octane-inventory-preview-rotate {
         left: 6px;
     }
 
-    .nitro-inventory-window .nitro-inventory-preview-state {
+    .octane-inventory-window .octane-inventory-preview-state {
         right: 6px;
     }
 }

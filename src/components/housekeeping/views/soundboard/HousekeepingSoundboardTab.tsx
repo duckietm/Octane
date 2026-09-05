@@ -1,4 +1,4 @@
-import { GetSoundManager, ISoundboardCatalogSound } from '@nitrots/nitro-renderer';
+import { GetSoundManager, ISoundboardCatalogSound } from '@octane/renderer';
 import { DragEvent, FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { useSoundboardCatalog, useSoundboardManifest } from '../../../../hooks';

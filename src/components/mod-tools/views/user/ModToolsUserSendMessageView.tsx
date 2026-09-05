@@ -1,8 +1,8 @@
-import { ModMessageMessageComposer } from '@nitrots/nitro-renderer';
+import { ModMessageMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { FaEnvelope, FaPaperPlane, FaUser } from 'react-icons/fa';
 import { ISelectedUser, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useNotification } from '../../../../hooks';
 
 interface ModToolsUserSendMessageViewProps {
@@ -31,13 +31,13 @@ export const ModToolsUserSendMessageView: FC<ModToolsUserSendMessageViewProps> =
     };
 
     return (
-        <NitroCardView
-            className="nitro-mod-tools-user-message min-w-0 w-[min(420px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-mod-tools-user-message min-w-0 w-[min(420px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
-            <NitroCardHeaderView headerText={LocalizeText('modtools.user.message.title')} onCloseClick={() => onCloseClick()} />
-            <NitroCardContentView className="text-black" gap={2}>
+            <OctaneCardHeaderView headerText={LocalizeText('modtools.user.message.title')} onCloseClick={() => onCloseClick()} />
+            <OctaneCardContentView className="text-black" gap={2}>
                 {/* Recipient header */}
                 <div className="flex items-center gap-2 bg-gradient-to-r from-sky-50 to-transparent rounded p-2 border border-sky-100">
                     <FaEnvelope className="text-sky-600 shrink-0" size={16} />
@@ -72,7 +72,7 @@ export const ModToolsUserSendMessageView: FC<ModToolsUserSendMessageViewProps> =
                 <Button disabled={!canSend} fullWidth gap={1} variant="primary" onClick={sendMessage}>
                     <FaPaperPlane size={12} /> {LocalizeText('modtools.user.message.send')}
                 </Button>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

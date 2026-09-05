@@ -1,7 +1,7 @@
-import { GetRoomEngine, GetSessionDataManager, RoomEngineTriggerWidgetEvent, RoomObjectVariable, StringDataType } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, GetSessionDataManager, RoomEngineTriggerWidgetEvent, RoomObjectVariable, StringDataType } from '@octane/renderer';
 import { useState } from 'react';
 import { LocalizeBadgeDescription, LocalizeBadgeName, LocalizeText } from '../../../../api';
-import { useNitroEvent } from '../../../events';
+import { useOctaneEvent } from '../../../events';
 import { useNotification } from '../../../notification';
 import { useFurniRemovedEvent } from '../../engine';
 
@@ -25,7 +25,7 @@ const useFurnitureBadgeDisplayWidgetState = () => {
         setSenderName('');
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(
         [RoomEngineTriggerWidgetEvent.REQUEST_BADGE_DISPLAY_ENGRAVING, RoomEngineTriggerWidgetEvent.REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING],
         (event) => {
             const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
@@ -46,7 +46,7 @@ const useFurnitureBadgeDisplayWidgetState = () => {
         }
     );
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_ACHIEVEMENT_RESOLUTION_FAILED, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_ACHIEVEMENT_RESOLUTION_FAILED, (event) => {
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
 
         if (!roomObject) return;

@@ -189,13 +189,13 @@
     background: transparent !important;
 }
 
-.has-classic-scrollbar .nitro-classic-scroll-area-viewport,
-.has-classic-scrollbar .nitro-avatar-editor .nitro-avatar-editor-subcategories {
+.has-classic-scrollbar .octane-classic-scroll-area-viewport,
+.has-classic-scrollbar .octane-avatar-editor .octane-avatar-editor-subcategories {
     scrollbar-width: none !important;
 }
 
-.has-classic-scrollbar .nitro-classic-scroll-area-viewport::-webkit-scrollbar,
-.has-classic-scrollbar .nitro-avatar-editor .nitro-avatar-editor-subcategories::-webkit-scrollbar {
+.has-classic-scrollbar .octane-classic-scroll-area-viewport::-webkit-scrollbar,
+.has-classic-scrollbar .octane-avatar-editor .octane-avatar-editor-subcategories::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;

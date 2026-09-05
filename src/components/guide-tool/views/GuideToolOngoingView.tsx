@@ -5,12 +5,12 @@ import {
     GuideSessionMessageMessageComposer,
     GuideSessionRequesterRoomMessageEvent,
     GuideSessionResolvedMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { GuideToolMessageGroup, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, Text } from '../../../common';
 import { useMessageEvent } from '../../../hooks';
-import { classNames, NitroInput } from '../../../layout';
+import { classNames, OctaneInput } from '../../../layout';
 
 interface GuideToolOngoingViewProps {
     isGuide: boolean;
@@ -72,7 +72,7 @@ export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
 
     return (
         <Column fullHeight>
-            <Flex alignItems="center" className="nitro-card-panel p-2" gap={1} justifyContent="between">
+            <Flex alignItems="center" className="octane-card-panel p-2" gap={1} justifyContent="between">
                 {isGuide && (
                     <div className="relative inline-flex align-middle">
                         <Button onClick={visit}>{LocalizeText('guide.help.request.guide.ongoing.visit.button')}</Button>
@@ -89,7 +89,7 @@ export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
                     {LocalizeText('guide.help.common.report.link')}
                 </Button>
             </Flex>
-            <Column className="nitro-card-panel p-2 chat-messages" gap={1} overflow="hidden">
+            <Column className="octane-card-panel p-2 chat-messages" gap={1} overflow="hidden">
                 <Column overflow="auto">
                     {messageGroups.map((group, index) => {
                         return (
@@ -99,7 +99,7 @@ export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
                                 </div>
                                 <div
                                     className={
-                                        'nitro-card-row text-black border-radius mb-2 py-1 px-2 messages-group-' + (isOwnChat(group.userId) ? 'right' : 'left')
+                                        'octane-card-row text-black border-radius mb-2 py-1 px-2 messages-group-' + (isOwnChat(group.userId) ? 'right' : 'left')
                                     }
                                 >
                                     <Text bold>
@@ -129,7 +129,7 @@ export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
             </Column>
             <div className="flex flex-col gap-1">
                 <div className="flex gap-1">
-                    <NitroInput
+                    <OctaneInput
                         placeholder={LocalizeText('guide.help.request.guide.ongoing.input.empty', ['name'], [userName])}
                         type="text"
                         value={messageText}

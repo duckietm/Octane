@@ -1,5 +1,5 @@
-import { GetRoomEngine, GetSessionDataManager, IFurnitureData, IObjectData, IProductData } from '@nitrots/nitro-renderer';
-import { GetConfigurationValue } from '../nitro';
+import { GetRoomEngine, GetSessionDataManager, IFurnitureData, IObjectData, IProductData } from '@octane/renderer';
+import { GetConfigurationValue } from '../octane';
 import { GetPixelEffectIcon, GetSubscriptionProductIcon } from './CatalogUtilities';
 import { IProduct } from './IProduct';
 import { IPurchasableOffer } from './IPurchasableOffer';

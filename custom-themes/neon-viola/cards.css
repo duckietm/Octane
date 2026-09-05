@@ -1,24 +1,24 @@
-/* Tema Neon Viola — pezzo "cards" (finestre / NitroCard).
+/* Tema Neon Viola — pezzo "cards" (finestre / OctaneCard).
    Ricolora header + cornice delle finestre. Caricato DOPO il CSS base, quindi
    usa !important per vincere. Tocca solo la cornice/header (non lo sfondo del
    contenuto) per non rovinare la leggibilita' del testo. */
 
-.nitro-card-shell:not(.nitro-wired) {
+.octane-card-shell:not(.octane-wired) {
     border-color: #7c3aed !important;
     box-shadow: 0 0 14px rgba(124, 58, 237, .55), 0 8px 22px rgba(0, 0, 0, .4) !important;
 }
 
-.nitro-card-shell:not(.nitro-wired) .nitro-card-header-shell {
+.octane-card-shell:not(.octane-wired) .octane-card-header-shell {
     background: linear-gradient(180deg, #9333ea 0%, #6d28d9 100%) !important;
     border-color: #a855f7 !important;
     border-bottom-color: #2a0a4a !important;
 }
 
-.nitro-card-shell:not(.nitro-wired) .nitro-card-title {
+.octane-card-shell:not(.octane-wired) .octane-card-title {
     color: #fff !important;
     text-shadow: 0 0 6px #c084fc, 0 1px 0 #3b0764 !important;
 }
 
-.nitro-card-shell:not(.nitro-wired) .nitro-card-tabs-shell .nitro-card-tab-item-active {
+.octane-card-shell:not(.octane-wired) .octane-card-tabs-shell .octane-card-tab-item-active {
     box-shadow: inset 0 -2px 0 #a855f7 !important;
 }
