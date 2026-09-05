@@ -140,4 +140,11 @@ export class WiredActionLayoutCode {
     public static ALL_USERS_LEAVE_TEAM: number = 124;
     /** The official override-height action: a two-way choice and a 0..8000 thousandths slider. */
     public static OVERRIDE_HEIGHT: number = 125;
+
+    /**
+     * Mints and serves a room variable over HTTP; the emulator registers it on
+     * wf_xtra_var_web_api. 126 and 127 are where the array boxes land, so this leaves those
+     * seats empty rather than have the two collide on whichever merges second.
+     */
+    public static VARIABLE_WEB_API_EXTRA: number = 128;
 }

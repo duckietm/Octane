@@ -27,6 +27,7 @@ import { WiredExtraTextInputVariableView } from '../extras/WiredExtraTextInputVa
 import { WiredExtraTextOutputFurniNameView } from '../extras/WiredExtraTextOutputFurniNameView';
 import { WiredExtraTextOutputUsernameView } from '../extras/WiredExtraTextOutputUsernameView';
 import { WiredExtraTextOutputVariableView } from '../extras/WiredExtraTextOutputVariableView';
+import { WiredExtraVariableWebApiView } from '../extras/WiredExtraVariableWebApiView';
 import { WiredExtraTimeUtilitiesView } from '../extras/WiredExtraTimeUtilitiesView';
 import { WiredExtraUnseenView } from '../extras/WiredExtraUnseenView';
 import { WiredExtraUserVariableView } from '../extras/WiredExtraUserVariableView';
@@ -279,6 +280,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredExtraVariableTextConnectorView />;
         case WiredActionLayoutCode.TEXT_OUTPUT_VARIABLE_EXTRA:
             return <WiredExtraTextOutputVariableView />;
+        case WiredActionLayoutCode.VARIABLE_WEB_API_EXTRA:
+            return <WiredExtraVariableWebApiView />;
         case WiredActionLayoutCode.USER_VARIABLE_EXTRA:
             return <WiredExtraUserVariableView />;
         case WiredActionLayoutCode.FURNI_VARIABLE_EXTRA:
