@@ -81,4 +81,10 @@ export class WiredConditionlayout {
     public static USER_RANGE: number = 57;
     public static FURNI_RANGE: number = 58;
     public static FURNI_PROPERTY: number = 59;
+
+    /**
+     * Ours: compares the level the level-up add-on derives from a user variable. 60 is where
+     * the array condition lands, so this takes 61 and leaves that seat empty.
+     */
+    public static USER_LEVEL: number = 61;
 }

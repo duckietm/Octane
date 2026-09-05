@@ -26,6 +26,7 @@ import { WiredConditionTeamHasRankView } from './WiredConditionTeamHasRankView';
 import { WiredConditionTeamHasScoreView } from './WiredConditionTeamHasScoreView';
 import { WiredConditionTimeElapsedLessView } from './WiredConditionTimeElapsedLessView';
 import { WiredConditionTimeElapsedMoreView } from './WiredConditionTimeElapsedMoreView';
+import { WiredConditionUserLevelView } from './WiredConditionUserLevelView';
 import { WiredConditionTriggererMatchView } from './WiredConditionTriggererMatchView';
 import { WiredConditionTriggerFurniAdjacentStateView } from './WiredConditionTriggerFurniAdjacentStateView';
 import { WiredConditionUserCountInRoomView } from './WiredConditionUserCountInRoomView';
@@ -86,6 +87,8 @@ export const WiredConditionLayoutView = (code: number) => {
             return <WiredConditionHasAltitudeView variant="userRange" />;
         case WiredConditionlayout.FURNI_RANGE:
             return <WiredConditionHasAltitudeView variant="furniRange" />;
+        case WiredConditionlayout.USER_LEVEL:
+            return <WiredConditionUserLevelView />;
         case WiredConditionlayout.FURNI_PROPERTY:
             return <WiredConditionHasAltitudeView variant="furniProperty" />;
         case WiredConditionlayout.USER_TAG:
