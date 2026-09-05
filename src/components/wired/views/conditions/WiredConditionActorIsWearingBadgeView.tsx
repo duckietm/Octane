@@ -6,11 +6,26 @@ import { NitroInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
+/**
+ * What the text field holds. The badge, tag and motto conditions all store a string plus the same
+ * user source and quantifier, so they share this dialog — but a tag is not a badge code and neither
+ * is a motto, and each has its own length limit. `null` is for the gender and room-rights conditions,
+ * whose answer comes from the user rather than from anything typed: they hide the field entirely.
+ */
+type WiredTextField = 'badge' | 'tag' | 'motto';
+
+const TEXT_FIELDS: Record<WiredTextField, { key: string; fallback: string; maxLength?: number }> = {
+    badge: { key: 'wiredfurni.params.badgecode', fallback: 'Badge code' },
+    tag: { key: 'wiredfurni.params.tag', fallback: 'Tag', maxLength: 38 },
+    motto: { key: 'wiredfurni.params.motto_contains', fallback: 'Motto contains', maxLength: 64 }
+};
+
 interface WiredConditionActorIsWearingBadgeViewProps {
     negative?: boolean;
+    field?: WiredTextField | null;
 }
 
-export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWearingBadgeViewProps> = ({ negative = false }) => {
+export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWearingBadgeViewProps> = ({ negative = false, field = 'badge' }) => {
     const [badge, setBadge] = useState('');
     const [quantifier, setQuantifier] = useState(1);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
@@ -19,8 +34,10 @@ export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWear
         return 0;
     });
 
+    const text = field ? TEXT_FIELDS[field] : null;
+
     const save = () => {
-        setStringParam(badge);
+        setStringParam(text ? badge : '');
         setIntParams([userSource, quantifier]);
     };
 
@@ -53,10 +70,17 @@ export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWear
                     </label>
                 ))}
             </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.badgecode', 'Badge code')}</Text>
-                <NitroInput type="text" value={badge} onChange={(event) => setBadge(event.target.value)} />
-            </div>
+            {text && (
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback(text.key, text.fallback)}</Text>
+                    <NitroInput
+                        maxLength={text.maxLength}
+                        type="text"
+                        value={badge}
+                        onChange={(event) => setBadge(event.target.value)}
+                    />
+                </div>
+            )}
         </WiredConditionBaseView>
     );
 };

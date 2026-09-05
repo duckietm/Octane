@@ -12,7 +12,7 @@ export const TABS: Array<{ key: WiredToolsTab; label: string }> = [
     { key: 'settings', label: 'Settings' }
 ];
 
-export const MONITOR_LOG_ORDER: string[] = ['EXECUTION_CAP', 'DELAYED_EVENTS_CAP', 'EXECUTOR_OVERLOAD', 'MARKED_AS_HEAVY', 'KILLED', 'RECURSION_TIMEOUT'];
+export const MONITOR_LOG_ORDER: string[] = ['EXECUTION_CAP', 'DELAYED_EVENTS_CAP', 'EXECUTOR_OVERLOAD', 'MARKED_AS_HEAVY', 'KILLED', 'RECURSION_TIMEOUT', 'NO_TARGETS', 'UNREACHABLE'];
 
 export const WIRED_MONITOR_ACTION_FETCH = 0;
 export const WIRED_MONITOR_ACTION_CLEAR_LOGS = 1;
@@ -22,6 +22,24 @@ export const WIRED_INSPECTION_REFRESH_MS = 50;
 export const WIRED_CLOCK_REFRESH_MS = 50;
 
 export const MONITOR_ERROR_INFO: Record<string, { description: string[]; severity: string; title: string }> = {
+    UNREACHABLE: {
+        title: 'UNREACHABLE',
+        severity: 'WARNING',
+        description: [
+            'A furni in this room is waiting on something the room has no way of producing, so it will sit there doing nothing.',
+            'A highscore board is the usual case: it only fills when a game ends, and a game can only end through a game timer. Without one in the room the board stays empty forever.',
+            'Nothing has failed. The furni is fine and so is the engine - the room is simply missing the piece that would feed it.'
+        ]
+    },
+    NO_TARGETS: {
+        title: 'NO_TARGETS',
+        severity: 'WARNING',
+        description: [
+            'A chain fired and one of its effects had nothing to act on, so it did nothing.',
+            'The reason names which source came back empty. "The triggering item" is empty when the trigger is not about a furni at all; "the selector" is empty when no selector picked anything; "the picked furni" is empty when the chosen furni have since been taken up.',
+            'This is not an engine error. It means the setup asked for something that was not there, which until now was the one way a chain could fail in complete silence.'
+        ]
+    },
     EXECUTION_CAP: {
         title: 'EXECUTION_CAP',
         severity: 'ERROR',

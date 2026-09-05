@@ -112,4 +112,32 @@ export class WiredActionLayoutCode {
     public static CONTRACT_TRADE: number = 112;
     public static CUSTOM_CONTRACT: number = 113;
     public static CHANGE_OPACITY: number = 114;
+    /**
+     * Walking to a furni borrowed TELEPORT, whose window offers a "teleport instantly" checkbox that
+     * this effect never reads — it walks. Same three slots, one control fewer.
+     */
+    public static WALK_TO_FURNI: number = 115;
+    /** Sit, lie down, fast walk: they only need to know which users, not a kick message. */
+    public static USER_TARGET: number = 116;
+    /** Move a user N tiles — the fourth slot the move/rotate window never sent. */
+    public static MOVE_USER_TILES: number = 117;
+    /**
+     * The shapes that borrowed the chat composer. They store one string and a user source like the
+     * chat effects do, but the bubble style and the visibility choice mean nothing to them, and what
+     * the textarea held was never a message.
+     */
+    public static EFFECT_AMOUNT: number = 118;
+    public static EFFECT_BADGE: number = 119;
+    public static EFFECT_TAG: number = 120;
+    public static EFFECT_ID: number = 121;
+    public static EFFECT_MESSAGE: number = 122;
+    public static EFFECT_TEXT: number = 123;
+    /**
+     * Everyone in the room leaves their game, so there is nobody to pick. The stored source still
+     * decides whether the stack needs a triggering user, so it keeps its slot - it is just no longer
+     * a question the window asks.
+     */
+    public static ALL_USERS_LEAVE_TEAM: number = 124;
+    /** The official override-height action: a two-way choice and a 0..8000 thousandths slider. */
+    public static OVERRIDE_HEIGHT: number = 125;
 }

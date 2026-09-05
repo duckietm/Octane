@@ -48,4 +48,37 @@ export class WiredConditionlayout {
     public static TRG_FURNI_ADJACENT_STATE: number = 46;
     public static CHEST_HAS_ITEMS: number = 47;
     public static CHEST_HAS_ITEM_TYPE: number = 48;
+    /**
+     * A condition answered by the user themselves — gender, room rights. Same dialog as the badge
+     * conditions minus the badge-code field, which those boxes showed and never read.
+     */
+    public static USER_ATTRIBUTE: number = 49;
+    public static NOT_USER_ATTRIBUTE: number = 50;
+    /**
+     * A threshold on something the user holds — inventory items, credits, diamonds, duckets. Same
+     * dialog as the team score minus the team colour and the comparison operator, neither of which
+     * those boxes consult, and with the amount ceiling the server actually enforces.
+     */
+    public static USER_AMOUNT: number = 51;
+    /**
+     * A boolean state the user is in — frozen. Same dialog as the wearing-effect conditions minus the
+     * effect id, which those boxes show and never read.
+     */
+    public static USER_STATE: number = 52;
+    public static NOT_USER_STATE: number = 53;
+    /**
+     * Text read off the user that is not a badge code. The field is genuinely used by these boxes —
+     * it was only labelled "Badge code", with the badge's length limit instead of its own.
+     */
+    public static USER_TAG: number = 54;
+    public static NOT_USER_TAG: number = 55;
+    public static USER_MOTTO: number = 56;
+    /**
+     * The three shapes that borrowed the altitude dialog. They inherited its counter-only furni gate,
+     * which refuses every furni that is not a game counter — and with it a radius labelled as an
+     * altitude, a furni picker where a user source is meant, and a comparison two of them never read.
+     */
+    public static USER_RANGE: number = 57;
+    public static FURNI_RANGE: number = 58;
+    public static FURNI_PROPERTY: number = 59;
 }
