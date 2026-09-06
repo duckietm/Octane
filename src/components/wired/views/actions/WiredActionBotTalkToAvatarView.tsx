@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredTextCounter, WiredTextFormattingHelp } from '../common/WiredTextFormattingHelp';
+import { WiredBubbleWidthSelect } from '../WiredBubbleWidthSelect';
 import { BOT_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -14,6 +15,7 @@ export const WiredActionBotTalkToAvatarView: FC<{}> = (props) => {
     const [message, setMessage] = useState('');
     const [talkMode, setTalkMode] = useState(-1);
     const [botSource, setBotSource] = useState<number>(100);
+    const [bubbleWidth, setBubbleWidth] = useState<number>(-1);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
     const maxMessageLength = 200;
     const [userSource, setUserSource] = useState<number>(() => {
@@ -23,7 +25,7 @@ export const WiredActionBotTalkToAvatarView: FC<{}> = (props) => {
 
     const save = () => {
         setStringParam((botSource === 100 ? botName : '') + WIRED_STRING_DELIMETER + message);
-        setIntParams([talkMode, userSource, botSource]);
+        setIntParams([talkMode, userSource, botSource, bubbleWidth]);
     };
 
     useEffect(() => {
@@ -38,6 +40,7 @@ export const WiredActionBotTalkToAvatarView: FC<{}> = (props) => {
         setBotSource(
             trigger.intData.length > 2 ? normalizeBotSource(trigger.intData[2], nextBotName.length > 0) : normalizeBotSource(-1, nextBotName.length > 0)
         );
+        setBubbleWidth(trigger.intData.length > 3 ? trigger.intData[3] : -1);
     }, [trigger]);
 
     return (
@@ -101,6 +104,7 @@ export const WiredActionBotTalkToAvatarView: FC<{}> = (props) => {
                     <Text>{LocalizeText('wiredfurni.params.whisper')}</Text>
                 </div>
             </div>
+            <WiredBubbleWidthSelect value={bubbleWidth} onChange={setBubbleWidth} />
         </WiredActionBaseView>
     );
 };

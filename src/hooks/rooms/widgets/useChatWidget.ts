@@ -228,6 +228,7 @@ const useChatWidgetState = () => {
             imageUrl,
             color
         );
+        chatMessage.bubbleWidthOverride = event.bubbleWidthOverride ?? -1;
 
         if (outgoingTranslation) {
             applyTranslationToBubble(

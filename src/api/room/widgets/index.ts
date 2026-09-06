@@ -23,6 +23,7 @@ export * from './PetSupplementEnum';
 export * from './PostureTypeEnum';
 export * from './RoomDimmerPreset';
 export * from './RoomObjectItem';
+export * from './resolveChatBubbleWidth';
 export * from './UseProductItem';
 export * from './VoteValue';
 export * from './YoutubeVideoPlaybackStateEnum';

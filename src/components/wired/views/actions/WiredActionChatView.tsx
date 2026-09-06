@@ -1,9 +1,10 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { localizeWithFallback, LocalizeText, WiredActionLayoutCode, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredActionLayoutCode, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredTextCounter, WiredTextFormattingHelp } from '../common/WiredTextFormattingHelp';
+import { WiredBubbleWidthSelect } from '../WiredBubbleWidthSelect';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -28,10 +29,7 @@ const clampShowMessage = (value: string) => {
  *
  * Each entry says what the box really holds. `chat` is the original composer.
  */
-const FIELDS: Record<
-    number,
-    { key: string; fallback: string; numeric?: boolean; multiline?: boolean; maxLength?: number }
-> = {
+const FIELDS: Record<number, { key: string; fallback: string; numeric?: boolean; multiline?: boolean; maxLength?: number }> = {
     [WiredActionLayoutCode.EFFECT_AMOUNT]: { key: 'wiredfurni.params.amount', fallback: 'Amount', numeric: true },
     [WiredActionLayoutCode.EFFECT_BADGE]: { key: 'wiredfurni.params.badgecode', fallback: 'Badge code', maxLength: 50 },
     [WiredActionLayoutCode.EFFECT_TAG]: { key: 'wiredfurni.params.tag', fallback: 'Tag', maxLength: 38 },
@@ -44,6 +42,7 @@ export const WiredActionChatView: FC<{}> = (props) => {
     const [message, setMessage] = useState('');
     const [visibilitySelection, setVisibilitySelection] = useState<number>(0);
     const [bubbleStyle, setBubbleStyle] = useState<number>(DEFAULT_SHOW_MESSAGE_STYLE_ID);
+    const [bubbleWidth, setBubbleWidth] = useState<number>(-1);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
     const [userSource, setUserSource] = useState<number>(() => {
         if (trigger?.intData?.length >= 1) return trigger.intData[0];
@@ -59,7 +58,8 @@ export const WiredActionChatView: FC<{}> = (props) => {
         // Slots 1 and 2 keep their places so nothing about how these effects store changes; the two
         // controls that fill them simply stop being offered where they mean nothing.
         setStringParam(isChat || field.multiline ? clampShowMessage(message) : message);
-        setIntParams([userSource, visibilitySelection, bubbleStyle]);
+        // The width is the chat box's fourth slot; the six effect boxes never read past the first.
+        setIntParams(isChat ? [userSource, visibilitySelection, bubbleStyle, bubbleWidth] : [userSource, visibilitySelection, bubbleStyle]);
     };
 
     useEffect(() => {
@@ -70,6 +70,7 @@ export const WiredActionChatView: FC<{}> = (props) => {
         else setVisibilitySelection(0);
         if (trigger.intData.length >= 3 && SHOW_MESSAGE_STYLE_IDS.includes(trigger.intData[2])) setBubbleStyle(trigger.intData[2]);
         else setBubbleStyle(DEFAULT_SHOW_MESSAGE_STYLE_ID);
+        setBubbleWidth(trigger.intData.length >= 4 ? trigger.intData[3] : -1);
     }, [trigger]);
 
     return (
@@ -104,44 +105,45 @@ export const WiredActionChatView: FC<{}> = (props) => {
             </div>
             {isChat && (
                 <>
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.show_message.visibility_selection.title')}</Text>
-                    <div className="flex items-center gap-1">
-                        <input
-                            checked={visibilitySelection === 0}
-                            className="form-check-input"
-                            name="showMessageVisibilitySelection"
-                            type="radio"
-                            onChange={() => setVisibilitySelection(0)}
-                        />
-                        <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.0')}</Text>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <input
-                            checked={visibilitySelection === 1}
-                            className="form-check-input"
-                            name="showMessageVisibilitySelection"
-                            type="radio"
-                            onChange={() => setVisibilitySelection(1)}
-                        />
-                        <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.1')}</Text>
-                    </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.show_message.style_selection.title')}</Text>
-                    <div className="flex items-center gap-2">
-                        <div className="bubble-container relative w-[50px] shrink-0">
-                            <div className={`relative min-h-[26px] chat-bubble bubble-${bubbleStyle}`} />
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.show_message.visibility_selection.title')}</Text>
+                        <div className="flex items-center gap-1">
+                            <input
+                                checked={visibilitySelection === 0}
+                                className="form-check-input"
+                                name="showMessageVisibilitySelection"
+                                type="radio"
+                                onChange={() => setVisibilitySelection(0)}
+                            />
+                            <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.0')}</Text>
                         </div>
-                        <select className="form-select form-select-sm" value={bubbleStyle} onChange={(event) => setBubbleStyle(Number(event.target.value))}>
-                            {bubbleStyleIds.map((styleId) => (
-                                <option key={styleId} value={styleId}>
-                                    {LocalizeText(`wiredfurni.params.show_message.style_selection.${styleId}`)}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="flex items-center gap-1">
+                            <input
+                                checked={visibilitySelection === 1}
+                                className="form-check-input"
+                                name="showMessageVisibilitySelection"
+                                type="radio"
+                                onChange={() => setVisibilitySelection(1)}
+                            />
+                            <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.1')}</Text>
+                        </div>
                     </div>
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.show_message.style_selection.title')}</Text>
+                        <div className="flex items-center gap-2">
+                            <div className="bubble-container relative w-[50px] shrink-0">
+                                <div className={`relative min-h-[26px] chat-bubble bubble-${bubbleStyle}`} />
+                            </div>
+                            <select className="form-select form-select-sm" value={bubbleStyle} onChange={(event) => setBubbleStyle(Number(event.target.value))}>
+                                {bubbleStyleIds.map((styleId) => (
+                                    <option key={styleId} value={styleId}>
+                                        {LocalizeText(`wiredfurni.params.show_message.style_selection.${styleId}`)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <WiredBubbleWidthSelect value={bubbleWidth} onChange={setBubbleWidth} />
                 </>
             )}
         </WiredActionBaseView>
