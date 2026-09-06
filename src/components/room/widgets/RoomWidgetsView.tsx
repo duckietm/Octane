@@ -25,10 +25,8 @@ import { RoomKeybindView } from './RoomKeybindView';
 import { RoomFilterWordsWidgetView } from './room-filter-words/RoomFilterWordsWidgetView';
 import { RoomThumbnailWidgetView } from './room-thumbnail/RoomThumbnailWidgetView';
 import { RoomToolsWidgetView } from './room-tools/RoomToolsWidgetView';
-import { applyRoomZoom } from './room-tools/roomZoom.helpers';
+import { animateRoomZoom, applyRoomZoom, roomZoomLevelToScale } from './room-tools/roomZoom.helpers';
 import { WordQuizWidgetView } from './word-quiz/WordQuizWidgetView';
-
-const MAX_ZOOM_SHIFT = 3;
 
 export const RoomWidgetsView: FC<{}> = (props) => {
     const { roomSession = null } = useRoom();
@@ -36,10 +34,13 @@ export const RoomWidgetsView: FC<{}> = (props) => {
 
     usePollSubscriptions();
 
+    // Official RoomUI: `:flip` toggles the flip immediately, `:zoom N` tweens
+    // to the level's scale.
     useOctaneEvent<RoomZoomEvent>(RoomZoomEvent.ROOM_ZOOM, (event) => {
-        const level = Number.isFinite(event.level) ? Math.floor(event.level) : 1;
-        const logicalScale = level < 1 ? 0.5 : (1 << Math.min(level - 1, MAX_ZOOM_SHIFT));
-        applyRoomZoom(event.roomId, logicalScale, event.isFlipForced);
+        const logicalScale = roomZoomLevelToScale(event.level);
+
+        if (event.isFlipForced) applyRoomZoom(event.roomId, logicalScale, true);
+        else animateRoomZoom(event.roomId, logicalScale);
     });
 
     useOctaneEvent<RoomEngineObjectEvent>(
