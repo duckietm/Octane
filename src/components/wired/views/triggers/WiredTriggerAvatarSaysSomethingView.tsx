@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
@@ -9,7 +9,15 @@ const MATCH_CONTAINS = 0;
 const MATCH_EXACT = 1;
 const MATCH_ALL = 2;
 
-export const WiredTriggerAvatarSaysSomethingView: FC<{}> = () => {
+interface WiredTriggerAvatarSaysSomethingViewProps {
+    /**
+     * The say-your-username trigger (code 31) fires on the speaker's own name, so it has no keyword
+     * and no match mode; only the hide and owner-only switches are its own.
+     */
+    usernameOnly?: boolean;
+}
+
+export const WiredTriggerAvatarSaysSomethingView: FC<WiredTriggerAvatarSaysSomethingViewProps> = ({ usernameOnly = false }) => {
     const [message, setMessage] = useState('');
     const [matchMode, setMatchMode] = useState(MATCH_CONTAINS);
     const [hideMessage, setHideMessage] = useState(false);
@@ -17,8 +25,8 @@ export const WiredTriggerAvatarSaysSomethingView: FC<{}> = () => {
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
 
     const save = () => {
-        setStringParam(message);
-        setIntParams([matchMode, hideMessage ? 1 : 0, ownerOnly ? 1 : 0]);
+        setStringParam(usernameOnly ? '' : message);
+        setIntParams([usernameOnly ? MATCH_CONTAINS : matchMode, hideMessage ? 1 : 0, ownerOnly ? 1 : 0]);
     };
 
     useEffect(() => {
@@ -30,45 +38,54 @@ export const WiredTriggerAvatarSaysSomethingView: FC<{}> = () => {
 
     return (
         <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.whatissaid')}</Text>
-                <OctaneInput type="text" value={message} onChange={(event) => setMessage(event.target.value)} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1">
-                    <input
-                        checked={matchMode === MATCH_CONTAINS}
-                        className="form-check-input"
-                        id="sayMatchContains"
-                        name="sayMatchMode"
-                        type="radio"
-                        onChange={() => setMatchMode(MATCH_CONTAINS)}
-                    />
-                    <Text>{LocalizeText('wiredfurni.params.chatcontains')}</Text>
+            {usernameOnly && (
+                <Text small className="text-black/60">
+                    {localizeWithFallback('wiredfurni.params.username_as_trigger.info', 'Fires when a user says their own username.')}
+                </Text>
+            )}
+            {!usernameOnly && (
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.whatissaid')}</Text>
+                    <OctaneInput type="text" value={message} onChange={(event) => setMessage(event.target.value)} />
                 </div>
-                <div className="flex items-center gap-1">
-                    <input
-                        checked={matchMode === MATCH_EXACT}
-                        className="form-check-input"
-                        id="sayMatchExact"
-                        name="sayMatchMode"
-                        type="radio"
-                        onChange={() => setMatchMode(MATCH_EXACT)}
-                    />
-                    <Text>{LocalizeText('wiredfurni.params.exactmatch')}</Text>
+            )}
+            {!usernameOnly && (
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                        <input
+                            checked={matchMode === MATCH_CONTAINS}
+                            className="form-check-input"
+                            id="sayMatchContains"
+                            name="sayMatchMode"
+                            type="radio"
+                            onChange={() => setMatchMode(MATCH_CONTAINS)}
+                        />
+                        <Text>{LocalizeText('wiredfurni.params.chatcontains')}</Text>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <input
+                            checked={matchMode === MATCH_EXACT}
+                            className="form-check-input"
+                            id="sayMatchExact"
+                            name="sayMatchMode"
+                            type="radio"
+                            onChange={() => setMatchMode(MATCH_EXACT)}
+                        />
+                        <Text>{LocalizeText('wiredfurni.params.exactmatch')}</Text>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <input
+                            checked={matchMode === MATCH_ALL}
+                            className="form-check-input"
+                            id="sayMatchAll"
+                            name="sayMatchMode"
+                            type="radio"
+                            onChange={() => setMatchMode(MATCH_ALL)}
+                        />
+                        <Text>{LocalizeText('wiredfurni.params.allmatch')}</Text>
+                    </div>
                 </div>
-                <div className="flex items-center gap-1">
-                    <input
-                        checked={matchMode === MATCH_ALL}
-                        className="form-check-input"
-                        id="sayMatchAll"
-                        name="sayMatchMode"
-                        type="radio"
-                        onChange={() => setMatchMode(MATCH_ALL)}
-                    />
-                    <Text>{LocalizeText('wiredfurni.params.allmatch')}</Text>
-                </div>
-            </div>
+            )}
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-1">
                     <input

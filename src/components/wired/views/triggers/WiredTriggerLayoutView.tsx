@@ -37,6 +37,8 @@ export const WiredTriggerLayoutView = (code: number) => {
             return <WiredTriggerAvatarLeaveRoomView />;
         case WiredTriggerLayout.AVATAR_SAYS_SOMETHING:
             return <WiredTriggerAvatarSaysSomethingView />;
+        case WiredTriggerLayout.AVATAR_SAYS_USERNAME:
+            return <WiredTriggerAvatarSaysSomethingView usernameOnly={true} />;
         case WiredTriggerLayout.AVATAR_WALKS_OFF_FURNI:
             return <WiredTriggerAvatarWalksOffFurniView />;
         case WiredTriggerLayout.AVATAR_WALKS_ON_FURNI:

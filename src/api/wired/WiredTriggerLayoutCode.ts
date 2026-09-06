@@ -34,4 +34,6 @@ export class WiredTriggerLayout {
     public static TEAM_GAME_RESULT: number = 29;
     /** The long one-shot timer, in 5-second steps; it used to borrow EXECUTE_ONCE and its half seconds. */
     public static EXECUTE_ONCE_LONG: number = 30;
+    /** Say your username: the keyword dialog without the keyword and the match mode it never read. */
+    public static AVATAR_SAYS_USERNAME: number = 31;
 }
