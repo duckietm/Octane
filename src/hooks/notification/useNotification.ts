@@ -48,6 +48,7 @@ import {
 } from '../../api';
 import { useMessageEvent } from '../events';
 import { useHotelAlertToastStore } from './hotelAlertToastStore';
+import { getFeedCategoryForBubbleType, pushNotificationFeedEntry } from './notificationFeedStore';
 
 const cleanText = (text: string) => (text && text.length ? text.replace(/\\r/g, '\r') : '');
 
@@ -144,16 +145,7 @@ const useNotificationStore = () => {
 
             if (!type || !type.length) type = NotificationAlertType.DEFAULT;
 
-            const alertItem = new NotificationAlertItem(
-                [cleanText(message)],
-                type,
-                clickUrl,
-                clickUrlText,
-                title,
-                imageUrl,
-                timeoutSeconds,
-                data
-            );
+            const alertItem = new NotificationAlertItem([cleanText(message)], type, clickUrl, clickUrlText, title, imageUrl, timeoutSeconds, data);
 
             setAlerts((prevValue) => prependSingleAlert(prevValue, alertItem));
         },
@@ -169,6 +161,9 @@ const useNotificationStore = () => {
             const notificationItem = new NotificationBubbleItem(message, type, imageUrl, internalLink, senderName);
 
             setBubbleAlerts((prevValue) => prependSingleBubble(prevValue, notificationItem));
+            // The bubble fades in seconds; the feed keeps it for the session, as the official
+            // client's notification feed does.
+            pushNotificationFeedEntry({ category: getFeedCategoryForBubbleType(type), type, message, iconUrl: imageUrl, linkUrl: internalLink, senderName });
         },
         [bubblesDisabled]
     );
@@ -177,6 +172,14 @@ const useNotificationStore = () => {
         const item = new MentionNotificationBubbleItem(mention);
 
         setBubbleAlerts((prevValue) => [item, ...prevValue]);
+        pushNotificationFeedEntry({
+            category: 'friends',
+            type: NotificationBubbleType.MENTION,
+            title: mention.roomName || '',
+            message: mention.message,
+            linkUrl: mention.roomId > 0 ? `navigator/goto/${mention.roomId}` : null,
+            senderName: mention.senderUsername
+        });
     }, []);
 
     const showNotification = (type: string, options: Map<string, string> = null) => {
@@ -331,6 +334,9 @@ const useNotificationStore = () => {
             return;
         }
 
+        // Hotel alerts are the hotel category of the feed whichever way they are shown.
+        pushNotificationFeedEntry({ category: 'hotel', type: 'broadcast', title: LocalizeText('notifications.broadcast.title'), message: raw });
+
         if (GetConfigurationValue<boolean>('hotel_alert_animated', false) && raw.length <= HOTEL_ALERT_TOAST_MAX_LENGTH) {
             useHotelAlertToastStore.getState().pushToast(raw);
             return;
@@ -363,14 +369,7 @@ const useNotificationStore = () => {
         // than announcing an empty string.
         const chestName = parser.chestName || LocalizeText('wiredchests.notification.unnamed');
 
-        showSingleBubble(
-            LocalizeText(
-                key,
-                ['chest', 'name', 'amount'],
-                [chestName, parser.actorName, String(parser.amount)],
-            ),
-            NotificationBubbleType.INFO,
-        );
+        showSingleBubble(LocalizeText(key, ['chest', 'name', 'amount'], [chestName, parser.actorName, String(parser.amount)]), NotificationBubbleType.INFO);
     });
 
     useMessageEvent<BadgeReceivedEvent>(BadgeReceivedEvent, (event) => {
@@ -403,6 +402,15 @@ const useNotificationStore = () => {
 
     useMessageEvent<ModeratorMessageEvent>(ModeratorMessageEvent, (event) => {
         const parser = event.getParser();
+
+        // A message from staff is addressed to me, so it files under the "me" category.
+        pushNotificationFeedEntry({
+            category: 'me',
+            type: 'moderator',
+            title: LocalizeText('mod.alert.title'),
+            message: cleanText(parser.message),
+            linkUrl: parser.url
+        });
 
         if (GetConfigurationValue<boolean>('hotel_alert_animated', false) && !parser.url && parser.message.length <= HOTEL_ALERT_TOAST_MAX_LENGTH) {
             useHotelAlertToastStore.getState().pushToast(cleanText(parser.message), LocalizeText('mod.alert.title'), 'staff');
@@ -714,7 +722,7 @@ const CHEST_NOTIFICATION_KEYS = [
     'wiredchests.notification.donation',
     'wiredchests.notification.withdraw',
     'wiredchests.notification.empty',
-    'wiredchests.notification.wired',
+    'wiredchests.notification.wired'
 ];
 
 export const useNotificationState = () => {

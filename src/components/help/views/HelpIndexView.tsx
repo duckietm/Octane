@@ -1,14 +1,16 @@
 import { GetCfhStatusMessageComposer } from '@octane/renderer';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { FaArrowCircleRight } from 'react-icons/fa';
 import { CreateLinkEvent, DispatchUiEvent, GetConfigurationValue, LocalizeText, ReportState, ReportType, SendMessageComposer } from '../../../api';
 import helpDuck from '../../../assets/images/help/help-duck.png';
 import { Text } from '../../../common';
 import { GuideToolEvent } from '../../../events';
 import { useHelp } from '../../../hooks';
+import { MyReportsStatusView } from './MyReportsStatusView';
 
 export const HelpIndexView: FC<{}> = (props) => {
     const { setActiveReport = null } = useHelp();
+    const [reportsStatusVisible, setReportsStatusVisible] = useState(false);
 
     const onReportClick = () => {
         setActiveReport((prevValue) => {
@@ -52,11 +54,13 @@ export const HelpIndexView: FC<{}> = (props) => {
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.sanction.status')}
                 </button>
-                <button type="button" className="help-link" onClick={() => SendMessageComposer(new GetCfhStatusMessageComposer(true))}>
+                {/* The official client opens its "My reports" table here; ours opens the same window over a stub until the renderer parses the packet. */}
+                <button type="button" className="help-link" onClick={() => setReportsStatusVisible(true)}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.reports.status')}
                 </button>
             </div>
+            {reportsStatusVisible && <MyReportsStatusView onClose={() => setReportsStatusVisible(false)} />}
         </div>
     );
 };
