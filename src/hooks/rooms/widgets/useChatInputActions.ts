@@ -12,13 +12,43 @@ import {
     RoomShakingEffect,
     RoomZoomEvent,
     TextureUtils,
-    UseHabbiconComposer
+    UseHabbiconComposer,
+    VisitUserComposer
 } from '@octane/renderer';
 import { useCallback } from 'react';
-import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../../api';
+import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../api';
+import { useWiredCreatorToolsUiStore } from '../../../components/wired-tools/wiredCreatorToolsUiStore';
 import { useNotification } from '../../notification';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
+
+// `:hidemouse` is a session-wide toggle in the official client, so the flag
+// lives at module scope instead of following the widget's mount cycle.
+let isMouseHidden = false;
+
+const toggleMouseCursor = () => {
+    isMouseHidden = !isMouseHidden;
+    document.body.style.cursor = isMouseHidden ? 'none' : '';
+};
+
+// The browser only honours a fullscreen request from a user gesture; pressing
+// Enter on the chat input counts, which is why this stays synchronous.
+const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+        void document.exitFullscreen?.();
+        return;
+    }
+
+    void document.documentElement.requestFullscreen?.();
+};
+
+const openWiredCreatorTools = (tab?: 'variables' | 'inspection') => {
+    const store = useWiredCreatorToolsUiStore.getState();
+
+    if (tab) store.setActiveTab(tab);
+
+    store.setIsVisible(true);
+};
 
 /**
  * Pure imperative dispatch for the chat-input widget. Exposes
@@ -223,6 +253,62 @@ export const useChatInputActions = () => {
                         return null;
                     case ':customize':
                         CreateLinkEvent('customize/show');
+                        return null;
+                    case ':visit':
+                        if (secondPart) SendMessageComposer(new VisitUserComposer(secondPart));
+
+                        return null;
+                    case ':roomid': {
+                        const roomId = parseInt(secondPart);
+
+                        if (Number.isFinite(roomId) && roomId > 0) TryVisitRoom(roomId);
+
+                        return null;
+                    }
+                    case ':cam':
+                    case ':camera':
+                        CreateLinkEvent('camera/show');
+                        return null;
+                    case ':fs':
+                    case ':fullscreen':
+                        toggleFullscreen();
+                        return null;
+                    case ':ignore':
+                    case ':unignore': {
+                        // The official client only ignores people who are in the room, so the
+                        // name has to resolve against the room's user list before anything is sent.
+                        const userData = secondPart ? roomSession?.userDataManager?.getUserDataByName(secondPart) : null;
+
+                        if (userData) {
+                            if (firstPart.toLowerCase() === ':ignore') GetSessionDataManager().ignoreUser(userData.name);
+                            else GetSessionDataManager().unignoreUser(userData.name);
+                        }
+
+                        return null;
+                    }
+                    case ':mutepets':
+                    case ':moonwalk':
+                    case ':habnam':
+                        GetSessionDataManager().sendSpecialCommandMessage(firstPart.toLowerCase());
+                        return null;
+                    case ':hidemouse':
+                        toggleMouseCursor();
+                        return null;
+                    case ':wf':
+                    case ':wired':
+                        openWiredCreatorTools();
+                        return null;
+                    case ':var':
+                    case ':variables':
+                        openWiredCreatorTools('variables');
+                        return null;
+                    case ':inspect':
+                    case ':inspection':
+                        openWiredCreatorTools('inspection');
+                        return null;
+                    case ':link':
+                        // The official handler groups `:link` with the wave shortcuts.
+                        roomSession?.sendExpressionMessage(AvatarExpressionEnum.WAVE.ordinal);
                         return null;
                 }
             }

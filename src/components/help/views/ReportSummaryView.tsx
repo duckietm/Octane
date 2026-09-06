@@ -11,7 +11,7 @@ import { Button, Text } from '../../../common';
 import { useHelp } from '../../../hooks';
 
 export const ReportSummaryView: FC<{}> = (props) => {
-    const { activeReport = null, setActiveReport = null } = useHelp();
+    const { activeReport = null, setActiveReport = null, ignoreAndUnfriendReportedUser = null } = useHelp();
 
     const submitReport = () => {
         const chats: (string | number)[] = [];
@@ -62,6 +62,8 @@ export const ReportSummaryView: FC<{}> = (props) => {
                 );
                 break;
         }
+
+        ignoreAndUnfriendReportedUser?.(activeReport.reportedUserId, activeReport.cfhTopic);
 
         setActiveReport(null);
     };

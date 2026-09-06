@@ -38,6 +38,7 @@ import {
 } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
+import { shouldNotifyFriendOnline, useFriendOnlineNotificationPreference } from './useFriendOnlineNotificationPreference';
 
 /**
  * Internal singleton store for friend-list state + actions. Public
@@ -56,6 +57,7 @@ const useFriendsStore = () => {
     const friendsRef = useRef<MessengerFriend[]>([]);
     const lastRequestedFriendIdRef = useRef<number>(-1);
     const { simpleAlert = null, showSingleBubble = null } = useNotification();
+    const [friendOnlineNotificationPreference] = useFriendOnlineNotificationPreference();
 
     const onlineFriends = useMemo(() => {
         const onlineFriends = friends.filter((friend) => friend.online);
@@ -129,6 +131,24 @@ const useFriendsStore = () => {
     const requestFriend = (userId: number, userName: string) => {
         if (!canRequestFriend(userId)) return false;
 
+        // The official friend list refuses the request with an alert once the list is full; the club limit is the larger one.
+        if (settings && settings.userFriendLimit > 0 && friends.length >= settings.userFriendLimit) {
+            simpleAlert?.(
+                localizeWithFallback(
+                    'friendlist.listfull.text',
+                    `You have ${settings.userFriendLimit} friends which means that you've reached your limit for Habbo friends!`,
+                    ['mylimit', 'clublimit'],
+                    [`${settings.userFriendLimit}`, `${settings.extendedFriendLimit}`]
+                ),
+                NotificationAlertType.DEFAULT,
+                null,
+                null,
+                localizeWithFallback('friendlist.listfull.title', 'Notice!')
+            );
+
+            return false;
+        }
+
         lastRequestedFriendIdRef.current = userId;
 
         setSentRequests((prevValue) => {
@@ -140,6 +160,19 @@ const useFriendsStore = () => {
         });
 
         SendMessageComposer(new RequestFriendComposer(userName));
+
+        simpleAlert?.(
+            localizeWithFallback(
+                'friendlist.friendrequestsent.text',
+                `${userName} has been sent your friend request. They will be added to your Friends List if they accept it.`,
+                ['user_name'],
+                [userName]
+            ),
+            NotificationAlertType.DEFAULT,
+            null,
+            null,
+            localizeWithFallback('friendlist.friendrequestsent.title', 'Notice!')
+        );
     };
 
     const requestResponse = (requestId: number, flag: boolean) => {
@@ -245,6 +278,9 @@ const useFriendsStore = () => {
         });
 
         for (const friend of onlineNotifications) {
+            // Settings > Other lets the user limit the bubble to relationships or switch it off.
+            if (!shouldNotifyFriendOnline(friendOnlineNotificationPreference, friend.relationshipStatus)) continue;
+
             const text = localizeWithFallback('notifications.friend_online', `${friend.name} is online`, ['name'], [friend.name]);
 
             showSingleBubble?.(text, NotificationBubbleType.FRIENDONLINE, friend.figure, `friends-messenger/${friend.id}`);
