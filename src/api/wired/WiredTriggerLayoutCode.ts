@@ -32,5 +32,6 @@ export class WiredTriggerLayout {
      * with the bot-reached trigger, so the window asked them which bot had arrived.
      */
     public static TEAM_GAME_RESULT: number = 29;
-
+    /** The long one-shot timer, in 5-second steps; it used to borrow EXECUTE_ONCE and its half seconds. */
+    public static EXECUTE_ONCE_LONG: number = 30;
 }

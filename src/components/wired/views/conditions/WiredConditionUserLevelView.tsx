@@ -3,6 +3,7 @@ import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { WiredComparisonOperator } from '../WiredComparisonOperator';
+import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
@@ -23,12 +24,10 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
     const [variableToken, setVariableToken] = useState('');
     const [level, setLevel] = useState(MIN_LEVEL);
     const [comparison, setComparison] = useState(1);
+    const [userSource, setUserSource] = useState(0);
     const [quantifier, setQuantifier] = useState(QUANTIFIER_ALL);
 
-    const variableEntries = useMemo(
-        () => buildWiredVariablePickerEntries('user', 'condition', userVariableDefinitions),
-        [userVariableDefinitions]
-    );
+    const variableEntries = useMemo(() => buildWiredVariablePickerEntries('user', 'condition', userVariableDefinitions), [userVariableDefinitions]);
 
     useEffect(() => {
         if (!trigger) return;
@@ -36,13 +35,12 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
         setVariableToken(trigger.stringData ?? '');
         setLevel(trigger.intData?.length > 0 ? trigger.intData[0] : MIN_LEVEL);
         setComparison(trigger.intData?.length > 1 ? trigger.intData[1] : 1);
+        setUserSource(trigger.intData?.length > 2 ? trigger.intData[2] : 0);
         setQuantifier(trigger.intData?.length > 3 && trigger.intData[3] === QUANTIFIER_ANY ? QUANTIFIER_ANY : QUANTIFIER_ALL);
     }, [trigger]);
 
     const save = () => {
-        // The third slot is the user source, which the base view owns; it is sent as the trigger
-        // default so the emulator reads a complete list rather than falling back mid-array.
-        setIntParams([level, comparison, 0, quantifier]);
+        setIntParams([level, comparison, userSource, quantifier]);
         setStringParam(variableToken);
     };
 
@@ -54,6 +52,7 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
             requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
             save={save}
             validate={validate}
+            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
         >
             <div className="flex flex-col gap-2">
                 <Text>{localizeWithFallback('wiredfurni.params.level.variable', 'Experience variable')}</Text>
@@ -65,7 +64,9 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
                 />
 
                 <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.level_selection', 'Level')}: {level}</Text>
+                    <Text bold>
+                        {localizeWithFallback('wiredfurni.params.level_selection', 'Level')}: {level}
+                    </Text>
                     <Slider max={MAX_LEVEL} min={MIN_LEVEL} value={level} onChange={(value) => setLevel(value)} />
                 </div>
 
@@ -78,12 +79,7 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
                         type="checkbox"
                         onChange={(event) => setQuantifier(event.target.checked ? QUANTIFIER_ANY : QUANTIFIER_ALL)}
                     />
-                    <Text>
-                        {localizeWithFallback(
-                            'wiredfurni.params.level.any_user',
-                            'One user is enough (otherwise every user must match)'
-                        )}
-                    </Text>
+                    <Text>{localizeWithFallback('wiredfurni.params.level.any_user', 'One user is enough (otherwise every user must match)')}</Text>
                 </label>
             </div>
         </WiredConditionBaseView>

@@ -12,6 +12,7 @@ import { WiredTriggerClickUserView } from './WiredTriggerClickUserView';
 import { WiredTriggerClockCounterView } from './WiredTriggerClockCounterView';
 import { WiredTriggerCollisionView } from './WiredTriggerCollisionView';
 import { WiredTriggerDiceRolledView } from './WiredTriggerDiceRolledView';
+import { WiredTriggerExecuteOnceLongView } from './WiredTriggerExecuteOnceLongView';
 import { WiredTriggeExecuteOnceView } from './WiredTriggerExecuteOnceView';
 import { WiredTriggeExecutePeriodicallyLongView } from './WiredTriggerExecutePeriodicallyLongView';
 import { WiredTriggeExecutePeriodicallyShortView } from './WiredTriggerExecutePeriodicallyShortView';
@@ -60,6 +61,8 @@ export const WiredTriggerLayoutView = (code: number) => {
             return <WiredTriggerCollisionView />;
         case WiredTriggerLayout.EXECUTE_ONCE:
             return <WiredTriggeExecuteOnceView />;
+        case WiredTriggerLayout.EXECUTE_ONCE_LONG:
+            return <WiredTriggerExecuteOnceLongView />;
         case WiredTriggerLayout.EXECUTE_PERIODICALLY:
             return <WiredTriggeExecutePeriodicallyView />;
         case WiredTriggerLayout.EXECUTE_PERIODICALLY_SHORT:

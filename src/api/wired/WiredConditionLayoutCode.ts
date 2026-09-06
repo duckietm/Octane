@@ -87,4 +87,15 @@ export class WiredConditionlayout {
      * the array condition lands, so this takes 61 and leaves that seat empty.
      */
     public static USER_LEVEL: number = 61;
+
+    /**
+     * Six shapes the hotel sells that had no class behind them until the 2026-09 census: account
+     * rank, furni opacity, per-user cooldown, first-time and daily gates, scoreboard points.
+     */
+    public static USER_RANK: number = 62;
+    public static FURNI_OPACITY: number = 63;
+    public static USER_COOLDOWN: number = 64;
+    public static USER_ONCE: number = 65;
+    public static USER_DAILY: number = 66;
+    public static USER_HIGHSCORE_POINTS: number = 67;
 }

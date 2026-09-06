@@ -26,7 +26,12 @@ import { WiredConditionTeamHasRankView } from './WiredConditionTeamHasRankView';
 import { WiredConditionTeamHasScoreView } from './WiredConditionTeamHasScoreView';
 import { WiredConditionTimeElapsedLessView } from './WiredConditionTimeElapsedLessView';
 import { WiredConditionTimeElapsedMoreView } from './WiredConditionTimeElapsedMoreView';
+import { WiredConditionFurniOpacityView } from './WiredConditionFurniOpacityView';
+import { WiredConditionUserCooldownView } from './WiredConditionUserCooldownView';
+import { WiredConditionUserHighscorePointsView } from './WiredConditionUserHighscorePointsView';
 import { WiredConditionUserLevelView } from './WiredConditionUserLevelView';
+import { WiredConditionUserOnceView } from './WiredConditionUserOnceView';
+import { WiredConditionUserRankView } from './WiredConditionUserRankView';
 import { WiredConditionTriggererMatchView } from './WiredConditionTriggererMatchView';
 import { WiredConditionTriggerFurniAdjacentStateView } from './WiredConditionTriggerFurniAdjacentStateView';
 import { WiredConditionUserCountInRoomView } from './WiredConditionUserCountInRoomView';
@@ -154,6 +159,18 @@ export const WiredConditionLayoutView = (code: number) => {
             return <WiredConditionChestHasItemsView />;
         case WiredConditionlayout.CHEST_HAS_ITEM_TYPE:
             return <WiredConditionChestHasItemTypeView />;
+        case WiredConditionlayout.USER_RANK:
+            return <WiredConditionUserRankView />;
+        case WiredConditionlayout.FURNI_OPACITY:
+            return <WiredConditionFurniOpacityView />;
+        case WiredConditionlayout.USER_COOLDOWN:
+            return <WiredConditionUserCooldownView />;
+        case WiredConditionlayout.USER_ONCE:
+            return <WiredConditionUserOnceView />;
+        case WiredConditionlayout.USER_DAILY:
+            return <WiredConditionUserOnceView daily={true} />;
+        case WiredConditionlayout.USER_HIGHSCORE_POINTS:
+            return <WiredConditionUserHighscorePointsView />;
     }
 
     return null;
