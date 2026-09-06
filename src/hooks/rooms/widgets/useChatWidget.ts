@@ -228,7 +228,9 @@ const useChatWidgetState = () => {
             imageUrl,
             color
         );
-        chatMessage.bubbleWidthOverride = event.bubbleWidthOverride ?? -1;
+        // The renderer adds bubbleWidthOverride to the chat event in Octane-Renderer#212; until that
+        // lands the published event has no such field, so it is read as optional.
+        chatMessage.bubbleWidthOverride = (event as RoomSessionChatEvent & { bubbleWidthOverride?: number }).bubbleWidthOverride ?? -1;
 
         if (outgoingTranslation) {
             applyTranslationToBubble(
