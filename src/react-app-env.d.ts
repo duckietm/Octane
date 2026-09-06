@@ -34,8 +34,8 @@ declare module '*.scss';
 declare module '*.sass';
 
 interface Window {
-    NitroConfig?: Record<string, unknown>;
-    NitroSecureApiUrl?: string;
+    OctaneConfig?: Record<string, unknown>;
+    OctaneSecureApiUrl?: string;
 }
 
 interface ImportMeta {

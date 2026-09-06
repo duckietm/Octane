@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { localizeWithFallback, LocalizeText, WiredActionLayoutCode, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredTextCounter, WiredTextFormattingHelp } from '../common/WiredTextFormattingHelp';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
@@ -84,7 +84,7 @@ export const WiredActionChatView: FC<{}> = (props) => {
                 {!field || field.multiline ? (
                     <>
                         <textarea
-                            className="form-control form-control-sm nitro-wired__resizable-textarea"
+                            className="form-control form-control-sm octane-wired__resizable-textarea"
                             maxLength={maxMessageLength}
                             rows={4}
                             value={message}
@@ -94,7 +94,7 @@ export const WiredActionChatView: FC<{}> = (props) => {
                         {isChat && <WiredTextFormattingHelp />}
                     </>
                 ) : (
-                    <NitroInput
+                    <OctaneInput
                         maxLength={field.maxLength}
                         type={field.numeric ? 'number' : 'text'}
                         value={message}

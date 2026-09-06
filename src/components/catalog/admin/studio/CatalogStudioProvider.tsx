@@ -11,7 +11,7 @@ import {
     CatalogStudioUndoEvent,
     CatalogStudioValidateComposer,
     CatalogStudioValidationEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SendMessageComposer } from '../../../../api';
 import { useConnectionState, useMessageEvent } from '../../../../hooks';

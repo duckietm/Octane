@@ -1,8 +1,8 @@
-import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaChevronRight, FaEnvelope, FaExclamationTriangle, FaEye, FaEyeSlash, FaIdBadge, FaInfoCircle, FaKey, FaShieldAlt, FaUserCog } from 'react-icons/fa';
 import { GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback } from '../../api';
-import { Button, LayoutAvatarImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { Button, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 128;
@@ -178,7 +178,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${ token }`,
-                    'X-Requested-With': 'NitroUserAccountSettings'
+                    'X-Requested-With': 'OctaneUserAccountSettings'
                 },
                 body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
             });
@@ -259,7 +259,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${ token }`,
-                    'X-Requested-With': 'NitroUserAccountSettings'
+                    'X-Requested-With': 'OctaneUserAccountSettings'
                 },
                 body: JSON.stringify({ currentPassword: emailCurrentPassword, newEmail })
             });
@@ -344,7 +344,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${ token }`,
-                    'X-Requested-With': 'NitroUserAccountSettings'
+                    'X-Requested-With': 'OctaneUserAccountSettings'
                 },
                 body: JSON.stringify({ currentPassword: usernameCurrentPassword, newUsername })
             });
@@ -393,8 +393,8 @@ export const UserAccountSettingsView: FC<{}> = () =>
     if(!isVisible) return null;
 
     return (
-        <NitroCardView className="user-account-settings-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim" uniqueKey="user-account-settings">
-            <NitroCardHeaderView headerText={ localizeWithFallback('usersettings.title', "User Settings") } onCloseClick={ close } />
+        <OctaneCardView className="user-account-settings-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" theme="primary-slim" uniqueKey="user-account-settings">
+            <OctaneCardHeaderView headerText={ localizeWithFallback('usersettings.title', "User Settings") } onCloseClick={ close } />
 
             <div className="relative flex items-center gap-3 px-3 py-2 bg-[linear-gradient(180deg,#5ba4c4_0%,#418db0_100%)] text-white">
                 <div className="absolute inset-0 opacity-20 pointer-events-none [background-image:radial-gradient(rgba(255,255,255,0.5)_1px,transparent_1px)] [background-size:6px_6px]" />
@@ -416,7 +416,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 </div>
             </div>
 
-            <NitroCardContentView className="flex flex-col gap-2 text-black">
+            <OctaneCardContentView className="flex flex-col gap-2 text-black">
                 { section === 'menu' && (
                     <div className="flex flex-col gap-2">
                         <Text small className="text-black/60 uppercase tracking-wider px-1">{ localizeWithFallback('usersettings.menu.section', "Account") }</Text>
@@ -752,7 +752,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
                         </div>
                     </div>
                 ) }
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

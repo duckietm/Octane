@@ -1,4 +1,4 @@
-import { RequestNickIconsComposer, SetActiveNickIconComposer, UserNickIconsEvent } from '@nitrots/nitro-renderer';
+import { RequestNickIconsComposer, SetActiveNickIconComposer, UserNickIconsEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { INickIconItem, SendMessageComposer } from '../../api';

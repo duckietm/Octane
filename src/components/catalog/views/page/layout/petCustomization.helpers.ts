@@ -1,4 +1,4 @@
-import { IFurnitureData } from '@nitrots/nitro-renderer';
+import { IFurnitureData } from '@octane/renderer';
 import { FurniCategory } from '../../../../../api';
 
 const parseNumberList = (value: string | undefined): number[] | null => {

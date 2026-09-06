@@ -6,13 +6,13 @@ import {
     RoomSessionUserBadgesEvent,
     RoomSessionUserFigureUpdateEvent,
     UserRelationshipsComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { AvatarInfoUser, CloneObject, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
-import { useMessageEvent, useNitroEvent, useRoom } from '../../../../../hooks';
+import { useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
 import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -70,7 +70,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
         }
     };
 
-    useNitroEvent<RoomSessionUserBadgesEvent>(RoomSessionUserBadgesEvent.RSUBE_BADGES, (event) => {
+    useOctaneEvent<RoomSessionUserBadgesEvent>(RoomSessionUserBadgesEvent.RSUBE_BADGES, (event) => {
         if (!avatarInfo || avatarInfo.webID !== event.userId) return;
 
         // Deduplicate badges from server
@@ -94,7 +94,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
         });
     });
 
-    useNitroEvent<RoomSessionUserFigureUpdateEvent>(RoomSessionUserFigureUpdateEvent.USER_FIGURE, (event) => {
+    useOctaneEvent<RoomSessionUserFigureUpdateEvent>(RoomSessionUserFigureUpdateEvent.USER_FIGURE, (event) => {
         if (!avatarInfo || avatarInfo.roomIndex !== event.roomIndex) return;
 
         setAvatarInfo((prevValue) => {
@@ -119,7 +119,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
         });
     });
 
-    useNitroEvent<RoomSessionFavoriteGroupUpdateEvent>(RoomSessionFavoriteGroupUpdateEvent.FAVOURITE_GROUP_UPDATE, (event) => {
+    useOctaneEvent<RoomSessionFavoriteGroupUpdateEvent>(RoomSessionFavoriteGroupUpdateEvent.FAVOURITE_GROUP_UPDATE, (event) => {
         if (!avatarInfo || avatarInfo.roomIndex !== event.roomIndex) return;
 
         setAvatarInfo((prevValue) => {
@@ -167,21 +167,21 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
 
     return (
         <>
-            <div className={`nitro-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}`}>
+            <div className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}`}>
                 {borderId ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
-                <button type="button" className="nitro-infostand__close" aria-label="Close" onClick={onClose} />
-                <div className="nitro-infostand__header">
+                <button type="button" className="octane-infostand__close" aria-label="Close" onClick={onClose} />
+                <div className="octane-infostand__header">
                     <button
                         type="button"
-                        className="nitro-infostand__home"
+                        className="octane-infostand__home"
                         aria-label={LocalizeText('infostand.profile.link.tooltip')}
                         onClick={handleProfileClick}
                     >
                         <img src={homeIcon} alt="" draggable={false} />
                     </button>
-                    <button type="button" className="nitro-infostand__profile-link" onClick={handleProfileClick}>
+                    <button type="button" className="octane-infostand__profile-link" onClick={handleProfileClick}>
                         <UserIdentityView
-                            className="nitro-infostand__identity"
+                            className="octane-infostand__identity"
                             displayOrder={avatarInfo.displayOrder}
                             nameClassName="text-white"
                             nickIcon={avatarInfo.nickIcon}
@@ -194,9 +194,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                         />
                     </button>
                 </div>
-                <div className="nitro-infostand__rule" />
-                <div className="nitro-infostand__figure-row">
-                    <div className={`nitro-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
+                <div className="octane-infostand__rule" />
+                <div className="octane-infostand__figure-row">
+                    <div className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
                         <Base position="absolute" className={`profile-stand ${infostandStandClass}`} />
                         <LayoutAvatarImageView direction={2} figure={avatarInfo.figure} />
                         <Base position="absolute" className={`profile-overlay ${infostandOverlayClass}`} />
@@ -209,7 +209,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             aria-label="Edit profile background"
                         />
                     )}
-                    <div className="nitro-infostand__badges">
+                    <div className="octane-infostand__badges">
                         {(() => {
                             const maxSlots = GetConfigurationValue<number>('user.badges.max.slots', 5);
                             const showGroup = maxSlots <= 5;
@@ -245,11 +245,11 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                         })()}
                     </div>
                 </div>
-                <div className="nitro-infostand__rule" />
-                <div className="nitro-infostand__motto">
-                    {isOwnUser && <img src={pencilIcon} alt="" className="nitro-infostand__pen" />}
+                <div className="octane-infostand__rule" />
+                <div className="octane-infostand__motto">
+                    {isOwnUser && <img src={pencilIcon} alt="" className="octane-infostand__pen" />}
                     {!isOwnUser && (
-                        <Text fullWidth pointer textBreak wrap className="nitro-infostand__motto-text" variant="white">
+                        <Text fullWidth pointer textBreak wrap className="octane-infostand__motto-text" variant="white">
                             {motto}
                         </Text>
                     )}
@@ -259,7 +259,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             pointer
                             textBreak
                             wrap
-                            className={`nitro-infostand__motto-text ${motto ? '' : 'is-placeholder'}`}
+                            className={`octane-infostand__motto-text ${motto ? '' : 'is-placeholder'}`}
                             variant="white"
                             onClick={() => setIsEditingMotto(true)}
                         >
@@ -281,8 +281,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                 </div>
                 {showAchievementScore && (
                     <>
-                        <div className="nitro-infostand__rule" />
-                        <div className="nitro-infostand__score">
+                        <div className="octane-infostand__rule" />
+                        <div className="octane-infostand__score">
                             <span>{LocalizeText('infostand.text.achievement_score')}</span>
                             <span>{avatarInfo.achievementScore}</span>
                         </div>
@@ -290,13 +290,13 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                 )}
                 {avatarInfo.carryItem > 0 && (
                     <>
-                        <div className="nitro-infostand__rule" />
+                        <div className="octane-infostand__rule" />
                         <Text small wrap variant="white">
                             {LocalizeText('infostand.text.handitem', ['item'], [LocalizeText('handitem' + avatarInfo.carryItem)])}
                         </Text>
                     </>
                 )}
-                <div className={`nitro-infostand__rule ${hasRelationships ? '' : 'nitro-infostand__rule--footer'}`} />
+                <div className={`octane-infostand__rule ${hasRelationships ? '' : 'octane-infostand__rule--footer'}`} />
                 <InfoStandWidgetUserRelationshipsView relationships={relationships} />
                 {GetConfigurationValue('user.tags.enabled') && (
                     <Column className="mt-1" gap={1}>

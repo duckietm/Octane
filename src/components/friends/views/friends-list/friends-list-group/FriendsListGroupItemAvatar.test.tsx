@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { GetAvatarRenderManager } from '@nitrots/nitro-renderer';
+import { GetAvatarRenderManager } from '@octane/renderer';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MessengerFriend, OpenMessengerChat } from '../../../../../api';

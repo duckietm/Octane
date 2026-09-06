@@ -2,7 +2,7 @@ import {
     AddLinkEventTracker,
     CreateLinkEvent,
     ILinkEventTracker,
-    NitroSettingsEvent,
+    OctaneSettingsEvent,
     RemoveLinkEventTracker,
     SoundboardSaveVolumeComposer,
     UserSettingsCameraFollowComposer,
@@ -11,7 +11,7 @@ import {
     UserSettingsPrivacyComposer,
     UserSettingsRoomInvitesComposer,
     UserSettingsSoundComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { DispatchMainEvent, DispatchUiEvent, localizeWithFallback, SendMessageComposer } from '../../api';
 import { DraggableWindow } from '../../common';
@@ -61,7 +61,7 @@ export const UserSettingsView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [section, setSection] = useState<SettingsSection>(null);
     const [returnToMenu, setReturnToMenu] = useState(false);
-    const [userSettings, setUserSettings] = useState<NitroSettingsEvent>(null);
+    const [userSettings, setUserSettings] = useState<OctaneSettingsEvent>(null);
     const [catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects] = useCatalogPlaceMultipleItems();
     const [catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
     const { density: catalogGridDensity, setDensity: setCatalogGridDensity, showTilePrices, setShowTilePrices } = useCatalogDisplayPreferences();
@@ -143,7 +143,7 @@ export const UserSettingsView: FC<{}> = () => {
 
     useMessageEvent<UserSettingsEvent>(UserSettingsEvent, (event) => {
         const parser = event.getParser();
-        const settingsEvent = new NitroSettingsEvent();
+        const settingsEvent = new OctaneSettingsEvent();
 
         settingsEvent.volumeSystem = parser.volumeSystem;
         settingsEvent.volumeFurni = parser.volumeFurni;

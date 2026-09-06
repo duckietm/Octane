@@ -1,4 +1,4 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import {
     FriendlyTime,

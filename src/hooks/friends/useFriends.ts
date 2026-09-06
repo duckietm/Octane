@@ -21,7 +21,7 @@ import {
     RequestFriendComposer,
     RequestOfflineMessagesComposer,
     SetRelationshipStatusComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {

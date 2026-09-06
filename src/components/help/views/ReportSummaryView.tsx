@@ -4,7 +4,7 @@ import {
     CallForHelpFromIMMessageComposer,
     CallForHelpFromPhotoMessageComposer,
     CallForHelpMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, ReportType, SendMessageComposer } from '../../../api';
 import { Button, Text } from '../../../common';

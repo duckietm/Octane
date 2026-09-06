@@ -1,7 +1,7 @@
-import { GroupBadgePart, GroupInformationEvent, GroupSettingsEvent } from '@nitrots/nitro-renderer';
+import { GroupBadgePart, GroupInformationEvent, GroupSettingsEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { IGroupData, LocalizeText } from '../../../api';
-import { Column, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, Text } from '../../../common';
+import { Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../../common';
 import { useMessageEvent } from '../../../hooks';
 import { GroupTabBadgeView } from './tabs/GroupTabBadgeView';
 import { GroupTabColorsView } from './tabs/GroupTabColorsView';
@@ -73,20 +73,20 @@ export const GroupManagerView: FC<{}> = (props) => {
     if (!groupData || groupData.groupId <= 0) return null;
 
     return (
-        <NitroCardView className="nitro-groups-window nitro-group-manager w-[560px]">
-            <NitroCardHeaderView headerText={LocalizeText('group.window.title')} onCloseClick={onClose} />
-            <NitroCardTabsView>
+        <OctaneCardView className="octane-groups-window octane-group-manager w-[560px]">
+            <OctaneCardHeaderView headerText={LocalizeText('group.window.title')} onCloseClick={onClose} />
+            <OctaneCardTabsView>
                 {TABS.map((tab) => {
                     return (
-                        <NitroCardTabsItemView key={tab} isActive={currentTab === tab} onClick={() => changeTab(tab)}>
+                        <OctaneCardTabsItemView key={tab} isActive={currentTab === tab} onClick={() => changeTab(tab)}>
                             {LocalizeText(`group.edit.tab.${tab}`)}
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     );
                 })}
-            </NitroCardTabsView>
-            <NitroCardContentView className="nitro-groups-content">
-                <div className="nitro-groups-tab-header items-center gap-2">
-                    <div className={`nitro-group-tab-image tab-${currentTab}`} />
+            </OctaneCardTabsView>
+            <OctaneCardContentView className="octane-groups-content">
+                <div className="octane-groups-tab-header items-center gap-2">
+                    <div className={`octane-group-tab-image tab-${currentTab}`} />
                     <Column grow gap={0}>
                         <Text bold fontSize={4}>
                             {LocalizeText(`group.edit.tabcaption.${currentTab}`)}
@@ -104,7 +104,7 @@ export const GroupManagerView: FC<{}> = (props) => {
                     {currentTab === 3 && <GroupTabColorsView groupData={groupData} setCloseAction={setCloseAction} setGroupData={setGroupData} />}
                     {currentTab === 5 && <GroupTabSettingsView groupData={groupData} setCloseAction={setCloseAction} setGroupData={setGroupData} />}
                 </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

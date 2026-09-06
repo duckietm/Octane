@@ -1,8 +1,8 @@
-import { FollowFriendMessageComposer, GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { FollowFriendMessageComposer, GetSessionDataManager } from '@octane/renderer';
 import { FC, KeyboardEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { FaArrowLeft, FaCopy, FaExclamationTriangle, FaSearch, FaTimes, FaUsers } from 'react-icons/fa';
 import { CopyToClipboard, GetUserProfile, LocalizeText, MessengerConversation, MessengerMessage, MessengerThread, ReportType, SendMessageComposer, selectConversations, selectMessages } from '../../../../api';
-import { DraggableWindowPosition, LayoutAvatarImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { DraggableWindowPosition, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useFriends, useHelp } from '../../../../hooks';
 import { STAFF_CHAT_FIGURE } from '../../staffChatIdentity';
 import { resolveAvatarFigure } from '../friends-list/resolveAvatarFigure';
@@ -106,9 +106,9 @@ export const FriendsPersistentMessengerView: FC<FriendsPersistentMessengerViewPr
     };
 
     return (
-        <NitroCardView className="messenger-card messenger-persistent" theme="primary-slim" uniqueKey="persistent-messenger" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8} isResizable={false}>
-            <NitroCardHeaderView headerText={LocalizeText('messenger.window.title', [ 'OPEN_CHAT_COUNT' ], [ (conversations.length + (legacyStaffThread ? 1 : 0)).toString() ])} onCloseClick={onClose} />
-            <NitroCardContentView className="p-0" gap={0} overflow="hidden">
+        <OctaneCardView className="messenger-card messenger-persistent" theme="primary-slim" uniqueKey="persistent-messenger" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8} isResizable={false}>
+            <OctaneCardHeaderView headerText={LocalizeText('messenger.window.title', [ 'OPEN_CHAT_COUNT' ], [ (conversations.length + (legacyStaffThread ? 1 : 0)).toString() ])} onCloseClick={onClose} />
+            <OctaneCardContentView className="p-0" gap={0} overflow="hidden">
                 <div className="messenger-card-body">
                     <div className="messenger-avatar-bar">
                         {legacyStaffThread && <button className={`messenger-avatar-tab ${ staffActive ? 'active' : '' } ${ legacyStaffThread.unread ? 'unread' : '' }`} onClick={() => { setStaffActive(true); setMode('conversation'); }} aria-label={legacyStaffThread.participant.name} aria-selected={staffActive}><LayoutAvatarImageView figure={STAFF_CHAT_FIGURE} headOnly compactHead compactHeadSize={36} compactHeadPadding={0} direction={3} /></button>}
@@ -161,7 +161,7 @@ export const FriendsPersistentMessengerView: FC<FriendsPersistentMessengerViewPr
                         </div>
                     )}
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

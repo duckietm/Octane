@@ -8,7 +8,7 @@ import {
     ScrGetKickbackInfoMessageComposer,
     ScrKickbackData,
     ScrSendKickbackInfoMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { ClubStatus, FriendlyTime, GetClubBadge, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
 import benefitsBg from '../../assets/images/hc-center/benefits.png';
@@ -21,9 +21,9 @@ import {
     Flex,
     LayoutAvatarImageView,
     LayoutBadgeImageView,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardView,
     Text
 } from '../../common';
 import { useInventoryBadges, useMessageEvent, usePurse, useSessionInfo } from '../../hooks';
@@ -157,8 +157,8 @@ export const HcCenterView: FC<{}> = (props) => {
     );
 
     return (
-        <NitroCardView className="min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] resize-none" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('generic.hccenter')} onCloseClick={() => setIsVisible(false)} />
+        <OctaneCardView className="min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] resize-none" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('generic.hccenter')} onCloseClick={() => setIsVisible(false)} />
             <Flex className="bg-muted/50 p-3" position="relative">
                 <Column gap={2}>
                     <div className="w-[213px] h-[37px] bg-contain bg-no-repeat" style={{ backgroundImage: `url(${hcLogo})` }} />
@@ -170,7 +170,7 @@ export const HcCenterView: FC<{}> = (props) => {
                     <LayoutAvatarImageView direction={4} figure={userFigure} scale={2} />
                 </div>
             </Flex>
-            <NitroCardContentView>
+            <OctaneCardContentView>
                 <Flex gap={2} alignItems="center" className="p-2 rounded bg-card-grid-item/30">
                     <LayoutBadgeImageView badgeCode={badgeCode} className="shrink-0" />
                     <Column gap={0} className="min-h-[48px] leading-4">
@@ -271,7 +271,7 @@ export const HcCenterView: FC<{}> = (props) => {
                         </span>
                     </Column>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

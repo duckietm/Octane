@@ -21,7 +21,7 @@ const measureCatalogTabStripWidth = (shell: HTMLElement) => {
 
     if (wasCondensed) shell.classList.remove(CONDENSED_CLASS);
 
-    const tabs = shell.querySelectorAll<HTMLElement>('.nitro-card-tab-item');
+    const tabs = shell.querySelectorAll<HTMLElement>('.octane-card-tab-item');
     let tabsWidth = 0;
 
     tabs.forEach((tab) => {
@@ -71,7 +71,7 @@ export const useCatalogWindowWidth = (
         const tabObserver = new ResizeObserver(measure);
 
         const observeTabs = () => {
-            shell.querySelectorAll<HTMLElement>('.nitro-card-tab-item').forEach((tab) => {
+            shell.querySelectorAll<HTMLElement>('.octane-card-tab-item').forEach((tab) => {
                 tabObserver.observe(tab);
             });
         };
@@ -99,8 +99,8 @@ export const useCatalogWindowWidth = (
         const width = stripWidth;
 
         return {
-            '--nitro-catalog-window-width': `${width}px`,
-            '--nitro-catalog-window-height': `${CATALOG_WINDOW_HEIGHT}px`,
+            '--octane-catalog-window-width': `${width}px`,
+            '--octane-catalog-window-height': `${CATALOG_WINDOW_HEIGHT}px`,
             width: `${width}px`,
             minWidth: `${width}px`,
             maxWidth: `${width}px`

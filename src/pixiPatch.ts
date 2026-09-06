@@ -8,7 +8,7 @@ interface MethodHost {
 
 declare global {
     interface Window {
-        __nitroPixiBatcherPatched__?: boolean;
+        __octanePixiBatcherPatched__?: boolean;
     }
 }
 
@@ -22,7 +22,7 @@ const isNullTextureCrash = (err: unknown): boolean => {
 const guardMethod = (proto: MethodHost, methodName: string, label: string): boolean => {
     const original = proto[methodName];
     if (typeof original !== 'function') return false;
-    if ((original as { __nitroGuarded__?: boolean }).__nitroGuarded__) return false;
+    if ((original as { __octaneGuarded__?: boolean }).__octaneGuarded__) return false;
 
     const guarded = function (this: unknown, ...args: unknown[]) {
         try {
@@ -33,16 +33,16 @@ const guardMethod = (proto: MethodHost, methodName: string, label: string): bool
         }
     };
 
-    (guarded as { __nitroGuarded__?: boolean }).__nitroGuarded__ = true;
+    (guarded as { __octaneGuarded__?: boolean }).__octaneGuarded__ = true;
     proto[methodName] = guarded;
 
-    console.info(`[NitroPixiPatch] guarded ${label}.prototype.${methodName} against null textureSource`);
+    console.info(`[OctanePixiPatch] guarded ${label}.prototype.${methodName} against null textureSource`);
     return true;
 };
 
 const installPatch = (): void => {
     if (typeof window === 'undefined') return;
-    if (window.__nitroPixiBatcherPatched__) return;
+    if (window.__octanePixiBatcherPatched__) return;
 
     const candidates: Array<[string, unknown]> = [
         ['DefaultBatcher', (PIXI as Record<string, unknown>).DefaultBatcher],
@@ -59,10 +59,10 @@ const installPatch = (): void => {
         if (guardMethod(proto, 'checkAndUpdateTexture', name)) patched = true;
     }
 
-    window.__nitroPixiBatcherPatched__ = patched;
+    window.__octanePixiBatcherPatched__ = patched;
 
     if (!patched) {
-        console.warn('[NitroPixiPatch] could not locate Batcher.prototype methods - is pixi.js export shape unchanged?');
+        console.warn('[OctanePixiPatch] could not locate Batcher.prototype methods - is pixi.js export shape unchanged?');
     }
 };
 

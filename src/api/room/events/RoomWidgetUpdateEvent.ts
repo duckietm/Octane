@@ -1,3 +1,3 @@
-import { NitroEvent } from '@nitrots/nitro-renderer';
+import { OctaneEvent } from '@octane/renderer';
 
-export class RoomWidgetUpdateEvent extends NitroEvent {}
+export class RoomWidgetUpdateEvent extends OctaneEvent {}

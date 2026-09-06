@@ -11,11 +11,11 @@ import {
     UserProfileEvent,
     UserProfileParser,
     UserRelationshipsComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useState } from 'react';
 import { CreateLinkEvent, GetRoomSession, GetUserProfile, LocalizeText, SendMessageComposer } from '../../api';
-import { useMessageEvent, useNitroEvent } from '../../hooks';
-import { NitroCard } from '../../layout';
+import { useMessageEvent, useOctaneEvent } from '../../hooks';
+import { OctaneCard } from '../../layout';
 import { GroupsContainerView } from './GroupsContainerView';
 import { UserContainerView } from './UserContainerView';
 
@@ -86,7 +86,7 @@ export const UserProfileView: FC<{}> = () => {
         GetUserProfile(parser.userId);
     });
 
-    useNitroEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.SELECTED, (event) => {
+    useOctaneEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.SELECTED, (event) => {
         if (!userProfile) return;
 
         if (event.category !== RoomObjectCategory.UNIT) return;
@@ -104,14 +104,14 @@ export const UserProfileView: FC<{}> = () => {
     const cardBackgroundClass = cardBackgroundId ? `profile-card-background card-background-${cardBackgroundId}` : '';
 
     return (
-        <NitroCard className="nitro-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]" uniqueKey="nitro-user-profile">
-            <NitroCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
-            <NitroCard.Content className={`nitro-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
+        <OctaneCard className="octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]" uniqueKey="octane-user-profile">
+            <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
+            <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
                 <div className="px-[10px] pt-[8px]">
                     <UserContainerView userBadges={userBadges} userProfile={userProfile} userRelationships={userRelationships} onOpenRooms={onOpenRooms} />
                 </div>
-                <div className="nitro-extended-profile-window__body nitro-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
-                    <div className="nitro-extended-profile-window__panel h-full p-2">
+                <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
+                    <div className="octane-extended-profile-window__panel h-full p-2">
                         <GroupsContainerView
                             fullWidth
                             groups={userProfile.groups}
@@ -120,7 +120,7 @@ export const UserProfileView: FC<{}> = () => {
                         />
                     </div>
                 </div>
-            </NitroCard.Content>
-        </NitroCard>
+            </OctaneCard.Content>
+        </OctaneCard>
     );
 };

@@ -179,15 +179,15 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
 
     return (
         <WiredActionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 244 }} hideDelay={true}>
-            <div className="nitro-wired__give-var">
-                <div className="nitro-wired__give-var-heading">
+            <div className="octane-wired__give-var">
+                <div className="octane-wired__give-var-heading">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="nitro-wired__give-var-targets">
+                    <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
                             <button
                                 key={button.key}
                                 type="button"
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${selectedTargetType === button.key ? 'is-active' : ''}`}
+                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${selectedTargetType === button.key ? 'is-active' : ''}`}
                                 onClick={() => handleTargetTypeChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
@@ -205,10 +205,10 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
 
                 {!targetDefinitions.length && <Text small>{missingVariablesText}</Text>}
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">
+                <div className="octane-wired__give-var-section">
+                    <div className="octane-wired__give-var-section-title">
                         {LocalizeText('wiredfurni.params.delay', ['seconds'], [GetWiredTimeLocale(actionDelay)])}
                     </div>
                     <Slider max={20} min={0} value={actionDelay} onChange={(event) => setActionDelay(event)} />
@@ -216,21 +216,21 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
 
                 {selectedTargetType !== 'context' && (
                     <>
-                        <div className="nitro-wired__divider" />
+                        <div className="octane-wired__divider" />
 
-                        <div className="nitro-wired__give-var-section">
-                            <div className="nitro-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.sources.merged.title.variables', 'Fonte variabile:')}</div>
+                        <div className="octane-wired__give-var-section">
+                            <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.sources.merged.title.variables', 'Fonte variabile:')}</div>
                             <div className="flex items-center gap-1">
                                 <Button
                                     disabled={resolvedSourceOptions.length <= 1}
                                     variant="primary"
-                                    classNames={['nitro-wired__picker-button']}
+                                    classNames={['octane-wired__picker-button']}
                                     className="px-2 py-1"
                                     onClick={() => cycleSource(-1)}
                                 >
                                     <FaChevronLeft />
                                 </Button>
-                                <div className="flex min-w-0 flex-1 items-center justify-center nitro-wired__picker-label">
+                                <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
                                     <Text small className="text-center">
                                         {selectedSourceOption ? LocalizeText(selectedSourceOption.label) : '-'}
                                     </Text>
@@ -238,7 +238,7 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
                                 <Button
                                     disabled={resolvedSourceOptions.length <= 1}
                                     variant="primary"
-                                    classNames={['nitro-wired__picker-button']}
+                                    classNames={['octane-wired__picker-button']}
                                     className="px-2 py-1"
                                     onClick={() => cycleSource(1)}
                                 >

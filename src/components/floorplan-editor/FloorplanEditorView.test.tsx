@@ -1,17 +1,17 @@
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Capture handlers registered by useMessageEvent / useNitroEvent so we can fire fake events.
+// Capture handlers registered by useMessageEvent / useOctaneEvent so we can fire fake events.
 const messageHandlers = new Map<unknown, (event: unknown) => void>();
-const nitroHandlers = new Map<unknown, (event: unknown) => void>();
+const octaneHandlers = new Map<unknown, (event: unknown) => void>();
 
 vi.mock('../../hooks', async () => {
     return {
         useMessageEvent: (eventClass: unknown, handler: (event: unknown) => void) => {
             messageHandlers.set(eventClass, handler);
         },
-        useNitroEvent: (eventType: unknown, handler: (event: unknown) => void) => {
-            nitroHandlers.set(eventType, handler);
+        useOctaneEvent: (eventType: unknown, handler: (event: unknown) => void) => {
+            octaneHandlers.set(eventType, handler);
         }
     };
 });
@@ -39,11 +39,11 @@ import {
     RoomOccupiedTilesMessageEvent,
     RoomVisualizationSettingsEvent,
     UpdateFloorPropertiesMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FloorplanEditorView } from './FloorplanEditorView';
 
 // The Button component in this codebase renders as a <div> (via Base), not <button>.
-// NitroCardView portals everything into #draggable-windows-container.
+// OctaneCardView portals everything into #draggable-windows-container.
 // Find a clickable element by its exact trimmed text content in the portal.
 const findByExactText = (text: string): Element | undefined => {
     const container = document.getElementById('draggable-windows-container') ?? document.body;
@@ -53,7 +53,7 @@ const findByExactText = (text: string): Element | undefined => {
 describe('FloorplanEditorView container', () => {
     beforeEach(() => {
         messageHandlers.clear();
-        nitroHandlers.clear();
+        octaneHandlers.clear();
         sendMessageComposer.mockClear();
         (AddLinkEventTracker as ReturnType<typeof vi.fn>).mockClear();
         (RemoveLinkEventTracker as ReturnType<typeof vi.fn>).mockClear();
@@ -173,9 +173,9 @@ describe('FloorplanEditorView container', () => {
         render(<FloorplanEditorView />);
         const tracker = (AddLinkEventTracker as ReturnType<typeof vi.fn>).mock.calls[0][0];
         act(() => tracker.linkReceived('floor-editor/show'));
-        // Editor should be visible — NitroCardHeaderView renders the title
+        // Editor should be visible — OctaneCardHeaderView renders the title
         expect(document.body.textContent).toContain('floor.plan.editor.title');
-        const disposeHandler = nitroHandlers.get(RoomEngineEvent.DISPOSED);
+        const disposeHandler = octaneHandlers.get(RoomEngineEvent.DISPOSED);
         expect(disposeHandler).toBeTruthy();
         act(() => disposeHandler!({}));
         expect(document.body.textContent).not.toContain('floor.plan.editor.title');

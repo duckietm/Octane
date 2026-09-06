@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 
 const MATCH_CONTAINS = 0;
@@ -32,7 +32,7 @@ export const WiredTriggerAvatarSaysSomethingView: FC<{}> = () => {
         <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.whatissaid')}</Text>
-                <NitroInput type="text" value={message} onChange={(event) => setMessage(event.target.value)} />
+                <OctaneInput type="text" value={message} onChange={(event) => setMessage(event.target.value)} />
             </div>
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-1">

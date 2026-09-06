@@ -1,4 +1,4 @@
-import { GetRoomEngine, RoomPreviewer } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomPreviewer } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import { LayoutRoomPreviewerView } from '../../common';
 

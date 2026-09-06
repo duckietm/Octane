@@ -1,13 +1,13 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useMemo } from 'react';
 import { getHousekeepingMode, HousekeepingTabId, isHousekeepingEnabled, isHousekeepingTabAvailable, LocalizeText } from '../../api';
 import {
     DraggableWindowPosition,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardTabsItemView,
-    NitroCardTabsView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardTabsItemView,
+    OctaneCardTabsView,
+    OctaneCardView,
     WidgetErrorBoundary
 } from '../../common';
 import { useHasPermission, useHousekeepingStore } from '../../hooks';
@@ -176,65 +176,65 @@ export const HousekeepingView: FC = () => {
 
     return (
         <WidgetErrorBoundary name="HousekeepingView">
-            <NitroCardView
-                className={`nitro-housekeeping ${sizeClass}`}
+            <OctaneCardView
+                className={`octane-housekeeping ${sizeClass}`}
                 theme="primary-slim"
                 uniqueKey="housekeeping"
                 windowPosition={DraggableWindowPosition.TOP_CENTER}
             >
-                <NitroCardHeaderView headerText={`${LocalizeText('housekeeping.title')}${headerSuffix}`} onCloseClick={() => closePanel()} />
-                <NitroCardTabsView>
+                <OctaneCardHeaderView headerText={`${LocalizeText('housekeeping.title')}${headerSuffix}`} onCloseClick={() => closePanel()} />
+                <OctaneCardTabsView>
                     {showDashboard && (
-                        <NitroCardTabsItemView isActive={activeTab === HousekeepingTabId.DASHBOARD} onClick={() => setActiveTab(HousekeepingTabId.DASHBOARD)}>
+                        <OctaneCardTabsItemView isActive={activeTab === HousekeepingTabId.DASHBOARD} onClick={() => setActiveTab(HousekeepingTabId.DASHBOARD)}>
                             <div className="flex items-center gap-1.5 text-xs">
-                                <span className="nitro-icon nitro-icon-hk-tab icon-housekeeping" />
+                                <span className="octane-icon octane-icon-hk-tab icon-housekeeping" />
                                 <span>{LocalizeText('housekeeping.tab.dashboard')}</span>
                             </div>
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     )}
-                    <NitroCardTabsItemView isActive={activeTab === HousekeepingTabId.USERS} onClick={() => setActiveTab(HousekeepingTabId.USERS)}>
+                    <OctaneCardTabsItemView isActive={activeTab === HousekeepingTabId.USERS} onClick={() => setActiveTab(HousekeepingTabId.USERS)}>
                         <div className="flex items-center gap-1.5 text-xs">
-                            <span className="nitro-icon nitro-icon-hk-tab icon-modtools" />
+                            <span className="octane-icon octane-icon-hk-tab icon-modtools" />
                             <span>{LocalizeText('housekeeping.tab.users')}</span>
                         </div>
-                    </NitroCardTabsItemView>
-                    <NitroCardTabsItemView isActive={activeTab === HousekeepingTabId.ROOMS} onClick={() => setActiveTab(HousekeepingTabId.ROOMS)}>
+                    </OctaneCardTabsItemView>
+                    <OctaneCardTabsItemView isActive={activeTab === HousekeepingTabId.ROOMS} onClick={() => setActiveTab(HousekeepingTabId.ROOMS)}>
                         <div className="flex items-center gap-1.5 text-xs">
-                            <span className="nitro-icon nitro-icon-hk-tab icon-rooms" />
+                            <span className="octane-icon octane-icon-hk-tab icon-rooms" />
                             <span>{LocalizeText('housekeeping.tab.rooms')}</span>
                         </div>
-                    </NitroCardTabsItemView>
+                    </OctaneCardTabsItemView>
                     {showEconomy && (
-                        <NitroCardTabsItemView isActive={activeTab === HousekeepingTabId.ECONOMY} onClick={() => setActiveTab(HousekeepingTabId.ECONOMY)}>
+                        <OctaneCardTabsItemView isActive={activeTab === HousekeepingTabId.ECONOMY} onClick={() => setActiveTab(HousekeepingTabId.ECONOMY)}>
                             <div className="flex items-center gap-1.5 text-xs">
-                                <span className="nitro-icon nitro-icon-hk-tab icon-catalog" />
+                                <span className="octane-icon octane-icon-hk-tab icon-catalog" />
                                 <span>{LocalizeText('housekeeping.tab.economy')}</span>
                             </div>
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     )}
                     {showAudit && (
-                        <NitroCardTabsItemView isActive={activeTab === HousekeepingTabId.AUDIT} onClick={() => setActiveTab(HousekeepingTabId.AUDIT)}>
+                        <OctaneCardTabsItemView isActive={activeTab === HousekeepingTabId.AUDIT} onClick={() => setActiveTab(HousekeepingTabId.AUDIT)}>
                             <div className="flex items-center gap-1.5 text-xs">
-                                <span className="nitro-icon nitro-icon-hk-tab icon-message" />
+                                <span className="octane-icon octane-icon-hk-tab icon-message" />
                                 <span>{LocalizeText('housekeeping.tab.audit')}</span>
                             </div>
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     )}
                     {showSoundboard && (
-                        <NitroCardTabsItemView isActive={activeTab === HousekeepingTabId.SOUNDBOARD} onClick={() => setActiveTab(HousekeepingTabId.SOUNDBOARD)}>
+                        <OctaneCardTabsItemView isActive={activeTab === HousekeepingTabId.SOUNDBOARD} onClick={() => setActiveTab(HousekeepingTabId.SOUNDBOARD)}>
                             <div className="flex items-center gap-1.5 text-xs">
-                                <span className="nitro-icon nitro-icon-hk-tab icon-soundboard" />
+                                <span className="octane-icon octane-icon-hk-tab icon-soundboard" />
                                 <span>{LocalizeText('housekeeping.tab.soundboard')}</span>
                             </div>
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     )}
-                </NitroCardTabsView>
+                </OctaneCardTabsView>
                 <HousekeepingStatusBanner />
                 <HousekeepingPasswordReveal />
-                <NitroCardContentView className="text-black" gap={2}>
+                <OctaneCardContentView className="text-black" gap={2}>
                     {activeView}
-                </NitroCardContentView>
-            </NitroCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
         </WidgetErrorBoundary>
     );
 };

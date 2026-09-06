@@ -1,4 +1,4 @@
-import { FindNewFriendsMessageComposer, MouseEventType } from '@nitrots/nitro-renderer';
+import { FindNewFriendsMessageComposer, MouseEventType } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useRef, useState } from 'react';
 import { GetUserProfile, LocalizeText, MessengerFriend, OpenMessengerChat, SendMessageComposer } from '../../../../api';

@@ -1,4 +1,4 @@
-import { GetConfigurationValue } from '../nitro';
+import { GetConfigurationValue } from '../octane';
 import { HousekeepingTabId } from './HousekeepingActionType';
 
 export type HousekeepingMode = 'light' | 'full';

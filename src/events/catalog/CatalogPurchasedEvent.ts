@@ -1,6 +1,6 @@
-import { NitroEvent, PurchaseOKMessageOfferData } from '@nitrots/nitro-renderer';
+import { OctaneEvent, PurchaseOKMessageOfferData } from '@octane/renderer';
 
-export class CatalogPurchasedEvent extends NitroEvent {
+export class CatalogPurchasedEvent extends OctaneEvent {
     public static PURCHASE_SUCCESS: string = 'CPE_PURCHASE_SUCCESS';
 
     private _purchase: PurchaseOKMessageOfferData;

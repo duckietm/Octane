@@ -5,10 +5,10 @@ import {
     RoomEngineTriggerWidgetEvent,
     RoomObjectVariable,
     SetObjectDataMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useEffect, useState } from 'react';
 import { CanManipulateFurniture, SendMessageComposer } from '../../../../api';
-import { useNitroEvent } from '../../../events';
+import { useOctaneEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
 
 const useFurnitureAreaHideWidgetState = () => {
@@ -59,7 +59,7 @@ const useFurnitureAreaHideWidgetState = () => {
         onClose();
     }, [objectId, isOn, rootX, rootY, width, length, invisibility, wallItems, inverted]);
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_AREA_HIDE, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_AREA_HIDE, (event) => {
         if (!CanManipulateFurniture(roomSession, event.objectId, event.category)) return;
 
         setObjectId(event.objectId);
@@ -80,7 +80,7 @@ const useFurnitureAreaHideWidgetState = () => {
         setInverted((model.getValue<number>(RoomObjectVariable.FURNITURE_AREA_HIDE_INVERT) ?? data[7] ?? 0) === 1);
     });
 
-    useNitroEvent<RoomEngineAreaHideStateEvent>(RoomEngineAreaHideStateEvent.UPDATE_STATE_AREA_HIDE, (event) => {
+    useOctaneEvent<RoomEngineAreaHideStateEvent>(RoomEngineAreaHideStateEvent.UPDATE_STATE_AREA_HIDE, (event) => {
         if (objectId !== event.objectId) return;
 
         setCategory(event.category);

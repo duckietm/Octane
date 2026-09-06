@@ -35,12 +35,12 @@
                 "../octane-renderer/node_modules/pixi.js",
                 "../renderer/node_modules/pixi.js"
             ],
-            "@nitrots/nitro-renderer": [
+            "@octane/renderer": [
                 "../Octane-Renderer/index.ts",
                 "../octane-renderer/index.ts",
                 "../renderer/index.ts"
             ],
-            "@nitrots/*": [
+            "@octane/*": [
                 "../Octane-Renderer/packages/*/src/index.ts",
                 "../octane-renderer/packages/*/src/index.ts",
                 "../renderer/packages/*/src/index.ts"
@@ -49,6 +49,6 @@
     },
     "include": [
         "src",
-        "node_modules/@nitrots/nitro-renderer/src/**/*.ts"
+        "node_modules/@octane/renderer/src/**/*.ts"
     ]
 }

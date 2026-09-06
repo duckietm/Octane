@@ -16,10 +16,10 @@ const localizedOrFallback = (key: string, fallback: string) => {
 export const CatalogLoadingStateView: FC<CatalogLoadingStateViewProps> = ({ error = null, onRetry = null }) => {
     if (error) {
         return (
-            <div aria-live="assertive" className="nitro-catalog-loading-state is-error" role="alert">
+            <div aria-live="assertive" className="octane-catalog-loading-state is-error" role="alert">
                 <span>{localizedOrFallback('catalog.loading.timeout', 'The catalog page took too long to load.')}</span>
                 {!!onRetry && (
-                    <button className="nitro-catalog-standard-button" type="button" onClick={onRetry}>
+                    <button className="octane-catalog-standard-button" type="button" onClick={onRetry}>
                         {localizedOrFallback('generic.retry', 'Retry')}
                     </button>
                 )}
@@ -28,7 +28,7 @@ export const CatalogLoadingStateView: FC<CatalogLoadingStateViewProps> = ({ erro
     }
 
     return (
-        <div aria-live="polite" className="nitro-catalog-loading-state" role="status">
+        <div aria-live="polite" className="octane-catalog-loading-state" role="status">
             <LayoutLoadingSpinnerView />
             <span>{LocalizeText('generic.loading') || 'Loading...'}</span>
         </div>

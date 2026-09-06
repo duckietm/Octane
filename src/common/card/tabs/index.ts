@@ -1,2 +1,2 @@
-export * from './NitroCardTabsItemView';
-export * from './NitroCardTabsView';
+export * from './OctaneCardTabsItemView';
+export * from './OctaneCardTabsView';

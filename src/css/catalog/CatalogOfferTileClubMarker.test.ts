@@ -12,8 +12,8 @@ describe('Habbo Club catalog offer marker', () => {
     it('uses the compact marker and anchors it over the product corner', () => {
         const iconCss = readFileSync(join(process.cwd(), 'src/css/icons/icons.css'), 'utf8');
         const catalogCss = readFileSync(join(process.cwd(), 'src/css/catalog/CatalogView.css'), 'utf8');
-        const iconRule = iconCss.match(/\.nitro-icon\.icon-catalogue-hc_small\s*\{[^}]*\}/s)?.[0] ?? '';
-        const markerRule = catalogCss.match(/\.nitro-catalog-grid-club-level\s*\{[^}]*\}/s)?.[0] ?? '';
+        const iconRule = iconCss.match(/\.octane-icon\.icon-catalogue-hc_small\s*\{[^}]*\}/s)?.[0] ?? '';
+        const markerRule = catalogCss.match(/\.octane-catalog-grid-club-level\s*\{[^}]*\}/s)?.[0] ?? '';
 
         expect(readPngSize(join(process.cwd(), 'src/assets/images/catalog/hc_small.png'))).toEqual({ width: 15, height: 15 });
         expect(iconRule).toMatch(/width:\s*15px;/);

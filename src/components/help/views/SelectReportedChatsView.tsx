@@ -1,4 +1,4 @@
-import { RoomObjectType } from '@nitrots/nitro-renderer';
+import { RoomObjectType } from '@octane/renderer';
 import { FC, useMemo, useState } from 'react';
 import { ChatEntryType, IChatEntry, LocalizeText, ReportState, ReportType } from '../../../api';
 import { AutoGrid, Button, Column, Flex, LayoutGridItem, Text } from '../../../common';

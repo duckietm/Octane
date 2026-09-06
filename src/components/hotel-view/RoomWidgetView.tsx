@@ -1,4 +1,4 @@
-import { CreateLinkEvent } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { GetConfigurationValue } from '../../api';
 import { Base } from '../../common';
@@ -16,25 +16,25 @@ export const RoomWidgetView: FC<RoomWidgetViewProps> = (props) => {
 
     return (
         <>
-            <Base className="nitro-hotel-view-rooftop position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopId)}>
+            <Base className="octane-hotel-view-rooftop position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="nitro-hotel-view-rooftop-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopPoolId)}>
+            <Base className="octane-hotel-view-rooftop-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopPoolId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="nitro-hotel-view-picnic position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + picnicId)}>
+            <Base className="octane-hotel-view-picnic position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + picnicId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="nitro-hotel-view-infobus position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + infobusId)}>
+            <Base className="octane-hotel-view-infobus position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + infobusId)}>
                 <i className="arrow-infobus" />
             </Base>
-            <Base className="nitro-hotel-view-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + poolId)}>
+            <Base className="octane-hotel-view-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + poolId)}>
                 <i className="arrow-pool" />
             </Base>
-            <Base className="nitro-hotel-view-lobby position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + lobbyId)}>
+            <Base className="octane-hotel-view-lobby position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + lobbyId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="nitro-hotel-view-peaceful position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + peacefulId)}>
+            <Base className="octane-hotel-view-peaceful position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + peacefulId)}>
                 <i className="arrow-peaceful" />
             </Base>
         </>

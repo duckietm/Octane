@@ -9,7 +9,7 @@ import {
     RoomInviteErrorEvent,
     RoomInviteEvent,
     SendMessageComposer as SendMessageComposerPacket
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {

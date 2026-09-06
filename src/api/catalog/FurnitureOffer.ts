@@ -1,5 +1,5 @@
-import { GetProductOfferComposer, IFurnitureData } from '@nitrots/nitro-renderer';
-import { GetProductDataForLocalization, SendMessageComposer } from '../nitro';
+import { GetProductOfferComposer, IFurnitureData } from '@octane/renderer';
+import { GetProductDataForLocalization, SendMessageComposer } from '../octane';
 import { ICatalogPage } from './ICatalogPage';
 import { IProduct } from './IProduct';
 import { IPurchasableOffer } from './IPurchasableOffer';

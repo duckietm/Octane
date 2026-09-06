@@ -1,8 +1,8 @@
-import { CloseIssuesMessageComposer, ReleaseIssuesMessageComposer } from '@nitrots/nitro-renderer';
+import { CloseIssuesMessageComposer, ReleaseIssuesMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { FaBan, FaCheck, FaCommentDots, FaExternalLinkAlt, FaSignOutAlt, FaTrashAlt } from 'react-icons/fa';
 import { GetIssueCategoryName, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useModTools } from '../../../../hooks';
 import { CfhChatlogView } from './CfhChatlogView';
 
@@ -38,16 +38,16 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = (props) => {
 
     return (
         <>
-            <NitroCardView
-                className="nitro-mod-tools-handle-issue min-w-0 w-[min(500px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+            <OctaneCardView
+                className="octane-mod-tools-handle-issue min-w-0 w-[min(500px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                 theme="primary-slim"
                 windowPosition={DraggableWindowPosition.TOP_LEFT}
             >
-                <NitroCardHeaderView
+                <OctaneCardHeaderView
                     headerText={LocalizeText('modtools.tickets.issue.title', ['issueId'], [issueId.toString()])}
                     onCloseClick={() => onIssueInfoClosed(issueId)}
                 />
-                <NitroCardContentView className="text-black" gap={2}>
+                <OctaneCardContentView className="text-black" gap={2}>
                     {/* Issue header */}
                     <div className="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-transparent rounded p-2 border border-amber-100">
                         <FaCommentDots className="text-amber-600 shrink-0" size={16} />
@@ -118,8 +118,8 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = (props) => {
                             <FaSignOutAlt size={12} /> {LocalizeText('modtools.tickets.issue.release')}
                         </Button>
                     </div>
-                </NitroCardContentView>
-            </NitroCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
             {cfhChatlogOpen && <CfhChatlogView issueId={issueId} onCloseClick={() => setCfhChatlogOpen(false)} />}
         </>
     );

@@ -1,8 +1,8 @@
-import { CheckUserNameMessageComposer, CheckUserNameResultMessageEvent } from '@nitrots/nitro-renderer';
+import { CheckUserNameMessageComposer, CheckUserNameResultMessageEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { useMessageEvent } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { NameChangeLayoutViewProps } from './NameChangeView.types';
 
 const AVAILABLE: number = 0;
@@ -71,12 +71,12 @@ export const NameChangeInputView: FC<NameChangeLayoutViewProps> = (props) => {
         <div className="flex flex-col h-full gap-3">
             <div>{LocalizeText('tutorial.name_change.info.select')}</div>
             <div className="flex gap-2">
-                <NitroInput type="text" value={newUsername} onChange={(event) => handleUsernameChange(event.target.value)} />
+                <OctaneInput type="text" value={newUsername} onChange={(event) => handleUsernameChange(event.target.value)} />
                 <button className="btn btn-primary" disabled={newUsername === '' || isChecking} onClick={check}>
                     {LocalizeText('tutorial.name_change.check')}
                 </button>
             </div>
-            {!errorCode && !canProceed && <div className="nitro-card-panel p-2 text-center">{LocalizeText('help.tutorial.name.info')}</div>}
+            {!errorCode && !canProceed && <div className="octane-card-panel p-2 text-center">{LocalizeText('help.tutorial.name.info')}</div>}
             {errorCode && (
                 <div className="p-2 text-center text-white rounded bg-danger">{LocalizeText(`help.tutorial.name.${errorCode}`, ['name'], [newUsername])}</div>
             )}
@@ -86,7 +86,7 @@ export const NameChangeInputView: FC<NameChangeLayoutViewProps> = (props) => {
             {suggestions && (
                 <div className="flex flex-col gap-2">
                     {suggestions.map((suggestion, index) => (
-                        <div key={index} className="nitro-card-row p-1 cursor-pointer col" onClick={() => handleUsernameChange(suggestion)}>
+                        <div key={index} className="octane-card-row p-1 cursor-pointer col" onClick={() => handleUsernameChange(suggestion)}>
                             {suggestion}
                         </div>
                     ))}

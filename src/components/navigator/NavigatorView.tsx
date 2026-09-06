@@ -10,7 +10,7 @@ import {
     NavigatorSettingsEvent,
     RemoveLinkEventTracker,
     RoomSessionEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useRef } from 'react';
 import { CreateLinkEvent, LocalizeText, localizeWithFallback, SendMessageComposer, TryVisitRoom } from '../../api';
 import createRoomImg from '../../assets/images/navigator/air/create-room.png';
@@ -25,7 +25,7 @@ import {
     useNavigatorSearch,
     useNavigatorUiState,
     useNavigatorUiStore,
-    useNitroEvent
+    useOctaneEvent
 } from '../../hooks';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
@@ -55,7 +55,7 @@ export const NavigatorView: FC<{}> = () => {
     const { isVisible, isCreatorOpen, isRoomInfoOpen, isRoomLinkOpen, isOpenSavesSearches, needsInit, currentTabCode, windowHeight } = useNavigatorUiState();
     const elementRef = useRef<HTMLDivElement>(null);
 
-    useNitroEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, () => {
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, () => {
         useNavigatorUiStore.getState().hide();
         useNavigatorUiStore.getState().closeCreator();
         useNavigatorRoomInfoPopupStore.getState().hide();
@@ -179,7 +179,7 @@ export const NavigatorView: FC<{}> = () => {
     const onToggleQuickLinks = () => {
         useNavigatorRoomInfoPopupStore.getState().hide();
         useNavigatorUiStore.getState().toggleSavesSearches();
-        persistNavigatorBounds(document.querySelector('.nitro-navigator-air') as HTMLElement | null);
+        persistNavigatorBounds(document.querySelector('.octane-navigator-air') as HTMLElement | null);
     };
 
     const onCreateRoom = () => {
@@ -201,33 +201,33 @@ export const NavigatorView: FC<{}> = () => {
     return (
         <>
             {isVisible && (
-                <DraggableWindow uniqueKey="navigator" handleSelector=".nitro-navigator-air__caption">
+                <DraggableWindow uniqueKey="navigator" handleSelector=".octane-navigator-air__caption">
                     <div
-                        className={`nitro-navigator-air max-w-[calc(100vw-16px)]${isOpenSavesSearches ? ' is-quick-links' : ''}`}
+                        className={`octane-navigator-air max-w-[calc(100vw-16px)]${isOpenSavesSearches ? ' is-quick-links' : ''}`}
                         data-air-frame="ubuntu-3"
                         style={{ '--navigator-height': `${windowHeight || 628}px` } as CSSProperties}
                     >
-                        <div className="nitro-navigator-air__skin" aria-hidden="true" />
-                        <div className="nitro-navigator-air__tab-shelf" aria-hidden="true" />
-                        <div className="nitro-navigator-air__caption">
-                            <span className="nitro-navigator-air__title">{headerText}</span>
+                        <div className="octane-navigator-air__skin" aria-hidden="true" />
+                        <div className="octane-navigator-air__tab-shelf" aria-hidden="true" />
+                        <div className="octane-navigator-air__caption">
+                            <span className="octane-navigator-air__title">{headerText}</span>
                             <button
                                 type="button"
-                                className="nitro-navigator-air__close"
+                                className="octane-navigator-air__close"
                                 aria-label={LocalizeText('generic.close')}
                                 onClick={() => useNavigatorUiStore.getState().hide()}
                             />
                         </div>
                         <button
                             type="button"
-                            className="nitro-navigator-air__quick-toggle"
+                            className="octane-navigator-air__quick-toggle"
                             aria-label={quickLinksToggleLabel}
                             aria-expanded={isOpenSavesSearches}
                             onClick={onToggleQuickLinks}
                         >
                             <img src={quicklinkAdd} alt="" width={18} height={18} />
                         </button>
-                        <div className="nitro-navigator-air__tabs" role="tablist">
+                        <div className="octane-navigator-air__tabs" role="tablist">
                             {topLevelContexts &&
                                 topLevelContexts.length > 0 &&
                                 topLevelContexts.map((context) => {
@@ -239,7 +239,7 @@ export const NavigatorView: FC<{}> = () => {
                                             type="button"
                                             role="tab"
                                             aria-selected={active}
-                                            className={`nitro-navigator-air__tab${active ? ' is-active' : ''}`}
+                                            className={`octane-navigator-air__tab${active ? ' is-active' : ''}`}
                                             onClick={() => {
                                                 useNavigatorRoomInfoPopupStore.getState().hide();
                                                 useNavigatorUiStore.getState().setTab(context.code);
@@ -250,18 +250,18 @@ export const NavigatorView: FC<{}> = () => {
                                     );
                                 })}
                         </div>
-                        <div className="nitro-navigator-air__body">
+                        <div className="octane-navigator-air__body">
                             {!isCreatorOpen && (
-                                <div className="nitro-navigator-air__workspace">
+                                <div className="octane-navigator-air__workspace">
                                     {isOpenSavesSearches && (
-                                        <nav className="nitro-navigator-air__quick-links" aria-label={quickLinksLabel}>
+                                        <nav className="octane-navigator-air__quick-links" aria-label={quickLinksLabel}>
                                             <NavigatorSearchSavesResultView searches={navigatorSearches || []} />
                                         </nav>
                                     )}
-                                    <main className="nitro-navigator-air__main" aria-label={navigatorLabel}>
+                                    <main className="octane-navigator-air__main" aria-label={navigatorLabel}>
                                         <NavigatorSearchView searchResult={searchResult} />
-                                        <div ref={elementRef} className="nitro-navigator-air__results">
-                                            {isFetching && <div className="nitro-navigator-air__busy-mask" aria-hidden="true" />}
+                                        <div ref={elementRef} className="octane-navigator-air__results">
+                                            {isFetching && <div className="octane-navigator-air__busy-mask" aria-hidden="true" />}
                                             {searchResult &&
                                                 searchResult.results.map((result, index) => (
                                                     <NavigatorSearchResultView
@@ -276,36 +276,36 @@ export const NavigatorView: FC<{}> = () => {
                                                 <NavigatorEmptyStateView code={searchResult.code} />
                                             )}
                                         </div>
-                                        <div className="nitro-navigator-air__actions">
+                                        <div className="octane-navigator-air__actions">
                                             <button
                                                 type="button"
-                                                className="nitro-navigator-air__action nitro-navigator-air__action--create"
+                                                className="octane-navigator-air__action octane-navigator-air__action--create"
                                                 onClick={onCreateRoom}
                                             >
                                                 <img src={createRoomImg} alt="" />
                                                 <span>{LocalizeText('navigator.createroom.create')}</span>
-                                                <i className="nitro-navigator-air__action-border" aria-hidden="true" />
+                                                <i className="octane-navigator-air__action-border" aria-hidden="true" />
                                             </button>
                                             {!showPromote && (
                                                 <button
                                                     type="button"
-                                                    className="nitro-navigator-air__action nitro-navigator-air__action--random"
+                                                    className="octane-navigator-air__action octane-navigator-air__action--random"
                                                     onClick={onRandomRoom}
                                                 >
                                                     <img src={randomRoomImg} alt="" />
                                                     <span>{LocalizeText('navigator.random.room')}</span>
-                                                    <i className="nitro-navigator-air__action-border" aria-hidden="true" />
+                                                    <i className="octane-navigator-air__action-border" aria-hidden="true" />
                                                 </button>
                                             )}
                                             {showPromote && (
                                                 <button
                                                     type="button"
-                                                    className="nitro-navigator-air__action nitro-navigator-air__action--promote"
+                                                    className="octane-navigator-air__action octane-navigator-air__action--promote"
                                                     onClick={onPromoteRoom}
                                                 >
                                                     <img src={promoteRoomImg} alt="" />
                                                     <span>{LocalizeText('navigator.promote.room')}</span>
-                                                    <i className="nitro-navigator-air__action-border" aria-hidden="true" />
+                                                    <i className="octane-navigator-air__action-border" aria-hidden="true" />
                                                 </button>
                                             )}
                                         </div>

@@ -7,11 +7,11 @@ import {
     IFigurePart,
     IGraphicAsset,
     IPartColor,
-    NitroAlphaFilter,
-    NitroContainer,
-    NitroSprite,
+    OctaneAlphaFilter,
+    OctaneContainer,
+    OctaneSprite,
     TextureUtils
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { IAvatarEditorCategoryPartItem } from './IAvatarEditorCategoryPartItem';
 
 const MAX_CACHE_BYTES = 200 * 1024 * 1024;
@@ -83,7 +83,7 @@ export class AvatarEditorThumbnailsHelper {
     private static PENDING_THUMBNAILS: Map<string, Promise<string>> = new Map();
     private static THUMB_DIRECTIONS: number[] = [2, 6, 0, 4, 3, 1];
     private static THUMB_BOX: number = 50;
-    private static ALPHA_FILTER: NitroAlphaFilter = new NitroAlphaFilter({ alpha: 0.2 });
+    private static ALPHA_FILTER: OctaneAlphaFilter = new OctaneAlphaFilter({ alpha: 0.2 });
     private static DRAW_ORDER: string[] = [
         AvatarFigurePartType.LEFT_HAND_ITEM,
         AvatarFigurePartType.LEFT_HAND,
@@ -255,7 +255,7 @@ export class AvatarEditorThumbnailsHelper {
         if (pending) return pending;
 
         const buildContainer = (part: IAvatarEditorCategoryPartItem, useColors: boolean, partColors: IPartColor[], isDisabled: boolean = false) => {
-            const container = new NitroContainer();
+            const container = new OctaneContainer();
             const sourceParts = part.partSet.parts;
             const parts = sourceParts.concat().sort(this.sortByDrawOrder);
             let renderedCount = 0;
@@ -300,7 +300,7 @@ export class AvatarEditorThumbnailsHelper {
             if (!union || union.width <= 0 || union.height <= 0) return { container, renderedCount };
 
             for (const { figurePart, asset } of drawn) {
-                const sprite = new NitroSprite(asset.texture);
+                const sprite = new OctaneSprite(asset.texture);
                 const dest = avatarEditorThumbDest(asset.x, asset.y, union);
 
                 sprite.position.set(dest.x, dest.y);

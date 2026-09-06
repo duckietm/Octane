@@ -1,4 +1,4 @@
-import { MouseEventType } from '@nitrots/nitro-renderer';
+import { MouseEventType } from '@octane/renderer';
 import { FC, KeyboardEvent, MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { CatalogType, GetConfigurationValue, GetProductIconUrl, IPurchasableOffer, Offer, ProductTypeEnum } from '../../../../../api';
 import { LayoutAvatarImageView, LayoutGridItem, LayoutGridItemProps } from '../../../../../common';
@@ -48,7 +48,7 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
                     observer.disconnect();
                 }
             },
-            { root: element.closest('.nitro-catalog-default-layout, .nitro-catalog-window') ?? null, rootMargin: '120px' }
+            { root: element.closest('.octane-catalog-default-layout, .octane-catalog-window') ?? null, rootMargin: '120px' }
         );
         observer.observe(element);
         return () => observer.disconnect();
@@ -125,7 +125,7 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
             >
                 {iconUrl && product.productType !== ProductTypeEnum.ROBOT && (
                     <img
-                        className="nitro-catalog-grid-offer-icon"
+                        className="octane-catalog-grid-offer-icon"
                         src={iconUrl}
                         draggable={false}
                         style={tintColor ? { filter: 'url(#guild-furni-recolor)', transform: 'translateZ(0)' } : undefined}
@@ -137,18 +137,18 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
                 )}
                 {product.productType === ProductTypeEnum.ROBOT && <LayoutAvatarImageView direction={2} figure={product.extraParam} fit />}
                 {offer.clubLevel > 0 && (
-                    <span aria-label="Habbo Club" className="nitro-catalog-grid-club-level" title="Habbo Club">
-                        <i aria-hidden="true" className="nitro-icon icon-catalogue-hc_small" />
+                    <span aria-label="Habbo Club" className="octane-catalog-grid-club-level" title="Habbo Club">
+                        <i aria-hidden="true" className="octane-icon icon-catalogue-hc_small" />
                     </span>
                 )}
                 {showPrices && currentType !== CatalogType.BUILDER && prices.length > 0 && (
-                    <span className={`nitro-catalog-grid-price ${prices.length > 1 ? 'is-multi-price' : 'is-single-price'}`}>
+                    <span className={`octane-catalog-grid-price ${prices.length > 1 ? 'is-multi-price' : 'is-single-price'}`}>
                         {prices.map((price, index) => (
-                            <span key={`${price.type}-${index}`} className="nitro-catalog-grid-price-entry">
-                                {index > 0 && <span className="nitro-catalog-grid-price-plus">+</span>}
-                                <span className="nitro-catalog-grid-price-amount">{price.amount}</span>
+                            <span key={`${price.type}-${index}`} className="octane-catalog-grid-price-entry">
+                                {index > 0 && <span className="octane-catalog-grid-price-plus">+</span>}
+                                <span className="octane-catalog-grid-price-amount">{price.amount}</span>
                                 {!!getCurrencyIconUrl(price.type) && (
-                                    <img className="nitro-catalog-grid-price-currency" src={getCurrencyIconUrl(price.type)} draggable={false} />
+                                    <img className="octane-catalog-grid-price-currency" src={getCurrencyIconUrl(price.type)} draggable={false} />
                                 )}
                             </span>
                         ))}

@@ -1,4 +1,4 @@
-import { GetTickerTime, IFurnitureItemData, IObjectData } from '@nitrots/nitro-renderer';
+import { GetTickerTime, IFurnitureItemData, IObjectData } from '@octane/renderer';
 import { IFurnitureItem } from './IFurnitureItem';
 
 export class FurnitureItem implements IFurnitureItem {

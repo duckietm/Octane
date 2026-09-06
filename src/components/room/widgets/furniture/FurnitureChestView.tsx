@@ -22,7 +22,7 @@ import {
     FurnitureType,
     GetSessionDataManager,
     IChestFurniStoredItem,
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, localizeWithFallback, ProductImageUtility, SendMessageComposer } from '../../../../api';
 import sceneHigh from '../../../../assets/images/chest/light_coins_chest_balance_high.png';
@@ -32,7 +32,7 @@ import sceneZero from '../../../../assets/images/chest/light_coins_chest_balance
 import furniEmptyScene from '../../../../assets/images/chest/variant_furni_chest_empty.png';
 import bellIcon from '../../../../assets/images/chest/wired_chests_bell_icon.png';
 import gearIcon from '../../../../assets/images/chest/wired_chests_gear_icon.png';
-import { Column, Flex, LayoutCurrencyIcon, LayoutFurniImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Column, Flex, LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useMessageEvent, usePurse } from '../../../../hooks';
 import { useInventoryFurni } from '../../../../hooks/inventory';
 import { ChestButton } from './ChestButton';
@@ -441,9 +441,9 @@ export const FurnitureChestView: FC = () => {
     return (
         <>
             {/* ===== MAIN WINDOW ===== */}
-            <NitroCardView className="nitro-widget-chest" theme="primary-slim" style={{ width: 460 }}>
-                <NitroCardHeaderView headerText={name || chestTypeLabel} onCloseClick={close} />
-                <NitroCardContentView>
+            <OctaneCardView className="octane-widget-chest" theme="primary-slim" style={{ width: 460 }}>
+                <OctaneCardHeaderView headerText={name || chestTypeLabel} onCloseClick={close} />
+                <OctaneCardContentView>
                     {locked && !isOwner && (
                         <div className="mb-1 rounded border border-[#c08a5a] bg-[#f7e6cf] px-2 py-1 text-[11px] text-[#7a4a1c]">
                             {localizeWithFallback(
@@ -455,7 +455,7 @@ export const FurnitureChestView: FC = () => {
                     {/* ===== header box (chest_generic.xml container "header", 460x51) =====
                          grey band (layout_1 #dadada) + bottom splitter (#c0c0c0 @y50);
                          desc text @(10,10) 380w bold blend=0.6; bell btn @(397,7) + gear btn @(426,7) 24x24.
-                         margin -10 bleeds past NitroCardContentView's p-[10px] to the card edges. */}
+                         margin -10 bleeds past OctaneCardContentView's p-[10px] to the card edges. */}
                     <div
                         style={{
                             position: 'relative',
@@ -506,8 +506,8 @@ export const FurnitureChestView: FC = () => {
                     </div>
                     {/* ===== FURNI CHEST body (furni_chest_contents.xml) ===== */}
                     {isFurni && (
-                        <div className="nitro-chest__furni-body">
-                            <div className="nitro-chest__grid-border">
+                        <div className="octane-chest__furni-body">
+                            <div className="octane-chest__grid-border">
                                 {showFurniSearch && (
                                     <FurniChestSearchBar
                                         draft={furniSearchDraft}
@@ -520,17 +520,17 @@ export const FurnitureChestView: FC = () => {
                                     />
                                 )}
                                 <div
-                                    className="nitro-chest__grid-scroll"
+                                    className="octane-chest__grid-scroll"
                                     style={showFurniSearch ? { height: 204 } : undefined}
                                 >
                                     {visibleFurniEntries.length === 0 ? (
-                                        <div className="nitro-chest__grid-empty">
+                                        <div className="octane-chest__grid-empty">
                                             <Text small style={{ opacity: 0.5 }}>
                                                 {localizeWithFallback('wiredchests.furni_chest.no_items', 'No items stored')}
                                             </Text>
                                         </div>
                                     ) : (
-                                        <div className="nitro-chest__grid">
+                                        <div className="octane-chest__grid">
                                             {visibleFurniEntries.map((f) => (
                                                 <FurniChestGridItem
                                                     key={f.key}
@@ -544,14 +544,14 @@ export const FurnitureChestView: FC = () => {
                                     )}
                                 </div>
                             </div>
-                            <div className="nitro-chest__detail-panel">
-                                <div className="nitro-chest__preview-box">
+                            <div className="octane-chest__detail-panel">
+                                <div className="octane-chest__preview-box">
                                     {selectedGroup ? (
                                         <>
-                                            <Text bold className="nitro-chest__preview-name">
+                                            <Text bold className="octane-chest__preview-name">
                                                 {groupLabel(selectedGroup)}
                                             </Text>
-                                            <div className="nitro-chest__preview-image">
+                                            <div className="octane-chest__preview-image">
                                                 <LayoutFurniImageView
                                                     productType={selectedGroup.wallItem ? 'i' : 's'}
                                                     productClassId={selectedGroup.baseItemId}
@@ -566,15 +566,15 @@ export const FurnitureChestView: FC = () => {
                                             src={furniEmptyScene}
                                             alt=""
                                             draggable={false}
-                                            className="nitro-chest__preview-placeholder"
+                                            className="octane-chest__preview-placeholder"
                                         />
                                     )}
                                 </div>
-                                <div className="nitro-chest__withdraw-row">
+                                <div className="octane-chest__withdraw-row">
                                     <input
                                         type="text"
                                         inputMode="numeric"
-                                        className="nitro-chest__input nitro-chest__input--furni"
+                                        className="octane-chest__input octane-chest__input--furni"
                                         value={furniWithdrawAmount}
                                         onChange={(e) =>
                                             setFurniWithdrawAmount(Math.max(0, parseInt(e.target.value.replace(/\D/g, ''), 10) || 0))
@@ -617,7 +617,7 @@ export const FurnitureChestView: FC = () => {
                             <input
                                 type="text"
                                 inputMode="numeric"
-                                className="nitro-chest__input nitro-chest__input--coin"
+                                className="octane-chest__input octane-chest__input--coin"
                                 value={withdrawAmount}
                                 onChange={(e) => setWithdrawAmount(Math.max(0, parseInt(e.target.value.replace(/\D/g, ''), 10) || 0))}
                             />
@@ -642,9 +642,9 @@ export const FurnitureChestView: FC = () => {
                     )}
                         </>
                     )}
-                    <div className="nitro-chest__footer">
-                        <div className="nitro-chest__locking">
-                            <label className="nitro-chest__option">
+                    <div className="octane-chest__footer">
+                        <div className="octane-chest__locking">
+                            <label className="octane-chest__option">
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -654,7 +654,7 @@ export const FurnitureChestView: FC = () => {
                                 />
                                 <Text small>{localizeWithFallback('wiredchests.lock_chest', 'Lock this chest')}</Text>
                             </label>
-                            <label className="nitro-chest__option">
+                            <label className="octane-chest__option">
                                 <input
                                     type="checkbox"
                                     className="form-check-input"
@@ -669,20 +669,20 @@ export const FurnitureChestView: FC = () => {
                             </label>
                             <button
                                 type="button"
-                                className="nitro-chest__info-button"
+                                className="octane-chest__info-button"
                                 title={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}
                                 onClick={() => setShowLockInfo((v) => !v)}
                             >
                                 i
                             </button>
                         </div>
-                        <Flex alignItems="center" justifyContent="between" className="nitro-chest__footer-capacity">
+                        <Flex alignItems="center" justifyContent="between" className="octane-chest__footer-capacity">
                             <Flex alignItems="center" gap={1}>
                                 <Text small style={{ opacity: 0.6 }}>
                                     {localizeWithFallback('wiredchests.capacity', 'Chest capacity:')}
                                 </Text>
                                 <input
-                                    className="form-control form-control-sm nitro-chest__capacity-input"
+                                    className="form-control form-control-sm octane-chest__capacity-input"
                                     inputMode="numeric"
                                     type="text"
                                     disabled={!isOwner}
@@ -715,9 +715,9 @@ export const FurnitureChestView: FC = () => {
                         <Text small style={{ opacity: 0.6 }}>
                             {LocalizeText('wiredchests.space_used2', ['count', 'total'], [String(used), String(capacity)])}
                         </Text>
-                        <div className="nitro-chest__footer-row">
+                        <div className="octane-chest__footer-row">
                             {!isFurni ? (
-                                <div className="nitro-chest__footer-group">
+                                <div className="octane-chest__footer-group">
                                     <ChestButton wide footer disabled={!canWithdraw || creditsBalance <= 0} onClick={withdrawAll}>
                                         {LocalizeText('wiredchests.withdraw_all')}
                                     </ChestButton>
@@ -726,7 +726,7 @@ export const FurnitureChestView: FC = () => {
                                     </ChestButton>
                                 </div>
                             ) : (
-                                <div className="nitro-chest__footer-group">
+                                <div className="octane-chest__footer-group">
                                     <ChestButton wide footer disabled={!canWithdraw || furniEntries.length <= 0} onClick={withdrawAll}>
                                         {LocalizeText('wiredchests.withdraw_all')}
                                     </ChestButton>
@@ -740,17 +740,17 @@ export const FurnitureChestView: FC = () => {
                             </ChestButton>
                         </div>
                     </div>
-                </NitroCardContentView>
-            </NitroCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
 
             {/* ===== SETTINGS ===== */}
             {showSettings && (
-                <NitroCardView className="nitro-widget-chest-settings" theme="primary-slim" style={{ width: 360 }}>
-                    <NitroCardHeaderView
+                <OctaneCardView className="octane-widget-chest-settings" theme="primary-slim" style={{ width: 360 }}>
+                    <OctaneCardHeaderView
                         headerText={LocalizeText('wiredchests.settings.title', ['chest_type'], [chestTypeLabel])}
                         onCloseClick={() => setShowSettings(false)}
                     />
-                    <NitroCardContentView>
+                    <OctaneCardContentView>
                         <Column gap={2}>
                             <Text bold>{LocalizeText('wiredchests.settings.access')}</Text>
                             <label className="flex items-center gap-2">
@@ -844,7 +844,7 @@ export const FurnitureChestView: FC = () => {
                                     </Text>
                                 </>
                             )}
-                            <div className="nitro-chest__actions">
+                            <div className="octane-chest__actions">
                                 <ChestButton wide onClick={saveSettings}>
                                     {LocalizeText('wiredchests.ready')}
                                 </ChestButton>
@@ -853,18 +853,18 @@ export const FurnitureChestView: FC = () => {
                                 </ChestButton>
                             </div>
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
 
             {/* ===== NOTIFICATIONS ===== */}
             {showNotifications && (
-                <NitroCardView className="nitro-widget-chest-notifications" theme="primary-slim" style={{ width: 360 }}>
-                    <NitroCardHeaderView
+                <OctaneCardView className="octane-widget-chest-notifications" theme="primary-slim" style={{ width: 360 }}>
+                    <OctaneCardHeaderView
                         headerText={LocalizeText('wiredchests.notification_settings.title', ['chest_type'], [chestTypeLabel])}
                         onCloseClick={() => setShowNotifications(false)}
                     />
-                    <NitroCardContentView>
+                    <OctaneCardContentView>
                         <Column gap={2}>
                             <Text bold>{LocalizeText('wiredchests.notification_settings.enable_notifications.generic')}</Text>
                             <label className="flex items-center gap-2">
@@ -896,7 +896,7 @@ export const FurnitureChestView: FC = () => {
                                     </option>
                                 ))}
                             </select>
-                            <div className="nitro-chest__actions">
+                            <div className="octane-chest__actions">
                                 <ChestButton wide onClick={saveNotifications}>
                                     {LocalizeText('wiredchests.ready')}
                                 </ChestButton>
@@ -905,18 +905,18 @@ export const FurnitureChestView: FC = () => {
                                 </ChestButton>
                             </div>
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
 
             {/* ===== UPGRADE ===== */}
             {showUpgrade && (
-                <NitroCardView className="nitro-widget-chest-upgrade" theme="primary-slim" style={{ width: 340 }}>
-                    <NitroCardHeaderView headerText={LocalizeText('wiredchests.upgrade.title')} onCloseClick={() => setShowUpgrade(false)} />
-                    <NitroCardContentView>
+                <OctaneCardView className="octane-widget-chest-upgrade" theme="primary-slim" style={{ width: 340 }}>
+                    <OctaneCardHeaderView headerText={LocalizeText('wiredchests.upgrade.title')} onCloseClick={() => setShowUpgrade(false)} />
+                    <OctaneCardContentView>
                         <Column gap={2}>
                             <Flex alignItems="center" gap={2}>
-                                <div className="nitro-chest__upgrade-preview">
+                                <div className="octane-chest__upgrade-preview">
                                     {chestBaseItemId > 0 && <LayoutFurniImageView productType={FurnitureType.FLOOR} productClassId={chestBaseItemId} direction={2} />}
                                 </div>
                                 <Column gap={1}>
@@ -961,16 +961,16 @@ export const FurnitureChestView: FC = () => {
                                 )}
                             </Flex>
                             {upgradeError && (
-                                <Text small className="nitro-chest__upgrade-error">
+                                <Text small className="octane-chest__upgrade-error">
                                     {LocalizeText('wiredchests.upgrade.error', ['reason'], [localizeWithFallback(upgradeError, '')])}
                                 </Text>
                             )}
                             {upgradeResult && (
-                                <Text small className="nitro-chest__upgrade-error">
+                                <Text small className="octane-chest__upgrade-error">
                                     {upgradeResult}
                                 </Text>
                             )}
-                            <div className="nitro-chest__actions">
+                            <div className="octane-chest__actions">
                                 <ChestButton wide disabled={!!upgradeError} onClick={buyUpgrade}>
                                     {LocalizeText('wiredchests.upgrade.buy')}
                                 </ChestButton>
@@ -979,15 +979,15 @@ export const FurnitureChestView: FC = () => {
                                 </ChestButton>
                             </div>
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
 
             {/* ===== LOG ===== */}
             {showLog && (
-                <NitroCardView className="nitro-widget-chest-log" theme="primary-slim" style={{ width: 520 }}>
-                    <NitroCardHeaderView headerText={LocalizeText('wiredchests.logs.title')} onCloseClick={() => setShowLog(false)} />
-                    <NitroCardContentView>
+                <OctaneCardView className="octane-widget-chest-log" theme="primary-slim" style={{ width: 520 }}>
+                    <OctaneCardHeaderView headerText={LocalizeText('wiredchests.logs.title')} onCloseClick={() => setShowLog(false)} />
+                    <OctaneCardContentView>
                         <Column gap={1}>
                             <Text small>{LocalizeText('wiredchests.logs.chest_id', ['id'], [String(itemId)])}</Text>
                             <Flex gap={2} className="border-b pb-1">
@@ -1030,21 +1030,21 @@ export const FurnitureChestView: FC = () => {
                                 </Flex>
                             ))}
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
 
             {/* ===== WITHDRAW-ALL CONFIRM (mirrors WiredChestWrapperView.onWithdrawAllClick) ===== */}
             {confirmWiredUpgrade && (
-                <NitroCardView className="nitro-widget-chest-confirm" theme="primary-slim" style={{ width: 360 }}>
-                    <NitroCardHeaderView
+                <OctaneCardView className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 360 }}>
+                    <OctaneCardHeaderView
                         headerText={localizeWithFallback('wiredchests.upgrade.wired.title', 'Make it wired')}
                         onCloseClick={() => setConfirmWiredUpgrade(false)}
                     />
-                    <NitroCardContentView>
+                    <OctaneCardContentView>
                         <Column gap={2}>
                             <Flex alignItems="center" gap={2}>
-                                <div className="nitro-chest__upgrade-preview">
+                                <div className="octane-chest__upgrade-preview">
                                     {chestBaseItemId > 0 && (
                                         <LayoutFurniImageView
                                             productType={FurnitureType.FLOOR}
@@ -1060,7 +1060,7 @@ export const FurnitureChestView: FC = () => {
                                     )}
                                 </Text>
                             </Flex>
-                            <div className="nitro-chest__actions">
+                            <div className="octane-chest__actions">
                                 <ChestButton
                                     wide
                                     onClick={() => {
@@ -1075,20 +1075,20 @@ export const FurnitureChestView: FC = () => {
                                 </ChestButton>
                             </div>
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
 
             {confirmLock !== null && (
-                <NitroCardView className="nitro-widget-chest-confirm" theme="primary-slim" style={{ width: 340 }}>
-                    <NitroCardHeaderView
+                <OctaneCardView className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 340 }}>
+                    <OctaneCardHeaderView
                         headerText={localizeWithFallback(
                             confirmLock ? 'wiredchests.lock.confirm.title' : 'wiredchests.unlock.confirm.title',
                             '',
                         )}
                         onCloseClick={() => setConfirmLock(null)}
                     />
-                    <NitroCardContentView>
+                    <OctaneCardContentView>
                         <Column gap={2}>
                             <Text>
                                 {localizeWithFallback(
@@ -1096,7 +1096,7 @@ export const FurnitureChestView: FC = () => {
                                     '',
                                 )}
                             </Text>
-                            <div className="nitro-chest__actions">
+                            <div className="octane-chest__actions">
                                 <ChestButton
                                     wide
                                     onClick={() => {
@@ -1111,20 +1111,20 @@ export const FurnitureChestView: FC = () => {
                                 </ChestButton>
                             </div>
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
 
             {showLockInfo && (
-                <NitroCardView className="nitro-widget-chest-info" theme="primary-slim" style={{ width: 400 }}>
-                    <NitroCardHeaderView
+                <OctaneCardView className="octane-widget-chest-info" theme="primary-slim" style={{ width: 400 }}>
+                    <OctaneCardHeaderView
                         headerText={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}
                         onCloseClick={() => setShowLockInfo(false)}
                     />
-                    <NitroCardContentView>
+                    <OctaneCardContentView>
                         <Column gap={2}>
                             <Text small>{localizeWithFallback('wiredchests.lock_info.desc', '')}</Text>
-                            <ul className="nitro-chest__rules">
+                            <ul className="octane-chest__rules">
                                 {LOCK_INFO_RULES.map((key) => (
                                     <li key={key}>
                                         <Text small>{localizeWithFallback(key, '')}</Text>
@@ -1133,7 +1133,7 @@ export const FurnitureChestView: FC = () => {
                             </ul>
                             <Text bold>{localizeWithFallback('wiredchests.capacity_info.title', 'About capacity')}</Text>
                             <Text small>{localizeWithFallback('wiredchests.capacity_info.desc', '')}</Text>
-                            <ul className="nitro-chest__rules">
+                            <ul className="octane-chest__rules">
                                 {CAPACITY_INFO_RULES.map((key) => (
                                     <li key={key}>
                                         <Text small>{localizeWithFallback(key, '')}</Text>
@@ -1141,21 +1141,21 @@ export const FurnitureChestView: FC = () => {
                                 ))}
                             </ul>
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
 
             {confirmWithdrawAll && (
-                <NitroCardView className="nitro-widget-chest-confirm" theme="primary-slim" style={{ width: 320 }}>
-                    <NitroCardHeaderView headerText={LocalizeText('wiredchests.withdraw_all.confirm.title')} onCloseClick={() => setConfirmWithdrawAll(false)} />
-                    <NitroCardContentView>
+                <OctaneCardView className="octane-widget-chest-confirm" theme="primary-slim" style={{ width: 320 }}>
+                    <OctaneCardHeaderView headerText={LocalizeText('wiredchests.withdraw_all.confirm.title')} onCloseClick={() => setConfirmWithdrawAll(false)} />
+                    <OctaneCardContentView>
                         <Column gap={2}>
                             <Text>
                                 {LocalizeText(
                                     isFurni ? 'wiredchests.withdraw_all.confirm.desc_furni' : 'wiredchests.withdraw_all.confirm.desc',
                                 )}
                             </Text>
-                            <div className="nitro-chest__actions">
+                            <div className="octane-chest__actions">
                                 <ChestButton wide onClick={doWithdrawAll}>
                                     {LocalizeText('wiredchests.withdraw_all.confirm.yes')}
                                 </ChestButton>
@@ -1164,8 +1164,8 @@ export const FurnitureChestView: FC = () => {
                                 </ChestButton>
                             </div>
                         </Column>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
         </>
     );

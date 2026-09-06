@@ -1,7 +1,7 @@
-import { GetRoomContentLoader } from '@nitrots/nitro-renderer';
+import { GetRoomContentLoader } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../../api';
-import { Button, LayoutPetImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { usePetPackageWidget } from '../../../../hooks';
 
 const PET_PACKAGE_PREVIEW: Record<string, { typeId: number; paletteId: number }> = {
@@ -39,17 +39,17 @@ export const PetPackageWidgetView: FC<{}> = (props) => {
     return (
         <>
             {isVisible && (
-                <NitroCardView
+                <OctaneCardView
                     isResizable={false}
-                    className="nitro-pet-package min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                    className="octane-pet-package min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                     theme="primary-slim"
                 >
-                    <NitroCardHeaderView
+                    <OctaneCardHeaderView
                         center
                         headerText={objectType === 'gnome_box' ? LocalizeText('widgets.gnomepackage.name.title') : LocalizeText('furni.petpackage.open')}
                         onCloseClick={() => onClose()}
                     />
-                    <NitroCardContentView>
+                    <OctaneCardContentView>
                         <div className="flex gap-2 items-stretch">
                             <div className="flex flex-col flex-1 min-w-0">
                                 <div className="flex pet-package-container-top p-3">
@@ -92,7 +92,7 @@ export const PetPackageWidgetView: FC<{}> = (props) => {
                                 </div>
                             </div>
                             {petPreview && (
-                                <div className="flex items-center justify-center shrink-0 overflow-hidden w-[130px] p-2 nitro-pet-package-preview">
+                                <div className="flex items-center justify-center shrink-0 overflow-hidden w-[130px] p-2 octane-pet-package-preview">
                                     <LayoutPetImageView
                                         direction={2}
                                         paletteId={petPreview.paletteId}
@@ -103,8 +103,8 @@ export const PetPackageWidgetView: FC<{}> = (props) => {
                                 </div>
                             )}
                         </div>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
         </>
     );

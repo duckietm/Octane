@@ -1,9 +1,9 @@
-import { AddLinkEventTracker, GetRoomEngine, GetSessionDataManager, ILinkEventTracker, IRareValue, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, GetRoomEngine, GetSessionDataManager, ILinkEventTracker, IRareValue, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizeFormattedNumber, LocalizeText } from '../../api';
 import { Column, Flex, LayoutCurrencyIcon, LayoutImage, Text } from '../../common';
 import { useRareValues } from '../../hooks';
-import { NitroCard, NitroInput } from '../../layout';
+import { OctaneCard, OctaneInput } from '../../layout';
 
 const PAGE_SIZE = 50;
 
@@ -116,13 +116,13 @@ export const RareValuesView: FC<{}> = () => {
     const hasMore = visibleCount < filtered.length;
 
     return (
-        <NitroCard className="w-[460px] h-[520px]" uniqueKey="rare-values">
-            <NitroCard.Header headerText={LocalizeText('rarevalues.title')} onCloseClick={() => setIsVisible(false)} />
-            <NitroCard.Content>
+        <OctaneCard className="w-[460px] h-[520px]" uniqueKey="rare-values">
+            <OctaneCard.Header headerText={LocalizeText('rarevalues.title')} onCloseClick={() => setIsVisible(false)} />
+            <OctaneCard.Content>
                 <Column gap={2} className="h-full p-2">
                     <Flex alignItems="center" gap={2} className="rounded border border-black/10 bg-white px-2 py-1 shadow-inner">
                         <span className="text-black/40">🔍</span>
-                        <NitroInput
+                        <OctaneInput
                             placeholder={LocalizeText('generic.search')}
                             value={searchValue}
                             onChange={(event) => setSearchValue(event.target.value)}
@@ -185,7 +185,7 @@ export const RareValuesView: FC<{}> = () => {
                         )}
                     </div>
                 </Column>
-            </NitroCard.Content>
-        </NitroCard>
+            </OctaneCard.Content>
+        </OctaneCard>
     );
 };

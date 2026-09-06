@@ -10,7 +10,7 @@ interface ChatInputMentionSelectorViewProps {
 }
 
 /**
- * @-mention autocomplete popover. Wears the Habbo NitroCard chrome: cream
+ * @-mention autocomplete popover. Wears the Habbo OctaneCard chrome: cream
  * cardstock, habbo-blue header, UbuntuCondensed names, kind chips and the
  * custom Habbo scrollbar.
  */

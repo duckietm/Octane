@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 
 export const WiredTriggerAvatarLeaveRoomView: FC<{}> = (props) => {
@@ -43,7 +43,7 @@ export const WiredTriggerAvatarLeaveRoomView: FC<{}> = (props) => {
                     />
                     <Text>{LocalizeText('wiredfurni.params.certainavatar')}</Text>
                 </div>
-                {avatarMode === 1 && <NitroInput type="text" value={username} onChange={(event) => setUsername(event.target.value)} />}
+                {avatarMode === 1 && <OctaneInput type="text" value={username} onChange={(event) => setUsername(event.target.value)} />}
             </div>
         </WiredTriggerBaseView>
     );

@@ -1,4 +1,4 @@
-import { RelationshipStatusEnum, RelationshipStatusInfo } from '@nitrots/nitro-renderer';
+import { RelationshipStatusEnum, RelationshipStatusInfo } from '@octane/renderer';
 import { FC } from 'react';
 import { GetUserProfile, LocalizeText } from '../../../../../api';
 import { Flex, Text } from '../../../../../common';
@@ -17,7 +17,7 @@ export const InfoStandWidgetUserRelationshipsRelationshipItemView: FC<InfoStandW
 
     return (
         <div className="flex items-center gap-1">
-            <i className={`nitro-friends-spritesheet icon-${relationshipName}`} />
+            <i className={`octane-friends-spritesheet icon-${relationshipName}`} />
             <Flex alignItems="center" gap={0}>
                 <Text small variant="white" onClick={(event) => GetUserProfile(relationship.randomFriendId)}>
                     <u>{relationship.randomFriendName}</u>

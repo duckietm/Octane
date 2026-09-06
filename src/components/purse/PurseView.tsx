@@ -1,4 +1,4 @@
-import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication } from '@octane/renderer';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ClearRememberLogin, FriendlyTime, GetConfigurationValue, GetRememberLogin, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
 import earningsIcon from '../../assets/images/purse-swf/icons/1747_icon_earnings_png$5e39e03f65fbbb9a85bedd0d577dc12d307477063.png';
@@ -71,7 +71,7 @@ export const PurseView: FC<{}> = (props) => {
         event.stopPropagation();
 
         const logoutUrl = GetConfigurationValue<string>('login.logout.endpoint', '/api/auth/logout');
-        const ssoTicket = (window.NitroConfig?.['sso.ticket'] as string) ?? '';
+        const ssoTicket = (window.OctaneConfig?.['sso.ticket'] as string) ?? '';
         const rememberToken = GetRememberLogin()?.token || '';
 
         try {
@@ -89,7 +89,7 @@ export const PurseView: FC<{}> = (props) => {
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-Requested-With': 'NitroPurseLogout'
+                    'X-Requested-With': 'OctanePurseLogout'
                 },
                 body: JSON.stringify({ ssoTicket, rememberToken })
             });
@@ -105,7 +105,7 @@ export const PurseView: FC<{}> = (props) => {
 
         ClearRememberLogin();
         ClearStoredChatHistory();
-        if (window.NitroConfig) window.NitroConfig['sso.ticket'] = '';
+        if (window.OctaneConfig) window.OctaneConfig['sso.ticket'] = '';
 
         // When the client runs inside a CMS page, reloading the iframe alone
         // leaves the user logged in on the site with a dead client. Send the
@@ -127,42 +127,42 @@ export const PurseView: FC<{}> = (props) => {
     if (!purse) return null;
 
     return (
-        <Column alignItems="end" className="nitro-purse-container" gap={0}>
-            <div className="nitro-purse">
-                <div className="nitro-purse__chrome" aria-hidden="true" />
-                <div className="nitro-purse__body">
-                    <div className="nitro-purse__currencies">
+        <Column alignItems="end" className="octane-purse-container" gap={0}>
+            <div className="octane-purse">
+                <div className="octane-purse__chrome" aria-hidden="true" />
+                <div className="octane-purse__body">
+                    <div className="octane-purse__currencies">
                         {hasDiamonds && <CurrencyView type={5} amount={purse.activityPoints.get(5) || 0} short={currencyDisplayNumberShort} />}
                         <CurrencyView type={-1} amount={purse.credits} short={currencyDisplayNumberShort} />
                         {hasDuckets && <CurrencyView type={0} amount={purse.activityPoints.get(0) || 0} short={currencyDisplayNumberShort} />}
                     </div>
-                    <div className="nitro-purse__col nitro-purse__col--primary subscription-container">
+                    <div className="octane-purse__col octane-purse__col--primary subscription-container">
                         {!hcDisabled && (
                             <button
                                 type="button"
-                                className="nitro-purse__btn nitro-purse__btn--join nitro-purse-subscription club-text"
+                                className="octane-purse__btn octane-purse__btn--join octane-purse-subscription club-text"
                                 onClick={openClub}
                                 title={clubLabel}
                             >
-                                <img src={hcIcon} alt="" className="nitro-purse__btn-img" />
+                                <img src={hcIcon} alt="" className="octane-purse__btn-img" />
                                 <span>{clubLabel}</span>
                             </button>
                         )}
                         <button
                             type="button"
-                            className="nitro-purse__btn nitro-purse__btn--earnings nitro-purse-subscription club-text"
+                            className="octane-purse__btn octane-purse__btn--earnings octane-purse-subscription club-text"
                             onClick={openEarnings}
                             title={earningsLabel}
                         >
-                            <img src={earningsIcon} alt="" className="nitro-purse__btn-img" />
+                            <img src={earningsIcon} alt="" className="octane-purse__btn-img" />
                             <span>{earningsLabel}</span>
                         </button>
                     </div>
-                    <div className="nitro-purse__divider" aria-hidden="true" />
-                    <div className="nitro-purse__col nitro-purse__col--actions">
+                    <div className="octane-purse__divider" aria-hidden="true" />
+                    <div className="octane-purse__col octane-purse__col--actions">
                         <button
                             type="button"
-                            className="nitro-purse__btn nitro-purse__btn--help nitro-purse-right-button help"
+                            className="octane-purse__btn octane-purse__btn--help octane-purse-right-button help"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 CreateLinkEvent('help/show');
@@ -173,37 +173,37 @@ export const PurseView: FC<{}> = (props) => {
                         </button>
                         <button
                             type="button"
-                            className="nitro-purse__btn nitro-purse__btn--icon nitro-purse__btn--logout nitro-purse-right-button disconnect"
+                            className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--logout octane-purse-right-button disconnect"
                             onClick={handleLogout}
                             title="Log out"
                         >
-                            <img src={logoutIcon} alt="" className="nitro-purse__btn-img" />
+                            <img src={logoutIcon} alt="" className="octane-purse__btn-img" />
                         </button>
                         <button
                             type="button"
-                            className="nitro-purse__btn nitro-purse__btn--icon nitro-purse__btn--settings nitro-purse-right-button settings"
+                            className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--settings octane-purse-right-button settings"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 setSettingsMenuOpen((value) => !value);
                             }}
                             title={LocalizeText('widget.memenu.settings.title')}
                         >
-                            <img src={settingsIcon} alt="" className="nitro-purse__btn-img" />
+                            <img src={settingsIcon} alt="" className="octane-purse__btn-img" />
                         </button>
                     </div>
                 </div>
             </div>
             {settingsMenuOpen && (
-                <div className="nitro-purse-menu">
-                    <button type="button" className="nitro-purse-menu__item" onClick={() => openSettingsSection('')}>
+                <div className="octane-purse-menu">
+                    <button type="button" className="octane-purse-menu__item" onClick={() => openSettingsSection('')}>
                         {localizeWithFallback('widget.memenu.settings.title', 'Settings')}
                     </button>
-                    <button type="button" className="nitro-purse-menu__item" onClick={() => openSettingsSection('privacy')}>
+                    <button type="button" className="octane-purse-menu__item" onClick={() => openSettingsSection('privacy')}>
                         {localizeWithFallback('purse.settings.game_privacy', 'Game Privacy')}
                     </button>
                     <button
                         type="button"
-                        className="nitro-purse-menu__item"
+                        className="octane-purse-menu__item"
                         onClick={() => {
                             CreateLinkEvent('translation-settings/toggle');
                             setSettingsMenuOpen(false);
@@ -213,7 +213,7 @@ export const PurseView: FC<{}> = (props) => {
                     </button>
                     <button
                         type="button"
-                        className="nitro-purse-menu__item"
+                        className="octane-purse-menu__item"
                         onClick={() => {
                             CreateLinkEvent('user-account-settings/show');
                             setSettingsMenuOpen(false);
@@ -221,13 +221,13 @@ export const PurseView: FC<{}> = (props) => {
                     >
                         {localizeWithFallback('purse.settings.account', 'Account Management')}
                     </button>
-                    <button type="button" className="nitro-purse-menu__item nitro-purse-menu__item--disabled" disabled>
+                    <button type="button" className="octane-purse-menu__item octane-purse-menu__item--disabled" disabled>
                         {localizeWithFallback('purse.settings.wordfilter', 'Word Filter')}
                     </button>
                 </div>
             )}
             {otherCurrencies.length > 0 && (
-                <div className="nitro-purse__other">
+                <div className="octane-purse__other">
                     {otherCurrencies.map((type) => (
                         <SeasonalView key={type} type={type} amount={purse.activityPoints.get(type) || 0} />
                     ))}

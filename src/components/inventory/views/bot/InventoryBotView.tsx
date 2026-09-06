@@ -1,9 +1,9 @@
-import { IRoomSession, RoomPreviewer } from '@nitrots/nitro-renderer';
+import { IRoomSession, RoomPreviewer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { attemptBotPlacement, IBotItem, LocalizeText, UnseenItemCategory } from '../../../../api';
 import { LayoutRoomPreviewerView } from '../../../../common';
 import { useInventoryBots, useInventoryUnseenTracker } from '../../../../hooks';
-import { InfiniteGrid, NitroButton } from '../../../../layout';
+import { InfiniteGrid, OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryBotItemView } from './InventoryBotItemView';
 
@@ -68,9 +68,9 @@ export const InventoryBotView: FC<{
                     <div className="flex flex-col justify-between gap-2 grow">
                         <span className="truncate grow">{selectedBot.botData.name}</span>
                         {!!roomSession && (
-                            <NitroButton className="nitro-inventory-btn-place" onClick={(event) => attemptBotPlacement(selectedBot)}>
+                            <OctaneButton className="octane-inventory-btn-place" onClick={(event) => attemptBotPlacement(selectedBot)}>
                                 {LocalizeText('inventory.furni.placetoroom')}
-                            </NitroButton>
+                            </OctaneButton>
                         )}
                     </div>
                 )}

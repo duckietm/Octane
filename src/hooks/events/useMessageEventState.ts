@@ -1,10 +1,10 @@
-import { IMessageEvent, MessageEvent } from '@nitrots/nitro-renderer';
+import { IMessageEvent, MessageEvent } from '@octane/renderer';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useMessageEvent } from './useMessageEvent';
 
 /**
  * Subscribe to a server message event and expose the latest derived
- * value as React state. Mirror of useNitroEventState for the Nitro
+ * value as React state. Mirror of useOctaneEventState for the Octane
  * communication channel (request/response composers, push parsers).
  *
  *   const data = useMessageEventState(SomeParser, e => e.getParser().data, null);

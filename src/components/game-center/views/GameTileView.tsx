@@ -1,4 +1,4 @@
-import { GameConfigurationData, JoinQueueMessageComposer } from '@nitrots/nitro-renderer';
+import { GameConfigurationData, JoinQueueMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { ColorUtils, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../../api';
 import snowStormLogo from '../../../assets/images/snowstorm/snowstorm.png';

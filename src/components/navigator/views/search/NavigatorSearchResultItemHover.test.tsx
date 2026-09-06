@@ -4,8 +4,8 @@ import { useNavigatorRoomInfoPopupStore } from '../../../../hooks';
 import { NavigatorRoomInfoPopupView } from './NavigatorRoomInfoPopupView';
 import { NavigatorSearchResultItemView } from './NavigatorSearchResultItemView';
 
-vi.mock('@nitrots/nitro-renderer', async () => {
-    const actual = await vi.importActual<typeof import('@nitrots/nitro-renderer')>('@nitrots/nitro-renderer');
+vi.mock('@octane/renderer', async () => {
+    const actual = await vi.importActual<typeof import('@octane/renderer')>('@octane/renderer');
 
     return {
         ...actual,

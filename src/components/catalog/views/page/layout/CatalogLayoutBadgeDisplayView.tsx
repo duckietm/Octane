@@ -17,48 +17,48 @@ export const CatalogLayoutBadgeDisplayView: FC<CatalogLayoutProps> = (props) => 
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
 
     return (
-        <div className="nitro-catalog-badge-display-layout">
+        <div className="octane-catalog-badge-display-layout">
             <CatalogFirstProductSelectorWidgetView />
-            <section className={`nitro-catalog-badge-preview ${currentOffer ? '' : 'is-empty'}`.trim()}>
+            <section className={`octane-catalog-badge-preview ${currentOffer ? '' : 'is-empty'}`.trim()}>
                 {!currentOffer && (
-                    <div className="nitro-catalog-badge-intro">
+                    <div className="octane-catalog-badge-intro">
                         {!!page.localization.getImage(1) && <img alt="" src={page.localization.getImage(1)} />}
                         <span dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(0)) }} />
                     </div>
                 )}
                 {currentOffer && (
                     <>
-                        <div className="nitro-catalog-badge-product-render">
+                        <div className="octane-catalog-badge-product-render">
                             <CatalogViewProductWidgetView height={240} />
                         </div>
-                        <div className="nitro-catalog-badge-product-copy nitro-catalog-preview-details">
+                        <div className="octane-catalog-badge-product-copy octane-catalog-preview-details">
                             <CatalogProductDetailsView offer={currentOffer} />
                         </div>
                         <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
-                        <div className="nitro-catalog-badge-limited">
+                        <div className="octane-catalog-badge-limited">
                             <CatalogLimitedItemWidgetView />
                         </div>
-                        <div className="nitro-catalog-badge-total-price nitro-catalog-preview-price nitro-catalog-price-frame">
+                        <div className="octane-catalog-badge-total-price octane-catalog-preview-price octane-catalog-price-frame">
                             <CatalogTotalPriceWidget alignItems="end" />
                         </div>
                     </>
                 )}
             </section>
 
-            <section className="nitro-catalog-badge-product-picker">
+            <section className="octane-catalog-badge-product-picker">
                 <CatalogItemGridWidgetView
-                    className="nitro-catalog-badge-offer-list"
+                    className="octane-catalog-badge-offer-list"
                     columnCount={1}
                     columnMinHeight={70}
                     columnMinWidth={70}
                 />
             </section>
 
-            <section className="nitro-catalog-badge-picker">
+            <section className="octane-catalog-badge-picker">
                 <CatalogBadgeSelectorWidgetView />
             </section>
 
-            <div className="nitro-catalog-badge-purchase">{currentOffer && <CatalogPurchaseWidgetView />}</div>
+            <div className="octane-catalog-badge-purchase">{currentOffer && <CatalogPurchaseWidgetView />}</div>
         </div>
     );
 };

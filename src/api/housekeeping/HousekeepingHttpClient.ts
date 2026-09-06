@@ -3,11 +3,11 @@ import { getAccessToken } from '../auth/accessToken';
 const trimSlash = (value: string) => value.replace(/\/$/, '');
 
 const resolveBaseUrl = (): string => {
-    const mode = (window as any).NitroClientMode;
+    const mode = (window as any).OctaneClientMode;
 
     if (mode && typeof mode.apiBaseUrl === 'string' && mode.apiBaseUrl.length) return trimSlash(mode.apiBaseUrl);
 
-    const configured = (window as any).NitroSecureApiUrl;
+    const configured = (window as any).OctaneSecureApiUrl;
 
     if (typeof configured === 'string' && configured.length) return trimSlash(configured);
 

@@ -1,4 +1,4 @@
-import { RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { LocalizeText, MessengerRequest } from '../../../../api';
@@ -15,7 +15,7 @@ export const FriendRequestDialogView: FC<{
 
     return (
         <ObjectLocationView category={RoomObjectCategory.UNIT} objectId={roomIndex}>
-            <div className="nitro-friend-request-dialog nitro-context-menu p-2 bg-[#1C323F] border-2 border-white/50 rounded-[10px] max-w-[200px]">
+            <div className="octane-friend-request-dialog octane-context-menu p-2 bg-[#1C323F] border-2 border-white/50 rounded-[10px] max-w-[200px]">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2 justify-between">
                         <Text fontSize={6} variant="white">

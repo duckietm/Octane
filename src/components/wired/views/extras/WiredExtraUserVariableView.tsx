@@ -2,7 +2,7 @@
 import { LocalizeText, localizeWithFallback, WiredFurniType  } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
 const AVAILABILITY_ROOM = 0;
@@ -93,7 +93,7 @@ export const WiredExtraVariableView: FC<WiredExtraVariableViewProps> = props =>
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text>{ LocalizeText('wiredfurni.params.variables.variable_name') }</Text>
-                    <NitroInput maxLength={ MAX_NAME_LENGTH } type="text" value={ variableName } onChange={ event => setVariableName(normalizeVariableName(event.target.value)) } onKeyDown={ event => handleVariableNameKeyDown(event, setVariableName) } />
+                    <OctaneInput maxLength={ MAX_NAME_LENGTH } type="text" value={ variableName } onChange={ event => setVariableName(normalizeVariableName(event.target.value)) } onKeyDown={ event => handleVariableNameKeyDown(event, setVariableName) } />
                 </div>
 
                 <div className="flex flex-col gap-1">

@@ -1,4 +1,4 @@
-import { FlatCreatedEvent, NavigatorSearchComposer, NavigatorSearchEvent, NavigatorSearchResultSet } from '@nitrots/nitro-renderer';
+import { FlatCreatedEvent, NavigatorSearchComposer, NavigatorSearchEvent, NavigatorSearchResultSet } from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
@@ -14,7 +14,7 @@ const NAVIGATOR_USER_COUNT_REFRESH_MS = 15000;
  * metadata arrives). Holds the latest NavigatorSearchResultSet that
  * matches the active tab.
  *
- * The TanStack Query variant (see useNitroQuery) was tried earlier but
+ * The TanStack Query variant (see useOctaneQuery) was tried earlier but
  * its one-shot listener doesn't always reach NavigatorSearchEvent in
  * production builds with older renderer SDKs; the persistent
  * useMessageEvent listener used here matches the rest of the codebase

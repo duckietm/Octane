@@ -1,21 +1,21 @@
-.nitro-groups-window {
+.octane-groups-window {
     font-family: Ubuntu, sans-serif;
     color: #111111;
 }
 
-.nitro-groups-window .nitro-card-content,
-.nitro-groups-window .nitro-card-content-shell,
-.nitro-groups-content {
+.octane-groups-window .octane-card-content,
+.octane-groups-window .octane-card-content-shell,
+.octane-groups-content {
     background: #eeeee7 !important;
     color: #111111;
 }
 
-.nitro-groups-window .nitro-card-tabs {
+.octane-groups-window .octane-card-tabs {
     background: #d6d5cc;
     border-bottom: 1px solid #77776f;
 }
 
-.nitro-groups-window .nitro-card-tabs-item {
+.octane-groups-window .octane-card-tabs-item {
     min-height: 25px;
     border: 1px solid #111111;
     border-bottom: 0;
@@ -25,16 +25,16 @@
     text-shadow: none;
 }
 
-.nitro-groups-window .nitro-card-tabs-item.active,
-.nitro-groups-window .nitro-card-tabs-item:hover {
+.octane-groups-window .octane-card-tabs-item.active,
+.octane-groups-window .octane-card-tabs-item:hover {
     background: #eeeee7;
 }
 
-.nitro-groups-window input,
-.nitro-groups-window textarea,
-.nitro-groups-window select,
-.nitro-groups-input,
-.nitro-groups-select {
+.octane-groups-window input,
+.octane-groups-window textarea,
+.octane-groups-window select,
+.octane-groups-input,
+.octane-groups-select {
     border: 1px solid #9c9c94 !important;
     border-radius: 3px !important;
     background: #ffffff !important;
@@ -43,7 +43,7 @@
     font-size: 12px;
 }
 
-.nitro-groups-tab-header {
+.octane-groups-tab-header {
     display: flex;
     min-height: 70px;
     padding: 6px;
@@ -53,19 +53,19 @@
     background: #f7f7f2;
 }
 
-.nitro-group-tab-image {
+.octane-group-tab-image {
     flex: 0 0 auto;
 }
 
-.nitro-groups-footer {
+.octane-groups-footer {
     margin-top: 6px;
     padding-top: 6px;
     border-top: 1px solid #c7c7bf;
 }
 
-.nitro-groups-button,
-.nitro-groups-window button:not(.nitro-card-header-close),
-.nitro-group-room-info .nitro-groups-button {
+.octane-groups-button,
+.octane-groups-window button:not(.octane-card-header-close),
+.octane-group-room-info .octane-groups-button {
     min-height: 24px;
     border: 3px solid transparent !important;
     border-image-source: var(--habbo-skin-button) !important;
@@ -81,28 +81,28 @@
     font-weight: 700;
 }
 
-.nitro-groups-button:hover,
-.nitro-groups-window button:not(.nitro-card-header-close):hover,
-.nitro-group-room-info .nitro-groups-button:hover {
+.octane-groups-button:hover,
+.octane-groups-window button:not(.octane-card-header-close):hover,
+.octane-group-room-info .octane-groups-button:hover {
     border-image-source: var(--habbo-skin-button-hover) !important;
     filter: none !important;
 }
 
-.nitro-groups-button:active,
-.nitro-groups-window button:not(.nitro-card-header-close):active,
-.nitro-group-room-info .nitro-groups-button:active {
+.octane-groups-button:active,
+.octane-groups-window button:not(.octane-card-header-close):active,
+.octane-group-room-info .octane-groups-button:active {
     border-image-source: var(--habbo-skin-button-pressed) !important;
 }
 
-.nitro-groups-button:disabled,
-.nitro-groups-window button:disabled,
-.nitro-group-room-info .nitro-groups-button:disabled {
+.octane-groups-button:disabled,
+.octane-groups-window button:disabled,
+.octane-group-room-info .octane-groups-button:disabled {
     border-image-source: var(--habbo-skin-button-disabled) !important;
     color: #777777 !important;
     opacity: 1 !important;
 }
 
-.nitro-groups-button--primary {
+.octane-groups-button--primary {
     border-width: 5px !important;
     border-style: solid !important;
     border-color: transparent !important;
@@ -115,29 +115,29 @@
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
 }
 
-.nitro-groups-button--primary:hover {
+.octane-groups-button--primary:hover {
     border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
 }
 
-.nitro-groups-button--primary:active {
+.octane-groups-button--primary:active {
     border-image-source: var(--habbo-skin-shiny-thick-green-pressed) !important;
 }
 
-.nitro-group-information-standalone {
+.octane-group-information-standalone {
     width: 365px !important;
     height: 267px !important;
     resize: none !important;
 }
 
-.nitro-group-information-standalone .nitro-card-content-shell,
-.nitro-group-information-standalone .nitro-groups-content {
+.octane-group-information-standalone .octane-card-content-shell,
+.octane-group-information-standalone .octane-groups-content {
     width: 365px !important;
     height: 234px !important;
     padding: 0 !important;
     overflow: visible !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info {
+.octane-group-information-standalone .octane-extended-profile-group-info {
     position: relative;
     display: block !important;
     width: 343px !important;
@@ -156,7 +156,7 @@
     clip-path: inset(0 round 5px);
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__badge-column {
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-column {
     position: absolute;
     left: 14px !important;
     top: 16px !important;
@@ -164,7 +164,7 @@
     height: 134px !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__badge-wrap {
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-wrap {
     position: absolute;
     left: 0 !important;
     top: 0 !important;
@@ -175,7 +175,7 @@
     justify-content: center;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__badge-wrap .group-badge {
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-wrap .group-badge {
     flex: 0 0 auto;
     min-width: 80px;
     min-height: 80px;
@@ -185,13 +185,13 @@
     image-rendering: pixelated;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__badge-wrap img {
+.octane-group-information-standalone .octane-extended-profile-group-info__badge-wrap img {
     width: auto;
     height: auto;
     image-rendering: pixelated;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__meta {
+.octane-group-information-standalone .octane-extended-profile-group-info__meta {
     position: absolute;
     left: 0 !important;
     top: 85px !important;
@@ -201,7 +201,7 @@
     gap: 1px;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__member-link {
+.octane-group-information-standalone .octane-extended-profile-group-info__member-link {
     display: block;
     width: 82px !important;
     height: 17px;
@@ -220,7 +220,7 @@
     cursor: pointer;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__role {
+.octane-group-information-standalone .octane-extended-profile-group-info__role {
     display: block !important;
     position: absolute !important;
     left: 30px !important;
@@ -230,7 +230,7 @@
     z-index: 2;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__content {
+.octane-group-information-standalone .octane-extended-profile-group-info__content {
     position: absolute;
     left: 116px !important;
     top: 11px !important;
@@ -239,7 +239,7 @@
     display: block;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__header-copy {
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy {
     position: absolute;
     left: 0 !important;
     top: 0 !important;
@@ -248,19 +248,19 @@
     display: block;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__header-copy > .flex {
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy > .flex {
     display: block !important;
     width: 196px !important;
     height: 16px !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__header-copy > .flex > .flex {
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy > .flex > .flex {
     display: none !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__header-copy .text-bold,
-.nitro-group-information-standalone .nitro-extended-profile-group-info__header-copy b,
-.nitro-group-information-standalone .nitro-extended-profile-group-info__header-copy .fw-bold {
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy .text-bold,
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy b,
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy .fw-bold {
     display: block !important;
     width: 196px !important;
     height: 16px !important;
@@ -273,7 +273,7 @@
     text-overflow: ellipsis !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__header-copy > .text {
+.octane-group-information-standalone .octane-extended-profile-group-info__header-copy > .text {
     display: block !important;
     position: absolute !important;
     left: 0 !important;
@@ -288,7 +288,7 @@
     text-overflow: ellipsis !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__description {
+.octane-group-information-standalone .octane-extended-profile-group-info__description {
     position: absolute;
     left: 0;
     top: 32px !important;
@@ -302,7 +302,7 @@
     word-break: normal;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__links {
+.octane-group-information-standalone .octane-extended-profile-group-info__links {
     position: absolute;
     left: 0;
     top: 84px !important;
@@ -313,15 +313,15 @@
     gap: 0;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__links .text,
-.nitro-group-information-standalone .nitro-extended-profile-group-info__links span {
+.octane-group-information-standalone .octane-extended-profile-group-info__links .text,
+.octane-group-information-standalone .octane-extended-profile-group-info__links span {
     color: #000000 !important;
     font-size: 12px;
     line-height: 16px;
     text-decoration: underline;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__button {
+.octane-group-information-standalone .octane-extended-profile-group-info__button {
     position: absolute;
     left: -2px !important;
     top: 168px !important;
@@ -340,24 +340,24 @@
         inset 0 -1px 0 #a6a6a0 !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__button:hover {
+.octane-group-information-standalone .octane-extended-profile-group-info__button:hover {
     background: linear-gradient(180deg, #ffffff 0%, #fafaf8 48%, #e0e0dc 100%) !important;
 }
 
-.nitro-group-information-standalone .nitro-extended-profile-group-info__button .text-white,
-.nitro-group-information-standalone .nitro-extended-profile-group-info__button span {
+.octane-group-information-standalone .octane-extended-profile-group-info__button .text-white,
+.octane-group-information-standalone .octane-extended-profile-group-info__button span {
     color: #111111 !important;
     text-shadow: none !important;
 }
 
-.nitro-group-members {
+.octane-group-members {
     width: 332px;
     height: 431px;
     resize: none !important;
 }
 
-.nitro-group-members .nitro-card-content-shell,
-.nitro-group-members .nitro-groups-content {
+.octane-group-members .octane-card-content-shell,
+.octane-group-members .octane-groups-content {
     position: relative;
     width: 332px;
     height: 398px;
@@ -366,7 +366,7 @@
     background: #eeeee7 !important;
 }
 
-.nitro-group-members-search {
+.octane-group-members-search {
     position: absolute;
     left: 6px;
     top: 0;
@@ -378,7 +378,7 @@
     background: transparent;
 }
 
-.nitro-group-members-search__badge {
+.octane-group-members-search__badge {
     position: absolute;
     left: 17px;
     top: 22px;
@@ -392,9 +392,9 @@
     image-rendering: pixelated;
 }
 
-.nitro-group-members-search .flex-column,
-.nitro-group-members-search .d-flex.flex-column,
-.nitro-group-members-search > .column {
+.octane-group-members-search .flex-column,
+.octane-group-members-search .d-flex.flex-column,
+.octane-group-members-search > .column {
     position: absolute;
     left: 78px;
     top: 14px;
@@ -403,7 +403,7 @@
     gap: 9px !important;
 }
 
-.nitro-group-members-search input {
+.octane-group-members-search input {
     width: 214px !important;
     height: 25px !important;
     min-height: 25px !important;
@@ -411,7 +411,7 @@
     font-size: 13px !important;
 }
 
-.nitro-group-members-search select {
+.octane-group-members-search select {
     width: 230px !important;
     height: 25px !important;
     min-height: 25px !important;
@@ -419,7 +419,7 @@
     font-size: 13px !important;
 }
 
-.nitro-group-members-list-grid {
+.octane-group-members-list-grid {
     position: absolute;
     left: 4px;
     top: 82px;
@@ -437,7 +437,7 @@
     overflow-x: hidden !important;
 }
 
-.nitro-group-member-row {
+.octane-group-member-row {
     position: relative;
     width: 164px !important;
     height: 35px !important;
@@ -451,11 +451,11 @@
     color: #000000;
 }
 
-.nitro-group-member-row:hover {
+.octane-group-member-row:hover {
     background: rgba(255, 255, 255, .35) !important;
 }
 
-.nitro-group-member-row__avatar {
+.octane-group-member-row__avatar {
     position: absolute;
     left: -3px;
     top: 0;
@@ -464,7 +464,7 @@
     overflow: hidden;
 }
 
-.nitro-group-member-row__head {
+.octane-group-member-row__head {
     position: absolute;
     left: 50%;
     top: -12px;
@@ -474,7 +474,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-group-member-row__copy {
+.octane-group-member-row__copy {
     position: absolute;
     left: 33px;
     top: 1px;
@@ -483,7 +483,7 @@
     overflow: hidden;
 }
 
-.nitro-group-member-row__name {
+.octane-group-member-row__name {
     display: block;
     width: 77px;
     height: 16px;
@@ -496,7 +496,7 @@
     text-overflow: ellipsis;
 }
 
-.nitro-group-member-row__since {
+.octane-group-member-row__since {
     display: block;
     position: absolute;
     left: 17px;
@@ -512,7 +512,7 @@
     text-overflow: ellipsis;
 }
 
-.nitro-group-member-row__actions {
+.octane-group-member-row__actions {
     position: absolute;
     right: 1px;
     top: 1px;
@@ -524,13 +524,13 @@
     align-items: center;
 }
 
-.nitro-group-member-row__actions .nitro-icon,
-.nitro-group-member-row__actions .nitro-friends-spritesheet {
+.octane-group-member-row__actions .octane-icon,
+.octane-group-member-row__actions .octane-friends-spritesheet {
     margin: 0 !important;
     flex: 0 0 auto;
 }
 
-.nitro-group-members .nitro-groups-footer {
+.octane-group-members .octane-groups-footer {
     position: absolute;
     left: 4px;
     top: 363px;
@@ -541,21 +541,21 @@
     border: 0;
 }
 
-.nitro-group-members .nitro-groups-button--pager {
+.octane-group-members .octane-groups-button--pager {
     width: 50px !important;
     height: 25px !important;
     min-height: 25px !important;
     padding: 0 !important;
 }
 
-.nitro-group-members .nitro-groups-footer .text {
+.octane-group-members .octane-groups-footer .text {
     width: 178px;
     text-align: center;
     color: rgba(0, 0, 0, .7) !important;
     font-size: 12px;
 }
 
-.nitro-group-room-info {
+.octane-group-room-info {
     margin-left: auto;
     margin-right: 0;
     width: 188px;
@@ -574,11 +574,11 @@
     transition: height 0.18s ease;
 }
 
-.nitro-group-room-info.is-closed {
+.octane-group-room-info.is-closed {
     height: 22px;
 }
 
-.nitro-group-room-info__contracted {
+.octane-group-room-info__contracted {
     position: relative;
     display: flex;
     align-items: center;
@@ -591,14 +591,14 @@
     border-radius: 3px 3px 0 0;
 }
 
-.nitro-group-room-info__base-icon {
+.octane-group-room-info__base-icon {
     width: auto;
     height: auto;
     flex: 0 0 auto;
     margin-right: 3px;
 }
 
-.nitro-group-room-info__toggle {
+.octane-group-room-info__toggle {
     position: absolute;
     top: 2px;
     right: 2px;
@@ -611,7 +611,7 @@
     transform: none;
 }
 
-.nitro-group-room-info__toggle::after {
+.octane-group-room-info__toggle::after {
     content: "";
     position: absolute;
     left: 4px;
@@ -624,16 +624,16 @@
     filter: drop-shadow(1px 1px 0 #000000);
 }
 
-.nitro-group-room-info.is-closed .nitro-group-room-info__toggle {
+.octane-group-room-info.is-closed .octane-group-room-info__toggle {
     transform: none;
 }
 
-.nitro-group-room-info.is-closed .nitro-group-room-info__toggle::after {
+.octane-group-room-info.is-closed .octane-group-room-info__toggle::after {
     transform: rotate(180deg);
 }
 
-.nitro-group-room-info__title,
-.nitro-group-room-info .text-white {
+.octane-group-room-info__title,
+.octane-group-room-info .text-white {
     color: #ffffff !important;
     font-size: 12px;
     font-weight: 700;
@@ -642,25 +642,25 @@
     text-shadow: 1px 1px 0 #000000;
 }
 
-.nitro-group-room-info__content {
+.octane-group-room-info__content {
     height: 90px;
     overflow: hidden;
     transition: opacity 0.14s ease;
     background: rgba(27, 27, 27, 0.94);
 }
 
-.nitro-group-room-info.is-closed .nitro-group-room-info__content {
+.octane-group-room-info.is-closed .octane-group-room-info__content {
     opacity: 0;
     pointer-events: none;
 }
 
-.nitro-group-room-info__main {
+.octane-group-room-info__main {
     height: 57px;
     padding: 7px 8px 0 10px;
     gap: 7px;
 }
 
-.nitro-group-room-info__badge {
+.octane-group-room-info__badge {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -670,15 +670,15 @@
     filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.75));
 }
 
-.nitro-group-room-info__badge .layout-badge-image,
-.nitro-group-room-info__badge .badge-image {
+.octane-group-room-info__badge .layout-badge-image,
+.octane-group-room-info__badge .badge-image {
     width: 39px !important;
     height: 39px !important;
     background-size: contain !important;
     background-position: center !important;
 }
 
-.nitro-group-room-info__group-name {
+.octane-group-room-info__group-name {
     display: -webkit-box;
     width: 124px;
     height: 42px;
@@ -693,11 +693,11 @@
     -webkit-box-orient: vertical;
 }
 
-.nitro-group-room-info__button-wrap {
+.octane-group-room-info__button-wrap {
     padding: 3px 8px 0;
 }
 
-.nitro-group-room-info__button {
+.octane-group-room-info__button {
     width: 170px;
     height: 27px;
     min-height: 27px;
@@ -706,7 +706,7 @@
 }
 
 /* SWF group_room_info.xml coordinates. */
-.nitro-group-room-info {
+.octane-group-room-info {
     width: 195px !important;
     max-width: 195px !important;
     height: 119px !important;
@@ -714,17 +714,17 @@
     border-radius: 4px !important;
 }
 
-.nitro-group-room-info.is-closed {
+.octane-group-room-info.is-closed {
     height: 25px !important;
 }
 
-.nitro-group-room-info__contracted {
+.octane-group-room-info__contracted {
     width: 195px !important;
     height: 25px !important;
     padding: 0 24px 0 5px !important;
 }
 
-.nitro-group-room-info__base-icon {
+.octane-group-room-info__base-icon {
     width: 21px !important;
     max-width: 21px !important;
     height: 16px !important;
@@ -732,41 +732,41 @@
     margin: 0 -11px 0 0 !important;
 }
 
-.nitro-group-room-info__title,
-.nitro-group-room-info .text-white {
+.octane-group-room-info__title,
+.octane-group-room-info .text-white {
     font-size: 13px !important;
     line-height: 18px !important;
     letter-spacing: -0.4px !important;
 }
 
-.nitro-group-room-info__content {
+.octane-group-room-info__content {
     height: 94px !important;
 }
 
-.nitro-group-room-info__main {
+.octane-group-room-info__main {
     height: 51px !important;
     padding: 7px 11px 0 12px !important;
     gap: 8px !important;
 }
 
-.nitro-group-room-info__badge {
+.octane-group-room-info__badge {
     width: 39px !important;
     height: 39px !important;
     flex: 0 0 39px !important;
 }
 
-.nitro-group-room-info__group-name {
+.octane-group-room-info__group-name {
     width: 125px !important;
     height: 50px !important;
     font-size: 13px !important;
     line-height: 14px !important;
 }
 
-.nitro-group-room-info__button-wrap {
+.octane-group-room-info__button-wrap {
     padding: 1px 10px 0 !important;
 }
 
-.nitro-group-room-info__button {
+.octane-group-room-info__button {
     width: 175px !important;
     height: 29px !important;
     min-height: 29px !important;
@@ -774,7 +774,7 @@
 
 /* group_room_info.xml: fixed 195x119 surface, using the same dark treatment as
  * the original right-side widgets. The content is positioned by the SWF x/y values. */
-.nitro-group-room-info {
+.octane-group-room-info {
     position: relative !important;
     overflow: hidden !important;
     border: 1px solid rgba(0, 0, 0, 0.92) !important;
@@ -786,7 +786,7 @@
         0 2px 0 rgba(0, 0, 0, 0.32) !important;
 }
 
-.nitro-group-room-info__contracted {
+.octane-group-room-info__contracted {
     position: relative !important;
     width: 195px !important;
     height: 25px !important;
@@ -796,7 +796,7 @@
     background: rgba(28, 34, 37, 0.40) !important;
 }
 
-.nitro-group-room-info__contracted::after {
+.octane-group-room-info__contracted::after {
     content: '';
     position: absolute;
     right: 0;
@@ -807,7 +807,7 @@
     pointer-events: none;
 }
 
-.nitro-group-room-info__base-icon {
+.octane-group-room-info__base-icon {
     position: absolute !important;
     top: 3px !important;
     left: 5px !important;
@@ -816,7 +816,7 @@
     margin: 0 !important;
 }
 
-.nitro-group-room-info__title {
+.octane-group-room-info__title {
     position: absolute !important;
     top: 2px !important;
     left: 27px !important;
@@ -827,12 +827,12 @@
     text-overflow: ellipsis !important;
 }
 
-.nitro-group-room-info__toggle {
+.octane-group-room-info__toggle {
     top: 4px !important;
     right: 5px !important;
 }
 
-.nitro-group-room-info__content {
+.octane-group-room-info__content {
     position: relative !important;
     width: 195px !important;
     height: 94px !important;
@@ -840,7 +840,7 @@
     background: rgba(117, 116, 111, 0.40) !important;
 }
 
-.nitro-group-room-info__main {
+.octane-group-room-info__main {
     position: absolute !important;
     inset: 0 !important;
     display: block !important;
@@ -849,13 +849,13 @@
     padding: 0 !important;
 }
 
-.nitro-group-room-info__badge {
+.octane-group-room-info__badge {
     position: absolute !important;
     top: 7px !important;
     left: 12px !important;
 }
 
-.nitro-group-room-info__group-name {
+.octane-group-room-info__group-name {
     position: absolute !important;
     top: 7px !important;
     left: 59px !important;
@@ -865,7 +865,7 @@
     color: #ffffff !important;
 }
 
-.nitro-group-room-info__button-wrap {
+.octane-group-room-info__button-wrap {
     position: absolute !important;
     top: 54px !important;
     left: 10px !important;
@@ -874,7 +874,7 @@
     padding: 0 !important;
 }
 
-.nitro-group-room-info .nitro-group-room-info__button {
+.octane-group-room-info .octane-group-room-info__button {
     width: 175px !important;
     height: 29px !important;
     min-height: 29px !important;
@@ -895,31 +895,31 @@
         0 1px 0 rgba(0, 0, 0, 0.45) !important;
 }
 
-.nitro-group-room-info__button .text-white {
+.octane-group-room-info__button .text-white {
     color: #111111 !important;
 }
 
 /* SWF guild_members_window/member_entry layout */
-.nitro-group-members {
+.octane-group-members {
     width: 351px !important;
     height: 431px !important;
     resize: none !important;
 }
 
-.nitro-group-members .nitro-card-header,
-.nitro-group-members .nitro-card-header-shell {
+.octane-group-members .octane-card-header,
+.octane-group-members .octane-card-header-shell {
     height: 32px !important;
 }
 
-.nitro-group-members .nitro-card-header-text {
+.octane-group-members .octane-card-header-text {
     font-size: 13px !important;
     font-weight: 700 !important;
     line-height: 30px !important;
     text-align: center !important;
 }
 
-.nitro-group-members .nitro-card-content-shell,
-.nitro-group-members .nitro-groups-content {
+.octane-group-members .octane-card-content-shell,
+.octane-group-members .octane-groups-content {
     position: relative !important;
     width: 351px !important;
     height: 398px !important;
@@ -928,7 +928,7 @@
     background: #eeeee7 !important;
 }
 
-.nitro-group-members-search {
+.octane-group-members-search {
     position: absolute !important;
     left: 7px !important;
     top: 9px !important;
@@ -939,7 +939,7 @@
     background: transparent !important;
 }
 
-.nitro-group-members-search__badge {
+.octane-group-members-search__badge {
     position: absolute !important;
     left: 19px !important;
     top: 8px !important;
@@ -949,10 +949,10 @@
     min-height: 39px !important;
 }
 
-.nitro-group-members-search__controls,
-.nitro-group-members-search .flex-column,
-.nitro-group-members-search .d-flex.flex-column,
-.nitro-group-members-search > .column {
+.octane-group-members-search__controls,
+.octane-group-members-search .flex-column,
+.octane-group-members-search .d-flex.flex-column,
+.octane-group-members-search > .column {
     position: absolute !important;
     left: 80px !important;
     top: 5px !important;
@@ -963,7 +963,7 @@
     flex-direction: column !important;
 }
 
-.nitro-group-members-search input {
+.octane-group-members-search input {
     position: relative !important;
     left: 0 !important;
     top: 0 !important;
@@ -979,7 +979,7 @@
     font-size: 13px !important;
 }
 
-.nitro-group-members-search select {
+.octane-group-members-search select {
     position: relative !important;
     left: 0 !important;
     top: 0 !important;
@@ -995,7 +995,7 @@
     font-size: 13px !important;
 }
 
-.nitro-group-members-list-grid {
+.octane-group-members-list-grid {
     position: absolute !important;
     left: 6px !important;
     top: 82px !important;
@@ -1012,7 +1012,7 @@
     overflow-x: hidden !important;
 }
 
-.nitro-group-member-row {
+.octane-group-member-row {
     position: relative !important;
     width: 168px !important;
     height: 36px !important;
@@ -1027,11 +1027,11 @@
     overflow: hidden !important;
 }
 
-.nitro-group-member-row:hover {
+.octane-group-member-row:hover {
     background: #ffffff !important;
 }
 
-.nitro-group-member-row__avatar {
+.octane-group-member-row__avatar {
     position: absolute !important;
     left: -5px !important;
     top: -5px !important;
@@ -1040,7 +1040,7 @@
     overflow: hidden !important;
 }
 
-.nitro-group-member-row__head {
+.octane-group-member-row__head {
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
@@ -1050,7 +1050,7 @@
     image-rendering: pixelated !important;
 }
 
-.nitro-group-member-row__copy {
+.octane-group-member-row__copy {
     position: absolute !important;
     left: 38px !important;
     top: 1px !important;
@@ -1059,7 +1059,7 @@
     overflow: hidden !important;
 }
 
-.nitro-group-member-row__name {
+.octane-group-member-row__name {
     display: block !important;
     width: 93px !important;
     height: 16px !important;
@@ -1072,7 +1072,7 @@
     text-overflow: ellipsis !important;
 }
 
-.nitro-group-member-row__since {
+.octane-group-member-row__since {
     display: block !important;
     position: absolute !important;
     left: 11px !important;
@@ -1088,7 +1088,7 @@
     text-overflow: clip !important;
 }
 
-.nitro-group-member-row__actions {
+.octane-group-member-row__actions {
     position: absolute !important;
     right: 3px !important;
     top: 17px !important;
@@ -1100,13 +1100,13 @@
     gap: 1px !important;
 }
 
-.nitro-group-member-row__actions .nitro-icon,
-.nitro-group-member-row__actions .nitro-friends-spritesheet {
+.octane-group-member-row__actions .octane-icon,
+.octane-group-member-row__actions .octane-friends-spritesheet {
     margin: 0 !important;
     flex: 0 0 auto !important;
 }
 
-.nitro-group-members-footer {
+.octane-group-members-footer {
     position: absolute !important;
     left: 8px !important;
     top: 360px !important;
@@ -1117,18 +1117,18 @@
     border: 0 !important;
 }
 
-.nitro-group-members-footer .nitro-groups-button--pager {
+.octane-group-members-footer .octane-groups-button--pager {
     width: 51px !important;
     height: 29px !important;
     min-height: 29px !important;
     padding: 0 !important;
 }
 
-.nitro-group-members-footer .nitro-groups-button--pager:first-child {
+.octane-group-members-footer .octane-groups-button--pager:first-child {
     visibility: hidden;
 }
 
-.nitro-group-members-footer__page {
+.octane-group-members-footer__page {
     position: absolute;
     left: 73px;
     top: 4px;
@@ -1141,15 +1141,15 @@
     color: #5d5d58;
 }
 
-.nitro-group-members-footer__label,
-.nitro-group-members-footer__total {
+.octane-group-members-footer__label,
+.octane-group-members-footer__total {
     color: #5d5d58 !important;
     font-size: 12px !important;
     line-height: 20px !important;
     white-space: nowrap !important;
 }
 
-.nitro-group-members-footer__input {
+.octane-group-members-footer__input {
     width: 22px !important;
     height: 22px !important;
     min-height: 22px !important;
@@ -1164,8 +1164,8 @@
     appearance: textfield !important;
 }
 
-.nitro-group-members-footer__input::-webkit-outer-spin-button,
-.nitro-group-members-footer__input::-webkit-inner-spin-button {
+.octane-group-members-footer__input::-webkit-outer-spin-button,
+.octane-group-members-footer__input::-webkit-inner-spin-button {
     appearance: none;
     margin: 0;
 }
@@ -1174,7 +1174,7 @@
    rest. Each tile is 48px tall (40px badge + 2x4px padding) with 4px gaps, so
    8 rows + 7 gaps = 412px. The rows template/height overrides undo the Grid
    component's h-full + 1fr stretched rows so tiles keep their natural height. */
-.nitro-group-badge-part-picker {
+.octane-group-badge-part-picker {
     max-height: 412px;
     overflow-y: auto;
     grid-template-rows: none !important;

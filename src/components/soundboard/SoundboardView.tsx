@@ -1,4 +1,4 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizeText } from '../../api';
 import { useSoundboard } from '../../hooks';
@@ -7,7 +7,7 @@ import {
     filterSoundboardSounds,
     SoundboardCategory
 } from '../../hooks/soundboard/soundboardPresentation';
-import { NitroCard } from '../../layout';
+import { OctaneCard } from '../../layout';
 import { SoundboardPadView } from './SoundboardPadView';
 
 const PAGE_SIZE = 10;
@@ -162,9 +162,9 @@ export const SoundboardView: FC<{}> = () => {
     if (!isVisible || !enabled) return null;
 
     return (
-        <NitroCard className="w-[420px] max-w-[96vw]" uniqueKey="soundboard">
-            <NitroCard.Header headerText={LocalizeText('soundboard.title')} onCloseClick={() => setIsVisible(false)} />
-            <NitroCard.Content>
+        <OctaneCard className="w-[420px] max-w-[96vw]" uniqueKey="soundboard">
+            <OctaneCard.Header headerText={LocalizeText('soundboard.title')} onCloseClick={() => setIsVisible(false)} />
+            <OctaneCard.Content>
                 <SoundboardContentView
                     sounds={sounds}
                     categories={categories}
@@ -172,7 +172,7 @@ export const SoundboardView: FC<{}> = () => {
                     isCoolingDown={isCoolingDown}
                     onPlay={play}
                 />
-            </NitroCard.Content>
-        </NitroCard>
+            </OctaneCard.Content>
+        </OctaneCard>
     );
 };

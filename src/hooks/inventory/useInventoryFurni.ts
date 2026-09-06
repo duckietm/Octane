@@ -5,7 +5,7 @@ import {
     FurnitureListInvalidateEvent,
     FurnitureListItemParser,
     FurnitureListRemovedEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { DispatchUiEvent, getGroupItemKey, GroupItem, mergeFurniFragments, SendMessageComposer, UnseenItemCategory } from '../../api';
@@ -148,9 +148,9 @@ const useInventoryFurniState = () => {
             });
         };
 
-        window.addEventListener('nitro-localization-updated', refreshFurnitureLocalization);
+        window.addEventListener('octane-localization-updated', refreshFurnitureLocalization);
 
-        return () => window.removeEventListener('nitro-localization-updated', refreshFurnitureLocalization);
+        return () => window.removeEventListener('octane-localization-updated', refreshFurnitureLocalization);
     }, []);
 
     return { isVisible, groupItems, setGroupItems, selectedItem, setSelectedItem, activate, deactivate, getWallItemById, getFloorItemById, getItemsByType };

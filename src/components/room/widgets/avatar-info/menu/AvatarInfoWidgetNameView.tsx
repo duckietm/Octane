@@ -1,4 +1,4 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { AvatarInfoName, MessengerFriend, SanitizeHtml } from '../../../../../api';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -42,7 +42,7 @@ export const AvatarInfoWidgetNameView: FC<AvatarInfoWidgetNameViewProps> = (prop
             onClose={onClose}
         >
             <div className="flex items-center justify-center gap-1">
-                {relationIconClass && <div className={`nitro-friends-spritesheet ${relationIconClass}`} />}
+                {relationIconClass && <div className={`octane-friends-spritesheet ${relationIconClass}`} />}
                 <div className="text-shadow" dangerouslySetInnerHTML={{ __html: SanitizeHtml(`${nameInfo.name}`) }}></div>
             </div>
         </ContextMenuView>

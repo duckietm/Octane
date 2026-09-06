@@ -82,7 +82,7 @@ export const GroupBadgeCreatorView: FC<GroupBadgeCreatorViewProps> = (props) => 
                     );
                 })}
             {selectedIndex >= 0 && (
-                <Grid className="nitro-group-badge-part-picker" columnCount={5} fullHeight={false} gap={1}>
+                <Grid className="octane-group-badge-part-picker" columnCount={5} fullHeight={false} gap={1}>
                     {badgeParts[selectedIndex].type === GroupBadgePart.SYMBOL && (
                         <Column center pointer className="bg-muted rounded p-1" onClick={(event) => setPartProperty(selectedIndex, 'key', 0)}>
                             <Flex center className="relative w-[40px] h-[40px] bg-no-repeat bg-center group-badge">

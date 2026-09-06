@@ -1,4 +1,4 @@
-import { GetEventDispatcher, NitroToolbarAnimateIconEvent, RoomPreviewer, TextureUtils, ToolbarIconEnum } from '@nitrots/nitro-renderer';
+import { GetEventDispatcher, OctaneToolbarAnimateIconEvent, RoomPreviewer, TextureUtils, ToolbarIconEnum } from '@octane/renderer';
 import { FC, useRef } from 'react';
 import { LayoutRoomPreviewerView } from '../../../../common';
 import { CatalogPurchasedEvent } from '../../../../events';
@@ -28,7 +28,7 @@ export const CatalogRoomPreviewerView: FC<{
             const x = bounds.x + bounds.width / 2;
             const y = bounds.y + bounds.height / 2;
 
-            const animateEvent = new NitroToolbarAnimateIconEvent(image, x, y);
+            const animateEvent = new OctaneToolbarAnimateIconEvent(image, x, y);
 
             animateEvent.iconName = ToolbarIconEnum.INVENTORY;
 

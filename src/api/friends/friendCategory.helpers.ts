@@ -1,4 +1,4 @@
-import { FriendCategoryData } from '@nitrots/nitro-renderer';
+import { FriendCategoryData } from '@octane/renderer';
 import { MessengerFriend } from './MessengerFriend';
 import { MessengerSettings } from './MessengerSettings';
 

@@ -2,7 +2,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { DetailedHTMLProps, Fragment, HTMLAttributes, ReactElement, Ref, RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ClassicScrollAreaView } from '../common/scroll-area/ClassicScrollAreaView';
 import { classNames } from './classNames';
-import { NitroLimitedEditionStyledNumberView } from './limited-edition';
+import { OctaneLimitedEditionStyledNumberView } from './limited-edition';
 import { styleNames } from './styleNames';
 
 type Props<T> = {
@@ -295,7 +295,7 @@ const InfiniteGridItem = ({
             ref={ref}
             className={classNames(
                 'flex flex-col items-center justify-center cursor-pointer overflow-hidden relative bg-center bg-no-repeat w-full rounded-md border-2',
-                itemImage && (!backgroundImageUrl || !backgroundImageUrl.length) && 'nitro-icon icon-loading',
+                itemImage && (!backgroundImageUrl || !backgroundImageUrl.length) && 'octane-icon icon-loading',
                 itemActive
                     ? itemColor
                         ? 'border-card-grid-item-active'
@@ -335,7 +335,7 @@ const InfiniteGridItem = ({
                         }}
                     />
                     <div className="absolute bottom-0 unique-item-counter">
-                        <NitroLimitedEditionStyledNumberView value={itemUniqueNumber} />
+                        <OctaneLimitedEditionStyledNumberView value={itemUniqueNumber} />
                     </div>
                 </>
             )}

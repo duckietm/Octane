@@ -6,10 +6,10 @@ import {
     GuildForumThread,
     ILinkEventTracker,
     RemoveLinkEventTracker
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { GroupForumListView } from './GroupForumListView';
 import { GroupForumNewThreadView } from './GroupForumNewThreadView';
@@ -126,9 +126,9 @@ export const GroupForumView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-group-forum w-[600px] h-[500px]" theme="primary" uniqueKey="group-forum">
-            <NitroCardHeaderView headerText={getHeaderText()} onCloseClick={() => setIsVisible(false)} />
-            <NitroCardContentView overflow="hidden" className="p-0">
+        <OctaneCardView className="octane-group-forum w-[600px] h-[500px]" theme="primary" uniqueKey="group-forum">
+            <OctaneCardHeaderView headerText={getHeaderText()} onCloseClick={() => setIsVisible(false)} />
+            <OctaneCardContentView overflow="hidden" className="p-0">
                 {currentView === VIEW_FORUM_LIST && <GroupForumListView onOpenForum={openForum} />}
                 {currentView === VIEW_THREAD_LIST && (
                     <GroupForumThreadListView
@@ -152,7 +152,7 @@ export const GroupForumView: FC<{}> = (props) => {
                     />
                 )}
                 {currentView === VIEW_SETTINGS && <GroupForumSettingsView groupId={groupId} forumData={forumData} onBack={backToThreadList} />}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 const roomWidgetsCss = readFileSync(resolve(process.cwd(), 'src/css/room/RoomWidgets.css'), 'utf8');
-const avatarMenuCss = roomWidgetsCss.slice(roomWidgetsCss.indexOf('.nitro-avatar-action-menu {'), roomWidgetsCss.indexOf('.nitro-context-menu.name-only'));
+const avatarMenuCss = roomWidgetsCss.slice(roomWidgetsCss.indexOf('.octane-avatar-action-menu {'), roomWidgetsCss.indexOf('.octane-context-menu.name-only'));
 
 afterEach(() => {
     document.body.replaceChildren();
@@ -20,11 +20,11 @@ describe('AIR own_avatar_menu bubble', () => {
         const footer = document.createElement('div');
 
         stylesheet.textContent = avatarMenuCss;
-        menu.className = 'nitro-context-menu nitro-avatar-action-menu nitro-avatar-action-menu--own';
-        header.className = 'nitro-context-menu-header';
+        menu.className = 'octane-context-menu octane-avatar-action-menu octane-avatar-action-menu--own';
+        header.className = 'octane-context-menu-header';
         buttons.className = 'air-avatar-menu-buttons';
-        item.className = 'nitro-context-menu-item';
-        footer.className = 'nitro-context-menu-footer';
+        item.className = 'octane-context-menu-item';
+        footer.className = 'octane-context-menu-footer';
         buttons.append(item);
         menu.append(header, buttons, footer);
         document.head.append(stylesheet);
@@ -66,8 +66,8 @@ describe('AIR own_avatar_menu bubble', () => {
         const footer = document.createElement('div');
 
         stylesheet.textContent = avatarMenuCss;
-        menu.className = 'nitro-context-menu nitro-avatar-action-menu nitro-avatar-action-menu--own menu-hidden';
-        footer.className = 'nitro-context-menu-footer';
+        menu.className = 'octane-context-menu octane-avatar-action-menu octane-avatar-action-menu--own menu-hidden';
+        footer.className = 'octane-context-menu-footer';
         menu.append(footer);
         document.head.append(stylesheet);
         document.body.append(menu);

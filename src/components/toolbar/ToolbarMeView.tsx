@@ -1,4 +1,4 @@
-import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, RoomObjectCategory } from '@octane/renderer';
 import { Dispatch, FC, PropsWithChildren, SetStateAction, useEffect, useRef } from 'react';
 import { DispatchUiEvent, GetConfigurationValue, GetRoomSession, GetUserProfile, LocalizeText } from '../../api';
 import { Flex, LayoutItemCountView } from '../../common';
@@ -46,33 +46,33 @@ export const ToolbarMeView: FC<
         >
             {GetConfigurationValue('guides.enabled') && useGuideTool && (
                 <div
-                    className="navigation-item relative nitro-icon icon-me-helper-tool cursor-pointer"
+                    className="navigation-item relative octane-icon icon-me-helper-tool cursor-pointer"
                     onClick={(event) => DispatchUiEvent(new GuideToolEvent(GuideToolEvent.TOGGLE_GUIDE_TOOL))}
                 />
             )}
             <div
-                className="navigation-item relative nitro-icon icon-me-achievements cursor-pointer"
+                className="navigation-item relative octane-icon icon-me-achievements cursor-pointer"
                 onClick={(event) => CreateLinkEvent('achievements/toggle')}
             >
                 {unseenAchievementCount > 0 && <LayoutItemCountView count={unseenAchievementCount} />}
             </div>
             <div
-                className="navigation-item relative nitro-icon icon-me-profile cursor-pointer"
+                className="navigation-item relative octane-icon icon-me-profile cursor-pointer"
                 onClick={(event) => GetUserProfile(GetSessionDataManager().userId)}
             />
             <div
-                className="navigation-item relative nitro-icon icon-me-rooms cursor-pointer"
+                className="navigation-item relative octane-icon icon-me-rooms cursor-pointer"
                 onClick={(event) => CreateLinkEvent('navigator/search/myworld_view')}
             />
-            <div className="navigation-item relative nitro-icon icon-me-clothing cursor-pointer" onClick={(event) => CreateLinkEvent('avatar-editor/toggle')} />
+            <div className="navigation-item relative octane-icon icon-me-clothing cursor-pointer" onClick={(event) => CreateLinkEvent('avatar-editor/toggle')} />
             <div
-                className="navigation-item relative nitro-icon icon-me-badge-creator cursor-pointer"
+                className="navigation-item relative octane-icon icon-me-badge-creator cursor-pointer"
                 onClick={(event) => CreateLinkEvent('badge-creator/toggle')}
                 title={LocalizeText('toolbar.icon.label.badge_creator')}
             />
-            <div className="navigation-item relative nitro-icon icon-me-settings cursor-pointer" onClick={(event) => CreateLinkEvent('user-settings/toggle')} />
+            <div className="navigation-item relative octane-icon icon-me-settings cursor-pointer" onClick={(event) => CreateLinkEvent('user-settings/toggle')} />
             <div
-                className="navigation-item relative nitro-icon icon-me-forums cursor-pointer"
+                className="navigation-item relative octane-icon icon-me-forums cursor-pointer"
                 onClick={(event) => CreateLinkEvent('groupforum/toggle')}
                 title={LocalizeText('toolbar.icon.label.forums')}
             />

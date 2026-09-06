@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { SoundboardPlayDeniedEvent, SoundboardSettingsEvent } from '@nitrots/nitro-renderer';
+import { SoundboardPlayDeniedEvent, SoundboardSettingsEvent } from '@octane/renderer';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NotificationBubbleType } from '../../api/notification/NotificationBubbleType';
@@ -15,8 +15,8 @@ const mocks = vi.hoisted(() => ({
     loadGamedata: vi.fn().mockResolvedValue({})
 }));
 
-vi.mock('@nitrots/nitro-renderer', () => {
-    class NitroEvent {
+vi.mock('@octane/renderer', () => {
+    class OctaneEvent {
         constructor(public type: string) {}
     }
     class SoundboardPlayComposer {
@@ -34,7 +34,7 @@ vi.mock('@nitrots/nitro-renderer', () => {
         GetSessionDataManager: () => ({ getUserDataSnapshot: () => ({ userId: 42 }) }),
         GetSoundManager: () => ({ playSoundboard: mocks.playSoundboard, stopSoundboard: mocks.stopSoundboard }),
         loadGamedata: mocks.loadGamedata,
-        NitroEvent,
+        OctaneEvent,
         SoundboardPlayComposer,
         SoundboardRequestSettingsComposer,
         SoundboardSetEnabledComposer,

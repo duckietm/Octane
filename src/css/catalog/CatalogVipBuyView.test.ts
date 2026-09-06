@@ -5,10 +5,10 @@ import { describe, expect, it } from 'vitest';
 describe('club membership catalog layout', () => {
     it('matches the AIR vip_buy geometry and integrated offer actions', () => {
         const css = readFileSync(join(process.cwd(), 'src/css/catalog/CatalogVipBuyView.css'), 'utf8');
-        const teaser = css.match(/\.nitro-club-teaser\s*\{([^}]+)\}/)?.[1] ?? '';
-        const introCopy = css.match(/\.nitro-club-vip-copy\s*\{([^}]+)\}/)?.[1] ?? '';
-        const offers = css.match(/\.nitro-club-vip-offers\s*\{([^}]+)\}/)?.[1] ?? '';
-        const wideOffer = css.match(/\.nitro-club-offer\.is-wide\s*\{([^}]+)\}/)?.[1] ?? '';
+        const teaser = css.match(/\.octane-club-teaser\s*\{([^}]+)\}/)?.[1] ?? '';
+        const introCopy = css.match(/\.octane-club-vip-copy\s*\{([^}]+)\}/)?.[1] ?? '';
+        const offers = css.match(/\.octane-club-vip-offers\s*\{([^}]+)\}/)?.[1] ?? '';
+        const wideOffer = css.match(/\.octane-club-offer\.is-wide\s*\{([^}]+)\}/)?.[1] ?? '';
 
         expect(teaser).toContain('top: 3px');
         expect(teaser).toContain('left: 3px');

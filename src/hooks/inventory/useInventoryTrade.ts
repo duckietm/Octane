@@ -18,7 +18,7 @@ import {
     TradingOtherNotAllowedEvent,
     TradingUnacceptComposer,
     TradingYouAreNotAllowedEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {

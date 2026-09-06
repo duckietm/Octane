@@ -1,4 +1,4 @@
-import { UnseenItemsEvent, UnseenResetCategoryComposer, UnseenResetItemsComposer } from '@nitrots/nitro-renderer';
+import { UnseenItemsEvent, UnseenResetCategoryComposer, UnseenResetItemsComposer } from '@octane/renderer';
 import { useCallback, useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';

@@ -1,9 +1,9 @@
-import { CreateLinkEvent, GroupDeleteComposer, GroupSaveInformationComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GroupDeleteComposer, GroupSaveInformationComposer } from '@octane/renderer';
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { IGroupData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Text } from '../../../../common';
 import { useNotification } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 
 interface GroupTabIdentityViewProps {
     groupData: IGroupData;
@@ -85,7 +85,7 @@ export const GroupTabIdentityView: FC<GroupTabIdentityViewProps> = (props) => {
                     <Text center className="col-span-3">
                         {LocalizeText('group.edit.name')}
                     </Text>
-                    <NitroInput maxLength={29} type="text" value={groupName} onChange={(event) => setGroupName(event.target.value)} />
+                    <OctaneInput maxLength={29} type="text" value={groupName} onChange={(event) => setGroupName(event.target.value)} />
                 </div>
                 <div className="flex items-center gap-1">
                     <Text center className="col-span-3">

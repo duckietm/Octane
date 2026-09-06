@@ -1,4 +1,4 @@
-import { CreateLinkEvent, PetRespectComposer, PetType } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, PetRespectComposer, PetType } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { ConvertSeconds, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../../../../api';
@@ -287,7 +287,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
 
     return (
         <Column alignItems="end" gap={1}>
-            <Column className="nitro-infostand rounded">
+            <Column className="octane-infostand rounded">
                 <Column className="container-fluid content-area" gap={1} overflow="visible">
                     <PetHeader name={avatarInfo.name} petType={avatarInfo.petType} petBreed={avatarInfo.petBreed} onClose={onClose} />
                     {avatarInfo.petType === PetType.MONSTERPLANT ? (

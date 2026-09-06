@@ -1,4 +1,4 @@
-import { GetRoomEngine } from '@nitrots/nitro-renderer';
+import { GetRoomEngine } from '@octane/renderer';
 import { ProductTypeEnum } from './ProductTypeEnum';
 
 export const GetImageIconUrlForProduct = (productType: string, productClassId: number, extraData: string = null) => {

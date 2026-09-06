@@ -1,5 +1,5 @@
-import { GetRoomEngine } from '@nitrots/nitro-renderer';
-import { GetRoomSession } from '../../nitro';
+import { GetRoomEngine } from '@octane/renderer';
+import { GetRoomSession } from '../../octane';
 
 export class FurnitureDimmerUtilities {
     public static AVAILABLE_COLORS: number[] = [7665141, 21495, 15161822, 15353138, 15923281, 8581961, 0];

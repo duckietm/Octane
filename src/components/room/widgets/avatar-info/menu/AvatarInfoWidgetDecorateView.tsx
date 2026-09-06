@@ -1,4 +1,4 @@
-import { RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory } from '@octane/renderer';
 import { Dispatch, FC, SetStateAction } from 'react';
 import { LocalizeText } from '../../../../../api';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';

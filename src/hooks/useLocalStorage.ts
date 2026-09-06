@@ -1,4 +1,4 @@
-import { NitroLogger } from '@nitrots/nitro-renderer';
+import { OctaneLogger } from '@octane/renderer';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { GetLocalStorage, SetLocalStorage } from '../api';
 
@@ -64,7 +64,7 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
             return;
         } catch (error) {
             if (!isQuotaError(error)) {
-                NitroLogger.error(error);
+                OctaneLogger.error(error);
                 return;
             }
         }
@@ -74,9 +74,9 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
         try {
             const trimmed = trimArrayForQuota(projected as T);
             SetLocalStorage(key, trimmed);
-            NitroLogger.warn(`[useLocalStorage] quota exceeded for ${key}, trimmed payload`);
+            OctaneLogger.warn(`[useLocalStorage] quota exceeded for ${key}, trimmed payload`);
         } catch (retryError) {
-            NitroLogger.error(retryError);
+            OctaneLogger.error(retryError);
             // Last resort: drop the key entirely so future writes have room.
             try {
                 window.localStorage.removeItem(key);
@@ -129,7 +129,7 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
 
             scheduleWrite(valueToStore);
         } catch (error) {
-            NitroLogger.error(error);
+            OctaneLogger.error(error);
         }
     };
 

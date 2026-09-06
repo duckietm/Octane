@@ -98,7 +98,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
     };
 
     const hasFrank = item.alertType === NotificationAlertType.DEFAULT;
-    const alertClassNames = hasCommandTemplate ? [...classNames, 'nitro-alert-command-list'] : classNames;
+    const alertClassNames = hasCommandTemplate ? [...classNames, 'octane-alert-command-list'] : classNames;
 
     // The listing arrives on the MOTD channel, so the window would be headed
     // "Messages for you". Its own first line names it better - promote that to

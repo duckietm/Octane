@@ -1,7 +1,7 @@
-import { FriendCategoryData } from '@nitrots/nitro-renderer';
+import { FriendCategoryData } from '@octane/renderer';
 import { FC, MouseEvent, useEffect, useState } from 'react';
 import { LocalizeText } from '../../../../api';
-import { Button, Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useFriendsActions } from '../../../../hooks';
 
 interface FriendsCategoryManagerViewProps {
@@ -38,14 +38,14 @@ export const FriendsCategoryManagerView: FC<FriendsCategoryManagerViewProps> = (
     };
 
     return (
-        <NitroCardView
-            className="nitro-friends-category-manager min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-friends-category-manager min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
-            uniqueKey="nitro-friends-category-manager"
+            uniqueKey="octane-friends-category-manager"
             isResizable={false}
         >
-            <NitroCardHeaderView headerText={LocalizeText('friendlist.friends')} onCloseClick={onCloseClick} />
-            <NitroCardContentView className="text-black" gap={1}>
+            <OctaneCardHeaderView headerText={LocalizeText('friendlist.friends')} onCloseClick={onCloseClick} />
+            <OctaneCardContentView className="text-black" gap={1}>
                 <Flex gap={1} alignItems="center">
                     <input
                         className="form-control form-control-sm w-full"
@@ -101,7 +101,7 @@ export const FriendsCategoryManagerView: FC<FriendsCategoryManagerViewProps> = (
                     ))}
                     {!categories.length && <span className="text-muted text-center py-2 text-sm">{LocalizeText('friendlist.search.nofriendsfound')}</span>}
                 </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

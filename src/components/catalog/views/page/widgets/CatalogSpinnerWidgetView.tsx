@@ -155,21 +155,21 @@ export const CatalogSpinnerWidgetView: FC<{}> = () => {
         return null;
 
     return (
-        <div className="nitro-catalog-standard-spinner">
-            <label className="nitro-catalog-standard-spinner-label" htmlFor={quantityInputId}>
+        <div className="octane-catalog-standard-spinner">
+            <label className="octane-catalog-standard-spinner-label" htmlFor={quantityInputId}>
                 {LocalizeText('catalog.bundlewidget.quantity')}
             </label>
             {freeItemCount > 0 && (
-                <div className="nitro-catalog-standard-spinner-discount">
-                    <span className="nitro-catalog-standard-spinner-discount-copy">
+                <div className="octane-catalog-standard-spinner-discount">
+                    <span className="octane-catalog-standard-spinner-discount-copy">
                         {LocalizeText('shop.bonus.items.count', ['amount'], [freeItemCount.toString()])}
                     </span>
-                    <span aria-hidden="true" className="nitro-catalog-standard-spinner-discount-star" />
+                    <span aria-hidden="true" className="octane-catalog-standard-spinner-discount-star" />
                 </div>
             )}
             <button
                 type="button"
-                className="nitro-catalog-standard-spinner-button nitro-catalog-standard-spinner-button-less"
+                className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-less"
                 aria-controls={quantityInputId}
                 aria-label={`${LocalizeText('catalog.bundlewidget.quantity')} −`}
                 disabled={quantity <= MIN_VALUE}
@@ -185,10 +185,10 @@ export const CatalogSpinnerWidgetView: FC<{}> = () => {
                 }}
                 onPointerUp={stopStepping}
             />
-            <div className="nitro-catalog-standard-spinner-input-frame">
+            <div className="octane-catalog-standard-spinner-input-frame">
                 <input
                     id={quantityInputId}
-                    className="nitro-catalog-standard-spinner-value"
+                    className="octane-catalog-standard-spinner-value"
                     type="text"
                     inputMode="numeric"
                     pattern="[0-9]*"
@@ -205,7 +205,7 @@ export const CatalogSpinnerWidgetView: FC<{}> = () => {
             </div>
             <button
                 type="button"
-                className="nitro-catalog-standard-spinner-button nitro-catalog-standard-spinner-button-more"
+                className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-more"
                 aria-controls={quantityInputId}
                 aria-label={`${LocalizeText('catalog.bundlewidget.quantity')} +`}
                 disabled={quantity >= maxPurchaseSize}

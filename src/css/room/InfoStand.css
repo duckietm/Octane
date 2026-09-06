@@ -1,10 +1,10 @@
-.nitro-use-product-confirmation {
+.octane-use-product-confirmation {
   width: min(350px, calc(100vw - 16px));
   min-width: 0;
   max-width: calc(100vw - 16px);
   max-height: calc(100vh - 16px);
 
-  .nitro-card-content-shell {
+  .octane-card-content-shell {
     max-height: calc(100vh - 72px);
     overflow: auto;
   }
@@ -31,13 +31,13 @@
 }
 
 @media (max-width: 420px) {
-  .nitro-use-product-confirmation .nitro-card-content-shell > .flex {
+  .octane-use-product-confirmation .octane-card-content-shell > .flex {
     flex-direction: column;
   }
 }
 
 /* AIR user_view: border style-1 black 190px, list x=10 y=10 w=170. */
-.nitro-infostand {
+.octane-infostand {
   position: relative;
   box-sizing: border-box;
   width: 190px;
@@ -81,7 +81,7 @@
     color: inherit;
   }
 
-  .nitro-infostand__close {
+  .octane-infostand__close {
     position: absolute;
     top: 0;
     right: -2px;
@@ -95,13 +95,13 @@
     image-rendering: pixelated;
   }
 
-  .nitro-infostand__header {
+  .octane-infostand__header {
     position: relative;
     width: 170px;
     height: 12px;
   }
 
-  .nitro-infostand__home {
+  .octane-infostand__home {
     position: absolute;
     top: 1px;
     left: -2px;
@@ -120,7 +120,7 @@
     }
   }
 
-  .nitro-infostand__profile-link {
+  .octane-infostand__profile-link {
     position: absolute;
     top: 0;
     left: 18px;
@@ -135,13 +135,13 @@
     text-align: left;
     cursor: pointer;
 
-    &:hover .nitro-infostand__identity,
-    &:hover .nitro-infostand__identity .text-white {
+    &:hover .octane-infostand__identity,
+    &:hover .octane-infostand__identity .text-white {
       color: #91c9ff;
     }
   }
 
-  .nitro-infostand__identity {
+  .octane-infostand__identity {
     max-width: 135px;
     overflow: hidden;
     background: #3d3d3d;
@@ -153,18 +153,18 @@
     -webkit-font-smoothing: none;
   }
 
-  .nitro-infostand__rule {
+  .octane-infostand__rule {
     width: 170px;
     height: 1px;
     margin: 3px 0;
     background: #333333;
   }
 
-  .nitro-infostand__rule--footer {
+  .octane-infostand__rule--footer {
     margin-bottom: 0;
   }
 
-  .nitro-infostand__figure-row {
+  .octane-infostand__figure-row {
     position: relative;
     display: flex;
     gap: 5px;
@@ -172,7 +172,7 @@
     min-height: 132px;
   }
 
-  .nitro-infostand__avatar-well {
+  .octane-infostand__avatar-well {
     position: relative;
     display: flex;
     flex: 0 0 67px;
@@ -187,7 +187,7 @@
     z-index: 1;
   }
 
-  .nitro-infostand__badges {
+  .octane-infostand__badges {
     position: relative;
     z-index: 1;
     display: grid;
@@ -198,7 +198,7 @@
     margin-top: 1px;
   }
 
-  .nitro-infostand__badge-slot {
+  .octane-infostand__badge-slot {
     box-sizing: border-box;
     transition: opacity 150ms ease, background-color 150ms ease;
 
@@ -217,7 +217,7 @@
     }
   }
 
-  .nitro-infostand__badge-slot-plus {
+  .octane-infostand__badge-slot-plus {
     color: rgba(255, 255, 255, 0.75);
     font-family: Arial, sans-serif;
     font-size: 10px;
@@ -225,7 +225,7 @@
     line-height: 1;
   }
 
-  .nitro-infostand__motto {
+  .octane-infostand__motto {
     box-sizing: border-box;
     position: relative;
     display: flex;
@@ -239,7 +239,7 @@
     background: transparent;
   }
 
-  .nitro-infostand__motto-text {
+  .octane-infostand__motto-text {
     box-sizing: border-box;
     max-height: 50px;
     padding-top: 6px;
@@ -253,7 +253,7 @@
     }
   }
 
-  .nitro-infostand__pen {
+  .octane-infostand__pen {
     position: absolute;
     top: 4px;
     left: 3px;
@@ -262,7 +262,7 @@
     image-rendering: pixelated;
   }
 
-  .nitro-infostand__score {
+  .octane-infostand__score {
     display: grid;
     grid-template-rows: 15px 15px;
     gap: 3px;
@@ -364,11 +364,11 @@
   }
 }
 
-.nitro-infostand.profile-card-background {
+.octane-infostand.profile-card-background {
   background-clip: padding-box;
 }
 
-.nitro-rarity-level {
+.octane-rarity-level {
     width: 36px;
     height: 28px;
     background: url('@/assets/images/infostand/rarity-level.png');

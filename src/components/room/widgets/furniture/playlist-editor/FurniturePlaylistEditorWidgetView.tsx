@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 import { useFurniturePlaylistEditorWidget } from '../../../../../hooks';
 import { DiskInventoryView } from './DiskInventoryView';
 import { SongPlaylistView } from './SongPlaylistView';
@@ -20,9 +20,9 @@ export const FurniturePlaylistEditorWidgetView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView className="nitro-playlist-editor-widget" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('playlist.editor.title')} onCloseClick={onClose} />
-            <NitroCardContentView>
+        <OctaneCardView className="octane-playlist-editor-widget" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('playlist.editor.title')} onCloseClick={onClose} />
+            <OctaneCardContentView>
                 <div className="playlist-editor-layout flex flex-row gap-1 h-full min-h-0">
                     <div className="playlist-editor-pane relative overflow-hidden h-full rounded flex flex-col min-w-0">
                         <DiskInventoryView addToPlaylist={addToPlaylist} diskInventory={diskInventory} />
@@ -37,7 +37,7 @@ export const FurniturePlaylistEditorWidgetView: FC<{}> = (props) => {
                         />
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

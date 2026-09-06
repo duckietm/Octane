@@ -181,7 +181,7 @@ export const InfoStandBadgeSlotView: FC<InfoStandBadgeSlotProps> = ({ slotIndex,
         <div className="relative">
             <div
                 ref={slotRef}
-                className={`nitro-infostand__badge-slot flex items-center justify-center relative h-[42px] w-[42px] bg-no-repeat bg-center
+                className={`octane-infostand__badge-slot flex items-center justify-center relative h-[42px] w-[42px] bg-no-repeat bg-center
                     ${isOwnUser && badgeCode ? 'cursor-grab active:cursor-grabbing' : ''}
                     ${isOwnUser && !badgeCode ? 'is-empty cursor-pointer' : ''}
                     ${isDragging ? 'opacity-30' : ''}
@@ -200,7 +200,7 @@ export const InfoStandBadgeSlotView: FC<InfoStandBadgeSlotProps> = ({ slotIndex,
                     <LayoutBadgeImageView badgeCode={badgeCode} showInfo={true} showRarityInfo={true} highlightRarity={true} />
                 ) : (
                     isOwnUser && (
-                        <span className="nitro-infostand__badge-slot-plus" aria-hidden="true">
+                        <span className="octane-infostand__badge-slot-plus" aria-hidden="true">
                             +
                         </span>
                     )

@@ -7,10 +7,10 @@ import {
     RoomEngineEvent,
     RoomGeometry,
     RoomSessionEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../api';
-import { useAchievements, useCamera, useNitroEvent, useNotification, useRoom } from '../../hooks';
+import { useAchievements, useCamera, useOctaneEvent, useNotification, useRoom } from '../../hooks';
 import { getCameraAchievementLevel } from './CameraAirUtilities';
 import { CameraWidgetCaptureView } from './views/CameraWidgetCaptureView';
 import { CameraWidgetCheckoutView } from './views/CameraWidgetCheckoutView';
@@ -116,12 +116,12 @@ export const CameraWidgetView: FC<{}> = (props) => {
         setMode(MODE_CHECKOUT);
     };
 
-    useNitroEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, (event) => {
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, (event) => {
         setSelectedPictureIndex(-1);
         setMode(MODE_NONE);
     });
 
-    useNitroEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, (event) => {
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, (event) => {
         if (!roomSession || event.roomId !== roomSession.roomId || isDefaultRoomZoom(event.roomId)) return;
 
         setSelectedPictureIndex(-1);

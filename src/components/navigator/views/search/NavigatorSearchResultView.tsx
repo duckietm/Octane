@@ -1,4 +1,4 @@
-import { NavigatorSearchResultList, NavigatorSearchSaveComposer } from '@nitrots/nitro-renderer';
+import { NavigatorSearchResultList, NavigatorSearchSaveComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, localizeWithFallback, NavigatorSearchResultViewDisplayMode, SendMessageComposer } from '../../../../api';
 import categoryCollapse from '../../../../assets/images/navigator/air/category-collapse.png';
@@ -64,11 +64,11 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
 
     return (
-        <section className="nitro-navigator-air__category">
-            <header className="nitro-navigator-air__category-header">
+        <section className="octane-navigator-air__category">
+            <header className="octane-navigator-air__category-header">
                 <button
                     type="button"
-                    className="nitro-navigator-air__category-toggle"
+                    className="octane-navigator-air__category-toggle"
                     aria-label={resultTitle}
                     aria-expanded={isExtended}
                     onClick={() => useNavigatorUiStore.getState().setResultCollapsed(searchResult.code, isExtended)}
@@ -76,11 +76,11 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                     <img src={isExtended ? categoryCollapse : categoryExpand} alt="" />
                     <span>{resultTitle}</span>
                 </button>
-                <div className="nitro-navigator-air__category-controls">
+                <div className="octane-navigator-air__category-controls">
                     {displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
                         <button
                             type="button"
-                            className="nitro-navigator-air__icon-button"
+                            className="octane-navigator-air__icon-button"
                             aria-label={tileViewLabel}
                             title={tileViewLabel}
                             onClick={toggleDisplayMode}
@@ -91,7 +91,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                     {isTileMode && (
                         <button
                             type="button"
-                            className="nitro-navigator-air__icon-button"
+                            className="octane-navigator-air__icon-button"
                             aria-label={listViewLabel}
                             title={listViewLabel}
                             onClick={toggleDisplayMode}
@@ -100,12 +100,12 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                         </button>
                     )}
                     {searchResult.action > 0 && searchResult.action === 1 && (
-                        <button type="button" className="nitro-navigator-air__icon-button" title={LocalizeText('navigator.more.rooms')} onClick={showMore}>
+                        <button type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.more.rooms')} onClick={showMore}>
                             <img src={categoryShowMore} alt="" />
                         </button>
                     )}
                     {searchResult.action > 0 && searchResult.action !== 1 && (
-                        <button type="button" className="nitro-navigator-air__icon-button" title={LocalizeText('navigator.back')} onClick={showMore}>
+                        <button type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.back')} onClick={showMore}>
                             <img src={navViewMini} alt="" />
                         </button>
                     )}
@@ -118,7 +118,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                 </div>
             </header>
             {isExtended && (
-                <div className={isTileMode ? 'nitro-navigator-air__tiles' : 'nitro-navigator-air__rows'}>
+                <div className={isTileMode ? 'octane-navigator-air__tiles' : 'octane-navigator-air__rows'}>
                     {searchResult.rooms.map((room, index) => (
                         <NavigatorSearchResultItemView
                             key={room.roomId || index}

@@ -1,4 +1,4 @@
-import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { CSSProperties, FC, MouseEvent as ReactMouseEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import {
     EmuStatsMemoryPoint,
@@ -10,7 +10,7 @@ import {
     fetchEmuStats,
     getCachedEmuStats
 } from '../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 
 type EmuStatsSection = 'overview' | 'system' | 'wiredInsights' | 'users' | 'rooms' | 'wired';
 
@@ -107,29 +107,29 @@ const MemoryChart: FC<{ history: EmuStatsMemoryPoint[] }> = ({ history }) => {
     };
 
     return (
-        <div className="nitro-emustats__chart-card">
-            <div className="nitro-emustats__section-header">
+        <div className="octane-emustats__chart-card">
+            <div className="octane-emustats__section-header">
                 <div>
                     <h3>Realtime Memory Usage</h3>
                     <p>Rolling history from the emulator process.</p>
                 </div>
-                <div className="nitro-emustats__chart-meta">
+                <div className="octane-emustats__chart-meta">
                     <span>Peak {chart.peak} MB</span>
                     <strong>{chart.latest} MB</strong>
                 </div>
             </div>
-            <div className="nitro-emustats__chart-shell">
-                <div className="nitro-emustats__chart-axis">
+            <div className="octane-emustats__chart-shell">
+                <div className="octane-emustats__chart-axis">
                     {chart.gridValues.map((value, index) => (
                         <span key={`${value}-${index}`}>{value} MB</span>
                     ))}
                     <span>0 MB</span>
                 </div>
-                <div className="nitro-emustats__chart-canvas">
+                <div className="octane-emustats__chart-canvas">
                     <svg
                         viewBox="0 0 100 100"
                         preserveAspectRatio="none"
-                        className="nitro-emustats__chart"
+                        className="octane-emustats__chart"
                         onMouseLeave={() => setHoveredIndex(-1)}
                         onMouseMove={onMouseMove}
                     >
@@ -139,22 +139,22 @@ const MemoryChart: FC<{ history: EmuStatsMemoryPoint[] }> = ({ history }) => {
                                 <stop offset="100%" stopColor="rgba(99,102,241,0.02)" />
                             </linearGradient>
                         </defs>
-                        <line x1="0" y1="20" x2="100" y2="20" className="nitro-emustats__chart-grid" />
-                        <line x1="0" y1="40" x2="100" y2="40" className="nitro-emustats__chart-grid" />
-                        <line x1="0" y1="60" x2="100" y2="60" className="nitro-emustats__chart-grid" />
-                        <line x1="0" y1="80" x2="100" y2="80" className="nitro-emustats__chart-grid" />
+                        <line x1="0" y1="20" x2="100" y2="20" className="octane-emustats__chart-grid" />
+                        <line x1="0" y1="40" x2="100" y2="40" className="octane-emustats__chart-grid" />
+                        <line x1="0" y1="60" x2="100" y2="60" className="octane-emustats__chart-grid" />
+                        <line x1="0" y1="80" x2="100" y2="80" className="octane-emustats__chart-grid" />
                         {!!chart.areaPoints.length && <polygon points={chart.areaPoints} fill="url(#emuStatsArea)" />}
-                        {!!chart.linePoints.length && <polyline points={chart.linePoints} className="nitro-emustats__chart-line" />}
+                        {!!chart.linePoints.length && <polyline points={chart.linePoints} className="octane-emustats__chart-line" />}
                         {hoveredPoint && (
                             <>
-                                <line x1={hoveredPoint.x} y1="0" x2={hoveredPoint.x} y2="100" className="nitro-emustats__chart-hover-line" />
-                                <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="1.8" className="nitro-emustats__chart-hover-point" />
+                                <line x1={hoveredPoint.x} y1="0" x2={hoveredPoint.x} y2="100" className="octane-emustats__chart-hover-line" />
+                                <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="1.8" className="octane-emustats__chart-hover-point" />
                             </>
                         )}
                     </svg>
                     {hoveredPoint && (
                         <div
-                            className="nitro-emustats__chart-tooltip"
+                            className="octane-emustats__chart-tooltip"
                             style={{
                                 left: `${Math.min(88, Math.max(6, hoveredPoint.x))}%`,
                                 top: `${Math.min(72, Math.max(6, hoveredPoint.y - 10))}%`
@@ -181,8 +181,8 @@ const StatsTable = <TRow extends object>({
     rowKey: (row: TRow, index: number) => string;
 }) => {
     return (
-        <div className="nitro-emustats__table-shell">
-            <table className="nitro-emustats__table">
+        <div className="octane-emustats__table-shell">
+            <table className="octane-emustats__table">
                 <thead>
                     <tr>
                         {columns.map((column) => (
@@ -195,7 +195,7 @@ const StatsTable = <TRow extends object>({
                 <tbody>
                     {rows.length === 0 && (
                         <tr>
-                            <td colSpan={columns.length} className="nitro-emustats__table-empty">
+                            <td colSpan={columns.length} className="octane-emustats__table-empty">
                                 Nothing to show right now.
                             </td>
                         </tr>
@@ -217,8 +217,8 @@ const StatsTable = <TRow extends object>({
 
 const DetailPanel: FC<{ title: string; description?: string; children: ReactNode }> = ({ title, description = '', children }) => {
     return (
-        <div className="nitro-emustats__detail-panel">
-            <div className="nitro-emustats__detail-panel-header">
+        <div className="octane-emustats__detail-panel">
+            <div className="octane-emustats__detail-panel-header">
                 <h3>{title}</h3>
                 {!!description.length && <p>{description}</p>}
             </div>
@@ -229,9 +229,9 @@ const DetailPanel: FC<{ title: string; description?: string; children: ReactNode
 
 const KeyValueGrid: FC<{ items: { label: string; value: string; tone?: 'default' | 'good' | 'warn' }[]; columns?: 1 | 2 }> = ({ items, columns = 2 }) => {
     return (
-        <div className={`nitro-emustats__kv-grid is-${columns}col`}>
+        <div className={`octane-emustats__kv-grid is-${columns}col`}>
             {items.map((item) => (
-                <div key={item.label} className="nitro-emustats__kv-item">
+                <div key={item.label} className="octane-emustats__kv-item">
                     <span>{item.label}</span>
                     <strong data-tone={item.tone || 'default'}>{item.value}</strong>
                 </div>
@@ -244,7 +244,7 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
     const { databasePool, garbageCollector, network, overview, scheduler } = snapshot;
 
     return (
-        <div className="nitro-emustats__detail-layout">
+        <div className="octane-emustats__detail-layout">
             <DetailPanel title="Database Pool" description="Current Hikari pool pressure and connection availability.">
                 <KeyValueGrid
                     items={[
@@ -320,7 +320,7 @@ const WiredInsightsSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) 
     const { overview } = snapshot;
 
     return (
-        <div className="nitro-emustats__detail-layout">
+        <div className="octane-emustats__detail-layout">
             <DetailPanel title="Wired Pressure" description="Live summary of tick load, delayed actions and heavy rooms.">
                 <KeyValueGrid
                     items={[
@@ -362,7 +362,7 @@ const WiredInsightsSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) 
 
 const MetricCard: FC<{ title: string; value: string; subtitle?: string; accent?: string }> = ({ title, value, subtitle = '', accent }) => {
     return (
-        <div className="nitro-emustats__metric-card" style={accent ? ({ '--emustats-accent': accent } as CSSProperties) : undefined}>
+        <div className="octane-emustats__metric-card" style={accent ? ({ '--emustats-accent': accent } as CSSProperties) : undefined}>
             <span>{title}</span>
             <strong>{value}</strong>
             {!!subtitle.length && <small>{subtitle}</small>}
@@ -510,8 +510,8 @@ export const EmuStatsView: FC<{}> = () => {
             case 'overview':
             default:
                 return (
-                    <div className="nitro-emustats__overview">
-                        <div className="nitro-emustats__overview-cards">
+                    <div className="octane-emustats__overview">
+                        <div className="octane-emustats__overview-cards">
                             <MetricCard title="Uptime" accent="#6366f1" value={formatUptime(overview.uptimeSeconds)} />
                             <MetricCard title="Last Refresh" accent="#22c55e" value={formatDateTime(overview.lastRefreshEpochMs)} />
                             <MetricCard title="GUI Status" accent="#f59e0b" value={overview.guiStatus} />
@@ -542,20 +542,20 @@ export const EmuStatsView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-emustats-window w-[980px] h-[620px]" isResizable={false} theme="primary-slim" uniqueKey="emu-stats">
-            <NitroCardHeaderView headerText="Emulator Stats" onCloseClick={() => setIsVisible(false)} />
-            <NitroCardContentView classNames={['nitro-emustats-window__content']}>
-                <div className="nitro-emustats">
-                    <aside className="nitro-emustats__sidebar">
-                        <div className="nitro-emustats__sidebar-brand">
+        <OctaneCardView className="octane-emustats-window w-[980px] h-[620px]" isResizable={false} theme="primary-slim" uniqueKey="emu-stats">
+            <OctaneCardHeaderView headerText="Emulator Stats" onCloseClick={() => setIsVisible(false)} />
+            <OctaneCardContentView classNames={['octane-emustats-window__content']}>
+                <div className="octane-emustats">
+                    <aside className="octane-emustats__sidebar">
+                        <div className="octane-emustats__sidebar-brand">
                             <h2>Arcturus</h2>
                             <p>{session?.userName || 'Operator'}</p>
                         </div>
-                        <nav className="nitro-emustats__nav">
+                        <nav className="octane-emustats__nav">
                             {navItems.map((item) => (
                                 <button
                                     key={item.key}
-                                    className={`nitro-emustats__nav-button ${section === item.key ? 'is-active' : ''}`}
+                                    className={`octane-emustats__nav-button ${section === item.key ? 'is-active' : ''}`}
                                     onClick={() => setSection(item.key)}
                                     type="button"
                                 >
@@ -564,36 +564,36 @@ export const EmuStatsView: FC<{}> = () => {
                                 </button>
                             ))}
                         </nav>
-                        <div className="nitro-emustats__sidebar-footer">
-                            <button className="nitro-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
+                        <div className="octane-emustats__sidebar-footer">
+                            <button className="octane-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
                                 Refresh now
                             </button>
                             <p>Auto refresh every {REFRESH_INTERVAL_MS / 1000}s</p>
                         </div>
                     </aside>
-                    <section className="nitro-emustats__main">
-                        <div className="nitro-emustats__header">
+                    <section className="octane-emustats__main">
+                        <div className="octane-emustats__header">
                             <div>
                                 <h1>{navItems.find((item) => item.key === section)?.label || 'Overview'}</h1>
                                 <p>Live operational view of emulator health, activity and wired performance.</p>
                             </div>
                             {overview && (
-                                <div className="nitro-emustats__status-pill" data-status={overview.guiStatus.toLowerCase().replace(/\s+/g, '-')}>
+                                <div className="octane-emustats__status-pill" data-status={overview.guiStatus.toLowerCase().replace(/\s+/g, '-')}>
                                     {overview.guiStatus}
                                 </div>
                             )}
                         </div>
-                        {error && <div className="nitro-emustats__error">{error}</div>}
-                        {isLoading && !snapshot && <div className="nitro-emustats__empty">Loading emulator stats...</div>}
-                        {!isLoading && !snapshot && !error && <div className="nitro-emustats__empty">No emulator stats available yet.</div>}
+                        {error && <div className="octane-emustats__error">{error}</div>}
+                        {isLoading && !snapshot && <div className="octane-emustats__empty">Loading emulator stats...</div>}
+                        {!isLoading && !snapshot && !error && <div className="octane-emustats__empty">No emulator stats available yet.</div>}
                         {snapshot && (
-                            <div className="nitro-emustats__body" style={{ '--emustats-section': `"${section}"` } as CSSProperties}>
+                            <div className="octane-emustats__body" style={{ '--emustats-section': `"${section}"` } as CSSProperties}>
                                 {content}
                             </div>
                         )}
                     </section>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

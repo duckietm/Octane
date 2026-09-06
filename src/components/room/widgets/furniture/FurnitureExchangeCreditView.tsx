@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
-import { Button, Column, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFurnitureExchangeWidget } from '../../../../hooks';
 
 export const FurnitureExchangeCreditView: FC<{}> = (props) => {
@@ -9,9 +9,9 @@ export const FurnitureExchangeCreditView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView className="nitro-widget-exchange-credit" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('catalog.redeem.dialog.title')} onCloseClick={onClose} />
-            <NitroCardContentView center>
+        <OctaneCardView className="octane-widget-exchange-credit" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('catalog.redeem.dialog.title')} onCloseClick={onClose} />
+            <OctaneCardContentView center>
                 <div className="flex gap-2 overflow-hidden">
                     <div className="flex flex-col items-center justify-conent-center">
                         <div className="exchange-image" />
@@ -26,7 +26,7 @@ export const FurnitureExchangeCreditView: FC<{}> = (props) => {
                         </Button>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

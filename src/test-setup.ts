@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-// Set up a container for React portals (used by NitroCardView's DraggableWindow)
+// Set up a container for React portals (used by OctaneCardView's DraggableWindow)
 const draggableWindowsContainer = document.createElement('div');
 draggableWindowsContainer.id = 'draggable-windows-container';
 document.body.appendChild(draggableWindowsContainer);

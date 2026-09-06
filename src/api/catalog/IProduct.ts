@@ -1,4 +1,4 @@
-import { IFurnitureData, IProductData } from '@nitrots/nitro-renderer';
+import { IFurnitureData, IProductData } from '@octane/renderer';
 import { IPurchasableOffer } from './IPurchasableOffer';
 
 export interface IProduct {

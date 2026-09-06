@@ -165,7 +165,7 @@
     cursor: not-allowed;
 }
 
-/* AIR has no dedicated red button style; Nitro danger uses shiny × purse logout #DE5347. */
+/* AIR has no dedicated red button style; Octane danger uses shiny × purse logout #DE5347. */
 .habbo-btn-danger {
     display: inline-flex;
     align-items: center;
@@ -231,7 +231,7 @@
 }
 
 /* Checkboxes and radios, drawn with the client's own artwork.
-   These rules used to live inside the .nitro-wired block, so they only reached the
+   These rules used to live inside the .octane-wired block, so they only reached the
    wired dialogs: everywhere else in the client a checkbox was whatever the browser
    drew. The images come from the official client - the checkbox is the two states
    of illumina_light_checkbox_basic, the radio is radio_button_off/on - so the size

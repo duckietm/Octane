@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue } from '../../api';
-import { subscribePlugins } from './NitroPluginApi';
+import { subscribePlugins } from './OctanePluginApi';
 
-import './NitroPluginApi';
+import './OctanePluginApi';
 
 export const ExternalPluginLoader: FC<{}> = () => {
     const [, forceUpdate] = useState(0);
@@ -18,16 +18,16 @@ export const ExternalPluginLoader: FC<{}> = () => {
         try {
             urls = GetConfigurationValue<string[]>('external.plugins', []) || [];
         } catch (e) {
-            console.warn('[NitroPlugins] Could not read external.plugins config:', e);
+            console.warn('[OctanePlugins] Could not read external.plugins config:', e);
             return;
         }
 
         if (!urls.length) {
-            console.log('[NitroPlugins] No external plugins configured');
+            console.log('[OctanePlugins] No external plugins configured');
             return;
         }
 
-        console.log('[NitroPlugins] Loading external plugins:', urls);
+        console.log('[OctanePlugins] Loading external plugins:', urls);
         setPluginUrls(urls);
     }, []);
 
@@ -40,8 +40,8 @@ export const ExternalPluginLoader: FC<{}> = () => {
                     key={url}
                     async
                     src={url}
-                    onLoad={() => console.log(`[NitroPlugins] Loaded: ${url}`)}
-                    onError={() => console.warn(`[NitroPlugins] Failed to load: ${url}`)}
+                    onLoad={() => console.log(`[OctanePlugins] Loaded: ${url}`)}
+                    onError={() => console.warn(`[OctanePlugins] Failed to load: ${url}`)}
                 />
             ))}
         </>

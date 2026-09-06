@@ -1,4 +1,4 @@
-import { GetGuestRoomMessageComposer, GetRoomEngine, NitroRenderTexture, ThumbnailStatusMessageEvent } from '@nitrots/nitro-renderer';
+import { GetGuestRoomMessageComposer, GetRoomEngine, OctaneRenderTexture, ThumbnailStatusMessageEvent } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { LocalizeText, RefreshRoomThumbnail, SendMessageComposer } from '../../../../api';
 import { LayoutMiniCameraView } from '../../../../common';
@@ -41,7 +41,7 @@ export const RoomThumbnailWidgetView: FC<{}> = (props) => {
         }
     });
 
-    const receiveTexture = async (texture: NitroRenderTexture) => {
+    const receiveTexture = async (texture: OctaneRenderTexture) => {
         if (isSaving) return;
 
         setIsSaving(true);

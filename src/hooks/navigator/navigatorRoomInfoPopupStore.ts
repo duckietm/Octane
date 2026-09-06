@@ -1,5 +1,5 @@
-import { RoomDataParser } from '@nitrots/nitro-renderer';
-import { createNitroStore } from '../../state/createNitroStore';
+import { RoomDataParser } from '@octane/renderer';
+import { createOctaneStore } from '../../state/createOctaneStore';
 
 export type NavigatorRoomInfoAnchorKind = 'info' | 'row' | 'tile';
 
@@ -52,7 +52,7 @@ const anchorPoint = (kind: NavigatorRoomInfoAnchorKind, rect: DOMRect) => {
     return { x: rect.right, y: midY };
 };
 
-export const useNavigatorRoomInfoPopupStore = createNitroStore<NavigatorRoomInfoPopupState & NavigatorRoomInfoPopupActions>()((set, get) => ({
+export const useNavigatorRoomInfoPopupStore = createOctaneStore<NavigatorRoomInfoPopupState & NavigatorRoomInfoPopupActions>()((set, get) => ({
     room: null,
     visible: false,
     x: 0,

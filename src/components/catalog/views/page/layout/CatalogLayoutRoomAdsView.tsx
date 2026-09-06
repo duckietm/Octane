@@ -4,12 +4,12 @@ import {
     PurchaseRoomAdMessageComposer,
     RoomAdPurchaseInfoEvent,
     RoomEntryData
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Text } from '../../../../../common';
 import { useCatalogUiState, useMessageEvent, useNavigatorData, useRoomPromote } from '../../../../../hooks';
-import { NitroInput } from '../../../../../layout';
+import { OctaneInput } from '../../../../../layout';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
@@ -108,7 +108,7 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
                     </Column>
                     <div className="flex flex-col gap-1">
                         <Text bold>{LocalizeText('roomad.catalog_name')}</Text>
-                        <NitroInput maxLength={64} readOnly={extended} value={eventName} onChange={(event) => setEventName(event.target.value)} />
+                        <OctaneInput maxLength={64} readOnly={extended} value={eventName} onChange={(event) => setEventName(event.target.value)} />
                     </div>
                     <div className="flex flex-col gap-1">
                         <Text bold>{LocalizeText('roomad.catalog_description')}</Text>

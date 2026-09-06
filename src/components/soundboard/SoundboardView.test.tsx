@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { DisplaySoundboardSound } from '../../hooks/soundboard/soundboardPresentation';
 import { SoundboardContentView } from './SoundboardView';
 
-vi.mock('@nitrots/nitro-renderer', () => ({
+vi.mock('@octane/renderer', () => ({
     AddLinkEventTracker: vi.fn(),
     RemoveLinkEventTracker: vi.fn()
 }));

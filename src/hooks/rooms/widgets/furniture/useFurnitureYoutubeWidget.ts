@@ -11,10 +11,10 @@ import {
     YoutubeDisplayPlaylist,
     YoutubeDisplayPlaylistsEvent,
     YoutubeDisplayVideoMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useRef, useState } from 'react';
 import { IsOwnerOfFurniture, SendMessageComposer, YoutubeVideoPlaybackStateEnum } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
 const CONTROL_COMMAND_PREVIOUS_VIDEO = 0;
@@ -72,7 +72,7 @@ const useFurnitureYoutubeWidgetState = () => {
         SendMessageComposer(new SetYoutubeDisplayPlaylistMessageComposer(objectId, video));
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_YOUTUBE, (event) => {
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_YOUTUBE, (event) => {
         if (RoomId.isRoomPreviewerId(event.roomId)) return;
 
         const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);

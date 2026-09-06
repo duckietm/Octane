@@ -1,4 +1,4 @@
-.nitro-room-widgets {
+.octane-room-widgets {
     pointer-events: none;
 }
 
@@ -10,16 +10,16 @@
     max-height: 430px !important;
 }
 
-.nitro-widget-custom-stack-height {
+.octane-widget-custom-stack-height {
     width: 275px;
     height: 220px;
 }
 
-.nitro-room-widget-toner {
+.octane-room-widget-toner {
     width: 190px;
 }
 
-.nitro-room-widget-background-color {
+.octane-room-widget-background-color {
     width: 314px;
 
     .bgcolor-widget-content {
@@ -97,13 +97,13 @@
         pointer-events: none;
     }
 
-    .bgcolor-widget-slider-shell .nitro-slider-wrapper {
+    .bgcolor-widget-slider-shell .octane-slider-wrapper {
         position: relative;
         z-index: 1;
         gap: 0;
     }
 
-    .bgcolor-widget-slider-shell .nitro-slider {
+    .bgcolor-widget-slider-shell .octane-slider {
         height: 16px;
     }
 
@@ -150,7 +150,7 @@
     }
 }
 
-.nitro-room-widget-dimmer {
+.octane-room-widget-dimmer {
     width: min(275px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -174,7 +174,7 @@
     }
 }
 
-.nitro-widget-crafting {
+.octane-widget-crafting {
     width: min(500px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -191,7 +191,7 @@
     }
 }
 
-.nitro-widget-exchange-credit {
+.octane-widget-exchange-credit {
     width: min(375px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -206,7 +206,7 @@
     }
 }
 
-.nitro-external-image-widget {
+.octane-external-image-widget {
     width: min(340px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -233,7 +233,7 @@
     }
 }
 
-.nitro-gift-opening {
+.octane-gift-opening {
     width: min(340px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -241,7 +241,7 @@
     resize: none;
 }
 
-.nitro-mannequin {
+.octane-mannequin {
     width: 300px;
 
     .mannequin-preview {
@@ -260,7 +260,7 @@
     }
 }
 
-.nitro-stickie {
+.octane-stickie {
     position: relative;
     width: 185px;
     height: 178px;
@@ -361,7 +361,7 @@
     }
 }
 
-.nitro-stickie-image {
+.octane-stickie-image {
     &.stickie-christmas {
         background-image: url('@/assets/images/room-widgets/stickie-widget/stickie-christmas.png');
     }
@@ -395,7 +395,7 @@
     }
 }
 
-.nitro-engraving-lock {
+.octane-engraving-lock {
     width: 300px;
 
     .engraving-lock-stage-1 {
@@ -414,7 +414,7 @@
 }
 
 /* lovelock_engraving_xml.xml — 375×210, absolute layout */
-.nitro-engraving-lock-view {
+.octane-engraving-lock-view {
     position: relative;
     width: 375px;
     height: 210px;
@@ -432,18 +432,18 @@
     user-select: none;
 }
 
-.nitro-engraving-lock-view.engraving-lock-3 {
+.octane-engraving-lock-view.engraving-lock-3 {
     background-position: 0 -210px;
     color: #614110;
 }
 
-.nitro-engraving-lock-view.engraving-lock-4 {
+.octane-engraving-lock-view.engraving-lock-4 {
     background-position: 0 -420px;
     color: #f1dcc8;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }
 
-.nitro-engraving-lock-view .engraving-lock-close {
+.octane-engraving-lock-view .engraving-lock-close {
     position: absolute;
     top: 33px;
     right: 24px;
@@ -455,7 +455,7 @@
     cursor: pointer;
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar {
+.octane-engraving-lock-view .engraving-lock-avatar {
     position: absolute;
     top: 7px;
     width: 70px;
@@ -464,7 +464,7 @@
     pointer-events: none;
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar .avatar-image {
+.octane-engraving-lock-view .engraving-lock-avatar .avatar-image {
     position: absolute !important;
     top: auto !important;
     bottom: 0 !important;
@@ -476,17 +476,17 @@
     image-rendering: pixelated;
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar--left {
+.octane-engraving-lock-view .engraving-lock-avatar--left {
     left: 115px;
 }
 
-.nitro-engraving-lock-view .engraving-lock-avatar--right {
+.octane-engraving-lock-view .engraving-lock-avatar--right {
     left: 186px;
 }
 
-.nitro-engraving-lock-view .engraving-lock-header,
-.nitro-engraving-lock-view .engraving-lock-date,
-.nitro-engraving-lock-view .engraving-lock-name {
+.octane-engraving-lock-view .engraving-lock-header,
+.octane-engraving-lock-view .engraving-lock-date,
+.octane-engraving-lock-view .engraving-lock-name {
     position: absolute;
     display: block;
     height: 17px;
@@ -498,37 +498,37 @@
     box-sizing: border-box;
 }
 
-.nitro-engraving-lock-view .engraving-lock-header {
+.octane-engraving-lock-view .engraving-lock-header {
     top: 126px;
     left: 82px;
     width: 217px;
     text-align: center;
 }
 
-.nitro-engraving-lock-view .engraving-lock-date {
+.octane-engraving-lock-view .engraving-lock-date {
     top: 151px;
     left: 143px;
     width: 97px;
     text-align: center;
 }
 
-.nitro-engraving-lock-view .engraving-lock-name {
+.octane-engraving-lock-view .engraving-lock-name {
     top: 175px;
 }
 
-.nitro-engraving-lock-view .engraving-lock-name--left {
+.octane-engraving-lock-view .engraving-lock-name--left {
     left: 19px;
     width: 150px;
     text-align: right;
 }
 
-.nitro-engraving-lock-view .engraving-lock-name--right {
+.octane-engraving-lock-view .engraving-lock-name--right {
     left: 199px;
     width: 87px;
     text-align: left;
 }
 
-.nitro-widget-high-score {
+.octane-widget-high-score {
     border-radius: 0.3rem;
     border: solid 1px #000;
 
@@ -609,7 +609,7 @@
     }
 }
 
-.nitro-playlist-editor-widget {
+.octane-playlist-editor-widget {
     width: min(625px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -725,7 +725,7 @@
 }
 
 @media (max-width: 640px), (max-height: 520px) {
-    .nitro-playlist-editor-widget {
+    .octane-playlist-editor-widget {
         .playlist-editor-layout {
             flex-direction: column;
         }
@@ -737,7 +737,7 @@
     }
 }
 
-.nitro-mysterybox-dialog {
+.octane-mysterybox-dialog {
     width: min(375px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
@@ -754,7 +754,7 @@
     }
 }
 
-.nitro-mysterytrophy-dialog {
+.octane-mysterytrophy-dialog {
     .mysterytrophy-dialog-top {
         width: 100%;
         min-height: 120px;
@@ -810,7 +810,7 @@
 }
 
 @media (max-width: 560px), (max-height: 460px) {
-    .nitro-widget-crafting {
+    .octane-widget-crafting {
         .crafting-widget-layout {
             flex-direction: column;
             overflow: auto;
@@ -822,7 +822,7 @@
         }
     }
 
-    .nitro-widget-exchange-credit {
+    .octane-widget-exchange-credit {
         height: auto;
     }
 }

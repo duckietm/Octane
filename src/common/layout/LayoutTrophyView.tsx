@@ -20,7 +20,7 @@ export const LayoutTrophyView: FC<LayoutTrophyViewProps> = (props) => {
 
     return (
         <DraggableWindow handleSelector=".drag-handler">
-            <Column alignItems="center" className={`nitro-layout-trophy trophy-${color}`} gap={0}>
+            <Column alignItems="center" className={`octane-layout-trophy trophy-${color}`} gap={0}>
                 <Flex center fullWidth className="trophy-header drag-handler" position="relative">
                     <Base pointer className="trophy-close" position="absolute" onClick={onCloseClick} />
                     <Text bold>{LocalizeText('widget.furni.trophy.title')}</Text>

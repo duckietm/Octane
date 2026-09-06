@@ -1,4 +1,4 @@
-import { GetAvatarRenderManager, GetSessionDataManager, Vector3d } from '@nitrots/nitro-renderer';
+import { GetAvatarRenderManager, GetSessionDataManager, Vector3d } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { FurniCategory, GetProductIconUrl, Offer, ProductTypeEnum } from '../../../../../api';
 import { AutoGrid, Column, LayoutGridItem, LayoutRoomPreviewerView } from '../../../../../common';
@@ -147,14 +147,14 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
     if (currentOffer.pricingModel === Offer.PRICING_MODEL_BUNDLE) {
         return (
             <Column fit className="bg-muted p-2 rounded" overflow="hidden">
-                <AutoGrid fullWidth className="nitro-catalog-layout-bundle-grid" columnCount={4}>
+                <AutoGrid fullWidth className="octane-catalog-layout-bundle-grid" columnCount={4}>
                     {currentOffer.products.length > 0 &&
                         currentOffer.products.map((product, index) => {
                             const iconUrl = GetProductIconUrl(product, currentOffer);
 
                             return (
                                 <LayoutGridItem key={index} itemCount={product.productCount}>
-                                    {iconUrl && <img alt="" className="nitro-catalog-grid-offer-icon" draggable={false} src={iconUrl} />}
+                                    {iconUrl && <img alt="" className="octane-catalog-grid-offer-icon" draggable={false} src={iconUrl} />}
                                 </LayoutGridItem>
                             );
                         })}

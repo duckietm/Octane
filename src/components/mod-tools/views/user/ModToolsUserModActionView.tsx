@@ -7,11 +7,11 @@ import {
     ModMessageMessageComposer,
     ModMuteMessageComposer,
     ModTradingLockMessageComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useMemo, useRef, useState } from 'react';
 import { FaBan, FaBolt, FaEnvelope, FaExclamationTriangle, FaGavel, FaHistory, FaUserSlash, FaVolumeMute } from 'react-icons/fa';
 import { ISelectedUser, LocalizeText, ModActionDefinition, NotificationAlertType, SendMessageComposer } from '../../../../api';
-import { Button, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useModTools, useNotification } from '../../../../hooks';
 
 interface ModToolsUserModActionViewProps {
@@ -184,16 +184,16 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
     const canSubmit = selectedTopic !== -1;
 
     return (
-        <NitroCardView
-            className="nitro-mod-tools-user-action min-w-0 w-[min(460px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-mod-tools-user-action min-w-0 w-[min(460px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
-            <NitroCardHeaderView
+            <OctaneCardHeaderView
                 headerText={LocalizeText('modtools.user.modaction.title', ['username'], [user.username])}
                 onCloseClick={() => onCloseClick()}
             />
-            <NitroCardContentView className="text-black relative" gap={2}>
+            <OctaneCardContentView className="text-black relative" gap={2}>
                 {/* Target header */}
                 <div className="flex items-center gap-2 bg-gradient-to-r from-rose-50 to-transparent rounded p-2 border border-rose-100">
                     <FaGavel className="text-rose-600 shrink-0" size={16} />
@@ -325,7 +325,7 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                         </div>
                     </div>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

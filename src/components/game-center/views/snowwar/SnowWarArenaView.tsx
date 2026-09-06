@@ -1914,7 +1914,7 @@ export const SnowWarArenaView: FC = () =>
                         // footprint and anchor the image by its BOTTOM-CENTRE there, so
                         // its base rests on the floor (size-independent; a fixed % lift
                         // floated tall props). Depth, however, sorts by the ORIGIN (back)
-                        // tile - the same rule Nitro uses for a real floor furni - so an
+                        // tile - the same rule Octane uses for a real floor furni - so an
                         // avatar on the near sides (left/front) draws in front of the
                         // furni and only one standing behind it is covered.
                         const front = toScreen(item.x + effW - 1, item.y + effL - 1);

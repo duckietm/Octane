@@ -1,8 +1,8 @@
-import { NitroTexture } from '@nitrots/nitro-renderer';
+import { OctaneTexture } from '@octane/renderer';
 
 export class CameraPicture {
     constructor(
-        public texture: NitroTexture,
+        public texture: OctaneTexture,
         public imageUrl: string
     ) {}
 }

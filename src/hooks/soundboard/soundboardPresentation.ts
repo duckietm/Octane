@@ -1,4 +1,4 @@
-import { ISoundboardSound } from '@nitrots/nitro-renderer';
+import { ISoundboardSound } from '@octane/renderer';
 import { EMPTY_SOUNDBOARD_MANIFEST, SoundboardManifest } from './soundboardManifest';
 
 export const SOUNDBOARD_TONES = ['blue', 'green', 'gold', 'purple'] as const;

@@ -15,11 +15,11 @@ import {
     HabboWebTools,
     LegacyExternalInterface,
     LoadGameUrlEvent,
-    NitroEventType,
-    NitroLogger,
-    NitroVersion,
+    OctaneEventType,
+    OctaneLogger,
+    OctaneVersion,
     PrepareRenderer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
 import { ClearRememberLogin, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, persistAccessTokenFromPayload, SetRememberLogin, StoreRememberLoginFromPayload } from './api';
 import { Base } from './common';
@@ -27,10 +27,10 @@ import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
 import { MainView } from './components/MainView';
 import { ReconnectView } from './components/reconnect/ReconnectView';
-import { ClearStoredChatHistory, getConnectionFailureAction, useConnectionState, useDevicePixelRatio, useMessageEvent, useNitroEvent } from './hooks';
+import { ClearStoredChatHistory, getConnectionFailureAction, useConnectionState, useDevicePixelRatio, useMessageEvent, useOctaneEvent } from './hooks';
 import { SharedHookRegistry } from './state/useSharedHook';
 
-NitroVersion.UI_VERSION = GetUIVersion();
+OctaneVersion.UI_VERSION = GetUIVersion();
 
 const getViewportDimensions = () => {
     const viewport = window.visualViewport;
@@ -43,8 +43,8 @@ const getViewportDimensions = () => {
 const syncViewportCssVars = () => {
     const { width, height } = getViewportDimensions();
 
-    document.documentElement.style.setProperty('--nitro-app-width', `${width}px`);
-    document.documentElement.style.setProperty('--nitro-app-height', `${height}px`);
+    document.documentElement.style.setProperty('--octane-app-width', `${width}px`);
+    document.documentElement.style.setProperty('--octane-app-height', `${height}px`);
 };
 
 const preloadUrl = async (url: string): Promise<void> => {
@@ -87,7 +87,7 @@ export const App: FC<{}> = (props) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [homeUrl, setHomeUrl] = useState('');
     const [showLogin, setShowLogin] = useState(false);
-    const [isEnteringHotel, setIsEnteringHotel] = useState(() => !!window.NitroConfig?.['sso.ticket'] || hasRememberLogin());
+    const [isEnteringHotel, setIsEnteringHotel] = useState(() => !!window.OctaneConfig?.['sso.ticket'] || hasRememberLogin());
     const [prepareTrigger, setPrepareTrigger] = useState(0);
     const [loadingProgress, setLoadingProgress] = useState(0);
     const [loadingTask, setLoadingTask] = useState('');
@@ -126,7 +126,7 @@ export const App: FC<{}> = (props) => {
         ClearStoredChatHistory();
         ClearRememberLogin();
         try {
-            delete (window as any).NitroConfig?.['sso.ticket'];
+            delete (window as any).OctaneConfig?.['sso.ticket'];
         } catch {}
         try {
             GetConfiguration().setValue('sso.ticket', '');
@@ -174,13 +174,13 @@ export const App: FC<{}> = (props) => {
     const applySsoTicket = useCallback((ssoTicket: string) => {
         if (!ssoTicket) return;
         ClearStoredChatHistory();
-        window.NitroConfig['sso.ticket'] = ssoTicket;
+        window.OctaneConfig['sso.ticket'] = ssoTicket;
         GetConfiguration().setValue('sso.ticket', ssoTicket);
         void exchangeSsoTicketForAccessToken(ssoTicket);
     }, []);
 
     useEffect(() => {
-        const ssoTicket = window.NitroConfig?.['sso.ticket'];
+        const ssoTicket = window.OctaneConfig?.['sso.ticket'];
 
         if (typeof ssoTicket === 'string' && ssoTicket.length) void exchangeSsoTicketForAccessToken(ssoTicket);
     }, []);
@@ -220,7 +220,7 @@ export const App: FC<{}> = (props) => {
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-Requested-With': 'NitroRememberLogin'
+                    'X-Requested-With': 'OctaneRememberLogin'
                 },
                 body: JSON.stringify({ rememberToken: remembered.token })
             });
@@ -267,7 +267,7 @@ export const App: FC<{}> = (props) => {
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-Requested-With': 'NitroRememberRotate'
+                    'X-Requested-With': 'OctaneRememberRotate'
                 },
                 body: JSON.stringify({ rememberToken: remembered.token })
             });
@@ -285,7 +285,7 @@ export const App: FC<{}> = (props) => {
 
             if (response.status === 400 || response.status === 401 || response.status === 403) ClearRememberLogin();
         } catch (error) {
-            NitroLogger.error('[LoginScreen] Remember rotation failed', error);
+            OctaneLogger.error('[LoginScreen] Remember rotation failed', error);
         }
     }, []);
 
@@ -315,7 +315,7 @@ export const App: FC<{}> = (props) => {
     const startRenderer = useCallback((width: number, height: number) => {
         if (rendererPromiseRef.current) return rendererPromiseRef.current;
 
-        const rawUseBackBuffer = window.NitroConfig?.['renderer.useBackBuffer'];
+        const rawUseBackBuffer = window.OctaneConfig?.['renderer.useBackBuffer'];
         const useBackBuffer = rawUseBackBuffer === undefined ? true : rawUseBackBuffer === true || rawUseBackBuffer === 'true';
 
         rendererPromiseRef.current = PrepareRenderer({
@@ -343,13 +343,13 @@ export const App: FC<{}> = (props) => {
                 bumpProgress(25, taskLabel('loader.waiting', 'Loading content...'));
 
                 GetTicker().maxFPS = GetConfiguration().getValue<number>('system.fps.max', 24);
-                NitroLogger.LOG_DEBUG = GetConfiguration().getValue<boolean>('system.log.debug', true);
-                NitroLogger.LOG_WARN = GetConfiguration().getValue<boolean>('system.log.warn', false);
-                NitroLogger.LOG_ERROR = GetConfiguration().getValue<boolean>('system.log.error', false);
-                NitroLogger.LOG_EVENTS = GetConfiguration().getValue<boolean>('system.log.events', false);
-                NitroLogger.LOG_PACKETS = GetConfiguration().getValue<boolean>('system.log.packets', false);
+                OctaneLogger.LOG_DEBUG = GetConfiguration().getValue<boolean>('system.log.debug', true);
+                OctaneLogger.LOG_WARN = GetConfiguration().getValue<boolean>('system.log.warn', false);
+                OctaneLogger.LOG_ERROR = GetConfiguration().getValue<boolean>('system.log.error', false);
+                OctaneLogger.LOG_EVENTS = GetConfiguration().getValue<boolean>('system.log.events', false);
+                OctaneLogger.LOG_PACKETS = GetConfiguration().getValue<boolean>('system.log.packets', false);
 
-                startRenderer(width, height).catch((error) => NitroLogger.error('[LoginScreen] Renderer warmup failed', error));
+                startRenderer(width, height).catch((error) => OctaneLogger.error('[LoginScreen] Renderer warmup failed', error));
 
                 const interpolate = (value: string) => GetConfiguration().interpolate(value);
                 const assetUrls = asStringArray(GetConfiguration().getValue<unknown>('preload.assets.urls')).map(interpolate);
@@ -422,8 +422,8 @@ export const App: FC<{}> = (props) => {
     useEffect(() => {
         const prepare = async (width: number, height: number) => {
             console.warn('[App] prepare() start', {
-                hasNitroConfig: !!window.NitroConfig,
-                ssoTicketInConfig: !!window.NitroConfig?.['sso.ticket'],
+                hasOctaneConfig: !!window.OctaneConfig,
+                ssoTicketInConfig: !!window.OctaneConfig?.['sso.ticket'],
                 hasRememberLocal: !!GetRememberLogin(),
                 hasUrlSso: !!new URLSearchParams(window.location.search).get('sso')
             });
@@ -434,9 +434,9 @@ export const App: FC<{}> = (props) => {
             bumpProgress(5, bootLabel);
 
             try {
-                if (!window.NitroConfig) throw new Error('NitroConfig is not defined!');
+                if (!window.OctaneConfig) throw new Error('OctaneConfig is not defined!');
 
-                let ssoTicket = window.NitroConfig['sso.ticket'];
+                let ssoTicket = window.OctaneConfig['sso.ticket'];
                 if (ssoTicket) GetConfiguration().setValue('sso.ticket', ssoTicket);
 
                 try {
@@ -473,7 +473,7 @@ export const App: FC<{}> = (props) => {
                     });
 
                     if (configInitError) {
-                        NitroLogger.error('[LoginScreen] Failed to load renderer-config.json — cannot resolve login.screen.enabled', configInitError);
+                        OctaneLogger.error('[LoginScreen] Failed to load renderer-config.json — cannot resolve login.screen.enabled', configInitError);
                     }
 
                     if (loginScreenEnabled) {
@@ -486,7 +486,7 @@ export const App: FC<{}> = (props) => {
                         } else {
                             setIsReady(false);
                             setShowLogin(true);
-                            startWarmup(width, height).catch((error) => NitroLogger.error('[LoginScreen] Warmup failed', error));
+                            startWarmup(width, height).catch((error) => OctaneLogger.error('[LoginScreen] Warmup failed', error));
                             return;
                         }
                     } else {
@@ -552,7 +552,7 @@ export const App: FC<{}> = (props) => {
                 setShowLogin(false);
                 setIsEnteringHotel(false);
             } catch (err) {
-                NitroLogger.error('[App] Initialization failed — falling back to login', err);
+                OctaneLogger.error('[App] Initialization failed — falling back to login', err);
                 onInitFailure();
             }
         };
@@ -571,7 +571,7 @@ export const App: FC<{}> = (props) => {
     }, [prepareTrigger, startWarmup, startRenderer, tryRememberLogin, applySsoTicket, rotateRememberLogin, bumpProgress, taskLabel]);
 
     return (
-        <Base fit overflow="hidden" className={`nitro-app-root ${!(devicePixelRatio % 1) ? 'image-rendering-pixelated' : ''}`}>
+        <Base fit overflow="hidden" className={`octane-app-root ${!(devicePixelRatio % 1) ? 'image-rendering-pixelated' : ''}`}>
             {!isReady && !showLogin && (
                 <LoadingView isError={errorMessage.length > 0} message={errorMessage} homeUrl={homeUrl} progress={loadingProgress} currentTask={loadingTask} />
             )}

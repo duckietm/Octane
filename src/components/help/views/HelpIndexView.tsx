@@ -1,4 +1,4 @@
-import { GetCfhStatusMessageComposer } from '@nitrots/nitro-renderer';
+import { GetCfhStatusMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { FaArrowCircleRight } from 'react-icons/fa';
 import { CreateLinkEvent, DispatchUiEvent, GetConfigurationValue, LocalizeText, ReportState, ReportType, SendMessageComposer } from '../../../api';

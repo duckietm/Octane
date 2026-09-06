@@ -1,7 +1,7 @@
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../api';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
-import { LayoutCurrencyIcon, LayoutFurniImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../common';
+import { LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 
 interface CatalogPurchaseConfirmViewProps {
     offer: IPurchasableOffer;
@@ -75,17 +75,17 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
     const isFurniture = offer.product?.productType === ProductTypeEnum.FLOOR || offer.product?.productType === ProductTypeEnum.WALL;
     const isLimited = !!offer.product?.isUniqueLimitedItem;
     const contentClassNames = [
-        'nitro-catalog-purchase-confirm-content',
+        'octane-catalog-purchase-confirm-content',
         spendingDisclaimerEnabled ? 'has-disclaimer' : '',
         isLimited ? 'has-limited' : ''
     ].filter(Boolean);
 
     return (
-        <NitroCardView
+        <OctaneCardView
             innerRef={dialogRef}
             aria-label={title}
             aria-modal="true"
-            classNames={['nitro-catalog-purchase-confirm']}
+            classNames={['octane-catalog-purchase-confirm']}
             frameStyle={3}
             isResizable={false}
             role="dialog"
@@ -93,9 +93,9 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
             theme="primary-slim"
             onKeyDown={onKeyDown}
         >
-            <NitroCardHeaderView headerText={title} onCloseClick={onCancel} />
-            <NitroCardContentView classNames={contentClassNames} overflow="hidden">
-                <div className="nitro-catalog-purchase-confirm-preview">
+            <OctaneCardHeaderView headerText={title} onCloseClick={onCancel} />
+            <OctaneCardContentView classNames={contentClassNames} overflow="hidden">
+                <div className="octane-catalog-purchase-confirm-preview">
                     {isFurniture ? (
                         <LayoutFurniImageView
                             aria-label={offer.localizationName}
@@ -110,31 +110,31 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                         !!iconUrl && <img alt={offer.localizationName} src={iconUrl} />
                     )}
                 </div>
-                <div className="nitro-catalog-purchase-confirm-properties">
-                    <strong className="nitro-catalog-purchase-confirm-product">{offer.localizationName}</strong>
-                    {quantity > 1 && <strong className="nitro-catalog-purchase-confirm-quantity">X {quantity}</strong>}
+                <div className="octane-catalog-purchase-confirm-properties">
+                    <strong className="octane-catalog-purchase-confirm-product">{offer.localizationName}</strong>
+                    {quantity > 1 && <strong className="octane-catalog-purchase-confirm-quantity">X {quantity}</strong>}
                     {freeItemCount > 0 && (
-                        <strong className="nitro-catalog-purchase-confirm-free-quantity">
+                        <strong className="octane-catalog-purchase-confirm-free-quantity">
                             {LocalizeText('shop.bonus.items.count', ['amount'], [freeItemCount.toString()])}
                         </strong>
                     )}
-                    <div className="nitro-catalog-purchase-confirm-summary">
+                    <div className="octane-catalog-purchase-confirm-summary">
                         <span>{LocalizeText('catalog.purchase.confirmation.dialog.cost')}</span>
-                        <span className="nitro-catalog-purchase-confirm-cost">
+                        <span className="octane-catalog-purchase-confirm-cost">
                             {hasCredits && (
-                                <span className="nitro-catalog-purchase-confirm-price" data-currency-type="-1">
+                                <span className="octane-catalog-purchase-confirm-price" data-currency-type="-1">
                                     <strong>{credits}</strong>
                                     <LayoutCurrencyIcon type={-1} />
                                 </span>
                             )}
                             {hasActivityPoints && (
-                                <span className="nitro-catalog-purchase-confirm-price" data-currency-type={offer.activityPointType}>
+                                <span className="octane-catalog-purchase-confirm-price" data-currency-type={offer.activityPointType}>
                                     <strong>{hasCredits ? `+ ${activityPoints}` : activityPoints}</strong>
                                     <LayoutCurrencyIcon type={offer.activityPointType} />
                                 </span>
                             )}
                             {!hasCredits && !hasActivityPoints && (
-                                <span className="nitro-catalog-purchase-confirm-price" data-currency-type="-1">
+                                <span className="octane-catalog-purchase-confirm-price" data-currency-type="-1">
                                     <strong>0</strong>
                                     <LayoutCurrencyIcon type={-1} />
                                 </span>
@@ -143,13 +143,13 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                     </div>
                 </div>
                 {spendingDisclaimerEnabled && (
-                    <label className="nitro-catalog-purchase-confirm-disclaimer">
+                    <label className="octane-catalog-purchase-confirm-disclaimer">
                         <input checked={spendingDisclaimerAccepted} type="checkbox" onChange={(event) => setSpendingDisclaimerAccepted(event.target.checked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}
                 {isLimited && (
-                    <div className="nitro-catalog-purchase-confirm-limited" role="status">
+                    <div className="octane-catalog-purchase-confirm-limited" role="status">
                         <span>
                             {LocalizeText('catalog.limited.items.left')}{' '}
                             <strong>
@@ -158,12 +158,12 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                         </span>
                     </div>
                 )}
-                <div className="nitro-catalog-purchase-confirm-actions">
-                    <button className="nitro-catalog-purchase-confirm-button is-cancel" disabled={isSubmitting} type="button" onClick={onCancel}>
+                <div className="octane-catalog-purchase-confirm-actions">
+                    <button className="octane-catalog-purchase-confirm-button is-cancel" disabled={isSubmitting} type="button" onClick={onCancel}>
                         {LocalizeText('catalog.purchase_confirmation.cancel')}
                     </button>
                     <button
-                        className="nitro-catalog-purchase-confirm-button is-buy"
+                        className="octane-catalog-purchase-confirm-button is-buy"
                         disabled={isSubmitting || !spendingDisclaimerAccepted}
                         type="button"
                         onClick={onConfirm}
@@ -171,7 +171,7 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                         {LocalizeText(isGift ? 'catalog.purchase_confirmation.gift' : `catalog.purchase_confirmation.${offer.isRentOffer ? 'rent' : 'buy'}`)}
                     </button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

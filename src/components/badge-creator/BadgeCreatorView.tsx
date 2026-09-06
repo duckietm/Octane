@@ -1,4 +1,4 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, MouseEvent as ReactMouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizeText } from '../../api';
 import {
@@ -11,7 +11,7 @@ import {
     setCustomBadgeText,
     updateCustomBadge
 } from '../../api/badges';
-import { Button, Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useNotification } from '../../hooks';
 
 const t = (key: string, fallback: string, params?: string[], replacements?: string[]): string => {
@@ -459,9 +459,9 @@ export const BadgeCreatorView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-badge-creator w-[760px] h-[680px]" isResizable={false} theme="primary-slim" uniqueKey="badge-creator">
-            <NitroCardHeaderView headerText={t('badgecreator.title', 'Badge Creator')} onCloseClick={() => setIsVisible(false)} />
-            <NitroCardContentView className="text-black">
+        <OctaneCardView className="octane-badge-creator w-[760px] h-[680px]" isResizable={false} theme="primary-slim" uniqueKey="badge-creator">
+            <OctaneCardHeaderView headerText={t('badgecreator.title', 'Badge Creator')} onCloseClick={() => setIsVisible(false)} />
+            <OctaneCardContentView className="text-black">
                 <Flex gap={2} className="badge-creator-main">
                     <Column gap={2}>
                         <div
@@ -710,7 +710,7 @@ export const BadgeCreatorView: FC<{}> = () => {
                             </Flex>
                         ))}
                 </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

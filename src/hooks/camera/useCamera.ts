@@ -4,11 +4,11 @@ import {
     IRoomCameraWidgetEffect,
     RequestCameraConfigurationComposer,
     RoomCameraWidgetManagerEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { CameraPicture, SendMessageComposer } from '../../api';
-import { useMessageEvent, useNitroEvent } from '../events';
+import { useMessageEvent, useOctaneEvent } from '../events';
 
 const useCameraState = () => {
     const [availableEffects, setAvailableEffects] = useState<IRoomCameraWidgetEffect[]>([]);
@@ -20,7 +20,7 @@ const useCameraState = () => {
     const [activePictureSlotIndex, setActivePictureSlotIndex] = useState(0);
     const [price, setPrice] = useState<{ credits: number; duckets: number; publishDucketPrice: number }>(null);
 
-    useNitroEvent<RoomCameraWidgetManagerEvent>(RoomCameraWidgetManagerEvent.INITIALIZED, (event) => {
+    useOctaneEvent<RoomCameraWidgetManagerEvent>(RoomCameraWidgetManagerEvent.INITIALIZED, (event) => {
         setAvailableEffects(Array.from(GetRoomCameraWidgetManager().effects.values()));
     });
 

@@ -1,6 +1,6 @@
 /* AIR purse_xml (1262): container 230x77, border style-9 230x76 color 0x686661. */
 
-.nitro-purse-container {
+.octane-purse-container {
     width: 100%;
     pointer-events: all;
     margin-top: 0;
@@ -10,7 +10,7 @@
     gap: 3px;
 }
 
-.nitro-purse {
+.octane-purse {
     position: relative;
     box-sizing: border-box;
     width: 230px;
@@ -26,7 +26,7 @@
 }
 
 /* Chrome is a sibling of the widgets so AIR x/y stay relative to the 230x77 box. */
-.nitro-purse__chrome {
+.octane-purse__chrome {
     position: absolute;
     left: 0;
     top: 0;
@@ -44,7 +44,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse__body {
+.octane-purse__body {
     position: relative;
     z-index: 1;
     width: 230px;
@@ -52,7 +52,7 @@
 }
 
 /* itemlist_vertical x=7 y=9 w=52 h=55 */
-.nitro-purse__currencies {
+.octane-purse__currencies {
     position: absolute;
     left: 7px;
     top: 9px;
@@ -64,16 +64,16 @@
     overflow: visible;
 }
 
-.nitro-purse__currencies > * {
+.octane-purse__currencies > * {
     width: 52px;
     height: 19px;
 }
 
-.nitro-purse__currencies > *:last-child {
+.octane-purse__currencies > *:last-child {
     height: 17px;
 }
 
-.nitro-purse .nitro-purse-button {
+.octane-purse .octane-purse-button {
     display: flex;
     width: 52px;
     height: 100%;
@@ -89,8 +89,8 @@
     box-shadow: none !important;
 }
 
-.nitro-purse .currency-info .currency-text,
-.nitro-purse .allcurrencypurse .text-white {
+.octane-purse .currency-info .currency-text,
+.octane-purse .allcurrencypurse .text-white {
     width: auto;
     min-width: 10px;
     margin: 0;
@@ -104,20 +104,20 @@
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.75);
 }
 
-.nitro-purse .nitro-purse-button.currency--1 .nitro-purse-button__amount {
+.octane-purse .octane-purse-button.currency--1 .octane-purse-button__amount {
     color: #d5af22 !important;
 }
 
-.nitro-purse .nitro-purse-button.currency-0 .nitro-purse-button__amount {
+.octane-purse .octane-purse-button.currency-0 .octane-purse-button__amount {
     color: #d787d7 !important;
 }
 
-.nitro-purse .nitro-purse-button.currency-5 .nitro-purse-button__amount {
+.octane-purse .octane-purse-button.currency-5 .octane-purse-button__amount {
     color: #38caeb !important;
 }
 
-.nitro-purse .nitro-purse-button .nitro-currency-icon,
-.nitro-purse .nitro-purse-air-currency {
+.octane-purse .octane-purse-button .octane-currency-icon,
+.octane-purse .octane-purse-air-currency {
     flex: 0 0 15px;
     width: 15px !important;
     height: 15px !important;
@@ -128,13 +128,13 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse .nitro-purse-air-currency {
+.octane-purse .octane-purse-air-currency {
     display: block;
     object-fit: none;
 }
 
-.nitro-purse .currency-info img,
-.nitro-purse .nitro-purse-button img {
+.octane-purse .currency-info img,
+.octane-purse .octane-purse-button img {
     width: 15px;
     height: 15px;
     max-width: 15px;
@@ -144,7 +144,7 @@
 }
 
 /* HC + earnings: border style-2 colorless color 0x3b3933 blend 0.8, 101x28 */
-.nitro-purse__col--primary {
+.octane-purse__col--primary {
     position: absolute;
     left: 64px;
     top: 7px;
@@ -155,8 +155,8 @@
     gap: 4px;
 }
 
-.nitro-purse__btn--join,
-.nitro-purse__btn--earnings {
+.octane-purse__btn--join,
+.octane-purse__btn--earnings {
     position: relative;
     display: flex;
     width: 101px;
@@ -178,8 +178,8 @@
     box-shadow: none;
 }
 
-.nitro-purse__btn--join::before,
-.nitro-purse__btn--earnings::before {
+.octane-purse__btn--join::before,
+.octane-purse__btn--earnings::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -194,24 +194,24 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse__btn--join:hover,
-.nitro-purse__btn--earnings:hover {
+.octane-purse__btn--join:hover,
+.octane-purse__btn--earnings:hover {
     filter: brightness(1.12);
 }
 
-.nitro-purse__btn--join:active,
-.nitro-purse__btn--earnings:active {
+.octane-purse__btn--join:active,
+.octane-purse__btn--earnings:active {
     filter: brightness(0.92);
 }
 
-.nitro-purse__btn--join > *,
-.nitro-purse__btn--earnings > * {
+.octane-purse__btn--join > *,
+.octane-purse__btn--earnings > * {
     position: relative;
     z-index: 1;
 }
 
-.nitro-purse__btn--join .nitro-purse__btn-img,
-.nitro-purse__btn--earnings .nitro-purse__btn-img {
+.octane-purse__btn--join .octane-purse__btn-img,
+.octane-purse__btn--earnings .octane-purse__btn-img {
     flex: 0 0 20px;
     width: 20px;
     height: 18px;
@@ -222,14 +222,14 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse__btn--join span,
-.nitro-purse__btn--earnings span {
+.octane-purse__btn--join span,
+.octane-purse__btn--earnings span {
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 /* background x=169 y=11 w=1 h=55 color 0xff444444 */
-.nitro-purse__divider {
+.octane-purse__divider {
     position: absolute;
     left: 169px;
     top: 11px;
@@ -239,7 +239,7 @@
 }
 
 /* itemlist_vertical x=174 y=8, container_button 50x19 spacing 2 */
-.nitro-purse__col--actions {
+.octane-purse__col--actions {
     position: absolute;
     left: 174px;
     top: 8px;
@@ -250,9 +250,9 @@
     gap: 2px;
 }
 
-.nitro-purse__btn--help,
-.nitro-purse__btn--logout,
-.nitro-purse__btn--settings {
+.octane-purse__btn--help,
+.octane-purse__btn--logout,
+.octane-purse__btn--settings {
     display: inline-flex;
     width: 50px;
     height: 19px;
@@ -276,48 +276,48 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse__btn--help {
+.octane-purse__btn--help {
     border-image-source: var(--habbo-skin-button-help);
 }
 
-.nitro-purse__btn--help:hover {
+.octane-purse__btn--help:hover {
     border-image-source: var(--habbo-skin-button-help-hover);
 }
 
-.nitro-purse__btn--help:active {
+.octane-purse__btn--help:active {
     border-image-source: var(--habbo-skin-button-help-pressed);
 }
 
-.nitro-purse__btn--logout {
+.octane-purse__btn--logout {
     border-image-source: var(--habbo-skin-button-logout);
 }
 
-.nitro-purse__btn--logout:hover {
+.octane-purse__btn--logout:hover {
     border-image-source: var(--habbo-skin-button-logout-hover);
 }
 
-.nitro-purse__btn--logout:active {
+.octane-purse__btn--logout:active {
     border-image-source: var(--habbo-skin-button-logout-pressed);
 }
 
-.nitro-purse__btn--settings {
+.octane-purse__btn--settings {
     border-image-source: var(--habbo-skin-button-settings);
 }
 
-.nitro-purse__btn--settings:hover {
+.octane-purse__btn--settings:hover {
     border-image-source: var(--habbo-skin-button-settings-hover);
 }
 
-.nitro-purse__btn--settings:active {
+.octane-purse__btn--settings:active {
     border-image-source: var(--habbo-skin-button-settings-pressed);
 }
 
-.nitro-purse__btn--help span {
+.octane-purse__btn--help span {
     position: relative;
     top: 0;
 }
 
-.nitro-purse__btn-img {
+.octane-purse__btn-img {
     display: block;
     width: auto;
     height: auto;
@@ -327,13 +327,13 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse__btn--logout .nitro-purse__btn-img,
-.nitro-purse__btn--settings .nitro-purse__btn-img {
+.octane-purse__btn--logout .octane-purse__btn-img,
+.octane-purse__btn--settings .octane-purse__btn-img {
     max-width: 50px;
     max-height: 19px;
 }
 
-.nitro-purse-menu {
+.octane-purse-menu {
     box-sizing: border-box;
     width: 188px;
     max-width: 188px;
@@ -352,7 +352,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse-menu__item {
+.octane-purse-menu__item {
     padding: 4px 10px;
     border: 0;
     background: transparent;
@@ -364,19 +364,19 @@
     cursor: pointer;
 }
 
-.nitro-purse-menu__item:hover {
+.octane-purse-menu__item:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
-.nitro-purse-menu__item--disabled,
-.nitro-purse-menu__item--disabled:hover {
+.octane-purse-menu__item--disabled,
+.octane-purse-menu__item--disabled:hover {
     color: rgba(255, 255, 255, 0.35);
     background: transparent;
     cursor: default;
 }
 
 /* track_promo / seasonal: style-9 192x29 color 0x686661 */
-.nitro-purse__other {
+.octane-purse__other {
     display: flex;
     width: 192px;
     max-width: 192px;
@@ -386,7 +386,7 @@
     gap: 3px;
 }
 
-.nitro-purse__other .nitro-purse-seasonal-currency {
+.octane-purse__other .octane-purse-seasonal-currency {
     position: relative;
     box-sizing: border-box;
     width: 192px;
@@ -405,14 +405,14 @@
     image-rendering: pixelated;
 }
 
-.nitro-purse-seasonal-currency .seasonal-row {
+.octane-purse-seasonal-currency .seasonal-row {
     position: relative;
     display: block;
     width: 178px;
     height: 14px;
 }
 
-.nitro-purse-seasonal-currency .seasonal-text {
+.octane-purse-seasonal-currency .seasonal-text {
     position: absolute;
     top: 0;
     left: 0;
@@ -427,7 +427,7 @@
     white-space: nowrap;
 }
 
-.nitro-purse-seasonal-currency .seasonal-amount {
+.octane-purse-seasonal-currency .seasonal-amount {
     position: absolute;
     top: 0;
     left: 90px;
@@ -440,7 +440,7 @@
     text-shadow: 1px 1px 0 #000000;
 }
 
-.nitro-purse-seasonal-currency .nitro-seasonal-box {
+.octane-purse-seasonal-currency .octane-seasonal-box {
     position: absolute;
     top: -7px;
     left: 156px;
@@ -454,7 +454,7 @@
     background: transparent;
 }
 
-.nitro-purse-seasonal-currency .seasonal-image {
+.octane-purse-seasonal-currency .seasonal-image {
     display: block;
     width: auto;
     height: auto;

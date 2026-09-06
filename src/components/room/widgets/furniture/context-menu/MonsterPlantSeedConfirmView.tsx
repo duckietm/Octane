@@ -1,7 +1,7 @@
-import { IFurnitureData, RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { IFurnitureData, RoomObjectCategory } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText } from '../../../../../api';
-import { Button, Column, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../../common';
+import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
 import { useRoom } from '../../../../../hooks';
 
 interface MonsterPlantSeedConfirmViewProps {
@@ -53,9 +53,9 @@ export const MonsterPlantSeedConfirmView: FC<MonsterPlantSeedConfirmViewProps> =
     if (mode === MODE_DEFAULT) return null;
 
     return (
-        <NitroCardView className="nitro-use-product-confirmation">
-            <NitroCardHeaderView headerText={LocalizeText('useproduct.widget.title.plant_seed', ['name'], [furniData.name])} onCloseClick={onClose} />
-            <NitroCardContentView center>
+        <OctaneCardView className="octane-use-product-confirmation">
+            <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.plant_seed', ['name'], [furniData.name])} onCloseClick={onClose} />
+            <OctaneCardContentView center>
                 <div className="flex gap-2 overflow-hidden">
                     <div className="flex flex-col">
                         <div className="product-preview">
@@ -77,7 +77,7 @@ export const MonsterPlantSeedConfirmView: FC<MonsterPlantSeedConfirmViewProps> =
                         </div>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

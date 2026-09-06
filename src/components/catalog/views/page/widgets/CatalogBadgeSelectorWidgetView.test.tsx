@@ -20,7 +20,7 @@ const rendererTypes = vi.hoisted(() => {
     return { StringDataType };
 });
 
-vi.mock('@nitrots/nitro-renderer', () => ({ StringDataType: rendererTypes.StringDataType }));
+vi.mock('@octane/renderer', () => ({ StringDataType: rendererTypes.StringDataType }));
 
 vi.mock('../../../../../api', () => ({
     GetConfigurationValue: vi.fn(),

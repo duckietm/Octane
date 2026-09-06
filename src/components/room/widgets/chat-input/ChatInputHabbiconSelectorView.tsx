@@ -1,4 +1,4 @@
-import { HabbiconAssetManager, UseHabbiconComposer } from '@nitrots/nitro-renderer';
+import { HabbiconAssetManager, UseHabbiconComposer } from '@octane/renderer';
 import * as Popover from '@radix-ui/react-popover';
 import { FC, useEffect, useMemo, useState } from 'react';
 import {

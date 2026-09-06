@@ -1,6 +1,6 @@
-import { NitroEvent } from '@nitrots/nitro-renderer';
+import { OctaneEvent } from '@octane/renderer';
 
-export class CatalogPurchaseFailureEvent extends NitroEvent {
+export class CatalogPurchaseFailureEvent extends OctaneEvent {
     public static PURCHASE_FAILED: string = 'CPFE_PURCHASE_FAILED';
 
     private _code: number;

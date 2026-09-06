@@ -6,7 +6,7 @@ import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -257,7 +257,7 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
 
     return (
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 260 }}>
-            <div className="nitro-wired__give-var">
+            <div className="octane-wired__give-var">
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <WiredVariablePicker
@@ -268,7 +268,7 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
                     />
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.sort_by')}</Text>
@@ -281,15 +281,15 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
                     </select>
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.setfilter')}</div>
-                    <label className="nitro-wired__change-var-radio">
+                <div className="octane-wired__give-var-section">
+                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.setfilter')}</div>
+                    <label className="octane-wired__change-var-radio">
                         <input checked={amountMode === 'constant'} type="radio" onChange={() => setAmountMode('constant')} />
                         <Text>{LocalizeText('wiredfurni.params.variables.reference_value.set_value')}</Text>
-                        <NitroInput
-                            className="nitro-wired__give-var-number"
+                        <OctaneInput
+                            className="octane-wired__give-var-number"
                             type="number"
                             min={1}
                             max={1000}
@@ -298,17 +298,17 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
                         />
                     </label>
 
-                    <div className="nitro-wired__change-var-reference-block">
-                        <label className="nitro-wired__change-var-radio">
+                    <div className="octane-wired__change-var-reference-block">
+                        <label className="octane-wired__change-var-radio">
                             <input checked={amountMode === 'variable'} type="radio" onChange={() => setAmountMode('variable')} />
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-                            <div className="nitro-wired__give-var-targets">
+                            <div className="octane-wired__give-var-targets">
                                 {TARGET_BUTTONS.map((button) => (
                                     <button
                                         key={`reference-${button.key}`}
                                         type="button"
                                         disabled={button.disabled || amountMode !== 'variable'}
-                                        className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
+                                        className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
                                         onClick={() => handleReferenceTargetChange(button.key)}
                                     >
                                         <img src={button.icon} alt={button.key} />
@@ -330,7 +330,7 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
 
                 {amountMode === 'variable' && (
                     <>
-                        <div className="nitro-wired__divider" />
+                        <div className="octane-wired__divider" />
                         <WiredFurniSelectionSourceRow
                             title="wiredfurni.params.sources.merged.title.variables_reference"
                             options={referenceSourceOptions}

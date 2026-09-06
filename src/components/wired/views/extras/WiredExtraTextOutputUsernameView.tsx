@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { CLICKED_USER_SOURCE_VALUE, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
@@ -87,7 +87,7 @@ export const WiredExtraTextOutputUsernameView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.texts.placeholder_name')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         maxLength={MAX_PLACEHOLDER_NAME_LENGTH}
                         type="text"
                         value={placeholderName}
@@ -121,7 +121,7 @@ export const WiredExtraTextOutputUsernameView: FC<{}> = () => {
                 {placeholderType === TYPE_MULTIPLE && (
                     <div className="flex flex-col gap-1">
                         <Text>{LocalizeText('wiredfurni.params.texts.select_delimiter')}</Text>
-                        <NitroInput
+                        <OctaneInput
                             maxLength={MAX_DELIMITER_LENGTH}
                             type="text"
                             value={delimiter}

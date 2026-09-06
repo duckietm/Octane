@@ -10,7 +10,7 @@ export const LayoutSearchSavesView: FC<LayoutSearchSavesViewProps> = (props) => 
     const { title = null, onClick = null } = props;
 
     return (
-        <button type="button" className="nitro-navigator-search-save" title={title} onClick={onClick}>
+        <button type="button" className="octane-navigator-search-save" title={title} onClick={onClick}>
             <img src={quicklinkAdd} alt="" />
         </button>
     );

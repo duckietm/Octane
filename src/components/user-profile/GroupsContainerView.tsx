@@ -1,4 +1,4 @@
-import { GroupInformationComposer, GroupInformationEvent, GroupInformationParser, HabboGroupEntryData } from '@nitrots/nitro-renderer';
+import { GroupInformationComposer, GroupInformationEvent, GroupInformationParser, HabboGroupEntryData } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, SanitizeHtml, SendMessageComposer, ToggleFavoriteGroup } from '../../api';
 import { Column, GridProps, LayoutBadgeImageView, LayoutGridItem } from '../../common';
@@ -46,7 +46,7 @@ export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
 
     if (!groups || !groups.length) {
         return (
-            <Column center fullHeight className="nitro-extended-profile-groups">
+            <Column center fullHeight className="octane-extended-profile-groups">
                 <div className="flex justify-center gap-2">
                     <div className="no-group-spritesheet image-1" />
                     <div className="no-group-spritesheet image-2" />
@@ -57,25 +57,25 @@ export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
     }
 
     return (
-        <div className="nitro-extended-profile-groups">
-            <div className="nitro-extended-profile-groups__sidebar">
+        <div className="octane-extended-profile-groups">
+            <div className="octane-extended-profile-groups__sidebar">
                 <div
-                    className="nitro-extended-profile-groups__count"
+                    className="octane-extended-profile-groups__count"
                     dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('extendedprofile.groups.count', ['count'], [groups.length.toString()])) }}
                 />
-                <div className="nitro-extended-profile-groups__list">
+                <div className="octane-extended-profile-groups__list">
                     {groups.map((group, index) => {
                         return (
                             <LayoutGridItem
                                 key={index}
-                                className="nitro-extended-profile-groups__item p-1"
+                                className="octane-extended-profile-groups__item p-1"
                                 itemActive={selectedGroupId === group.groupId}
                                 overflow="unset"
                                 onClick={() => setSelectedGroupId(group.groupId)}
                             >
                                 {itsMe && (
                                     <i
-                                        className={'absolute inset-e-0 top-0 z-20 nitro-icon icon-group-' + (group.favourite ? 'favorite' : 'not-favorite')}
+                                        className={'absolute inset-e-0 top-0 z-20 octane-icon icon-group-' + (group.favourite ? 'favorite' : 'not-favorite')}
                                         onClick={(event) => {
                                             event.stopPropagation();
                                             ToggleFavoriteGroup(group);
@@ -88,7 +88,7 @@ export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
                     })}
                 </div>
             </div>
-            <div className="nitro-extended-profile-groups__details">
+            <div className="octane-extended-profile-groups__details">
                 {groupInformation && <GroupInformationView groupInformation={groupInformation} onClose={onLeaveGroup} />}
             </div>
         </div>

@@ -6,7 +6,7 @@ import readline from 'readline';
 import { DEFAULT_JSON_MODE, isValidJsonMode, normalizeJsonModeAnswer } from './json-mode.mjs';
 const SCRIPT_DIR = fileURLToPath(new URL('.', import.meta.url));
 const PROJECT_ROOT = resolve(SCRIPT_DIR, '..');
-const CONFIG_FILE = resolve(PROJECT_ROOT, '.nitro-build.json');
+const CONFIG_FILE = resolve(PROJECT_ROOT, '.octane-build.json');
 const args = process.argv.slice(2);
 const ifMissing = args.includes('--if-missing');
 const nonInteractive = args.includes('--non-interactive') || !process.stdin.isTTY;
@@ -33,7 +33,7 @@ const writeChoice = (mode) =>
 const printBanner = () =>
 {
     const line = '═'.repeat(60);
-    process.stdout.write(`\n${ line }\n  Nitro V3 — JSON mode configuration\n${ line }\n\n`);
+    process.stdout.write(`\n${ line }\n  Octane V3 — JSON mode configuration\n${ line }\n\n`);
     process.stdout.write('Configuration files (renderer-config, ui-config, gamedata)\ncan be parsed in two ways:\n\n');
     process.stdout.write('  1) JSONC  (recommended — accepts comments and trailing commas)\n');
     process.stdout.write('  2) JSON   (legacy strict — only standard valid JSON)\n');
@@ -77,7 +77,7 @@ const main = async () =>
     if(existing) process.stdout.write(`Current mode: ${ existing.jsonMode }\n\n`);
     const choice = await promptUser();
     writeChoice(choice);
-    process.stdout.write(`\n✓ Saved to .nitro-build.json — mode: ${ choice }\n`);
+    process.stdout.write(`\n✓ Saved to .octane-build.json — mode: ${ choice }\n`);
     if(choice === 'legacy')
     {
         process.stdout.write('  Warning: config files must be strict valid JSON\n  (no comments, no trailing commas).\n');

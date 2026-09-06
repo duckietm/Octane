@@ -1,6 +1,6 @@
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { GetOptionalConfigurationValue } from '../../api';
-import { Base, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, Text } from '../../common';
+import { Base, Flex, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { useRoom } from '../../hooks';
 import { configFileUrl } from '../../secure-assets';
 
@@ -174,23 +174,23 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
     );
 
     return (
-        <NitroCardView uniqueKey="backgrounds" className="absolute min-w-[535px] max-w-[535px] min-h-[389px] max-h-[389px]">
-            <NitroCardHeaderView headerText="Profile Background" onCloseClick={() => setIsVisible(false)} />
-            <NitroCardTabsView>
+        <OctaneCardView uniqueKey="backgrounds" className="absolute min-w-[535px] max-w-[535px] min-h-[389px] max-h-[389px]">
+            <OctaneCardHeaderView headerText="Profile Background" onCloseClick={() => setIsVisible(false)} />
+            <OctaneCardTabsView>
                 {TABS.map((tab) => (
-                    <NitroCardTabsItemView key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
+                    <OctaneCardTabsItemView key={tab} isActive={activeTab === tab} onClick={() => setActiveTab(tab)}>
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                    </NitroCardTabsItemView>
+                    </OctaneCardTabsItemView>
                 ))}
-            </NitroCardTabsView>
-            <NitroCardContentView gap={1}>
+            </OctaneCardTabsView>
+            <OctaneCardContentView gap={1}>
                 <Text bold center>
                     Select an Option
                 </Text>
                 <Grid gap={1} columnCount={7} overflow="auto">
                     {allData[activeTab].map((item) => renderItem(item, itemTypeFor(activeTab)))}
                 </Grid>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

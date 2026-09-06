@@ -1,4 +1,4 @@
-import { CreateLinkEvent, DeleteBadgeMessageComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, DeleteBadgeMessageComposer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaPaintBrush, FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../../../api';
 import { LayoutBadgeImageView } from '../../../../common';
 import { useInventoryBadges, useInventoryUnseenTracker, useNotification } from '../../../../hooks';
-import { InfiniteGrid, NitroButton } from '../../../../layout';
+import { InfiniteGrid, OctaneButton } from '../../../../layout';
 import { InventoryBadgeItemView } from './InventoryBadgeItemView';
 
 const ActiveBadgeSlot: FC<{
@@ -340,29 +340,29 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
                             <span className="text-sm truncate grow">{LocalizeBadgeName(selectedBadgeCode)}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <NitroButton
+                            <OctaneButton
                                 className="grow"
                                 disabled={!isWearingBadge(selectedBadgeCode) && !canWearBadges()}
                                 onClick={(event) => toggleBadge(selectedBadgeCode)}
                             >
                                 {LocalizeText(isWearingBadge(selectedBadgeCode) ? 'inventory.badges.clearbadge' : 'inventory.badges.wearbadge')}
-                            </NitroButton>
+                            </OctaneButton>
                             {isOwnCustomBadge(selectedBadgeCode) && (
-                                <NitroButton
+                                <OctaneButton
                                     className="p-1"
                                     title={LocalizeText('inventory.badges.edit') !== 'inventory.badges.edit' ? LocalizeText('inventory.badges.edit') : 'Edit'}
                                     onClick={handleEditCustom}
                                 >
                                     <FaPencilAlt className="fa-icon" />
-                                </NitroButton>
+                                </OctaneButton>
                             )}
                             {!isWearingBadge(selectedBadgeCode) && (
-                                <NitroButton
+                                <OctaneButton
                                     className="bg-danger! hover:bg-danger/80! p-1"
                                     onClick={isOwnCustomBadge(selectedBadgeCode) ? handleDeleteCustom : attemptDeleteBadge}
                                 >
                                     <FaTrashAlt className="fa-icon" />
-                                </NitroButton>
+                                </OctaneButton>
                             )}
                         </div>
                     </div>

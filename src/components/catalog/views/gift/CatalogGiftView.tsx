@@ -1,11 +1,11 @@
 import {
     GetSessionDataManager,
     GiftReceiverNotFoundEvent,
-    NitroEvent,
+    OctaneEvent,
     NotEnoughBalanceMessageEvent,
     PurchaseFromCatalogAsGiftComposer,
     SecurityLevel
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { ChangeEvent, CSSProperties, FC, KeyboardEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ColorUtils,
@@ -25,7 +25,7 @@ import giftPaletteBorderImage from '../../../../assets/images/catalog/air/gift/p
 import giftPaletteSelectionImage from '../../../../assets/images/catalog/air/gift/palette-selection.png';
 import giftSmallCoinImage from '../../../../assets/images/catalog/air/gift/small-coin.png';
 import giftSmallPenImage from '../../../../assets/images/catalog/air/gift/small-pen.png';
-import { LayoutAvatarImageView, LayoutFurniImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { LayoutAvatarImageView, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import {
     CatalogEvent,
     CatalogInitGiftEvent,
@@ -376,7 +376,7 @@ export const CatalogGiftView: FC = () => {
     useMessageEvent<NotEnoughBalanceMessageEvent>(NotEnoughBalanceMessageEvent, onNotEnoughBalance);
 
     const onCatalogEvent = useCallback(
-        (event: NitroEvent) => {
+        (event: OctaneEvent) => {
             if (event.type === CatalogEvent.INIT_GIFT) {
                 const giftEvent = event as CatalogInitGiftEvent;
                 const initialReceiverName = giftEvent.receiverName ?? '';
@@ -481,13 +481,13 @@ export const CatalogGiftView: FC = () => {
     if (!isVisible || !giftConfiguration || !boxTypes.length) return null;
 
     return (
-        <NitroCardView classNames={['nitro-catalog-gift']} frameStyle={3} isResizable={false} theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('catalog.gift_wrapping.title')} onCloseClick={onClose} />
-            <NitroCardContentView classNames={['nitro-catalog-gift-content']} overflow="hidden">
-                <div className="nitro-catalog-gift-name-border">
+        <OctaneCardView classNames={['octane-catalog-gift']} frameStyle={3} isResizable={false} theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('catalog.gift_wrapping.title')} onCloseClick={onClose} />
+            <OctaneCardContentView classNames={['octane-catalog-gift-content']} overflow="hidden">
+                <div className="octane-catalog-gift-name-border">
                     <input
                         aria-label={LocalizeText('catalog.gift_wrapping_new.name_hint')}
-                        className="nitro-catalog-gift-name-input"
+                        className="octane-catalog-gift-name-input"
                         maxLength={32}
                         placeholder={LocalizeText('catalog.gift_wrapping_new.name_hint')}
                         ref={recipientInputRef}
@@ -498,10 +498,10 @@ export const CatalogGiftView: FC = () => {
                         onMouseDown={() => setIsAutocompleteVisible(false)}
                     />
                 </div>
-                <img alt="" className="nitro-catalog-gift-pen" draggable={false} src={giftSmallPenImage} />
+                <img alt="" className="octane-catalog-gift-pen" draggable={false} src={giftSmallPenImage} />
 
                 {isAutocompleteVisible && suggestions.length > 0 && (
-                    <div className="nitro-catalog-gift-suggestions" role="listbox">
+                    <div className="octane-catalog-gift-suggestions" role="listbox">
                         {suggestions.map((friend, index) => (
                             <div
                                 aria-selected={index === highlightedSuggestionIndex}
@@ -520,23 +520,23 @@ export const CatalogGiftView: FC = () => {
                     </div>
                 )}
 
-                <img alt="" className="nitro-catalog-gift-card" draggable={false} src={giftCardImage} />
-                <div className="nitro-catalog-gift-avatar">
+                <img alt="" className="octane-catalog-gift-card" draggable={false} src={giftCardImage} />
+                <div className="octane-catalog-gift-avatar">
                     {showPurchaserIdentity ? (
                         <LayoutAvatarImageView
                             headOnly
-                            classNames={['nitro-catalog-gift-avatar-image']}
+                            classNames={['octane-catalog-gift-avatar-image']}
                             direction={2}
                             figure={sessionDataManager.figure}
                             nativeCroppedHead
                         />
                     ) : (
-                        <img alt="" className="nitro-catalog-gift-incognito" draggable={false} src={giftIncognitoImage} />
+                        <img alt="" className="octane-catalog-gift-incognito" draggable={false} src={giftIncognitoImage} />
                     )}
                 </div>
                 <textarea
                     aria-label={LocalizeText('catalog.gift_wrapping_new.message_hint')}
-                    className={`nitro-catalog-gift-message${isAutocompleteVisible && suggestions.length >= 2 ? ' is-concealed' : ''}`}
+                    className={`octane-catalog-gift-message${isAutocompleteVisible && suggestions.length >= 2 ? ' is-concealed' : ''}`}
                     maxLength={140}
                     placeholder={LocalizeText('catalog.gift_wrapping_new.message_hint')}
                     ref={messageInputRef}
@@ -545,7 +545,7 @@ export const CatalogGiftView: FC = () => {
                     onFocus={() => setIsAutocompleteVisible(false)}
                 />
                 {showPurchaserIdentity && (
-                    <div className="nitro-catalog-gift-signature">
+                    <div className="octane-catalog-gift-signature">
                         {LocalizeText('catalog.gift_wrapping_new.message_from', ['name'], [sessionDataManager.userName])}
                     </div>
                 )}
@@ -555,20 +555,20 @@ export const CatalogGiftView: FC = () => {
                         <input
                             aria-label={LocalizeText('catalog.gift_wrapping.show_face.title')}
                             checked={showMyFace}
-                            className="nitro-catalog-gift-show-face"
-                            id="nitro-catalog-gift-show-face"
+                            className="octane-catalog-gift-show-face"
+                            id="octane-catalog-gift-show-face"
                             type="checkbox"
                             onChange={(event) => setShowMyFace(event.target.checked)}
                         />
-                        <label className="nitro-catalog-gift-show-face-label" htmlFor="nitro-catalog-gift-show-face">
+                        <label className="octane-catalog-gift-show-face-label" htmlFor="octane-catalog-gift-show-face">
                             {LocalizeText('catalog.gift_wrapping.show_face.title')}
                         </label>
                     </>
                 )}
 
-                <div className="nitro-catalog-gift-box-picker">
-                    <div className="nitro-catalog-gift-product-border">
-                        <div className="nitro-catalog-gift-product-image">
+                <div className="octane-catalog-gift-box-picker">
+                    <div className="octane-catalog-gift-product-border">
+                        <div className="octane-catalog-gift-product-image">
                             {giftSelection.wrapperId > 0 && (
                                 <LayoutFurniImageView
                                     direction={180}
@@ -581,7 +581,7 @@ export const CatalogGiftView: FC = () => {
                     </div>
                     <button
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
-                        className="nitro-catalog-gift-arrow nitro-catalog-gift-box-prev"
+                        className="octane-catalog-gift-arrow octane-catalog-gift-box-prev"
                         type="button"
                         onClick={() => selectRelativeBox(-1)}
                     >
@@ -589,20 +589,20 @@ export const CatalogGiftView: FC = () => {
                     </button>
                     <button
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
-                        className="nitro-catalog-gift-arrow nitro-catalog-gift-box-next"
+                        className="octane-catalog-gift-arrow octane-catalog-gift-box-next"
                         type="button"
                         onClick={() => selectRelativeBox(1)}
                     >
                         <img alt="" draggable={false} src={giftArrowRightImage} />
                     </button>
-                    <div className="nitro-catalog-gift-box-name">{LocalizeText(boxName)}</div>
-                    <div className="nitro-catalog-gift-price">
+                    <div className="octane-catalog-gift-box-name">{LocalizeText(boxName)}</div>
+                    <div className="octane-catalog-gift-price">
                         <span>{LocalizeText(priceText, ['price'], [giftConfiguration.price.toString()])}</span>
                         {!isDefaultBox && <img alt="" draggable={false} src={giftSmallCoinImage} />}
                     </div>
                     <button
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon.title')}
-                        className={`nitro-catalog-gift-arrow nitro-catalog-gift-ribbon-prev${isRibbonEnabled ? '' : ' is-disabled'}`}
+                        className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-prev${isRibbonEnabled ? '' : ' is-disabled'}`}
                         disabled={!isRibbonEnabled}
                         type="button"
                         onClick={() => selectRelativeRibbon(-1)}
@@ -611,51 +611,51 @@ export const CatalogGiftView: FC = () => {
                     </button>
                     <button
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon.title')}
-                        className={`nitro-catalog-gift-arrow nitro-catalog-gift-ribbon-next${isRibbonEnabled ? '' : ' is-disabled'}`}
+                        className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-next${isRibbonEnabled ? '' : ' is-disabled'}`}
                         disabled={!isRibbonEnabled}
                         type="button"
                         onClick={() => selectRelativeRibbon(1)}
                     >
                         <img alt="" draggable={false} src={giftArrowRightImage} />
                     </button>
-                    <div className={`nitro-catalog-gift-ribbon-name${isRibbonEnabled ? '' : ' is-disabled'}`}>{LocalizeText(ribbonName)}</div>
+                    <div className={`octane-catalog-gift-ribbon-name${isRibbonEnabled ? '' : ' is-disabled'}`}>{LocalizeText(ribbonName)}</div>
                 </div>
 
-                <div className={`nitro-catalog-gift-color-title${isColorEnabled ? '' : ' is-disabled'}`}>
+                <div className={`octane-catalog-gift-color-title${isColorEnabled ? '' : ' is-disabled'}`}>
                     {LocalizeText('catalog.gift_wrapping.pick_color')}
                 </div>
-                <div className={`nitro-catalog-gift-palette${isColorEnabled ? '' : ' is-disabled'}`}>
-                    <div className="nitro-catalog-gift-palette-grid">
+                <div className={`octane-catalog-gift-palette${isColorEnabled ? '' : ' is-disabled'}`}>
+                    <div className="octane-catalog-gift-palette-grid">
                         {colors.map((color) => (
                             <button
                                 aria-label={color.color}
-                                className="nitro-catalog-gift-palette-item"
+                                className="octane-catalog-gift-palette-item"
                                 disabled={!isColorEnabled}
                                 key={color.id}
-                                style={{ '--nitro-gift-palette-color': color.color } as CSSProperties}
+                                style={{ '--octane-gift-palette-color': color.color } as CSSProperties}
                                 type="button"
                                 onClick={() => {
                                     setIsAutocompleteVisible(false);
                                     setSelectedColorId(color.id);
                                 }}
                             >
-                                <span className="nitro-catalog-gift-palette-color" />
-                                <img alt="" className="nitro-catalog-gift-palette-border" draggable={false} src={giftPaletteBorderImage} />
+                                <span className="octane-catalog-gift-palette-color" />
+                                <img alt="" className="octane-catalog-gift-palette-border" draggable={false} src={giftPaletteBorderImage} />
                                 {color.id === selectedColorId && (
-                                    <img alt="" className="nitro-catalog-gift-palette-selection" draggable={false} src={giftPaletteSelectionImage} />
+                                    <img alt="" className="octane-catalog-gift-palette-selection" draggable={false} src={giftPaletteSelectionImage} />
                                 )}
                             </button>
                         ))}
                     </div>
                 </div>
 
-                <button className="nitro-catalog-gift-cancel" type="button" onClick={onClose}>
+                <button className="octane-catalog-gift-cancel" type="button" onClick={onClose}>
                     {LocalizeText('catalog.gift_wrapping.cancel')}
                 </button>
-                <button className="nitro-catalog-gift-submit" disabled={isBuyingGift} type="button" onClick={onBuyGift}>
+                <button className="octane-catalog-gift-submit" disabled={isBuyingGift} type="button" onClick={onBuyGift}>
                     {LocalizeText('catalog.gift_wrapping.give_gift')}
                 </button>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

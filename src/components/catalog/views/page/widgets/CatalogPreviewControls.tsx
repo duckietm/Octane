@@ -1,4 +1,4 @@
-import { RoomPreviewer } from '@nitrots/nitro-renderer';
+import { RoomPreviewer } from '@octane/renderer';
 import { FC, MouseEvent, useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { ProductTypeEnum } from '../../../../../api';
 import previewArrowLeft from '../../../../../assets/images/catalog/air/preview-arrow-left.png';
@@ -29,7 +29,7 @@ const CatalogPreviewArrowIcon: FC<{ direction: 'left' | 'right' }> = ({ directio
     <img
         alt=""
         aria-hidden="true"
-        className="nitro-catalog-preview-arrow"
+        className="octane-catalog-preview-arrow"
         draggable={false}
         src={direction === 'left' ? previewArrowLeft : previewArrowRight}
     />
@@ -108,12 +108,12 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
     };
 
     return (
-        <div className={`nitro-catalog-preview-controls is-${capabilities.mode}`} role="toolbar" aria-label="Product preview">
+        <div className={`octane-catalog-preview-controls is-${capabilities.mode}`} role="toolbar" aria-label="Product preview">
             {showRotationControls && (
                 <>
                     <button
                         aria-label="Rotate left"
-                        className="nitro-catalog-preview-btn is-left"
+                        className="octane-catalog-preview-btn is-left"
                         disabled={!capabilities.canRotate}
                         type="button"
                         onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(true))}
@@ -122,7 +122,7 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                     </button>
                     <button
                         aria-label="Rotate right"
-                        className="nitro-catalog-preview-btn is-right"
+                        className="octane-catalog-preview-btn is-right"
                         disabled={!capabilities.canRotate}
                         type="button"
                         onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(false))}
@@ -135,22 +135,22 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                 <button
                     aria-label="Toggle zoom"
                     aria-pressed={avatarZoomed}
-                    className="nitro-catalog-preview-region nitro-catalog-preview-zoom-btn"
+                    className="octane-catalog-preview-region octane-catalog-preview-zoom-btn"
                     type="button"
                     onClick={(event) => runPreviewAction(event, () => setAvatarZoomed((value) => !value))}
                 >
-                    <i aria-hidden="true" className="nitro-icon icon-zoom-more" />
+                    <i aria-hidden="true" className="octane-icon icon-zoom-more" />
                 </button>
             )}
             {isAvatarPreview && (
                 <button
                     aria-label="Change avatar action"
-                    className="nitro-catalog-preview-region nitro-catalog-preview-action-btn"
+                    className="octane-catalog-preview-region octane-catalog-preview-action-btn"
                     disabled={!canChangeAvatarAction}
                     type="button"
                     onClick={(event) => runPreviewAction(event, () => directionalPreviewer.cycleAvatarAction?.())}
                 >
-                    <span aria-hidden="true" className="nitro-catalog-preview-action-icon" />
+                    <span aria-hidden="true" className="octane-catalog-preview-action-icon" />
                 </button>
             )}
         </div>

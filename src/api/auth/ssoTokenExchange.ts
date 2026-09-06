@@ -1,4 +1,4 @@
-import { GetConfiguration } from '@nitrots/nitro-renderer';
+import { GetConfiguration } from '@octane/renderer';
 import { getAccessToken, getAccessTokenExpiresAt, persistAccessTokenFromPayload } from './accessToken';
 
 const EXPIRY_SLACK_SECONDS = 60;
@@ -26,7 +26,7 @@ export const exchangeSsoTicketForAccessToken = (ssoTicket: string): Promise<void
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-Requested-With': 'NitroSsoExchange'
+                    'X-Requested-With': 'OctaneSsoExchange'
                 },
                 body: JSON.stringify({ ssoTicket })
             });

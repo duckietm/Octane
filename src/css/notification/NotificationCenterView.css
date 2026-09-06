@@ -1,4 +1,4 @@
-.nitro-alert {
+.octane-alert {
     min-height: 150px;
     max-height: 350px;
 
@@ -12,30 +12,30 @@
         min-width: 250px;
     }
 
-    &.nitro-alert-default,
-    &.nitro-alert-motd {
+    &.octane-alert-default,
+    &.octane-alert-motd {
         width: 350px;
         .notification-text {
             min-width: auto;
         }
     }
 
-	&.nitro-alert-credits {
+	&.octane-alert-credits {
         width: 370px;
         .notification-text {
             min-width: auto;
         }
     }
 
-    &.nitro-alert-moderation,
-    &.nitro-alert-alert {
+    &.octane-alert-moderation,
+    &.octane-alert-alert {
         width: 250px;
         .notification-text {
             min-width: 225px;
         }
     }
 
-    &.nitro-alert-system {
+    &.octane-alert-system {
         width: auto;
         min-width: 260px;
         max-width: 90vw;
@@ -51,7 +51,7 @@
     /* Hotel event announcement. The box is a fixed 530x300 so that a one word
        message and a long one produce exactly the same window: the message is the
        only part that scrolls, and the button never moves. */
-    &.nitro-alert-hotel-event {
+    &.octane-alert-hotel-event {
         width: 530px;
         height: 300px;
         min-height: 300px;
@@ -59,7 +59,7 @@
 
         animation: hotelEventPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-        .nitro-card-content-shell {
+        .octane-card-content-shell {
             display: flex;
             flex-direction: column;
             /* The shell carries h-full from the card defaults, which inside a card
@@ -219,13 +219,13 @@
         }
     }
 
-    &.nitro-alert-nitro-info {
+    &.octane-alert-octane-info {
         width: 460px;
         min-height: 320px;
         max-height: 640px;
-        animation: nitroInfoPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: octaneInfoPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-        .nitro-info-hero {
+        .octane-info-hero {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -242,7 +242,7 @@
             overflow: hidden;
         }
 
-        .nitro-info-hero-stars {
+        .octane-info-hero-stars {
             position: absolute;
             inset: 0;
             background-image:
@@ -252,11 +252,11 @@
                 radial-gradient(1.5px 1.5px at 88% 78%, rgba(255, 255, 255, 0.75), transparent 60%),
                 radial-gradient(1px 1px at 12% 80%, rgba(255, 255, 255, 0.8), transparent 60%);
             opacity: 0.85;
-            animation: nitroInfoTwinkle 2.6s ease-in-out infinite alternate;
+            animation: octaneInfoTwinkle 2.6s ease-in-out infinite alternate;
             pointer-events: none;
         }
 
-        .nitro-info-version-badge {
+        .octane-info-version-badge {
             position: relative;
             display: inline-flex;
             align-items: center;
@@ -281,22 +281,22 @@
             max-width: 90%;
         }
 
-        .nitro-info-version-spark {
+        .octane-info-version-spark {
             color: #fff;
             text-shadow: 0 0 6px rgba(255, 255, 200, 0.9);
-            animation: nitroInfoSpin 3s linear infinite;
+            animation: octaneInfoSpin 3s linear infinite;
             display: inline-block;
         }
 
-        .nitro-info-version-spark:last-child {
+        .octane-info-version-spark:last-child {
             animation-direction: reverse;
         }
 
-        .nitro-info-content {
+        .octane-info-content {
             padding: 0 2px;
         }
 
-        .nitro-info-avatar-wrap {
+        .octane-info-avatar-wrap {
             position: relative;
             width: 90px;
             display: flex;
@@ -306,26 +306,26 @@
             padding-top: 2px;
         }
 
-        .nitro-info-avatar {
+        .octane-info-avatar {
             filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
-            animation: nitroInfoBob 2.6s ease-in-out infinite;
+            animation: octaneInfoBob 2.6s ease-in-out infinite;
         }
 
-        .nitro-info-avatar-shadow {
+        .octane-info-avatar-shadow {
             width: 60px;
             height: 8px;
             margin-top: -4px;
             background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
-            animation: nitroInfoShadowPulse 2.6s ease-in-out infinite;
+            animation: octaneInfoShadowPulse 2.6s ease-in-out infinite;
         }
 
-        .nitro-info-body {
+        .octane-info-body {
             font-family: Volter, Volter_Goldfish, "Ubuntu", sans-serif;
             color: #2f2f2f;
             padding-right: 4px;
         }
 
-        .nitro-info-section {
+        .octane-info-section {
             background: linear-gradient(to bottom, #ffffff 0%, #eaf1fb 100%);
             border: 1px solid #6f8db5;
             border-radius: 6px;
@@ -337,7 +337,7 @@
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
 
-        .nitro-info-section:hover {
+        .octane-info-section:hover {
             transform: translateY(-1px);
             box-shadow:
                 inset 0 1px 0 rgba(255, 255, 255, 0.8),
@@ -345,7 +345,7 @@
                 0 0 0 1px rgba(110, 160, 230, 0.4);
         }
 
-        .nitro-info-section-header {
+        .octane-info-section-header {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -358,34 +358,34 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
 
-        .nitro-info-section-icon {
+        .octane-info-section-icon {
             font-size: 14px;
             filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.4));
         }
 
-        .nitro-info-section-hotel .nitro-info-section-header {
+        .octane-info-section-hotel .octane-info-section-header {
             background: linear-gradient(180deg, #4fb3ff 0%, #1f6dc7 100%);
         }
 
-        .nitro-info-section-server .nitro-info-section-header {
+        .octane-info-section-server .octane-info-section-header {
             background: linear-gradient(180deg, #6bd66b 0%, #2a8a2a 100%);
         }
 
-        .nitro-info-section-credits .nitro-info-section-header {
+        .octane-info-section-credits .octane-info-section-header {
             background: linear-gradient(180deg, #ff9a44 0%, #d9591a 100%);
         }
 
-        .nitro-info-section-generic .nitro-info-section-header {
+        .octane-info-section-generic .octane-info-section-header {
             background: linear-gradient(180deg, #8da0bc 0%, #4b5d7a 100%);
         }
 
-        .nitro-info-section-body {
+        .octane-info-section-body {
             padding: 6px 10px;
             color: #1f2f4a;
         }
 
-        .nitro-info-stats-list,
-        .nitro-info-credits-list {
+        .octane-info-stats-list,
+        .octane-info-credits-list {
             list-style: none;
             margin: 0;
             padding: 0;
@@ -394,7 +394,7 @@
             gap: 2px;
         }
 
-        .nitro-info-stats-list li {
+        .octane-info-stats-list li {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -403,18 +403,18 @@
             border-radius: 3px;
         }
 
-        .nitro-info-stats-list li:nth-child(odd) {
+        .octane-info-stats-list li:nth-child(odd) {
             background: rgba(110, 160, 230, 0.08);
         }
 
-        .nitro-info-stat-label {
+        .octane-info-stat-label {
             font-size: 12px;
             color: #4a5a76;
             font-weight: 500;
             flex-shrink: 0;
         }
 
-        .nitro-info-stat-value {
+        .octane-info-stat-value {
             font-size: 12px;
             color: #1a3a6b;
             font-weight: 700;
@@ -427,7 +427,7 @@
             word-break: break-word;
         }
 
-        .nitro-info-credits-list li {
+        .octane-info-credits-list li {
             display: flex;
             align-items: flex-start;
             gap: 6px;
@@ -439,18 +439,18 @@
             word-break: break-word;
         }
 
-        .nitro-info-credits-list li:hover {
+        .octane-info-credits-list li:hover {
             background: rgba(255, 180, 80, 0.15);
         }
 
-        .nitro-info-credit-star {
+        .octane-info-credit-star {
             color: #f0a318;
             text-shadow: 0 0 4px rgba(240, 163, 24, 0.6);
             font-size: 13px;
             flex-shrink: 0;
         }
 
-        .nitro-info-footer {
+        .octane-info-footer {
             margin-top: 6px;
             padding-top: 8px;
             border-top: 1px dashed #b0b0b0;
@@ -459,11 +459,11 @@
             gap: 6px;
         }
 
-        .nitro-info-actions {
+        .octane-info-actions {
             margin-top: 2px;
         }
 
-        .nitro-info-report-btn {
+        .octane-info-report-btn {
             position: relative;
             overflow: hidden;
             background: linear-gradient(180deg, #ff6b6b 0%, #c92a2a 100%) !important;
@@ -476,7 +476,7 @@
             transition: transform 0.12s ease, box-shadow 0.12s ease;
         }
 
-        .nitro-info-report-btn:hover {
+        .octane-info-report-btn:hover {
             transform: translateY(-1px);
             box-shadow:
                 inset 0 1px 0 rgba(255, 255, 255, 0.4),
@@ -485,11 +485,11 @@
                 0 0 18px rgba(255, 100, 100, 0.7);
         }
 
-        .nitro-info-report-btn:active {
+        .octane-info-report-btn:active {
             transform: translateY(1px);
         }
 
-        .nitro-info-report-btn::after {
+        .octane-info-report-btn::after {
             content: '';
             position: absolute;
             top: 0;
@@ -498,11 +498,11 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transform: skewX(-20deg);
-            animation: nitroInfoShine 2.8s ease-in-out infinite;
+            animation: octaneInfoShine 2.8s ease-in-out infinite;
         }
     }
 
-    &.nitro-alert-furnidata {
+    &.octane-alert-furnidata {
         width: 400px;
         max-height: 520px;
 
@@ -659,38 +659,38 @@
     }
 }
 
-@keyframes nitroInfoPop {
+@keyframes octaneInfoPop {
     0% { transform: scale(0.85); opacity: 0; }
     60% { transform: scale(1.04); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes nitroInfoTwinkle {
+@keyframes octaneInfoTwinkle {
     0% { opacity: 0.4; }
     100% { opacity: 1; }
 }
 
-@keyframes nitroInfoSpin {
+@keyframes octaneInfoSpin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-@keyframes nitroInfoBob {
+@keyframes octaneInfoBob {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-3px); }
 }
 
-@keyframes nitroInfoShadowPulse {
+@keyframes octaneInfoShadowPulse {
     0%, 100% { transform: scaleX(1); opacity: 0.55; }
     50% { transform: scaleX(0.8); opacity: 0.35; }
 }
 
-@keyframes nitroInfoShine {
+@keyframes octaneInfoShine {
     0% { left: -120%; }
     60%, 100% { left: 140%; }
 }
 
-.nitro-notification-bubble {
+.octane-notification-bubble {
     pointer-events: all;
     padding: 6px 5px;
     pointer-events: all;
@@ -711,19 +711,19 @@
     margin-top: -6px;
 }
 
-.nitro-rightside-notifications {
+.octane-rightside-notifications {
     width: 100%;
     align-items: flex-end;
     gap: 4px;
     pointer-events: none;
 }
 
-.nitro-rightside-notifications > * {
+.octane-rightside-notifications > * {
     margin-left: auto;
     pointer-events: auto;
 }
 
-.nitro-swf-notification-bubble {
+.octane-swf-notification-bubble {
     width: 188px;
     max-width: 188px;
     min-height: 42px;
@@ -744,14 +744,14 @@
     text-shadow: 1px 1px 0 #000000;
 }
 
-.nitro-swf-notification-bubble .w-\[50px\],
-.nitro-swf-notification-bubble .h-\[50px\],
-.nitro-swf-notification-bubble .bubble-image-container {
+.octane-swf-notification-bubble .w-\[50px\],
+.octane-swf-notification-bubble .h-\[50px\],
+.octane-swf-notification-bubble .bubble-image-container {
     width: 38px !important;
     height: 38px !important;
 }
 
-.nitro-swf-notification-bubble img {
+.octane-swf-notification-bubble img {
     width: auto;
     height: auto;
     max-width: 38px;
@@ -759,8 +759,8 @@
     object-fit: contain;
 }
 
-.nitro-swf-notification-bubble .btn,
-.nitro-swf-notification-bubble button {
+.octane-swf-notification-bubble .btn,
+.octane-swf-notification-bubble button {
     min-height: 24px;
     padding: 0 8px;
     border: 3px solid transparent !important;
@@ -777,20 +777,20 @@
     text-shadow: none;
 }
 
-.nitro-swf-notification-bubble .btn:hover,
-.nitro-swf-notification-bubble button:hover {
+.octane-swf-notification-bubble .btn:hover,
+.octane-swf-notification-bubble button:hover {
     border-image-source: var(--habbo-skin-button-hover) !important;
 }
 
-.alertView_nitro-coolui-logo {
+.alertView_octane-coolui-logo {
 	width: 150px;
 	height: 73px;
 	position: relative;
-	background-image: url("@/assets/images/notifications/nitro_v3.png");
+	background-image: url("@/assets/images/notifications/octane_v3.png");
 	background-repeat: no-repeat;
 }
 
-.nitro-friendonline-notification {
+.octane-friendonline-notification {
     position: relative;
     min-width: 86px;
     height: 58px;
@@ -801,7 +801,7 @@
     user-select: none;
 }
 
-.nitro-friendonline-notification__content {
+.octane-friendonline-notification__content {
     position: absolute;
     left: 0;
     top: 12px;
@@ -810,20 +810,20 @@
     overflow: hidden;
 }
 
-.nitro-friendonline-notification__left,
-.nitro-friendonline-notification__right {
+.octane-friendonline-notification__left,
+.octane-friendonline-notification__right {
     width: auto;
     height: auto;
     flex: 0 0 auto;
 }
 
-.nitro-friendonline-notification__middle {
+.octane-friendonline-notification__middle {
     height: 34px;
     flex: 1 1 auto;
     background-repeat: repeat-x;
 }
 
-.nitro-friendonline-notification__message {
+.octane-friendonline-notification__message {
     position: absolute;
     left: 8px;
     top: 6px;
@@ -839,21 +839,21 @@
     text-shadow: 0 1px 0 #000;
 }
 
-.nitro-friendonline-notification__message span {
+.octane-friendonline-notification__message span {
     display: block;
     overflow: hidden;
     text-align: center;
     text-overflow: ellipsis;
 }
 
-.nitro-friendonline-notification__message img {
+.octane-friendonline-notification__message img {
     width: auto;
     height: auto;
     margin-top: 1px;
     flex: 0 0 auto;
 }
 
-.nitro-friendonline-notification__avatar {
+.octane-friendonline-notification__avatar {
     position: absolute;
     left: 33px;
     top: 3px;
@@ -861,8 +861,8 @@
     height: 53px;
 }
 
-.nitro-friendonline-notification__circle-inner,
-.nitro-friendonline-notification__circle {
+.octane-friendonline-notification__circle-inner,
+.octane-friendonline-notification__circle {
     position: absolute;
     inset: 0;
     width: auto;
@@ -870,7 +870,7 @@
     pointer-events: none;
 }
 
-.nitro-friendonline-notification__head {
+.octane-friendonline-notification__head {
     position: absolute;
     left: 2px;
     top: 1px;
@@ -880,7 +880,7 @@
     border-radius: 50%;
 }
 
-.nitro-friendonline-notification__head .avatar-image {
+.octane-friendonline-notification__head .avatar-image {
     width: 50px !important;
     height: 50px !important;
     background-size: 76px auto !important;
@@ -889,9 +889,9 @@
 }
 
 /* Command list produced by ":commands". NotificationDefaultAlertView tags the alert
-   with .nitro-alert-command-list and renders one button per command; without these
+   with .octane-alert-command-list and renders one button per command; without these
    rules the buttons stay inline and several commands share a visual line. */
-.nitro-alert.nitro-alert-command-list {
+.octane-alert.octane-alert-command-list {
     width: 430px;
     max-height: 470px;
 }

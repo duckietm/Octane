@@ -1,9 +1,9 @@
-import { MysteryBoxKeysUpdateEvent } from '@nitrots/nitro-renderer';
+import { MysteryBoxKeysUpdateEvent } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { ColorUtils, LocalizeText } from '../../../../api';
 import { Flex, LayoutGridItem, Text } from '../../../../common';
-import { useNitroEvent } from '../../../../hooks';
+import { useOctaneEvent } from '../../../../hooks';
 
 const colorMap = {
     purple: 9452386,
@@ -21,7 +21,7 @@ export const MysteryBoxExtensionView: FC<{}> = (props) => {
     const [keyColor, setKeyColor] = useState<string>('');
     const [boxColor, setBoxColor] = useState<string>('');
 
-    useNitroEvent<MysteryBoxKeysUpdateEvent>(MysteryBoxKeysUpdateEvent.MYSTERY_BOX_KEYS_UPDATE, (event) => {
+    useOctaneEvent<MysteryBoxKeysUpdateEvent>(MysteryBoxKeysUpdateEvent.MYSTERY_BOX_KEYS_UPDATE, (event) => {
         setKeyColor(event.keyColor);
         setBoxColor(event.boxColor);
     });

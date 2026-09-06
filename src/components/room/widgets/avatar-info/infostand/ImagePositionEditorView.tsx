@@ -1,7 +1,7 @@
-import { GetRoomEngine, RoomObjectCategory, RoomObjectVariable } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomObjectCategory, RoomObjectVariable } from '@octane/renderer';
 import { FC, PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { LocalizeText } from '../../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 
 const PAD_W = 230;
 const PAD_H = 150;
@@ -96,9 +96,9 @@ export const ImagePositionEditorView: FC<Props> = (props) => {
     const clampedTop = Math.max(0, Math.min(PAD_H, dotTop));
 
     return (
-        <NitroCardView className="no-resize" uniqueKey="image-position-editor" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('image.position.editor.title')} onCloseClick={cancel} />
-            <NitroCardContentView>
+        <OctaneCardView className="no-resize" uniqueKey="image-position-editor" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('image.position.editor.title')} onCloseClick={cancel} />
+            <OctaneCardContentView>
                 <div className="flex flex-col gap-2">
                     <span className="text-[11px] text-black/60">{LocalizeText('image.position.editor.hint')}</span>
                     <div
@@ -171,7 +171,7 @@ export const ImagePositionEditorView: FC<Props> = (props) => {
                         </Button>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -1,6 +1,6 @@
-import { RoomEngineObjectEvent, RoomObjectCategory, RoomSessionChatEvent } from '@nitrots/nitro-renderer';
+import { RoomEngineObjectEvent, RoomObjectCategory, RoomSessionChatEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
-import { useNitroEvent } from '../../events';
+import { useOctaneEvent } from '../../events';
 import { useObjectSelectedEvent } from '../engine';
 import { useRoom } from '../useRoom';
 
@@ -26,7 +26,7 @@ export const useChatInputState = () => {
     const [floodBlockedSeconds, setFloodBlockedSeconds] = useState(0);
     const { roomSession = null } = useRoom();
 
-    useNitroEvent<RoomSessionChatEvent>(RoomSessionChatEvent.FLOOD_EVENT, (event) => {
+    useOctaneEvent<RoomSessionChatEvent>(RoomSessionChatEvent.FLOOD_EVENT, (event) => {
         setFloodBlocked(true);
         setFloodBlockedSeconds(parseFloat(event.message));
     });
@@ -41,7 +41,7 @@ export const useChatInputState = () => {
         setSelectedUsername(userData.name);
     });
 
-    useNitroEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.DESELECTED, () => setSelectedUsername(''));
+    useOctaneEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.DESELECTED, () => setSelectedUsername(''));
 
     useEffect(() => {
         if (!floodBlocked) return;

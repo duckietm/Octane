@@ -1,4 +1,4 @@
-import { createNitroStore } from '../../state/createNitroStore';
+import { createOctaneStore } from '../../state/createOctaneStore';
 
 export type NavigatorFavouritesState = {
     ids: Set<number>;
@@ -9,7 +9,7 @@ export type NavigatorFavouritesActions = {
     apply(roomId: number, added: boolean): void;
 };
 
-export const useNavigatorFavouritesStore = createNitroStore<NavigatorFavouritesState & NavigatorFavouritesActions>()((set) => ({
+export const useNavigatorFavouritesStore = createOctaneStore<NavigatorFavouritesState & NavigatorFavouritesActions>()((set) => ({
     ids: new Set<number>(),
 
     setAll: (roomIds) => set({ ids: new Set(roomIds.map(Number)) }),

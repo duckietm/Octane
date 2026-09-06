@@ -45,7 +45,7 @@ describe('PurseView', () => {
 
     it('shortens large currency amounts and keeps the exact value in a tooltip', () => {
         const { container } = render(<PurseView />);
-        const amounts = Array.from(container.querySelectorAll('.nitro-purse-button__amount')).map((element) => element.textContent?.trim());
+        const amounts = Array.from(container.querySelectorAll('.octane-purse-button__amount')).map((element) => element.textContent?.trim());
 
         expect(screen.getByText('3.7k')).toBeInTheDocument();
         expect(amounts).toContain('3.7k');
@@ -56,7 +56,7 @@ describe('PurseView', () => {
     it('keeps official Help / Logout / Settings inside the 77px purse and Translate in the settings menu', () => {
         const { container } = render(<PurseView />);
 
-        const actionColumn = container.querySelector('.nitro-purse__col--actions');
+        const actionColumn = container.querySelector('.octane-purse__col--actions');
         expect(actionColumn).toBeTruthy();
 
         const actionButtons = within(actionColumn as HTMLElement).getAllByRole('button');
@@ -66,12 +66,12 @@ describe('PurseView', () => {
             'widget.memenu.settings.title'
         ]);
 
-        const settingsButton = container.querySelector('.nitro-purse__btn--settings');
+        const settingsButton = container.querySelector('.octane-purse__btn--settings');
         expect(settingsButton).toBeTruthy();
 
         fireEvent.click(settingsButton!);
 
-        const settingsMenu = container.querySelector('.nitro-purse-menu');
+        const settingsMenu = container.querySelector('.octane-purse-menu');
         expect(settingsMenu).toBeTruthy();
         expect(within(settingsMenu as HTMLElement).getByRole('button', { name: 'Translate' })).toBeInTheDocument();
     });

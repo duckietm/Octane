@@ -1,8 +1,8 @@
-import { MarkMentionsReadComposer, RequestMentionsComposer } from '@nitrots/nitro-renderer';
+import { MarkMentionsReadComposer, RequestMentionsComposer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaSearch, FaSync } from 'react-icons/fa';
 import { getMentionDateGroup, IMentionEntry, LocalizeText, MentionDateGroup, MentionType, SendMessageComposer } from '../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { useMentionActions, useMentionsSnapshot } from '../../hooks';
 import { markAllRead } from '../../hooks/mentions/mentionsStore';
 import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
@@ -89,13 +89,13 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
     const title = `${LocalizeText('mentions.window.title')}${unreadCount > 0 ? ` (${unreadCount})` : ''}`;
 
     return (
-        <NitroCardView
+        <OctaneCardView
             className="mentions-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] has-classic-scrollbar"
             theme="primary-slim"
             uniqueKey="mentions"
         >
-            <NitroCardHeaderView headerText={title} onCloseClick={onClose} />
-            <NitroCardContentView gap={1}>
+            <OctaneCardHeaderView headerText={title} onCloseClick={onClose} />
+            <OctaneCardContentView gap={1}>
                 <div className="mentions-search">
                     <FaSearch className="mentions-search-icon" />
                     <input type="text" value={query} placeholder={LocalizeText('generic.search')} onChange={(event) => setQuery(event.target.value)} />
@@ -147,7 +147,7 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
                         {LocalizeText('mentions.window.markall')}
                     </Button>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

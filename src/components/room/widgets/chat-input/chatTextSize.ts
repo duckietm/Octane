@@ -1,7 +1,7 @@
 export type ChatTextSize = 's' | 'm' | 'l' | 'xl' | 'xxl';
 
 export const CHAT_TEXT_SIZE_STORAGE_KEY = 'nitro.chat.text_size';
-export const CHAT_TEXT_SIZE_EVENT = 'nitro-chat-text-size-change';
+export const CHAT_TEXT_SIZE_EVENT = 'octane-chat-text-size-change';
 export const CHAT_TEXT_SIZES: ChatTextSize[] = ['s', 'm', 'l', 'xl', 'xxl'];
 
 const CHAT_TEXT_SIZE_LABELS: Record<ChatTextSize, string> = {

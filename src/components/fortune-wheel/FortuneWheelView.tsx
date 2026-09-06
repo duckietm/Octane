@@ -1,9 +1,9 @@
-import { AddLinkEventTracker, ILinkEventTracker, IWheelPrize, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, IWheelPrize, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, TransitionEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizeText } from '../../api';
 import { Column, Flex, LayoutAvatarImageView, LayoutCurrencyIcon, Text } from '../../common';
 import { useFortuneWheel, useHasPermission } from '../../hooks';
-import { NitroCard } from '../../layout';
+import { OctaneCard } from '../../layout';
 import { FortuneWheelSettingsView } from './FortuneWheelSettingsView';
 import { WheelWinReveal } from './WheelWinReveal';
 import { renderPrizeIcon } from './wheelPrizeIcon';
@@ -199,9 +199,9 @@ export const FortuneWheelView: FC<{}> = () => {
     const canSpin = freeSpins + extraSpins > 0 && !isSpinning && prizes.length > 0;
 
     return (
-        <NitroCard className="wheel-card w-[780px] max-w-[96vw]" uniqueKey="fortune-wheel">
-            <NitroCard.Header headerText={LocalizeText('wheel.title')} onCloseClick={() => setIsVisible(false)} />
-            <NitroCard.Content>
+        <OctaneCard className="wheel-card w-[780px] max-w-[96vw]" uniqueKey="fortune-wheel">
+            <OctaneCard.Header headerText={LocalizeText('wheel.title')} onCloseClick={() => setIsVisible(false)} />
+            <OctaneCard.Content>
                 <div className="relative">
                     <Flex gap={3} className="flex-col sm:flex-row">
                         <Column alignItems="center" gap={2} className="w-full shrink-0 sm:w-[420px]">
@@ -327,8 +327,8 @@ export const FortuneWheelView: FC<{}> = () => {
                     </Flex>
                     {revealPrize && <WheelWinReveal prize={revealPrize} onDismiss={() => setRevealPrize(null)} />}
                 </div>
-            </NitroCard.Content>
+            </OctaneCard.Content>
             {canManage && isSettingsOpen && <FortuneWheelSettingsView onClose={() => setIsSettingsOpen(false)} />}
-        </NitroCard>
+        </OctaneCard>
     );
 };

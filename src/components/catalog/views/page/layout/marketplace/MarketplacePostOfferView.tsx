@@ -1,10 +1,10 @@
-import { MakeOfferMessageComposer } from '@nitrots/nitro-renderer';
+import { MakeOfferMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FurnitureItem, LocalizeText, ProductTypeEnum, SendMessageComposer } from '../../../../../../api';
-import { Button, Column, Grid, LayoutFurniImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../../../common';
+import { Button, Column, Grid, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../../common';
 import { CatalogPostMarketplaceOfferEvent } from '../../../../../../events';
 import { useMarketplaceConfiguration, useNotification, useUiEvent } from '../../../../../../hooks';
-import { NitroInput } from '../../../../../../layout';
+import { OctaneInput } from '../../../../../../layout';
 
 let isPostingMarketplaceOffer = false;
 
@@ -64,9 +64,9 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
     };
 
     return (
-        <NitroCardView className="nitro-catalog-layout-marketplace-post-offer" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('inventory.marketplace.make_offer.title')} onCloseClick={(event) => setItem(null)} />
-            <NitroCardContentView overflow="hidden">
+        <OctaneCardView className="octane-catalog-layout-marketplace-post-offer" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('inventory.marketplace.make_offer.title')} onCloseClick={(event) => setItem(null)} />
+            <OctaneCardContentView overflow="hidden">
                 <Grid fullHeight>
                     <Column center className="bg-muted rounded p-2" overflow="hidden" size={4}>
                         <LayoutFurniImageView
@@ -87,7 +87,7 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
                                 {LocalizeText('inventory.marketplace.make_offer.expiration_info', ['time'], [marketplaceConfiguration.offerTime.toString()])}
                             </Text>
                             <div className="input-group has-validation">
-                                <NitroInput
+                                <OctaneInput
                                     min={0}
                                     placeholder={LocalizeText('inventory.marketplace.make_offer.price_request')}
                                     type="number"
@@ -139,7 +139,7 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
                         </Column>
                     </Column>
                 </Grid>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -1,37 +1,37 @@
-.nitro-extended-profile-window__content {
+.octane-extended-profile-window__content {
   background: #ece8dc;
 }
 
-.nitro-extended-profile {
+.octane-extended-profile {
   display: flex;
   flex-direction: column;
   gap: 7px;
 }
 
-.nitro-extended-profile__top {
+.octane-extended-profile__top {
   display: grid;
   grid-template-columns: minmax(0, 1.06fr) 1px minmax(0, 0.94fr);
   gap: 10px;
   min-height: 188px;
 }
 
-.nitro-extended-profile__separator {
+.octane-extended-profile__separator {
   background: #afafaf;
 }
 
-.nitro-extended-profile__left,
-.nitro-extended-profile__right {
+.octane-extended-profile__left,
+.octane-extended-profile__right {
   display: flex;
   flex-direction: column;
 }
 
-.nitro-extended-profile__identity {
+.octane-extended-profile__identity {
   display: grid;
   grid-template-columns: 68px minmax(0, 1fr);
   gap: 10px;
 }
 
-.nitro-extended-profile__avatar-shell {
+.octane-extended-profile__avatar-shell {
   width: 68px;
   height: 135px;
   position: relative;
@@ -42,20 +42,20 @@
   align-items: center;
 }
 
-.nitro-extended-profile__avatar-stand,
-.nitro-extended-profile__avatar-overlay {
+.octane-extended-profile__avatar-stand,
+.octane-extended-profile__avatar-overlay {
   position: absolute;
   top: 0;
   left: 0;
 }
 
-.nitro-extended-profile__identity-copy {
+.octane-extended-profile__identity-copy {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.nitro-extended-profile__username {
+.octane-extended-profile__username {
   display: inline-flex;
   align-items: center;
   min-width: 0;
@@ -65,7 +65,7 @@
   line-height: 16px;
 }
 
-.nitro-extended-profile__motto {
+.octane-extended-profile__motto {
   margin: 0;
   min-height: 24px;
   color: #242424;
@@ -75,18 +75,18 @@
   overflow: hidden;
 }
 
-.nitro-extended-profile__meta {
+.octane-extended-profile__meta {
   margin: 0;
   color: #111;
   font-size: 11px;
   line-height: 15px;
 }
 
-.nitro-extended-profile__meta--strong {
+.octane-extended-profile__meta--strong {
   margin-top: 2px;
 }
 
-.nitro-extended-profile__status {
+.octane-extended-profile__status {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -94,14 +94,14 @@
   margin-top: 3px;
 }
 
-.nitro-extended-profile__presence {
+.octane-extended-profile__presence {
   width: 40px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
 
-.nitro-extended-profile__status-copy {
+.octane-extended-profile__status-copy {
   min-height: 23px;
   display: flex;
   align-items: center;
@@ -109,15 +109,15 @@
   min-width: 0;
 }
 
-.nitro-extended-profile__status-text {
+.octane-extended-profile__status-text {
   color: #111;
   font-size: 11px;
   font-weight: 700;
   line-height: 1;
 }
 
-.nitro-extended-profile__friend-button,
-.nitro-extended-profile__link {
+.octane-extended-profile__friend-button,
+.octane-extended-profile__link {
   border: 0;
   background: none;
   padding: 0;
@@ -128,7 +128,7 @@
   cursor: pointer;
 }
 
-.nitro-extended-profile__friend-button {
+.octane-extended-profile__friend-button {
   min-height: 24px;
   padding: 0 14px;
   border: 1px solid #9b9b9b;
@@ -138,14 +138,14 @@
   text-decoration: none;
 }
 
-.nitro-extended-profile__actions {
+.octane-extended-profile__actions {
   display: flex;
   gap: 12px;
   margin-top: 2px;
   min-height: 16px;
 }
 
-.nitro-extended-profile__badges {
+.octane-extended-profile__badges {
   margin-top: 5px;
   min-height: 55px;
   border: 1px solid #afafaf;
@@ -156,7 +156,7 @@
   padding: 6px 7px;
 }
 
-.nitro-extended-profile__badge-slot {
+.octane-extended-profile__badge-slot {
   width: 42px;
   height: 42px;
   display: flex;
@@ -168,16 +168,16 @@
   cursor: pointer;
 }
 
-.nitro-extended-profile__badge-slot .badge-image {
+.octane-extended-profile__badge-slot .badge-image {
   width: auto !important;
   height: auto !important;
 }
 
-.nitro-extended-profile__right {
+.octane-extended-profile__right {
   padding-top: 6px;
 }
 
-.nitro-extended-profile__relationships-label {
+.octane-extended-profile__relationships-label {
   margin: 3px 0 4px;
   color: #111;
   font-size: 12px;
@@ -185,24 +185,24 @@
   line-height: 16px;
 }
 
-.nitro-extended-profile__relationship {
+.octane-extended-profile__relationship {
   display: grid;
   grid-template-columns: 19px minmax(0, 1fr);
   gap: 4px;
   margin-bottom: 4px;
 }
 
-.nitro-extended-profile__relationship-icon {
+.octane-extended-profile__relationship-icon {
   height: 33px;
 }
 
-.nitro-extended-profile__relationship-copy {
+.octane-extended-profile__relationship-copy {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.nitro-extended-profile__relationship-box {
+.octane-extended-profile__relationship-box {
   min-height: 22px;
   border: 1px solid #b4b4b4;
   background: linear-gradient(180deg, #fdfdfb 0%, #ecebe3 100%);
@@ -213,7 +213,7 @@
   overflow: hidden;
 }
 
-.nitro-extended-profile__relationship-name {
+.octane-extended-profile__relationship-name {
   margin: 0;
   color: #111;
   font-size: 11px;
@@ -226,7 +226,7 @@
   white-space: nowrap;
 }
 
-.nitro-extended-profile__relationship-head {
+.octane-extended-profile__relationship-head {
   position: absolute;
   right: 3px;
   top: 50%;
@@ -236,7 +236,7 @@
   overflow: hidden;
 }
 
-.nitro-extended-profile__relationship-head .avatar-image {
+.octane-extended-profile__relationship-head .avatar-image {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
@@ -247,7 +247,7 @@
   transform: none !important;
 }
 
-.nitro-extended-profile__relationship-subcopy {
+.octane-extended-profile__relationship-subcopy {
   margin: 1px 0 0 8px;
   color: #7f7f7f;
   font-size: 11px;
@@ -255,7 +255,7 @@
   line-height: 14px;
 }
 
-.nitro-extended-profile__summary-bar {
+.octane-extended-profile__summary-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
@@ -265,7 +265,7 @@
   border-bottom: 1px solid #afafaf;
 }
 
-.nitro-extended-profile__summary-button {
+.octane-extended-profile__summary-button {
   min-height: 38px;
   display: flex;
   align-items: center;
@@ -280,15 +280,15 @@
   cursor: pointer;
 }
 
-.nitro-extended-profile__summary-button:first-child {
+.octane-extended-profile__summary-button:first-child {
   border-left: 1px solid #afafaf;
 }
 
-.nitro-extended-profile__summary-button--center {
+.octane-extended-profile__summary-button--center {
   cursor: pointer;
 }
 
-.nitro-extended-profile__summary-icon {
+.octane-extended-profile__summary-icon {
   width: auto;
   height: auto;
   max-width: 32px;
@@ -297,41 +297,41 @@
   flex-shrink: 0;
 }
 
-.nitro-extended-profile__summary-icon--badge {
+.octane-extended-profile__summary-icon--badge {
   max-width: 25px;
   max-height: 25px;
 }
 
-.nitro-extended-profile__summary-label {
+.octane-extended-profile__summary-label {
   font-weight: 700;
   line-height: 1;
   text-decoration: underline;
 }
 
-.nitro-extended-profile__summary-value {
+.octane-extended-profile__summary-value {
   font-weight: 700;
   line-height: 1;
 }
 
-.nitro-extended-profile-window__body {
+.octane-extended-profile-window__body {
   background: #ece8dc;
 }
 
-.nitro-extended-profile-window__content.profile-card-background .nitro-extended-profile-window__body {
+.octane-extended-profile-window__content.profile-card-background .octane-extended-profile-window__body {
   background: transparent;
 }
 
-.nitro-extended-profile-window__body--groups {
+.octane-extended-profile-window__body--groups {
   min-height: 249px;
 }
 
-.nitro-extended-profile-window__panel {
+.octane-extended-profile-window__panel {
   border: 1px solid #afafaf;
   background: #d6d3cb;
   padding: 0 !important;
 }
 
-.nitro-extended-profile-groups {
+.octane-extended-profile-groups {
   display: grid;
   grid-template-columns: 82px minmax(0, 1fr);
   gap: 7px;
@@ -339,39 +339,39 @@
   height: 100%;
 }
 
-.nitro-extended-profile-groups__sidebar {
+.octane-extended-profile-groups__sidebar {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.nitro-extended-profile-groups__count {
+.octane-extended-profile-groups__count {
   margin-bottom: 5px;
   color: #111;
   font-size: 11px;
   line-height: 1;
 }
 
-.nitro-extended-profile-groups__list {
+.octane-extended-profile-groups__list {
   flex: 1 1 auto;
   overflow-y: auto;
   padding-right: 2px;
 }
 
-.nitro-extended-profile-groups__item {
+.octane-extended-profile-groups__item {
   width: 54px;
   min-height: 54px;
   margin-bottom: 4px;
 }
 
-.nitro-extended-profile-groups__details {
+.octane-extended-profile-groups__details {
   min-width: 0;
   min-height: 236px;
   max-height: 100%;
   overflow-y: auto;
 }
 
-.nitro-extended-profile-group-info {
+.octane-extended-profile-group-info {
   display: grid;
   grid-template-columns: 110px minmax(0, 1fr);
   gap: 12px;
@@ -382,14 +382,14 @@
   padding: 12px 14px;
 }
 
-.nitro-extended-profile-group-info__badge-column {
+.octane-extended-profile-group-info__badge-column {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
 }
 
-.nitro-extended-profile-group-info__badge-wrap {
+.octane-extended-profile-group-info__badge-wrap {
   width: 96px;
   height: 96px;
   display: flex;
@@ -398,7 +398,7 @@
   overflow: hidden;
 }
 
-.nitro-extended-profile-group-info__meta {
+.octane-extended-profile-group-info__meta {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -406,47 +406,47 @@
   text-align: center;
 }
 
-.nitro-extended-profile-group-info__role {
+.octane-extended-profile-group-info__role {
   min-height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.nitro-extended-profile-group-info__content {
+.octane-extended-profile-group-info__content {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.nitro-extended-profile-group-info__header-copy {
+.octane-extended-profile-group-info__header-copy {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
-.nitro-extended-profile-group-info__description {
+.octane-extended-profile-group-info__description {
   margin-top: 10px;
   min-height: 52px;
   color: #222;
   line-height: 14px;
 }
 
-.nitro-extended-profile-group-info__links {
+.octane-extended-profile-group-info__links {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin-top: 8px;
 }
 
-.nitro-extended-profile-group-info__button {
+.octane-extended-profile-group-info__button {
   align-self: center;
   min-width: 162px;
   min-height: 24px;
   margin-top: auto;
 }
 
-.nitro-extended-profile-group-info__badge-wrap .group-badge {
+.octane-extended-profile-group-info__badge-wrap .group-badge {
   width: 100% !important;
   height: 100% !important;
   transform: none !important;
@@ -456,28 +456,28 @@
   image-rendering: pixelated;
 }
 
-.nitro-extended-profile-window .layout-grid-item.active {
+.octane-extended-profile-window .layout-grid-item.active {
   background: linear-gradient(180deg, #ffe89b 0%, #ffc74b 100%);
   box-shadow: inset 0 0 0 2px #fff4c4;
 }
 
-.nitro-extended-profile-window .layout-grid-item {
+.octane-extended-profile-window .layout-grid-item {
   border-radius: 4px;
   border: 1px solid #8d8d8d;
   background: #efede4;
 }
 
-.nitro-extended-profile-groups__item .layout-grid-item-icon {
+.octane-extended-profile-groups__item .layout-grid-item-icon {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.nitro-extended-profile-groups__item {
+.octane-extended-profile-groups__item {
   overflow: hidden;
 }
 
-.nitro-extended-profile-groups__item .group-badge {
+.octane-extended-profile-groups__item .group-badge {
   width: 40px !important;
   height: 40px !important;
   transform: none !important;
@@ -488,29 +488,29 @@
 }
 
 @media (max-width: 575.98px) {
-  .nitro-extended-profile-window__content {
+  .octane-extended-profile-window__content {
     overflow-y: auto;
   }
 
-  .nitro-extended-profile-window__body--groups {
+  .octane-extended-profile-window__body--groups {
     flex: 0 0 auto;
     overflow: visible;
   }
 
-  .nitro-extended-profile-window__panel {
+  .octane-extended-profile-window__panel {
     height: auto;
   }
 
-  .nitro-extended-profile__top {
+  .octane-extended-profile__top {
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
   }
 
-  .nitro-extended-profile__separator {
+  .octane-extended-profile__separator {
     display: none;
   }
 
-  .nitro-extended-profile-groups {
+  .octane-extended-profile-groups {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -518,12 +518,12 @@
     min-height: 0;
   }
 
-  .nitro-extended-profile-groups__sidebar {
+  .octane-extended-profile-groups__sidebar {
     min-width: 0;
     flex: 0 0 auto;
   }
 
-  .nitro-extended-profile-groups__list {
+  .octane-extended-profile-groups__list {
     display: flex;
     flex: 0 0 auto;
     flex-direction: row;
@@ -536,29 +536,29 @@
     padding-bottom: 6px;
   }
 
-  .nitro-extended-profile-groups__item {
+  .octane-extended-profile-groups__item {
     flex: 0 0 auto;
     margin-bottom: 0;
   }
 
-  .nitro-extended-profile-groups__details {
+  .octane-extended-profile-groups__details {
     min-height: 0;
     max-height: none;
     overflow: visible;
   }
 
-  .nitro-extended-profile-group-info {
+  .octane-extended-profile-group-info {
     grid-template-columns: 72px minmax(0, 1fr);
     gap: 10px;
     padding: 10px;
   }
 
-  .nitro-extended-profile-group-info__badge-wrap {
+  .octane-extended-profile-group-info__badge-wrap {
     width: 64px;
     height: 64px;
   }
 
-  .nitro-extended-profile-group-info__button {
+  .octane-extended-profile-group-info__button {
     min-width: 0;
     width: 100%;
   }

@@ -24,7 +24,7 @@ import {
     NavigatorSavedSearch,
     NavigatorSearchesEvent,
     NavigatorTopLevelContext,
-    NitroEventType,
+    OctaneEventType,
     RoomDataParser,
     RoomEnterErrorEvent,
     RoomEntryInfoMessageEvent,
@@ -35,7 +35,7 @@ import {
     UserFlatCatsEvent,
     UserInfoEvent,
     UserPermissionsEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useCallback, useState } from 'react';
 import {
     CreateRoomSession,
@@ -48,7 +48,7 @@ import {
     TryVisitRoom,
     VisitDesktop
 } from '../../api';
-import { useMessageEvent, useNitroEvent } from '../events';
+import { useMessageEvent, useOctaneEvent } from '../events';
 import { useNotification } from '../notification';
 import { useNavigatorFavouritesStore } from './navigatorFavouritesStore';
 import { useNavigatorUiStore } from './navigatorUiStore';
@@ -294,8 +294,8 @@ export const useNavigatorStore = () => {
         }, [])
     );
 
-    useNitroEvent(
-        NitroEventType.SOCKET_RECONNECTING,
+    useOctaneEvent(
+        OctaneEventType.SOCKET_RECONNECTING,
         useCallback(() => {
             setNavigatorData((prev) => ({ ...prev, settingsReceived: false }));
         }, [])

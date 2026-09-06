@@ -106,16 +106,16 @@ export const Slider: FC<SliderProps> = (props) => {
     };
 
     return (
-        <Flex fullWidth gap={1} classNames={['nitro-slider-wrapper']}>
+        <Flex fullWidth gap={1} classNames={['octane-slider-wrapper']}>
             {!disabledButton && (
-                <Button classNames={['nitro-slider-button', 'nitro-slider-button-left']} disabled={disabled || minimum >= currentValue} onClick={stepDown}>
+                <Button classNames={['octane-slider-button', 'octane-slider-button-left']} disabled={disabled || minimum >= currentValue} onClick={stepDown}>
                     <FaAngleLeft />
                 </Button>
             )}
             <RadixSlider.Root
                 inverted={invert}
                 disabled={disabled}
-                className={cn('nitro-slider', 'relative', 'min-w-0', 'grow', className)}
+                className={cn('octane-slider', 'relative', 'min-w-0', 'grow', className)}
                 style={style}
                 max={max}
                 min={min}
@@ -130,7 +130,7 @@ export const Slider: FC<SliderProps> = (props) => {
                 {valueArr.map((_, i) => renderThumbElement(i))}
             </RadixSlider.Root>
             {!disabledButton && (
-                <Button classNames={['nitro-slider-button', 'nitro-slider-button-right']} disabled={disabled || maximum <= currentValue} onClick={stepUp}>
+                <Button classNames={['octane-slider-button', 'octane-slider-button-right']} disabled={disabled || maximum <= currentValue} onClick={stepUp}>
                     <FaAngleRight />
                 </Button>
             )}

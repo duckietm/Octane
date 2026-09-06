@@ -1,9 +1,9 @@
-import { UpdateRoomFilterMessageComposer } from '@nitrots/nitro-renderer';
+import { UpdateRoomFilterMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, Column, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Column, Flex, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFilterWordsWidget, useNavigatorData } from '../../../../hooks';
-import { classNames, NitroInput } from '../../../../layout';
+import { classNames, OctaneInput } from '../../../../layout';
 
 export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
     const [word, setWord] = useState<string>('bobba');
@@ -44,15 +44,15 @@ export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView
+        <OctaneCardView
             isResizable={false}
-            className="nitro-guide-tool nitro-room-filter-words min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+            className="octane-guide-tool octane-room-filter-words min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
         >
-            <NitroCardHeaderView headerText={LocalizeText('navigator.roomsettings.roomfilter')} onCloseClick={() => onClose()} />
-            <NitroCardContentView className="text-black">
+            <OctaneCardHeaderView headerText={LocalizeText('navigator.roomsettings.roomfilter')} onCloseClick={() => onClose()} />
+            <OctaneCardContentView className="text-black">
                 <Grid className="flex items-center gap-2 justify-end">
-                    <NitroInput maxLength={255} type="text" value={word} onChange={(event) => onTyping(event.target.value)} />
+                    <OctaneInput maxLength={255} type="text" value={word} onChange={(event) => onTyping(event.target.value)} />
                     <Button onClick={() => processAction(true)}>{LocalizeText('navigator.roomsettings.roomfilter.addword')}</Button>
                 </Grid>
                 <Column
@@ -82,7 +82,7 @@ export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
                         {LocalizeText('navigator.roomsettings.roomfilter.removeword')}
                     </Button>
                 </Grid>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

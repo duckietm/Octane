@@ -1,10 +1,10 @@
-import { AddLinkEventTracker, GetSoundManager, ILinkEventTracker, ITraxEditorSong, RemoveLinkEventTracker, SoundManagerEvent } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, GetSoundManager, ILinkEventTracker, ITraxEditorSong, RemoveLinkEventTracker, SoundManagerEvent } from '@octane/renderer';
 import { FC, MouseEvent, PointerEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { GetDiskColor, localizeWithFallback } from '../../api';
 import { GetTraxCartridgeUrl } from '../../assets/images/trax';
 import { Button, Column, Flex, LayoutCurrencyIcon, Text } from '../../common';
-import { useNitroEvent, usePurse, useTraxEditor } from '../../hooks';
-import { NitroCard, NitroInput } from '../../layout';
+import { useOctaneEvent, usePurse, useTraxEditor } from '../../hooks';
+import { OctaneCard, OctaneInput } from '../../layout';
 import { CreateEmptyChannels, ITraxPlacement, ParseTraxSong, SerializeTraxSong, TRAX_CHANNEL_COUNT, TRAX_DEFAULT_UNITS, TRAX_MAX_UNITS, TRAX_MIN_UNITS, TraxChannels } from './TraxSongData';
 import { GetTraxSampleId, GetTraxSoundSetForSample, TraxSoundSets } from './TraxSoundSets';
 
@@ -213,7 +213,7 @@ export const TraxEditorView: FC<{}> = () =>
         GetSoundManager().musicController?.stopSamplePreview();
     }, []);
 
-    useNitroEvent<SoundManagerEvent>(SoundManagerEvent.TRAX_SONG_COMPLETE, () =>
+    useOctaneEvent<SoundManagerEvent>(SoundManagerEvent.TRAX_SONG_COMPLETE, () =>
     {
         isPlayingRef.current = false;
         setIsPlaying(false);
@@ -466,12 +466,12 @@ export const TraxEditorView: FC<{}> = () =>
     const emptySlots = Math.max(0, maxSongs - songs.length);
     const rackCartridges = TraxSoundSets.slice(rackPage * CARTRIDGES_PER_PAGE, (rackPage + 1) * CARTRIDGES_PER_PAGE);
     return (
-        <NitroCard className="w-[920px] max-w-[98vw]" uniqueKey="trax-editor">
-            <NitroCard.Header
+        <OctaneCard className="w-[920px] max-w-[98vw]" uniqueKey="trax-editor">
+            <OctaneCard.Header
                 headerText={localizeWithFallback('trax.editor.title', 'Trax Machine')}
                 onCloseClick={hideEditor}
             />
-            <NitroCard.Content>
+            <OctaneCard.Content>
                 <div className="relative">
                     <Column gap={2} className="absolute inset-y-0 left-0 w-[200px] overflow-y-auto">
                         <Text bold>{localizeWithFallback('trax.editor.my.songs', 'My songs')}</Text>
@@ -671,7 +671,7 @@ export const TraxEditorView: FC<{}> = () =>
                                         ⇥
                                     </MachineButton>
                                     <div className="min-w-0 flex-1">
-                                        <NitroInput
+                                        <OctaneInput
                                             value={songName}
                                             maxLength={64}
                                             style={{
@@ -855,7 +855,7 @@ export const TraxEditorView: FC<{}> = () =>
                         )}
                     </Column>
                 </div>
-            </NitroCard.Content>
-        </NitroCard>
+            </OctaneCard.Content>
+        </OctaneCard>
     );
 };
