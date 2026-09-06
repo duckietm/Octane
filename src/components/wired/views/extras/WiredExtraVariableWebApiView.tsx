@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries } from '../WiredVariablePickerData';
@@ -75,11 +75,11 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
                     <>
                         <div className="flex flex-col gap-1">
                             <Text>{localizeWithFallback('wiredfurni.params.web_api.read_key', 'Read key')}</Text>
-                            <NitroInput readOnly={true} type="text" value={readKey} />
+                            <OctaneInput readOnly={true} type="text" value={readKey} />
                         </div>
                         <div className="flex flex-col gap-1">
                             <Text>{localizeWithFallback('wiredfurni.params.web_api.write_key', 'Write key')}</Text>
-                            <NitroInput readOnly={true} type="text" value={writeKey} />
+                            <OctaneInput readOnly={true} type="text" value={writeKey} />
                         </div>
                     </>
                 )}

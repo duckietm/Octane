@@ -4,7 +4,7 @@ import iconRotateClockwise from '../../../../assets/images/wired/icon_wired_rota
 import iconRotateCounterClockwise from '../../../../assets/images/wired/icon_wired_rotate_counter_clockwise.png';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
@@ -145,7 +145,7 @@ export const WiredActionMoveRotateUserView: FC<{}> = (props) => {
             {hasTileCount && (
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.tilecount', 'Tiles to move')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         max={MAX_TILE_COUNT}
                         min={MIN_TILE_COUNT}
                         type="number"
