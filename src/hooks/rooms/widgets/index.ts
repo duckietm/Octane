@@ -18,6 +18,7 @@ export * from './usePetPackageWidget';
 export * from './usePollActions';
 export * from './usePollSubscriptions';
 export * from './usePollWidget';
+export * from './userChooser.helpers';
 export * from './useUserChooserActions';
 export * from './useUserChooserState';
 export * from './useUserChooserWidget';

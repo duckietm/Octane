@@ -1,7 +1,7 @@
 import { CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { CSSProperties, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { GetConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
+import { CSSProperties, FC, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { GetConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, TryVisitRoom, VisitDesktop } from '../../api';
 import collapseLeftImg from '../../assets/images/toolbar/air/collapse-left.png';
 import collapseRightImg from '../../assets/images/toolbar/air/collapse-right.png';
 import dividerImg from '../../assets/images/toolbar/air/divider.png';
@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useOctaneEvent, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_MS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -48,6 +48,138 @@ const readCollapsedPreference = (key: string): boolean =>
     {
         return false;
     }
+};
+
+/**
+ * The official navigator icon unfolds a small menu while hovered
+ * (ToolbarHoverCtrl.as, 3075_toolbar_hover_xml): navigator, home,
+ * favourites, create, and the visited / frequent room lists that reuse
+ * the room visit history. Pointer-only, so the touch layout never mounts it.
+ */
+const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
+{
+    const [ isOpen, setIsOpen ] = useState(false);
+    const [ expandedList, setExpandedList ] = useState<'history' | 'frequent' | null>(null);
+    const hideTimerRef = useRef<number | null>(null);
+    const { navigatorData } = useNavigatorData();
+    const { historyView = [], frequentView = [] } = useRoomVisitHistory();
+
+    const homeRoomId = navigatorData?.homeRoomId ?? -1;
+    const items = buildNavigatorHoverItems({ homeRoomId, historyCount: historyView.length });
+
+    const clearHideTimer = () =>
+    {
+        if(hideTimerRef.current === null) return;
+
+        window.clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = null;
+    };
+
+    const open = () =>
+    {
+        clearHideTimer();
+        setIsOpen(true);
+    };
+
+    const scheduleHide = () =>
+    {
+        clearHideTimer();
+        hideTimerRef.current = window.setTimeout(() =>
+        {
+            hideTimerRef.current = null;
+            setIsOpen(false);
+            setExpandedList(null);
+        }, NAVIGATOR_HOVER_HIDE_DELAY_MS);
+    };
+
+    const hideNow = () =>
+    {
+        clearHideTimer();
+        setIsOpen(false);
+        setExpandedList(null);
+    };
+
+    useEffect(() => clearHideTimer, []);
+
+    const activate = (id: NavigatorHoverItemId) =>
+    {
+        switch(id)
+        {
+            case 'navigator':
+                CreateLinkEvent('navigator/show');
+                hideNow();
+                return;
+            case 'home':
+                if(homeRoomId <= 0) return;
+                CreateLinkEvent('navigator/goto/home');
+                hideNow();
+                return;
+            case 'favorites':
+                // Favourites live in the "me" view of the navigator; the server
+                // lists them as their own category there.
+                CreateLinkEvent('navigator/me');
+                hideNow();
+                return;
+            case 'create':
+                CreateLinkEvent('navigator/create');
+                hideNow();
+                return;
+            case 'history':
+            case 'frequent':
+                setExpandedList(previous => (previous === id ? null : id));
+                return;
+        }
+    };
+
+    const visitRoom = (roomId: number) =>
+    {
+        TryVisitRoom(roomId);
+        hideNow();
+    };
+
+    const expandedRooms = expandedList === 'history' ? historyView : expandedList === 'frequent' ? frequentView : [];
+
+    return (
+        <div
+            className="relative"
+            data-testid="navigator-hover"
+            onMouseEnter={ open }
+            onMouseLeave={ scheduleHide }>
+            { children }
+            { isOpen &&
+                <div
+                    className="tb-navigator-hover absolute bottom-full left-0 z-[90] mb-1 min-w-[190px] rounded-md border border-black/40 bg-[#1f1f1f]/95 p-1 text-[12px] text-white shadow-lg"
+                    data-testid="navigator-hover-panel"
+                    onMouseEnter={ open }
+                    onMouseLeave={ scheduleHide }>
+                    { items.map(item => (
+                        <div key={ item.id }>
+                            <button
+                                type="button"
+                                disabled={ item.disabled }
+                                aria-expanded={ item.expandable ? expandedList === item.id : undefined }
+                                className={ `flex w-full items-center justify-between rounded px-2 py-1 text-left ${ item.disabled ? 'cursor-default text-white/40' : 'cursor-pointer hover:bg-white/10' } ${ expandedList === item.id ? 'bg-white/10' : '' }` }
+                                onClick={ () => activate(item.id) }>
+                                <span>{ localizeWithFallback(item.key, item.fallback) }</span>
+                                { item.expandable && <span aria-hidden="true">{ expandedList === item.id ? '▾' : '▸' }</span> }
+                            </button>
+                            { item.expandable && expandedList === item.id && expandedRooms.length > 0 &&
+                                <div className="ml-2 flex max-h-[220px] flex-col overflow-y-auto border-l border-white/20 pl-2">
+                                    { expandedRooms.map(room => (
+                                        <button
+                                            key={ room.roomId }
+                                            type="button"
+                                            className={ `truncate rounded px-2 py-[2px] text-left hover:bg-white/10 ${ room.roomId === navigatorData?.currentRoomId ? 'font-bold' : '' }` }
+                                            onClick={ () => visitRoom(room.roomId) }>
+                                            { room.roomName }
+                                        </button>
+                                    )) }
+                                </div> }
+                        </div>
+                    )) }
+                </div> }
+        </div>
+    );
 };
 
 export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
@@ -379,7 +511,9 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             : <ToolbarItemView icon="house" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
                     </motion.div>
                     <motion.div variants={ itemVariants } className="tb-slot">
-                        <ToolbarItemView icon="rooms" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
+                        <NavigatorHoverPanel>
+                            <ToolbarItemView icon="rooms" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
+                        </NavigatorHoverPanel>
                     </motion.div>
                     { isInRoom &&
                         <motion.div variants={ itemVariants } className="tb-slot">

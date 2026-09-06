@@ -11,13 +11,29 @@ const css = readFileSync(join(process.cwd(), 'src/css/room/RoomWidgets.css'), 'u
         expect(source).toContain('room-tools-zoom-row');
         expect(source).toContain('room-tools-zoom-button');
         expect(source).toContain('room-tools-collapse-toggle');
-        expect(source).toContain("LocalizeText('room.zoom.text', ['zoom_level'], [getZoomText(zoomScale)])");
+        expect(source).toContain("LocalizeText('room.zoom.text', ['zoom_level'], [currentZoomLevel.toString()])");
     });
 
-    it('keeps renderer zoom side effects outside React state updaters', () => {
+    it('keeps renderer zoom side effects outside React state updaters and uses the shared zoom table', () => {
         expect(source).not.toMatch(/setZoomScale\s*\([^)]*=>[\s\S]{0,500}applyRoomZoom/);
-        expect(source).toContain('getNextZoomScale(currentScale, direction)');
+        expect(source).toContain('stepRoomZoom(currentScale, direction)');
         expect(source).toContain('applyRoomZoom(roomSession.roomId, logicalScale)');
+        expect(source).not.toMatch(/const ROOM_ZOOM_SCALES\s*=/);
+    });
+
+    it('offers the official achievements and camera tools and a persisted collapsed state', () => {
+        expect(source).toContain("action: 'achievements'");
+        expect(source).toContain("action: 'camera'");
+        expect(source).toContain("CreateLinkEvent('achievements/show')");
+        expect(source).toContain("CreateLinkEvent('camera/toggle')");
+        expect(source).toContain("const TOOLS_COLLAPSED_STORAGE_KEY = 'octane.room.tools.collapsed'");
+    });
+
+    it('drives the history buttons from the shared room visit history', () => {
+        expect(source).toContain('useRoomVisitHistory()');
+        expect(source).toContain("if (canGoBack) goBack();");
+        expect(source).toContain("if (canGoForward) goForward();");
+        expect(source).toContain('<RoomToolsInfoView isToolsOpen={isToolsOpen} />');
     });
 
     it('drops the room geometry to size-32 below 1x for crisp zoomed-out furni', () => {

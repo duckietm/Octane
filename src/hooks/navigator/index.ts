@@ -1,9 +1,12 @@
 export type { DoorStateSnapshot } from '../rooms/widgets/useDoorState';
 export { useDoorState } from '../rooms/widgets/useDoorState';
+export type { NavigatorHoverItem, NavigatorHoverItemId } from './navigatorHoverMenu';
+export { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_MS } from './navigatorHoverMenu';
 export type { NavigatorRoomInfoAnchorKind, NavigatorRoomInfoPopupActions, NavigatorRoomInfoPopupState } from './navigatorRoomInfoPopupStore';
 export { useNavigatorRoomInfoPopupStore } from './navigatorRoomInfoPopupStore';
 export type { NavigatorUiActions, NavigatorUiState } from './navigatorUiStore';
 export { useNavigatorUiStore } from './navigatorUiStore';
+export { buildRoomEmbedCode, getRoomThumbnailUrl } from './roomEmbedCode';
 export { useNavigatorData } from './useNavigatorData';
 export { useNavigatorFavourite } from './useNavigatorFavourite';
 export { useNavigatorSearch } from './useNavigatorSearch';
