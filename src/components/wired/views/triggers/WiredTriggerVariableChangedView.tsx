@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { LocalizeText, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
 import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_global.png';
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
@@ -20,6 +20,16 @@ type VariableTargetType = 'user' | 'furni' | 'global';
 const TARGET_USER = 0;
 const TARGET_FURNI = 1;
 const TARGET_GLOBAL = 3;
+
+// Where a change may come from; the server labels each write and the trigger keeps a bit mask of
+// the origins it listens to (-1 = every origin, which is also what a box saved before the mask means).
+const ORIGIN_ALL = -1;
+const ORIGIN_OPTIONS = [
+    { bit: 0, key: 'wiredfurni.params.variables.trigger_origin.0', fallback: 'A wired box in this room' },
+    { bit: 1, key: 'wiredfurni.params.variables.trigger_origin.1', fallback: 'The web API' },
+    { bit: 2, key: 'wiredfurni.params.variables.trigger_origin.2', fallback: 'The creator tools' }
+] as const;
+const ORIGIN_EVERY_BIT = ORIGIN_OPTIONS.reduce((mask, option) => mask | (1 << option.bit), 0);
 
 const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string }> = [
     { key: 'furni', icon: furniVariableIcon },
@@ -69,6 +79,7 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
     const [decreasedEnabled, setDecreasedEnabled] = useState(true);
     const [unchangedEnabled, setUnchangedEnabled] = useState(true);
     const [deletedEnabled, setDeletedEnabled] = useState(true);
+    const [originMask, setOriginMask] = useState(ORIGIN_ALL);
 
     const variableDefinitions = useMemo(() => {
         switch (targetType) {
@@ -111,6 +122,7 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
         setDecreasedEnabled(intData.length <= 4 || intData[4] === 1);
         setUnchangedEnabled(intData.length <= 5 || intData[5] === 1);
         setDeletedEnabled(intData.length <= 6 || intData[6] === 1);
+        setOriginMask(intData.length > 7 ? intData[7] : ORIGIN_ALL);
     }, [trigger]);
 
     useEffect(() => {
@@ -129,8 +141,17 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
             effectiveIncreasedEnabled ? 1 : 0,
             effectiveDecreasedEnabled ? 1 : 0,
             effectiveUnchangedEnabled ? 1 : 0,
-            effectiveDeletedEnabled ? 1 : 0
+            effectiveDeletedEnabled ? 1 : 0,
+            originMask
         ]);
+    };
+
+    const effectiveOriginMask = originMask < 0 || originMask === 0 ? ORIGIN_EVERY_BIT : originMask;
+    const isOriginChecked = (bit: number) => (effectiveOriginMask & (1 << bit)) !== 0;
+    const toggleOrigin = (bit: number, checked: boolean) => {
+        const nextMask = checked ? effectiveOriginMask | (1 << bit) : effectiveOriginMask & ~(1 << bit);
+
+        setOriginMask(nextMask === ORIGIN_EVERY_BIT ? ORIGIN_ALL : nextMask);
     };
 
     return (
@@ -233,6 +254,23 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
                         />
                         <Text>{LocalizeText('wiredfurni.params.variables.trigger_options.2')}</Text>
                     </label>
+                </div>
+
+                <div className="octane-wired__divider" />
+
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.variables.trigger_origin', 'Changed by:')}</Text>
+                    {ORIGIN_OPTIONS.map((option) => (
+                        <label key={option.bit} className="flex items-center gap-1">
+                            <input
+                                checked={isOriginChecked(option.bit)}
+                                className="form-check-input"
+                                type="checkbox"
+                                onChange={(event) => toggleOrigin(option.bit, event.target.checked)}
+                            />
+                            <Text>{localizeWithFallback(option.key, option.fallback)}</Text>
+                        </label>
+                    ))}
                 </div>
             </div>
         </WiredTriggerBaseView>
