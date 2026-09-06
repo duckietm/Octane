@@ -1019,3 +1019,233 @@
     border-radius: 0 !important;
     box-shadow: none !important;
 }
+
+/*
+ * Official wired window skins, colour for colour from the AIR client's wired_style_*.xml layouts:
+ * volter (dark), ubuntu (light warm) and volter_blue (the yellow one; that is its name). "default"
+ * carries no override and is the look above. Each block only restates what the layout defines:
+ * window background, ruler (divider) colour, text colour, input background, the source-button box
+ * and the menu items; the rest keeps the base rules.
+ */
+.octane-wired.octane-wired--style-volter {
+    /* container colour 0x3d3d3d, ruler 0x232323, text white, source box 0x181818, mini button 0x333333, menu item 0x626262 */
+    background: #3d3d3d;
+    border-color: #232323 !important;
+    box-shadow: inset 0 0 0 1px #4a4a4a !important;
+    color: #fff;
+
+    .octane-wired__header .nitro-card-title {
+        color: #fff !important;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+    }
+
+    .octane-wired__header .nitro-card-close-button {
+        border-color: #181818;
+        background: linear-gradient(180deg, #626262 0%, #333333 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .octane-wired__header .nitro-card-close-button::before,
+    .octane-wired__header .nitro-card-close-button::after {
+        background: #e8e8e8;
+    }
+
+    .octane-wired__content {
+        background: #3d3d3d !important;
+    }
+
+    .octane-wired__summary {
+        background: linear-gradient(180deg, #333333 0%, #2a2a2a 100%);
+        color: #fff;
+    }
+
+    .octane-wired__summary-kind,
+    .octane-wired__summary-title,
+    .octane-wired__advanced-toggle,
+    .octane-wired__picker-label,
+    .form-check-label,
+    label,
+    .text-black,
+    .text-black\/60 {
+        color: #fff !important;
+        text-shadow: none;
+    }
+
+    .octane-wired__divider,
+    hr {
+        background: #232323;
+        box-shadow: 0 1px 0 #4a4a4a;
+    }
+
+    .form-check-input,
+    input[type='checkbox'],
+    input[type='radio'] {
+        border-color: #181818;
+        background: linear-gradient(180deg, #626262 0%, #4a4a4a 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .form-check-input[type='radio']:checked,
+    input[type='radio']:checked {
+        background:
+            radial-gradient(circle at center, #f4f4f4 0 34%, transparent 38%),
+            linear-gradient(180deg, #626262 0%, #4a4a4a 100%);
+        border-color: #181818;
+    }
+
+    .form-check-input[type='checkbox']:checked,
+    input[type='checkbox']:checked {
+        background: linear-gradient(180deg, #7a7a7a 0%, #5a5a5a 100%);
+        border-color: #181818;
+    }
+
+    .form-check-input[type='checkbox']:checked::before,
+    .form-check-input[type='checkbox']:checked::after,
+    input[type='checkbox']:checked::before,
+    input[type='checkbox']:checked::after {
+        background: #f4f4f4;
+    }
+
+    .form-control,
+    .form-select,
+    input[type='text'],
+    input[type='number'],
+    textarea {
+        border-color: #181818 !important;
+        background: #2b2b2b !important;
+        color: #fff !important;
+        box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .octane-wired__button,
+    .octane-wired__picker-button,
+    .octane-wired__selection-toggle,
+    .octane-slider-button {
+        border-color: #181818 !important;
+        background: linear-gradient(180deg, #6a6a6a 0%, #4f4f4f 46%, #3f3f3f 47%, #4a4a4a 100%) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        color: #fff !important;
+    }
+}
+
+.octane-wired.octane-wired--style-ubuntu {
+    /* container colour 0xe9e9e1, ruler 0xb5b5b5, text 0x222222, menu item 0xb2b2b2, 10px il_regular text */
+    background: #e9e9e1;
+    border-color: #b5b5b5 !important;
+    box-shadow: inset 0 0 0 1px #f6f6f2 !important;
+    color: #222;
+
+    .octane-wired__header .nitro-card-title,
+    .octane-wired__summary-kind,
+    .octane-wired__summary-title,
+    .octane-wired__advanced-toggle {
+        color: #222 !important;
+    }
+
+    .octane-wired__content {
+        background: #e9e9e1 !important;
+    }
+
+    .octane-wired__summary {
+        background: linear-gradient(180deg, #e2e2da 0%, #d6d6cc 100%);
+        color: #222;
+    }
+
+    .octane-wired__divider,
+    hr {
+        background: #b5b5b5;
+        box-shadow: 0 1px 0 #f6f6f2;
+    }
+
+    .form-control,
+    .form-select,
+    input[type='text'],
+    input[type='number'],
+    textarea {
+        border-color: #b5b5b5 !important;
+        background: #ffffff !important;
+        color: #222 !important;
+    }
+
+    .octane-wired__button,
+    .octane-wired__picker-button,
+    .octane-slider-button {
+        border-color: #b2b2b2 !important;
+        background: linear-gradient(180deg, #fbfbf8 0%, #e9e9e1 46%, #d9d9d1 47%, #ecece4 100%) !important;
+        color: #222 !important;
+    }
+}
+
+.octane-wired.octane-wired--style-volter_blue {
+    /* container colour 0xf4d763, ruler 0x222222, text 0x222222, input white, source box 0xffeda5, mini button 0xffeda5, menu item 0xdddddd */
+    background: #f4d763;
+    border-color: #222222 !important;
+    box-shadow: inset 0 0 0 1px #ffeda5 !important;
+    color: #222;
+
+    .octane-wired__header .nitro-card-title,
+    .octane-wired__summary-kind,
+    .octane-wired__summary-title,
+    .octane-wired__advanced-toggle {
+        color: #222 !important;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .octane-wired__header .nitro-card-close-button {
+        border-color: #222222;
+        background: linear-gradient(180deg, #ffeda5 0%, #f4d763 100%);
+    }
+
+    .octane-wired__content {
+        background: #f4d763 !important;
+    }
+
+    .octane-wired__summary {
+        background: linear-gradient(180deg, #f8e28a 0%, #f0cf55 100%);
+        color: #222;
+    }
+
+    .octane-wired__divider,
+    hr {
+        background: #222222;
+        box-shadow: 0 1px 0 #ffeda5;
+    }
+
+    .form-check-input,
+    input[type='checkbox'],
+    input[type='radio'] {
+        border-color: #222222;
+        background: #ffffff;
+    }
+
+    .form-check-input[type='radio']:checked,
+    input[type='radio']:checked {
+        background: radial-gradient(circle at center, #222222 0 34%, transparent 38%), #ffffff;
+        border-color: #222222;
+    }
+
+    .form-check-input[type='checkbox']:checked,
+    input[type='checkbox']:checked {
+        background: #ffeda5;
+        border-color: #222222;
+    }
+
+    .form-control,
+    .form-select,
+    input[type='text'],
+    input[type='number'],
+    textarea {
+        border-color: #222222 !important;
+        background: #ffffff !important;
+        color: #222 !important;
+    }
+
+    .octane-wired__button,
+    .octane-wired__picker-button,
+    .octane-wired__selection-toggle,
+    .octane-slider-button {
+        border-color: #222222 !important;
+        background: linear-gradient(180deg, #ffeda5 0%, #f8e28a 46%, #f0cf55 47%, #f4d763 100%) !important;
+        color: #222 !important;
+    }
+}

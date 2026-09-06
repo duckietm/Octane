@@ -11,7 +11,15 @@ import {
 } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook } from '@/state/useSharedHook';
-import { createPacketCooldownGate, LocalizeText, NotificationAlertType, SendMessageComposer } from '../../api';
+import {
+    createPacketCooldownGate,
+    LocalizeText,
+    NotificationAlertType,
+    normalizeWiredStyle,
+    SendMessageComposer,
+    WIRED_STYLE_DEFAULT,
+    WiredStyleName
+} from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 import { useRoom } from '../rooms';
@@ -20,6 +28,8 @@ export interface IWiredAccountPreferences {
     showInspectButton: boolean;
     showSystemNotifications: boolean;
     showToolbarButton: boolean;
+    /** The look of the wired box windows; one of WIRED_STYLE_OPTIONS. */
+    wiredStyle: WiredStyleName;
 }
 
 export interface IWiredRoomSettings {
@@ -104,7 +114,8 @@ const getCurrentUnixTime = () => Math.floor(Date.now() / 1000);
 const DEFAULT_ACCOUNT_PREFERENCES: IWiredAccountPreferences = {
     showToolbarButton: false,
     showInspectButton: false,
-    showSystemNotifications: false
+    showSystemNotifications: false,
+    wiredStyle: WIRED_STYLE_DEFAULT
 };
 
 const DEFAULT_ROOM_SETTINGS: IWiredRoomSettings = {
@@ -174,7 +185,8 @@ export const useWiredToolsStore = () => {
 
             setAccountPreferences({
                 ...DEFAULT_ACCOUNT_PREFERENCES,
-                ...(parsedValue || {})
+                ...(parsedValue || {}),
+                wiredStyle: normalizeWiredStyle(parsedValue?.wiredStyle)
             });
         } catch {
             setAccountPreferences(DEFAULT_ACCOUNT_PREFERENCES);

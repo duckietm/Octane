@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { LocalizeText } from '../../api';
+import { LocalizeText, localizeWithFallback, normalizeWiredStyle, WIRED_STYLE_DEFAULT, WIRED_STYLE_OPTIONS, wiredStyleTitle } from '../../api';
 import { Button, Text } from '../../common';
 import { useNotification, useRoom, useWiredTools } from '../../hooks';
 
@@ -157,6 +157,22 @@ export const WiredToolsSettingsTabView: FC<{}> = () => {
                             onChange={(event) => updateAccountPreferences({ showSystemNotifications: event.target.checked })}
                         />
                         <span>Show all system notifications</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-[12px] text-[#222]">
+                        <span>{localizeWithFallback('wiredmenu.settings.preferences.wired_style', 'Wired style:')}</span>
+                        <select
+                            className="form-select form-select-sm"
+                            value={accountPreferences.wiredStyle}
+                            onChange={(event) => updateAccountPreferences({ wiredStyle: normalizeWiredStyle(event.target.value) })}
+                        >
+                            {WIRED_STYLE_OPTIONS.map((style) => (
+                                <option key={style} value={style}>
+                                    {style === WIRED_STYLE_DEFAULT
+                                        ? localizeWithFallback('wiredmenu.settings.preferences.wired_style.default', 'Default (%name%)', ['name'], ['Octane'])
+                                        : wiredStyleTitle(style)}
+                                </option>
+                            ))}
+                        </select>
                     </label>
                 </div>
             </div>
