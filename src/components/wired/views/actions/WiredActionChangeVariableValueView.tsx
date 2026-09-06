@@ -17,6 +17,7 @@ import {
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { localizeWiredVariableOperation, WIRED_VARIABLE_OPERATIONS, WIRED_VARIABLE_UNARY_OPERATIONS } from './WiredVariableOperations';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -46,8 +47,6 @@ const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string; disabled?: 
     { key: 'global', icon: globalVariableIcon },
     { key: 'context', icon: contextVariableIcon }
 ];
-
-const OPERATION_OPTIONS = [0, 1, 2, 3, 4, 5, 6, 40, 41, 50, 60, 100, 101, 102, 103, 104, 105];
 
 const SECONDARY_FURNI_SOURCES: WiredSourceOption[] = sortWiredSourceOptions(
     [
@@ -211,6 +210,8 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
     const destinationSelectionEnabled = isFurniTarget(destinationTargetType) && destinationFurniSource === SOURCE_SELECTED;
     const referenceSelectionEnabled = referenceMode === 'variable' && isFurniTarget(referenceTargetType) && referenceFurniSource === SOURCE_SECONDARY_SELECTED;
+    // The server reads only the destination for these, so the reference controls would be a lie.
+    const isUnaryOperation = WIRED_VARIABLE_UNARY_OPERATIONS.includes(operation);
     const destinationSelectedSourceValue = isFurniTarget(destinationTargetType)
         ? destinationFurniSource
         : isGlobalTarget(destinationTargetType)
@@ -416,9 +417,9 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                         value={operation}
                         onChange={(event) => setOperation(parseInt(event.target.value, 10))}
                     >
-                        {OPERATION_OPTIONS.map((value) => (
+                        {WIRED_VARIABLE_OPERATIONS.map((value) => (
                             <option key={value} value={value}>
-                                {LocalizeText(`wiredfurni.params.variables.operation.${value}`)}
+                                {localizeWiredVariableOperation(value)}
                             </option>
                         ))}
                     </select>
@@ -429,10 +430,11 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                 <div className="octane-wired__give-var-section">
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
                     <label className="octane-wired__change-var-radio">
-                        <input checked={referenceMode === 'constant'} type="radio" onChange={() => setReferenceMode('constant')} />
+                        <input checked={referenceMode === 'constant'} disabled={isUnaryOperation} type="radio" onChange={() => setReferenceMode('constant')} />
                         <Text>{LocalizeText('wiredfurni.params.operator.2')}</Text>
                         <OctaneInput
                             className="octane-wired__give-var-number"
+                            disabled={isUnaryOperation}
                             type="number"
                             value={referenceConstantValueInput}
                             onChange={(event) => setReferenceConstantValueInput(event.target.value)}
@@ -441,7 +443,12 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
                     <div className="octane-wired__change-var-reference-block">
                         <label className="octane-wired__change-var-radio">
-                            <input checked={referenceMode === 'variable'} type="radio" onChange={() => setReferenceMode('variable')} />
+                            <input
+                                checked={referenceMode === 'variable'}
+                                disabled={isUnaryOperation}
+                                type="radio"
+                                onChange={() => setReferenceMode('variable')}
+                            />
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                             <div className="octane-wired__give-var-targets">
                                 {TARGET_BUTTONS.map((button) => (
