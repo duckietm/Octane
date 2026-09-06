@@ -4,6 +4,7 @@ export * from './avatar-effects';
 export * from './buildheight/useBuildHeight';
 export * from './camera';
 export * from './catalog';
+export * from './chat';
 export * from './chat-history';
 export * from './discord/useDiscordSettings';
 export * from './events';

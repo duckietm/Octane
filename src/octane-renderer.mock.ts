@@ -253,6 +253,15 @@ export class RoomDoorbellAcceptedEvent extends MessageEvent {}
 export class FlatAccessDeniedMessageEvent extends MessageEvent {}
 export class GenericErrorEvent extends MessageEvent {}
 export class GetGuestRoomResultEvent extends MessageEvent {}
+export class AvailableCommandsEvent extends MessageEvent {}
+// Friend-list events and composers the useFriends hook subscribes to.
+export class FollowFriendFailedEvent extends MessageEvent {}
+export class FriendListFragmentEvent extends MessageEvent {}
+export class FriendListUpdateEvent extends MessageEvent {}
+export class FriendRequestsEvent extends MessageEvent {}
+export class MessageErrorEvent extends MessageEvent {}
+export class MessengerInitEvent extends MessageEvent {}
+export class NewFriendRequestEvent extends MessageEvent {}
 export class ThumbnailStatusMessageEvent extends MessageEvent {}
 
 // Mentions system — incoming events extend MessageEvent (they expose
@@ -400,6 +409,7 @@ export class GetGuestRoomMessageComposer extends StubClass {}
 export class GetProductOfferComposer extends StubClass {}
 export class GroupFavoriteComposer extends StubClass {}
 export class GroupInformationComposer extends StubClass {}
+export class GroupInformationEvent extends StubClass {}
 export class GroupJoinComposer extends StubClass {}
 export class GroupUnfavoriteComposer extends StubClass {}
 export class UserProfileComposer extends StubClass {}
@@ -751,3 +761,75 @@ export class SnowWarPlayAgainComposer extends StubClass {}
 export class SnowWarGameChatComposer extends StubClass {}
 export class SnowWarJoinQueueComposer extends StubClass {}
 export class SnowWarLeaveQueueComposer extends StubClass {}
+
+// ---------------------------------------------------------------------------
+// Composers whose payload a test asserts on, plus the avatar expression
+// table the chat-command handler reads. `PayloadComposer` mirrors the real
+// `getMessageArray()` so a test can check what would go on the wire.
+// ---------------------------------------------------------------------------
+
+class PayloadComposer {
+    private readonly _data: unknown[];
+
+    constructor(...args: unknown[]) {
+        this._data = args;
+    }
+
+    public getMessageArray(): unknown[] {
+        return this._data;
+    }
+
+    public dispose(): void {}
+}
+
+export class VisitUserComposer extends PayloadComposer {}
+export class RequestFriendComposer extends PayloadComposer {}
+export class IgnoreUserIdComposer extends PayloadComposer {}
+export class RemoveFriendComposer extends PayloadComposer {
+    constructor(...userIds: number[]) {
+        super(userIds.length, ...userIds);
+    }
+}
+export class RoomSettingsComposer extends StubClass {}
+export class UseHabbiconComposer extends StubClass {}
+export class RoomZoomEvent extends StubClass {}
+export const RoomShakingEffect = { init: vi.fn(), turnVisualizationOn: vi.fn() };
+export const RoomRotatingEffect = { init: vi.fn(), turnVisualizationOn: vi.fn() };
+export const AvatarExpressionEnum = {
+    NONE: { ordinal: 0 },
+    WAVE: { ordinal: 1 },
+    BLOW: { ordinal: 2 },
+    LAUGH: { ordinal: 3 },
+    CRY: { ordinal: 4 },
+    IDLE: { ordinal: 5 },
+    JUMP: { ordinal: 6 },
+    RESPECT: { ordinal: 7 }
+};
+
+// Chat settings constants the user preferences hook compares against (values from the renderer).
+export class RoomChatSettings {
+    public static CHAT_MODE_FREE_FLOW = 0;
+    public static CHAT_MODE_LINE_BY_LINE = 1;
+    public static CHAT_BUBBLE_WIDTH_WIDE = 0;
+    public static CHAT_BUBBLE_WIDTH_NORMAL = 1;
+    public static CHAT_BUBBLE_WIDTH_THIN = 2;
+    public static CHAT_SCROLL_SPEED_FAST = 0;
+    public static CHAT_SCROLL_SPEED_NORMAL = 1;
+    public static CHAT_SCROLL_SPEED_SLOW = 2;
+    public static FLOOD_FILTER_STRICT = 0;
+    public static FLOOD_FILTER_NORMAL = 1;
+    public static FLOOD_FILTER_LOOSE = 2;
+}
+
+// Friend-list composers the useFriends hook sends; nothing asserts on their payload.
+export class AcceptFriendMessageComposer extends StubClass {}
+export class AddFriendCategoryComposer extends StubClass {}
+export class DeclineFriendMessageComposer extends StubClass {}
+export class FriendListUpdateComposer extends StubClass {}
+export class GetFriendRequestsComposer extends StubClass {}
+export class MessengerInitComposer extends StubClass {}
+export class MoveFriendToCategoryComposer extends StubClass {}
+export class RemoveFriendCategoryComposer extends StubClass {}
+export class RenameFriendCategoryComposer extends StubClass {}
+export class RequestOfflineMessagesComposer extends StubClass {}
+export class SetRelationshipStatusComposer extends StubClass {}

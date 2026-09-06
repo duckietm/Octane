@@ -25,6 +25,8 @@ import {
 } from '../../hooks';
 import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
 import { SoundboardVolumeControl } from './SoundboardVolumeControl';
+import { UserChatPreferencesView } from './UserChatPreferencesView';
+import { UserOtherPreferencesView } from './UserOtherPreferencesView';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -302,7 +304,7 @@ export const UserSettingsView: FC<{}> = () => {
             <AirSettingsFrame
                 backLabel={backLabel}
                 onBack={handleBack}
-                title={localizeWithFallback('room.chat.settings.title', 'Chat settings')}
+                title={localizeWithFallback('toolbar.chat.settings.title', 'Chat settings')}
                 variant="chat"
             >
                 <p className="air-settings-chat__info">{localizeWithFallback('toolbar.chat.settings.info', 'Choose how chat appears for you.')}</p>
@@ -325,6 +327,7 @@ export const UserSettingsView: FC<{}> = () => {
                         />
                         <span>{localizeWithFallback('memenu.settings.other.enable.chat.window', 'Enable chat window')}</span>
                     </label>
+                    <UserChatPreferencesView />
                 </div>
             </AirSettingsFrame>
         );
@@ -357,6 +360,7 @@ export const UserSettingsView: FC<{}> = () => {
                         />
                         <span>{localizeWithFallback('memenu.settings.other.disable.room.camera.follow', "Don't focus on own avatar")}</span>
                     </label>
+                    <UserOtherPreferencesView />
                     <label className="air-settings-check-row">
                         <input
                             checked={catalogPlaceMultipleObjects}

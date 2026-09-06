@@ -27,6 +27,7 @@ import {
     RoomChatFormatter
 } from '../../../api';
 import { SoundboardRoomMessageEvent } from '../../../events';
+import { isWiredWhisper, resolveEffectiveChatSettings, useChatPreferences, useWiredWhisperDisabled } from '../../chat';
 import { useChatHistory } from './../../chat-history';
 import { useMessageEvent, useOctaneEvent, useUiEvent } from '../../events';
 import { useUserDataSnapshot } from '../../session/useSessionSnapshots';
@@ -37,13 +38,18 @@ const CHAT_MESSAGES_MAX = 250;
 
 const useChatWidgetState = () => {
     const [chatMessages, setChatMessages] = useState<ChatBubbleMessage[]>([]);
-    const [chatSettings, setChatSettings] = useState<IRoomChatSettings>({
+    const [roomChatSettings, setRoomChatSettings] = useState<IRoomChatSettings>({
         mode: RoomChatSettings.CHAT_MODE_FREE_FLOW,
         weight: RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL,
         speed: RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL,
         distance: 50,
         protection: RoomChatSettings.FLOOD_FILTER_NORMAL
     });
+    const [chatPreferences] = useChatPreferences();
+    const [wiredWhisperDisabled] = useWiredWhisperDisabled();
+    // Mode, width and speed are the user's own choice (Settings > Chat); the room only decides
+    // distance and flood protection. This is what the official client does too.
+    const chatSettings = useMemo(() => resolveEffectiveChatSettings(roomChatSettings, chatPreferences), [roomChatSettings, chatPreferences]);
     const { roomSession = null } = useRoom();
     const { addChatEntry, updateChatEntry } = useChatHistory();
     const { settings, translateIncoming, consumeOutgoingTranslation } = useTranslation();
@@ -119,6 +125,10 @@ const useChatWidgetState = () => {
     }, [chatSettings]);
 
     useOctaneEvent<RoomSessionChatEvent>(RoomSessionChatEvent.CHAT_EVENT, async (event) => {
+        // The official client stops the server from sending wired whispers at all, so a disabled
+        // whisper never reaches the bubbles nor the chat history here either.
+        if (wiredWhisperDisabled && isWiredWhisper(event.chatType, event.style)) return;
+
         const roomObject = GetRoomEngine().getRoomObject(roomSession.roomId, event.objectId, RoomObjectCategory.UNIT);
         const bubbleLocation = roomObject ? GetRoomObjectScreenLocation(roomSession.roomId, roomObject?.id, RoomObjectCategory.UNIT) : { x: 0, y: 0 };
         const userData = roomObject ? roomSession.userDataManager.getUserDataByIndex(event.objectId) : new RoomUserData(-1);
@@ -364,13 +374,13 @@ const useChatWidgetState = () => {
 
         if (!parser.roomEnter) return;
 
-        setChatSettings(parser.chat);
+        setRoomChatSettings(parser.chat);
     });
 
     useMessageEvent<RoomChatSettingsEvent>(RoomChatSettingsEvent, (event) => {
         const parser = event.getParser();
 
-        setChatSettings(parser.chat);
+        setRoomChatSettings(parser.chat);
     });
 
     useEffect(() => {
