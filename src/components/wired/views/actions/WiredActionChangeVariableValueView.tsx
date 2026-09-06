@@ -59,7 +59,7 @@ const SECONDARY_FURNI_SOURCES: WiredSourceOption[] = sortWiredSourceOptions(
 );
 
 const GLOBAL_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.global' }];
-const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'Current execution' }];
+const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.context.current' }];
 
 const parseIds = (value: string): number[] => {
     if (!value?.length) return [];
