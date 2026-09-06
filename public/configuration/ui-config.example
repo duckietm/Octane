@@ -282,6 +282,7 @@
     "achievements.unseen.ignored": [
         "ACH_AllTimeHotelPresence"
     ],
+    "avatareditor.show.unowned.sellables": false,
     "avatareditor.show.clubitems.dimmed": true,
     "avatareditor.show.clubitems.first": true,
     "chat.history.max.items": 100,

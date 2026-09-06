@@ -19,6 +19,8 @@ const isNullTextureCrash = (err: unknown): boolean => {
     return NULL_TEXTURE_MARKERS.test(err.message ?? '');
 };
 
+let absorbedCount = 0;
+
 const guardMethod = (proto: MethodHost, methodName: string, label: string): boolean => {
     const original = proto[methodName];
     if (typeof original !== 'function') return false;
@@ -28,7 +30,13 @@ const guardMethod = (proto: MethodHost, methodName: string, label: string): bool
         try {
             return (original as AnyFn).apply(this, args);
         } catch (err) {
-            if (isNullTextureCrash(err)) return undefined;
+            if (isNullTextureCrash(err)) {
+                absorbedCount++;
+                if (absorbedCount <= 5 || absorbedCount % 500 === 0) {
+                    console.warn(`[OctanePixiPatch] absorbed null-texture crash #${absorbedCount} in ${label}.prototype.${methodName} — renderer texture-lifecycle bug resurfaced, please report`, err);
+                }
+                return undefined;
+            }
             throw err;
         }
     };

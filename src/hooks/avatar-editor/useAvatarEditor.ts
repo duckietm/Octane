@@ -347,7 +347,9 @@ const useAvatarEditorState = () => {
 
                 const isSellableNotOwned = partSet.isSellable && figureSetIds.indexOf(partSet.id) === -1;
 
-                if (isSellableNotOwned && buildMode !== buildModeNft && setType !== AvatarFigurePartType.PET) continue;
+                const showUnownedSellables = GetConfigurationValue<boolean>('avatareditor.show.unowned.sellables', false);
+
+                if (isSellableNotOwned && !showUnownedSellables && buildMode !== buildModeNft && setType !== AvatarFigurePartType.PET) continue;
 
                 let maxPaletteCount = 0;
 
