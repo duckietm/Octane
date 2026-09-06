@@ -14,12 +14,13 @@ import {
 import { AutoGrid, Button, Column, Flex, Grid, LayoutGridItem, Text } from '../../../../common';
 import { useInventoryTrade, useNotification } from '../../../../hooks';
 import { InventoryFurnitureSearchView } from './InventoryFurnitureSearchView';
+import { formatTradeOfferSummary, TRADE_GRID_COLUMNS, TRADE_SLOT_COUNT } from './inventoryTradeSummary';
 
 interface InventoryTradeViewProps {
     cancelTrade: () => void;
 }
 
-const MAX_ITEMS_TO_TRADE: number = 9;
+const MAX_ITEMS_TO_TRADE: number = TRADE_SLOT_COUNT;
 
 export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
     const { cancelTrade = null } = props;
@@ -165,6 +166,9 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
 
     if (tradeState === TradeState.TRADING_STATE_READY || !ownUser || !otherUser) return null;
 
+    const ownSummary = formatTradeOfferSummary(ownUser.itemCount, ownUser.creditsCount);
+    const otherSummary = formatTradeOfferSummary(otherUser.itemCount, otherUser.creditsCount);
+
     return (
         <Grid>
             <Column overflow="hidden" size={4}>
@@ -232,7 +236,10 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
                             </Text>
                             {getLockIcon(ownUser.accepts)}
                         </div>
-                        <AutoGrid columnCount={3}>
+                        <Text small className="octane-inventory-trade-summary" data-testid="trade-summary-own">
+                            {ownSummary.itemCount} / {ownSummary.creditValue}
+                        </Text>
+                        <AutoGrid columnCount={TRADE_GRID_COLUMNS}>
                             {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
                                 const item = ownUser.userItems.getWithIndex(i) || null;
 
@@ -271,7 +278,10 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
                             </Text>
                             {getLockIcon(otherUser.accepts)}
                         </div>
-                        <AutoGrid columnCount={3}>
+                        <Text small className="octane-inventory-trade-summary" data-testid="trade-summary-other">
+                            {otherSummary.itemCount} / {otherSummary.creditValue}
+                        </Text>
+                        <AutoGrid columnCount={TRADE_GRID_COLUMNS}>
                             {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
                                 const item = otherUser.userItems.getWithIndex(i) || null;
 

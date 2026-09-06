@@ -19,10 +19,10 @@ import {
     useInventoryFurni,
     useInventoryPrefixes,
     useInventoryTrade,
-    useWiredTrading,
     useInventoryUnseenTracker,
     useMessageEvent,
-    useOctaneEvent
+    useOctaneEvent,
+    useWiredTrading
 } from '../../hooks';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
@@ -30,7 +30,8 @@ import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitu
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
-import { FILTER_EVERYTHING, FILTER_FLOOR, FILTER_WALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
+import { filterInventoryGroupItems, MAIN_FILTER_ALL, TYPE_FILTER_ANY } from './views/furniture/inventoryFurniFilters';
+import { InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
 import { InventoryPrefixView } from './views/prefix/InventoryPrefixView';
 
@@ -57,7 +58,8 @@ export const InventoryView: FC<{}> = (props) => {
     const [roomSession, setRoomSession] = useState<IRoomSession>(null);
     const [roomPreviewer, setRoomPreviewer] = useState<RoomPreviewer>(null);
     const [searchValue, setSearchValue] = useState('');
-    const [filterType, setFilterType] = useState<string>(FILTER_EVERYTHING);
+    const [mainFilter, setMainFilter] = useState<string>(MAIN_FILTER_ALL);
+    const [typeFilter, setTypeFilter] = useState<string>(TYPE_FILTER_ANY);
     const { isTrading = false, stopTrading = null } = useInventoryTrade();
     const { isOpen: isWiredTrading = false } = useWiredTrading();
     const { getCount = null } = useInventoryUnseenTracker();
@@ -66,24 +68,21 @@ export const InventoryView: FC<{}> = (props) => {
 
     useEffect(() => {
         setSearchValue('');
-        setFilterType(FILTER_EVERYTHING);
+        setMainFilter(MAIN_FILTER_ALL);
+        setTypeFilter(TYPE_FILTER_ANY);
     }, [currentTab]);
 
-    const filteredGroupItems = useMemo(() => {
-        const comparison = searchValue.toLocaleLowerCase();
+    // Changing the main filter swaps the type list underneath it; keeping the old type id would
+    // silently filter with an option the dropdown no longer shows.
+    const onMainFilterChange = (value: string) => {
+        setMainFilter(value);
+        setTypeFilter(TYPE_FILTER_ANY);
+    };
 
-        if (filterType === FILTER_EVERYTHING) {
-            return groupItems.filter((item) => item.name.toLocaleLowerCase().includes(comparison));
-        }
-
-        return groupItems.filter((item) => {
-            const isWall = filterType === FILTER_WALL ? item.isWallItem : false;
-            const isFloor = filterType === FILTER_FLOOR ? !item.isWallItem : false;
-            const matchesSearch = item.name.toLocaleLowerCase().includes(comparison);
-
-            return comparison.length ? matchesSearch && (isWall || isFloor) : isWall || isFloor;
-        });
-    }, [groupItems, searchValue, filterType]);
+    const filteredGroupItems = useMemo(
+        () => filterInventoryGroupItems(groupItems, mainFilter, typeFilter, searchValue),
+        [groupItems, searchValue, mainFilter, typeFilter]
+    );
 
     const filteredBadgeCodes = useMemo(() => {
         const comparison = searchValue.toLocaleLowerCase().replace(' ', '');
@@ -215,10 +214,12 @@ export const InventoryView: FC<{}> = (props) => {
                             {showFilter && (
                                 <InventoryCategoryFilterView
                                     currentTab={currentTab}
-                                    filterType={filterType}
+                                    mainFilter={mainFilter}
                                     searchValue={searchValue}
-                                    onFilterTypeChange={setFilterType}
+                                    typeFilter={typeFilter}
+                                    onMainFilterChange={onMainFilterChange}
                                     onSearchChange={setSearchValue}
+                                    onTypeFilterChange={setTypeFilter}
                                 />
                             )}
                             <div className="flex-1 overflow-hidden">

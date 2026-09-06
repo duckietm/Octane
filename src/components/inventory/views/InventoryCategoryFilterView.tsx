@@ -1,24 +1,38 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../api';
 import { OctaneInput } from '../../../layout';
-
-// Filter option keys (also consumed by InventoryView's useMemo derivation).
-export const FILTER_EVERYTHING = 'inventory.filter.option.everything';
-export const FILTER_FLOOR = 'inventory.furni.tab.floor';
-export const FILTER_WALL = 'inventory.furni.tab.wall';
+import {
+    getInventoryMainFilterLabel,
+    getInventoryTypeFilterIds,
+    getInventoryTypeFilterLabel,
+    INVENTORY_MAIN_FILTER_IDS,
+    MAIN_FILTER_ALL,
+    TYPE_FILTER_ANY
+} from './furniture/inventoryFurniFilters';
 
 const TAB_BADGES = 'inventory.badges';
 
 interface InventoryCategoryFilterViewProps {
     currentTab: string;
     searchValue: string;
-    filterType: string;
+    mainFilter: string;
+    typeFilter: string;
     onSearchChange: (value: string) => void;
-    onFilterTypeChange: (value: string) => void;
+    onMainFilterChange: (value: string) => void;
+    onTypeFilterChange: (value: string) => void;
 }
 
 export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> = (props) => {
-    const { currentTab = null, searchValue = '', filterType = FILTER_EVERYTHING, onSearchChange = null, onFilterTypeChange = null } = props;
+    const {
+        currentTab = null,
+        searchValue = '',
+        mainFilter = MAIN_FILTER_ALL,
+        typeFilter = TYPE_FILTER_ANY,
+        onSearchChange = null,
+        onMainFilterChange = null,
+        onTypeFilterChange = null
+    } = props;
+    const typeFilterIds = getInventoryTypeFilterIds(mainFilter);
 
     return (
         <div className={`octane-inventory-filter-bar flex gap-1 rounded p-1 shrink-0 ${currentTab === TAB_BADGES ? 'is-badges' : ''}`}>
@@ -34,17 +48,34 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
                 )}
             </div>
             {currentTab !== TAB_BADGES && (
-                <select
-                    className="form-select text-xs rounded px-1 py-0 border border-gray-400 bg-white cursor-pointer"
-                    value={filterType}
-                    onChange={(event) => onFilterTypeChange?.(event.target.value)}
-                >
-                    {[FILTER_EVERYTHING, FILTER_FLOOR, FILTER_WALL].map((type, index) => (
-                        <option key={index} value={type}>
-                            {LocalizeText(type)}
-                        </option>
-                    ))}
-                </select>
+                <>
+                    <select
+                        aria-label={getInventoryMainFilterLabel(MAIN_FILTER_ALL)}
+                        className="form-select text-xs rounded px-1 py-0 border border-gray-400 bg-white cursor-pointer"
+                        data-testid="inventory-main-filter"
+                        value={mainFilter}
+                        onChange={(event) => onMainFilterChange?.(event.target.value)}
+                    >
+                        {INVENTORY_MAIN_FILTER_IDS.map((id) => (
+                            <option key={id} value={id}>
+                                {getInventoryMainFilterLabel(id)}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        aria-label={getInventoryTypeFilterLabel(TYPE_FILTER_ANY)}
+                        className="form-select text-xs rounded px-1 py-0 border border-gray-400 bg-white cursor-pointer"
+                        data-testid="inventory-type-filter"
+                        value={typeFilterIds.indexOf(typeFilter) >= 0 ? typeFilter : TYPE_FILTER_ANY}
+                        onChange={(event) => onTypeFilterChange?.(event.target.value)}
+                    >
+                        {typeFilterIds.map((id) => (
+                            <option key={id} value={id}>
+                                {getInventoryTypeFilterLabel(id)}
+                            </option>
+                        ))}
+                    </select>
+                </>
             )}
         </div>
     );

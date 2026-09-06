@@ -18,6 +18,7 @@ import { useMessageEvent, useNotification, usePurse } from '../../../../../../ho
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { CatalogLayoutMarketplaceItemView, PUBLIC_OFFER } from './CatalogLayoutMarketplaceItemView';
 import { SearchFormView } from './CatalogLayoutMarketplaceSearchFormView';
+import { MarketplaceOfferDetailsView } from './MarketplaceOfferDetailsView';
 
 const SORT_TYPES_VALUE = [1, 2];
 const SORT_TYPES_ACTIVITY = [3, 4, 5, 6];
@@ -28,6 +29,7 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
     const [searchType, setSearchType] = useState(MarketplaceSearchType.BY_ACTIVITY);
     const [totalItemsFound, setTotalItemsFound] = useState(0);
     const [offers, setOffers] = useState(new Map<number, MarketplaceOfferData>());
+    const [detailsOffer, setDetailsOffer] = useState<MarketplaceOfferData>(null);
     const [lastSearch, setLastSearch] = useState<IMarketplaceSearchOptions>({ minPrice: -1, maxPrice: -1, query: '', type: 3 });
     const { getCurrencyAmount = null } = usePurse();
     const { simpleAlert = null, showConfirm = null } = useNotification();
@@ -106,6 +108,8 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
 
         setTotalItemsFound(parser.totalItemsFound);
         setOffers(latestOffers);
+        // A fresh list means the details page could be describing an offer that no longer exists.
+        setDetailsOffer(null);
     });
 
     useMessageEvent<MarketplaceBuyOfferResultEvent>(MarketplaceBuyOfferResultEvent, (event) => {
@@ -181,6 +185,8 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
         }
     });
 
+    if (detailsOffer) return <MarketplaceOfferDetailsView offerData={detailsOffer} onBack={() => setDetailsOffer(null)} onBuy={purchaseItem} />;
+
     return (
         <>
             <div className="relative inline-flex align-middle">
@@ -201,7 +207,13 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                 </Text>
                 <Column className="octane-catalog-layout-marketplace-grid" overflow="auto">
                     {Array.from(offers.values()).map((entry, index) => (
-                        <CatalogLayoutMarketplaceItemView key={index} offerData={entry} type={PUBLIC_OFFER} onClick={purchaseItem} />
+                        <CatalogLayoutMarketplaceItemView
+                            key={index}
+                            offerData={entry}
+                            type={PUBLIC_OFFER}
+                            onClick={purchaseItem}
+                            onViewMore={setDetailsOffer}
+                        />
                     ))}
                 </Column>
             </Column>

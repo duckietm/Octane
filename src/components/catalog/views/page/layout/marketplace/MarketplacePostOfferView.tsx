@@ -1,10 +1,11 @@
 import { MakeOfferMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { FurnitureItem, LocalizeText, ProductTypeEnum, SendMessageComposer } from '../../../../../../api';
+import { FurnitureItem, LocalizeText, localizeWithFallback, ProductTypeEnum, SendMessageComposer } from '../../../../../../api';
 import { Button, Column, Grid, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../../common';
 import { CatalogPostMarketplaceOfferEvent } from '../../../../../../events';
-import { useMarketplaceConfiguration, useNotification, useUiEvent } from '../../../../../../hooks';
+import { getMarketplaceStatsCategory, useMarketplaceConfiguration, useMarketplaceItemStats, useNotification, useUiEvent } from '../../../../../../hooks';
 import { OctaneInput } from '../../../../../../layout';
+import { getMarketplacePriceWithoutCommission, resolveCopiedSuggestedPrice } from './marketplacePostOffer.helpers';
 
 let isPostingMarketplaceOffer = false;
 
@@ -13,6 +14,10 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
     const [askingPrice, setAskingPrice] = useState(0);
     const [tempAskingPrice, setTempAskingPrice] = useState('0');
     const { data: marketplaceConfiguration = null } = useMarketplaceConfiguration({ enabled: !!item });
+    const isUniqueLimitedItem = !!item?.stuffData && item.stuffData.uniqueNumber > 0;
+    const { data: itemStats = null } = useMarketplaceItemStats(getMarketplaceStatsCategory(!!item?.isWallItem, isUniqueLimitedItem), item?.type ?? 0, {
+        enabled: !!item
+    });
     const { showConfirm = null } = useNotification();
 
     const updateAskingPrice = (price: string) => {
@@ -39,6 +44,15 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
     const getFurniDescription = item ? LocalizeText(item.isWallItem ? 'wallItem.desc.' + item.type : 'roomItem.desc.' + item.type) : '';
 
     const getCommission = () => Math.max(Math.ceil(marketplaceConfiguration.commission * 0.01 * askingPrice), 1);
+
+    // The official make-offer window hides each stat line while its value is 0; the lowest and
+    // suggested prices stay 0 until the renderer parser carries the AIR 13 fields.
+    const averagePrice = itemStats?.averagePrice ?? 0;
+    const lowestPrice = itemStats?.lowestCurrentPrice ?? 0;
+    const suggestedPrice = itemStats?.suggestedPrice ?? 0;
+    const averagePriceDays = itemStats?.historyLength > 0 ? itemStats.historyLength : 30;
+
+    const copySuggestedPrice = () => updateAskingPrice(resolveCopiedSuggestedPrice(suggestedPrice, askingPrice).toString());
 
     const postItem = () => {
         if (!item || askingPrice < marketplaceConfiguration.minimumPrice || isPostingMarketplaceOffer) return;
@@ -86,6 +100,45 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
                             <Text italics>
                                 {LocalizeText('inventory.marketplace.make_offer.expiration_info', ['time'], [marketplaceConfiguration.offerTime.toString()])}
                             </Text>
+                            {averagePrice > 0 && (
+                                <Text small data-testid="marketplace-average-price">
+                                    {localizeWithFallback(
+                                        'inventory.marketplace.make_offer.average_price',
+                                        'Average price in last %days% days: %price% credits (%price_no_commission% without the commission).',
+                                        ['days', 'price', 'price_no_commission'],
+                                        [
+                                            averagePriceDays.toString(),
+                                            averagePrice.toString(),
+                                            getMarketplacePriceWithoutCommission(averagePrice, marketplaceConfiguration.commission).toString()
+                                        ]
+                                    )}
+                                </Text>
+                            )}
+                            {lowestPrice > 0 && (
+                                <Text small data-testid="marketplace-lowest-price">
+                                    {localizeWithFallback(
+                                        'inventory.marketplace.make_offer.lowest_price',
+                                        'Lowest current price: %price% credits',
+                                        ['price'],
+                                        [lowestPrice.toString()]
+                                    )}
+                                </Text>
+                            )}
+                            {suggestedPrice > 0 && (
+                                <div className="flex items-center gap-1">
+                                    <Text small data-testid="marketplace-suggested-price">
+                                        {localizeWithFallback(
+                                            'inventory.marketplace.make_offer.suggested_price',
+                                            'Suggested price: %price% credits',
+                                            ['price'],
+                                            [suggestedPrice.toString()]
+                                        )}
+                                    </Text>
+                                    <Button variant="secondary" onClick={copySuggestedPrice}>
+                                        {localizeWithFallback('inventory.marketplace.make_offer.copy_suggested_price', 'Copy suggested price')}
+                                    </Button>
+                                </div>
+                            )}
                             <div className="input-group has-validation">
                                 <OctaneInput
                                     min={0}
