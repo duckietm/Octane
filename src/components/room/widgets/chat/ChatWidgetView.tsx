@@ -4,7 +4,7 @@ import { ChatBubbleMessage, GetConfigurationValue } from '../../../../api';
 import { useChatWidget, useChatWindow } from '../../../../hooks';
 import IntervalWebWorker from '../../../../workers/IntervalWebWorker';
 import { WorkerBuilder } from '../../../../workers/WorkerBuilder';
-import { CHAT_TEXT_SIZE_EVENT, CHAT_TEXT_SIZE_PIXELS } from '../chat-input/chatTextSize';
+import { CHAT_TEXT_SIZE_EVENT, CHAT_TEXT_SIZE_PIXELS, getStoredChatTextSize } from '../chat-input/chatTextSize';
 import { ChatWidgetMessageView } from './ChatWidgetMessageView';
 import { ChatWidgetWindowView } from './ChatWidgetWindowView';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
@@ -42,7 +42,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
             const visualOffsets = measureBubbleVisualOffsets(chat.elementRef);
 
             chat.width = chat.elementRef.offsetWidth;
-            chat.height = getBubbleCollisionHeight(chat.elementRef.offsetHeight, getChatFontSizeScale(CHAT_TEXT_SIZE_PIXELS[chat.textSize]));
+            chat.height = getBubbleCollisionHeight(chat.elementRef.offsetHeight, getChatFontSizeScale(CHAT_TEXT_SIZE_PIXELS[getStoredChatTextSize()]));
             chat.visualOffsetTop = visualOffsets.top;
             chat.visualOffsetBottom = visualOffsets.bottom;
         });

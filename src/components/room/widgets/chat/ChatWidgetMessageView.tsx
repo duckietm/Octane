@@ -162,7 +162,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
 
         const observer = new ResizeObserver(() => {
             const { offsetWidth: width, offsetHeight: height } = element;
-            const collisionHeight = getBubbleCollisionHeight(height, getChatFontSizeScale(CHAT_TEXT_SIZE_PIXELS[chat.textSize]));
+            const collisionHeight = getBubbleCollisionHeight(height, getChatFontSizeScale(CHAT_TEXT_SIZE_PIXELS[getStoredChatTextSize()]));
 
             if (width === chat.width && collisionHeight === chat.height) return;
 
