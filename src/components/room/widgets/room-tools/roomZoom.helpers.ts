@@ -181,8 +181,12 @@ const getRoomCanvasOrigin = (canvas: IRoomRenderingCanvas): RoomZoomAnchor | nul
     return { x: canvas.screenOffsetX + (sign * canvas.width) / 2, y: canvas.screenOffsetY + (sign * canvas.height) / 2 };
 };
 
+// The published engine types the anchor as a pixi Point while only reading x and y; the renderer
+// change that goes with this one widens it to a plain point, so the cast goes away with it.
+type CanvasScaleAnchor = Parameters<ReturnType<typeof GetRoomEngine>['setRoomInstanceRenderingCanvasScale']>[3];
+
 const setCanvasScale = (roomId: number, displayScale: number, anchor: RoomZoomAnchor | null, isAnimated: boolean): void => {
-    GetRoomEngine().setRoomInstanceRenderingCanvasScale(roomId, ROOM_ZOOM_CANVAS_ID, displayScale, anchor, null, false, isAnimated);
+    GetRoomEngine().setRoomInstanceRenderingCanvasScale(roomId, ROOM_ZOOM_CANVAS_ID, displayScale, anchor as unknown as CanvasScaleAnchor, null, false, isAnimated);
 };
 
 // Switches the geometry for the requested logical scale and returns the
