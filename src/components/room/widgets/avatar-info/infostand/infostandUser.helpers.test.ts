@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BadgeLeaderboardResponse } from '../../../../../api';
-import { getBadgesRank, getRealNameLine } from './infostandUser.helpers';
+import { getBadgesRank, getRealNameLine, getUserHomePageUrl } from './infostandUser.helpers';
 
 const leaderboard = {
     viewerUserId: 7,
@@ -35,5 +35,17 @@ describe('infostandUser.helpers', () => {
         expect(getRealNameLine('  John Doe ')).toBe('John Doe');
         expect(getRealNameLine(null)).toBe('');
         expect(getRealNameLine('   ')).toBe('');
+    });
+});
+
+describe('getUserHomePageUrl', () => {
+    it('fills the official userpage format with id and name', () => {
+        expect(getUserHomePageUrl('https://hotel.test/home/%username%?id=%ID%', 12, 'Simo Leo')).toBe('https://hotel.test/home/Simo%20Leo?id=12');
+    });
+
+    it('returns an empty url without a format or a valid user', () => {
+        expect(getUserHomePageUrl('', 12, 'Simo')).toBe('');
+        expect(getUserHomePageUrl(undefined, 12, 'Simo')).toBe('');
+        expect(getUserHomePageUrl('https://hotel.test/%ID%', 0, 'Simo')).toBe('');
     });
 });

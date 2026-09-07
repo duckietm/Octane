@@ -1,5 +1,15 @@
 export type { DoorStateSnapshot } from '../rooms/widgets/useDoorState';
 export { useDoorState } from '../rooms/widgets/useDoorState';
+export type { EnforceableCategory, EnforceCategoryUpdate } from './navigatorEnforceCategory';
+export {
+    buildEnforceCategoryUpdate,
+    ENFORCE_CATEGORY_TRADE_KEYS,
+    getEnforceableCategories,
+    MY_ROOMS_SEARCH_CODE,
+    shouldReloadRoomListAfterSettingsSaved
+} from './navigatorEnforceCategory';
+export type { NavigatorEnforceCategoryState } from './navigatorEnforceCategoryStore';
+export { useNavigatorEnforceCategoryStore } from './navigatorEnforceCategoryStore';
 export type { NavigatorHoverItem, NavigatorHoverItemId } from './navigatorHoverMenu';
 export { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NAVIGATOR_HOVER_LINKS } from './navigatorHoverMenu';
 export type { NavigatorRoomInfoAnchorKind, NavigatorRoomInfoPopupActions, NavigatorRoomInfoPopupState } from './navigatorRoomInfoPopupStore';

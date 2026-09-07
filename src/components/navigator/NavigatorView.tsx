@@ -28,6 +28,7 @@ import {
     useOctaneEvent
 } from '../../hooks';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
+import { NavigatorEnforceCategoryView } from './views/NavigatorEnforceCategoryView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
 import { NavigatorRoomLinkView } from './views/NavigatorRoomLinkView';
@@ -340,6 +341,9 @@ export const NavigatorView: FC<{}> = () => {
             <NavigatorRoomInfoPopupView />
             <WidgetErrorBoundary name="NavigatorDoorState">
                 <NavigatorDoorStateView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="NavigatorEnforceCategory">
+                <NavigatorEnforceCategoryView />
             </WidgetErrorBoundary>
             {isRoomInfoOpen && (
                 <WidgetErrorBoundary name="NavigatorRoomInfo">

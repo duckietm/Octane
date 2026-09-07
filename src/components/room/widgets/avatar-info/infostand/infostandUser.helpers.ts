@@ -29,3 +29,18 @@ export const getBadgesRank = (leaderboard: BadgeLeaderboardResponse | null, user
  * official client hides the row for an empty string (setRealName).
  */
 export const getRealNameLine = (realName: string | null | undefined): string => (realName || '').trim();
+
+/**
+ * The official infostand home icon opens the user's Habbo Home page in the
+ * browser (InfoStandWidgetHandler, RWUAM_OPEN_HOME_PAGE ->
+ * SessionDataManager.openHabboHomePage): the `link.format.userpage`
+ * property with %ID% / %username% filled in. Without the property the
+ * official does nothing; we fall back to the in-client profile instead.
+ */
+export const getUserHomePageUrl = (format: string | null | undefined, userId: number, username: string | null | undefined): string => {
+    const template = (format || '').trim();
+
+    if (!template || !Number.isInteger(userId) || userId <= 0) return '';
+
+    return template.replace(/%ID%/g, String(userId)).replace(/%username%/g, encodeURIComponent((username || '').trim()));
+};

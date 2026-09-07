@@ -9,6 +9,16 @@ import {
     LocalizeBadgeName,
     LocalizeText
 } from '../../api';
+import {
+    badgeRarityColorToCss,
+    formatBadgeOwnerCount,
+    getBadgeRarityGlowColor,
+    getBadgeRarityLabelKey,
+    getBadgeRarityTagColor,
+    getBadgeRarityTier,
+    isBadgeRarityStandaloneTier,
+    shouldShowBadgeOwnerCount
+} from '../../api/badges/badgeRarity';
 import { Base, BaseProps } from '../Base';
 import { useTooltip } from '../Tooltip';
 
@@ -23,15 +33,16 @@ export interface LayoutBadgeImageViewProps extends BaseProps<HTMLDivElement> {
     highlightRarity?: boolean;
 }
 
-/* Glow around the badge itself (highlightRarity); the tooltip is the skinned
-   dark bubble, so the rarity line inside it is plain white text. */
-const BADGE_RARITY_GLOW: Record<string, string> = {
-    common: 'rgba(148, 163, 184, 0.55)',
-    rare: 'rgba(59, 130, 246, 0.7)',
-    epic: 'rgba(168, 85, 247, 0.72)',
-    legendary: 'rgba(249, 115, 22, 0.76)',
-    mythical: 'rgba(236, 72, 153, 0.76)',
-    unique: 'rgba(34, 197, 94, 0.76)'
+/* Glow around the badge itself (highlightRarity). The official infostand
+   (InfoStandUserView.setBadge) only glows standalone tiers — rare and above,
+   plus uncommon when `badge_rarity.uncommon` is on — in the tier's colour;
+   anything else stays flat. */
+const glowCss = (color: number): string => {
+    const red = (color >> 16) & 0xff;
+    const green = (color >> 8) & 0xff;
+    const blue = color & 0xff;
+
+    return `rgba(${red}, ${green}, ${blue}, 0.75)`;
 };
 
 export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
@@ -54,6 +65,8 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const tooltipsEnabled = showInfo && GetConfigurationValue<boolean>('badge.descriptions.enabled', true);
+    const uncommonRarityEnabled = GetConfigurationValue<boolean>('badge_rarity.uncommon', false) === true;
+    const rarityTier = badgeRarityStat ? getBadgeRarityTier(badgeRarityStat.rarity) : null;
 
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = ['relative w-[40px] h-[40px] bg-no-repeat bg-center'];
@@ -85,19 +98,17 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
             }
         }
 
-        if (highlightRarity && badgeRarityStat) {
-            const glow = BADGE_RARITY_GLOW[badgeRarityStat.rarity];
+        if (highlightRarity && rarityTier !== null && isBadgeRarityStandaloneTier(rarityTier, uncommonRarityEnabled)) {
+            const glow = glowCss(getBadgeRarityGlowColor(rarityTier, uncommonRarityEnabled));
 
-            if (glow) {
-                newStyle.borderRadius = 8;
-                newStyle.boxShadow = `0 0 0 1px ${glow}, 0 0 14px ${glow}`;
-            }
+            newStyle.borderRadius = 8;
+            newStyle.boxShadow = `0 0 0 1px ${glow}, 0 0 14px ${glow}`;
         }
 
         if (Object.keys(style).length) newStyle = { ...newStyle, ...style };
 
         return newStyle;
-    }, [badgeCode, badgeRarityStat, highlightRarity, isGroup, imageElement, scale, style]);
+    }, [badgeCode, rarityTier, highlightRarity, isGroup, imageElement, scale, style, uncommonRarityEnabled]);
 
     useEffect(() => {
         if (!badgeCode || !badgeCode.length) return;
@@ -181,9 +192,14 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
         };
     }, [badgeCode, highlightRarity, isGroup, showRarityInfo]);
 
-    const rarityLabel = badgeRarityStat ? LocalizeText(`badge.rarity.${badgeRarityStat.rarity}`) : '';
-    const rarityText = badgeRarityStat ? LocalizeText('badge.rarity.badge', ['rarity'], [rarityLabel]) : '';
-    const ownersText = badgeRarityStat ? LocalizeText('badge.owner_count', ['count'], [badgeRarityStat.ownerCount.toString()]) : '';
+    // Official badge_details bubble: a coloured "rarity_tag" with "<Tier> badge"
+    // (non-standalone tiers read "Common"), and an owner count only while it
+    // stays under 1000 (BadgeOwnerCountUtils.shouldShowOwnerCount).
+    const rarityLabel = rarityTier !== null ? LocalizeText(getBadgeRarityLabelKey(rarityTier, uncommonRarityEnabled)) : '';
+    const rarityText = rarityTier !== null ? LocalizeText('badge.rarity.badge', ['rarity'], [rarityLabel]) : '';
+    const rarityTagColor = rarityTier !== null ? badgeRarityColorToCss(getBadgeRarityTagColor(rarityTier, uncommonRarityEnabled)) : '';
+    const showOwnerCount = !!badgeRarityStat && shouldShowBadgeOwnerCount(badgeRarityStat.ownerCount);
+    const ownersText = showOwnerCount ? LocalizeText('badge.owner_count', ['count'], [formatBadgeOwnerCount(badgeRarityStat.ownerCount)]) : '';
 
     // The badge element itself is the hover target: wrapping it would change
     // the grid cell it sits in, so the headless hook spreads onto Base instead.
@@ -193,10 +209,16 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
         content: tooltipsEnabled ? (
             <>
                 <div className="font-bold">{isGroup ? customTitle : LocalizeBadgeName(badgeCode)}</div>
-                {showRarityInfo && badgeRarityStat && (
+                {showRarityInfo && rarityTier !== null && (
                     <div className="mb-1">
-                        <div className="font-bold uppercase text-[10px] tracking-[0.04em]">{rarityText}</div>
-                        <div className="text-[10px] opacity-80">{ownersText}</div>
+                        <div
+                            className="octane-badge-rarity-tag inline-block rounded-[3px] px-[5px] py-[2px] font-bold text-[10px] tracking-[0.04em] text-white"
+                            data-rarity-tier={rarityTier}
+                            style={{ backgroundColor: rarityTagColor }}
+                        >
+                            {rarityText}
+                        </div>
+                        {showOwnerCount && <div className="text-[10px] opacity-80">{ownersText}</div>}
                     </div>
                 )}
                 <div>{isGroup ? LocalizeText('group.badgepopup.body') : LocalizeBadgeDescription(badgeCode)}</div>

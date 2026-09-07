@@ -2127,3 +2127,51 @@
 }
 
 
+
+/* Official enforce_category layout: body text, category drop menu, trade
+   settings label + drop menu, centred OK button (310x240, no close button). */
+.octane-navigator-enforce-category__content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px 8px 8px;
+}
+
+.octane-navigator-enforce-category__body {
+    font-weight: bold;
+    white-space: pre-line;
+}
+
+.octane-navigator-enforce-category__label {
+    margin-top: 4px;
+    font-weight: bold;
+}
+
+.octane-navigator-enforce-category__select {
+    width: 100%;
+    height: 23px;
+    padding: 0 6px;
+    border: 1px solid #a5a5a5;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #000000;
+    font: inherit;
+}
+
+.octane-navigator-enforce-category__ok {
+    align-self: center;
+    width: 132px;
+    height: 32px;
+    margin-top: 8px;
+    border: 1px solid #2f5a7a;
+    border-radius: 4px;
+    background: linear-gradient(#5ea3c8, #418db0);
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.octane-navigator-enforce-category__ok:disabled {
+    opacity: 0.5;
+    cursor: default;
+}

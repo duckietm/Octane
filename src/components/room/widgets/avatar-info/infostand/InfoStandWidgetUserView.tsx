@@ -18,6 +18,7 @@ import {
     GetUserProfile,
     LocalizeText,
     localizeWithFallback,
+    OpenUrl,
     SendMessageComposer
 } from '../../../../../api';
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
@@ -28,7 +29,7 @@ import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
-import { getBadgesRank, getRealNameLine } from './infostandUser.helpers';
+import { getBadgesRank, getRealNameLine, getUserHomePageUrl } from './infostandUser.helpers';
 
 interface InfoStandWidgetUserViewProps {
     avatarInfo: AvatarInfoUser;
@@ -83,6 +84,21 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const handleProfileClick = useCallback(() => {
         GetUserProfile(avatarInfo.webID);
     }, [avatarInfo.webID]);
+
+    // Official home icon (RWUAM_OPEN_HOME_PAGE): the Habbo Home web page of
+    // the viewed user, built from `link.format.userpage`. Without the
+    // property there is no home page to open, so the profile stays the target.
+    const homePageUrl = getUserHomePageUrl(GetConfigurationValue<string>('link.format.userpage', ''), avatarInfo.webID, avatarInfo.name);
+    const homeLabel = homePageUrl ? localizeWithFallback('infostand.link.home.tooltip', 'Open Habbo Home') : LocalizeText('infostand.profile.link.tooltip');
+
+    const handleHomeClick = useCallback(() => {
+        if (homePageUrl) {
+            OpenUrl(homePageUrl);
+            return;
+        }
+
+        GetUserProfile(avatarInfo.webID);
+    }, [avatarInfo.webID, homePageUrl]);
 
     const handleEditClick = useCallback((event: React.MouseEvent) => {
         event.stopPropagation();
@@ -215,8 +231,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <button
                         type="button"
                         className="octane-infostand__home"
-                        aria-label={LocalizeText('infostand.profile.link.tooltip')}
-                        onClick={handleProfileClick}
+                        aria-label={homeLabel}
+                        title={homePageUrl ? homeLabel : undefined}
+                        onClick={handleHomeClick}
                     >
                         <img src={homeIcon} alt="" draggable={false} />
                     </button>
