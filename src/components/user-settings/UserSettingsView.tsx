@@ -13,7 +13,7 @@ import {
     UserSettingsSoundComposer
 } from '@octane/renderer';
 import { FC, ReactNode, useEffect, useState } from 'react';
-import { DispatchMainEvent, DispatchUiEvent, localizeWithFallback, SendMessageComposer } from '../../api';
+import { DispatchMainEvent, DispatchUiEvent, GetConfigurationValue, localizeWithFallback, SendMessageComposer } from '../../api';
 import { DraggableWindow } from '../../common';
 import {
     useCatalogDisplayPreferences,
@@ -244,6 +244,18 @@ export const UserSettingsView: FC<{}> = () => {
                     <button className="air-settings-button" onClick={() => openMenuSection('privacy')} type="button">
                         {localizeWithFallback('privacy.settings.title', 'Game Privacy')}
                     </button>
+                    {GetConfigurationValue<boolean>('user.custom.filter.enabled', true) && (
+                        <button
+                            className="air-settings-button"
+                            onClick={() => {
+                                CreateLinkEvent('word-filter/show');
+                                closeView();
+                            }}
+                            type="button"
+                        >
+                            {localizeWithFallback('word_filter.settings.title', 'Word filter')}
+                        </button>
+                    )}
                     <button className="air-settings-button" onClick={() => CreateLinkEvent('user-account-settings/show')} type="button">
                         {localizeWithFallback('usersettings.open.title', 'User Settings')}
                     </button>

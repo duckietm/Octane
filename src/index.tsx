@@ -76,6 +76,7 @@ import './css/slider.css';
 import './css/toolbar/ToolBar.css';
 import './css/user-profile/UserProfileView.css';
 import './css/user-settings/UserSettingsView.css';
+import './css/user-settings/WordFilterSettingsView.css';
 
 import './css/vault/VaultView.css';
 import './css/widgets/FurnitureWidgets.css';

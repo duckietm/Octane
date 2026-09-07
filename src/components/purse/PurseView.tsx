@@ -55,6 +55,8 @@ export const PurseView: FC<{}> = (props) => {
 
     const displayedCurrencies = useMemo(() => GetConfigurationValue<number[]>('system.currency.types', []), []);
     const currencyDisplayNumberShort = useMemo(() => GetConfigurationValue<boolean>('currency.display.number.short', false), []);
+    // AIR 13 SettingsExtension shows the "Word filter" row only when user.custom.filter.enabled is on.
+    const wordFilterEnabled = useMemo(() => GetConfigurationValue<boolean>('user.custom.filter.enabled', true), []);
 
     const currencyTypes = useMemo(() => {
         if (!purse || !purse.activityPoints || !purse.activityPoints.size) return [];
@@ -266,9 +268,18 @@ export const PurseView: FC<{}> = (props) => {
                         >
                             {localizeWithFallback('purse.settings.account', 'Account Management')}
                         </button>
-                        <button type="button" className="octane-purse-menu__item octane-purse-menu__item--disabled" disabled>
-                            {localizeWithFallback('purse.settings.wordfilter', 'Word Filter')}
-                        </button>
+                        {wordFilterEnabled && (
+                            <button
+                                type="button"
+                                className="octane-purse-menu__item"
+                                onClick={() => {
+                                    CreateLinkEvent('word-filter/show');
+                                    setSettingsMenuOpen(false);
+                                }}
+                            >
+                                {localizeWithFallback('word_filter.settings.title', localizeWithFallback('purse.settings.wordfilter', 'Word Filter'))}
+                            </button>
+                        )}
                     </div>,
                     document.body
                 )}

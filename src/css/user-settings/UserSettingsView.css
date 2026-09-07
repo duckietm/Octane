@@ -11,8 +11,8 @@
 
 .user-settings-window.air-settings-window {
     --air-settings-width: 180px;
-    --air-settings-height: 225px;
-    --air-settings-back-top: 187px;
+    --air-settings-height: 250px;
+    --air-settings-back-top: 212px;
 
     position: relative;
     box-sizing: border-box;
@@ -202,7 +202,7 @@
     left: 10px;
     display: flex;
     width: 160px;
-    height: 147px;
+    height: 172px;
     flex-direction: column;
     gap: 3px;
 }
