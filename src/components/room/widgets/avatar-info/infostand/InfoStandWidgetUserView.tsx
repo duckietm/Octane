@@ -19,6 +19,7 @@ import {
     LocalizeText,
     localizeWithFallback,
     OpenUrl,
+    rememberBadgeRarityFromPacket,
     SendMessageComposer
 } from '../../../../../api';
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
@@ -126,6 +127,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
 
     useOctaneEvent<RoomSessionUserBadgesEvent>(RoomSessionUserBadgesEvent.RSUBE_BADGES, (event) => {
         if (!avatarInfo || avatarInfo.webID !== event.userId) return;
+
+        rememberBadgeRarityFromPacket(event.badgeDetails);
 
         // Deduplicate badges from server
         const seen = new Set<string>();

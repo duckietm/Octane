@@ -84,7 +84,7 @@ export interface SnowWarLobbyTeamsState {
     leaderUserId: number;
     selectedArenaId: number;
     arenas: { id: number; name: string; official: boolean }[];
-    players: { userId: number; teamId: number; name: string; figure: string; gender: string }[];
+    players: { userId: number; teamId: number; name: string; figure: string; gender: string; skillLevel?: number }[];
 }
 
 export interface SnowWarResultsState {
@@ -94,16 +94,21 @@ export interface SnowWarResultsState {
         score: number;
         players: SnowWarResultPlayer[];
     }[];
-    /** AIR Game2SnowWarGameStats: user ids of the "Most Hits" / "Most K.O.'s" players (absent from our packet). */
+    /**
+     * AIR Game2SnowWarGameStats: user ids of the "Most Hits" / "Most K.O.'s"
+     * players, read from the optional stats tail of OnGameEnding (5022);
+     * undefined when the server sent none.
+     */
     playerWithMostHits?: number;
     playerWithMostKills?: number;
 }
 
 /**
  * One row of the end-of-game screen. AIR's Game2TeamPlayerData also carries
- * the figure, gender and per-player stats (hits, kills, ...); our OnGameEnding
- * packet only sends id, name and score, so those stay optional and the view
- * falls back to the arena's level data for the figure.
+ * the figure, gender and per-player stats (hits, kills, ...); OnGameEnding
+ * (5022) appends them as an optional tail, so they stay optional and the view
+ * falls back to the arena's level data for the figure when an older server
+ * omits them.
  */
 export interface SnowWarResultPlayer {
     userId: number;
@@ -433,6 +438,7 @@ const useSnowWarState = () =>
                 name: player.name,
                 figure: player.figure,
                 gender: player.gender,
+                skillLevel: player.skillLevel,
             })),
         });
     }, []);
@@ -518,7 +524,11 @@ const useSnowWarState = () =>
     {
         const parser = event.getParser();
         if (!parser) return;
-        const nextResults = { secondsToResults: parser.secondsToResults, teams: parser.teams };
+        const nextResults: SnowWarResultsState = { secondsToResults: parser.secondsToResults, teams: parser.teams };
+        if (parser.hasPlayerStats) {
+            nextResults.playerWithMostHits = parser.playerWithMostHits || undefined;
+            nextResults.playerWithMostKills = parser.playerWithMostKills || undefined;
+        }
         setResults(nextResults);
         setPhase('results');
     }, []);

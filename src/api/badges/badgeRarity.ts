@@ -64,6 +64,43 @@ const TAG_DARKEN_BY_TIER: Record<number, number> = {
 
 export const BADGE_RARITY_COMMON_LABEL_KEY = 'badge.rarity.common';
 
+/** Rarity data as UserCurrentBadges (1087) carries it per worn slot. */
+export interface BadgePacketRarity {
+    ownerCount: number;
+    tier: number;
+}
+
+export interface BadgePacketRarityInput {
+    badgeCode: string;
+    ownerCount: number;
+    badgeRarityId: number;
+}
+
+const PACKET_RARITY_BY_CODE = new Map<string, BadgePacketRarity>();
+
+export const isBadgeRarityTierId = (tier: number): tier is BadgeRarityTierId =>
+    Number.isInteger(tier) && tier >= BadgeRarityTier.COMMON && tier <= BadgeRarityTier.UNIQUE;
+
+/**
+ * Remembers the owner count and tier the server sent for the worn badges of
+ * a user, so the badge views can label them without the leaderboard fetch.
+ * Slots with an unknown tier id are ignored.
+ */
+export const rememberBadgeRarityFromPacket = (details: readonly BadgePacketRarityInput[] | null | undefined): void => {
+    if (!details?.length) return;
+
+    for (const detail of details) {
+        if (!detail?.badgeCode || !isBadgeRarityTierId(detail.badgeRarityId)) continue;
+
+        PACKET_RARITY_BY_CODE.set(detail.badgeCode, { ownerCount: Math.max(0, Math.floor(detail.ownerCount || 0)), tier: detail.badgeRarityId });
+    }
+};
+
+export const getBadgeRarityFromPacket = (badgeCode: string | null | undefined): BadgePacketRarity | null =>
+    (badgeCode && PACKET_RARITY_BY_CODE.get(badgeCode)) || null;
+
+export const clearBadgeRarityFromPacket = (): void => PACKET_RARITY_BY_CODE.clear();
+
 export const getBadgeRarityTier = (key: string | null | undefined): BadgeRarityTierId => {
     if (!key) return BadgeRarityTier.COMMON;
 

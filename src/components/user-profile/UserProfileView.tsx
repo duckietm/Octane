@@ -13,7 +13,7 @@ import {
     UserRelationshipsComposer
 } from '@octane/renderer';
 import { FC, useState } from 'react';
-import { CreateLinkEvent, GetRoomSession, GetUserProfile, LocalizeText, SendMessageComposer } from '../../api';
+import { CreateLinkEvent, GetRoomSession, GetUserProfile, LocalizeText, rememberBadgeRarityFromPacket, SendMessageComposer } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { GroupsContainerView } from './GroupsContainerView';
@@ -47,6 +47,7 @@ export const UserProfileView: FC<{}> = () => {
 
         if (!userProfile || parser.userId !== userProfile.id) return;
 
+        rememberBadgeRarityFromPacket(parser.badgeDetails);
         setUserBadges(parser.badges);
     });
 

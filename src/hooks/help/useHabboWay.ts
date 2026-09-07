@@ -1,8 +1,9 @@
 import { GetQuizQuestionsComposer, PostQuizAnswersComposer, QuizDataMessageEvent, QuizResultsMessageEvent } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
+import { GetConfigurationValue, LocalizeText, localizeWithFallback, NotificationAlertType, SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
+import { useNotification } from '../notification';
 import { HABBO_WAY_START_PAGE, nextHabboWayPage, previousHabboWayPage, resolveHabboWayPageCount } from './habboWay';
 import {
     applyQuizResults,
@@ -12,6 +13,7 @@ import {
     ensureQuizAnswerOrder,
     getCurrentQuizQuestionId,
     getQuizAnswerIds,
+    getQuizLocalizationKey,
     goToQuizQuestion,
     gradeQuizLocally,
     HABBO_WAY_QUIZ_CODE,
@@ -43,6 +45,7 @@ const useHabboWayState = () => {
     const [habboWayPage, setHabboWayPage] = useState(HABBO_WAY_START_PAGE);
     const [quizSession, setQuizSession] = useState<QuizSession>(null);
     const quizTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+    const { simpleAlert = null } = useNotification();
 
     const habboWayPageCount = resolveHabboWayPageCount(GetConfigurationValue<number>('help.habboway.page.count', 0), lookupText);
 
@@ -144,6 +147,21 @@ const useHabboWayState = () => {
         const parser = event.getParser();
 
         clearQuizTimeout();
+
+        // The server answers with no questions while the user is still inside
+        // the retry lockout that follows a submitted attempt.
+        if (!parser.questionIds.length) {
+            simpleAlert(
+                localizeWithFallback('quiz.retry.locked', 'You have already taken this quiz recently. Please try again in a couple of hours.'),
+                NotificationAlertType.DEFAULT,
+                null,
+                null,
+                localizeWithFallback(getQuizLocalizationKey(parser.quizCode, 'title'), 'Habbo Way Quiz')
+            );
+
+            return;
+        }
+
         openQuizSession(createQuizSession(parser.quizCode, parser.questionIds, true));
     });
 

@@ -12,6 +12,7 @@ import {
 import {
     badgeRarityColorToCss,
     formatBadgeOwnerCount,
+    getBadgeRarityFromPacket,
     getBadgeRarityGlowColor,
     getBadgeRarityLabelKey,
     getBadgeRarityTagColor,
@@ -62,11 +63,15 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
     } = props;
     const [imageElement, setImageElement] = useState<HTMLImageElement>(null);
     const [badgeRarityStat, setBadgeRarityStat] = useState<BadgeLeaderboardStat>(null);
+    // The badges packet (1087) carries the official tier per worn slot; it
+    // wins over the leaderboard classification when the server sent it.
+    const packetRarity = !isGroup && badgeCode && (showRarityInfo || highlightRarity) ? getBadgeRarityFromPacket(badgeCode) : null;
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const tooltipsEnabled = showInfo && GetConfigurationValue<boolean>('badge.descriptions.enabled', true);
     const uncommonRarityEnabled = GetConfigurationValue<boolean>('badge_rarity.uncommon', false) === true;
-    const rarityTier = badgeRarityStat ? getBadgeRarityTier(badgeRarityStat.rarity) : null;
+    const rarityTier = packetRarity ? packetRarity.tier : badgeRarityStat ? getBadgeRarityTier(badgeRarityStat.rarity) : null;
+    const ownerCount = packetRarity ? packetRarity.ownerCount : badgeRarityStat ? badgeRarityStat.ownerCount : 0;
 
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = ['relative w-[40px] h-[40px] bg-no-repeat bg-center'];
@@ -161,7 +166,7 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
     }, [badgeCode, isGroup]);
 
     useEffect(() => {
-        if (isGroup || !badgeCode || (!showRarityInfo && !highlightRarity)) {
+        if (isGroup || !badgeCode || (!showRarityInfo && !highlightRarity) || getBadgeRarityFromPacket(badgeCode)) {
             setBadgeRarityStat(null);
             return;
         }
@@ -198,8 +203,8 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
     const rarityLabel = rarityTier !== null ? LocalizeText(getBadgeRarityLabelKey(rarityTier, uncommonRarityEnabled)) : '';
     const rarityText = rarityTier !== null ? LocalizeText('badge.rarity.badge', ['rarity'], [rarityLabel]) : '';
     const rarityTagColor = rarityTier !== null ? badgeRarityColorToCss(getBadgeRarityTagColor(rarityTier, uncommonRarityEnabled)) : '';
-    const showOwnerCount = !!badgeRarityStat && shouldShowBadgeOwnerCount(badgeRarityStat.ownerCount);
-    const ownersText = showOwnerCount ? LocalizeText('badge.owner_count', ['count'], [formatBadgeOwnerCount(badgeRarityStat.ownerCount)]) : '';
+    const showOwnerCount = rarityTier !== null && shouldShowBadgeOwnerCount(ownerCount);
+    const ownersText = showOwnerCount ? LocalizeText('badge.owner_count', ['count'], [formatBadgeOwnerCount(ownerCount)]) : '';
 
     // The badge element itself is the hover target: wrapping it would change
     // the grid cell it sits in, so the headless hook spreads onto Base instead.
