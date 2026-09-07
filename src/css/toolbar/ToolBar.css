@@ -68,6 +68,30 @@
     background: #6b675f;
 }
 
+/* The history rows split in two: the label opens the navigator on the
+   visited rooms block like the official row, the chevron unfolds the inline
+   list. Both inherit the row's look. */
+.tb-navigator-hover-row-label,
+.tb-navigator-hover-row-toggle {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+}
+
+.tb-navigator-hover-row-toggle {
+    width: 16px;
+    text-align: right;
+}
+
+.tb-navigator-hover-row-label:disabled,
+.tb-navigator-hover-row-toggle:disabled {
+    cursor: default;
+}
+
 .tb-navigator-hover-row.is-current {
     text-decoration: underline;
 }

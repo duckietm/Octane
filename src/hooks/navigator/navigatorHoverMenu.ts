@@ -39,3 +39,21 @@ export const buildNavigatorHoverItems = (input: NavigatorHoverInput): NavigatorH
         { id: 'frequent', key: 'navigator.navisel.frequentvisits', fallback: 'Frequently Visited Rooms', disabled: !hasHistory, expandable: true }
     ];
 };
+
+/**
+ * The link event each row fires. The official favourites / history /
+ * frequent rows call showFavouriteRooms / showHistoryRooms /
+ * showFrequentRooms, which open the navigator on the "me" tab with the
+ * `favorites` / `history` / `history_freq` search block selected
+ * (LegacyNavigator.as performSearch). The emulator has no `history` block:
+ * it serves the last three days of visits, newest first, as `history_freq`,
+ * so both history rows land on that block.
+ */
+export const NAVIGATOR_HOVER_LINKS: Record<NavigatorHoverItemId, string> = {
+    navigator: 'navigator/show',
+    home: 'navigator/goto/home',
+    favorites: 'navigator/me/favorites',
+    create: 'navigator/create',
+    history: 'navigator/me/history_freq',
+    frequent: 'navigator/me/history_freq'
+};

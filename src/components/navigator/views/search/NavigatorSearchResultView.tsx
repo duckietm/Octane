@@ -64,7 +64,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
 
     return (
-        <section className="octane-navigator-air__category">
+        <section className="octane-navigator-air__category" data-result-code={searchResult.code}>
             <header className="octane-navigator-air__category-header">
                 <button
                     type="button"

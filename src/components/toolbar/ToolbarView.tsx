@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NAVIGATOR_HOVER_LINKS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -62,7 +62,7 @@ const readCollapsedPreference = (key: string): boolean =>
 const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
 {
     const [ isOpen, setIsOpen ] = useState(false);
-    const [ expandedList, setExpandedList ] = useState<'history' | 'frequent' | null>(null);
+    const [ expandedList, setExpandedList ] = useState<NavigatorHoverItemId | null>(null);
     const hideTimerRef = useRef<number | null>(null);
     const rootRef = useRef<HTMLDivElement>(null);
     const { navigatorData } = useNavigatorData();
@@ -125,35 +125,18 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
         return () => document.removeEventListener('pointerdown', onPointerDown, true);
     }, [ isOpen ]);
 
+    // Every row opens the navigator like its official counterpart
+    // (ToolbarHoverCtrl.as): the history rows land on the visited rooms block
+    // of the "me" tab, the chevron next to them unfolds the inline list instead.
     const activate = (id: NavigatorHoverItemId) =>
     {
-        switch(id)
-        {
-            case 'navigator':
-                CreateLinkEvent('navigator/show');
-                hideNow();
-                return;
-            case 'home':
-                if(homeRoomId <= 0) return;
-                CreateLinkEvent('navigator/goto/home');
-                hideNow();
-                return;
-            case 'favorites':
-                // Favourites live in the "me" view of the navigator; the server
-                // lists them as their own category there.
-                CreateLinkEvent('navigator/me');
-                hideNow();
-                return;
-            case 'create':
-                CreateLinkEvent('navigator/create');
-                hideNow();
-                return;
-            case 'history':
-            case 'frequent':
-                setExpandedList(previous => (previous === id ? null : id));
-                return;
-        }
+        if((id === 'home') && (homeRoomId <= 0)) return;
+
+        CreateLinkEvent(NAVIGATOR_HOVER_LINKS[id]);
+        hideNow();
     };
+
+    const toggleList = (id: NavigatorHoverItemId) => setExpandedList(previous => (previous === id ? null : id));
 
     const visitRoom = (roomId: number) =>
     {
@@ -180,15 +163,33 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
                     <div className="tb-navigator-hover-body flex flex-col gap-[1px]">
                         { items.map(item => (
                             <div key={ item.id }>
-                                <button
-                                    type="button"
-                                    disabled={ item.disabled }
-                                    aria-expanded={ item.expandable ? expandedList === item.id : undefined }
-                                    className={ `tb-navigator-hover-row flex w-full items-center justify-between text-left ${ item.disabled ? 'cursor-default text-white/40' : 'cursor-pointer' } ${ expandedList === item.id ? 'is-open' : '' }` }
-                                    onClick={ () => activate(item.id) }>
-                                    <span className="truncate">{ localizeWithFallback(item.key, item.fallback) }</span>
-                                    { item.expandable && <span aria-hidden="true">{ expandedList === item.id ? '▾' : '▸' }</span> }
-                                </button>
+                                { item.expandable
+                                    ? <div className={ `tb-navigator-hover-row flex w-full items-center justify-between ${ item.disabled ? 'cursor-default text-white/40' : '' } ${ expandedList === item.id ? 'is-open' : '' }` }>
+                                        <button
+                                            type="button"
+                                            disabled={ item.disabled }
+                                            className="tb-navigator-hover-row-label min-w-0 flex-1 truncate text-left"
+                                            onClick={ () => activate(item.id) }>
+                                            { localizeWithFallback(item.key, item.fallback) }
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={ item.disabled }
+                                            aria-expanded={ expandedList === item.id }
+                                            aria-label={ localizeWithFallback(item.key, item.fallback) }
+                                            className="tb-navigator-hover-row-toggle"
+                                            data-testid={ `navigator-hover-toggle-${ item.id }` }
+                                            onClick={ () => toggleList(item.id) }>
+                                            { expandedList === item.id ? '▾' : '▸' }
+                                        </button>
+                                    </div>
+                                    : <button
+                                        type="button"
+                                        disabled={ item.disabled }
+                                        className={ `tb-navigator-hover-row flex w-full items-center text-left ${ item.disabled ? 'cursor-default text-white/40' : 'cursor-pointer' }` }
+                                        onClick={ () => activate(item.id) }>
+                                        <span className="truncate">{ localizeWithFallback(item.key, item.fallback) }</span>
+                                    </button> }
                                 { item.expandable && expandedList === item.id && expandedRooms.length > 0 &&
                                     <div className="tb-navigator-hover-list flex max-h-[220px] flex-col overflow-y-auto">
                                         { expandedRooms.map(room => (

@@ -11,7 +11,7 @@ import {
     RemoveLinkEventTracker,
     RoomSessionEvent
 } from '@octane/renderer';
-import { CSSProperties, FC, useEffect, useRef } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import { CreateLinkEvent, LocalizeText, localizeWithFallback, SendMessageComposer, TryVisitRoom } from '../../api';
 import createRoomImg from '../../assets/images/navigator/air/create-room.png';
 import promoteRoomImg from '../../assets/images/navigator/air/promote-room.png';
@@ -54,6 +54,9 @@ export const NavigatorView: FC<{}> = () => {
     const { searchResult, isFetching } = useNavigatorSearch();
     const { isVisible, isCreatorOpen, isRoomInfoOpen, isRoomLinkOpen, isOpenSavesSearches, needsInit, currentTabCode, windowHeight } = useNavigatorUiState();
     const elementRef = useRef<HTMLDivElement>(null);
+    // A search block of the "me" tab to unfold and scroll to once it renders
+    // (navigator/me/<code>, the toolbar hover rows; HabboNavigator.as showMeTab).
+    const [focusResultCode, setFocusResultCode] = useState<string | null>(null);
 
     useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, () => {
         useNavigatorUiStore.getState().hide();
@@ -132,6 +135,7 @@ export const NavigatorView: FC<{}> = () => {
                     case 'me':
                         store.setTab('myworld_view');
                         store.show();
+                        setFocusResultCode(parts[2] || null);
                         return;
                 }
             },
@@ -146,6 +150,18 @@ export const NavigatorView: FC<{}> = () => {
         if (elementRef.current) elementRef.current.scrollTop = 0;
         useNavigatorRoomInfoPopupStore.getState().hide();
     }, [searchResult]);
+
+    useEffect(() => {
+        if (!focusResultCode || !isVisible || !searchResult || searchResult.code !== 'myworld_view') return;
+
+        const block = elementRef.current?.querySelector<HTMLElement>(`[data-result-code="${focusResultCode}"]`);
+        if (!block) return;
+
+        const store = useNavigatorUiStore.getState();
+        if (!store.expandedResultCodes.includes(focusResultCode)) store.setResultCollapsed(focusResultCode, false);
+        block.scrollIntoView({ block: 'start' });
+        setFocusResultCode(null);
+    }, [focusResultCode, isVisible, searchResult]);
 
     useEffect(() => {
         if (!isVisible || !needsInit) return;
