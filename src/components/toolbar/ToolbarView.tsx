@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_MS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -64,6 +64,7 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
     const [ isOpen, setIsOpen ] = useState(false);
     const [ expandedList, setExpandedList ] = useState<'history' | 'frequent' | null>(null);
     const hideTimerRef = useRef<number | null>(null);
+    const rootRef = useRef<HTMLDivElement>(null);
     const { navigatorData } = useNavigatorData();
     const { historyView = [], frequentView = [] } = useRoomVisitHistory();
 
@@ -92,7 +93,7 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
             hideTimerRef.current = null;
             setIsOpen(false);
             setExpandedList(null);
-        }, NAVIGATOR_HOVER_HIDE_DELAY_MS);
+        }, expandedList ? NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS : NAVIGATOR_HOVER_HIDE_DELAY_MS);
     };
 
     const hideNow = () =>
@@ -103,6 +104,26 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     useEffect(() => clearHideTimer, []);
+
+    // A click anywhere outside the menu closes it at once, as the official
+    // toolbar does when another window takes the mouse.
+    useEffect(() =>
+    {
+        if(!isOpen) return;
+
+        const onPointerDown = (event: PointerEvent) =>
+        {
+            if(rootRef.current?.contains(event.target as Node)) return;
+
+            clearHideTimer();
+            setIsOpen(false);
+            setExpandedList(null);
+        };
+
+        document.addEventListener('pointerdown', onPointerDown, true);
+
+        return () => document.removeEventListener('pointerdown', onPointerDown, true);
+    }, [ isOpen ]);
 
     const activate = (id: NavigatorHoverItemId) =>
     {
@@ -144,6 +165,7 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
 
     return (
         <div
+            ref={ rootRef }
             className="absolute inset-0"
             data-testid="navigator-hover"
             onMouseEnter={ open }

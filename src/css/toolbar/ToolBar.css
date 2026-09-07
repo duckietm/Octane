@@ -41,6 +41,17 @@
     text-shadow: 1px 1px 0 #000;
 }
 
+/* The gap under the bubble counts as part of it, so crossing from the icon to
+   the rows never fires a leave. */
+.tb-navigator-hover::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    height: 10px;
+}
+
 .tb-navigator-hover-row {
     height: 20px;
     padding: 0 7px;

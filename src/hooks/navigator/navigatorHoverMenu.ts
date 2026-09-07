@@ -15,9 +15,12 @@ export interface NavigatorHoverInput {
     historyCount: number;
 }
 
-// The official hover menu closes shortly after the pointer leaves it
-// (ToolbarHoverCtrl.as, _hideTimeout).
-export const NAVIGATOR_HOVER_HIDE_DELAY_MS = 350;
+// The official hover menu closes half a second after the pointer leaves it
+// (ToolbarHoverCtrl.as, _hideTimeout = Timer(500, 1)).
+export const NAVIGATOR_HOVER_HIDE_DELAY_MS = 500;
+// With a room list unfolded the menu is being used, so it waits much longer
+// and otherwise closes on a click elsewhere.
+export const NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS = 2000;
 
 /**
  * The six rows of the official toolbar hover menu, in XML order
