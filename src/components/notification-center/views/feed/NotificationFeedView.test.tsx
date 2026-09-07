@@ -160,6 +160,31 @@ describe('NotificationFeedView', () => {
         expect(screen.getByTestId('feed-minimized').style.bottom).toBe('164px');
     });
 
+    it('flashes the folded tab when a mention arrives', () => {
+        render(<NotificationFeedView />);
+
+        expect(screen.getByTestId('feed-minimized').getAttribute('data-flash')).toBeNull();
+
+        act(() =>
+            setMentions([
+                {
+                    mentionId: 9,
+                    senderId: 2,
+                    senderUsername: 'Sulake',
+                    senderFigure: '',
+                    roomId: 0,
+                    roomName: '',
+                    message: 'ping',
+                    mentionType: 0,
+                    timestamp: 1,
+                    read: false
+                }
+            ])
+        );
+
+        expect(screen.getByTestId('feed-minimized').getAttribute('data-flash')).toBe('true');
+    });
+
     it('minimizes from the header and remembers it', () => {
         useNotificationFeedStore.getState().setOpen(true);
 

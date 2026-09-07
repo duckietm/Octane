@@ -352,6 +352,12 @@
     image-rendering: pixelated;
 }
 
+/* Floating copy: same skin, keeps the purse width and the margin the in-flow menu had. */
+.octane-purse-menu--floating {
+    margin: 0;
+    pointer-events: auto;
+}
+
 .octane-purse-menu__item {
     padding: 4px 10px;
     border: 0;

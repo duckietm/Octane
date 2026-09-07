@@ -11,6 +11,8 @@ import { NotificationFeedMentionView } from './NotificationFeedMentionView';
 
 /** Time-ago labels are refreshed on this cadence; a minute of drift is invisible in a feed. */
 const CLOCK_TICK_MS = 30_000;
+/** How long the folded tab flashes after a mention lands. */
+const FLASH_MS = 2_500;
 
 const CATEGORY_LABEL: Record<NotificationFeedCategory, { key: string; fallback: string }> = {
     mentions: { key: 'mentions.window.title', fallback: 'Mentions' },
@@ -127,6 +129,24 @@ export const NotificationFeedView: FC<{}> = () => {
         if (!drag.moved) setOpen(true);
     };
     const [now, setNow] = useState(() => Date.now());
+    // A mention that arrives while the panel is folded makes the tab flash for a moment,
+    // the way the old toolbar icon lit up.
+    const [flash, setFlash] = useState(false);
+    const lastMentionsUnreadRef = useRef(mentionsUnread);
+
+    useEffect(() => {
+        const previous = lastMentionsUnreadRef.current;
+
+        lastMentionsUnreadRef.current = mentionsUnread;
+
+        if (isOpen || mentionsUnread <= previous) return;
+
+        setFlash(true);
+
+        const handle = window.setTimeout(() => setFlash(false), FLASH_MS);
+
+        return () => window.clearTimeout(handle);
+    }, [mentionsUnread, isOpen]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -240,7 +260,8 @@ export const NotificationFeedView: FC<{}> = () => {
         return (
             <button
                 aria-label={title}
-                className="fixed right-0 z-20 pointer-events-auto flex items-center gap-1 px-2 py-2 rounded-l bg-[#1c1c20f2] text-white border border-r-0 border-black/70 hover:bg-[#2a2a30f2] touch-none select-none cursor-grab active:cursor-grabbing"
+                className={`fixed right-0 z-20 pointer-events-auto flex items-center gap-1 px-2 py-2 rounded-l bg-[#1c1c20f2] text-white border border-r-0 border-black/70 hover:bg-[#2a2a30f2] touch-none select-none cursor-grab active:cursor-grabbing ${flash ? 'animate-pulse ring-2 ring-amber-300' : ''}`}
+                data-flash={flash ? 'true' : undefined}
                 data-testid="feed-minimized"
                 style={{ bottom: `${tabBottom}px` }}
                 title={localizeWithFallback('notifications.feed.open', 'Open the notification feed')}
