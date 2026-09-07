@@ -16,7 +16,6 @@ import { FaSearch, FaTimes } from 'react-icons/fa';
 import { GetRoomSession, ISelectedUser, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Tooltip } from '../../common';
 import { useMessageEvent, useModTools, useOctaneEvent, useObjectSelectedEvent, useRoomUserListSnapshot } from '../../hooks';
-import { ModToolsNewToolView } from './views/new-tool/ModToolsNewToolView';
 import { ModToolsChatlogView } from './views/room/ModToolsChatlogView';
 import { ModToolsRoomView } from './views/room/ModToolsRoomView';
 import { ModToolsTicketsView } from './views/tickets/ModToolsTicketsView';
@@ -28,7 +27,6 @@ export const ModToolsView: FC<{}> = (props) => {
     const [currentRoomId, setCurrentRoomId] = useState<number>(-1);
     const [selectedUser, setSelectedUser] = useState<ISelectedUser>(null);
     const [isTicketsVisible, setIsTicketsVisible] = useState(false);
-    const [isNewToolVisible, setIsNewToolVisible] = useState(false);
     const [userQuery, setUserQuery] = useState('');
     const [userResults, setUserResults] = useState<HabboSearchResultData[]>(null);
     // The search packet is shared with the friend list, so only a search this window
@@ -376,16 +374,6 @@ export const ModToolsView: FC<{}> = (props) => {
                                     </Tooltip>
                                 )}
                             </Button>
-                            <Button
-                                active={isNewToolVisible}
-                                gap={2}
-                                justifyContent="start"
-                                variant="secondary"
-                                onClick={() => setIsNewToolVisible((prevValue) => !prevValue)}
-                            >
-                                <div className="octane-icon icon-room-tools shrink-0" />
-                                <span className="grow text-start">{localizeWithFallback('modtools.window.tools.newtool', 'Moderation tool')}</span>
-                            </Button>
                         </div>
                     </OctaneCardContentView>
                 </OctaneCardView>
@@ -407,7 +395,6 @@ export const ModToolsView: FC<{}> = (props) => {
                     <ModToolsUserChatlogView key={userId} userId={userId} onCloseClick={() => CreateLinkEvent(`mod-tools/close-user-chatlog/${userId}`)} />
                 ))}
             {isTicketsVisible && <ModToolsTicketsView onCloseClick={() => setIsTicketsVisible(false)} />}
-            {isNewToolVisible && <ModToolsNewToolView onCloseClick={() => setIsNewToolVisible(false)} />}
         </>
     );
 };
