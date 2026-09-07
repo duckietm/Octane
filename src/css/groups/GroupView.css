@@ -124,8 +124,8 @@
 }
 
 .octane-group-information-standalone {
-    width: 365px !important;
-    height: 267px !important;
+    width: 369px !important;
+    height: 273px !important;
     resize: none !important;
 }
 
@@ -351,8 +351,8 @@
 }
 
 .octane-group-members {
-    width: 332px;
-    height: 431px;
+    width: 336px;
+    height: 437px;
     resize: none !important;
 }
 
@@ -902,7 +902,7 @@
 /* SWF guild_members_window/member_entry layout */
 .octane-group-members {
     width: 351px !important;
-    height: 431px !important;
+    height: 437px !important;
     resize: none !important;
 }
 
