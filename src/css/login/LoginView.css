@@ -12,15 +12,15 @@
     src: url("@/assets/webfonts/Volter-b.ttf") format("truetype");
 }
 
-.nitro-login-view,
-.nitro-login-view * {
+.octane-login-view,
+.octane-login-view * {
     font-family: Volter, "Volter (Goldfish)", monospace;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: grayscale;
     font-smooth: never;
 }
 
-.nitro-login-view {
+.octane-login-view {
     position: fixed;
     inset: 0;
     width: 100%;
@@ -30,21 +30,21 @@
     z-index: 100;
 }
 
-.nitro-login-view .login-layer {
+.octane-login-view .login-layer {
     position: absolute;
     background-repeat: no-repeat;
     pointer-events: none;
     transform: translateZ(0);
 }
 
-.nitro-login-view .login-layer-img {
+.octane-login-view .login-layer-img {
     display: block;
     user-select: none;
     -webkit-user-drag: none;
     object-fit: none;
 }
 
-.nitro-login-view .login-image-preloader {
+.octane-login-view .login-image-preloader {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -53,12 +53,12 @@
     pointer-events: none;
 }
 
-.nitro-login-view .login-image-preloader img {
+.octane-login-view .login-image-preloader img {
     width: 1px;
     height: 1px;
 }
 
-.nitro-login-view .login-background {
+.octane-login-view .login-background {
     top: 0;
     left: 0;
     width: 100%;
@@ -67,7 +67,7 @@
     object-position: center top;
 }
 
-.nitro-login-view .login-sun {
+.octane-login-view .login-sun {
     left: 50%;
     transform: translateX(-50%);
     width: 600px;
@@ -76,7 +76,7 @@
     object-position: center top;
 }
 
-.nitro-login-view .login-drape {
+.octane-login-view .login-drape {
     top: 0;
     left: 0;
     width: 190px;
@@ -86,7 +86,7 @@
     object-position: left top;
 }
 
-.nitro-login-view .login-left {
+.octane-login-view .login-left {
     bottom: 0;
     left: 0;
     width: 100%;
@@ -95,7 +95,7 @@
     object-position: left bottom;
 }
 
-.nitro-login-view .login-right-repeat {
+.octane-login-view .login-right-repeat {
     top: 0;
     right: 0;
     width: 400px;
@@ -104,7 +104,7 @@
     background-position: right top;
 }
 
-.nitro-login-view .login-right {
+.octane-login-view .login-right {
     bottom: 0;
     right: 0;
     width: auto;
@@ -116,7 +116,7 @@
 
 /* ─── Foreground Login Card Stack ─── */
 
-.nitro-login-view .login-stack {
+.octane-login-view .login-stack {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -133,7 +133,7 @@
     pointer-events: auto;
 }
 
-.nitro-login-view .login-widgets {
+.octane-login-view .login-widgets {
     position: absolute;
     top: 18px;
     left: 240px;
@@ -145,7 +145,7 @@
     pointer-events: auto;
 }
 
-.nitro-login-view .login-widget-slot {
+.octane-login-view .login-widget-slot {
     min-height: 110px;
     display: grid;
     grid-template-columns: 160px minmax(0, 1fr);
@@ -156,7 +156,7 @@
     text-shadow: 0 2px 2px rgba(0, 0, 0, 0.45);
 }
 
-.nitro-login-view .login-widget-image {
+.octane-login-view .login-widget-image {
     max-width: 150px;
     max-height: 150px;
     width: auto;
@@ -167,11 +167,11 @@
     -webkit-user-drag: none;
 }
 
-.nitro-login-view .login-widget-content {
+.octane-login-view .login-widget-content {
     min-width: 0;
 }
 
-.nitro-login-view .login-widget-title {
+.octane-login-view .login-widget-title {
     font-size: 18px;
     line-height: 20px;
     font-weight: 700;
@@ -179,7 +179,7 @@
     margin-bottom: 5px;
 }
 
-.nitro-login-view .login-widget-description {
+.octane-login-view .login-widget-description {
     max-width: 285px;
     font-size: 12px;
     line-height: 14px;
@@ -187,7 +187,7 @@
     margin-bottom: 14px;
 }
 
-.nitro-login-view .login-widget-button {
+.octane-login-view .login-widget-button {
     min-width: 178px;
     height: 25px;
     padding: 0 18px;
@@ -202,22 +202,22 @@
     text-shadow: none;
 }
 
-.nitro-login-view .login-widget-button:hover {
+.octane-login-view .login-widget-button:hover {
     background: linear-gradient(#ffffff, #e9e9e9);
 }
 
-.nitro-login-card {
+.octane-login-card {
     display: flex;
     flex-direction: column;
     padding: 0;
     resize: none !important;
-    background: var(--nitro-card-frame, #376275);
-    color: var(--nitro-card-text, #151515);
+    background: var(--octane-card-frame, #376275);
+    color: var(--octane-card-text, #151515);
     font-family: Ubuntu, 'Helvetica Neue', Arial, sans-serif;
-    box-shadow: var(--nitro-card-shadow, 0 4px 4px rgba(0, 0, 0, 0.349));
+    box-shadow: var(--octane-card-shadow, 0 4px 4px rgba(0, 0, 0, 0.349));
 }
 
-.nitro-login-card .card-title {
+.octane-login-card .card-title {
     position: relative;
     display: flex;
     align-items: center;
@@ -228,13 +228,13 @@
     margin: 0;
     padding: 4px 38px;
     border: 0;
-    border-bottom: 2px solid var(--nitro-card-border, #283f5d);
+    border-bottom: 2px solid var(--octane-card-border, #283f5d);
     border-radius: 4px 4px 0 0;
     background: linear-gradient(
         180deg,
-        var(--nitro-card-header-highlight, #5ba4c4) 0%,
-        var(--nitro-card-header, #418db0) 44%,
-        var(--nitro-card-header-shadow, #2e6f8a) 100%
+        var(--octane-card-header-highlight, #5ba4c4) 0%,
+        var(--octane-card-header, #418db0) 44%,
+        var(--octane-card-header-shadow, #2e6f8a) 100%
     );
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.38);
     color: #ffffff;
@@ -245,7 +245,7 @@
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.65);
 }
 
-.nitro-login-card .card-title .nitro-card-close-button {
+.octane-login-card .card-title .octane-card-close-button {
     position: absolute;
     top: 50%;
     right: 6px;
@@ -254,7 +254,7 @@
     padding: 0;
 }
 
-.nitro-login-card .card-body {
+.octane-login-card .card-body {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -262,68 +262,68 @@
     padding: 10px;
     overflow: visible;
     border-radius: 0 0 4px 4px;
-    background: var(--nitro-card-surface, #dfdfdf);
-    color: var(--nitro-card-text, #151515);
+    background: var(--octane-card-surface, #dfdfdf);
+    color: var(--octane-card-text, #151515);
     font-family: Ubuntu, sans-serif;
     font-size: 14px;
     line-height: 1.35;
 }
 
-.nitro-login-card .field {
+.octane-login-card .field {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.nitro-login-card .field label {
+.octane-login-card .field label {
     font-size: 13px;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     font-weight: 600;
 }
 
-.nitro-login-card .field input {
+.octane-login-card .field input {
     width: 100%;
     min-height: 32px;
     padding: 5px 8px;
     border: 1px solid #8d8d8d;
     border-radius: 4px;
     background: #f6f6f6;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     font-size: 14px;
     outline: none;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
-.nitro-login-card .field input:focus {
-    border-color: var(--nitro-card-header, #418db0);
+.octane-login-card .field input:focus {
+    border-color: var(--octane-card-header, #418db0);
     box-shadow: 0 0 0 2px rgba(65, 141, 176, 0.28);
 }
 
-.nitro-login-card .remember-row {
+.octane-login-card .remember-row {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     user-select: none;
 }
 
-.nitro-login-card .remember-row input {
+.octane-login-card .remember-row input {
     width: 13px;
     height: 13px;
     margin: 0;
     cursor: pointer;
 }
 
-.nitro-login-card .submit-row {
+.octane-login-card .submit-row {
     display: flex;
     justify-content: center;
     margin-top: 2px;
 }
 
-.nitro-login-card button.ok-button {
+.octane-login-card button.ok-button {
     cursor: pointer;
     min-height: 32px;
     padding: 5px 16px;
@@ -337,16 +337,16 @@
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.35), 0 1px rgba(0, 0, 0, 0.15);
 }
 
-.nitro-login-card button.ok-button:hover {
+.octane-login-card button.ok-button:hover {
     background: linear-gradient(180deg, #6eb8d4 0%, #4a9bc0 44%, #3580a0 100%);
 }
 
-.nitro-login-card button.ok-button:disabled {
+.octane-login-card button.ok-button:disabled {
     opacity: 0.55;
     cursor: not-allowed;
 }
 
-.nitro-login-card .forgot {
+.octane-login-card .forgot {
     display: block;
     text-align: center;
     margin-top: 6px;
@@ -357,7 +357,7 @@
     cursor: pointer;
 }
 
-.nitro-login-card .error-line {
+.octane-login-card .error-line {
     color: #a81a12;
     background: #fde6e4;
     border: 1px solid #e0a7a2;
@@ -367,7 +367,7 @@
     text-align: center;
 }
 
-.nitro-login-card .info-line {
+.octane-login-card .info-line {
     color: #0a4d2e;
     background: #e5f5ec;
     border: 1px solid #a4d4b8;
@@ -377,7 +377,7 @@
     text-align: center;
 }
 
-.nitro-login-card .error-line.ban-message {
+.octane-login-card .error-line.ban-message {
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -386,30 +386,30 @@
     line-height: 1.35;
 }
 
-.nitro-login-card .error-line.ban-message .ban-title {
+.octane-login-card .error-line.ban-message .ban-title {
     font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
 
-.nitro-login-card .error-line.ban-message .ban-status {
+.octane-login-card .error-line.ban-message .ban-status {
     font-size: 11px;
     font-variant-numeric: tabular-nums;
 }
 
-.nitro-login-card .error-line.ban-message .ban-reason {
+.octane-login-card .error-line.ban-message .ban-reason {
     font-size: 11px;
     font-style: italic;
     word-break: break-word;
 }
 
-.nitro-login-card .register-card-body {
+.octane-login-card .register-card-body {
     align-items: center;
     text-align: center;
 }
 
-.nitro-login-card .register-card-body .register-link {
+.octane-login-card .register-card-body .register-link {
     width: 100%;
     min-height: 30px;
     border: 2px solid #006d09;
@@ -425,11 +425,11 @@
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.35), 0 1px rgba(0, 0, 0, 0.15);
 }
 
-.nitro-login-card .register-card-body .register-link:hover {
+.octane-login-card .register-card-body .register-link:hover {
     filter: brightness(1.04);
 }
 
-.nitro-login-view .login-language-picker {
+.octane-login-view .login-language-picker {
     position: absolute;
     top: 18px;
     right: 22px;
@@ -437,33 +437,33 @@
     min-width: 180px;
     padding: 0;
     resize: none !important;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     pointer-events: auto;
 }
 
-.nitro-login-view .login-language-header {
+.octane-login-view .login-language-header {
     min-height: 31px;
     max-height: 31px;
     padding: 4px 28px;
 }
 
-.nitro-login-view .login-language-header .nitro-card-title {
+.octane-login-view .login-language-header .octane-card-title {
     font-size: 17px;
 }
 
-.nitro-login-view .login-language-content {
+.octane-login-view .login-language-content {
     height: auto;
     padding: 8px;
     overflow: visible;
 }
 
-.nitro-login-view .login-language-select-wrap {
+.octane-login-view .login-language-select-wrap {
     display: flex;
     align-items: center;
     gap: 7px;
 }
 
-.nitro-login-view .login-language-select-wrap img {
+.octane-login-view .login-language-select-wrap img {
     width: 22px;
     height: 16px;
     object-fit: contain;
@@ -471,14 +471,14 @@
     flex: 0 0 auto;
 }
 
-.nitro-login-view .login-language-select-wrap select {
+.octane-login-view .login-language-select-wrap select {
     min-width: 118px;
     height: 27px;
     padding: 3px 26px 3px 8px;
     border: 1px solid #8d8d8d;
     border-radius: 4px;
     background: #f6f6f6;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     font-family: Ubuntu, sans-serif;
     font-size: 12px;
     font-weight: 600;
@@ -486,17 +486,17 @@
     outline: none;
 }
 
-.nitro-login-view .login-language-select-wrap select:focus {
-    border-color: var(--nitro-card-header, #418db0);
+.octane-login-view .login-language-select-wrap select:focus {
+    border-color: var(--octane-card-header, #418db0);
     box-shadow: 0 0 0 2px rgba(65, 141, 176, 0.28);
 }
 
-.nitro-login-view .login-language-select-wrap select:disabled {
+.octane-login-view .login-language-select-wrap select:disabled {
     cursor: wait;
     opacity: 0.7;
 }
 
-.nitro-login-view .login-language-picker .language-error {
+.octane-login-view .login-language-picker .language-error {
     max-width: 180px;
     margin-top: 5px;
     color: #8a1712;
@@ -504,16 +504,16 @@
     line-height: 11px;
 }
 
-.nitro-login-view .login-auth-card {
-    box-shadow: var(--nitro-card-shadow, 0 4px 4px rgba(0, 0, 0, 0.349));
+.octane-login-view .login-auth-card {
+    box-shadow: var(--octane-card-shadow, 0 4px 4px rgba(0, 0, 0, 0.349));
 }
 
-.nitro-login-view .login-register-card {
-    background: var(--nitro-card-frame, #376275);
+.octane-login-view .login-register-card {
+    background: var(--octane-card-frame, #376275);
 }
 
-.nitro-login-view .login-language-select-wrap img,
-.nitro-login-view .login-language-picker img {
+.octane-login-view .login-language-select-wrap img,
+.octane-login-view .login-language-picker img {
     max-width: 28px;
     max-height: 22px;
     pointer-events: none;
@@ -521,18 +521,18 @@
     -webkit-user-drag: none;
 }
 
-.nitro-login-card .turnstile-slot {
+.octane-login-card .turnstile-slot {
     display: flex;
     justify-content: center;
     margin-top: 4px;
     min-height: 65px;
 }
 
-.nitro-login-card .turnstile-slot iframe {
+.octane-login-card .turnstile-slot iframe {
     max-width: 100%;
 }
 
-.nitro-login-modal {
+.octane-login-modal {
     position: fixed;
     inset: 0;
     background: rgba(6, 24, 35, 0.48);
@@ -544,34 +544,34 @@
 
 /* Keep the tinted fallback on touch-first devices, avoiding iOS backdrop/viewport glitches. */
 @media (hover: hover) and (pointer: fine) {
-    .nitro-login-modal {
+    .octane-login-modal {
         -webkit-backdrop-filter: blur(2px);
         backdrop-filter: blur(2px);
     }
 }
 
-.nitro-login-modal .dialog {
+.octane-login-modal .dialog {
     width: 320px;
     max-width: calc(100% - 40px);
 }
 
-.nitro-login-modal .dialog.dialog-avatar {
+.octane-login-modal .dialog.dialog-avatar {
     width: 720px;
 }
 
 /* ─── Multi-step register dialog ─── */
 
-.nitro-login-card .register-intro {
+.octane-login-card .register-intro {
     background: rgba(0, 0, 0, 0.04);
     border: 1px solid var(--habbo-tab, #b6bec5);
     border-radius: 4px;
     padding: 6px 8px;
     font-size: 13px;
     line-height: 1.4;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
 }
 
-.nitro-login-card .step-footer {
+.octane-login-card .step-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -579,30 +579,30 @@
     margin-top: 4px;
 }
 
-.nitro-login-card .step-footer-split {
+.octane-login-card .step-footer-split {
     justify-content: space-between;
 }
 
-.nitro-login-card .step-indicator {
+.octane-login-card .step-indicator {
     font-size: 13px;
-    color: var(--nitro-card-muted, #666666);
+    color: var(--octane-card-muted, #666666);
     font-weight: 600;
 }
 
-.nitro-login-card .back-button {
+.octane-login-card .back-button {
     border-color: var(--habbo-blue-header-border, #376275);
     background: linear-gradient(180deg, #f2f8fb 0%, #d4e6ef 44%, #a8c9d8 45%, #d9e9f0 100%);
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
-.nitro-login-card button.ok-button.back-button:hover {
+.octane-login-card button.ok-button.back-button:hover {
     background: linear-gradient(180deg, #ffffff 0%, #e0eff6 44%, #b8d5e4 45%, #e8f3f8 100%);
 }
 
 /* ─── Avatar builder (pre-login) ─── */
 
-.nitro-login-card .gender-row {
+.octane-login-card .gender-row {
     display: flex;
     justify-content: center;
     gap: 22px;
@@ -610,14 +610,14 @@
     font-weight: 600;
 }
 
-.nitro-login-card .gender-row label {
+.octane-login-card .gender-row label {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     cursor: pointer;
 }
 
-.nitro-login-card .avatar-preview-panel {
+.octane-login-card .avatar-preview-panel {
     display: flex;
     flex-direction: column;
     align-self: stretch;
@@ -628,7 +628,7 @@
     background: linear-gradient(180deg, #ffffff 0%, #e9f0f3 100%);
 }
 
-.nitro-login-card .avatar-preview {
+.octane-login-card .avatar-preview {
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -636,14 +636,14 @@
     overflow: hidden;
 }
 
-.nitro-login-card .avatar-preview img {
+.octane-login-card .avatar-preview img {
     max-width: 100%;
     max-height: 190px;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
 }
 
-.nitro-login-card .registration-avatar-wardrobe {
+.octane-login-card .registration-avatar-wardrobe {
     min-height: 360px;
     overflow: hidden;
     border: 1px solid #8d8d8d;
@@ -651,7 +651,7 @@
     background: #cacaca;
 }
 
-.nitro-login-card .registration-wardrobe-tabs {
+.octane-login-card .registration-wardrobe-tabs {
     display: flex;
     align-items: flex-end;
     gap: 2px;
@@ -661,7 +661,7 @@
     background: #b7b7b7;
 }
 
-.nitro-login-card .registration-wardrobe-tabs button {
+.octane-login-card .registration-wardrobe-tabs button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -675,24 +675,24 @@
     cursor: pointer;
 }
 
-.nitro-login-card .registration-wardrobe-tabs button:hover,
-.nitro-login-card .registration-wardrobe-tabs button.active {
+.octane-login-card .registration-wardrobe-tabs button:hover,
+.octane-login-card .registration-wardrobe-tabs button.active {
     background: #ececec;
 }
 
-.nitro-login-card .registration-wardrobe-tabs button.active {
+.octane-login-card .registration-wardrobe-tabs button.active {
     height: 38px;
     border-color: #686868;
 }
 
-.nitro-login-card .registration-wardrobe-tabs img {
+.octane-login-card .registration-wardrobe-tabs img {
     max-width: 40px;
     max-height: 27px;
     image-rendering: pixelated;
     pointer-events: none;
 }
 
-.nitro-login-card .registration-wardrobe-main {
+.octane-login-card .registration-wardrobe-main {
     display: grid;
     grid-template-columns: 170px minmax(0, 1fr);
     gap: 10px;
@@ -701,7 +701,7 @@
     align-items: start;
 }
 
-.nitro-login-card .registration-wardrobe-preview {
+.octane-login-card .registration-wardrobe-preview {
     align-self: end;
     width: 170px;
     height: 270px;
@@ -709,7 +709,7 @@
     justify-content: flex-start;
 }
 
-.nitro-login-card .registration-wardrobe-preview .avatar-preview {
+.octane-login-card .registration-wardrobe-preview .avatar-preview {
     position: relative;
     width: 100%;
     min-height: 230px;
@@ -717,13 +717,13 @@
     background: radial-gradient(circle at 50% 42%, #8792a3 0%, #677181 66%);
 }
 
-.nitro-login-card .registration-wardrobe-preview .avatar-image {
+.octane-login-card .registration-wardrobe-preview .avatar-image {
     z-index: 2;
     margin-bottom: -6px;
     transform-origin: center bottom;
 }
 
-.nitro-login-card .registration-avatar-shadow {
+.octane-login-card .registration-avatar-shadow {
     position: absolute;
     left: 50%;
     bottom: 9px;
@@ -735,7 +735,7 @@
     z-index: 1;
 }
 
-.nitro-login-card .registration-wardrobe-rotation {
+.octane-login-card .registration-wardrobe-rotation {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -746,7 +746,7 @@
     background: #d8dfe4;
 }
 
-.nitro-login-card .registration-wardrobe-rotation button {
+.octane-login-card .registration-wardrobe-rotation button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -759,23 +759,23 @@
     cursor: pointer;
 }
 
-.nitro-login-card .registration-wardrobe-rotation button img {
+.octane-login-card .registration-wardrobe-rotation button img {
     filter: brightness(0) saturate(100%) invert(47%) sepia(86%) saturate(1316%) hue-rotate(164deg) brightness(88%) contrast(85%) drop-shadow(0 1px 0 #0e3f52);
 }
 
-.nitro-login-card .registration-wardrobe-rotation button:hover,
-.nitro-login-card .registration-wardrobe-rotation button:focus-visible {
+.octane-login-card .registration-wardrobe-rotation button:hover,
+.octane-login-card .registration-wardrobe-rotation button:focus-visible {
     border-color: #8b979f;
     background: #eef2f4;
     outline: none;
 }
 
-.nitro-login-card .registration-wardrobe-rotation button:hover img,
-.nitro-login-card .registration-wardrobe-rotation button:focus-visible img {
+.octane-login-card .registration-wardrobe-rotation button:hover img,
+.octane-login-card .registration-wardrobe-rotation button:focus-visible img {
     filter: brightness(0) saturate(100%) invert(36%) sepia(98%) saturate(1180%) hue-rotate(166deg) brightness(88%) contrast(91%) drop-shadow(0 1px 0 #0e3f52);
 }
 
-.nitro-login-card .registration-wardrobe-editor {
+.octane-login-card .registration-wardrobe-editor {
     display: grid;
     grid-template-rows: auto auto minmax(145px, 1fr) auto 78px;
     min-width: 0;
@@ -783,7 +783,7 @@
     overflow: hidden;
 }
 
-.nitro-login-card .registration-wardrobe-set-tabs {
+.octane-login-card .registration-wardrobe-set-tabs {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -791,7 +791,7 @@
     padding: 2px 4px;
 }
 
-.nitro-login-card .registration-wardrobe-set-tabs button {
+.octane-login-card .registration-wardrobe-set-tabs button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -807,12 +807,12 @@
     cursor: pointer;
 }
 
-.nitro-login-card .registration-wardrobe-set-tabs button > div {
+.octane-login-card .registration-wardrobe-set-tabs button > div {
     width: 100%;
     height: 100%;
 }
 
-.nitro-login-card .registration-wardrobe-set-tabs button img {
+.octane-login-card .registration-wardrobe-set-tabs button img {
     width: auto !important;
     height: auto !important;
     max-width: 30px;
@@ -820,13 +820,13 @@
     object-fit: contain;
 }
 
-.nitro-login-card .registration-wardrobe-set-tabs button:hover,
-.nitro-login-card .registration-wardrobe-set-tabs button.active {
+.octane-login-card .registration-wardrobe-set-tabs button:hover,
+.octane-login-card .registration-wardrobe-set-tabs button.active {
     border-color: #999999;
     background: #e7e7e7;
 }
 
-.nitro-login-card .registration-wardrobe-section-title {
+.octane-login-card .registration-wardrobe-section-title {
     min-height: 22px;
     padding: 3px 6px;
     color: #444444;
@@ -834,7 +834,7 @@
     font-weight: 700;
 }
 
-.nitro-login-card .registration-wardrobe-parts {
+.octane-login-card .registration-wardrobe-parts {
     position: relative;
     min-height: 0;
     overflow: hidden;
@@ -844,7 +844,7 @@
     padding: 5px;
 }
 
-.nitro-login-card .registration-wardrobe-parts > div {
+.octane-login-card .registration-wardrobe-parts > div {
     position: absolute;
     inset: 5px;
     width: auto !important;
@@ -855,28 +855,28 @@
     overscroll-behavior: contain;
 }
 
-.nitro-login-card .registration-wardrobe-part {
+.octane-login-card .registration-wardrobe-part {
     min-height: 48px;
     background-size: 75% auto !important;
     background-position: center !important;
 }
 
-.nitro-login-card .registration-wardrobe-part.wardrobe-part-hd {
+.octane-login-card .registration-wardrobe-part.wardrobe-part-hd {
     background-size: 64% auto !important;
 }
 
-.nitro-login-card .registration-wardrobe-part:focus-visible {
-    outline: 2px solid var(--nitro-card-header, #418db0);
+.octane-login-card .registration-wardrobe-part:focus-visible {
+    outline: 2px solid var(--octane-card-header, #418db0);
     outline-offset: -2px;
 }
 
-.nitro-login-card .registration-wardrobe-part.wardrobe-part-loading:not(:has(.nitro-icon)) {
+.octane-login-card .registration-wardrobe-part.wardrobe-part-loading:not(:has(.octane-icon)) {
     background-image: linear-gradient(110deg, #e9e8e4 30%, #f8f8f6 45%, #e9e8e4 60%);
     background-size: 200% 100% !important;
     animation: wardrobe-loading 1.1s linear infinite;
 }
 
-.nitro-login-card .registration-wardrobe-palette {
+.octane-login-card .registration-wardrobe-palette {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(27px, 1fr));
     gap: 4px;
@@ -888,7 +888,7 @@
     background: #eeeeeb;
 }
 
-.nitro-login-card .registration-wardrobe-palette button {
+.octane-login-card .registration-wardrobe-palette button {
     min-width: 27px;
     height: 27px;
     padding: 0;
@@ -898,26 +898,26 @@
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.45);
 }
 
-.nitro-login-card .registration-wardrobe-palette button:hover {
+.octane-login-card .registration-wardrobe-palette button:hover {
     border-color: #777777;
 }
 
-.nitro-login-card .registration-wardrobe-palette button.active {
+.octane-login-card .registration-wardrobe-palette button.active {
     border-color: #1d657f;
     box-shadow: 0 0 0 2px #66b6d2;
 }
 
-.nitro-login-card .registration-wardrobe-palette button:disabled {
+.octane-login-card .registration-wardrobe-palette button:disabled {
     cursor: not-allowed;
     opacity: 0.45;
 }
 
-.nitro-login-card .registration-wardrobe-loading {
+.octane-login-card .registration-wardrobe-loading {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: var(--nitro-card-muted, #666666);
+    color: var(--octane-card-muted, #666666);
     font-size: 13px;
 }
 
@@ -927,14 +927,14 @@
     }
 }
 
-.nitro-login-card .hot-looks-row {
+.octane-login-card .hot-looks-row {
     display: flex;
     justify-content: center;
     gap: 8px;
     margin-top: 2px;
 }
 
-.nitro-login-card .server-offline {
+.octane-login-card .server-offline {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -943,29 +943,29 @@
     text-align: left;
 }
 
-.nitro-login-card .server-offline .retry-link {
+.octane-login-card .server-offline .retry-link {
     background: linear-gradient(180deg, #f2f8fb 0%, #d4e6ef 44%, #a8c9d8 45%, #d9e9f0 100%);
     border: 2px solid var(--habbo-blue-header-border, #376275);
     border-radius: 4px;
     padding: 2px 10px;
     font-size: 13px;
     font-weight: 700;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     cursor: pointer;
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.8), 0 1px rgba(0, 0, 0, 0.15);
 }
 
-.nitro-login-card .server-offline .retry-link:disabled {
+.octane-login-card .server-offline .retry-link:disabled {
     opacity: 0.55;
     cursor: not-allowed;
 }
 
-.nitro-login-card .hot-looks-button {
+.octane-login-card .hot-looks-button {
     padding: 5px 16px;
     font-size: 13px;
 }
 
-.nitro-login-card .random-look-button {
+.octane-login-card .random-look-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -973,57 +973,57 @@
 }
 
 @media (max-width: 540px) {
-    .nitro-login-card .registration-wardrobe-main {
+    .octane-login-card .registration-wardrobe-main {
         grid-template-columns: 1fr;
         height: auto;
     }
 
-    .nitro-login-card .registration-wardrobe-preview {
+    .octane-login-card .registration-wardrobe-preview {
         justify-self: center;
         min-height: 0;
     }
 
-    .nitro-login-card .registration-wardrobe-editor {
+    .octane-login-card .registration-wardrobe-editor {
         min-height: 300px;
     }
 
 }
 
 @media (max-width: 1180px) {
-    .nitro-login-view .login-widgets {
+    .octane-login-view .login-widgets {
         left: 210px;
         right: 315px;
         grid-template-columns: 1fr;
         gap: 16px;
     }
 
-    .nitro-login-view .login-widget-slot {
+    .octane-login-view .login-widget-slot {
         grid-template-columns: 120px minmax(0, 1fr);
         min-height: 86px;
         gap: 14px;
     }
 
-    .nitro-login-view .login-widget-image {
+    .octane-login-view .login-widget-image {
         max-width: 110px;
         max-height: 110px;
     }
 }
 
 @media (max-width: 600px) {
-    .nitro-login-view .login-language-picker {
+    .octane-login-view .login-language-picker {
         top: 12px;
         right: 12px;
         min-width: 150px;
     }
 
-    .nitro-login-view .login-language-select-wrap select {
+    .octane-login-view .login-language-select-wrap select {
         min-width: 104px;
     }
 }
 
 /* ─── Login News Window (Habbo flavour) ─── */
 
-.nitro-login-view .login-news-stack {
+.octane-login-view .login-news-stack {
     position: absolute;
     top: 25%;
     left: 8vw;
@@ -1035,12 +1035,12 @@
     pointer-events: auto;
 }
 
-.nitro-login-view .news-card-wrapper {
+.octane-login-view .news-card-wrapper {
     position: relative;
     animation: news-pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.nitro-login-view .news-card-wrapper > .nitro-login-card.nitro-news-card {
+.octane-login-view .news-card-wrapper > .octane-login-card.octane-news-card {
     position: relative;
     overflow: visible;
     border-width: 3px;
@@ -1055,7 +1055,7 @@
 }
 
 /* Yellow Habbo-style ribbon title */
-.nitro-login-card.nitro-news-card .card-title.news-ribbon {
+.octane-login-card.octane-news-card .card-title.news-ribbon {
     position: absolute;
     top: -14px;
     left: -10px;
@@ -1080,8 +1080,8 @@
 }
 
 /* Pennant tails on the ribbon */
-.nitro-login-card.nitro-news-card .card-title.news-ribbon::before,
-.nitro-login-card.nitro-news-card .card-title.news-ribbon::after {
+.octane-login-card.octane-news-card .card-title.news-ribbon::before,
+.octane-login-card.octane-news-card .card-title.news-ribbon::after {
     content: "";
     position: absolute;
     bottom: -6px;
@@ -1092,24 +1092,24 @@
     z-index: -1;
 }
 
-.nitro-login-card.nitro-news-card .card-title.news-ribbon::before {
+.octane-login-card.octane-news-card .card-title.news-ribbon::before {
     left: -2px;
     clip-path: polygon(0 0, 100% 0, 100% 100%);
     transform: rotate(0deg);
 }
 
-.nitro-login-card.nitro-news-card .card-title.news-ribbon::after {
+.octane-login-card.octane-news-card .card-title.news-ribbon::after {
     right: -2px;
     clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
-.nitro-login-card.nitro-news-card .news-ribbon-text {
+.octane-login-card.octane-news-card .news-ribbon-text {
     display: inline-block;
     animation: news-ribbon-wobble 4s ease-in-out infinite;
 }
 
 /* "NEW!" star badge */
-.nitro-login-view .news-new-badge {
+.octane-login-view .news-new-badge {
     position: absolute;
     top: -28px;
     right: -24px;
@@ -1141,7 +1141,7 @@
     pointer-events: none;
 }
 
-.nitro-login-view .news-new-badge span {
+.octane-login-view .news-new-badge span {
     transform: rotate(-10deg);
     display: inline-block;
     line-height: 1;
@@ -1149,7 +1149,7 @@
 }
 
 /* Sparkles around the card */
-.nitro-login-view .news-sparkle {
+.octane-login-view .news-sparkle {
     position: absolute;
     color: #fff5b0;
     text-shadow:
@@ -1161,7 +1161,7 @@
     font-weight: 700;
 }
 
-.nitro-login-view .news-sparkle-1 {
+.octane-login-view .news-sparkle-1 {
     top: -8px;
     left: 18px;
     font-size: 14px;
@@ -1169,7 +1169,7 @@
     animation-delay: 0s;
 }
 
-.nitro-login-view .news-sparkle-2 {
+.octane-login-view .news-sparkle-2 {
     top: 38%;
     left: -12px;
     font-size: 12px;
@@ -1177,7 +1177,7 @@
     animation-delay: 0.6s;
 }
 
-.nitro-login-view .news-sparkle-3 {
+.octane-login-view .news-sparkle-3 {
     bottom: -6px;
     right: 36px;
     font-size: 16px;
@@ -1186,13 +1186,13 @@
 }
 
 /* Body */
-.nitro-login-card.nitro-news-card .card-body.news-body {
+.octane-login-card.octane-news-card .card-body.news-body {
     gap: 8px;
     font-size: 14px;
     color: #0a2e45;
 }
 
-.nitro-login-card.nitro-news-card .news-image {
+.octane-login-card.octane-news-card .news-image {
     position: relative;
     display: flex;
     align-items: center;
@@ -1214,11 +1214,11 @@
     transition: transform 0.25s ease;
 }
 
-.nitro-login-card.nitro-news-card .news-image:hover {
+.octane-login-card.octane-news-card .news-image:hover {
     transform: translateY(-1px) scale(1.01);
 }
 
-.nitro-login-card.nitro-news-card .news-image::after {
+.octane-login-card.octane-news-card .news-image::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -1226,7 +1226,7 @@
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 35%);
 }
 
-.nitro-login-card.nitro-news-card .news-image img {
+.octane-login-card.octane-news-card .news-image img {
     max-width: 100%;
     max-height: 146px;
     width: auto;
@@ -1238,7 +1238,7 @@
     z-index: 1;
 }
 
-.nitro-login-card.nitro-news-card .news-headline {
+.octane-login-card.octane-news-card .news-headline {
     font-weight: 800;
     font-size: 15px;
     line-height: 1.25;
@@ -1249,7 +1249,7 @@
     padding-bottom: 4px;
 }
 
-.nitro-login-card.nitro-news-card .news-text {
+.octane-login-card.octane-news-card .news-text {
     font-size: 13px;
     line-height: 1.45;
     color: #103e5d;
@@ -1260,7 +1260,7 @@
     padding-right: 2px;
 }
 
-.nitro-login-card.nitro-news-card .news-footer {
+.octane-login-card.octane-news-card .news-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1268,7 +1268,7 @@
     margin-top: 4px;
 }
 
-.nitro-login-card.nitro-news-card .news-link-button {
+.octane-login-card.octane-news-card .news-link-button {
     padding: 4px 14px;
     font-size: 13px;
     font-weight: 800;
@@ -1283,7 +1283,7 @@
     transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.nitro-login-card.nitro-news-card .news-link-button:hover {
+.octane-login-card.octane-news-card .news-link-button:hover {
     background: linear-gradient(180deg, #fff0a8 0%, #ffd45c 60%, #f7b822 100%);
     transform: translateY(-1px);
     box-shadow:
@@ -1292,29 +1292,29 @@
         0 3px 0 rgba(0, 0, 0, 0.25);
 }
 
-.nitro-login-card.nitro-news-card .news-link-button:active {
+.octane-login-card.octane-news-card .news-link-button:active {
     transform: translateY(1px);
     box-shadow:
         inset 0 1px rgba(0, 0, 0, 0.15),
         0 0 0 rgba(0, 0, 0, 0);
 }
 
-.nitro-login-card.nitro-news-card .news-pager {
+.octane-login-card.octane-news-card .news-pager {
     display: flex;
     align-items: center;
     gap: 6px;
     margin-left: auto;
 }
 
-.nitro-login-card.nitro-news-card .news-pager .arrow-btn {
+.octane-login-card.octane-news-card .news-pager .arrow-btn {
     transition: transform 0.12s ease;
 }
 
-.nitro-login-card.nitro-news-card .news-pager .arrow-btn:hover {
+.octane-login-card.octane-news-card .news-pager .arrow-btn:hover {
     transform: scale(1.15);
 }
 
-.nitro-login-card.nitro-news-card .news-counter {
+.octane-login-card.octane-news-card .news-counter {
     font-size: 12px;
     color: #134b6e;
     font-weight: 700;
@@ -1360,43 +1360,43 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .nitro-login-view .news-card-wrapper,
-    .nitro-login-view .news-card-wrapper > .nitro-login-card.nitro-news-card,
-    .nitro-login-view .news-new-badge,
-    .nitro-login-view .news-sparkle,
-    .nitro-login-card.nitro-news-card .news-ribbon-text {
+    .octane-login-view .news-card-wrapper,
+    .octane-login-view .news-card-wrapper > .octane-login-card.octane-news-card,
+    .octane-login-view .news-new-badge,
+    .octane-login-view .news-sparkle,
+    .octane-login-card.octane-news-card .news-ribbon-text {
         animation: none !important;
     }
 }
 
 @media (max-width: 1100px) {
-    .nitro-login-view .login-news-stack {
+    .octane-login-view .login-news-stack {
         left: 24px;
         top: 45%;
     }
 }
 
 @media (max-width: 900px) {
-    .nitro-login-view .login-news-stack {
+    .octane-login-view .login-news-stack {
         display: none;
     }
 }
 
-/* Login news uses the same frame and content surface as in-client Nitro cards. */
-.nitro-login-view .news-card-wrapper {
+/* Login news uses the same frame and content surface as in-client Octane cards. */
+.octane-login-view .news-card-wrapper {
     animation: none;
 }
 
-.nitro-login-view .news-card-wrapper > .nitro-login-card.nitro-card-shell.nitro-news-card {
+.octane-login-view .news-card-wrapper > .octane-login-card.octane-card-shell.octane-news-card {
     padding: 0;
     overflow: hidden;
     border-width: 2px;
-    background: var(--nitro-card-frame, #376275);
-    box-shadow: var(--nitro-card-shadow, 0 4px 4px rgba(0, 0, 0, 0.349));
+    background: var(--octane-card-frame, #376275);
+    box-shadow: var(--octane-card-shadow, 0 4px 4px rgba(0, 0, 0, 0.349));
     animation: none;
 }
 
-.nitro-login-card.nitro-card-shell.nitro-news-card .card-title.nitro-card-header-shell {
+.octane-login-card.octane-card-shell.octane-news-card .card-title.octane-card-header-shell {
     position: relative;
     inset: auto;
     min-height: 33px;
@@ -1404,33 +1404,33 @@
     margin: 0;
     padding: 4px 38px;
     border: 0;
-    border-bottom: 2px solid var(--nitro-card-border, #283f5d);
+    border-bottom: 2px solid var(--octane-card-border, #283f5d);
     border-radius: 4px 4px 0 0;
     background: linear-gradient(
         180deg,
-        var(--nitro-card-header-highlight, #5ba4c4) 0%,
-        var(--nitro-card-header, #418db0) 44%,
-        var(--nitro-card-header-shadow, #2e6f8a) 100%
+        var(--octane-card-header-highlight, #5ba4c4) 0%,
+        var(--octane-card-header, #418db0) 44%,
+        var(--octane-card-header-shadow, #2e6f8a) 100%
     );
     color: #ffffff;
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.38);
     text-transform: none;
 }
 
-.nitro-login-card.nitro-card-shell.nitro-news-card .card-body.news-body {
+.octane-login-card.octane-card-shell.octane-news-card .card-body.news-body {
     padding: 10px;
-    background: var(--nitro-card-surface, #dfdfdf);
-    color: var(--nitro-card-text, #151515);
+    background: var(--octane-card-surface, #dfdfdf);
+    color: var(--octane-card-text, #151515);
 }
 
-.nitro-login-card.nitro-card-shell.nitro-news-card .news-headline,
-.nitro-login-card.nitro-card-shell.nitro-news-card .news-text,
-.nitro-login-card.nitro-card-shell.nitro-news-card .news-counter {
-    color: var(--nitro-card-text, #151515);
+.octane-login-card.octane-card-shell.octane-news-card .news-headline,
+.octane-login-card.octane-card-shell.octane-news-card .news-text,
+.octane-login-card.octane-card-shell.octane-news-card .news-counter {
+    color: var(--octane-card-text, #151515);
     text-shadow: none;
 }
 
-.nitro-login-card.nitro-card-shell.nitro-news-card .news-headline {
+.octane-login-card.octane-card-shell.octane-news-card .news-headline {
     border-bottom-color: var(--habbo-tab, #b6bec5);
 }
 
@@ -1517,11 +1517,11 @@
 
 /* ─── Register dialog · room template step ─── */
 
-.nitro-login-modal .dialog.dialog-room {
+.octane-login-modal .dialog.dialog-room {
     width: 400px;
 }
 
-.nitro-login-card .room-templates-list {
+.octane-login-card .room-templates-list {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -1532,41 +1532,41 @@
     margin-top: 2px;
 }
 
-.nitro-login-card .room-template-option {
+.octane-login-card .room-template-option {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 8px 10px;
-    background: var(--nitro-card-surface-raised, #ececec);
+    background: var(--octane-card-surface-raised, #ececec);
     border: 1px solid var(--habbo-tab, #b6bec5);
     border-radius: 4px;
     cursor: pointer;
     transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     user-select: none;
     position: relative;
 }
 
-.nitro-login-card .room-template-option:hover {
+.octane-login-card .room-template-option:hover {
     border-color: #9aa3ab;
     background: #f4f4f4;
     box-shadow: none;
 }
 
-.nitro-login-card .room-template-option.selected {
+.octane-login-card .room-template-option.selected {
     border-color: var(--habbo-blue-header, #0e3f52);
     background: var(--habbo-select-outer, #82d1ed);
     box-shadow: inset 0 0 0 1px var(--habbo-select, #63c5e9);
 }
 
-.nitro-login-card .room-template-option input[type="radio"] {
+.octane-login-card .room-template-option input[type="radio"] {
     flex-shrink: 0;
     margin: 0;
     accent-color: #2a78b8;
     cursor: pointer;
 }
 
-.nitro-login-card .room-template-thumb {
+.octane-login-card .room-template-thumb {
     width: 64px;
     height: 48px;
     object-fit: cover;
@@ -1577,7 +1577,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-login-card .room-template-body {
+.octane-login-card .room-template-body {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -1585,28 +1585,28 @@
     flex: 1;
 }
 
-.nitro-login-card .room-template-title {
+.octane-login-card .room-template-title {
     font-size: 12px;
     font-weight: 700;
-    color: var(--nitro-card-text, #151515);
+    color: var(--octane-card-text, #151515);
     line-height: 1.25;
     text-transform: capitalize;
 }
 
-.nitro-login-card .room-template-description {
+.octane-login-card .room-template-description {
     font-size: 11px;
     line-height: 1.4;
-    color: var(--nitro-card-muted, #666666);
+    color: var(--octane-card-muted, #666666);
     word-break: break-word;
 }
 
 /* The "Skip" option sits at the top with a softer dashed border so it
    visually distinguishes itself from the actual templates. */
-.nitro-login-card .room-template-option.room-template-skip {
+.octane-login-card .room-template-option.room-template-skip {
     background: var(--habbo-panel, #f7f7f2);
     border-style: dashed;
 }
 
-.nitro-login-card .room-template-option.room-template-skip.selected {
+.octane-login-card .room-template-option.room-template-skip.selected {
     border-style: solid;
 }

@@ -6,10 +6,10 @@ import {
     RoomEngineTriggerWidgetEvent,
     RoomObjectCategory,
     RoomObjectVariable
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { useState } from 'react';
 import { IsOwnerOfFurniture, TryJoinGroup, TryVisitRoom } from '../../../../api';
-import { useMessageEvent, useNitroEvent } from '../../../events';
+import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
 
 export const MONSTERPLANT_SEED_CONFIRMATION: string = 'MONSTERPLANT_SEED_CONFIRMATION';
@@ -77,7 +77,7 @@ const useFurnitureContextMenuWidgetState = () => {
         onClose();
     };
 
-    useNitroEvent<RoomEngineTriggerWidgetEvent>(
+    useOctaneEvent<RoomEngineTriggerWidgetEvent>(
         [
             RoomEngineTriggerWidgetEvent.OPEN_FURNI_CONTEXT_MENU,
             RoomEngineTriggerWidgetEvent.CLOSE_FURNI_CONTEXT_MENU,

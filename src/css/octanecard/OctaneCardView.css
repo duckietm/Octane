@@ -1,0 +1,543 @@
+@font-face {
+    font-family: HabboAirUbuntu;
+    src: url("../../assets/webfonts/Ubuntu.ttf");
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: HabboAirUbuntu;
+    src: url("../../assets/webfonts/Ubuntu-b.ttf");
+    font-style: normal;
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: HabboAirUbuntu;
+    src: url("../../assets/webfonts/Ubuntu-i.ttf");
+    font-style: italic;
+    font-weight: 400;
+}
+
+:root {
+    --octane-card-border: var(--habbo-frame-border, #283f5d);
+    --octane-card-frame: #376275;
+    --octane-card-surface: var(--habbo-surface, #dfdfdf);
+    --octane-card-surface-raised: var(--habbo-grid-active, #ececec);
+    --octane-card-header: var(--habbo-blue, #418db0);
+    --octane-card-header-highlight: var(--habbo-blue-highlight, #5ba4c4);
+    --octane-card-header-shadow: var(--habbo-blue-dark, #2e6f8a);
+    --octane-card-text: var(--habbo-text, #151515);
+    --octane-card-muted: var(--habbo-text-muted, #666666);
+    --octane-card-focus: #ffd95a;
+    --octane-card-radius: 6px;
+    /* Air frame style 3 DropShadowFilter: distance 4, alpha 0.349 */
+    --octane-card-shadow: 0 4px 4px rgba(0, 0, 0, 0.349);
+}
+
+.octane-card,
+.octane-card-shell:not(.octane-wired) {
+    resize: both;
+    border: 1px solid #0f1b22 !important;
+    border-radius: 6px;
+    background: var(--octane-card-surface);
+    box-shadow: none;
+    filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.3333333333));
+    color: var(--octane-card-text);
+    overflow: hidden;
+}
+
+.octane-card-header,
+.octane-card-header-shell {
+    position: relative;
+    min-height: 31px;
+    max-height: 31px;
+    width: 100%;
+    margin: 0;
+    padding: 0 34px;
+    background: #347d93;
+    border: 0;
+    border-bottom: 1px solid #0f1b22;
+    border-radius: 5px 5px 0 0;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.28);
+
+    &:before {
+        position: absolute;
+        content: " ";
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .octane-card-header-text,
+    .octane-card-title {
+        position: relative;
+        z-index: 1;
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        overflow: hidden;
+        color: #fff;
+        text-overflow: ellipsis;
+        text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.65);
+        white-space: nowrap;
+        font-family: UbuntuCondensed, Ubuntu, sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 31px;
+        min-height: 31px;
+    }
+
+    .octane-card-header-close,
+    .octane-card-close-button {
+        appearance: none;
+        cursor: pointer;
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        z-index: 2;
+        box-sizing: border-box;
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+        border-radius: 4px;
+        border: 2px solid #921911;
+        box-shadow: 0 0 0 1.6px #ffffff;
+        background: repeating-linear-gradient(rgb(245, 80, 65), rgb(245, 80, 65) 50%, rgb(194, 48, 39) 50%, rgb(194, 48, 39) 100%);
+        transform: translateY(-50%);
+
+        &:hover {
+            filter: brightness(1.2);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--octane-card-focus);
+            outline-offset: 2px;
+        }
+
+        &:active {
+            filter: brightness(0.8);
+        }
+    }
+
+    .octane-card-close-button::before,
+    .octane-card-close-button::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        width: 9px;
+        height: 2px;
+        margin: auto;
+        border-radius: 2px;
+        background: #fff;
+        transform-origin: center;
+    }
+
+    .octane-card-close-button::before {
+        transform: rotate(45deg);
+    }
+
+    .octane-card-close-button::after {
+        transform: rotate(-45deg);
+    }
+}
+
+/* WIN63 habbo_window_layout_frame_3 / Ubuntu skin. Feature windows opt in
+   through OctaneCardView frameStyle={3}; the shared frame coordinate plane is
+   x=6/y=6 for the 27px titlebar and x=3/y=36 for generic content. */
+.octane-card-shell.octane-card-frame-3 {
+    --octane-card-frame-3: url("../../assets/images/habbo-skin/slices/frame-ubuntu-3.png");
+    --octane-card-close-3: url("../../assets/images/habbo-skin/slices/close-3-default.png");
+    --octane-card-close-3-hover: url("../../assets/images/habbo-skin/slices/close-3-hover.png");
+    --octane-card-close-3-pressed: url("../../assets/images/habbo-skin/slices/close-3-pressed.png");
+
+    isolation: isolate;
+    overflow: visible !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    filter: drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349)) !important;
+}
+
+.octane-card-shell.octane-card-frame-3::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 0;
+    border: solid transparent;
+    border-width: 33px 10px 10px;
+    border-image-source: var(--octane-card-frame-3);
+    border-image-slice: 33 10 10 10 fill;
+    border-image-width: 33px 10px 10px;
+    border-image-repeat: stretch;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-card-shell.octane-card-frame-3 > * {
+    z-index: 1;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell {
+    position: absolute !important;
+    top: 5px !important;
+    left: 5px !important;
+    z-index: 2;
+    width: calc(100% - 10px) !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 27px !important;
+    min-height: 27px !important;
+    max-height: 27px !important;
+    margin: 0 !important;
+    padding: 0 25px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell::before {
+    display: none !important;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-title {
+    position: absolute !important;
+    top: 2px !important;
+    right: 4px !important;
+    left: 4px !important;
+    width: auto !important;
+    height: 15px !important;
+    min-height: 15px !important;
+    margin: 0 !important;
+    color: #ffffff !important;
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 15px !important;
+    text-align: center;
+    text-shadow: none !important;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button {
+    top: 2px !important;
+    right: 0 !important;
+    width: 19px !important;
+    height: 20px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--octane-card-close-3) 0 0 / 19px 20px no-repeat !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button:hover {
+    background-image: var(--octane-card-close-3-hover) !important;
+    filter: none !important;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button:active {
+    background-image: var(--octane-card-close-3-pressed) !important;
+    filter: none !important;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button::before,
+.octane-card-shell.octane-card-frame-3 > .octane-card-header-shell .octane-card-close-button::after {
+    display: none !important;
+}
+
+.octane-card-header-shell.builders-club-card-header {
+    border-color: #d79d2e;
+    border-bottom-color: var(--octane-card-border);
+    background: linear-gradient(180deg, #d89f2d 0%, #c68515 100%);
+}
+
+.octane-card-tabs,
+.octane-card-tabs-shell {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    min-height: 32px;
+    max-height: 32px;
+    align-items: flex-end;
+    padding: 2px 3px 0 !important;
+    background: #dfdfd7;
+    border-bottom: 1px solid #000;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+
+    .nav-item,
+    .octane-card-tab-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 29px !important;
+        max-height: 29px !important;
+        min-width: 67px;
+        padding: 0 12px !important;
+        margin-bottom: 0;
+        color: var(--octane-card-text);
+        background: #cbc9c2;
+        border: 1px solid #55554f;
+        border-bottom: 0;
+        border-radius: 6px 6px 0 0;
+        box-shadow: inset 1px 1px #ffffff, inset -1px 0 rgba(0, 0, 0, 0.08);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 29px;
+        text-align: center;
+        white-space: nowrap;
+
+        &:before {
+            display: none;
+        }
+
+        &:hover {
+            background: #d8d6cf;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--octane-card-focus);
+            outline-offset: -2px;
+        }
+
+        &.active,
+        &.octane-card-tab-item-active {
+            background: var(--octane-card-surface);
+            border-bottom: 0;
+            box-shadow: inset 1px 1px #ffffff;
+        }
+    }
+}
+
+.content-area,
+.octane-card-content-shell {
+    height: 100%;
+    overflow: auto;
+    padding: 10px;
+    background: var(--octane-card-surface);
+    border: 0;
+    border-top: 0;
+    border-radius: 0 0 calc(var(--octane-card-radius) - 2px) calc(var(--octane-card-radius) - 2px);
+    font-family: Ubuntu, sans-serif;
+    color: var(--octane-card-text);
+}
+
+.builders-club-status-shell {
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    border-bottom: 2px solid var(--octane-card-border);
+    background: linear-gradient(180deg, rgba(84, 62, 46, 0.95) 0%, rgba(50, 38, 29, 0.97) 100%);
+}
+
+.builders-club-status-icon-shell {
+    background: rgba(255, 193, 70, 0.12);
+    border: 1px solid rgba(255, 193, 70, 0.26);
+}
+
+.octane-card-panel {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--habbo-tab, #b6bec5) !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+}
+
+.octane-card-row {
+    background: rgba(0, 0, 0, 0.035) !important;
+    border: 1px solid var(--habbo-tab, #b6bec5) !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.octane-card-row:hover {
+    background: rgba(0, 0, 0, 0.07) !important;
+    border-color: #9aa3ab !important;
+}
+
+.octane-card-divider {
+    border-color: var(--habbo-tab, #b6bec5) !important;
+    box-shadow: none !important;
+}
+
+.octane-card-shell :where(.bg-muted, .bg-light, .bg-light-dark, .bg-white, .bg-white\/50, .bg-white\/80) {
+    background: rgba(0, 0, 0, 0.04) !important;
+    box-shadow: none !important;
+}
+
+.octane-card-shell :where(.border, .border-muted, .border-card-grid-item-border, .border-card-grid-item-border-active, .border-white, .border-white\/10, .border-white\/20, .border-white\/30) {
+    border-color: var(--habbo-tab, #b6bec5) !important;
+    box-shadow: none !important;
+}
+
+.octane-card-shell :where(.shadow, .shadow-md, .shadow-lg, .shadow-inner, .shadow-inner1px) {
+    box-shadow: none !important;
+}
+
+.content-area,
+.octane-card-content-shell {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: Ubuntu, sans-serif;
+        font-weight: 700;
+        line-height: 1.15;
+        color: var(--octane-card-text);
+    }
+
+    p,
+    span,
+    label,
+    li,
+    td,
+    th,
+    input,
+    textarea,
+    select,
+    button {
+        font-family: Ubuntu, sans-serif;
+        color: var(--octane-card-text);
+    }
+
+    p,
+    label,
+    li,
+    td,
+    th,
+    input,
+    textarea,
+    select,
+    button {
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    &.theme-dark {
+        background-color: #1c323f !important;
+    }
+}
+
+/* Do NOT make the inner wrapper relative: if it were, the close button
+   (position:absolute) would anchor to it, which is only as wide as the content
+   area (header minus 38px padding per side), leaving the X detached from the
+   edge. Only set the width. */
+.octane-card-header,
+.octane-card-header-shell {
+    > .flex,
+    > div:not(.octane-card-close-button):not(.octane-card-header-close) {
+        width: 100%;
+    }
+}
+
+/* Close button anchored to the header shell (position:relative), whose
+   padding-box reaches the window edge: right:6px = 6px from the right edge.
+   Non-nested high-specificity rule + !important to beat Tailwind utilities. */
+.octane-card-header .octane-card-close-button,
+.octane-card-header-shell .octane-card-close-button,
+.octane-card-header .octane-card-header-close,
+.octane-card-header-shell .octane-card-header-close {
+    position: absolute !important;
+    top: 50% !important;
+    right: 6px !important;
+    left: auto !important;
+    width: 18px !important;
+    height: 18px !important;
+    transform: translateY(-50%) !important;
+}
+
+.octane-card-accordion-set {
+    &.active {
+        height: 100%;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.5);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .octane-card-accordion-set-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+}
+
+@media (max-width: 991.98px) {
+    .octane-card,
+    .octane-card-shell:not(.octane-wired) {
+        resize: none !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100vh - 16px) !important;
+    }
+
+    .octane-card,
+    .octane-card-shell:not(.octane-wired) {
+        .octane-card-header,
+        .octane-card-header-shell {
+            min-height: 31px;
+            max-height: 31px;
+            padding: 0 34px;
+
+            .octane-card-header-text,
+            .octane-card-title {
+                font-size: 13px;
+            }
+        }
+
+        .octane-card-tabs,
+        .octane-card-tabs-shell {
+            padding: 2px 3px 0;
+            gap: 0;
+
+            .nav-item,
+            .octane-card-tab-item {
+                padding: 0 12px;
+                font-size: 12px;
+            }
+        }
+
+        .content-area,
+        .octane-card-content-shell {
+            padding: 8px;
+        }
+    }
+
+    .content-area,
+    .octane-card-content-shell {
+        min-height: auto !important;
+        max-height: 100% !important;
+
+        p,
+        label,
+        li,
+        td,
+        th,
+        input,
+        textarea,
+        select,
+        button {
+            font-size: 11.5px;
+        }
+    }
+
+    .builders-club-status-shell {
+        padding: 10px 12px;
+    }
+}
+
+.draggable-window .drag-handler {
+    touch-action: none;
+}
+
+@media (max-width: 640px) {
+    .draggable-window:not([data-window-key='octane-radio']) {
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+    }
+}

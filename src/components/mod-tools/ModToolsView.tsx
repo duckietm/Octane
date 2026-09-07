@@ -6,12 +6,12 @@ import {
     RoomEngineEvent,
     RoomId,
     RoomObjectCategory,
-    RoomObjectType, HabboSearchComposer, HabboSearchResultData, HabboSearchResultEvent } from '@nitrots/nitro-renderer';
+    RoomObjectType, HabboSearchComposer, HabboSearchResultData, HabboSearchResultEvent } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { GetRoomSession, ISelectedUser, LocalizeText, SendMessageComposer } from '../../api';
-import { Button, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
-import { useMessageEvent, useModTools, useNitroEvent, useObjectSelectedEvent, useRoomUserListSnapshot } from '../../hooks';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
+import { useMessageEvent, useModTools, useOctaneEvent, useObjectSelectedEvent, useRoomUserListSnapshot } from '../../hooks';
 import { ModToolsChatlogView } from './views/room/ModToolsChatlogView';
 import { ModToolsRoomView } from './views/room/ModToolsRoomView';
 import { ModToolsTicketsView } from './views/tickets/ModToolsTicketsView';
@@ -62,7 +62,7 @@ export const ModToolsView: FC<{}> = (props) => {
         [selectedUser, roomUserList]
     );
 
-    useNitroEvent<RoomEngineEvent>([RoomEngineEvent.INITIALIZED, RoomEngineEvent.DISPOSED], (event) => {
+    useOctaneEvent<RoomEngineEvent>([RoomEngineEvent.INITIALIZED, RoomEngineEvent.DISPOSED], (event) => {
         if (RoomId.isRoomPreviewerId(event.roomId)) return;
 
         switch (event.type) {
@@ -208,14 +208,14 @@ export const ModToolsView: FC<{}> = (props) => {
     return (
         <>
             {isVisible && (
-                <NitroCardView
-                    className="nitro-mod-tools min-w-0 w-[min(260px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                <OctaneCardView
+                    className="octane-mod-tools min-w-0 w-[min(260px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                     theme="primary-slim"
                     uniqueKey="mod-tools"
                     windowPosition={DraggableWindowPosition.TOP_LEFT}
                 >
-                    <NitroCardHeaderView headerText={LocalizeText('modtools.window.title')} onCloseClick={(event) => setIsVisible(false)} />
-                    <NitroCardContentView className="text-black" gap={2}>
+                    <OctaneCardHeaderView headerText={LocalizeText('modtools.window.title')} onCloseClick={(event) => setIsVisible(false)} />
+                    <OctaneCardContentView className="text-black" gap={2}>
                         {/* Room tools */}
                         <div className="flex flex-col gap-1.5">
                             <div className="text-[.6rem] uppercase tracking-wide opacity-60 font-semibold pl-1">
@@ -230,7 +230,7 @@ export const ModToolsView: FC<{}> = (props) => {
                                 title={!isInRoom ? noRoomHint : undefined}
                                 onClick={() => CreateLinkEvent(`mod-tools/toggle-room-info/${currentRoomId}`)}
                             >
-                                <div className="nitro-icon icon-small-room shrink-0" />
+                                <div className="octane-icon icon-small-room shrink-0" />
                                 <span className="grow text-start">{LocalizeText('modtools.window.tools.room')}</span>
                             </Button>
                             <Button
@@ -243,7 +243,7 @@ export const ModToolsView: FC<{}> = (props) => {
                                 title={!isInRoom ? noRoomHint : undefined}
                                 onClick={() => CreateLinkEvent(`mod-tools/toggle-room-chatlog/${currentRoomId}`)}
                             >
-                                <div className="nitro-icon icon-chat-history shrink-0" />
+                                <div className="octane-icon icon-chat-history shrink-0" />
                                 <span className="grow text-start">{LocalizeText('modtools.window.tools.chatlog')}</span>
                             </Button>
                         </div>
@@ -290,14 +290,14 @@ export const ModToolsView: FC<{}> = (props) => {
                                         variant="secondary"
                                         onClick={() => CreateLinkEvent(`mod-tools/toggle-user-info/${selectedUser.userId}`)}
                                     >
-                                        <div className="nitro-icon icon-user shrink-0" />
+                                        <div className="octane-icon icon-user shrink-0" />
                                         <span className="grow text-start">{LocalizeText('modtools.window.user.open_info')}</span>
                                     </Button>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-1.5">
                                     <div className="flex items-center gap-2 rounded p-2 border border-dashed border-zinc-300 bg-zinc-50/50">
-                                        <div className="nitro-icon icon-avatar-anonymous shrink-0 opacity-70" />
+                                        <div className="octane-icon icon-avatar-anonymous shrink-0 opacity-70" />
                                         <span className="text-xs italic">{LocalizeText('modtools.window.select.user')}</span>
                                     </div>
                                     <div className="relative">
@@ -337,7 +337,7 @@ export const ModToolsView: FC<{}> = (props) => {
                                 {LocalizeText('modtools.window.section.reports')}
                             </div>
                             <Button active={isTicketsVisible} gap={2} justifyContent="start" variant="secondary" onClick={() => setIsTicketsVisible((prevValue) => !prevValue)}>
-                                <div className="nitro-icon icon-tickets shrink-0" />
+                                <div className="octane-icon icon-tickets shrink-0" />
                                 <span className="grow text-start">{LocalizeText('modtools.window.tools.report')}</span>
                                 {openTicketsCount > 0 && (
                                     <span
@@ -353,8 +353,8 @@ export const ModToolsView: FC<{}> = (props) => {
                                 )}
                             </Button>
                         </div>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
             {openRooms.length > 0 &&
                 openRooms.map((roomId) => (

@@ -1,6 +1,6 @@
 # Secure Runtime Production Setup
 
-Quick setup guide for running Nitro with:
+Quick setup guide for running Octane with:
 
 - configuration and gamedata served through `/nitro-sec/file`;
 - encrypted runtime `/api/*` calls;
@@ -11,7 +11,7 @@ Replace the example domains with your real domains:
 - `https://hotel.example.com`
 - `https://nitro.example.com:2096`
 
-## 1. Build Nitro
+## 1. Build Octane
 
 Inside the `octane` repository:
 
@@ -52,7 +52,7 @@ Secure production configuration:
     "secureApiEnabled": true,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -139,8 +139,8 @@ crypto.ws.enabled=1
 
 nitro.secure.assets.enabled=true
 nitro.secure.api.enabled=true
-nitro.secure.config.root=C:/inetpub/wwwroot/hotel/nitro/configuration
-nitro.secure.gamedata.root=C:/inetpub/wwwroot/hotel/nitro/client/nitro/gamedata
+nitro.secure.config.root=C:/inetpub/wwwroot/hotel/octane/configuration
+nitro.secure.gamedata.root=C:/inetpub/wwwroot/hotel/octane/client/octane/gamedata
 nitro.secure.master_key=change-this-to-a-long-random-secret
 
 login.remember.enabled=true
@@ -212,7 +212,7 @@ For quick debugging, only change `client-mode.json`:
     "secureApiEnabled": false,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -359,7 +359,7 @@ https://nitro.example.com:2096/nitro-sec/file?kind=config&file=...
 The emulator reads them from:
 
 ```ini
-nitro.secure.config.root=C:/inetpub/wwwroot/hotel/nitro/configuration
+nitro.secure.config.root=C:/inetpub/wwwroot/hotel/octane/configuration
 ```
 
 If you add new JSON/JS files inside `configuration` and want to protect them, they must be requested through the secure endpoint or loaded through `bootstrap.js`.

@@ -1,4 +1,4 @@
-import { GetSessionDataManager, HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, HabboClubLevelEnum, RoomControllerLevel } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
@@ -346,7 +346,7 @@ export const ChatInputView: FC<{}> = (props) => {
         // left cap via a negative margin. With justify-between, hiding an optional
         // trailing button (habbicons disabled) redistributes the slack between the
         // trigger and the bubble, exposing the cap and opening a gap.
-        <div className="nitro-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible">
+        <div className="octane-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible">
             {commandSelectorVisible && (
                 <ChatInputCommandSelectorView
                     commands={filteredCommands}

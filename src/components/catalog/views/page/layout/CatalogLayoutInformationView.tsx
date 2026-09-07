@@ -12,20 +12,20 @@ export const CatalogLayoutInformationView: FC<CatalogLayoutProps> = ({ page, hid
 
     if (!images.length && !texts.length) {
         return (
-            <div className="nitro-catalog-specialized-state" role="status">
+            <div className="octane-catalog-specialized-state" role="status">
                 {localizeWithFallback('catalog.layout.info.empty', 'Information will be available here soon.')}
             </div>
         );
     }
 
     return (
-        <article className="nitro-catalog-information-layout">
+        <article className="octane-catalog-information-layout">
             {!!images.length && (
-                <div className="nitro-catalog-information-images">
+                <div className="octane-catalog-information-images">
                     {images.map((image, index) => <img key={`${image}-${index}`} alt="" src={image} />)}
                 </div>
             )}
-            <div className="nitro-catalog-information-copy">
+            <div className="octane-catalog-information-copy">
                 {texts.map((text, index) => (
                     <section key={index} dangerouslySetInnerHTML={{ __html: SanitizeHtml(text) }} />
                 ))}

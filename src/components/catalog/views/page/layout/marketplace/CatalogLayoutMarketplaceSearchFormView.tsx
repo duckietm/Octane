@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { IMarketplaceSearchOptions, LocalizeText, MarketplaceSearchType } from '../../../../../../api';
 import { Button, Text } from '../../../../../../common';
-import { NitroInput } from '../../../../../../layout';
+import { OctaneInput } from '../../../../../../layout';
 
 export interface SearchFormViewProps {
     searchType: number;
@@ -60,13 +60,13 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
                 <>
                     <div className="flex items-center gap-1">
                         <Text className="col-span-3">{LocalizeText('catalog.marketplace.search_name')}</Text>
-                        <NitroInput value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} />
+                        <OctaneInput value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} />
                     </div>
                     <div className="flex items-center gap-1">
                         <Text className="col-span-3">{LocalizeText('catalog.marketplace.search_price')}</Text>
                         <div className="flex w-full gap-1">
-                            <NitroInput min={0} type="number" value={min} onChange={(event) => setMin(event.target.valueAsNumber)} />
-                            <NitroInput min={0} type="number" value={max} onChange={(event) => setMax(event.target.valueAsNumber)} />
+                            <OctaneInput min={0} type="number" value={min} onChange={(event) => setMin(event.target.valueAsNumber)} />
+                            <OctaneInput min={0} type="number" value={max} onChange={(event) => setMax(event.target.valueAsNumber)} />
                         </div>
                     </div>
                     <Button className="mx-auto" variant="secondary" onClick={onClickSearch}>

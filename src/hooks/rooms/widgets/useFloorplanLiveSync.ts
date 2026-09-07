@@ -1,4 +1,4 @@
-import { GetRoomEngine, GetRoomMessageHandler } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, GetRoomMessageHandler } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { parseTilemap, serializeTilemap } from '../../../components/floorplan-editor/state/encoding';
 import { FloorplanState } from '../../../components/floorplan-editor/state/types';

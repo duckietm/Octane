@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
@@ -52,7 +52,7 @@ export const WiredConditionActorIsWearingEffectView: FC<WiredConditionActorIsWea
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.effectid', LocalizeText('wiredfurni.tooltip.effectid'))}</Text>
-                <NitroInput type="number" value={effect} onChange={(event) => setEffect(parseInt(event.target.value))} />
+                <OctaneInput type="number" value={effect} onChange={(event) => setEffect(parseInt(event.target.value))} />
             </div>
         </WiredConditionBaseView>
     );

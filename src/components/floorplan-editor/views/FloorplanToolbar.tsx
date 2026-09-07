@@ -55,7 +55,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                         pointer
                         data-testid={b.id}
                         data-active={active ? 'true' : 'false'}
-                        className={`nitro-icon ${b.iconClass} ${active ? 'border border-primary' : ''}`}
+                        className={`octane-icon ${b.iconClass} ${active ? 'border border-primary' : ''}`}
                         onClick={() => {
                             exitPan();
                             dispatch({ type: 'BRUSH_SET', action: b.mode });
@@ -66,7 +66,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
             <Base
                 pointer
                 data-testid="tool-select-all"
-                className={`nitro-icon ${state.brush.action === 'UNSET' ? 'icon-set-deselect' : 'icon-set-select'}`}
+                className={`octane-icon ${state.brush.action === 'UNSET' ? 'icon-set-deselect' : 'icon-set-select'}`}
                 title={state.brush.action === 'UNSET' ? 'Erase all tiles' : 'Apply brush to all tiles'}
                 onClick={() => {
                     exitPan();
@@ -83,7 +83,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                         ? 'Rectangular selection mode active — drag on the canvas to apply the brush'
                         : 'Rectangular selection — apply the brush to all tiles in an area'
                 }
-                className={`nitro-icon icon-set-squaresselect transition-shadow ${state.squareSelect && !panMode ? 'border-2 border-amber-500 bg-amber-400 shadow-[0_0_0_2px_rgba(245,158,11,0.45)]' : ''}`}
+                className={`octane-icon icon-set-squaresselect transition-shadow ${state.squareSelect && !panMode ? 'border-2 border-amber-500 bg-amber-400 shadow-[0_0_0_2px_rgba(245,158,11,0.45)]' : ''}`}
                 onClick={() => {
                     exitPan();
                     dispatch({ type: 'SQUARE_SELECT_TOGGLE' });

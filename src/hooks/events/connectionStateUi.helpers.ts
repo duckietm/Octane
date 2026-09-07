@@ -1,4 +1,4 @@
-import { ConnectionStatePhase, IConnectionStateSnapshot } from '@nitrots/nitro-renderer';
+import { ConnectionStatePhase, IConnectionStateSnapshot } from '@octane/renderer';
 
 type ReconnectSnapshot = Pick<IConnectionStateSnapshot, 'phase' | 'reconnectAttempt' | 'maxReconnectAttempts'>;
 

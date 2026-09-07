@@ -2,7 +2,7 @@
     transition: bottom 140ms ease-out, background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease, border-radius 220ms ease;
 }
 
-.nitro-toolbar-hobba {
+.octane-toolbar-hobba {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -13,7 +13,7 @@
     background: #55534e;
 }
 
-.nitro-toolbar-mobile-hobba {
+.octane-toolbar-mobile-hobba {
     min-height: 44px;
     border: 1px solid rgba(0, 0, 0, 0.50);
     border-radius: 7px;
@@ -35,8 +35,8 @@
     filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.28));
 }
 
-.tb-nav-clip .nitro-icon:hover,
-.tb-nav-clip .nitro-icon:active {
+.tb-nav-clip .octane-icon:hover,
+.tb-nav-clip .octane-icon:active {
     transform: none;
     filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.28));
 }

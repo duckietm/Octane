@@ -1,8 +1,8 @@
-import { GetRoomVisitsMessageComposer, RoomVisitsData, RoomVisitsEvent } from '@nitrots/nitro-renderer';
+import { GetRoomVisitsMessageComposer, RoomVisitsData, RoomVisitsEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaClock, FaDoorOpen, FaSignInAlt } from 'react-icons/fa';
 import { LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api';
-import { DraggableWindowPosition, InfiniteScroll, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { DraggableWindowPosition, InfiniteScroll, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 
 interface ModToolsUserRoomVisitsViewProps {
@@ -37,13 +37,13 @@ export const ModToolsUserRoomVisitsView: FC<ModToolsUserRoomVisitsViewProps> = (
             : LocalizeText('modtools.user.visits.entries.many', ['count'], [rows.length.toString()]);
 
     return (
-        <NitroCardView
-            className="nitro-mod-tools-user-visits min-w-0 w-[min(460px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-mod-tools-user-visits min-w-0 w-[min(460px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
-            <NitroCardHeaderView headerText={LocalizeText('modtools.user.visits.title')} onCloseClick={onCloseClick} />
-            <NitroCardContentView className="text-black" gap={1}>
+            <OctaneCardHeaderView headerText={LocalizeText('modtools.user.visits.title')} onCloseClick={onCloseClick} />
+            <OctaneCardContentView className="text-black" gap={1}>
                 {/* Header strip */}
                 <div className="flex items-center gap-2 bg-gradient-to-r from-sky-50 to-transparent rounded p-2 border border-sky-100">
                     <FaDoorOpen className="text-sky-600 shrink-0" size={14} />
@@ -92,7 +92,7 @@ export const ModToolsUserRoomVisitsView: FC<ModToolsUserRoomVisitsViewProps> = (
                         )}
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

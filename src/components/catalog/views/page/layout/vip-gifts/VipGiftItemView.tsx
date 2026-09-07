@@ -1,4 +1,4 @@
-import { CatalogPageMessageOfferData } from '@nitrots/nitro-renderer';
+import { CatalogPageMessageOfferData } from '@octane/renderer';
 import { FC, useCallback } from 'react';
 import { LocalizeText, ProductImageUtility } from '../../../../../../api';
 import { Button, LayoutGridItem, LayoutImage, Text } from '../../../../../../common';

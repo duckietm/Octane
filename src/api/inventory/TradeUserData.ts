@@ -1,4 +1,4 @@
-import { AdvancedMap } from '@nitrots/nitro-renderer';
+import { AdvancedMap } from '@octane/renderer';
 import { GroupItem } from './GroupItem';
 
 export class TradeUserData {

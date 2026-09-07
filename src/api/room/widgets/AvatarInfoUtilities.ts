@@ -16,8 +16,8 @@ import {
     RoomObjectVariable,
     RoomTradingLevelEnum,
     RoomWidgetEnumItemExtradataParameter
-} from '@nitrots/nitro-renderer';
-import { GetRoomSession, IsOwnerOfFurniture } from '../../nitro';
+} from '@octane/renderer';
+import { GetRoomSession, IsOwnerOfFurniture } from '../../octane';
 import { LocalizeText } from '../../utils';
 import { AvatarInfoFurni } from './AvatarInfoFurni';
 import { AvatarInfoName } from './AvatarInfoName';

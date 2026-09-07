@@ -1,4 +1,4 @@
-import { IRareValue, RareValuesEvent, RequestRareValuesComposer } from '@nitrots/nitro-renderer';
+import { IRareValue, RareValuesEvent, RequestRareValuesComposer } from '@octane/renderer';
 import { useCallback, useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';

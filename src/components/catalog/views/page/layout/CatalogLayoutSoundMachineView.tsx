@@ -1,9 +1,9 @@
-import { GetOfficialSongIdMessageComposer, GetSoundManager, MusicPriorities, OfficialSongIdMessageEvent, SongInfoReceivedEvent } from '@nitrots/nitro-renderer';
+import { GetOfficialSongIdMessageComposer, GetSoundManager, MusicPriorities, OfficialSongIdMessageEvent, SongInfoReceivedEvent } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { LayoutFurniImageView } from '../../../../../common';
-import { getCatalogGridMetrics, useCatalogData, useCatalogDisplayPreferences, useMessageEvent, useNitroEvent } from '../../../../../hooks';
-import { NitroButton } from '../../../../../layout';
+import { getCatalogGridMetrics, useCatalogData, useCatalogDisplayPreferences, useMessageEvent, useOctaneEvent } from '../../../../../hooks';
+import { OctaneButton } from '../../../../../layout';
 import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
 import { CatalogPriceDisplayWidgetView } from '../widgets/CatalogPriceDisplayWidgetView';
 import { CatalogPurchaseSelectionPrompt } from '../widgets/CatalogPurchaseSelectionPrompt';
@@ -50,7 +50,7 @@ export const CatalogLayoutSoundMachineView: FC<CatalogLayoutProps> = (props) => 
         setSongId(parser.songId > 0 ? parser.songId : -1);
     });
 
-    useNitroEvent<SongInfoReceivedEvent>(SongInfoReceivedEvent.SIR_TRAX_SONG_INFO_RECEIVED, (event) => {
+    useOctaneEvent<SongInfoReceivedEvent>(SongInfoReceivedEvent.SIR_TRAX_SONG_INFO_RECEIVED, (event) => {
         if (event.id !== songId) return;
 
         updateSongLength(event.id);
@@ -99,14 +99,14 @@ export const CatalogLayoutSoundMachineView: FC<CatalogLayoutProps> = (props) => 
     }, [songLength]);
 
     return (
-        <div className="nitro-catalog-sound-layout">
-            <section className="nitro-catalog-sound-product">
+        <div className="octane-catalog-sound-layout">
+            <section className="octane-catalog-sound-product">
                 {currentOffer ? (
                     <>
-                        <strong className="nitro-catalog-sound-title">{currentOffer.localizationName}</strong>
-                        <span className="nitro-catalog-sound-description">{currentOffer.localizationDescription}</span>
-                        <span className="nitro-catalog-sound-length">{formattedSongLength}</span>
-                        <div className="nitro-catalog-sound-product-render">
+                        <strong className="octane-catalog-sound-title">{currentOffer.localizationName}</strong>
+                        <span className="octane-catalog-sound-description">{currentOffer.localizationDescription}</span>
+                        <span className="octane-catalog-sound-length">{formattedSongLength}</span>
+                        <div className="octane-catalog-sound-product-render">
                             <LayoutFurniImageView
                                 direction={2}
                                 extraData={currentOffer.product.extraParam}
@@ -114,36 +114,36 @@ export const CatalogLayoutSoundMachineView: FC<CatalogLayoutProps> = (props) => 
                                 productType={currentOffer.product.productType}
                             />
                         </div>
-                        <div className="nitro-catalog-sound-price">
+                        <div className="octane-catalog-sound-price">
                             <CatalogPriceDisplayWidgetView offer={currentOffer} />
                         </div>
                         {currentOffer.product.extraParam.length > 0 && (
-                            <div className="nitro-catalog-sound-listen-panel">
+                            <div className="octane-catalog-sound-listen-panel">
                                 <span>{LocalizeText('play_preview')}</span>
-                                <NitroButton
-                                    className="nitro-catalog-sound-listen-button"
+                                <OctaneButton
+                                    className="octane-catalog-sound-listen-button"
                                     disabled={songId <= 0 || songLength === null}
                                     onClick={() => previewSong(songId)}
                                 >
                                     {LocalizeText('play_preview_button')}
-                                </NitroButton>
+                                </OctaneButton>
                             </div>
                         )}
                     </>
                 ) : (
-                    <span className="nitro-catalog-sound-select-product">{LocalizeText('catalog_selectproduct')}</span>
+                    <span className="octane-catalog-sound-select-product">{LocalizeText('catalog_selectproduct')}</span>
                 )}
             </section>
 
-            <div className="nitro-catalog-sound-grid">
+            <div className="octane-catalog-sound-grid">
                 <CatalogItemGridWidgetView
-                    className={`nitro-catalog-grid nitro-catalog-grid-density-${density}`}
+                    className={`octane-catalog-grid octane-catalog-grid-density-${density}`}
                     showPrices={showTilePrices}
                     {...gridMetrics}
                 />
             </div>
 
-            <div className="nitro-catalog-sound-purchase">{currentOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
+            <div className="octane-catalog-sound-purchase">{currentOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
         </div>
     );
 };

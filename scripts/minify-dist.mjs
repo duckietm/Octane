@@ -68,7 +68,7 @@ for(const file of [ 'app.css.dat', 'app.js.dat' ])
 const publicLoaderAssets = [
     [ 'src/assets/images/loading/octane-logo.png', 'octane-logo.png' ],
     [ 'src/assets/images/loading/loading.gif', 'loading.gif' ],
-    [ 'src/assets/images/notifications/nitro_v3.png', 'nitro_v3.png' ]
+    [ 'src/assets/images/notifications/octane_v3.png', 'octane_v3.png' ]
 ];
 
 for(const [ source, file ] of publicLoaderAssets)

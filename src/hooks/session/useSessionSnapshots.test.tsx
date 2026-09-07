@@ -2,7 +2,7 @@
 
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetEventDispatcher, GetSessionDataManager } from '../../nitro-renderer.mock';
+import { GetEventDispatcher, GetSessionDataManager } from '../../octane-renderer.mock';
 import { useHasPermission, usePermissionValue, useUserPermissions, useUserRank } from './useSessionSnapshots';
 
 // ============================================================================
@@ -154,11 +154,11 @@ describe('useHasPermission + usePermissionValue + useUserPermissions', () => {
 
         act(() => {
             // Renderer invariant: every invalidation produces a NEW
-            // map reference. The mock's NitroEventType proxy resolves
-            // any property to `mock:NitroEventType:<PROP>`, so that's
+            // map reference. The mock's OctaneEventType proxy resolves
+            // any property to `mock:OctaneEventType:<PROP>`, so that's
             // the wire string useSessionSnapshots subscribes against.
             permissionsSnapshot = new Map([['acc_supporttool', 1]]);
-            fakeDispatcher.dispatch('mock:NitroEventType:USER_PERMISSIONS_UPDATED');
+            fakeDispatcher.dispatch('mock:OctaneEventType:USER_PERMISSIONS_UPDATED');
         });
 
         expect(result.current).toBe(true);

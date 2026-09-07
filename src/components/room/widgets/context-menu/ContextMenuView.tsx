@@ -1,4 +1,4 @@
-import { GetStage, GetTicker, NitroRectangle, NitroTicker, RoomObjectType } from '@nitrots/nitro-renderer';
+import { GetStage, GetTicker, OctaneRectangle, OctaneTicker, RoomObjectType } from '@octane/renderer';
 import { CSSProperties, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FixedSizeStack, GetRoomObjectBounds, GetRoomObjectScreenLocation, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
@@ -55,7 +55,7 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
     const maxStackRef = useRef(-1000000);
 
     const updatePosition = useCallback(
-        (bounds: NitroRectangle, location: { x: number; y: number }) =>
+        (bounds: OctaneRectangle, location: { x: number; y: number }) =>
         {
             if (
                 !bounds ||
@@ -110,7 +110,7 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
 
     const getClassNames = useMemo(() =>
     {
-        const classes = ['nitro-context-menu', pos.x !== null ? 'visible' : 'invisible'];
+        const classes = ['octane-context-menu', pos.x !== null ? 'visible' : 'invisible'];
         if (isCollapsed) classes.push('menu-hidden');
         return [...classes, ...classNames];
     }, [pos.x, isCollapsed, classNames]);

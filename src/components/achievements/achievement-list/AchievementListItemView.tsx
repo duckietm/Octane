@@ -1,4 +1,4 @@
-import { AchievementData } from '@nitrots/nitro-renderer';
+import { AchievementData } from '@octane/renderer';
 import { CSSProperties, FC } from 'react';
 import { AchievementUtilities } from '../../../api';
 import { useAchievements } from '../../../hooks';

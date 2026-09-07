@@ -1,4 +1,4 @@
-import { RoomObjectCategory, RoomObjectVariable, WiredFurniOpacityUpdate } from '@nitrots/nitro-renderer';
+import { RoomObjectCategory, RoomObjectVariable, WiredFurniOpacityUpdate } from '@octane/renderer';
 
 export interface WiredOpacityObjectModel {
     getValue<T>(key: string): T;

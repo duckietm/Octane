@@ -1,4 +1,4 @@
-import { GetRoomEngine } from '@nitrots/nitro-renderer';
+import { GetRoomEngine } from '@octane/renderer';
 import { CSSProperties, FC, JSX, MouseEvent as ReactMouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaMinus, FaPlus, FaTimes } from 'react-icons/fa';
 import { MdGridOn } from 'react-icons/md';
@@ -423,12 +423,12 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () => {
                     selectionEnabledValues={[SOURCE_FURNI_PICKED]}
                     showSelectionToggle={false}
                     headerContent={
-                        <div className="nitro-wired__give-var-targets">
+                        <div className="octane-wired__give-var-targets">
                             {SOURCE_GROUP_BUTTONS.map((button) => (
                                 <button
                                     key={button.key}
                                     type="button"
-                                    className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${isUserGroup === button.isUserGroup ? 'is-active' : ''}`}
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${isUserGroup === button.isUserGroup ? 'is-active' : ''}`}
                                     onClick={() => changeGroup(button.isUserGroup)}
                                 >
                                     <img src={button.icon} alt={button.key} />

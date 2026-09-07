@@ -7,7 +7,7 @@ import {
     PetFigureData,
     TextureUtils,
     Vector3d
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 
 export class ChatBubbleUtilities {
     private static MAX_CACHE_SIZE: number = 200;

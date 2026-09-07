@@ -1,4 +1,4 @@
-import { AvatarEditorFigureCategory, AvatarFigurePartType, FigureDataContainer } from '@nitrots/nitro-renderer';
+import { AvatarEditorFigureCategory, AvatarFigurePartType, FigureDataContainer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { CreateLinkEvent, GetClubMemberLevel, IAvatarEditorCategory, LocalizeText } from '../../api';
 import { LayoutCurrencyIcon } from '../../common';
@@ -58,8 +58,8 @@ export const AvatarEditorModelView: FC<{
     if (!activeCategory) return null;
 
     return (
-        <div className="nitro-avatar-editor-model">
-            <div className={`nitro-avatar-editor-subcategories${name === AvatarEditorFigureCategory.GENERIC ? ' is-gender' : ''}`}>
+        <div className="octane-avatar-editor-model">
+            <div className={`octane-avatar-editor-subcategories${name === AvatarEditorFigureCategory.GENERIC ? ' is-gender' : ''}`}>
                 {name === AvatarEditorFigureCategory.GENERIC && (
                     <>
                         <button type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.MALE)}>
@@ -86,20 +86,20 @@ export const AvatarEditorModelView: FC<{
                     ))}
             </div>
 
-            <div className="nitro-avatar-editor-parts-grid">
+            <div className="octane-avatar-editor-parts-grid">
                 <AvatarEditorFigureSetView category={activeCategory} columnCount={6} />
             </div>
 
             <button
                 type="button"
-                className={`nitro-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
+                className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                 onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
             >
                 Advanced Color
                 <LayoutCurrencyIcon type="hc" />
             </button>
 
-            <div className={`nitro-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
+            <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
                 {maxPaletteCount >= 1 && (
                     <div className="avatar-editor-palette-set-view">
                         {advancedColorMode ? (

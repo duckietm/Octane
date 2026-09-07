@@ -1,7 +1,7 @@
-import { GetSessionDataManager, RoomObjectType } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager, RoomObjectType } from '@octane/renderer';
 import { FC, UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChatEntryType, LocalizeText, SanitizeHtml } from '../../../../api';
-import { DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useChatHistory, useChatWindow, useOnClickChat } from '../../../../hooks';
 import { useRoom } from '../../../../hooks/rooms';
 
@@ -75,7 +75,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
     }, [roomChatHistory.length, isAutoScrollEnabled, scrollToLatest]);
 
     return (
-        <NitroCardView
+        <OctaneCardView
             className="w-[460px] h-[240px]"
             disableDrag={false}
             style={{ pointerEvents: 'auto' }}
@@ -83,7 +83,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
             uniqueKey="chat-widget-window"
             windowPosition={DraggableWindowPosition.TOP_LEFT}
         >
-            <NitroCardHeaderView
+            <OctaneCardHeaderView
                 headerText="Chat window"
                 onCloseClick={() => {
                     setChatWindowEnabled(false);
@@ -91,7 +91,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                     if (clearChatHistory) clearChatHistory();
                 }}
             />
-            <NitroCardContentView className="bg-[#f2f2f2] relative" overflow="hidden">
+            <OctaneCardContentView className="bg-[#f2f2f2] relative" overflow="hidden">
                 <div className="flex items-center gap-2 px-2 py-1 border-b border-black/20 bg-white/40 text-black text-[11px]">
                     <label className="flex items-center gap-1 cursor-pointer select-none">
                         <input checked={hidePets} type="checkbox" onChange={(event) => setHidePets(event.target.checked)} />
@@ -244,7 +244,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                         Go to latest message
                     </button>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

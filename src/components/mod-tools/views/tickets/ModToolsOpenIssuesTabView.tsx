@@ -1,4 +1,4 @@
-import { IssueMessageData, PickIssuesMessageComposer } from '@nitrots/nitro-renderer';
+import { IssueMessageData, PickIssuesMessageComposer } from '@octane/renderer';
 import { FC, useRef } from 'react';
 import { FaClock, FaHandPointer, FaInbox, FaUser } from 'react-icons/fa';
 import { GetIssueCategoryName, LocalizeText, SendMessageComposer } from '../../../../api';

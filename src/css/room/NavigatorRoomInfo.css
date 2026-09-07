@@ -1,8 +1,8 @@
-.nitro-room-info {
+.octane-room-info {
     width: min(236px, calc(100vw - 16px));
 }
 
-.nitro-room-info__content {
+.octane-room-info__content {
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -11,7 +11,7 @@
     color: #111;
 }
 
-.nitro-room-info__heading {
+.octane-room-info__heading {
     display: flex;
     min-height: 17px;
     align-items: center;
@@ -19,7 +19,7 @@
     font-size: 12px;
 }
 
-.nitro-room-info__home {
+.octane-room-info__home {
     width: 13px;
     height: 12px;
     border: 0;
@@ -28,28 +28,28 @@
     cursor: pointer;
 }
 
-.nitro-room-info__home.is-home {
+.octane-room-info__home.is-home {
     background-image: url("@/assets/images/navigator/air/icon-home-yes.png");
 }
 
-.nitro-room-info__meta {
+.octane-room-info__meta {
     min-height: 14px;
     font-size: 11px;
 }
 
-.nitro-room-info__meta .user-profile-icon {
+.octane-room-info__meta .user-profile-icon {
     width: 12px;
     height: 12px;
 }
 
-.nitro-room-info__description {
+.octane-room-info__description {
     min-height: 0;
     overflow-wrap: anywhere;
     font-size: 11px;
     line-height: 13px;
 }
 
-.nitro-room-info__thumbnail {
+.octane-room-info__thumbnail {
     width: 112px !important;
     height: 112px !important;
     align-self: center;
@@ -59,7 +59,7 @@
     background: #c4c4bc url("@/assets/images/navigator/air/default-room.png") center no-repeat;
 }
 
-.nitro-room-info__camera {
+.octane-room-info__camera {
     width: 17px;
     height: 15px;
     border: 0;
@@ -67,12 +67,12 @@
     image-rendering: pixelated;
 }
 
-.nitro-room-info__quick-actions,
-.nitro-room-info__group {
+.octane-room-info__quick-actions,
+.octane-room-info__group {
     min-height: 16px;
 }
 
-.nitro-room-info__room-link {
+.octane-room-info__room-link {
     min-height: 17px;
     margin: 1px 0 2px;
     color: #111;
@@ -80,24 +80,24 @@
     cursor: pointer;
 }
 
-.nitro-room-info__room-link img {
+.octane-room-info__room-link img {
     width: 17px;
     height: 15px;
     image-rendering: pixelated;
 }
 
-.nitro-room-info__room-link:hover {
+.octane-room-info__room-link:hover {
     color: #1c789b;
 }
 
-.nitro-room-info__actions {
+.octane-room-info__actions {
     display: flex;
     flex-direction: column;
     gap: 3px;
     margin-top: 3px;
 }
 
-.nitro-room-info__action {
+.octane-room-info__action {
     box-sizing: border-box;
     width: 220px;
     max-width: 100%;
@@ -111,7 +111,7 @@
     text-align: center;
 }
 
-.nitro-room-info__action.habbo-btn-primary,
-.nitro-room-info__action.habbo-btn-danger {
+.octane-room-info__action.habbo-btn-primary,
+.octane-room-info__action.habbo-btn-danger {
     border-radius: 0 !important;
 }

@@ -1,5 +1,5 @@
-import { GetRoomEngine, SellablePetPaletteData } from '@nitrots/nitro-renderer';
-import { GetConfigurationValue } from '../nitro';
+import { GetRoomEngine, SellablePetPaletteData } from '@octane/renderer';
+import { GetConfigurationValue } from '../octane';
 import { ICatalogNode } from './ICatalogNode';
 import { IProduct } from './IProduct';
 import { IPurchasableOffer } from './IPurchasableOffer';

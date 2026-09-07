@@ -1,4 +1,4 @@
-import { GetRoomEngine, RoomPreviewer } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomPreviewer } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { LayoutRoomPreviewerView } from '../../../common/layout/LayoutRoomPreviewerView';
 import { serializeTilemap } from '../state/encoding';

@@ -3,9 +3,9 @@ import {
     NavigatorSearchCloseComposer,
     NavigatorSearchOpenComposer,
     NavigatorSettingsSaveComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { SendMessageComposer } from '../../api';
-import { createNitroStore } from '../../state/createNitroStore';
+import { createOctaneStore } from '../../state/createOctaneStore';
 
 const QUICK_LINKS_STORAGE_KEY = 'nitro.navigator.air.quickLinksOpen';
 const COLLAPSED_RESULTS_STORAGE_KEY = 'nitro.navigator.air.collapsedResults';
@@ -109,7 +109,7 @@ export type NavigatorUiActions = {
     setResultViewMode(code: string, mode: number): void;
 };
 
-export const useNavigatorUiStore = createNitroStore<NavigatorUiState & NavigatorUiActions>()((set) => ({
+export const useNavigatorUiStore = createOctaneStore<NavigatorUiState & NavigatorUiActions>()((set) => ({
     isVisible: false,
     isReady: false,
     isCreatorOpen: false,

@@ -9,7 +9,7 @@ export const LayoutRarityLevelView: FC<LayoutRarityLevelViewProps> = (props) => 
     const { level = 0, classNames = [], children = null, ...rest } = props;
 
     const getClassNames = useMemo(() => {
-        const newClassNames: string[] = ['nitro-rarity-level'];
+        const newClassNames: string[] = ['octane-rarity-level'];
 
         if (classNames.length) newClassNames.push(...classNames);
 

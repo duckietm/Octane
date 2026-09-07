@@ -1,4 +1,4 @@
-import { GetRoomEngine, Vector3d } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, Vector3d } from '@octane/renderer';
 import { FC, useEffect, useRef } from 'react';
 import { GetSessionDataManager, LocalizeText } from '../../../../api';
 import snowStormLogo from '../../../../assets/images/snowstorm/original/snowstorm_logo.png';

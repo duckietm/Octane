@@ -1,4 +1,4 @@
-.nitro-catalog-window {
+.octane-catalog-window {
     --catalog-standard-bg: #ecece4;
     --catalog-standard-panel: #f7f7f2;
     --catalog-standard-panel-2: #e7e7df;
@@ -24,10 +24,10 @@
     --habbo-stepper-minus-pressed: url("../../assets/images/catalog/buttons/minus_pressed.png");
     --habbo-stepper-minus-disabled: url("../../assets/images/catalog/buttons/minus_disabled.png");
 
-    width: var(--nitro-catalog-window-width, 570px) !important;
-    height: var(--nitro-catalog-window-height, 635px) !important;
-    min-width: var(--nitro-catalog-window-width, 570px) !important;
-    max-width: var(--nitro-catalog-window-width, 570px) !important;
+    width: var(--octane-catalog-window-width, 570px) !important;
+    height: var(--octane-catalog-window-height, 635px) !important;
+    min-width: var(--octane-catalog-window-width, 570px) !important;
+    max-width: var(--octane-catalog-window-width, 570px) !important;
     min-height: 570px !important;
     max-height: calc(100vh - 24px) !important;
     position: relative;
@@ -38,32 +38,32 @@
     box-sizing: border-box;
 }
 
-.draggable-window:has(> .nitro-catalog-window) {
-    width: var(--nitro-catalog-window-width, 570px) !important;
-    height: var(--nitro-catalog-window-height, 635px) !important;
-    min-width: var(--nitro-catalog-window-width, 570px) !important;
-    max-width: var(--nitro-catalog-window-width, 570px) !important;
+.draggable-window:has(> .octane-catalog-window) {
+    width: var(--octane-catalog-window-width, 570px) !important;
+    height: var(--octane-catalog-window-height, 635px) !important;
+    min-width: var(--octane-catalog-window-width, 570px) !important;
+    max-width: var(--octane-catalog-window-width, 570px) !important;
 }
 
-.nitro-catalog-window img,
-.nitro-catalog-window canvas,
-.nitro-catalog-window .nitro-icon,
-.nitro-catalog-window [class*='nitro-catalog-standard-button'],
-.nitro-catalog-window [class*='nitro-catalog-standard-buy-button'],
-.nitro-catalog-window [class*='nitro-catalog-standard-gift-button'] {
+.octane-catalog-window img,
+.octane-catalog-window canvas,
+.octane-catalog-window .octane-icon,
+.octane-catalog-window [class*='octane-catalog-standard-button'],
+.octane-catalog-window [class*='octane-catalog-standard-buy-button'],
+.octane-catalog-window [class*='octane-catalog-standard-gift-button'] {
     image-rendering: pixelated;
 }
 
-.nitro-catalog-mobile-header,
-.nitro-catalog-admin-banner,
-.nitro-catalog-layout-header-shell,
-.nitro-catalog-layout-hero,
-.nitro-catalog-window .nitro-catalog-header,
-.nitro-catalog-window .builders-club-status-shell {
+.octane-catalog-mobile-header,
+.octane-catalog-admin-banner,
+.octane-catalog-layout-header-shell,
+.octane-catalog-layout-hero,
+.octane-catalog-window .octane-catalog-header,
+.octane-catalog-window .builders-club-status-shell {
     display: none !important;
 }
 
-.nitro-catalog-window .nitro-catalog-header-publish {
+.octane-catalog-window .octane-catalog-header-publish {
     position: absolute !important;
     top: 5px !important;
     right: 32px !important;
@@ -78,16 +78,16 @@
     z-index: 10 !important;
 }
 
-.nitro-catalog-window .nitro-catalog-header-publish.has-pending {
-    animation: nitroPublishPulse 1.4s ease-in-out infinite;
+.octane-catalog-window .octane-catalog-header-publish.has-pending {
+    animation: octanePublishPulse 1.4s ease-in-out infinite;
 }
 
-@keyframes nitroPublishPulse {
+@keyframes octanePublishPulse {
     0%, 100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 0 0 rgba(61, 204, 69, 0); }
     50%      { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 0 8px rgba(61, 204, 69, 0.75); }
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin {
+.octane-catalog-window .octane-catalog-default-admin {
     flex-wrap: nowrap !important;
     align-items: center !important;
     gap: 6px !important;
@@ -96,7 +96,7 @@
     overflow-y: visible !important;
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin button {
+.octane-catalog-window .octane-catalog-default-admin button {
     display: inline-flex !important;
     align-items: center !important;
     gap: 4px !important;
@@ -121,20 +121,20 @@
     image-rendering: pixelated !important;
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin button:hover {
+.octane-catalog-window .octane-catalog-default-admin button:hover {
     filter: none;
     border-image-source: var(--habbo-skin-button-hover) !important;
     color: #111111 !important;
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin button:active {
+.octane-catalog-window .octane-catalog-default-admin button:active {
     filter: none;
     border-image-source: var(--habbo-skin-button-pressed) !important;
     box-shadow: none !important;
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin button.text-success,
-.nitro-catalog-window .nitro-catalog-default-admin button[class*="success"] {
+.octane-catalog-window .octane-catalog-default-admin button.text-success,
+.octane-catalog-window .octane-catalog-default-admin button[class*="success"] {
     border-width: 5px !important;
     border-style: solid !important;
     border-color: transparent !important;
@@ -147,26 +147,26 @@
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35) !important;
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin button.text-success:hover,
-.nitro-catalog-window .nitro-catalog-default-admin button[class*="success"]:hover {
+.octane-catalog-window .octane-catalog-default-admin button.text-success:hover,
+.octane-catalog-window .octane-catalog-default-admin button[class*="success"]:hover {
     border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
     color: #ffffff !important;
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin button svg {
+.octane-catalog-window .octane-catalog-default-admin button svg {
     width: 11px !important;
     height: 11px !important;
     fill: currentColor !important;
     flex-shrink: 0 !important;
 }
 
-.nitro-catalog-window .nitro-catalog-default-admin button .font-mono {
+.octane-catalog-window .octane-catalog-default-admin button .font-mono {
     color: #4a4a44 !important;
     font-weight: 600 !important;
     margin-left: 4px !important;
 }
 
-.nitro-catalog-tabs-shell .nitro-card-tab-item.nitro-catalog-admin-tab {
+.octane-catalog-tabs-shell .octane-card-tab-item.octane-catalog-admin-tab {
     flex: 0 0 auto !important;
     width: 32px !important;
     min-width: 32px !important;
@@ -175,7 +175,7 @@
     margin-left: 0 !important;
 }
 
-.nitro-catalog-admin-modal {
+.octane-catalog-admin-modal {
     --catalog-admin-bg: #ecece4;
     --catalog-admin-panel: #f7f7f2;
     --catalog-admin-panel-alt: #e5e5dc;
@@ -192,11 +192,11 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-admin-modal .nitro-card-header-shell {
+.octane-catalog-admin-modal .octane-card-header-shell {
     background: linear-gradient(180deg, #58a8c5 0%, var(--catalog-admin-blue) 45%, var(--catalog-admin-blue-dark) 100%) !important;
 }
 
-.nitro-catalog-admin-modal .nitro-card-title {
+.octane-catalog-admin-modal .octane-card-title {
     padding: 0 28px;
     font-size: 15px;
     font-weight: 700;
@@ -204,34 +204,34 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-admin-body {
+.octane-catalog-admin-body {
     background: var(--catalog-admin-bg);
     color: var(--catalog-admin-text);
 }
 
-.nitro-catalog-admin-modal :where(.bg-white, .bg-gray-50, .bg-card-grid-item) {
+.octane-catalog-admin-modal :where(.bg-white, .bg-gray-50, .bg-card-grid-item) {
     background: linear-gradient(180deg, var(--catalog-admin-panel-top) 0%, var(--catalog-admin-panel) 100%) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 1px 0 rgba(0, 0, 0, 0.08) !important;
 }
 
-.nitro-catalog-admin-modal :where(.border, .border-card-grid-item-border, .border-primary\/40) {
+.octane-catalog-admin-modal :where(.border, .border-card-grid-item-border, .border-primary\/40) {
     border-color: var(--catalog-admin-border) !important;
 }
 
-.nitro-catalog-admin-modal :where(.text-primary) {
+.octane-catalog-admin-modal :where(.text-primary) {
     color: var(--catalog-admin-blue-dark) !important;
 }
 
-.nitro-catalog-admin-modal :where(.text-muted, .text-dark) {
+.octane-catalog-admin-modal :where(.text-muted, .text-dark) {
     color: var(--catalog-admin-muted) !important;
 }
 
-.nitro-catalog-admin-body :where(label, p),
-.nitro-catalog-admin-body :where(span[class*="text-"], div[class*="text-"]) {
+.octane-catalog-admin-body :where(label, p),
+.octane-catalog-admin-body :where(span[class*="text-"], div[class*="text-"]) {
     color: inherit;
 }
 
-.nitro-catalog-admin-modal :where(input, select, textarea) {
+.octane-catalog-admin-modal :where(input, select, textarea) {
     min-height: 24px;
     background: #fffdf4 !important;
     border-color: var(--catalog-admin-border-dark) !important;
@@ -239,16 +239,16 @@
     box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.55) !important;
 }
 
-.nitro-catalog-admin-modal :where(input:focus, select:focus, textarea:focus) {
+.octane-catalog-admin-modal :where(input:focus, select:focus, textarea:focus) {
     border-color: var(--catalog-admin-blue) !important;
     box-shadow: 0 0 0 2px rgba(99, 197, 233, 0.35), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
 }
 
-.nitro-catalog-admin-modal :where(input::placeholder, textarea::placeholder) {
+.octane-catalog-admin-modal :where(input::placeholder, textarea::placeholder) {
     color: #77766d !important;
 }
 
-.nitro-catalog-admin-modal :where(input[type="checkbox"]) {
+.octane-catalog-admin-modal :where(input[type="checkbox"]) {
     appearance: auto;
     -webkit-appearance: checkbox;
     width: 14px !important;
@@ -266,7 +266,7 @@
     flex-shrink: 0;
 }
 
-.nitro-catalog-admin-input {
+.octane-catalog-admin-input {
     min-height: 24px;
     padding: 4px 8px;
     border: 2px solid var(--catalog-admin-border-dark);
@@ -278,69 +278,69 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.nitro-catalog-admin-input::placeholder {
+.octane-catalog-admin-input::placeholder {
     color: #77766d;
 }
 
-.nitro-catalog-admin-input:focus {
+.octane-catalog-admin-input:focus {
     border-color: var(--catalog-admin-blue);
     outline: none;
     box-shadow: 0 0 0 2px rgba(99, 197, 233, 0.35), inset 0 1px 0 rgba(0, 0, 0, 0.16);
 }
 
-.nitro-catalog-admin-panel,
-.nitro-catalog-admin-note {
+.octane-catalog-admin-panel,
+.octane-catalog-admin-note {
     border: 2px solid var(--catalog-admin-border);
     border-radius: 4px;
     background: linear-gradient(180deg, var(--catalog-admin-panel-top) 0%, var(--catalog-admin-panel) 100%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 1px 0 rgba(0, 0, 0, 0.08);
 }
 
-.nitro-catalog-admin-panel {
+.octane-catalog-admin-panel {
     padding: 10px;
 }
 
-.nitro-catalog-admin-note {
+.octane-catalog-admin-note {
     padding: 4px 10px;
     color: var(--catalog-admin-muted);
     font-size: 10px;
 }
 
-.nitro-catalog-admin-label,
-.nitro-catalog-admin-section-title {
+.octane-catalog-admin-label,
+.octane-catalog-admin-section-title {
     color: var(--catalog-admin-muted);
     font-size: 9px;
     font-weight: 700;
     line-height: 1.2;
 }
 
-.nitro-catalog-admin-label.is-primary,
-.nitro-catalog-admin-label.is-uppercase,
-.nitro-catalog-admin-section-title {
+.octane-catalog-admin-label.is-primary,
+.octane-catalog-admin-label.is-uppercase,
+.octane-catalog-admin-section-title {
     color: var(--catalog-admin-blue-dark);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
 
-.nitro-catalog-admin-section-title {
+.octane-catalog-admin-section-title {
     margin-bottom: 6px;
 }
 
-.nitro-catalog-admin-check-label {
+.octane-catalog-admin-check-label {
     color: var(--catalog-admin-text);
     font-size: 10px;
     cursor: pointer;
 }
 
 /* ---- Admin edit modals: structured form layout ---- */
-.nitro-catalog-admin-form {
+.octane-catalog-admin-form {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
 }
 
-.nitro-catalog-admin-form-sheet {
+.octane-catalog-admin-form-sheet {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -354,7 +354,7 @@
         0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.nitro-catalog-admin-form-scroll {
+.octane-catalog-admin-form-scroll {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -363,9 +363,9 @@
     overflow-y: auto;
 }
 
-.nitro-catalog-admin-form-hero,
-.nitro-catalog-admin-page-preview-card,
-.nitro-catalog-admin-offer-preview-card {
+.octane-catalog-admin-form-hero,
+.octane-catalog-admin-page-preview-card,
+.octane-catalog-admin-offer-preview-card {
     display: flex;
     flex-shrink: 0;
     gap: 12px;
@@ -375,7 +375,7 @@
     background: linear-gradient(180deg, #eef6fa 0%, #e2edf2 100%);
 }
 
-.nitro-catalog-admin-form-section {
+.octane-catalog-admin-form-section {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -386,11 +386,11 @@
     box-shadow: none;
 }
 
-.nitro-catalog-admin-form-section + .nitro-catalog-admin-form-section {
+.octane-catalog-admin-form-section + .octane-catalog-admin-form-section {
     border-top: 1px solid #d8d8d0;
 }
 
-.nitro-catalog-admin-form-section .nitro-catalog-admin-section-title {
+.octane-catalog-admin-form-section .octane-catalog-admin-section-title {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
@@ -401,7 +401,7 @@
     letter-spacing: 0;
 }
 
-.nitro-catalog-admin-label.is-field {
+.octane-catalog-admin-label.is-field {
     color: var(--catalog-admin-muted);
     font-size: 10px;
     font-weight: 600;
@@ -409,41 +409,41 @@
     letter-spacing: 0;
 }
 
-.nitro-catalog-admin-form-grid {
+.octane-catalog-admin-form-grid {
     display: grid;
     gap: 10px 12px;
 }
 
-.nitro-catalog-admin-form-grid.is-2col {
+.octane-catalog-admin-form-grid.is-2col {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.nitro-catalog-admin-form-grid.is-3col {
+.octane-catalog-admin-form-grid.is-3col {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.nitro-catalog-admin-form-field {
+.octane-catalog-admin-form-field {
     display: flex;
     flex-direction: column;
     gap: 4px;
     min-width: 0;
 }
 
-.nitro-catalog-admin-form-field.is-span-2 {
+.octane-catalog-admin-form-field.is-span-2 {
     grid-column: span 2;
 }
 
-.nitro-catalog-admin-form-field.is-span-3 {
+.octane-catalog-admin-form-field.is-span-3 {
     grid-column: span 3;
 }
 
-.nitro-catalog-admin-form-field-hint {
+.octane-catalog-admin-form-field-hint {
     color: var(--catalog-admin-muted);
     font-size: 9px;
     font-weight: 400;
 }
 
-.nitro-catalog-admin-form-toggles {
+.octane-catalog-admin-form-toggles {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -451,7 +451,7 @@
     min-height: 28px;
 }
 
-.nitro-catalog-admin-form-toggle {
+.octane-catalog-admin-form-toggle {
     display: inline-flex;
     gap: 8px;
     align-items: center;
@@ -468,17 +468,17 @@
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.nitro-catalog-admin-form-toggle:has(input:checked) {
+.octane-catalog-admin-form-toggle:has(input:checked) {
     border-color: var(--catalog-admin-blue);
     background: rgba(65, 141, 176, 0.12);
     color: var(--catalog-admin-blue-dark);
 }
 
-.nitro-catalog-admin-form-toggle input[type="checkbox"] {
+.octane-catalog-admin-form-toggle input[type="checkbox"] {
     pointer-events: none;
 }
 
-.nitro-catalog-admin-form-actions {
+.octane-catalog-admin-form-actions {
     display: flex;
     flex-shrink: 0;
     gap: 8px;
@@ -489,7 +489,7 @@
     background: linear-gradient(180deg, var(--catalog-admin-panel-alt) 0%, #deded6 100%);
 }
 
-.nitro-catalog-admin-savebar {
+.octane-catalog-admin-savebar {
     display: flex;
     flex-shrink: 0;
     gap: 10px;
@@ -501,7 +501,7 @@
     background: linear-gradient(180deg, var(--catalog-admin-panel-alt) 0%, #deded6 100%);
 }
 
-.nitro-catalog-admin-savebar-status {
+.octane-catalog-admin-savebar-status {
     display: flex;
     flex-direction: column;
     min-width: 112px;
@@ -510,19 +510,19 @@
     line-height: 1.15;
 }
 
-.nitro-catalog-admin-savebar-status small {
+.octane-catalog-admin-savebar-status small {
     margin-top: 3px;
     color: #88929a;
     font-size: 9px;
 }
 
-.nitro-catalog-admin-savebar.is-dirty .nitro-catalog-admin-savebar-status { color: #865a05; }
-.nitro-catalog-admin-savebar.is-saving .nitro-catalog-admin-savebar-status { color: #296786; }
-.nitro-catalog-admin-savebar.is-error .nitro-catalog-admin-savebar-status,
-.nitro-catalog-admin-savebar.is-conflict .nitro-catalog-admin-savebar-status { color: #a83232; }
-.nitro-catalog-admin-savebar.is-saved .nitro-catalog-admin-savebar-status { color: #397046; }
+.octane-catalog-admin-savebar.is-dirty .octane-catalog-admin-savebar-status { color: #865a05; }
+.octane-catalog-admin-savebar.is-saving .octane-catalog-admin-savebar-status { color: #296786; }
+.octane-catalog-admin-savebar.is-error .octane-catalog-admin-savebar-status,
+.octane-catalog-admin-savebar.is-conflict .octane-catalog-admin-savebar-status { color: #a83232; }
+.octane-catalog-admin-savebar.is-saved .octane-catalog-admin-savebar-status { color: #397046; }
 
-.nitro-catalog-admin-savebar-actions {
+.octane-catalog-admin-savebar-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
@@ -530,37 +530,37 @@
     justify-content: flex-end;
 }
 
-.nitro-catalog-admin-field-error {
+.octane-catalog-admin-field-error {
     color: #a83232;
     font-size: 10px;
     line-height: 1.2;
 }
 
 @media (max-width: 520px) {
-    .nitro-catalog-admin-savebar {
+    .octane-catalog-admin-savebar {
         align-items: stretch;
         flex-direction: column;
     }
 
-    .nitro-catalog-admin-savebar-actions {
+    .octane-catalog-admin-savebar-actions {
         justify-content: stretch;
     }
 
-    .nitro-catalog-admin-savebar-actions .nitro-catalog-admin-button {
+    .octane-catalog-admin-savebar-actions .octane-catalog-admin-button {
         flex: 1 1 auto;
     }
 }
 
-.nitro-catalog-admin-form .nitro-catalog-admin-input,
-.nitro-catalog-admin-form-sheet .nitro-catalog-admin-input {
+.octane-catalog-admin-form .octane-catalog-admin-input,
+.octane-catalog-admin-form-sheet .octane-catalog-admin-input {
     min-height: 28px;
     padding: 5px 9px;
     border-width: 1px;
     font-size: 11px;
 }
 
-.nitro-catalog-admin-page-preview-icon,
-.nitro-catalog-admin-offer-preview-icon {
+.octane-catalog-admin-page-preview-icon,
+.octane-catalog-admin-offer-preview-icon {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
@@ -573,24 +573,24 @@
     overflow: hidden;
 }
 
-.nitro-catalog-admin-page-preview-icon img,
-.nitro-catalog-admin-offer-preview-icon img {
+.octane-catalog-admin-page-preview-icon img,
+.octane-catalog-admin-offer-preview-icon img {
     width: 36px;
     height: 36px;
     image-rendering: pixelated;
     object-fit: contain;
 }
 
-.nitro-catalog-admin-page-preview-info,
-.nitro-catalog-admin-offer-preview-info {
+.octane-catalog-admin-page-preview-info,
+.octane-catalog-admin-offer-preview-info {
     display: flex;
     flex-direction: column;
     gap: 3px;
     min-width: 0;
 }
 
-.nitro-catalog-admin-page-preview-name,
-.nitro-catalog-admin-offer-preview-name {
+.octane-catalog-admin-page-preview-name,
+.octane-catalog-admin-offer-preview-name {
     overflow: hidden;
     color: var(--catalog-admin-blue-dark);
     font-size: 14px;
@@ -599,14 +599,14 @@
     text-overflow: ellipsis;
 }
 
-.nitro-catalog-admin-page-preview-sub,
-.nitro-catalog-admin-offer-preview-sub {
+.octane-catalog-admin-page-preview-sub,
+.octane-catalog-admin-offer-preview-sub {
     color: var(--catalog-admin-muted);
     font-size: 10px;
     line-height: 1.35;
 }
 
-.nitro-catalog-admin-translate-bar {
+.octane-catalog-admin-translate-bar {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
@@ -617,29 +617,29 @@
     background: var(--catalog-admin-panel-alt);
 }
 
-.nitro-catalog-admin-translate-error {
+.octane-catalog-admin-translate-error {
     color: var(--catalog-admin-danger);
     font-size: 9px;
 }
 
-.nitro-catalog-admin-form-status {
+.octane-catalog-admin-form-status {
     color: var(--catalog-admin-muted);
     font-size: 9px;
 }
 
 /* Legacy preview card rules kept for specificity elsewhere */
-.nitro-catalog-admin-offer-preview-card {
+.octane-catalog-admin-offer-preview-card {
     border: none;
     border-radius: 0;
     box-shadow: none;
 }
 
-.nitro-catalog-admin-offer-preview-icon-empty {
+.octane-catalog-admin-offer-preview-icon-empty {
     color: #8aa3ad;
     font-size: 20px;
 }
 
-.nitro-catalog-admin-offer-preview-price {
+.octane-catalog-admin-offer-preview-price {
     display: flex;
     gap: 6px;
     margin-top: 1px;
@@ -647,23 +647,23 @@
     font-weight: 700;
 }
 
-.nitro-catalog-admin-offer-preview-price .is-credits {
+.octane-catalog-admin-offer-preview-price .is-credits {
     color: #b07a17;
 }
 
-.nitro-catalog-admin-offer-preview-price .is-points {
+.octane-catalog-admin-offer-preview-price .is-points {
     color: #2c7fb0;
 }
 
-.nitro-catalog-admin-offer-preview-price .is-free {
+.octane-catalog-admin-offer-preview-price .is-free {
     color: #6a8a3a;
 }
 
-.nitro-catalog-admin-modal button {
+.octane-catalog-admin-modal button {
     text-shadow: none !important;
 }
 
-.nitro-catalog-admin-button {
+.octane-catalog-admin-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -686,22 +686,22 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-admin-button:disabled {
+.octane-catalog-admin-button:disabled {
     cursor: default;
     opacity: 0.55;
 }
 
-.nitro-catalog-admin-button:not(:disabled):hover {
+.octane-catalog-admin-button:not(:disabled):hover {
     filter: brightness(1.06);
 }
 
-.nitro-catalog-admin-button.is-compact {
+.octane-catalog-admin-button.is-compact {
     min-height: 20px;
     padding: 3px 7px;
     font-size: 9px;
 }
 
-.nitro-catalog-admin-button.is-primary {
+.octane-catalog-admin-button.is-primary {
     border-width: 5px;
     border-style: solid;
     border-color: transparent;
@@ -713,7 +713,7 @@
     color: #ffffff;
 }
 
-.nitro-catalog-admin-button.is-danger {
+.octane-catalog-admin-button.is-danger {
     border-width: 5px;
     border-style: solid;
     border-color: transparent;
@@ -725,16 +725,16 @@
     color: #ffffff;
 }
 
-.nitro-catalog-admin-button.is-muted,
-.nitro-catalog-admin-button.is-ghost {
+.octane-catalog-admin-button.is-muted,
+.octane-catalog-admin-button.is-ghost {
     border-image-source: var(--habbo-skin-button);
     background: transparent;
     color: #111111;
 }
 
-.nitro-catalog-admin-modal button.bg-primary,
-.nitro-catalog-admin-modal button.text-primary,
-.nitro-catalog-admin-modal button.text-success {
+.octane-catalog-admin-modal button.bg-primary,
+.octane-catalog-admin-modal button.text-primary,
+.octane-catalog-admin-modal button.text-success {
     border-width: 5px !important;
     border-style: solid !important;
     border-color: transparent !important;
@@ -747,14 +747,14 @@
     box-shadow: none !important;
 }
 
-.nitro-catalog-admin-modal button.bg-primary:hover,
-.nitro-catalog-admin-modal button.text-primary:hover,
-.nitro-catalog-admin-modal button.text-success:hover {
+.octane-catalog-admin-modal button.bg-primary:hover,
+.octane-catalog-admin-modal button.text-primary:hover,
+.octane-catalog-admin-modal button.text-success:hover {
     border-image-source: var(--habbo-skin-shiny-thick-green-hover) !important;
 }
 
-.nitro-catalog-admin-modal button.text-danger,
-.nitro-catalog-admin-modal button[class*="danger"] {
+.octane-catalog-admin-modal button.text-danger,
+.octane-catalog-admin-modal button[class*="danger"] {
     border-width: 5px !important;
     border-style: solid !important;
     border-color: transparent !important;
@@ -767,7 +767,7 @@
     box-shadow: none !important;
 }
 
-.nitro-catalog-admin-modal button.text-muted {
+.octane-catalog-admin-modal button.text-muted {
     border: 3px solid transparent !important;
     border-image-source: var(--habbo-skin-button) !important;
     border-image-slice: 3 fill !important;
@@ -777,45 +777,45 @@
     box-shadow: none !important;
 }
 
-.nitro-catalog-admin-body :where(.uppercase.font-bold) {
+.octane-catalog-admin-body :where(.uppercase.font-bold) {
     color: var(--catalog-admin-blue-dark) !important;
     letter-spacing: 0.04em;
 }
 
-.nitro-catalog-admin-body :where(.font-mono) {
+.octane-catalog-admin-body :where(.font-mono) {
     color: #383833 !important;
 }
 
-.nitro-catalog-admin-modal .font-mono {
+.octane-catalog-admin-modal .font-mono {
     color: #383833 !important;
 }
 
-.nitro-catalog-window :where(.bg-white, .bg-gray-50, .bg-card-grid-item),
-.nitro-catalog-window :where(.bg-gray-100, .bg-light) {
+.octane-catalog-window :where(.bg-white, .bg-gray-50, .bg-card-grid-item),
+.octane-catalog-window :where(.bg-gray-100, .bg-light) {
     background: var(--catalog-standard-panel) !important;
     color: var(--catalog-standard-text) !important;
     box-shadow: none !important;
 }
 
-.nitro-catalog-window :where(.bg-white\/50, .bg-white\/80) {
+.octane-catalog-window :where(.bg-white\/50, .bg-white\/80) {
     background: rgba(247, 247, 242, 0.82) !important;
     color: var(--catalog-standard-text) !important;
 }
 
-.nitro-catalog-window :where(.border, .border-card-grid-item-border, .border-muted, .border-white, .border-white\/10, .border-white\/20, .border-white\/30) {
+.octane-catalog-window :where(.border, .border-card-grid-item-border, .border-muted, .border-white, .border-white\/10, .border-white\/20, .border-white\/30) {
     border-color: var(--catalog-standard-border) !important;
     box-shadow: none !important;
 }
 
-.nitro-catalog-window :where(.text-muted, .text-dark) {
+.octane-catalog-window :where(.text-muted, .text-dark) {
     color: var(--catalog-standard-muted) !important;
 }
 
-.nitro-catalog-window :where(.text-primary) {
+.octane-catalog-window :where(.text-primary) {
     color: var(--catalog-standard-blue-dark) !important;
 }
 
-.nitro-catalog-window :where(input, select, textarea) {
+.octane-catalog-window :where(input, select, textarea) {
     min-height: 22px;
     border: 1px solid var(--catalog-standard-border-dark) !important;
     border-radius: 3px !important;
@@ -825,19 +825,19 @@
     font-size: 11px !important;
 }
 
-.nitro-catalog-window :where(input:focus, select:focus, textarea:focus) {
+.octane-catalog-window :where(input:focus, select:focus, textarea:focus) {
     border-color: var(--catalog-standard-blue) !important;
     box-shadow: 0 0 0 2px rgba(99, 197, 233, 0.32), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
 }
 
-.nitro-catalog-window :where(input[type="checkbox"], input[type="radio"]) {
+.octane-catalog-window :where(input[type="checkbox"], input[type="radio"]) {
     min-height: 0;
     accent-color: var(--catalog-standard-blue);
     box-shadow: none !important;
 }
 
 /* standard: bordo esterno #376275 (2px), body #0e3f52 -> border 2px + bg body. */
-.nitro-catalog-standard-header {
+.octane-catalog-standard-header {
     position: relative;
     flex: 0 0 90px;
     height: 90px;
@@ -850,7 +850,7 @@
 /* standard: header image blend 0.1, greyscale, zoom 2, pivot center.
    L'immagine reale per-pagina arriva inline da currentPage.getImage(0);
    se assente resta il body #0e3f52 (nessun finto gradiente). */
-.nitro-catalog-standard-header-bg {
+.octane-catalog-standard-header-bg {
     position: absolute;
     inset: -2px;
     opacity: 0.1;
@@ -863,7 +863,7 @@
     transform-origin: center;
 }
 
-.nitro-catalog-standard-header-icon {
+.octane-catalog-standard-header-icon {
     position: absolute;
     left: 22px;
     top: 28px;
@@ -875,7 +875,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-standard-header-icon img {
+.octane-catalog-standard-header-icon img {
     width: 20px !important;
     height: 20px !important;
     max-width: none !important;
@@ -884,7 +884,7 @@
     transform-origin: center;
 }
 
-.nitro-catalog-standard-header-copy {
+.octane-catalog-standard-header-copy {
     position: absolute;
     left: 78px;
     top: 9px;
@@ -893,7 +893,7 @@
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
-.nitro-catalog-standard-header-title {
+.octane-catalog-standard-header-title {
     height: 24px;
     min-height: 24px;
     overflow: hidden;
@@ -904,7 +904,7 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-standard-header-description {
+.octane-catalog-standard-header-description {
     margin-top: -1px;
     font-family: UbuntuRegular, Ubuntu, sans-serif;
     font-size: 12px;
@@ -919,14 +919,14 @@
     overflow: hidden;
 }
 
-.nitro-catalog-standard-header.is-builder .nitro-catalog-standard-header-title {
+.octane-catalog-standard-header.is-builder .octane-catalog-standard-header-title {
     height: 30px;
     min-height: 30px;
     font-size: 24px;
     line-height: 30px;
 }
 
-.nitro-catalog-standard-header.is-builder .nitro-catalog-standard-header-description {
+.octane-catalog-standard-header.is-builder .octane-catalog-standard-header-description {
     position: absolute;
     left: 0;
     width: 475px;
@@ -939,20 +939,20 @@
     line-height: 19px;
 }
 
-.nitro-catalog-standard-header.is-builder .nitro-catalog-standard-header-description.is-builder-membership {
+.octane-catalog-standard-header.is-builder .octane-catalog-standard-header-description.is-builder-membership {
     top: 30px;
 }
 
-.nitro-catalog-standard-header.is-builder .nitro-catalog-standard-header-description.is-builder-limit {
+.octane-catalog-standard-header.is-builder .octane-catalog-standard-header-description.is-builder-limit {
     top: 45px;
 }
 
-.nitro-catalog-standard-header-description b,
-.nitro-catalog-standard-header-description strong {
+.octane-catalog-standard-header-description b,
+.octane-catalog-standard-header-description strong {
     font-weight: 400;
 }
 
-.nitro-catalog-window .nitro-catalog-tabs-shell {
+.octane-catalog-window .octane-catalog-tabs-shell {
     flex: 0 0 35px;
     height: 35px;
     min-height: 35px;
@@ -972,7 +972,7 @@
  * `is-condensed` in exactly that case, and only then are they allowed to shrink, the label
  * ellipsising down to its icon the way the original client's tab context does.
  */
-.nitro-catalog-window .nitro-catalog-tabs-shell .nitro-card-tab-item {
+.octane-catalog-window .octane-catalog-tabs-shell .octane-card-tab-item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -992,21 +992,21 @@
 
 /* Only once the window has run out of room to widen. Until then the tabs keep their natural
    width, which is what the strip is measured at. */
-.nitro-catalog-window .nitro-catalog-tabs-shell.is-condensed .nitro-card-tab-item {
+.octane-catalog-window .octane-catalog-tabs-shell.is-condensed .octane-card-tab-item {
     min-width: 34px;
     flex: 0 1 auto;
     flex-shrink: 1;
 }
 
-.nitro-catalog-window .nitro-catalog-tabs-shell .nitro-card-tab-item:last-of-type {
+.octane-catalog-window .octane-catalog-tabs-shell .octane-card-tab-item:last-of-type {
     margin-right: 0;
 }
 
-.nitro-catalog-window .nitro-catalog-tabs-shell .nitro-card-tab-item.nitro-catalog-admin-tab {
+.octane-catalog-window .octane-catalog-tabs-shell .octane-card-tab-item.octane-catalog-admin-tab {
     padding: 4px 4px 6px !important;
 }
 
-.nitro-catalog-window .nitro-catalog-tabs-shell .nitro-card-tab-item > div {
+.octane-catalog-window .octane-catalog-tabs-shell .octane-card-tab-item > div {
     align-items: center !important;
     justify-content: center !important;
     gap: 4px;
@@ -1016,7 +1016,7 @@
     line-height: 17px;
 }
 
-.nitro-catalog-tab-icon {
+.octane-catalog-tab-icon {
     width: 18px;
     height: 18px;
     object-fit: contain;
@@ -1024,20 +1024,20 @@
     flex-shrink: 0;
 }
 
-.nitro-catalog-tab-label {
+.octane-catalog-tab-label {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.nitro-catalog-tab-count {
+.octane-catalog-tab-count {
     flex: 0 0 auto;
     font-size: 10px;
     opacity: 0.85;
 }
 
-.nitro-catalog-content-shell {
+.octane-catalog-content-shell {
     position: relative;
     flex: 1 1 auto;
     min-height: 0;
@@ -1046,7 +1046,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-stage {
+.octane-catalog-stage {
     display: grid;
     grid-template-columns: 184px 1fr;
     gap: 8px;
@@ -1055,11 +1055,11 @@
     min-height: 0;
 }
 
-.nitro-catalog-stage.is-navigation-hidden {
+.octane-catalog-stage.is-navigation-hidden {
     grid-template-columns: 1fr;
 }
 
-.nitro-catalog-sidebar {
+.octane-catalog-sidebar {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1068,7 +1068,7 @@
 }
 
 /* standard search: border x8 y131 w184 h24 style 105 (inset chiaro). */
-.nitro-catalog-search-shell {
+.octane-catalog-search-shell {
     position: relative;
     display: flex;
     align-items: center;
@@ -1081,7 +1081,7 @@
     box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.07);
 }
 
-.nitro-catalog-search-shell input {
+.octane-catalog-search-shell input {
     flex: 1 1 auto;
     width: 100% !important;
     height: 22px !important;
@@ -1097,26 +1097,26 @@
     vertical-align: middle !important;
 }
 
-.nitro-catalog-search-shell > div {
+.octane-catalog-search-shell > div {
     width: 100% !important;
     height: 100% !important;
 }
 
-.nitro-catalog-search-shell svg {
+.octane-catalog-search-shell svg {
     color: #888 !important;
     font-size: 11px !important;
 }
 
-.nitro-catalog-search-shell svg:first-child {
+.octane-catalog-search-shell svg:first-child {
     left: 4px !important;
 }
 
-.nitro-catalog-search-shell button {
+.octane-catalog-search-shell button {
     right: 4px !important;
 }
 
 /* standard navigationContainer: x8 y159 w184 h433 style 6 (bordo beveled inset). */
-.nitro-catalog-navigation-shell {
+.octane-catalog-navigation-shell {
     flex: 1 1 auto;
     min-height: 0;
     padding: 5px 3px;
@@ -1129,16 +1129,16 @@
     overflow: auto;
 }
 
-.nitro-catalog-navigation-list {
+.octane-catalog-navigation-list {
     display: flex;
     flex-direction: column;
 }
 
-.nitro-catalog-navigation-node {
+.octane-catalog-navigation-node {
     min-height: 21px;
 }
 
-.nitro-catalog-navigation-item {
+.octane-catalog-navigation-item {
     position: relative;
     display: flex;
     align-items: center;
@@ -1157,13 +1157,13 @@
     text-shadow: 0 1px 0 #b4b4ae;
 }
 
-.nitro-catalog-navigation-node.is-child .nitro-catalog-navigation-item {
+.octane-catalog-navigation-node.is-child .octane-catalog-navigation-item {
     padding-left: 15px;
     color: #52819a;
     font-style: italic;
 }
 
-.nitro-catalog-navigation-item::before {
+.octane-catalog-navigation-item::before {
     position: absolute;
     inset: 0 1px 1px 1px;
     z-index: 0;
@@ -1173,31 +1173,31 @@
     background: linear-gradient(180deg, var(--catalog-standard-select-outer) 0 2px, var(--catalog-standard-select) 2px calc(100% - 2px), var(--catalog-standard-select-outer) calc(100% - 2px));
 }
 
-.nitro-catalog-navigation-list.is-builders-club .nitro-catalog-navigation-item::before {
+.octane-catalog-navigation-list.is-builders-club .octane-catalog-navigation-item::before {
     --catalog-standard-select: var(--catalog-standard-bc);
     --catalog-standard-select-outer: var(--catalog-standard-bc-outer);
 }
 
-.nitro-catalog-navigation-list.is-builders-club .nitro-catalog-navigation-node.is-child .nitro-catalog-navigation-item {
+.octane-catalog-navigation-list.is-builders-club .octane-catalog-navigation-node.is-child .octane-catalog-navigation-item {
     color: #b77734;
 }
 
-.nitro-catalog-navigation-item:hover::before,
-.nitro-catalog-navigation-item.is-active::before {
+.octane-catalog-navigation-item:hover::before,
+.octane-catalog-navigation-item.is-active::before {
     display: block;
 }
 
-.nitro-catalog-navigation-icon,
-.nitro-catalog-navigation-label,
-.nitro-catalog-navigation-caret,
-.nitro-catalog-navigation-favorite,
-.nitro-catalog-navigation-admin,
-.nitro-catalog-navigation-drag {
+.octane-catalog-navigation-icon,
+.octane-catalog-navigation-label,
+.octane-catalog-navigation-caret,
+.octane-catalog-navigation-favorite,
+.octane-catalog-navigation-admin,
+.octane-catalog-navigation-drag {
     position: relative;
     z-index: 1;
 }
 
-.nitro-catalog-navigation-icon {
+.octane-catalog-navigation-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1206,15 +1206,15 @@
     height: 20px;
 }
 
-.nitro-catalog-navigation-icon img,
-.nitro-catalog-navigation-icon canvas {
+.octane-catalog-navigation-icon img,
+.octane-catalog-navigation-icon canvas {
     width: auto;
     height: auto;
     max-width: 20px;
     max-height: 20px;
 }
 
-.nitro-catalog-navigation-label {
+.octane-catalog-navigation-label {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
@@ -1222,7 +1222,7 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-navigation-caret {
+.octane-catalog-navigation-caret {
     position: absolute;
     right: 5px;
     top: 5px;
@@ -1230,7 +1230,7 @@
     font-size: 9px;
 }
 
-.nitro-catalog-layout-shell {
+.octane-catalog-layout-shell {
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -1241,7 +1241,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-layout-container {
+.octane-catalog-layout-container {
     flex: 1 1 auto;
     min-height: 0;
     padding: 0;
@@ -1249,21 +1249,21 @@
     overflow: hidden;
 }
 
-.nitro-catalog-window .nitro-catalog-forum-text {
+.octane-catalog-window .octane-catalog-forum-text {
     font-size: 12px;
     line-height: 15px;
 }
 
-.nitro-catalog-window .nitro-catalog-forum-text p,
-.nitro-catalog-window .nitro-catalog-forum-text div {
+.octane-catalog-window .octane-catalog-forum-text p,
+.octane-catalog-window .octane-catalog-forum-text div {
     margin: 0 0 8px;
 }
 
-.nitro-catalog-window .nitro-catalog-forum-text > :last-child {
+.octane-catalog-window .octane-catalog-forum-text > :last-child {
     margin-bottom: 0;
 }
 
-.nitro-catalog-window .nitro-catalog-guild-join-btn {
+.octane-catalog-window .octane-catalog-guild-join-btn {
     min-height: 20px !important;
     width: auto !important;
     padding: 1px 10px !important;
@@ -1277,16 +1277,16 @@
     text-shadow: none !important;
 }
 
-.nitro-catalog-window .nitro-catalog-guild-join-btn:hover {
+.octane-catalog-window .octane-catalog-guild-join-btn:hover {
     background: linear-gradient(180deg, #ffffff 0%, #f2f2f2 55%, #e2e2e2 100%) !important;
 }
 
-.nitro-catalog-window .nitro-catalog-guild-join-btn:active {
+.octane-catalog-window .octane-catalog-guild-join-btn:active {
     background: linear-gradient(180deg, #d8d8d8 0%, #eaeaea 100%) !important;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
-.nitro-catalog-default-layout {
+.octane-catalog-default-layout {
     position: relative;
     display: block !important;
     width: 100%;
@@ -1295,13 +1295,13 @@
     max-height: 460px;
 }
 
-.nitro-catalog-grid-shell,
-.nitro-catalog-price-row,
-.nitro-catalog-purchase-row {
+.octane-catalog-grid-shell,
+.octane-catalog-price-row,
+.octane-catalog-purchase-row {
     width: 100% !important;
 }
 
-.nitro-catalog-grid-shell {
+.octane-catalog-grid-shell {
     border: 1px solid #b4b4ae;
     border-radius: 5px;
     background: var(--catalog-standard-panel);
@@ -1314,9 +1314,9 @@
  * canvas behind it is drawn taller than the box and cropped, exactly as the original does.
  *
  * Everything placed inside it is anchored to an edge rather than to an offset measured from the
- * old 360 - see `.nitro-catalog-preview-limited` and `.nitro-catalog-preview-controls`.
+ * old 360 - see `.octane-catalog-preview-limited` and `.octane-catalog-preview-controls`.
  */
-.nitro-catalog-product-view {
+.octane-catalog-product-view {
     position: relative;
     top: 0;
     left: 0;
@@ -1329,22 +1329,22 @@
     background: transparent;
 }
 
-.nitro-catalog-product-view::before {
+.octane-catalog-product-view::before {
     display: none;
 }
 
-.nitro-catalog-offer-panel {
+.octane-catalog-offer-panel {
     position: relative;
     z-index: 1;
     width: 100%;
     height: 100%;
 }
 
-.nitro-catalog-offer-panel:has(> .nitro-catalog-offer-info) {
+.octane-catalog-offer-panel:has(> .octane-catalog-offer-info) {
     justify-content: center;
 }
 
-.nitro-catalog-offer-preview {
+.octane-catalog-offer-preview {
     position: relative;
     height: 100%;
     padding: 0;
@@ -1353,12 +1353,12 @@
 }
 
 /* Follows the product view now that the product view follows the page. */
-.nitro-catalog-offer-panel > .nitro-catalog-offer-preview {
+.octane-catalog-offer-panel > .octane-catalog-offer-preview {
     width: 100%;
     min-width: 0;
 }
 
-.nitro-catalog-preview-title {
+.octane-catalog-preview-title {
     position: absolute;
     top: 12px;
     left: 12px;
@@ -1370,7 +1370,7 @@
     text-shadow: 0 1px 0 #000;
 }
 
-.nitro-catalog-offer-preview > .shadow-room-previewer {
+.octane-catalog-offer-preview > .shadow-room-previewer {
     position: absolute !important;
     top: 0;
     left: 0;
@@ -1383,7 +1383,7 @@
     box-shadow: none !important;
 }
 
-.nitro-catalog-offer-preview > .shadow-room-previewer > .shadow-room-previewer-canvas {
+.octane-catalog-offer-preview > .shadow-room-previewer > .shadow-room-previewer-canvas {
     display: block;
     width: 100% !important;
     height: 100% !important;
@@ -1396,7 +1396,7 @@
     transition: transform 180ms ease-out;
 }
 
-.nitro-catalog-offer-preview:has(.nitro-catalog-preview-zoom-btn[aria-pressed="true"])
+.octane-catalog-offer-preview:has(.octane-catalog-preview-zoom-btn[aria-pressed="true"])
     > .shadow-room-previewer
     > .shadow-room-previewer-canvas {
     transform: translateY(-41px) scale(2);
@@ -1404,25 +1404,25 @@
 
 /* Badge offers: the black 3D-preview stage is meant for furni room previews.
    Badges get a light panel, a dark title and a larger, centered badge. */
-.nitro-catalog-offer-preview.is-badge {
+.octane-catalog-offer-preview.is-badge {
     background: var(--catalog-standard-panel, #e9e9e1);
 }
 
-.nitro-catalog-offer-preview.is-badge .nitro-catalog-preview-title {
+.octane-catalog-offer-preview.is-badge .octane-catalog-preview-title {
     color: #33332e !important;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.nitro-catalog-offer-preview.is-badge .group-badge,
-.nitro-catalog-offer-preview.is-badge > *:not(.nitro-catalog-preview-title) {
+.octane-catalog-offer-preview.is-badge .group-badge,
+.octane-catalog-offer-preview.is-badge > *:not(.octane-catalog-preview-title) {
     image-rendering: pixelated;
 }
 
-.nitro-catalog-color-grid-shell {
+.octane-catalog-color-grid-shell {
     max-height: 154px;
 }
 
-.nitro-catalog-badge-display-layout {
+.octane-catalog-badge-display-layout {
     position: relative;
     width: 100%;
     max-width: 360px;
@@ -1433,7 +1433,7 @@
     background: var(--catalog-standard-bg, #e4e3db);
 }
 
-.nitro-catalog-badge-product-picker {
+.octane-catalog-badge-product-picker {
     position: absolute;
     top: 245px;
     left: 0;
@@ -1446,17 +1446,17 @@
     overflow: hidden;
 }
 
-.nitro-catalog-badge-product-picker .nitro-catalog-item-grid-scroll-area,
-.nitro-catalog-badge-product-picker .nitro-classic-scroll-area-viewport {
+.octane-catalog-badge-product-picker .octane-catalog-item-grid-scroll-area,
+.octane-catalog-badge-product-picker .octane-classic-scroll-area-viewport {
     width: 87px;
     height: 167px;
 }
 
-.nitro-catalog-badge-product-picker .nitro-classic-scroll-area-viewport {
+.octane-catalog-badge-product-picker .octane-classic-scroll-area-viewport {
     padding-right: 17px;
 }
 
-.nitro-catalog-badge-offer-list {
+.octane-catalog-badge-offer-list {
     display: grid !important;
     grid-template-columns: 70px !important;
     grid-auto-rows: 70px !important;
@@ -1467,7 +1467,7 @@
 }
 
 @layer utilities {
-    .nitro-catalog-window .nitro-catalog-badge-offer-list .layout-grid-item {
+    .octane-catalog-window .octane-catalog-badge-offer-list .layout-grid-item {
         width: 70px !important;
         min-width: 70px !important;
         height: 70px !important;
@@ -1476,7 +1476,7 @@
     }
 }
 
-.nitro-catalog-badge-picker {
+.octane-catalog-badge-picker {
     position: absolute;
     top: 245px;
     left: 105px;
@@ -1485,7 +1485,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-badge-selector {
+.octane-catalog-badge-selector {
     position: absolute;
     top: 0;
     left: 0;
@@ -1494,7 +1494,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-badge-scroll-area {
+.octane-catalog-badge-scroll-area {
     position: absolute;
     top: 30px;
     left: 0;
@@ -1502,13 +1502,13 @@
     height: 145px;
 }
 
-.nitro-catalog-badge-scroll-area .nitro-classic-scroll-area-viewport {
+.octane-catalog-badge-scroll-area .octane-classic-scroll-area-viewport {
     width: 255px;
     height: 145px;
     padding-right: 17px;
 }
 
-.nitro-catalog-badge-grid {
+.octane-catalog-badge-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, 44px) !important;
     grid-auto-rows: 44px !important;
@@ -1520,7 +1520,7 @@
 }
 
 @layer utilities {
-    .nitro-catalog-window .nitro-catalog-badge-tile {
+    .octane-catalog-window .octane-catalog-badge-tile {
         width: 44px !important;
         min-width: 44px !important;
         height: 44px !important;
@@ -1532,24 +1532,24 @@
         overflow: hidden !important;
     }
 
-    .nitro-catalog-window .nitro-catalog-badge-tile:hover {
+    .octane-catalog-window .octane-catalog-badge-tile:hover {
         background: #e5e8e1 !important;
     }
 
-    .nitro-catalog-window .nitro-catalog-badge-tile.is-grid-active {
+    .octane-catalog-window .octane-catalog-badge-tile.is-grid-active {
         border-color: #222 !important;
         background: #fff !important;
         box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px #222 !important;
     }
 }
 
-.nitro-catalog-badge-tile > div {
+.octane-catalog-badge-tile > div {
     max-width: 40px;
     max-height: 40px;
     image-rendering: pixelated;
 }
 
-.nitro-catalog-badge-empty {
+.octane-catalog-badge-empty {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1562,7 +1562,7 @@
     text-align: center;
 }
 
-.nitro-catalog-badge-preview {
+.octane-catalog-badge-preview {
     position: absolute;
     top: 0;
     left: 0;
@@ -1572,14 +1572,14 @@
     background: #000;
 }
 
-.nitro-catalog-badge-preview.is-empty {
+.octane-catalog-badge-preview.is-empty {
     top: 0;
     left: 0;
     width: 360px;
     height: 240px;
 }
 
-.nitro-catalog-badge-product-copy {
+.octane-catalog-badge-product-copy {
     position: absolute;
     top: 12px;
     left: 10px;
@@ -1593,7 +1593,7 @@
     pointer-events: none;
 }
 
-.nitro-catalog-badge-product-name {
+.octane-catalog-badge-product-name {
     width: 165px;
     min-height: 17px;
     overflow: hidden;
@@ -1604,7 +1604,7 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-badge-product-description {
+.octane-catalog-badge-product-description {
     width: 165px;
     max-height: 30px;
     overflow: hidden;
@@ -1614,7 +1614,7 @@
     text-overflow: ellipsis;
 }
 
-.nitro-catalog-badge-product-render {
+.octane-catalog-badge-product-render {
     position: absolute;
     top: 0;
     left: 0;
@@ -1623,7 +1623,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-badge-product-render .shadow-room-previewer {
+.octane-catalog-badge-product-render .shadow-room-previewer {
     width: 360px !important;
     max-width: 360px !important;
     height: 240px !important;
@@ -1632,7 +1632,7 @@
     border-radius: 0 !important;
 }
 
-.nitro-catalog-badge-intro {
+.octane-catalog-badge-intro {
     position: absolute;
     top: 0;
     left: 0;
@@ -1650,7 +1650,7 @@
     color: #fff;
 }
 
-.nitro-catalog-badge-intro img {
+.octane-catalog-badge-intro img {
     width: auto;
     height: auto;
     max-width: 96px;
@@ -1658,7 +1658,7 @@
     object-fit: contain;
 }
 
-.nitro-catalog-badge-limited {
+.octane-catalog-badge-limited {
     position: absolute;
     top: 20px;
     left: 180px;
@@ -1667,7 +1667,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-badge-total-price {
+.octane-catalog-badge-total-price {
     position: absolute;
     right: 6px;
     bottom: 7px;
@@ -1675,7 +1675,7 @@
     min-width: 90px;
 }
 
-.nitro-catalog-badge-purchase {
+.octane-catalog-badge-purchase {
     position: absolute;
     top: 430px;
     left: 0;
@@ -1689,25 +1689,25 @@
     overflow: hidden;
 }
 
-.nitro-catalog-badge-purchase .nitro-catalog-standard-gift-button,
-.nitro-catalog-badge-purchase .nitro-catalog-standard-buy-button {
+.octane-catalog-badge-purchase .octane-catalog-standard-gift-button,
+.octane-catalog-badge-purchase .octane-catalog-standard-buy-button {
     width: 170px !important;
     min-width: 170px !important;
     max-width: 170px !important;
 }
 
-.nitro-catalog-badge-product-copy .nitro-catalog-product-details-name,
-.nitro-catalog-badge-product-copy .nitro-catalog-product-details-description {
+.octane-catalog-badge-product-copy .octane-catalog-product-details-name,
+.octane-catalog-badge-product-copy .octane-catalog-product-details-description {
     color: #fff !important;
     opacity: 1 !important;
 }
 
-.nitro-catalog-badge-preview .nitro-catalog-preview-controls {
+.octane-catalog-badge-preview .octane-catalog-preview-controls {
     top: 8px;
     right: 6px;
 }
 
-.nitro-catalog-badge-search {
+.octane-catalog-badge-search {
     position: absolute;
     top: 0;
     left: 0;
@@ -1717,7 +1717,7 @@
     background: #fff;
 }
 
-.nitro-catalog-badge-search input {
+.octane-catalog-badge-search input {
     position: absolute;
     top: 3px;
     left: 6px;
@@ -1732,11 +1732,11 @@
     line-height: 20px;
 }
 
-.nitro-catalog-badge-search input:focus {
+.octane-catalog-badge-search input:focus {
     outline: 0;
 }
 
-.nitro-catalog-badge-search-clear {
+.octane-catalog-badge-search-clear {
     position: absolute;
     top: 3px;
     left: 232px;
@@ -1751,7 +1751,7 @@
     cursor: pointer;
 }
 
-.nitro-catalog-badge-preview .nitro-catalog-price-frame {
+.octane-catalog-badge-preview .octane-catalog-price-frame {
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -1770,20 +1770,20 @@
     box-shadow: none;
 }
 
-.nitro-catalog-badge-preview .nitro-catalog-price-frame .nitro-catalog-standard-price-display {
+.octane-catalog-badge-preview .octane-catalog-price-frame .octane-catalog-standard-price-display {
     height: 13px;
     min-height: 13px;
     gap: 1px;
 }
 
-.nitro-catalog-badge-preview .nitro-catalog-price-frame .nitro-catalog-standard-price-pill {
+.octane-catalog-badge-preview .octane-catalog-price-frame .octane-catalog-standard-price-pill {
     min-width: 0;
     height: 13px;
     gap: 1px;
     padding: 0;
 }
 
-.nitro-catalog-badge-preview .nitro-catalog-price-frame .nitro-catalog-standard-price-text {
+.octane-catalog-badge-preview .octane-catalog-price-frame .octane-catalog-standard-price-text {
     color: #111 !important;
     font-family: Ubuntu, Arial, sans-serif;
     font-size: 14px !important;
@@ -1792,7 +1792,7 @@
     text-shadow: none !important;
 }
 
-.nitro-catalog-badge-preview .nitro-catalog-price-frame .nitro-currency-icon {
+.octane-catalog-badge-preview .octane-catalog-price-frame .octane-currency-icon {
     flex: 0 0 22px;
     width: 22px !important;
     height: 22px !important;
@@ -1800,11 +1800,11 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-badge-preview .nitro-catalog-price-frame .is-credits .nitro-currency-icon {
+.octane-catalog-badge-preview .octane-catalog-price-frame .is-credits .octane-currency-icon {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAD/SURBVEhLtZSBDYMwDAQzTTtNR2GmrlBW6SBlhFSO9OFsnJRKraUngPH5ZSCl1lr+oXZ43i8HtWQpdhhqWhuTBNZtrlGDA1hQFa7LXGxATgvdIFSF2+pFt3bNBoQ7MKECqXC57mA7l9hAcAeObgnmqrwacGR03cEZNILlUhCtmevTYCq6jNdfgW2lToBvHSw3hBMc8wSz2WmwxDydfwRbIhZzLMpRbKAX68DRdSwcic8ZuEMF5g8i5ywcSUA1GoHdSASO89a5VgO/HgGqzw1gu+lczcAGTKApuMOzmVMAOuhhE3Jb3v4gizPRZYNmm1AMV3RCPiZgRQRE5SHwr/UG8Hq+iW3+jYQAAAAASUVORK5CYII=") !important;
 }
 
-.nitro-catalog-sound-layout {
+.octane-catalog-sound-layout {
     position: relative;
     width: 100%;
     max-width: none;
@@ -1815,7 +1815,7 @@
     background: var(--catalog-standard-bg, #e4e3db);
 }
 
-.nitro-catalog-sound-product {
+.octane-catalog-sound-product {
     position: absolute;
     top: 0;
     left: 0;
@@ -1825,9 +1825,9 @@
     background: var(--catalog-standard-bg, #e4e3db);
 }
 
-.nitro-catalog-sound-title,
-.nitro-catalog-sound-description,
-.nitro-catalog-sound-length {
+.octane-catalog-sound-title,
+.octane-catalog-sound-description,
+.octane-catalog-sound-length {
     position: absolute;
     left: 10px;
     z-index: 3;
@@ -1837,28 +1837,28 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-sound-title {
+.octane-catalog-sound-title {
     top: 16px;
     height: 17px;
     font-size: 12px;
     line-height: 17px;
 }
 
-.nitro-catalog-sound-description {
+.octane-catalog-sound-description {
     top: 34px;
     height: 15px;
     font-size: 10px;
     line-height: 15px;
 }
 
-.nitro-catalog-sound-length {
+.octane-catalog-sound-length {
     top: 53px;
     height: 15px;
     font-size: 10px;
     line-height: 15px;
 }
 
-.nitro-catalog-sound-product-render {
+.octane-catalog-sound-product-render {
     position: absolute;
     top: 70px;
     right: auto;
@@ -1871,19 +1871,19 @@
     overflow: hidden;
 }
 
-.nitro-catalog-sound-product-render .furni-image {
+.octane-catalog-sound-product-render .furni-image {
     flex: 0 0 auto;
     image-rendering: pixelated;
 }
 
-.nitro-catalog-sound-price {
+.octane-catalog-sound-price {
     position: absolute;
     right: 7px;
     bottom: 10px;
     z-index: 4;
 }
 
-.nitro-catalog-sound-listen-panel {
+.octane-catalog-sound-listen-panel {
     position: absolute;
     top: 195px;
     left: 7px;
@@ -1895,7 +1895,7 @@
     font-size: 10px;
 }
 
-.nitro-catalog-sound-listen-panel > span {
+.octane-catalog-sound-listen-panel > span {
     position: absolute;
     top: 11px;
     left: 9px;
@@ -1904,7 +1904,7 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-sound-listen-button {
+.octane-catalog-sound-listen-button {
     position: absolute !important;
     top: 8px;
     left: 102px;
@@ -1924,24 +1924,24 @@
     box-shadow: inset 0 0 0 1px #ffffff, 0 1px 0 rgba(0, 0, 0, 0.16) !important;
 }
 
-.nitro-catalog-sound-listen-button:hover:not(:disabled) {
+.octane-catalog-sound-listen-button:hover:not(:disabled) {
     background: linear-gradient(180deg, #ffffff 0%, #e9e9e9 100%) !important;
     filter: none;
 }
 
-.nitro-catalog-sound-listen-button:active:not(:disabled) {
+.octane-catalog-sound-listen-button:active:not(:disabled) {
     background: linear-gradient(180deg, #cdcdcd 0%, #eeeeee 100%) !important;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.24) !important;
 }
 
-.nitro-catalog-sound-select-product {
+.octane-catalog-sound-select-product {
     position: absolute;
     top: 130px;
     left: 6px;
     font-size: 10px;
 }
 
-.nitro-catalog-sound-grid {
+.octane-catalog-sound-grid {
     position: absolute;
     top: 245px;
     left: 0;
@@ -1955,11 +1955,11 @@
     background: #c9c9c3;
 }
 
-.nitro-catalog-sound-grid .nitro-classic-scroll-area-viewport {
+.octane-catalog-sound-grid .octane-classic-scroll-area-viewport {
     padding-right: 17px;
 }
 
-.nitro-catalog-sound-purchase {
+.octane-catalog-sound-purchase {
     position: absolute;
     top: 430px;
     left: 0;
@@ -1971,19 +1971,19 @@
     gap: 6px;
 }
 
-.nitro-catalog-sound-purchase > button {
+.octane-catalog-sound-purchase > button {
     flex: 1 1 0;
     width: auto;
     min-width: 0;
     height: 24px;
 }
 
-.nitro-catalog-marketplace-item-icon {
+.octane-catalog-marketplace-item-icon {
     width: 40px;
     height: 40px;
 }
 
-.nitro-catalog-vip-hc-banner {
+.octane-catalog-vip-hc-banner {
     width: 34px;
     height: 20px;
     background-position: center;
@@ -1991,35 +1991,35 @@
     background-size: contain;
 }
 
-.nitro-catalog-trophy-card {
+.octane-catalog-trophy-card {
     box-shadow: 0 0 8px rgba(255, 193, 7, 0.15);
 }
 
-.nitro-catalog-trophy-preview {
+.octane-catalog-trophy-preview {
     background: linear-gradient(180deg, #fff9e6 0%, #fff3cc 100%);
 }
 
-.nitro-catalog-trophy-inscription {
+.octane-catalog-trophy-inscription {
     background: #ffffff;
 }
 
-.nitro-catalog-trophy-inscription.has-text {
+.octane-catalog-trophy-inscription.has-text {
     background: linear-gradient(180deg, #fffdf5 0%, #fff8e8 100%);
     border-color: rgba(255, 193, 7, 0.4) !important;
 }
 
-.nitro-catalog-offer-info {
+.octane-catalog-offer-info {
     display: none !important;
 }
 
-.nitro-catalog-offer-info .nitro-text,
-.nitro-catalog-offer-info span,
-.nitro-catalog-offer-info div {
+.octane-catalog-offer-info .octane-text,
+.octane-catalog-offer-info span,
+.octane-catalog-offer-info div {
     color: inherit;
 }
 
 
-.nitro-catalog-welcome {
+.octane-catalog-welcome {
     position: relative;
     z-index: 1;
     width: 100%;
@@ -2028,7 +2028,7 @@
     color: var(--catalog-standard-muted);
 }
 
-.nitro-catalog-welcome img {
+.octane-catalog-welcome img {
     width: auto !important;
     height: auto !important;
     max-width: 96px;
@@ -2037,12 +2037,12 @@
     background: transparent;
 }
 
-.nitro-catalog-welcome.is-image-only img {
+.octane-catalog-welcome.is-image-only img {
     max-width: 100%;
     max-height: 100%;
 }
 
-.nitro-catalog-grid-shell {
+.octane-catalog-grid-shell {
     position: absolute;
     left: 0;
     top: 245px;
@@ -2053,13 +2053,13 @@
     overflow: auto;
 }
 
-.nitro-catalog-default-layout:has(.nitro-catalog-default-admin) .nitro-catalog-grid-shell {
+.octane-catalog-default-layout:has(.octane-catalog-default-admin) .octane-catalog-grid-shell {
     top: 280px !important;
 }
 
-.nitro-catalog-grid {
-    grid-template-columns: repeat(auto-fill, minmax(var(--nitro-grid-column-min-width, 53px), 1fr)) !important;
-    grid-auto-rows: var(--nitro-grid-column-min-height, 70px);
+.octane-catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--octane-grid-column-min-width, 53px), 1fr)) !important;
+    grid-auto-rows: var(--octane-grid-column-min-height, 70px);
     align-content: start;
     justify-content: start;
     column-gap: 3px !important;
@@ -2067,44 +2067,44 @@
     overflow: visible !important;
 }
 
-.nitro-catalog-grid-virtual .grid {
+.octane-catalog-grid-virtual .grid {
     column-gap: 3px !important;
     row-gap: 3px !important;
 }
 
-.nitro-catalog-grid-density-standard,
-.nitro-catalog-grid-virtual.nitro-catalog-grid-density-standard .grid {
-    grid-template-columns: repeat(var(--nitro-air-column-count, 6), 53px) !important;
+.octane-catalog-grid-density-standard,
+.octane-catalog-grid-virtual.octane-catalog-grid-density-standard .grid {
+    grid-template-columns: repeat(var(--octane-air-column-count, 6), 53px) !important;
     row-gap: 0 !important;
 }
 
-.nitro-catalog-grid-density-standard.uses-base-grid-template,
-.nitro-catalog-grid-virtual.nitro-catalog-grid-density-standard.uses-base-grid-template .grid {
-    grid-template-columns: repeat(var(--nitro-air-column-count, 8), 36px) !important;
+.octane-catalog-grid-density-standard.uses-base-grid-template,
+.octane-catalog-grid-virtual.octane-catalog-grid-density-standard.uses-base-grid-template .grid {
+    grid-template-columns: repeat(var(--octane-air-column-count, 8), 36px) !important;
     grid-auto-rows: 36px;
 }
 
-.nitro-catalog-air-mixed-grid.uses-mixed-grid-template {
-    --nitro-grid-column-min-width: 53px;
-    --nitro-grid-column-min-height: 74px;
+.octane-catalog-air-mixed-grid.uses-mixed-grid-template {
+    --octane-grid-column-min-width: 53px;
+    --octane-grid-column-min-height: 74px;
     display: block !important;
     position: relative;
     grid-template-columns: none !important;
     grid-auto-rows: auto;
 }
 
-.nitro-catalog-item-grid-scroll-area:has(.nitro-catalog-grid-density-standard) > .nitro-classic-scroll-area-viewport,
-.nitro-catalog-grid-virtual.nitro-catalog-grid-density-standard .nitro-classic-scroll-area > .nitro-classic-scroll-area-viewport {
+.octane-catalog-item-grid-scroll-area:has(.octane-catalog-grid-density-standard) > .octane-classic-scroll-area-viewport,
+.octane-catalog-grid-virtual.octane-catalog-grid-density-standard .octane-classic-scroll-area > .octane-classic-scroll-area-viewport {
     padding-right: 17px;
     overflow-x: auto;
 }
 
 @layer utilities {
-    .nitro-catalog-window .layout-grid-item {
+    .octane-catalog-window .layout-grid-item {
         width: 100% !important;
-        height: var(--nitro-grid-column-min-height, 70px) !important;
+        height: var(--octane-grid-column-min-height, 70px) !important;
         min-width: 0 !important;
-        min-height: var(--nitro-grid-column-min-height, 70px) !important;
+        min-height: var(--octane-grid-column-min-height, 70px) !important;
         border: 0 !important;
         border-radius: 0 !important;
         background-image: none !important;
@@ -2112,35 +2112,35 @@
         overflow: visible !important;
     }
 
-    .nitro-catalog-window .layout-grid-item:not(.has-highlight) {
+    .octane-catalog-window .layout-grid-item:not(.has-highlight) {
         background-color: #e4e7df !important;
         border: 2px solid transparent !important;
         border-radius: 4px !important;
         box-shadow: none !important;
     }
 
-    .nitro-catalog-window .nitro-catalog-pet-breeds .layout-grid-item {
+    .octane-catalog-window .octane-catalog-pet-breeds .layout-grid-item {
         width: 84px !important;
         min-width: 84px !important;
         height: 74px !important;
         min-height: 74px !important;
     }
 
-    .nitro-catalog-window .layout-grid-item:not(.has-highlight):not(.is-active):hover {
+    .octane-catalog-window .layout-grid-item:not(.has-highlight):not(.is-active):hover {
         background-image: none !important;
         border-color: transparent !important;
         box-shadow: none !important;
     }
 
-    .nitro-catalog-window .layout-grid-item.is-active {
+    .octane-catalog-window .layout-grid-item.is-active {
         background-color: #ffffff !important;
         background-image: none !important;
         border: 2px solid #62c4e8 !important;
         box-shadow: none !important;
     }
 
-    .nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item:not(.has-highlight),
-    .nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item.is-active {
+    .octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item:not(.has-highlight),
+    .octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.is-active {
         border: 0 !important;
         border-radius: 0 !important;
         background-color: transparent !important;
@@ -2148,7 +2148,7 @@
     }
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item.is-active::before {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.is-active::before {
     content: "";
     position: absolute;
     top: 0;
@@ -2164,31 +2164,31 @@
     pointer-events: none;
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item.is-active.uses-single-price-template::before {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.is-active.uses-single-price-template::before {
     height: 62px;
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item.uses-base-grid-template {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.uses-base-grid-template {
     width: 36px !important;
     height: 36px !important;
     min-width: 36px !important;
     min-height: 36px !important;
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item.is-active.uses-base-grid-template::before {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.is-active.uses-base-grid-template::before {
     width: 36px;
     height: 36px;
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard.is-builder-grid .layout-grid-item.is-active::before {
+.octane-catalog-window .octane-catalog-grid-density-standard.is-builder-grid .layout-grid-item.is-active::before {
     border-color: var(--catalog-standard-bc-outer);
 }
 
-.nitro-catalog-window .is-builder-grid .layout-grid-item.is-active {
+.octane-catalog-window .is-builder-grid .layout-grid-item.is-active {
     border-color: var(--catalog-standard-bc-outer) !important;
 }
 
-.nitro-catalog-window .layout-grid-item.has-highlight {
+.octane-catalog-window .layout-grid-item.has-highlight {
     width: 26px !important;
     height: 26px !important;
     min-width: 26px !important;
@@ -2202,7 +2202,7 @@
     cursor: pointer !important;
 }
 
-.nitro-catalog-window .layout-grid-item.has-highlight:hover {
+.octane-catalog-window .layout-grid-item.has-highlight:hover {
     border-color: #000 !important;
     box-shadow:
         inset 1px 1px 0 rgba(255, 255, 255, 0.5),
@@ -2210,7 +2210,7 @@
         0 0 0 1px rgba(0, 0, 0, 0.45) !important;
 }
 
-.nitro-catalog-window .layout-grid-item.has-highlight.is-active {
+.octane-catalog-window .layout-grid-item.has-highlight.is-active {
     border-color: #000 !important;
     box-shadow:
         inset 0 0 0 2px #ffffff,
@@ -2218,7 +2218,7 @@
         0 0 0 1px #63c5e9 !important;
 }
 
-.nitro-catalog-grid-offer-icon {
+.octane-catalog-grid-offer-icon {
     width: auto !important;
     height: auto !important;
     max-width: 100% !important;
@@ -2228,7 +2228,7 @@
     pointer-events: none;
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item:not(.unique-item) > .nitro-catalog-grid-offer-icon {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item:not(.unique-item) > .octane-catalog-grid-offer-icon {
     position: absolute;
     top: 2px;
     left: 8px;
@@ -2242,8 +2242,8 @@
 
 /* AIR gridItem_with_price: multiContainer is painted after the 36px image at
    icon-local x=18/y=21, so the quantity badge sits above its lower-right edge. */
-.nitro-catalog-window
-    .nitro-catalog-grid-density-standard
+.octane-catalog-window
+    .octane-catalog-grid-density-standard
     .layout-grid-item:not(.uses-base-grid-template):not(.unique-item)
     > .layout-item-count {
     top: 23px !important;
@@ -2263,15 +2263,15 @@
     line-height: 11px !important;
 }
 
-.nitro-catalog-window
-    .nitro-catalog-grid-density-standard
+.octane-catalog-window
+    .octane-catalog-grid-density-standard
     .layout-grid-item:not(.uses-base-grid-template):not(.unique-item)
     > .layout-item-count::before {
     content: "x";
 }
 
-.nitro-catalog-window
-    .nitro-catalog-grid-density-standard
+.octane-catalog-window
+    .octane-catalog-grid-density-standard
     .layout-grid-item.uses-base-grid-template:not(.unique-item)
     > .layout-item-count {
     top: 21px !important;
@@ -2280,15 +2280,15 @@
     z-index: 6;
 }
 
-.nitro-catalog-window
-    .nitro-catalog-grid-density-standard
+.octane-catalog-window
+    .octane-catalog-grid-density-standard
     .layout-grid-item.uses-base-grid-template:not(.unique-item)
-    > .nitro-catalog-grid-offer-icon {
+    > .octane-catalog-grid-offer-icon {
     top: 0;
     left: 0;
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item > .avatar-image {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item > .avatar-image {
     top: 2px !important;
     right: auto !important;
     bottom: auto !important;
@@ -2297,7 +2297,7 @@
     height: 36px !important;
 }
 
-.nitro-catalog-window .nitro-catalog-grid-density-standard .layout-grid-item.uses-base-grid-template > .avatar-image {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.uses-base-grid-template > .avatar-image {
     top: 0 !important;
     left: 0 !important;
 }
@@ -2309,12 +2309,12 @@
    of the flow, layer the icon between the backdrop (z-2) and the glass (z-4),
    and overlay the price as a chip so double-currency offers can't overflow.
    Scoped to the catalog window: inventory/trade LTD tiles are untouched. */
-.nitro-catalog-window .unique-item .unique-bg-override {
+.octane-catalog-window .unique-item .unique-bg-override {
     position: absolute !important;
     inset: 0 !important;
 }
 
-.nitro-catalog-window .unique-item .nitro-catalog-grid-offer-icon {
+.octane-catalog-window .unique-item .octane-catalog-grid-offer-icon {
     position: relative;
     z-index: 3;
     /* keep the furni inside the glass, clear of the bottom counter strip */
@@ -2322,7 +2322,7 @@
     margin-bottom: 8px;
 }
 
-.nitro-catalog-window .unique-item .nitro-catalog-grid-price {
+.octane-catalog-window .unique-item .octane-catalog-grid-price {
     position: absolute;
     left: 50%;
     bottom: 12px;
@@ -2336,7 +2336,7 @@
     background: rgba(255, 255, 255, 0.85);
 }
 
-.nitro-catalog-window .unique-item .nitro-catalog-grid-price.is-multi-price {
+.octane-catalog-window .unique-item .octane-catalog-grid-price.is-multi-price {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
@@ -2345,7 +2345,7 @@
 }
 
 
-.nitro-catalog-grid-price {
+.octane-catalog-grid-price {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -2361,7 +2361,7 @@
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price {
     position: absolute;
     z-index: 2;
     gap: 1px;
@@ -2372,9 +2372,9 @@
     text-shadow: none;
 }
 
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .nitro-catalog-grid-price,
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .layout-grid-item:has(> .avatar-image) > .nitro-catalog-grid-price,
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .avatar-image ~ .nitro-catalog-grid-price {
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .octane-catalog-grid-price,
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .layout-grid-item:has(> .avatar-image) > .octane-catalog-grid-price,
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .avatar-image ~ .octane-catalog-grid-price {
     /* Without absolute positioning the bottom/left offsets below are ignored
        on the statically-positioned badge while translateX(-50%) still applies,
        leaving the price floating mid-tile and shifted left (bots page). */
@@ -2402,7 +2402,7 @@
    The avatar img itself arrives with its transparent border already
    cropped off (LayoutAvatarImageView fit variant), so object-contain
    centers the actual figure in this box. */
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .layout-grid-item > .avatar-image {
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .layout-grid-item > .avatar-image {
     bottom: 18px;
 }
 
@@ -2410,15 +2410,15 @@
    plus the price strip doesn't fit in 74px, and the multi-currency price pill
    (e.g. "35 credits + 5 diamonds") is wider than a 6-column tile. 4 columns
    makes the tiles wide enough for the pill; the height !important is needed
-   to beat the grid's inline --nitro-grid-column-min-height (set by AutoGrid);
+   to beat the grid's inline --octane-grid-column-min-height (set by AutoGrid);
    grid-auto-rows and the tile height both read this variable. */
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard):has(.layout-grid-item > .avatar-image) {
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard):has(.layout-grid-item > .avatar-image) {
     grid-template-columns: repeat(4, 1fr) !important;
-    --nitro-grid-column-min-height: 100px !important;
+    --octane-grid-column-min-height: 100px !important;
 }
 
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .nitro-catalog-grid-price-entry,
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .avatar-image ~ .nitro-catalog-grid-price .nitro-catalog-grid-price-entry {
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .octane-catalog-grid-price-entry,
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .avatar-image ~ .octane-catalog-grid-price .octane-catalog-grid-price-entry {
     height: auto !important;
     line-height: 1 !important;
     align-items: center !important;
@@ -2426,8 +2426,8 @@
     gap: 3px !important;
 }
 
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .nitro-catalog-grid-price-currency,
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .avatar-image ~ .nitro-catalog-grid-price .nitro-catalog-grid-price-currency {
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .octane-catalog-grid-price-currency,
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .avatar-image ~ .octane-catalog-grid-price .octane-catalog-grid-price-currency {
     width: 13px !important;
     height: 13px !important;
     object-fit: contain !important;
@@ -2435,12 +2435,12 @@
     display: inline-block !important;
 }
 
-.nitro-catalog-grid-price.is-single-price {
+.octane-catalog-grid-price.is-single-price {
     height: auto;
     min-height: 0;
 }
 
-.nitro-catalog-grid-price.is-multi-price {
+.octane-catalog-grid-price.is-multi-price {
     height: auto;
     min-height: 0;
     flex-direction: column;
@@ -2448,7 +2448,7 @@
     row-gap: 1px;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price.is-single-price {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price.is-single-price {
     top: 36px;
     left: -3px;
     width: 54px;
@@ -2456,7 +2456,7 @@
     min-height: 19px;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price.is-multi-price {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price.is-multi-price {
     top: 36px;
     left: 8px;
     display: block;
@@ -2465,7 +2465,7 @@
     min-height: 34px;
 }
 
-.nitro-catalog-grid-price-entry {
+.octane-catalog-grid-price-entry {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2474,36 +2474,36 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price-entry {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price-entry {
     justify-content: flex-end;
     gap: 1px;
     height: 19px;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price.is-single-price .nitro-catalog-grid-price-entry {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price.is-single-price .octane-catalog-grid-price-entry {
     width: 54px;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price.is-multi-price .nitro-catalog-grid-price-entry {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price.is-multi-price .octane-catalog-grid-price-entry {
     position: absolute;
     right: 0;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price.is-multi-price .nitro-catalog-grid-price-entry:first-child {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price.is-multi-price .octane-catalog-grid-price-entry:first-child {
     top: 0;
     width: 32px;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price.is-multi-price .nitro-catalog-grid-price-entry:nth-child(2) {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price.is-multi-price .octane-catalog-grid-price-entry:nth-child(2) {
     top: 15px;
     width: 43px;
 }
 
-.nitro-catalog-grid-price-plus {
+.octane-catalog-grid-price-plus {
     padding-right: 1px;
 }
 
-.nitro-catalog-grid-price-currency {
+.octane-catalog-grid-price-currency {
     width: auto !important;
     height: auto !important;
     max-width: none !important;
@@ -2513,7 +2513,7 @@
     object-fit: none !important;
 }
 
-.nitro-catalog-grid-density-standard .nitro-catalog-grid-price-currency {
+.octane-catalog-grid-density-standard .octane-catalog-grid-price-currency {
     width: 15px !important;
     height: 15px !important;
     min-width: 15px !important;
@@ -2521,7 +2521,7 @@
     object-fit: contain !important;
 }
 
-.nitro-catalog-price-row {
+.octane-catalog-price-row {
     position: absolute;
     left: 0;
     top: 405px;
@@ -2531,7 +2531,7 @@
     overflow: visible;
 }
 
-.nitro-catalog-spinner-slot {
+.octane-catalog-spinner-slot {
     position: absolute;
     left: 0;
     top: 0;
@@ -2539,7 +2539,7 @@
     height: 25px;
 }
 
-.nitro-catalog-total-price-slot {
+.octane-catalog-total-price-slot {
     position: absolute;
     left: 180px;
     top: 0;
@@ -2551,7 +2551,7 @@
     padding: 0;
 }
 
-.nitro-catalog-total-price-label {
+.octane-catalog-total-price-label {
     position: absolute;
     top: 3px;
     left: 20px;
@@ -2565,7 +2565,7 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-total-price-value {
+.octane-catalog-total-price-value {
     position: absolute !important;
     top: 1px;
     left: 85px;
@@ -2576,7 +2576,7 @@
     padding: 0;
 }
 
-.nitro-catalog-purchase-row {
+.octane-catalog-purchase-row {
     position: absolute;
     left: 0;
     top: 430px;
@@ -2586,7 +2586,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-offer-actions {
+.octane-catalog-offer-actions {
     display: flex !important;
     flex-direction: row;
     align-items: flex-start;
@@ -2600,11 +2600,11 @@
     padding: 0;
 }
 
-.nitro-catalog-default-layout .nitro-catalog-offer-actions > .nitro-catalog-standard-buy-button {
+.octane-catalog-default-layout .octane-catalog-offer-actions > .octane-catalog-standard-buy-button {
     margin-left: auto !important;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-button {
+.octane-catalog-window .octane-catalog-standard-button {
     appearance: none;
     display: inline-flex !important;
     align-items: center !important;
@@ -2632,32 +2632,32 @@
     image-rendering: pixelated !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-preview-btn,
-.nitro-catalog-window button.nitro-catalog-preview-btn *,
-.nitro-catalog-window button.nitro-catalog-preview-btn svg {
+.octane-catalog-window button.octane-catalog-preview-btn,
+.octane-catalog-window button.octane-catalog-preview-btn *,
+.octane-catalog-window button.octane-catalog-preview-btn svg {
     border-radius: 0 !important;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-button:hover {
+.octane-catalog-window .octane-catalog-standard-button:hover {
     border-image-source: var(--habbo-skin-button-hover) !important;
     filter: none !important;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-button:active {
+.octane-catalog-window .octane-catalog-standard-button:active {
     border-image-source: var(--habbo-skin-button-pressed) !important;
     filter: none !important;
     box-shadow: none !important;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-button.pointer-events-none,
-.nitro-catalog-window .nitro-catalog-standard-button:disabled {
+.octane-catalog-window .octane-catalog-standard-button.pointer-events-none,
+.octane-catalog-window .octane-catalog-standard-button:disabled {
     border-image-source: var(--habbo-skin-button-disabled) !important;
     color: #777777 !important;
     opacity: 1 !important;
     cursor: not-allowed !important;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-buy-button {
+.octane-catalog-window .octane-catalog-standard-buy-button {
     width: 170px !important;
     min-width: 170px !important;
     height: 24px !important;
@@ -2674,7 +2674,7 @@
     color: #ffffff !important;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-gift-button {
+.octane-catalog-window .octane-catalog-standard-gift-button {
     width: 170px !important;
     min-width: 170px !important;
     height: 24px !important;
@@ -2690,25 +2690,25 @@
     background: transparent !important;
 }
 
-.nitro-catalog-pet-card .nitro-catalog-standard-buy-button {
+.octane-catalog-pet-card .octane-catalog-standard-buy-button {
     width: auto !important;
     min-width: 0 !important;
     padding: 0 14px !important;
 }
 
-.nitro-catalog-window .layout-grid,
-.nitro-catalog-window [class*="grid-cols-["] {
+.octane-catalog-window .layout-grid,
+.octane-catalog-window [class*="grid-cols-["] {
     overflow-x: hidden !important;
 }
 
-.nitro-catalog-standard-spinner {
+.octane-catalog-standard-spinner {
     position: relative;
     width: 200px;
     height: 25px;
     color: #000;
 }
 
-.nitro-catalog-standard-spinner-label {
+.octane-catalog-standard-spinner-label {
     position: absolute;
     left: 0;
     top: 3px;
@@ -2727,7 +2727,7 @@
 /* The active AIR Ubuntu layout hides its legacy stacked spinner buttons.
    Polaris intentionally keeps quantity controls visible, using the existing
    Habbo +/- sprite family without increasing AIR's 25px purchase row. */
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button {
+.octane-catalog-window button.octane-catalog-standard-spinner-button {
     appearance: none;
     position: absolute;
     top: 1px;
@@ -2751,46 +2751,46 @@
     touch-action: none;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button:focus-visible {
+.octane-catalog-window button.octane-catalog-standard-spinner-button:focus-visible {
     outline: 1px dotted #000000;
     outline-offset: -2px;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-less {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-less {
     left: 54px;
     background-image: var(--habbo-stepper-minus) !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-less:hover {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-less:hover {
     background-image: var(--habbo-stepper-minus-hover) !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-less:active {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-less:active {
     background-image: var(--habbo-stepper-minus-pressed) !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-less:disabled {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-less:disabled {
     background-image: var(--habbo-stepper-minus-disabled) !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-more {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-more {
     left: 110px;
     background-image: var(--habbo-stepper-plus) !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-more:hover {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-more:hover {
     background-image: var(--habbo-stepper-plus-hover) !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-more:active {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-more:active {
     background-image: var(--habbo-stepper-plus-pressed) !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-standard-spinner-button-more:disabled {
+.octane-catalog-window button.octane-catalog-standard-spinner-button-more:disabled {
     background-image: var(--habbo-stepper-plus-disabled) !important;
 }
 
-.nitro-catalog-standard-spinner-input-frame {
+.octane-catalog-standard-spinner-input-frame {
     position: absolute;
     top: 0;
     left: 78px;
@@ -2799,7 +2799,7 @@
     z-index: 2;
 }
 
-.nitro-catalog-standard-spinner-discount {
+.octane-catalog-standard-spinner-discount {
     position: absolute;
     top: 0;
     left: 65px;
@@ -2812,7 +2812,7 @@
 
 /* AIR border style 3: the white border-slot alpha mask colorized to the
    discount container's #92d27c window color. */
-.nitro-catalog-standard-spinner-discount::before {
+.octane-catalog-standard-spinner-discount::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -2823,7 +2823,7 @@
     pointer-events: none;
 }
 
-.nitro-catalog-standard-spinner-discount-copy {
+.octane-catalog-standard-spinner-discount-copy {
     /* Keep the localized "+ N free!" visible between the requested plus
        control and AIR's fixed x=173 bonus star. */
     position: absolute;
@@ -2843,7 +2843,7 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-standard-spinner-discount-star {
+.octane-catalog-standard-spinner-discount-star {
     position: absolute;
     top: -2px;
     left: 108px;
@@ -2854,7 +2854,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-standard-spinner-input-frame::before {
+.octane-catalog-standard-spinner-input-frame::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -2872,7 +2872,7 @@
     pointer-events: none;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-spinner-value {
+.octane-catalog-window .octane-catalog-standard-spinner-value {
     position: absolute;
     left: 3px;
     top: 5px;
@@ -2894,13 +2894,13 @@
     text-align: left;
 }
 
-.nitro-catalog-window .nitro-catalog-standard-spinner-value:focus {
+.octane-catalog-window .octane-catalog-standard-spinner-value:focus {
     border: 0 !important;
     outline: 0 !important;
     box-shadow: none !important;
 }
 
-.nitro-catalog-standard-price-display {
+.octane-catalog-standard-price-display {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -2910,7 +2910,7 @@
     font-size: 11px;
 }
 
-.nitro-catalog-standard-price-pill {
+.octane-catalog-standard-price-pill {
     display: inline-flex;
     align-items: center;
     gap: 2px;
@@ -2922,14 +2922,14 @@
     background: transparent !important;
 }
 
-.nitro-catalog-standard-price-text {
+.octane-catalog-standard-price-text {
     color: #222 !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     line-height: 17px !important;
 }
 
-.nitro-catalog-standard-price-original {
+.octane-catalog-standard-price-original {
     position: relative;
     display: inline-block;
     color: #999999 !important;
@@ -2938,7 +2938,7 @@
     line-height: 17px !important;
 }
 
-.nitro-catalog-standard-price-original::after {
+.octane-catalog-standard-price-original::after {
     content: "";
     position: absolute;
     top: 8px;
@@ -2949,7 +2949,7 @@
     pointer-events: none;
 }
 
-.nitro-catalog-total-price-value .nitro-catalog-standard-price-display {
+.octane-catalog-total-price-value .octane-catalog-standard-price-display {
     align-items: flex-start;
     width: max-content;
     height: 24px;
@@ -2959,7 +2959,7 @@
     margin-left: auto;
 }
 
-.nitro-catalog-total-price-value .nitro-catalog-standard-price-pill {
+.octane-catalog-total-price-value .octane-catalog-standard-price-pill {
     align-items: flex-start;
     height: 24px;
     min-width: 0;
@@ -2967,21 +2967,21 @@
     padding: 0;
 }
 
-.nitro-catalog-total-price-value .nitro-catalog-standard-price-text {
+.octane-catalog-total-price-value .octane-catalog-standard-price-text {
     font-size: 12px !important;
     margin-top: 3px;
 }
 
-.nitro-catalog-total-price-value .nitro-catalog-standard-price-original {
+.octane-catalog-total-price-value .octane-catalog-standard-price-original {
     font-size: 12px !important;
     margin-top: 3px;
 }
 
-.nitro-catalog-total-price-value .nitro-catalog-standard-price-original::after {
+.octane-catalog-total-price-value .octane-catalog-standard-price-original::after {
     top: 7px;
 }
 
-.nitro-catalog-total-price-value .nitro-catalog-standard-price-plus {
+.octane-catalog-total-price-value .octane-catalog-standard-price-plus {
     display: inline-block;
     width: 8px;
     height: 17px;
@@ -2994,7 +2994,7 @@
     text-align: left;
 }
 
-.nitro-catalog-total-price-value .nitro-currency-icon {
+.octane-catalog-total-price-value .octane-currency-icon {
     width: 22px !important;
     height: 22px !important;
     min-width: 22px !important;
@@ -3004,19 +3004,19 @@
     background-repeat: no-repeat !important;
 }
 
-.nitro-catalog-total-price-value [data-currency-type="-1"] .nitro-currency-icon {
+.octane-catalog-total-price-value [data-currency-type="-1"] .octane-currency-icon {
     background-image: url("../../assets/images/catalog/air/currency-credit-big.png") !important;
 }
 
-.nitro-catalog-total-price-value [data-currency-type="0"] .nitro-currency-icon {
+.octane-catalog-total-price-value [data-currency-type="0"] .octane-currency-icon {
     background-image: url("../../assets/images/catalog/air/currency-ducket-big.png") !important;
 }
 
-.nitro-catalog-total-price-value [data-currency-type="5"] .nitro-currency-icon {
+.octane-catalog-total-price-value [data-currency-type="5"] .octane-currency-icon {
     background-image: url("../../assets/images/catalog/air/currency-diamond-big.png") !important;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-price .nitro-catalog-standard-price-text {
+.octane-catalog-window .octane-catalog-preview-price .octane-catalog-standard-price-text {
     color: #ffffff !important;
     text-shadow:
         0 0 2px #000,
@@ -3026,7 +3026,7 @@
         -1px -1px 1px #000 !important;
 }
 
-.nitro-catalog-standard-price-plus {
+.octane-catalog-standard-price-plus {
     display: inline-block;
     width: 7px;
     height: 17px;
@@ -3037,7 +3037,7 @@
     text-align: center;
 }
 
-.nitro-catalog-preview-btn {
+.octane-catalog-preview-btn {
     position: absolute;
     z-index: 4;
     width: 25px;
@@ -3052,7 +3052,7 @@
     justify-content: center !important;
 }
 
-.nitro-catalog-preview-btn svg {
+.octane-catalog-preview-btn svg {
     width: 14px !important;
     height: 14px !important;
     color: #111 !important;
@@ -3061,17 +3061,17 @@
     display: block !important;
 }
 
-.nitro-catalog-preview-rotate {
+.octane-catalog-preview-rotate {
     top: 8px;
     right: 35px;
 }
 
-.nitro-catalog-preview-state {
+.octane-catalog-preview-state {
     top: 8px;
     right: 6px;
 }
 
-.nitro-catalog-window button.nitro-catalog-preview-btn {
+.octane-catalog-window button.octane-catalog-preview-btn {
     width: 25px !important;
     height: 24px !important;
     min-width: 25px !important;
@@ -3086,7 +3086,7 @@
     z-index: 10 !important;
 }
 
-.nitro-catalog-window button.nitro-catalog-preview-btn::before {
+.octane-catalog-window button.octane-catalog-preview-btn::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -3101,28 +3101,28 @@
     pointer-events: none;
 }
 
-.nitro-catalog-window button.nitro-catalog-preview-btn:hover::before {
+.octane-catalog-window button.octane-catalog-preview-btn:hover::before {
     border-image-source: var(--habbo-skin-shiny-large-hover);
 }
 
-.nitro-catalog-window button.nitro-catalog-preview-btn:active::before {
+.octane-catalog-window button.octane-catalog-preview-btn:active::before {
     border-image-source: var(--habbo-skin-shiny-large-pressed);
 }
 
-.nitro-catalog-window button.nitro-catalog-preview-btn:disabled::before {
+.octane-catalog-window button.octane-catalog-preview-btn:disabled::before {
     border-image-source: var(--habbo-skin-shiny-large-disabled);
 }
 
-.nitro-catalog-window button.nitro-catalog-preview-btn > svg {
+.octane-catalog-window button.octane-catalog-preview-btn > svg {
     position: relative;
     z-index: 1;
 }
 
-.nitro-catalog-breadcrumb {
+.octane-catalog-breadcrumb {
     display: none;
 }
 
-.nitro-catalog-preview-controls {
+.octane-catalog-preview-controls {
     position: absolute;
     top: 8px;
     right: 6px;
@@ -3131,7 +3131,7 @@
     height: 77px;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-btn {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-btn {
     position: absolute;
     top: 0;
     width: 25px !important;
@@ -3141,19 +3141,19 @@
     overflow: hidden;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-btn.is-left {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-btn.is-left {
     left: 0;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-btn.is-right {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-btn.is-right {
     left: 29px;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-btn:disabled {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-btn:disabled {
     opacity: 1 !important;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-region {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-region {
     position: absolute;
     left: 31px;
     display: block;
@@ -3165,7 +3165,7 @@
     box-shadow: none !important;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-zoom-btn {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-zoom-btn {
     top: 29px;
     width: 20px !important;
     min-width: 20px !important;
@@ -3173,7 +3173,7 @@
     min-height: 22px !important;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-action-btn {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-action-btn {
     top: 55px;
     width: 22px !important;
     min-width: 22px !important;
@@ -3181,15 +3181,15 @@
     min-height: 22px !important;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-region:hover {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-region:hover {
     filter: brightness(1.12);
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.nitro-catalog-preview-region:active {
+.octane-catalog-window .octane-catalog-preview-controls button.octane-catalog-preview-region:active {
     filter: brightness(0.9);
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls .nitro-catalog-preview-arrow {
+.octane-catalog-window .octane-catalog-preview-controls .octane-catalog-preview-arrow {
     position: absolute;
     top: 7px;
     display: block;
@@ -3203,15 +3203,15 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.is-left .nitro-catalog-preview-arrow {
+.octane-catalog-window .octane-catalog-preview-controls button.is-left .octane-catalog-preview-arrow {
     left: 7px;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls button.is-right .nitro-catalog-preview-arrow {
+.octane-catalog-window .octane-catalog-preview-controls button.is-right .octane-catalog-preview-arrow {
     left: 9px;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls .nitro-icon.icon-zoom-more {
+.octane-catalog-window .octane-catalog-preview-controls .octane-icon.icon-zoom-more {
     position: absolute;
     top: 0;
     left: 3px;
@@ -3221,13 +3221,13 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls .nitro-icon.icon-zoom-more:hover,
-.nitro-catalog-window .nitro-catalog-preview-controls .nitro-icon.icon-zoom-more:active {
+.octane-catalog-window .octane-catalog-preview-controls .octane-icon.icon-zoom-more:hover,
+.octane-catalog-window .octane-catalog-preview-controls .octane-icon.icon-zoom-more:active {
     transform: none;
     filter: none;
 }
 
-.nitro-catalog-window .nitro-catalog-preview-controls .nitro-catalog-preview-action-icon {
+.octane-catalog-window .octane-catalog-preview-controls .octane-catalog-preview-action-icon {
     position: absolute;
     top: 0;
     left: -10px;
@@ -3237,7 +3237,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-grid-club-level {
+.octane-catalog-grid-club-level {
     position: absolute;
     top: 4px;
     left: 23px;
@@ -3246,18 +3246,18 @@
     pointer-events: none;
 }
 
-.nitro-catalog-grid-density-standard .layout-grid-item.uses-base-grid-template .nitro-catalog-grid-club-level {
+.octane-catalog-grid-density-standard .layout-grid-item.uses-base-grid-template .octane-catalog-grid-club-level {
     top: 2px;
     left: 15px;
 }
 
 /* Bots (avatar offers): pin the HC badge to the tile's top-left corner —
    the default 23px offset suits furni tiles. */
-.nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .nitro-catalog-grid-club-level {
+.octane-catalog-grid:not(.octane-catalog-grid-density-standard) .layout-grid-item:has(.avatar-image) .octane-catalog-grid-club-level {
     left: 4px;
 }
 
-.nitro-catalog-purchase-selection-prompt {
+.octane-catalog-purchase-selection-prompt {
     align-self: center;
     color: var(--bs-secondary-color);
     font-size: 11px;
@@ -3265,7 +3265,7 @@
 }
 
 @media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
-    .nitro-catalog-window {
+    .octane-catalog-window {
         width: 100vw !important;
         min-width: 0 !important;
         max-width: 100vw !important;
@@ -3275,33 +3275,33 @@
         border-radius: 0 !important;
     }
 
-    .draggable-window:has(> .nitro-catalog-window) {
+    .draggable-window:has(> .octane-catalog-window) {
         transform: none !important;
         left: 0 !important;
         top: 0 !important;
     }
 
-    .nitro-catalog-tabs-shell {
+    .octane-catalog-tabs-shell {
         overflow-x: auto;
         overflow-y: hidden;
     }
 
-    .nitro-catalog-content-shell {
+    .octane-catalog-content-shell {
         padding: 6px !important;
         overflow-x: hidden !important;
         overflow-y: auto !important;
     }
 
-    .nitro-catalog-welcome {
+    .octane-catalog-welcome {
         display: none !important;
     }
 
-    .nitro-catalog-product-view:has(> .nitro-catalog-welcome) {
+    .octane-catalog-product-view:has(> .octane-catalog-welcome) {
         display: none !important;
     }
 
-    .nitro-catalog-stage,
-    .nitro-catalog-stage.is-navigation-hidden {
+    .octane-catalog-stage,
+    .octane-catalog-stage.is-navigation-hidden {
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -3310,12 +3310,12 @@
         min-height: 0;
     }
 
-    .nitro-catalog-sidebar {
+    .octane-catalog-sidebar {
         flex: 0 0 auto;
         max-height: 30vh;
     }
 
-    .nitro-catalog-layout-shell {
+    .octane-catalog-layout-shell {
         flex: 0 0 auto;
         width: 100%;
         height: auto;
@@ -3323,22 +3323,22 @@
         overflow: visible;
     }
 
-    .nitro-catalog-layout-container {
+    .octane-catalog-layout-container {
         flex: 0 0 auto;
         height: auto;
         min-height: 460px;
         overflow: visible;
     }
 
-    .nitro-catalog-default-layout {
+    .octane-catalog-default-layout {
         width: 100%;
         height: 460px;
         min-height: 460px;
         overflow: visible;
     }
 
-    .nitro-catalog-grid:not(.nitro-catalog-grid-density-standard) {
-        grid-template-columns: repeat(auto-fill, minmax(var(--nitro-grid-column-min-width, 47px), 1fr)) !important;
+    .octane-catalog-grid:not(.octane-catalog-grid-density-standard) {
+        grid-template-columns: repeat(auto-fill, minmax(var(--octane-grid-column-min-width, 47px), 1fr)) !important;
     }
 }
 
@@ -3348,7 +3348,7 @@
    draggable window, so the main catalog chrome stays identical in browse and
    admin mode (the tab strip no longer carries admin controls).
    ============================================================================ */
-.nitro-catalog-admin-manager {
+.octane-catalog-admin-manager {
     width: 880px;
     max-width: calc(100vw - 16px);
     color: #263842;
@@ -3356,15 +3356,15 @@
     font-size: 11px;
 }
 
-.nitro-catalog-admin-manager button,
-.nitro-catalog-admin-manager input,
-.nitro-catalog-admin-manager select {
+.octane-catalog-admin-manager button,
+.octane-catalog-admin-manager input,
+.octane-catalog-admin-manager select {
     font-family: Ubuntu, Arial, sans-serif;
 }
 
-.nitro-catalog-admin-preview-persona,
-.nitro-catalog-admin-bulk-grid,
-.nitro-catalog-admin-import-toolbar {
+.octane-catalog-admin-preview-persona,
+.octane-catalog-admin-bulk-grid,
+.octane-catalog-admin-import-toolbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -3376,8 +3376,8 @@
     background: linear-gradient(180deg, #edf3f6 0%, #dce7ed 100%);
 }
 
-.nitro-catalog-admin-preview-persona label,
-.nitro-catalog-admin-bulk-grid label {
+.octane-catalog-admin-preview-persona label,
+.octane-catalog-admin-bulk-grid label {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -3388,10 +3388,10 @@
     font-weight: 700;
 }
 
-.nitro-catalog-admin-preview-persona input[type="number"],
-.nitro-catalog-admin-bulk-grid input:not([type="checkbox"]),
-.nitro-catalog-admin-bulk-grid select,
-.nitro-catalog-admin-import-toolbar select {
+.octane-catalog-admin-preview-persona input[type="number"],
+.octane-catalog-admin-bulk-grid input:not([type="checkbox"]),
+.octane-catalog-admin-bulk-grid select,
+.octane-catalog-admin-import-toolbar select {
     height: 25px;
     min-width: 74px;
     padding: 2px 7px;
@@ -3403,24 +3403,24 @@
     font: 700 10px Ubuntu, Arial, sans-serif;
 }
 
-.nitro-catalog-admin-preview-persona input:focus,
-.nitro-catalog-admin-bulk-grid input:focus,
-.nitro-catalog-admin-bulk-grid select:focus,
-.nitro-catalog-admin-import-toolbar select:focus,
-.nitro-catalog-admin-import-export textarea:focus {
+.octane-catalog-admin-preview-persona input:focus,
+.octane-catalog-admin-bulk-grid input:focus,
+.octane-catalog-admin-bulk-grid select:focus,
+.octane-catalog-admin-import-toolbar select:focus,
+.octane-catalog-admin-import-export textarea:focus {
     border-color: #3e83b5;
     box-shadow: 0 0 0 2px rgba(62, 131, 181, .18);
 }
 
-.nitro-catalog-admin-preview-persona input[type="checkbox"],
-.nitro-catalog-admin-bulk-grid input[type="checkbox"] {
+.octane-catalog-admin-preview-persona input[type="checkbox"],
+.octane-catalog-admin-bulk-grid input[type="checkbox"] {
     width: 13px;
     height: 13px;
     margin: 0;
     accent-color: #438ec0;
 }
 
-.nitro-catalog-admin-preview-pages {
+.octane-catalog-admin-preview-pages {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
     gap: 6px;
@@ -3429,65 +3429,65 @@
     overflow: auto;
 }
 
-.nitro-catalog-admin-preview-page,
-.nitro-catalog-admin-preview-offer {
+.octane-catalog-admin-preview-page,
+.octane-catalog-admin-preview-offer {
     border: 1px solid #aab8c0;
     border-radius: 5px;
     padding: 6px 7px;
     background: #f8fafb;
 }
 
-.nitro-catalog-admin-preview-page header,
-.nitro-catalog-admin-preview-offer {
+.octane-catalog-admin-preview-page header,
+.octane-catalog-admin-preview-offer {
     display: flex;
     flex-direction: column;
     gap: 1px;
 }
 
-.nitro-catalog-admin-preview-page header strong,
-.nitro-catalog-admin-preview-offer strong {
+.octane-catalog-admin-preview-page header strong,
+.octane-catalog-admin-preview-offer strong {
     color: #223b48;
     font-size: 10px;
     line-height: 1.25;
 }
 
-.nitro-catalog-admin-preview-page header span,
-.nitro-catalog-admin-preview-offer span,
-.nitro-catalog-admin-preview-offer small {
+.octane-catalog-admin-preview-page header span,
+.octane-catalog-admin-preview-offer span,
+.octane-catalog-admin-preview-offer small {
     color: #647985;
     font-size: 9px;
     line-height: 1.3;
 }
 
-.nitro-catalog-admin-preview-offers {
+.octane-catalog-admin-preview-offers {
     display: grid;
     gap: 4px;
     margin-top: 6px;
 }
 
-.nitro-catalog-admin-preview-offer.is-eligible {
+.octane-catalog-admin-preview-offer.is-eligible {
     border-left: 3px solid #4a9b63;
 }
 
-.nitro-catalog-admin-preview-offer.is-blocked {
+.octane-catalog-admin-preview-offer.is-blocked {
     border-left: 3px solid #bd574f;
     background: #fbefee;
 }
 
-.nitro-catalog-admin-preview-offer.is-blocked small {
+.octane-catalog-admin-preview-offer.is-blocked small {
     color: #a33d36;
     font-weight: 700;
 }
 
-.nitro-catalog-admin-bulk,
-.nitro-catalog-admin-studio-preview,
-.nitro-catalog-admin-import-export {
+.octane-catalog-admin-bulk,
+.octane-catalog-admin-studio-preview,
+.octane-catalog-admin-import-export {
     height: 100%;
     min-height: 0;
     color: #263842;
 }
 
-.nitro-catalog-admin-import-export textarea {
+.octane-catalog-admin-import-export textarea {
     width: 100%;
     min-height: 292px;
     padding: 8px 9px;
@@ -3501,7 +3501,7 @@
     tab-size: 2;
 }
 
-.nitro-catalog-admin-command-bar {
+.octane-catalog-admin-command-bar {
     display: flex;
     gap: 16px;
     align-items: center;
@@ -3514,20 +3514,20 @@
     box-shadow: inset 4px 0 0 #7e949f, inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-.nitro-catalog-admin-command-bar.is-draft {
+.octane-catalog-admin-command-bar.is-draft {
     box-shadow: inset 4px 0 0 #d99a24, inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-.nitro-catalog-admin-command-bar.is-blocked {
+.octane-catalog-admin-command-bar.is-blocked {
     box-shadow: inset 4px 0 0 #bd5149, inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-.nitro-catalog-admin-command-bar.is-clean,
-.nitro-catalog-admin-command-bar.is-ready {
+.octane-catalog-admin-command-bar.is-clean,
+.octane-catalog-admin-command-bar.is-ready {
     box-shadow: inset 4px 0 0 #4f9a67, inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-.nitro-catalog-admin-command-title {
+.octane-catalog-admin-command-title {
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
@@ -3535,27 +3535,27 @@
     line-height: 1.2;
 }
 
-.nitro-catalog-admin-command-title strong {
+.octane-catalog-admin-command-title strong {
     color: #183541;
     font-size: 15px;
     font-weight: 800;
     letter-spacing: 0.1px;
 }
 
-.nitro-catalog-admin-command-title span {
+.octane-catalog-admin-command-title span {
     color: #617985;
     font-size: 10px;
     font-weight: 600;
 }
 
-.nitro-catalog-admin-command-stats {
+.octane-catalog-admin-command-stats {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     justify-content: flex-end;
 }
 
-.nitro-catalog-admin-command-stats > span {
+.octane-catalog-admin-command-stats > span {
     display: inline-flex;
     gap: 5px;
     align-items: center;
@@ -3571,48 +3571,48 @@
     box-shadow: 0 1px 1px rgba(36, 62, 75, 0.08), inset 0 1px 0 #ffffff;
 }
 
-.nitro-catalog-admin-command-stats > span.is-revision {
+.octane-catalog-admin-command-stats > span.is-revision {
     border-color: #a9bac3;
     background: #edf3f6;
 }
 
-.nitro-catalog-admin-command-stats > span.is-actors {
+.octane-catalog-admin-command-stats > span.is-actors {
     border-color: #8fb8d1;
     background: #e8f4fa;
     color: #285e7b;
 }
 
-.nitro-catalog-admin-command-stats > span.is-locks {
+.octane-catalog-admin-command-stats > span.is-locks {
     border-color: #aa9bc8;
     background: #f1edf8;
     color: #59477d;
 }
 
-.nitro-catalog-admin-command-stats > span.has-pending {
+.octane-catalog-admin-command-stats > span.has-pending {
     border-color: #d9a13a;
     background: #fff3d5;
     color: #775000;
 }
 
-.nitro-catalog-admin-command-stats > span.has-error {
+.octane-catalog-admin-command-stats > span.has-error {
     border-color: #d46d65;
     background: #fde9e7;
     color: #8c302a;
 }
 
-.nitro-catalog-admin-command-stats > span.has-warning {
+.octane-catalog-admin-command-stats > span.has-warning {
     border-color: #d6a648;
     background: #fff6dc;
     color: #775500;
 }
 
-.nitro-catalog-admin-command-stats > span.is-valid {
+.octane-catalog-admin-command-stats > span.is-valid {
     border-color: #74b487;
     background: #e9f6ed;
     color: #2f7043;
 }
 
-.nitro-catalog-admin-command-stats svg {
+.octane-catalog-admin-command-stats svg {
     width: 10px;
     height: 10px;
     flex: 0 0 auto;
@@ -3620,18 +3620,18 @@
 }
 
 @media (max-width: 760px) {
-    .nitro-catalog-admin-command-bar {
+    .octane-catalog-admin-command-bar {
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
     }
 
-    .nitro-catalog-admin-command-stats {
+    .octane-catalog-admin-command-stats {
         justify-content: flex-start;
     }
 }
 
-.nitro-catalog-admin-manager-body {
+.octane-catalog-admin-manager-body {
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -3639,7 +3639,7 @@
     background: var(--catalog-standard-bg, #d7d7cf) !important;
 }
 
-.nitro-catalog-admin-operation-error {
+.octane-catalog-admin-operation-error {
     display: flex;
     align-items: center;
     gap: 7px;
@@ -3652,13 +3652,13 @@
     font-weight: 700;
 }
 
-.nitro-catalog-admin-operation-error svg {
+.octane-catalog-admin-operation-error svg {
     flex: 0 0 auto;
     color: #b64038;
 }
 
 /* Tab strip under the header */
-.nitro-catalog-admin-tabs {
+.octane-catalog-admin-tabs {
     display: flex;
     gap: 4px;
     padding: 6px 8px 0;
@@ -3666,7 +3666,7 @@
     border-bottom: 1px solid #9a9a90;
 }
 
-.nitro-catalog-admin-tab {
+.octane-catalog-admin-tab {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -3682,28 +3682,28 @@
     cursor: pointer;
 }
 
-.nitro-catalog-admin-tab svg {
+.octane-catalog-admin-tab svg {
     width: 11px;
     height: 11px;
     fill: currentColor;
 }
 
-.nitro-catalog-admin-tab:hover {
+.octane-catalog-admin-tab:hover {
     filter: brightness(1.03);
 }
 
-.nitro-catalog-admin-tab.is-active {
+.octane-catalog-admin-tab.is-active {
     background: linear-gradient(180deg, #6aa4d8 0%, #4d8bc9 100%);
     border-color: #35618f;
     color: #ffffff;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.nitro-catalog-admin-tab.has-pending:not(.is-active) {
+.octane-catalog-admin-tab.has-pending:not(.is-active) {
     box-shadow: inset 0 -2px 0 #1aa022;
 }
 
-.nitro-catalog-admin-tab-count {
+.octane-catalog-admin-tab-count {
     padding: 0 5px;
     border-radius: 8px;
     background: rgba(65, 141, 176, 0.2);
@@ -3711,12 +3711,12 @@
     font-size: 9px;
 }
 
-.nitro-catalog-admin-tab.is-active .nitro-catalog-admin-tab-count {
+.octane-catalog-admin-tab.is-active .octane-catalog-admin-tab-count {
     background: rgba(0, 0, 0, 0.18);
     color: #ffffff;
 }
 
-.nitro-catalog-admin-panel {
+.octane-catalog-admin-panel {
     flex: 1 1 auto;
     height: 460px;
     min-height: 0;
@@ -3726,7 +3726,7 @@
 }
 
 /* Shared buttons */
-.nitro-catalog-admin-btn {
+.octane-catalog-admin-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -3748,24 +3748,24 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-admin-btn:hover {
+.octane-catalog-admin-btn:hover {
     filter: brightness(1.04);
 }
 
-.nitro-catalog-admin-btn:disabled {
+.octane-catalog-admin-btn:disabled {
     cursor: default;
     opacity: 0.5;
     filter: none;
 }
 
-.nitro-catalog-admin-btn svg {
+.octane-catalog-admin-btn svg {
     width: 11px;
     height: 11px;
     fill: currentColor;
 }
 
-.nitro-catalog-admin-btn.is-primary,
-.nitro-catalog-admin-btn.is-publish {
+.octane-catalog-admin-btn.is-primary,
+.octane-catalog-admin-btn.is-publish {
     border-width: 5px;
     border-style: solid;
     border-color: transparent;
@@ -3777,7 +3777,7 @@
     color: #ffffff;
 }
 
-.nitro-catalog-admin-btn.is-danger {
+.octane-catalog-admin-btn.is-danger {
     border-width: 5px;
     border-style: solid;
     border-color: transparent;
@@ -3789,29 +3789,29 @@
     color: #ffffff;
 }
 
-.nitro-catalog-admin-btn.is-danger:hover {
+.octane-catalog-admin-btn.is-danger:hover {
     border-image-source: var(--habbo-skin-shiny-red-hover);
 }
 
-.nitro-catalog-admin-btn.is-publish {
+.octane-catalog-admin-btn.is-publish {
     height: 34px;
     padding: 0 22px;
     font-size: 12px;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }
 
-.nitro-catalog-admin-btn.is-publish.has-pending {
+.octane-catalog-admin-btn.is-publish.has-pending {
     box-shadow: 0 0 0 2px rgba(61, 204, 69, 0.5);
 }
 
-.nitro-catalog-admin-btn.is-small {
+.octane-catalog-admin-btn.is-small {
     height: 23px;
     padding: 0 8px;
     font-size: 9px;
 }
 
 /* ---- Activity tab ---- */
-.nitro-catalog-admin-activity {
+.octane-catalog-admin-activity {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -3819,7 +3819,7 @@
     min-height: 0;
 }
 
-.nitro-catalog-admin-section-head {
+.octane-catalog-admin-section-head {
     display: flex;
     flex: 0 0 auto;
     align-items: center;
@@ -3830,34 +3830,34 @@
     background: #f7f7f2;
 }
 
-.nitro-catalog-admin-section-head > div,
-.nitro-catalog-admin-history-main,
-.nitro-catalog-admin-version-row > div,
-.nitro-catalog-admin-validation-row > div {
+.octane-catalog-admin-section-head > div,
+.octane-catalog-admin-history-main,
+.octane-catalog-admin-version-row > div,
+.octane-catalog-admin-validation-row > div {
     display: flex;
     flex-direction: column;
     min-width: 0;
 }
 
-.nitro-catalog-admin-section-head strong,
-.nitro-catalog-admin-history-summary,
-.nitro-catalog-admin-version-row strong,
-.nitro-catalog-admin-validation-row strong {
+.octane-catalog-admin-section-head strong,
+.octane-catalog-admin-history-summary,
+.octane-catalog-admin-version-row strong,
+.octane-catalog-admin-validation-row strong {
     color: #252521;
     font-size: 11px;
     font-weight: 700;
 }
 
-.nitro-catalog-admin-section-head span,
-.nitro-catalog-admin-history-meta,
-.nitro-catalog-admin-version-row span,
-.nitro-catalog-admin-validation-row span,
-.nitro-catalog-admin-history-side > span {
+.octane-catalog-admin-section-head span,
+.octane-catalog-admin-history-meta,
+.octane-catalog-admin-version-row span,
+.octane-catalog-admin-validation-row span,
+.octane-catalog-admin-history-side > span {
     color: #75756e;
     font-size: 9px;
 }
 
-.nitro-catalog-admin-history-list {
+.octane-catalog-admin-history-list {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -3866,8 +3866,8 @@
     overflow-y: auto;
 }
 
-.nitro-catalog-admin-history-row,
-.nitro-catalog-admin-version-row {
+.octane-catalog-admin-history-row,
+.octane-catalog-admin-version-row {
     display: flex;
     gap: 10px;
     align-items: center;
@@ -3878,7 +3878,7 @@
     background: #fff;
 }
 
-.nitro-catalog-admin-history-side {
+.octane-catalog-admin-history-side {
     display: flex;
     flex: 0 0 auto;
     gap: 8px;
@@ -3886,7 +3886,7 @@
 }
 
 /* Empty / placeholder states */
-.nitro-catalog-admin-placeholder {
+.octane-catalog-admin-placeholder {
     display: flex;
     flex: 1 1 auto;
     align-items: center;
@@ -3898,13 +3898,13 @@
     text-align: center;
 }
 
-.nitro-catalog-admin-placeholder.is-small {
+.octane-catalog-admin-placeholder.is-small {
     padding: 12px;
     font-size: 11px;
 }
 
 /* ---- Pages tab: sidebar tree + detail pane ---- */
-.nitro-catalog-admin-pages {
+.octane-catalog-admin-pages {
     display: grid;
     grid-template-columns: 225px minmax(0, 1fr) 220px;
     grid-template-rows: minmax(0, 1fr) 82px;
@@ -3913,21 +3913,21 @@
     min-height: 0;
 }
 
-.nitro-catalog-admin-sidebar {
+.octane-catalog-admin-sidebar {
     display: flex;
     flex-direction: column;
     gap: 6px;
     min-height: 0;
 }
 
-.nitro-catalog-admin-search-row {
+.octane-catalog-admin-search-row {
     display: flex;
     flex: 0 0 auto;
     gap: 6px;
     align-items: center;
 }
 
-.nitro-catalog-admin-search {
+.octane-catalog-admin-search {
     display: flex;
     flex: 1 1 auto;
     align-items: center;
@@ -3939,13 +3939,13 @@
     background: #ffffff;
 }
 
-.nitro-catalog-admin-search svg {
+.octane-catalog-admin-search svg {
     width: 11px;
     height: 11px;
     fill: #9a9a90;
 }
 
-.nitro-catalog-admin-search input {
+.octane-catalog-admin-search input {
     flex: 1 1 auto;
     min-width: 0;
     border: 0;
@@ -3955,7 +3955,7 @@
     outline: none;
 }
 
-.nitro-catalog-admin-add {
+.octane-catalog-admin-add {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
@@ -3968,22 +3968,22 @@
     cursor: pointer;
 }
 
-.nitro-catalog-admin-add:hover {
+.octane-catalog-admin-add:hover {
     filter: brightness(1.04);
 }
 
-.nitro-catalog-admin-add:disabled {
+.octane-catalog-admin-add:disabled {
     cursor: default;
     opacity: 0.5;
 }
 
-.nitro-catalog-admin-add svg {
+.octane-catalog-admin-add svg {
     width: 11px;
     height: 11px;
     fill: currentColor;
 }
 
-.nitro-catalog-admin-tree {
+.octane-catalog-admin-tree {
     flex: 1 1 auto;
     min-height: 0;
     padding: 4px;
@@ -3994,7 +3994,7 @@
     overflow-y: auto;
 }
 
-.nitro-catalog-admin-tree-row {
+.octane-catalog-admin-tree-row {
     display: flex;
     gap: 6px;
     align-items: center;
@@ -4004,25 +4004,25 @@
     cursor: pointer;
 }
 
-.nitro-catalog-admin-tree-row:hover {
+.octane-catalog-admin-tree-row:hover {
     background: rgba(65, 141, 176, 0.1);
 }
 
-.nitro-catalog-admin-tree-row.is-selected {
+.octane-catalog-admin-tree-row.is-selected {
     background: linear-gradient(180deg, #cdeafb 0%, #a9d6ef 100%);
     box-shadow: inset 0 0 0 1px rgba(65, 141, 176, 0.5);
 }
 
-.nitro-catalog-admin-tree-row.is-hidden {
+.octane-catalog-admin-tree-row.is-hidden {
     opacity: 0.55;
 }
 
-.nitro-catalog-admin-tree-row.is-drag-over {
+.octane-catalog-admin-tree-row.is-drag-over {
     background: rgba(65, 141, 176, 0.22);
     box-shadow: inset 0 0 0 1px rgba(65, 141, 176, 0.55);
 }
 
-.nitro-catalog-admin-tree-drag {
+.octane-catalog-admin-tree-drag {
     flex: 0 0 auto;
     width: 10px;
     height: 10px;
@@ -4031,11 +4031,11 @@
     opacity: 0.45;
 }
 
-.nitro-catalog-admin-tree-row:hover .nitro-catalog-admin-tree-drag {
+.octane-catalog-admin-tree-row:hover .octane-catalog-admin-tree-drag {
     opacity: 0.85;
 }
 
-.nitro-catalog-admin-tree-caret {
+.octane-catalog-admin-tree-caret {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
@@ -4043,7 +4043,7 @@
     width: 14px;
 }
 
-.nitro-catalog-admin-tree-caret button {
+.octane-catalog-admin-tree-caret button {
     display: grid;
     place-items: center;
     width: 14px;
@@ -4055,19 +4055,19 @@
     cursor: pointer;
 }
 
-.nitro-catalog-admin-tree-caret button svg {
+.octane-catalog-admin-tree-caret button svg {
     width: 8px;
     height: 8px;
     fill: currentColor;
 }
 
-.nitro-catalog-admin-tree-caret-spacer {
+.octane-catalog-admin-tree-caret-spacer {
     display: inline-block;
     width: 14px;
     height: 14px;
 }
 
-.nitro-catalog-admin-tree-icon {
+.octane-catalog-admin-tree-icon {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
@@ -4076,7 +4076,7 @@
     height: 20px;
 }
 
-.nitro-catalog-admin-tree-icon-empty {
+.octane-catalog-admin-tree-icon-empty {
     display: inline-block;
     width: 16px;
     height: 16px;
@@ -4085,7 +4085,7 @@
     background: #ffffff;
 }
 
-.nitro-catalog-admin-tree-label {
+.octane-catalog-admin-tree-label {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
@@ -4096,14 +4096,14 @@
     text-overflow: ellipsis;
 }
 
-.nitro-catalog-admin-tree-count {
+.octane-catalog-admin-tree-count {
     flex: 0 0 auto;
     color: #9a9a90;
     font-size: 9px;
     font-weight: 600;
 }
 
-.nitro-catalog-admin-detail {
+.octane-catalog-admin-detail {
     display: flex;
     min-height: 0;
     border: 1px solid #b7b7ae;
@@ -4112,7 +4112,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-admin-detail-inner {
+.octane-catalog-admin-detail-inner {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -4122,12 +4122,12 @@
     padding: 12px;
 }
 
-.nitro-catalog-admin-detail-head,
-.nitro-catalog-admin-detail-actions {
+.octane-catalog-admin-detail-head,
+.octane-catalog-admin-detail-actions {
     flex: 0 0 auto;
 }
 
-.nitro-catalog-admin-detail-head {
+.octane-catalog-admin-detail-head {
     display: flex;
     gap: 10px;
     align-items: center;
@@ -4135,7 +4135,7 @@
     border-bottom: 1px solid #c9c9c0;
 }
 
-.nitro-catalog-admin-detail-icon {
+.octane-catalog-admin-detail-icon {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
@@ -4146,18 +4146,18 @@
     background: #ffffff;
 }
 
-.nitro-catalog-admin-detail-icon img {
+.octane-catalog-admin-detail-icon img {
     width: 28px;
     height: 28px;
 }
 
-.nitro-catalog-admin-detail-titles {
+.octane-catalog-admin-detail-titles {
     display: flex;
     flex-direction: column;
     min-width: 0;
 }
 
-.nitro-catalog-admin-detail-title {
+.octane-catalog-admin-detail-title {
     overflow: hidden;
     color: #20201d;
     font-size: 14px;
@@ -4166,23 +4166,23 @@
     text-overflow: ellipsis;
 }
 
-.nitro-catalog-admin-detail-sub {
+.octane-catalog-admin-detail-sub {
     color: #7a7a70;
     font-size: 10px;
 }
 
-.nitro-catalog-admin-detail-actions {
+.octane-catalog-admin-detail-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
 }
 
-.nitro-catalog-admin-detail-actions .nitro-catalog-admin-btn {
+.octane-catalog-admin-detail-actions .octane-catalog-admin-btn {
     justify-content: flex-start;
 }
 
 /* ---- Offers (inside page detail) ---- */
-.nitro-catalog-admin-offers {
+.octane-catalog-admin-offers {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -4193,7 +4193,7 @@
     border-top: 1px solid #c9c9c0;
 }
 
-.nitro-catalog-admin-offers-head {
+.octane-catalog-admin-offers-head {
     display: flex;
     flex: 0 0 auto;
     gap: 8px;
@@ -4201,7 +4201,7 @@
     justify-content: space-between;
 }
 
-.nitro-catalog-admin-offers-title {
+.octane-catalog-admin-offers-title {
     overflow: hidden;
     color: #20201d;
     font-size: 13px;
@@ -4210,7 +4210,7 @@
     text-overflow: ellipsis;
 }
 
-.nitro-catalog-admin-offers-list {
+.octane-catalog-admin-offers-list {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -4224,7 +4224,7 @@
     overflow-y: auto;
 }
 
-.nitro-catalog-admin-offer-row {
+.octane-catalog-admin-offer-row {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -4235,17 +4235,17 @@
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-.nitro-catalog-admin-offer-row.is-selected {
+.octane-catalog-admin-offer-row.is-selected {
     background: linear-gradient(180deg, #cdeafb 0%, #a9d6ef 100%);
     box-shadow: inset 0 0 0 1px rgba(65, 141, 176, 0.5);
 }
 
-.nitro-catalog-admin-offer-row.is-drag-over {
+.octane-catalog-admin-offer-row.is-drag-over {
     background: rgba(65, 141, 176, 0.12);
     box-shadow: inset 0 0 0 1px rgba(65, 141, 176, 0.45);
 }
 
-.nitro-catalog-admin-offer-drag {
+.octane-catalog-admin-offer-drag {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
@@ -4256,17 +4256,17 @@
     opacity: 0.55;
 }
 
-.nitro-catalog-admin-offer-row:hover .nitro-catalog-admin-offer-drag {
+.octane-catalog-admin-offer-row:hover .octane-catalog-admin-offer-drag {
     opacity: 0.95;
 }
 
-.nitro-catalog-admin-offer-drag svg {
+.octane-catalog-admin-offer-drag svg {
     width: 10px;
     height: 10px;
     fill: currentColor;
 }
 
-.nitro-catalog-admin-offer-icon {
+.octane-catalog-admin-offer-icon {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
@@ -4278,14 +4278,14 @@
     box-shadow: inset 0 0 0 1px #ffffff;
 }
 
-.nitro-catalog-admin-offer-icon img {
+.octane-catalog-admin-offer-icon img {
     max-width: 32px;
     max-height: 32px;
     object-fit: contain;
     image-rendering: pixelated;
 }
 
-.nitro-catalog-admin-offer-icon-empty {
+.octane-catalog-admin-offer-icon-empty {
     width: 22px;
     height: 22px;
     border: 1px dashed #c2c2ba;
@@ -4293,7 +4293,7 @@
     background: repeating-linear-gradient(45deg, #e7e7df 0, #e7e7df 3px, #f7f7f2 3px, #f7f7f2 6px);
 }
 
-.nitro-catalog-admin-offer-name {
+.octane-catalog-admin-offer-name {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
@@ -4304,7 +4304,7 @@
     text-overflow: ellipsis;
 }
 
-.nitro-catalog-admin-offer-price {
+.octane-catalog-admin-offer-price {
     display: flex;
     flex: 0 0 auto;
     flex-wrap: wrap;
@@ -4314,32 +4314,32 @@
     font-size: 10px;
 }
 
-.nitro-catalog-admin-offer-price-entry {
+.octane-catalog-admin-offer-price-entry {
     display: inline-flex;
     gap: 2px;
     align-items: center;
 }
 
-.nitro-catalog-admin-offer-price-plus {
+.octane-catalog-admin-offer-price-plus {
     margin: 0 1px;
     color: #9a9a90;
     font-size: 9px;
     font-weight: 700;
 }
 
-.nitro-catalog-admin-offer-preview-price .nitro-catalog-admin-offer-price {
+.octane-catalog-admin-offer-preview-price .octane-catalog-admin-offer-price {
     font-size: 11px;
 }
 
 /* Shared reorder + control buttons (offer rows) */
-.nitro-catalog-admin-manager-reorder {
+.octane-catalog-admin-manager-reorder {
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
     gap: 1px;
 }
 
-.nitro-catalog-admin-manager-reorder button {
+.octane-catalog-admin-manager-reorder button {
     display: grid;
     place-items: center;
     width: 15px;
@@ -4351,25 +4351,25 @@
     cursor: pointer;
 }
 
-.nitro-catalog-admin-manager-reorder button:disabled {
+.octane-catalog-admin-manager-reorder button:disabled {
     color: #c2c2ba;
     cursor: default;
 }
 
-.nitro-catalog-admin-manager-reorder button svg {
+.octane-catalog-admin-manager-reorder button svg {
     width: 8px;
     height: 8px;
     fill: currentColor;
 }
 
-.nitro-catalog-admin-manager-controls {
+.octane-catalog-admin-manager-controls {
     display: flex;
     flex: 0 0 auto;
     gap: 1px;
     align-items: center;
 }
 
-.nitro-catalog-admin-manager-controls button {
+.octane-catalog-admin-manager-controls button {
     display: grid;
     place-items: center;
     width: 22px;
@@ -4382,23 +4382,23 @@
     cursor: pointer;
 }
 
-.nitro-catalog-admin-manager-controls button:hover {
+.octane-catalog-admin-manager-controls button:hover {
     border-color: rgba(0, 0, 0, 0.12);
     background: rgba(255, 255, 255, 0.7);
 }
 
-.nitro-catalog-admin-manager-controls button.danger {
+.octane-catalog-admin-manager-controls button.danger {
     color: #b83b32;
 }
 
-.nitro-catalog-admin-manager-controls button svg {
+.octane-catalog-admin-manager-controls button svg {
     width: 11px;
     height: 11px;
     fill: currentColor;
 }
 
 /* ---- Publish tab ---- */
-.nitro-catalog-admin-publish {
+.octane-catalog-admin-publish {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -4410,7 +4410,7 @@
     text-align: left;
 }
 
-.nitro-catalog-admin-publish-status {
+.octane-catalog-admin-publish-status {
     flex: 0 0 auto;
     align-self: flex-start;
     padding: 8px 14px;
@@ -4421,12 +4421,12 @@
     font-weight: 700;
 }
 
-.nitro-catalog-admin-publish-status.is-draft {
+.octane-catalog-admin-publish-status.is-draft {
     background: rgba(240, 163, 24, 0.18);
     color: #8a5b00;
 }
 
-.nitro-catalog-admin-inspector {
+.octane-catalog-admin-inspector {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -4440,7 +4440,7 @@
     overflow-y: auto;
 }
 
-.nitro-catalog-admin-inspector-head {
+.octane-catalog-admin-inspector-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -4448,13 +4448,13 @@
     border-bottom: 1px solid #bdcbd2;
 }
 
-.nitro-catalog-admin-inspector-head strong {
+.octane-catalog-admin-inspector-head strong {
     color: #1d3a47;
     font-size: 14px;
     font-weight: 800;
 }
 
-.nitro-catalog-admin-inspector-head span {
+.octane-catalog-admin-inspector-head span {
     padding: 3px 7px;
     border: 1px solid #aabcc5;
     border-radius: 7px;
@@ -4464,7 +4464,7 @@
     font-weight: 700;
 }
 
-.nitro-catalog-admin-inspector-data {
+.octane-catalog-admin-inspector-data {
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -4475,7 +4475,7 @@
     background: rgba(255, 255, 255, 0.78);
 }
 
-.nitro-catalog-admin-inspector-data > div {
+.octane-catalog-admin-inspector-data > div {
     display: grid;
     grid-template-columns: minmax(70px, 0.8fr) minmax(0, 1.2fr);
     gap: 8px;
@@ -4485,22 +4485,22 @@
     border-bottom: 1px solid #dce4e8;
 }
 
-.nitro-catalog-admin-inspector-data > div:last-child {
+.octane-catalog-admin-inspector-data > div:last-child {
     border-bottom: 0;
 }
 
-.nitro-catalog-admin-inspector-data dt,
-.nitro-catalog-admin-inspector-data dd {
+.octane-catalog-admin-inspector-data dt,
+.octane-catalog-admin-inspector-data dd {
     margin: 0;
     font-size: 10px;
 }
 
-.nitro-catalog-admin-inspector-data dt {
+.octane-catalog-admin-inspector-data dt {
     color: #657b86;
     font-weight: 600;
 }
 
-.nitro-catalog-admin-inspector-data dd {
+.octane-catalog-admin-inspector-data dd {
     min-width: 0;
     overflow: hidden;
     color: #203b49;
@@ -4510,15 +4510,15 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-admin-inspector-data dd.is-positive {
+.octane-catalog-admin-inspector-data dd.is-positive {
     color: #2f7043;
 }
 
-.nitro-catalog-admin-inspector-data dd.is-muted {
+.octane-catalog-admin-inspector-data dd.is-muted {
     color: #9a4b43;
 }
 
-.nitro-catalog-admin-lock-state {
+.octane-catalog-admin-lock-state {
     display: flex;
     gap: 8px;
     align-items: flex-start;
@@ -4530,13 +4530,13 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
-.nitro-catalog-admin-lock-state.is-owned {
+.octane-catalog-admin-lock-state.is-owned {
     border-color: #74ad83;
     background: linear-gradient(180deg, #f1faf3 0%, #dff1e4 100%);
     color: #2c6e3b;
 }
 
-.nitro-catalog-admin-lock-state > svg {
+.octane-catalog-admin-lock-state > svg {
     width: 12px;
     height: 12px;
     margin-top: 1px;
@@ -4544,40 +4544,40 @@
     fill: currentColor;
 }
 
-.nitro-catalog-admin-lock-state > div {
+.octane-catalog-admin-lock-state > div {
     display: flex;
     flex-direction: column;
     min-width: 0;
 }
 
-.nitro-catalog-admin-lock-state strong,
-.nitro-catalog-admin-lock-state span {
+.octane-catalog-admin-lock-state strong,
+.octane-catalog-admin-lock-state span {
     font-size: 9px;
     line-height: 1.35;
 }
 
-.nitro-catalog-admin-lock-state strong {
+.octane-catalog-admin-lock-state strong {
     font-size: 10px;
     font-weight: 800;
 }
 
-.nitro-catalog-admin-inspector-actions {
+.octane-catalog-admin-inspector-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
     margin-top: auto;
 }
 
-.nitro-catalog-admin-inspector-actions .nitro-catalog-admin-btn {
+.octane-catalog-admin-inspector-actions .octane-catalog-admin-btn {
     justify-content: center;
     width: 100%;
 }
 
-.nitro-catalog-admin-inspector-actions .nitro-catalog-admin-btn:first-child {
+.octane-catalog-admin-inspector-actions .octane-catalog-admin-btn:first-child {
     grid-column: 1 / -1;
 }
 
-.nitro-catalog-admin-changes-drawer {
+.octane-catalog-admin-changes-drawer {
     display: flex;
     grid-column: 1 / -1;
     gap: 8px;
@@ -4589,29 +4589,29 @@
     background: linear-gradient(180deg, #eef4f7 0%, #dce7ed 100%);
 }
 
-.nitro-catalog-admin-changes-title {
+.octane-catalog-admin-changes-title {
     display: flex;
     flex: 0 0 auto;
     gap: 6px;
     align-items: center;
 }
 
-.nitro-catalog-admin-changes-title > div {
+.octane-catalog-admin-changes-title > div {
     display: flex;
     flex-direction: column;
 }
 
-.nitro-catalog-admin-changes-title strong {
+.octane-catalog-admin-changes-title strong {
     color: #273845;
     font-size: 10px;
 }
 
-.nitro-catalog-admin-changes-title span {
+.octane-catalog-admin-changes-title span {
     color: #60737f;
     font-size: 8px;
 }
 
-.nitro-catalog-admin-changes-feed {
+.octane-catalog-admin-changes-feed {
     display: flex;
     flex: 1 1 auto;
     gap: 5px;
@@ -4619,7 +4619,7 @@
     overflow: hidden;
 }
 
-.nitro-catalog-admin-changes-feed > button {
+.octane-catalog-admin-changes-feed > button {
     display: flex;
     flex: 1 1 0;
     flex-direction: column;
@@ -4631,36 +4631,36 @@
     text-align: left;
 }
 
-.nitro-catalog-admin-changes-feed > button strong,
-.nitro-catalog-admin-changes-feed > button span {
+.octane-catalog-admin-changes-feed > button strong,
+.octane-catalog-admin-changes-feed > button span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.nitro-catalog-admin-changes-feed > button strong {
+.octane-catalog-admin-changes-feed > button strong {
     color: #273845;
     font-size: 8px;
 }
 
-.nitro-catalog-admin-changes-feed > button span,
-.nitro-catalog-admin-changes-feed > span {
+.octane-catalog-admin-changes-feed > button span,
+.octane-catalog-admin-changes-feed > span {
     color: #697a85;
     font-size: 8px;
 }
 
-.nitro-catalog-admin-publish-status.is-blocked,
-.nitro-catalog-admin-publish-status.is-offline {
+.octane-catalog-admin-publish-status.is-blocked,
+.octane-catalog-admin-publish-status.is-offline {
     background: rgba(184, 59, 50, 0.14);
     color: #98342d;
 }
 
-.nitro-catalog-admin-publish-status.is-ready {
+.octane-catalog-admin-publish-status.is-ready {
     background: rgba(31, 111, 46, 0.16);
     color: #1f6f2e;
 }
 
-.nitro-catalog-admin-publish-text {
+.octane-catalog-admin-publish-text {
     flex: 0 0 auto;
     max-width: none;
     margin: 0;
@@ -4669,7 +4669,7 @@
     line-height: 1.5;
 }
 
-.nitro-catalog-admin-publish-changes {
+.octane-catalog-admin-publish-changes {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -4677,14 +4677,14 @@
     min-height: 0;
 }
 
-.nitro-catalog-admin-publish-changes-head {
+.octane-catalog-admin-publish-changes-head {
     flex: 0 0 auto;
     color: #20201d;
     font-size: 12px;
     font-weight: 700;
 }
 
-.nitro-catalog-admin-publish-changes-list {
+.octane-catalog-admin-publish-changes-list {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -4700,7 +4700,7 @@
     list-style: none;
 }
 
-.nitro-catalog-admin-publish-change {
+.octane-catalog-admin-publish-change {
     display: flex;
     gap: 10px;
     align-items: baseline;
@@ -4711,7 +4711,7 @@
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-.nitro-catalog-admin-publish-change-summary {
+.octane-catalog-admin-publish-change-summary {
     flex: 1 1 auto;
     min-width: 0;
     color: #20201d;
@@ -4720,7 +4720,7 @@
     line-height: 1.35;
 }
 
-.nitro-catalog-admin-publish-change-time {
+.octane-catalog-admin-publish-change-time {
     flex: 0 0 auto;
     color: #9a9a90;
     font-size: 10px;
@@ -4728,7 +4728,7 @@
     white-space: nowrap;
 }
 
-.nitro-catalog-admin-publish-actions {
+.octane-catalog-admin-publish-actions {
     display: flex;
     flex: 0 0 auto;
     justify-content: center;
@@ -4736,8 +4736,8 @@
     padding-top: 4px;
 }
 
-.nitro-catalog-admin-validation-list,
-.nitro-catalog-admin-versions {
+.octane-catalog-admin-validation-list,
+.octane-catalog-admin-versions {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -4745,7 +4745,7 @@
     overflow-y: auto;
 }
 
-.nitro-catalog-admin-validation-row {
+.octane-catalog-admin-validation-row {
     display: flex;
     gap: 8px;
     align-items: flex-start;
@@ -4755,7 +4755,7 @@
     background: #fff3f2;
 }
 
-.nitro-catalog-admin-validation-row > svg {
+.octane-catalog-admin-validation-row > svg {
     flex: 0 0 auto;
     margin-top: 2px;
     color: #b83b32;
@@ -4763,14 +4763,14 @@
 
 /* Problems panel: the rules are the list, the entities are the detail underneath.
    A live catalog answers with hundreds of rows, so they open one rule at a time. */
-.nitro-catalog-admin-validation-list .nitro-catalog-admin-publish-changes-head {
+.octane-catalog-admin-validation-list .octane-catalog-admin-publish-changes-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
 }
 
-.nitro-catalog-admin-validation-meta {
+.octane-catalog-admin-validation-meta {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -4779,13 +4779,13 @@
     font-weight: 400;
 }
 
-.nitro-catalog-admin-validation-group {
+.octane-catalog-admin-validation-group {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.nitro-catalog-admin-validation-group-head {
+.octane-catalog-admin-validation-group-head {
     display: flex;
     align-items: center;
     gap: 7px;
@@ -4802,17 +4802,17 @@
     cursor: pointer;
 }
 
-.nitro-catalog-admin-validation-group-head:hover {
+.octane-catalog-admin-validation-group-head:hover {
     background: #ffe9e6;
 }
 
-.nitro-catalog-admin-validation-group-head > strong {
+.octane-catalog-admin-validation-group-head > strong {
     flex: 1 1 auto;
     min-width: 0;
     overflow-wrap: anywhere;
 }
 
-.nitro-catalog-admin-validation-count {
+.octane-catalog-admin-validation-count {
     flex: 0 0 auto;
     padding: 1px 7px;
     border-radius: 9px;
@@ -4822,7 +4822,7 @@
     font-weight: 700;
 }
 
-.nitro-catalog-admin-validation-group-body {
+.octane-catalog-admin-validation-group-body {
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -4830,25 +4830,25 @@
 }
 
 /* The row became a button so a problem can carry you to the page it names. */
-.nitro-catalog-admin-validation-group-body .nitro-catalog-admin-validation-row {
+.octane-catalog-admin-validation-group-body .octane-catalog-admin-validation-row {
     width: 100%;
     font: inherit;
     text-align: left;
     cursor: pointer;
 }
 
-.nitro-catalog-admin-validation-group-body .nitro-catalog-admin-validation-row:disabled {
+.octane-catalog-admin-validation-group-body .octane-catalog-admin-validation-row:disabled {
     cursor: default;
     opacity: 0.75;
 }
 
-.nitro-catalog-admin-validation-group-body .nitro-catalog-admin-validation-row:not(:disabled):hover {
+.octane-catalog-admin-validation-group-body .octane-catalog-admin-validation-row:not(:disabled):hover {
     border-color: #b4514b;
     background: #ffe9e6;
 }
 
 /* Bundle layout (single_bundle / room_bundle): main hero item + framed "What's Included" container */
-.nitro-catalog-bundle-main-item {
+.octane-catalog-bundle-main-item {
     display: flex;
     flex-shrink: 0;
     box-sizing: border-box;
@@ -4861,7 +4861,7 @@
     background: #e4e7df;
 }
 
-.nitro-catalog-bundle-main-item > .nitro-catalog-grid-offer-icon {
+.octane-catalog-bundle-main-item > .octane-catalog-grid-offer-icon {
     width: auto !important;
     height: auto !important;
     max-width: 100% !important;
@@ -4870,7 +4870,7 @@
     image-rendering: pixelated;
 }
 
-.nitro-catalog-bundle-frame {
+.octane-catalog-bundle-frame {
     box-sizing: border-box;
     padding: 8px;
     border: 1px solid #8a8882;
@@ -4881,15 +4881,15 @@
 
 /* Show at most 5 rows of items; scroll when the bundle holds more. Rows are pinned
    to the tile height and top-aligned so a partly-filled grid doesn't stretch. */
-.nitro-catalog-bundle-frame .nitro-catalog-layout-bundle-grid {
-    height: calc(var(--nitro-grid-column-min-height, 40px) * 5 + 2rem);
+.octane-catalog-bundle-frame .octane-catalog-layout-bundle-grid {
+    height: calc(var(--octane-grid-column-min-height, 40px) * 5 + 2rem);
     grid-template-rows: none !important;
-    grid-auto-rows: var(--nitro-grid-column-min-height, 40px);
+    grid-auto-rows: var(--octane-grid-column-min-height, 40px);
     align-content: start;
 }
 
 /* Currency sits at the right of the top row on the classic golden credits panel. */
-.nitro-catalog-bundle-price {
+.octane-catalog-bundle-price {
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
@@ -4902,14 +4902,14 @@
     box-shadow: inset 0 0 0 2px #e3c47c;
 }
 
-.nitro-catalog-bundle-price > div {
+.octane-catalog-bundle-price > div {
     padding: 0 !important;
     background: transparent !important;
 }
 
 /* page_text_details sits at the top of a room bundle (e.g. "Also available in the Credit
    page") — small, muted and left-aligned, above both columns. */
-.nitro-catalog-bundle-details {
+.octane-catalog-bundle-details {
     color: #6b6b6b;
     line-height: 1.2;
 }
@@ -4917,7 +4917,7 @@
 /* Invisible one-line stand-in for the "What's included" header in the left column: it
    reserves the header's height so the currency plate lines up with the top of the furni
    container on the right. Kept to a single line to match the (short) real header. */
-.nitro-catalog-bundle-header-spacer {
+.octane-catalog-bundle-header-spacer {
     visibility: hidden;
     white-space: nowrap;
     overflow: hidden;
@@ -4926,7 +4926,7 @@
 
 /* Room bundles use the classic grey pixel plate for the currency instead of the golden
    panel: a white outer edge, a thick black rounded border and a flat grey fill. */
-.nitro-catalog-bundle-price.nitro-catalog-bundle-price--room {
+.octane-catalog-bundle-price.octane-catalog-bundle-price--room {
     padding: 3px 10px;
     /* 1px black outer edge, then a 2px white ring, then the grey plate face. */
     border: 1px solid #000000;
@@ -4936,13 +4936,13 @@
 }
 
 /* Gift + Buy share one line at the bottom of the bundle's left column. */
-.nitro-catalog-bundle-actions {
+.octane-catalog-bundle-actions {
     display: flex;
     flex-direction: row;
     gap: 4px;
 }
 
-.nitro-catalog-bundle-actions > .nitro-catalog-standard-button {
+.octane-catalog-bundle-actions > .octane-catalog-standard-button {
     flex: 1 1 0;
     width: auto !important;
     min-width: 0 !important;

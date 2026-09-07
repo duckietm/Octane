@@ -1,11 +1,11 @@
-import { GetRoomEngine, NitroTexture } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, OctaneTexture } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { blitRoomCanvasToViewfinder, getViewfinderRoomFrame, LocalizeText, PlaySound, SoundNames } from '../../api';
 import { DraggableWindow } from '../draggable-window';
 
 interface LayoutMiniCameraViewProps {
     roomId: number;
-    textureReceiver: (texture: NitroTexture) => Promise<void>;
+    textureReceiver: (texture: OctaneTexture) => Promise<void>;
     onClose: () => void;
     isSaving?: boolean;
 }
@@ -51,9 +51,9 @@ export const LayoutMiniCameraView: FC<LayoutMiniCameraViewProps> = (props) => {
     const isBusy = isCapturing || isSaving;
 
     return (
-        <DraggableWindow handleSelector=".nitro-room-thumbnail-camera">
+        <DraggableWindow handleSelector=".octane-room-thumbnail-camera">
             <div
-                className="nitro-room-thumbnail-camera w-[132px] h-[192px] bg-[url('@/assets/images/room-widgets/thumbnail-widget/thumbnail-camera-spritesheet.png')] px-2"
+                className="octane-room-thumbnail-camera w-[132px] h-[192px] bg-[url('@/assets/images/room-widgets/thumbnail-widget/thumbnail-camera-spritesheet.png')] px-2"
                 role="dialog"
                 aria-label={LocalizeText('navigator.thumbnail.camera.title')}
                 aria-busy={isBusy}
@@ -66,7 +66,7 @@ export const LayoutMiniCameraView: FC<LayoutMiniCameraViewProps> = (props) => {
                 >
                     <canvas
                         ref={elementRef}
-                        className="nitro-camera-viewfinder absolute mt-[30px] ml-[3px] w-[110px] h-[110px] pointer-events-none"
+                        className="octane-camera-viewfinder absolute mt-[30px] ml-[3px] w-[110px] h-[110px] pointer-events-none"
                         width={110}
                         height={110}
                     />

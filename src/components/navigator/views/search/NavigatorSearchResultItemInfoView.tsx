@@ -1,4 +1,4 @@
-import { RoomDataParser } from '@nitrots/nitro-renderer';
+import { RoomDataParser } from '@octane/renderer';
 import { FC, MouseEvent, useRef } from 'react';
 import { LocalizeText } from '../../../../api';
 import { useNavigatorRoomInfoPopupStore } from '../../../../hooks';
@@ -28,7 +28,7 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
         <button
             type="button"
             ref={elementRef}
-            className="nitro-navigator-air__room-info"
+            className="octane-navigator-air__room-info"
             aria-label={LocalizeText('navigator.room.popup.room.info')}
             onClick={handleClick}
             onMouseEnter={handleMouseEnter}

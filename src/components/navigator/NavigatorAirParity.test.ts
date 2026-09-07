@@ -9,9 +9,9 @@ describe('AIR navigator visual contract', () => {
         const view = read('src/components/navigator/NavigatorView.tsx');
         const css = read('src/css/navigator/NavigatorView.css');
 
-        expect(view).toContain('nitro-navigator-air__skin');
-        expect(view).toContain('nitro-navigator-air__close');
-        expect(view).toContain('nitro-navigator-air__quick-toggle');
+        expect(view).toContain('octane-navigator-air__skin');
+        expect(view).toContain('octane-navigator-air__close');
+        expect(view).toContain('octane-navigator-air__quick-toggle');
         expect(css).toContain('frame-ubuntu-3.png');
         expect(css).toContain('close-3-hover.png');
         expect(css).toContain('tab-3-default-left.png');
@@ -19,7 +19,7 @@ describe('AIR navigator visual contract', () => {
         expect(view).toContain('ForwardToSomeRoomMessageComposer');
         expect(view).toContain('create-room.png');
         expect(view).toContain('promote-room.png');
-        expect(view).toContain('nitro-navigator-air__action-border');
+        expect(view).toContain('octane-navigator-air__action-border');
         expect(css).toContain('border-4.png');
         expect(css).toContain('border-5.png');
         expect(css).toContain('color: #ffffff !important');
@@ -54,9 +54,9 @@ describe('AIR navigator visual contract', () => {
         const css = read('src/css/navigator/NavigatorView.css');
 
         expect(filter).not.toContain('<select');
-        expect(filter).toContain('nitro-navigator-air__filter-list');
+        expect(filter).toContain('octane-navigator-air__filter-list');
         expect(css).toContain('dropmenu-3.png');
-        expect(css).toContain('nitro-navigator-air__tab-shelf');
+        expect(css).toContain('octane-navigator-air__tab-shelf');
         expect(css).toContain('close-3-default.png');
     });
 
@@ -83,10 +83,10 @@ describe('AIR navigator visual contract', () => {
 
         // left_hide_container: bitmap (3,3) 18x18, caption (20,2) h17 in id_heading_2.
         expect(view).not.toContain('gap={1}');
-        expect(rule('.nitro-navigator-search-saves-result__header-icon')).toContain('left: 3px');
-        expect(rule('.nitro-navigator-search-saves-result__header-icon')).toContain('top: 3px');
-        expect(rule('.nitro-navigator-search-saves-result__header-label')).toContain('left: 20px');
-        expect(rule('.nitro-navigator-search-saves-result__header-label')).toContain('top: 2px');
+        expect(rule('.octane-navigator-search-saves-result__header-icon')).toContain('left: 3px');
+        expect(rule('.octane-navigator-search-saves-result__header-icon')).toContain('top: 3px');
+        expect(rule('.octane-navigator-search-saves-result__header-label')).toContain('left: 20px');
+        expect(rule('.octane-navigator-search-saves-result__header-label')).toContain('top: 2px');
 
         // quick_link_text inherits the Ubuntu theme default u_regular: 12px, black.
         expect(rule('.saved-search-row__label')).toContain('font-size: 12px');

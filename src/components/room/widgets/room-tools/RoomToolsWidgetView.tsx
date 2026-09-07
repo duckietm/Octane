@@ -1,11 +1,11 @@
-import { CreateLinkEvent, GetGuestRoomResultEvent, GetRoomEngine, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GetGuestRoomResultEvent, GetRoomEngine, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, SendMessageComposer, SetLocalStorage, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
-import { useMessageEvent, useNavigatorData, useNitroEvent, useRoom } from '../../../../hooks';
+import { useMessageEvent, useNavigatorData, useOctaneEvent, useRoom } from '../../../../hooks';
 import { classNames } from '../../../../layout';
-import { getRegisteredPlugins, INitroPlugin, subscribePlugins } from '../../../plugins/NitroPluginApi';
+import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { applyRoomZoom } from './roomZoom.helpers';
 
 interface RoomHistoryEntry {
@@ -63,7 +63,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const [isToolsOpen, setIsToolsOpen] = useState<boolean>(true);
     const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
     const [roomHistory, setRoomHistory] = useState<RoomHistoryEntry[]>([]);
-    const [plugins, setPlugins] = useState<INitroPlugin[]>([]);
+    const [plugins, setPlugins] = useState<IOctanePlugin[]>([]);
     const { navigatorData } = useNavigatorData();
     const { roomSession = null } = useRoom();
 
@@ -191,7 +191,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
 
     // The renderer can be zoomed from outside this toolbar (keyboard shortcuts,
     // other widgets), so resync the displayed level whenever the engine reports it.
-    useNitroEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, (event) => {
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, (event) => {
         if (!roomSession || event.roomId !== roomSession.roomId) return;
 
         updateZoomScale();
@@ -208,12 +208,12 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const canZoomOut = getNextZoomScale(zoomScale, -1) !== getNearestZoomScale(zoomScale);
 
     return (
-        <div className={classNames('nitro-room-tools-container', !isToolsOpen && 'is-collapsed')}>
+        <div className={classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')}>
             <button className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
                 {isToolsOpen ? '‹' : '›'}
             </button>
             {isToolsOpen && (
-                <div className="nitro-room-tools">
+                <div className="octane-room-tools">
                     <div className="room-tools-zoom-row">
                         <span>{LocalizeText('room.zoom.text', ['zoom_level'], [getZoomText(zoomScale)])}</span>
                         <button className="room-tools-zoom-button" type="button" title={LocalizeText('room.zoom.zoom_in.tooltip')} disabled={!canZoomIn} onClick={() => handleToolClick('zoom_in')}>
@@ -230,7 +230,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                             title={tool.label}
                             onClick={() => !tool.disabled && handleToolClick(tool.action)}
                         >
-                            <div className={classNames('nitro-icon', tool.icon)} />
+                            <div className={classNames('octane-icon', tool.icon)} />
                             <span className="room-tool-label">{tool.label}</span>
                         </div>
                     ))}
@@ -241,23 +241,23 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                             title={plugin.label}
                             onClick={() => plugin.onOpen()}
                         >
-                            <div className={classNames('nitro-icon', plugin.icon || 'icon-cog')} />
+                            <div className={classNames('octane-icon', plugin.icon || 'icon-cog')} />
                             <span className="room-tool-label">{plugin.label}</span>
                         </div>
                     ))}
                     <div className="room-history-controls">
                         <div
-                            className={classNames('nitro-icon', canGoBack ? 'cursor-pointer icon-room-history-back-enabled' : 'icon-room-history-back-disabled')}
+                            className={classNames('octane-icon', canGoBack ? 'cursor-pointer icon-room-history-back-enabled' : 'icon-room-history-back-disabled')}
                             title={LocalizeText('room.history.button.back.tooltip')}
                             onClick={() => canGoBack && handleToolClick('room_history_back')}
                         />
                         <div
-                            className={classNames('nitro-icon', hasHistory ? 'cursor-pointer icon-room-history-enabled' : 'icon-room-history-disabled')}
+                            className={classNames('octane-icon', hasHistory ? 'cursor-pointer icon-room-history-enabled' : 'icon-room-history-disabled')}
                             title={LocalizeText('room.history.button.tooltip')}
                             onClick={() => hasHistory && handleToolClick('room_history')}
                         />
                         <div
-                            className={classNames('nitro-icon', canGoNext ? 'cursor-pointer icon-room-history-next-enabled' : 'icon-room-history-next-disabled')}
+                            className={classNames('octane-icon', canGoNext ? 'cursor-pointer icon-room-history-next-enabled' : 'icon-room-history-next-disabled')}
                             title={LocalizeText('room.history.button.forward.tooltip')}
                             onClick={() => canGoNext && handleToolClick('room_history_next')}
                         />
@@ -271,9 +271,9 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                         animate={{ x: 0 }}
                         exit={{ x: -100 }}
                         transition={{ duration: 0.3 }}
-                        className="nitro-room-tools-history"
+                        className="octane-room-tools-history"
                     >
-                        <div className="flex flex-col px-3 py-2 rounded nitro-room-history">
+                        <div className="flex flex-col px-3 py-2 rounded octane-room-history">
                             {roomHistory.map((history) => (
                                 <Text
                                     key={history.roomId}

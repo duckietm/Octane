@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
 export const WiredConditionTriggerFurniAdjacentStateView: FC<{}> = () =>
@@ -30,7 +30,7 @@ export const WiredConditionTriggerFurniAdjacentStateView: FC<{}> = () =>
             save={ save }>
             <div className="flex flex-col gap-1">
                 <Text bold>Required state</Text>
-                <NitroInput maxLength={ 64 } type="text" value={ requiredState } onChange={ event => setRequiredState(event.target.value) } />
+                <OctaneInput maxLength={ 64 } type="text" value={ requiredState } onChange={ event => setRequiredState(event.target.value) } />
             </div>
         </WiredConditionBaseView>
     );

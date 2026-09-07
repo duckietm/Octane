@@ -1,4 +1,4 @@
-import { GetTickerTime } from '@nitrots/nitro-renderer';
+import { GetTickerTime } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { CatalogType, FriendlyTime, GetConfigurationValue, LocalizeText, localizeWithFallback } from '../../../../api';
 import { useCatalogData, useCatalogUiState } from '../../../../hooks';
@@ -62,9 +62,9 @@ export const CatalogBuildersClubStatusView: FC = () => {
 
     return (
         <>
-            <div className="nitro-catalog-standard-header-title">{title}</div>
-            <div className="nitro-catalog-standard-header-description is-builder-membership">{durationText}</div>
-            <div className="nitro-catalog-standard-header-description is-builder-limit">{limitText}</div>
+            <div className="octane-catalog-standard-header-title">{title}</div>
+            <div className="octane-catalog-standard-header-description is-builder-membership">{durationText}</div>
+            <div className="octane-catalog-standard-header-description is-builder-limit">{limitText}</div>
         </>
     );
 };

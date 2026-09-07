@@ -6,7 +6,7 @@ import {
     RequestBotCommandConfigurationComposer,
     RoomObjectCategory,
     RoomObjectType
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import {
     AvatarInfoRentableBot,
@@ -19,7 +19,7 @@ import {
 } from '../../../../../api';
 import { Button, Column, Text } from '../../../../../common';
 import { useMessageEvent } from '../../../../../hooks';
-import { NitroInput } from '../../../../../layout';
+import { OctaneInput } from '../../../../../layout';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -207,7 +207,7 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
             {mode === MODE_CHANGE_NAME && (
                 <Column className="menu-item" gap={1} onClick={null}>
                     <Text variant="white">{LocalizeText('bot.skill.name.configuration.new.name')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         maxLength={GetConfigurationValue<number>('bot.name.max.length', 15)}
                         type="text"
                         value={newName}
@@ -226,7 +226,7 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
             {mode === MODE_CHANGE_MOTTO && (
                 <Column className="menu-item" gap={1} onClick={null}>
                     <Text variant="white">{LocalizeText('bot.skill.name.configuration.new.motto')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         maxLength={GetConfigurationValue<number>('motto.max.length', 38)}
                         type="text"
                         value={newMotto}

@@ -1,4 +1,4 @@
-import { GetRoomEngine, RoomObjectCategory, RoomUnitWalkComposer } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomObjectCategory, RoomUnitWalkComposer } from '@octane/renderer';
 import { useEffect, useRef } from 'react';
 import { SendMessageComposer } from '../../api';
 import { useKeyboardMovement } from '../useKeyboardMovement';

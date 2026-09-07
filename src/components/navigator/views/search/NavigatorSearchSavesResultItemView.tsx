@@ -1,4 +1,4 @@
-import { NavigatorDeleteSavedSearchComposer, NavigatorSavedSearch } from '@nitrots/nitro-renderer';
+import { NavigatorDeleteSavedSearchComposer, NavigatorSavedSearch } from '@octane/renderer';
 import { FC, MouseEvent } from 'react';
 import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { useNavigatorUiStore } from '../../../../hooks';

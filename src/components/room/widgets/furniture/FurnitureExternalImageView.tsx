@@ -1,7 +1,7 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { FC } from 'react';
 import { GetConfigurationValue, isSafeExternalUrl, LocalizeText, ReportType } from '../../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useFurnitureExternalImageWidget, useHelp } from '../../../../hooks';
 import { CameraWidgetShowPhotoView } from '../../../camera/views/CameraWidgetShowPhotoView';
 
@@ -19,13 +19,13 @@ export const FurnitureExternalImageView: FC<{}> = (props) => {
     };
 
     return (
-        <NitroCardView
+        <OctaneCardView
             isResizable={false}
-            className="nitro-external-image-widget min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+            className="octane-external-image-widget min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             uniqueKey="photo-viewer"
             theme="primary-slim"
         >
-            <NitroCardHeaderView
+            <OctaneCardHeaderView
                 headerText={LocalizeText('camera.interface.title')}
                 isGalleryPhoto={true}
                 onCloseClick={onClose}
@@ -38,9 +38,9 @@ export const FurnitureExternalImageView: FC<{}> = (props) => {
                     })
                 }
             />
-            <NitroCardContentView>
+            <OctaneCardContentView>
                 <CameraWidgetShowPhotoView currentIndex={currentPhotoIndex} currentPhotos={currentPhotos} onClick={handleOpenFullPhoto} />
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

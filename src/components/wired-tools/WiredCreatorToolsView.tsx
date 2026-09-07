@@ -31,7 +31,7 @@ import {
     WiredMonitorDataEvent,
     WiredMonitorRequestComposer,
     WiredUserInspectMoveComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     AvatarInfoUtilities,
@@ -51,11 +51,11 @@ import {
     LayoutAvatarImageView,
     LayoutPetImageView,
     LayoutRoomObjectImageView,
-    NitroCardContentView,
-    NitroCardHeaderView,
-    NitroCardTabsItemView,
-    NitroCardTabsView,
-    NitroCardView,
+    OctaneCardContentView,
+    OctaneCardHeaderView,
+    OctaneCardTabsItemView,
+    OctaneCardTabsView,
+    OctaneCardView,
     Text
 } from '../../common';
 import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredTools } from '../../hooks';
@@ -3236,21 +3236,21 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     ))}
                 </div>
             )}
-            <NitroCardView
+            <OctaneCardView
                 className="min-w-[520px] max-w-[520px]"
                 theme="primary-slim"
                 uniqueKey="wired-creator-tools"
                 windowPosition={DraggableWindowPosition.TOP_LEFT}
             >
-                <NitroCardHeaderView headerText="Wired Creator Tools (:wired)" onCloseClick={() => setIsVisible(false)} />
-                <NitroCardTabsView justifyContent="start">
+                <OctaneCardHeaderView headerText="Wired Creator Tools (:wired)" onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardTabsView justifyContent="start">
                     {TABS.map((tab) => (
-                        <NitroCardTabsItemView key={tab.key} isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
+                        <OctaneCardTabsItemView key={tab.key} isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
                             <Text>{tab.label}</Text>
-                        </NitroCardTabsItemView>
+                        </OctaneCardTabsItemView>
                     ))}
-                </NitroCardTabsView>
-                <NitroCardContentView className="text-black bg-[#e9e6d9]" gap={3}>
+                </OctaneCardTabsView>
+                <OctaneCardContentView className="text-black bg-[#e9e6d9]" gap={3}>
                     {activeTab === 'monitor' && (
                         <WiredMonitorTabView
                             monitorStats={monitorStats}
@@ -3312,10 +3312,10 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     )}
                     {activeTab === 'settings' && <WiredToolsSettingsTabView />}
                     {activeTab === 'chests' && <WiredChestsTabView />}
-                </NitroCardContentView>
-            </NitroCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
             {isMonitorHistoryOpen && (
-                <NitroCardView
+                <OctaneCardView
                     className="min-w-[760px] max-w-[760px] max-h-[520px]"
                     theme="primary-slim"
                     uniqueKey="wired-monitor-history"
@@ -3323,8 +3323,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     offsetLeft={560}
                     offsetTop={40}
                 >
-                    <NitroCardHeaderView headerText="Wired Monitor Logs" onCloseClick={() => setIsMonitorHistoryOpen(false)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                    <OctaneCardHeaderView headerText="Wired Monitor Logs" onCloseClick={() => setIsMonitorHistoryOpen(false)} />
+                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
                         <div className="flex flex-wrap items-center gap-2 text-[12px]">
                             <span className="text-[#555]">Severity:</span>
                             {['ALL', 'WARNING', 'ERROR'].map((severity) => (
@@ -3393,11 +3393,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 </tbody>
                             </table>
                         </div>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
             {isMonitorInfoOpen && (
-                <NitroCardView
+                <OctaneCardView
                     className="min-w-[560px] max-w-[560px] max-h-[520px]"
                     theme="primary-slim"
                     uniqueKey="wired-monitor-info"
@@ -3405,8 +3405,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     offsetLeft={610}
                     offsetTop={80}
                 >
-                    <NitroCardHeaderView headerText="Wired Monitor Information" onCloseClick={() => setIsMonitorInfoOpen(false)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-4 overflow-y-auto">
+                    <OctaneCardHeaderView headerText="Wired Monitor Information" onCloseClick={() => setIsMonitorInfoOpen(false)} />
+                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-4 overflow-y-auto">
                         {monitorInfoSections.map((section) => (
                             <div key={section.title} className="flex flex-col gap-1">
                                 <Text bold>{section.title}</Text>
@@ -3415,11 +3415,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 ))}
                             </div>
                         ))}
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
             {isVariableManageOpen && !!selectedVariableDefinition && (
-                <NitroCardView
+                <OctaneCardView
                     className="min-w-[860px] max-w-[860px] max-h-[620px]"
                     theme="primary-slim"
                     uniqueKey="wired-variable-management"
@@ -3427,8 +3427,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     offsetLeft={540}
                     offsetTop={60}
                 >
-                    <NitroCardHeaderView headerText="Variable Management" onCloseClick={() => setIsVariableManageOpen(false)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                    <OctaneCardHeaderView headerText="Variable Management" onCloseClick={() => setIsVariableManageOpen(false)} />
+                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
                         <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
                             <div className="grow flex flex-col items-center text-center">
                                 <Text>{variableManageDescription}</Text>
@@ -3575,11 +3575,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 </button>
                             </div>
                         </div>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
             {!!selectedManagedVariableEntry && !!selectedVariableDefinition && (
-                <NitroCardView
+                <OctaneCardView
                     className="min-w-[430px] max-w-[430px] max-h-[620px]"
                     theme="primary-slim"
                     uniqueKey="wired-variable-management-entry"
@@ -3587,8 +3587,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     offsetLeft={890}
                     offsetTop={110}
                 >
-                    <NitroCardHeaderView headerText={managedHolderPanelTitle} onCloseClick={() => setSelectedManagedVariableEntry(null)} />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3 relative" overflow="hidden">
+                    <OctaneCardHeaderView headerText={managedHolderPanelTitle} onCloseClick={() => setSelectedManagedVariableEntry(null)} />
+                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3 relative" overflow="hidden">
                         <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
                             <div className="grow text-center">
                                 <Text>{managedHolderWarningText}</Text>
@@ -3738,11 +3738,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 Give variable
                             </Button>
                         </div>
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
             {!!selectedMonitorErrorInfo && (
-                <NitroCardView
+                <OctaneCardView
                     className="min-w-[470px] max-w-[470px] max-h-[500px]"
                     theme="primary-slim"
                     uniqueKey="wired-monitor-error-info"
@@ -3750,14 +3750,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     offsetLeft={660}
                     offsetTop={120}
                 >
-                    <NitroCardHeaderView
+                    <OctaneCardHeaderView
                         headerText="Wired Error Information"
                         onCloseClick={() => {
                             setSelectedMonitorErrorType(null);
                             setSelectedMonitorLogDetails(null);
                         }}
                     />
-                    <NitroCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-3 overflow-y-auto">
+                    <OctaneCardContentView className="text-black bg-[#f4efe3] p-4 flex flex-col gap-3 overflow-y-auto">
                         <div className="flex items-start justify-between gap-3">
                             <Text bold>{selectedMonitorErrorInfo.title}</Text>
                             <span
@@ -3794,8 +3794,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                         {selectedMonitorErrorInfo.description.map((paragraph, index) => (
                             <Text key={index}>{paragraph}</Text>
                         ))}
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
         </>
     );

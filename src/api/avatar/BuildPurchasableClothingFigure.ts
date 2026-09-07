@@ -1,4 +1,4 @@
-import { AvatarFigureContainer, GetAvatarRenderManager, IFigurePartSet } from '@nitrots/nitro-renderer';
+import { AvatarFigureContainer, GetAvatarRenderManager, IFigurePartSet } from '@octane/renderer';
 
 const getFirstSelectableColorForSetType = (setType: string): number => {
     const structure = GetAvatarRenderManager()?.structureData;

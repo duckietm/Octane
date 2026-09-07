@@ -1,9 +1,9 @@
-import { FurniturePickupAllComposer } from '@nitrots/nitro-renderer';
+import { FurniturePickupAllComposer } from '@octane/renderer';
 import { FC, useEffect, useEffectEvent, useMemo, useState } from 'react';
 import { chooserSelectionVisualizer, LocalizeText, RoomObjectItem, SendMessageComposer } from '../../../../api';
-import { Button, Flex, InfiniteScroll, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, Flex, InfiniteScroll, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useHasPermission } from '../../../../hooks';
-import { classNames, NitroInput } from '../../../../layout';
+import { classNames, OctaneInput } from '../../../../layout';
 
 const LIMIT_FURNI_PICKALL = 100;
 
@@ -116,11 +116,11 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
     };
 
     return (
-        <NitroCardView className="w-[420px] h-[400px]" theme="primary-slim">
-            <NitroCardHeaderView headerText={title + ' (' + filteredItems.length + ')'} onCloseClick={handleClose} />
-            <NitroCardContentView overflow="hidden" gap={1}>
+        <OctaneCardView className="w-[420px] h-[400px]" theme="primary-slim">
+            <OctaneCardHeaderView headerText={title + ' (' + filteredItems.length + ')'} onCloseClick={handleClose} />
+            <OctaneCardContentView overflow="hidden" gap={1}>
                 <Flex gap={2}>
-                    <NitroInput
+                    <OctaneInput
                         type="text"
                         placeholder={LocalizeText('generic.search')}
                         value={searchValue}
@@ -184,7 +184,7 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                         {LocalizeText('widget.chooser.btn.pickall')}
                     </Button>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

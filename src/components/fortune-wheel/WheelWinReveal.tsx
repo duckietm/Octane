@@ -1,4 +1,4 @@
-import { IWheelPrize } from '@nitrots/nitro-renderer';
+import { IWheelPrize } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { LocalizeText } from '../../api';
 import { renderPrizeIcon } from './wheelPrizeIcon';

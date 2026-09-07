@@ -1,4 +1,4 @@
-import { GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '@octane/renderer';
 import { RefObject, useCallback, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../api';
 import { useRoomUserListSnapshot } from '../../session/useSessionSnapshots';

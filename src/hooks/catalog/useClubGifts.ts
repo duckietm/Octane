@@ -1,8 +1,8 @@
-import { ClubGiftInfoEvent, ClubGiftInfoParser, GetClubGiftInfo } from '@nitrots/nitro-renderer';
+import { ClubGiftInfoEvent, ClubGiftInfoParser, GetClubGiftInfo } from '@octane/renderer';
 import { UseQueryResult } from '@tanstack/react-query';
-import { useNitroEventInvalidator, useNitroQuery } from '../../api/nitro-query';
+import { useOctaneEventInvalidator, useOctaneQuery } from '../../api/octane-query';
 
-const CLUB_GIFTS_KEY = ['nitro', 'catalog', 'clubGifts'] as const;
+const CLUB_GIFTS_KEY = ['octane', 'catalog', 'clubGifts'] as const;
 
 /**
  * Habbo Club gift availability (counts of pending gifts, days until
@@ -11,7 +11,7 @@ const CLUB_GIFTS_KEY = ['nitro', 'catalog', 'clubGifts'] as const;
  * a gift via SelectClubGiftComposer — so the cache needs to be
  * invalidated on each push, not just hydrated by the first response.
  *
- * Pair the query with useNitroEventInvalidator so unsolicited pushes
+ * Pair the query with useOctaneEventInvalidator so unsolicited pushes
  * mark the slot stale; the next render of any consumer triggers a
  * re-fetch (which, since the server just pushed, will resolve almost
  * immediately with the fresh data the server already sent us).
@@ -20,7 +20,7 @@ const CLUB_GIFTS_KEY = ['nitro', 'catalog', 'clubGifts'] as const;
  * `parser` into `catalogOptions.clubGifts`.
  */
 export const useClubGifts = (options: { enabled?: boolean } = {}): UseQueryResult<ClubGiftInfoParser> => {
-    const query = useNitroQuery<ClubGiftInfoEvent, ClubGiftInfoParser>({
+    const query = useOctaneQuery<ClubGiftInfoEvent, ClubGiftInfoParser>({
         key: CLUB_GIFTS_KEY as unknown as string[],
         request: () => new GetClubGiftInfo(),
         parser: ClubGiftInfoEvent,
@@ -29,7 +29,7 @@ export const useClubGifts = (options: { enabled?: boolean } = {}): UseQueryResul
         staleTime: Infinity
     });
 
-    useNitroEventInvalidator<ClubGiftInfoEvent>(ClubGiftInfoEvent, CLUB_GIFTS_KEY as unknown as string[]);
+    useOctaneEventInvalidator<ClubGiftInfoEvent>(ClubGiftInfoEvent, CLUB_GIFTS_KEY as unknown as string[]);
 
     return query;
 };

@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { LocalizeText } from '../../../../api';
-import { Button, Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { Button, Column, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useDoorbellActions, useDoorbellState } from '../../../../hooks';
 
 export const DoorbellWidgetView: FC = () => {
@@ -13,9 +13,9 @@ export const DoorbellWidgetView: FC = () => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView className="nitro-widget-doorbell" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('navigator.doorbell.title')} onCloseClick={() => setDismissed(true)} />
-            <NitroCardContentView gap={0} overflow="hidden">
+        <OctaneCardView className="octane-widget-doorbell" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('navigator.doorbell.title')} onCloseClick={() => setDismissed(true)} />
+            <OctaneCardContentView gap={0} overflow="hidden">
                 <Column gap={2}>
                     <Grid className="text-black font-bold	 border-bottom px-1 pb-1" gap={1}>
                         <div className="col-span-6">{LocalizeText('generic.username')}</div>
@@ -39,7 +39,7 @@ export const DoorbellWidgetView: FC = () => {
                         </Grid>
                     ))}
                 </Column>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

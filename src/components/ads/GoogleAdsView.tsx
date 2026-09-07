@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue } from '../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { configFileUrl } from '../../secure-assets';
 
 interface AdsenseConfig {
@@ -41,7 +41,7 @@ export const GoogleAdsView: FC<{}> = () => {
 
     // Auto-open once on initial mount (the login / landing stage).
     // Subsequent toggles are driven by the "ads:toggle" window event
-    // (e.g. the Show Ad button in NitroSystemAlertView).
+    // (e.g. the Show Ad button in OctaneSystemAlertView).
     useEffect(() => {
         if (!adsEnabled) return;
         if (autoOpenedRef.current) return;
@@ -120,12 +120,12 @@ export const GoogleAdsView: FC<{}> = () => {
     if (!isOpen) return null;
 
     return (
-        <NitroCardView className="nitro-google-ads" uniqueKey="google-ads" theme="primary">
+        <OctaneCardView className="octane-google-ads" uniqueKey="google-ads" theme="primary">
             {publisherId && (
                 <script async crossOrigin="anonymous" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${publisherId}`} />
             )}
-            <NitroCardHeaderView headerText="Sponsored" onCloseClick={() => setIsOpen(false)} />
-            <NitroCardContentView>
+            <OctaneCardHeaderView headerText="Sponsored" onCloseClick={() => setIsOpen(false)} />
+            <OctaneCardContentView>
                 <div className="flex items-center justify-center w-[300px] h-[250px] bg-white">
                     {loadError && <div className="text-xs text-red-600 text-center px-2">Ads unavailable: {loadError}</div>}
                     {!loadError && (!publisherId || !config) && <div className="text-xs text-gray-500">Loading…</div>}
@@ -145,7 +145,7 @@ export const GoogleAdsView: FC<{}> = () => {
                         <div className="text-xs text-gray-500 text-center px-2">Ad slot not configured in configuration/adsense.json</div>
                     )}
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

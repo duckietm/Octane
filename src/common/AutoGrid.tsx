@@ -12,8 +12,8 @@ export const AutoGrid: FC<AutoGridProps> = (props) => {
     const getStyle = useMemo(() => {
         let newStyle: CSSProperties = {};
 
-        newStyle['--nitro-grid-column-min-height'] = columnMinHeight + 'px';
-        newStyle['--nitro-grid-column-min-width'] = columnMinWidth + 'px';
+        newStyle['--octane-grid-column-min-height'] = columnMinHeight + 'px';
+        newStyle['--octane-grid-column-min-width'] = columnMinWidth + 'px';
 
         if (columnCount > 1) newStyle.gridTemplateColumns = `repeat(auto-fill, minmax(${columnMinWidth}px, 1fr))`;
 

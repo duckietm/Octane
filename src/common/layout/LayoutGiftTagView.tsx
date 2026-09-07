@@ -17,7 +17,7 @@ export const LayoutGiftTagView: FC<LayoutGiftTagViewProps> = (props) => {
     const { figure = null, userName = null, message = null, editable = false, onChange = null } = props;
 
     return (
-        <Flex className="nitro-gift-card text-black" overflow="hidden">
+        <Flex className="octane-gift-card text-black" overflow="hidden">
             <div className="flex items-center justify-center gift-face shrink-0">
                 {!userName && <div className="gift-incognito"></div>}
                 {figure && (

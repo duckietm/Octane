@@ -6,7 +6,7 @@ import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -444,16 +444,16 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                 </div>
             }
         >
-            <div className="nitro-wired__give-var">
-                <div className="nitro-wired__give-var-heading">
+            <div className="octane-wired__give-var">
+                <div className="octane-wired__give-var-heading">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="nitro-wired__give-var-targets">
+                    <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
                             <button
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
+                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
                                 onClick={() => handleTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
@@ -469,10 +469,10 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                     onSelect={(entry) => setVariableToken(entry.token)}
                 />
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">
+                <div className="octane-wired__give-var-section">
+                    <div className="octane-wired__give-var-section-title">
                         {localizeWithFallback('wiredfurni.params.comparison_selection', LocalizeText('wiredfurni.params.choose_type'))}
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -491,32 +491,32 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                     </div>
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
-                    <label className="nitro-wired__change-var-radio">
+                <div className="octane-wired__give-var-section">
+                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
+                    <label className="octane-wired__change-var-radio">
                         <input checked={referenceMode === 'constant'} type="radio" onChange={() => setReferenceMode('constant')} />
                         <Text>{localizeWithFallback('wiredfurni.params.variables.reference_value.set_value', LocalizeText('wiredfurni.params.operator.2'))}</Text>
-                        <NitroInput
-                            className="nitro-wired__give-var-number"
+                        <OctaneInput
+                            className="octane-wired__give-var-number"
                             type="number"
                             value={referenceConstantValueInput}
                             onChange={(event) => setReferenceConstantValueInput(event.target.value)}
                         />
                     </label>
 
-                    <div className="nitro-wired__change-var-reference-block">
-                        <label className="nitro-wired__change-var-radio">
+                    <div className="octane-wired__change-var-reference-block">
+                        <label className="octane-wired__change-var-radio">
                             <input checked={referenceMode === 'variable'} type="radio" onChange={() => setReferenceMode('variable')} />
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-                            <div className="nitro-wired__give-var-targets">
+                            <div className="octane-wired__give-var-targets">
                                 {TARGET_BUTTONS.map((button) => (
                                     <button
                                         key={`reference-${button.key}`}
                                         type="button"
                                         disabled={button.disabled || referenceMode !== 'variable'}
-                                        className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
+                                        className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
                                         onClick={() => handleReferenceTargetChange(button.key)}
                                     >
                                         <img src={button.icon} alt={button.key} />

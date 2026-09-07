@@ -1,4 +1,4 @@
-import { GetConfiguration, GetLocalizationManager, GetSessionDataManager, TranslationLanguagesEvent, TranslationLanguagesRequestComposer, TranslationResultEvent, TranslationTextRequestComposer } from '@nitrots/nitro-renderer';
+import { GetConfiguration, GetLocalizationManager, GetSessionDataManager, TranslationLanguagesEvent, TranslationLanguagesRequestComposer, TranslationResultEvent, TranslationTextRequestComposer } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { LocalStorageKeys, SendMessageComposer } from '../../api';
@@ -185,7 +185,7 @@ const dispatchLocalizationUpdated = () =>
 {
     if(typeof window === 'undefined') return;
 
-    window.dispatchEvent(new CustomEvent('nitro-localization-updated'));
+    window.dispatchEvent(new CustomEvent('octane-localization-updated'));
 };
 
 export const applyTextTranslationLocale = async (languageCode: string): Promise<void> =>

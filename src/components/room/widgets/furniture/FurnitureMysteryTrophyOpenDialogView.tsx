@@ -1,7 +1,7 @@
-import { OpenMysteryTrophyMessageComposer } from '@nitrots/nitro-renderer';
+import { OpenMysteryTrophyMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 
 interface FurnitureMysteryTrophyOpenDialogViewProps {
     objectId: number;
@@ -20,13 +20,13 @@ export const FurnitureMysteryTrophyOpenDialogView: FC<FurnitureMysteryTrophyOpen
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView
+        <OctaneCardView
             isResizable={false}
-            className="nitro-mysterytrophy-dialog min-w-0 w-[min(400px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+            className="octane-mysterytrophy-dialog min-w-0 w-[min(400px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
         >
-            <NitroCardHeaderView center headerText={LocalizeText('mysterytrophy.header.title')} onCloseClick={onClose} />
-            <NitroCardContentView>
+            <OctaneCardHeaderView center headerText={LocalizeText('mysterytrophy.header.title')} onCloseClick={onClose} />
+            <OctaneCardContentView>
                 <div className="flex mysterytrophy-dialog-top p-3">
                     <div className="mysterytrophy-image shrink-0"></div>
                     <div className="m-2">
@@ -55,7 +55,7 @@ export const FurnitureMysteryTrophyOpenDialogView: FC<FurnitureMysteryTrophyOpen
                         </div>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

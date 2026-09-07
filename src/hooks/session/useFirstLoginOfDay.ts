@@ -1,4 +1,4 @@
-import { IsFirstLoginOfDayEvent } from '@nitrots/nitro-renderer';
+import { IsFirstLoginOfDayEvent } from '@octane/renderer';
 import { useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { useMessageEvent } from '../events';

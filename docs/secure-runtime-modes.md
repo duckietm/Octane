@@ -18,7 +18,7 @@ Questo file controlla tutto a runtime.
     "secureApiEnabled": true,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -37,7 +37,7 @@ Questo file controlla tutto a runtime.
   - `false`: le chiamate `/api/*` restano normali
 
 - `apiBaseUrl`
-  - base URL dell’emulatore / API Nitro
+  - base URL dell’emulatore / API Octane
   - esempio: `https://nitro.example.com:2096`
   - meglio valorizzarlo sempre, così non dipendi dal fallback hardcoded
 
@@ -47,15 +47,15 @@ Questo file controlla tutto a runtime.
 
 - `plainGamedataBaseUrl`
   - base URL del gamedata plain
-  - normalmente: `https://hotel.example.com/client/nitro/gamedata/`
+  - normalmente: `https://hotel.example.com/client/octane/gamedata/`
 
 ## 2. `octane/src/bootstrap.ts`
 
 `bootstrap.ts`:
 
 - installa il secure fetch wrapper
-- legge `window.__nitroClientMode`
-- costruisce `NitroConfig['config.urls']`
+- legge `window.__octaneClientMode`
+- costruisce `OctaneConfig['config.urls']`
 
 ### Comportamento attuale
 
@@ -71,7 +71,7 @@ Questo file controlla tutto a runtime.
 Il fallback attuale è:
 
 ```ts
-(window as any).NitroSecureApiUrl = clientMode.apiBaseUrl || 'https://nitro.example.com:2096/';
+(window as any).OctaneSecureApiUrl = clientMode.apiBaseUrl || 'https://nitro.example.com:2096/';
 ```
 
 Quindi in produzione conviene sempre valorizzare `apiBaseUrl` dentro `configuration/client-mode.json`.
@@ -87,7 +87,7 @@ Qui vive tutta la logica runtime:
 
 ### In pratica
 
-- legge i flag da `window.__nitroClientMode`
+- legge i flag da `window.__octaneClientMode`
 - se `secureAssetsEnabled=false`
   - converte automaticamente `/nitro-sec/file?...` in URL plain
 - se `secureApiEnabled=false`
@@ -124,7 +124,7 @@ e gli altri URL secure equivalenti.
 Conviene usare i path plain classici, per esempio:
 
 ```json
-"gamedata.url": "https://hotel.example.com/client/nitro/gamedata"
+"gamedata.url": "https://hotel.example.com/client/octane/gamedata"
 ```
 
 oppure lasciare il renderer configurato com’è e demandare il fallback a `secure-assets.ts`.
@@ -216,7 +216,7 @@ nitro.secure.master_key=change-me-to-a-long-random-secret
     "secureApiEnabled": true,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -226,7 +226,7 @@ nitro.secure.master_key=change-me-to-a-long-random-secret
 nitro.secure.assets.enabled=true
 nitro.secure.api.enabled=true
 nitro.secure.config.root=C:/inetpub/wwwroot/paxxo/nitro
-nitro.secure.gamedata.root=C:/inetpub/wwwroot/paxxo/nitro/client/nitro/gamedata
+nitro.secure.gamedata.root=C:/inetpub/wwwroot/paxxo/octane/client/octane/gamedata
 nitro.secure.master_key=una-chiave-lunga-random
 ```
 
@@ -241,7 +241,7 @@ nitro.secure.master_key=una-chiave-lunga-random
     "secureApiEnabled": false,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -263,7 +263,7 @@ nitro.secure.api.enabled=false
     "secureApiEnabled": false,
     "apiBaseUrl": "https://nitro.example.com:2096",
     "plainConfigBaseUrl": "https://hotel.example.com/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 

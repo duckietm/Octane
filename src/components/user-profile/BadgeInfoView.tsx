@@ -13,7 +13,7 @@ export const BadgeInfoView: FC<BadgeInfoViewProps> = (props) => {
     return (
         <Flex
             center
-            className="nitro-card-panel w-[45px] h-[45px] relative cursor-pointer"
+            className="octane-card-panel w-[45px] h-[45px] relative cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >

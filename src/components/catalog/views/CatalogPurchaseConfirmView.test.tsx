@@ -67,7 +67,7 @@ describe('catalog purchase confirmation', () => {
         render(<CatalogPurchaseConfirmView offer={limitedOffer} quantity={1} onCancel={() => undefined} onConfirm={() => undefined} />);
 
         expect(screen.getByText('7 / 100')).toBeInTheDocument();
-        expect(screen.getByRole('status')).toHaveClass('nitro-catalog-purchase-confirm-limited');
+        expect(screen.getByRole('status')).toHaveClass('octane-catalog-purchase-confirm-limited');
     });
 
     it('traps keyboard focus and restores it to the opener when closed', () => {

@@ -14,7 +14,7 @@ import {
     UpdateMessageMessageEvent,
     UpdateThreadMessageComposer,
     UpdateThreadMessageEvent
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, Text } from '../../../../common';

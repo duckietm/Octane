@@ -1,9 +1,9 @@
-import { GetRoomEngine, GetSessionDataManager } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, GetSessionDataManager } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType, WiredSelectionVisualizer } from '../../../api';
 import wiredBgLeft from '../../../assets/images/wired/wired_bg_left.png';
 import wiredBgRight from '../../../assets/images/wired/wired_bg_right.png';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { useWired, useWiredTools } from '../../../hooks';
 import { WiredFurniSelectorView } from './WiredFurniSelectorView';
 
@@ -134,43 +134,43 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
     resolvedCardStyle.resize = 'none';
 
     return (
-        <NitroCardView
-            className="nitro-wired max-h-[calc(100vh-16px)]"
+        <OctaneCardView
+            className="octane-wired max-h-[calc(100vh-16px)]"
             theme="primary-slim"
-            uniqueKey="nitro-wired"
+            uniqueKey="octane-wired"
             isResizable={false}
             style={resolvedCardStyle}
         >
-            <NitroCardHeaderView classNames={['nitro-wired__header']} headerText={LocalizeText('wiredfurni.title')} onCloseClick={onClose} />
-            <NitroCardContentView classNames={['nitro-wired__content']} gap={0}>
-                <div className="nitro-wired__section nitro-wired__summary">
-                    <img className="nitro-wired__summary-bg nitro-wired__summary-bg--left" src={wiredBgLeft} alt="" />
-                    <img className="nitro-wired__summary-bg nitro-wired__summary-bg--right" src={wiredBgRight} alt="" />
-                    <div className="nitro-wired__summary-copy">
-                        <Text bold className="nitro-wired__summary-title">
+            <OctaneCardHeaderView classNames={['octane-wired__header']} headerText={LocalizeText('wiredfurni.title')} onCloseClick={onClose} />
+            <OctaneCardContentView classNames={['octane-wired__content']} gap={0}>
+                <div className="octane-wired__section octane-wired__summary">
+                    <img className="octane-wired__summary-bg octane-wired__summary-bg--left" src={wiredBgLeft} alt="" />
+                    <img className="octane-wired__summary-bg octane-wired__summary-bg--right" src={wiredBgRight} alt="" />
+                    <div className="octane-wired__summary-copy">
+                        <Text bold className="octane-wired__summary-title">
                             {wiredName}
                         </Text>
                     </div>
                 </div>
-                <div className="nitro-wired__body">
-                    {!!children && <div className="nitro-wired__divider" />}
-                    {!!children && <div className="nitro-wired__section nitro-wired__section--body">{children}</div>}
+                <div className="octane-wired__body">
+                    {!!children && <div className="octane-wired__divider" />}
+                    {!!children && <div className="octane-wired__section octane-wired__section--body">{children}</div>}
                     {requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE && (
                         <>
-                            <div className="nitro-wired__divider" />
-                            <div className="nitro-wired__section nitro-wired__section--selector">{selectionPreview || <WiredFurniSelectorView />}</div>
+                            <div className="octane-wired__divider" />
+                            <div className="octane-wired__section octane-wired__section--selector">{selectionPreview || <WiredFurniSelectorView />}</div>
                         </>
                     )}
                     {footer && (
                         <>
-                            <div className="nitro-wired__divider" />
-                            <div className="nitro-wired__section nitro-wired__section--footer">
+                            <div className="octane-wired__divider" />
+                            <div className="octane-wired__section octane-wired__section--footer">
                                 {footerCollapsible ? (
                                     <>
-                                        <button className="nitro-wired__advanced-toggle" type="button" onClick={() => setShowFooter((value) => !value)}>
+                                        <button className="octane-wired__advanced-toggle" type="button" onClick={() => setShowFooter((value) => !value)}>
                                             {LocalizeText(showFooter ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
                                         </button>
-                                        {showFooter && <div className="nitro-wired__advanced-body">{footer}</div>}
+                                        {showFooter && <div className="octane-wired__advanced-body">{footer}</div>}
                                     </>
                                 ) : (
                                     footer
@@ -178,23 +178,23 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                             </div>
                         </>
                     )}
-                    <div className="nitro-wired__divider" />
-                    <div className="flex items-center gap-1 nitro-wired__actions">
+                    <div className="octane-wired__divider" />
+                    <div className="flex items-center gap-1 octane-wired__actions">
                         <Button
                             disabled={!roomSettings.canModify}
                             fullWidth
                             variant="success"
-                            classNames={['nitro-wired__button', 'nitro-wired__button--primary']}
+                            classNames={['octane-wired__button', 'octane-wired__button--primary']}
                             onClick={onSave}
                         >
                             {LocalizeText('wiredfurni.ready')}
                         </Button>
-                        <Button fullWidth variant="secondary" classNames={['nitro-wired__button', 'nitro-wired__button--secondary']} onClick={onClose}>
+                        <Button fullWidth variant="secondary" classNames={['octane-wired__button', 'octane-wired__button--secondary']} onClick={onClose}>
                             {LocalizeText('cancel')}
                         </Button>
                     </div>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

@@ -9,7 +9,7 @@ interface ChatInputCommandSelectorViewProps {
 }
 
 /**
- * :command autocomplete popover. Wears the Habbo NitroCard chrome: cream
+ * :command autocomplete popover. Wears the Habbo OctaneCard chrome: cream
  * cardstock, habbo-green header, UbuntuCondensed names, green ":" tile and
  * the custom Habbo scrollbar.
  */

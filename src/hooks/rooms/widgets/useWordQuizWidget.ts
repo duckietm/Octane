@@ -1,7 +1,7 @@
-import { AvatarAction, GetRoomEngine, IQuestion, RoomSessionWordQuizEvent } from '@nitrots/nitro-renderer';
+import { AvatarAction, GetRoomEngine, IQuestion, RoomSessionWordQuizEvent } from '@octane/renderer';
 import { useEffect, useRef, useState } from 'react';
 import { VoteValue } from '../../../api';
-import { useNitroEvent } from '../../events';
+import { useOctaneEvent } from '../../events';
 import { useRoom } from '../useRoom';
 import { usePollActions } from './usePollActions';
 
@@ -44,7 +44,7 @@ const useWordQuizWidgetState = () => {
         setAnswerSent(true);
     };
 
-    useNitroEvent<RoomSessionWordQuizEvent>(RoomSessionWordQuizEvent.ANSWERED, (event) => {
+    useOctaneEvent<RoomSessionWordQuizEvent>(RoomSessionWordQuizEvent.ANSWERED, (event) => {
         const userData = roomSession.userDataManager.getUserData(event.userId);
 
         if (!userData) return;
@@ -70,7 +70,7 @@ const useWordQuizWidgetState = () => {
         );
     });
 
-    useNitroEvent<RoomSessionWordQuizEvent>(RoomSessionWordQuizEvent.FINISHED, (event) => {
+    useOctaneEvent<RoomSessionWordQuizEvent>(RoomSessionWordQuizEvent.FINISHED, (event) => {
         if (question && question.id === event.questionId) {
             setAnswerCounts(event.answerCounts);
             setAnswerSent(true);
@@ -81,7 +81,7 @@ const useWordQuizWidgetState = () => {
         setUserAnswers(new Map());
     });
 
-    useNitroEvent<RoomSessionWordQuizEvent>(RoomSessionWordQuizEvent.QUESTION, (event) => {
+    useOctaneEvent<RoomSessionWordQuizEvent>(RoomSessionWordQuizEvent.QUESTION, (event) => {
         setPollId(event.id);
         setQuestion(event.question);
         setAnswerSent(false);

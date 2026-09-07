@@ -1,6 +1,6 @@
 # Setup locale con `yarn start`
 
-Questa guida serve per avviare Nitro in locale con Vite, usando:
+Questa guida serve per avviare Octane in locale con Vite, usando:
 
 - UI locale su `http://localhost:5173`;
 - API/emulatore locale su `http://localhost:2096`;
@@ -51,7 +51,7 @@ Config locale consigliato:
     "secureApiEnabled": false,
     "apiBaseUrl": "http://localhost:2096",
     "plainConfigBaseUrl": "http://localhost:5173/configuration/",
-    "plainGamedataBaseUrl": "https://hotel.example.com/client/nitro/gamedata/"
+    "plainGamedataBaseUrl": "https://hotel.example.com/client/octane/gamedata/"
 }
 ```
 
@@ -65,13 +65,13 @@ Note:
 Se vuoi tutto locale, usa:
 
 ```json
-"plainGamedataBaseUrl": "http://localhost:5173/client/nitro/gamedata/"
+"plainGamedataBaseUrl": "http://localhost:5173/client/octane/gamedata/"
 ```
 
 ma devi avere davvero i file sotto:
 
 ```txt
-octane/public/client/nitro/gamedata/
+octane/public/client/octane/gamedata/
 ```
 
 ## 3. `public/configuration/renderer-config.json`
@@ -89,7 +89,7 @@ Valori minimi locali:
     "socket.url": "ws://localhost:2096",
     "api.url": "http://localhost:2096",
     "crypto.ws.enabled": false,
-    "gamedata.url": "https://hotel.example.com/client/nitro/gamedata",
+    "gamedata.url": "https://hotel.example.com/client/octane/gamedata",
     "external.texts.url": [
         "${gamedata.url}/ExternalTexts.json",
         "${gamedata.url}/UITexts.json"
@@ -138,11 +138,11 @@ Per la login view puoi usare immagini remote plain:
 {
     "loginview": {
         "images": {
-            "background": "https://hotel.example.com/client/nitro/images/reception/background_gradient_apr25.png",
+            "background": "https://hotel.example.com/client/octane/images/reception/background_gradient_apr25.png",
             "background.colour": "#6eadc8",
-            "drape": "https://hotel.example.com/client/nitro/images/reception/drape.png",
-            "left": "https://hotel.example.com/client/nitro/images/reception/mute_reception_backdrop_left.png",
-            "right": "https://hotel.example.com/client/nitro/images/reception/background_right.png"
+            "drape": "https://hotel.example.com/client/octane/images/reception/drape.png",
+            "left": "https://hotel.example.com/client/octane/images/reception/mute_reception_backdrop_left.png",
+            "right": "https://hotel.example.com/client/octane/images/reception/background_right.png"
         }
     }
 }
@@ -184,7 +184,7 @@ Colonne principali:
 
 `public/configuration/news.json` può rimanere solo come mock/fallback, ma non è il flow corretto.
 
-## 6. Avvio Nitro
+## 6. Avvio Octane
 
 Nel repo `octane`:
 
@@ -223,13 +223,13 @@ Vuol dire che il client ha chiesto un JSON, ma Vite ha risposto HTML.
 Succede quando un URL punta a un file che non esiste, per esempio:
 
 ```txt
-http://localhost:5173/client/nitro/gamedata/ExternalTexts.json
+http://localhost:5173/client/octane/gamedata/ExternalTexts.json
 ```
 
 Soluzione:
 
 - usa gamedata remoto plain;
-- oppure copia davvero i gamedata in `public/client/nitro/gamedata`.
+- oppure copia davvero i gamedata in `public/client/octane/gamedata`.
 
 ### WebSocket `1006`
 
@@ -248,7 +248,7 @@ ws.port=2096
 
 ### Custom badges `401 Unauthorized`
 
-È normale se non sei loggato o se apri Nitro da un host diverso.
+È normale se non sei loggato o se apri Octane da un host diverso.
 
 Usa:
 

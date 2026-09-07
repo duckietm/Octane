@@ -1,4 +1,4 @@
-import { GetRoomEngine, TextureUtils, Vector3d } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, TextureUtils, Vector3d } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Base, BaseProps } from '../Base';
 

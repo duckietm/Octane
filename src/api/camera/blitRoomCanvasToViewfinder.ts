@@ -1,4 +1,4 @@
-import { GetRenderer, GetRoomEngine, NitroRectangle, TextureUtils } from '@nitrots/nitro-renderer';
+import { GetRenderer, GetRoomEngine, OctaneRectangle, TextureUtils } from '@octane/renderer';
 
 /**
  * AIR CameraViewFinder.update() snapshots the room display object
@@ -28,7 +28,7 @@ const toMasterLocal = (master: { worldTransform?: { applyInverse?: (point: { x: 
     return { x: screenX, y: screenY };
 };
 
-export const getViewfinderRoomFrame = (target: HTMLCanvasElement | null, width?: number, height?: number): InstanceType<typeof NitroRectangle> | null =>
+export const getViewfinderRoomFrame = (target: HTMLCanvasElement | null, width?: number, height?: number): InstanceType<typeof OctaneRectangle> | null =>
 {
     if(!target) return null;
 
@@ -63,7 +63,7 @@ export const getViewfinderRoomFrame = (target: HTMLCanvasElement | null, width?:
         const frameWidth = Math.max(1, Math.round(Math.abs(bottomRight.x - topLeft.x)));
         const frameHeight = Math.max(1, Math.round(Math.abs(bottomRight.y - topLeft.y)));
 
-        return new NitroRectangle(x, y, frameWidth, frameHeight);
+        return new OctaneRectangle(x, y, frameWidth, frameHeight);
     }
     catch
     {

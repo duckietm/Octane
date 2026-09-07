@@ -1,4 +1,4 @@
-import { loadGamedata } from '@nitrots/nitro-renderer';
+import { loadGamedata } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetConfigurationValue, IsTouchDevice } from '../../api';
@@ -31,7 +31,7 @@ const useRadioState = () => {
     const watchdogTimeRef = useRef({ time: -1, stuckTicks: 0 });
 
     useEffect(() => {
-        if (loadStartedRef.current || IsTouchDevice()) return;
+        if (loadStartedRef.current || IsTouchDevice() || !GetConfigurationValue<boolean>('radio_ui.enabled', false)) return;
         loadStartedRef.current = true;
 
         const url = GetConfigurationValue<string>('radio.url') || GetConfigurationValue<string>('radio.stations.url') || 'configuration/radio-stations.jsonc';

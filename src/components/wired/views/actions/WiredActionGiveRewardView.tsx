@@ -3,7 +3,7 @@ import { FaPlus, FaTrash } from 'react-icons/fa';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Button, Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -228,7 +228,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                         <option value="1">Once every {limitationInterval} days</option>
                     </select>
                     {rewardTime > 0 && (
-                        <NitroInput type="number" value={limitationInterval} onChange={(event) => setLimitationInterval(Number(event.target.value))} />
+                        <OctaneInput type="number" value={limitationInterval} onChange={(event) => setLimitationInterval(Number(event.target.value))} />
                     )}
                 </div>
             </div>
@@ -290,7 +290,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                         </option>
                                     ))}
                                 </select>
-                                <NitroInput
+                                <OctaneInput
                                     placeholder={getRewardValuePlaceholder(reward.rewardType)}
                                     type={reward.rewardType === 'badge' ? 'text' : 'number'}
                                     value={reward.rewardValue}
@@ -301,7 +301,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                         <Text small>Unique</Text>
                                     </div>
                                 ) : (
-                                    <NitroInput
+                                    <OctaneInput
                                         min={0}
                                         max={100}
                                         placeholder="Chance %"
@@ -311,7 +311,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                     />
                                 )}
                                 {reward.rewardType === 'points' ? (
-                                    <NitroInput
+                                    <OctaneInput
                                         min={0}
                                         placeholder={getExtraFieldPlaceholder(reward.rewardType)}
                                         type="number"

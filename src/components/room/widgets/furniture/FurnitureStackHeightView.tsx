@@ -1,7 +1,7 @@
-import { FurnitureStackHeightComposer } from '@nitrots/nitro-renderer';
+import { FurnitureStackHeightComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Slider, Text } from '../../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../../common';
 import { useFurnitureStackHeightWidget } from '../../../../hooks';
 
 export const FurnitureStackHeightView: FC<{}> = (props) => {
@@ -27,9 +27,9 @@ export const FurnitureStackHeightView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView className="nitro-widget-custom-stack-height" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText(titleKey)} onCloseClick={onClose} />
-            <NitroCardContentView justifyContent="between">
+        <OctaneCardView className="octane-widget-custom-stack-height" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText(titleKey)} onCloseClick={onClose} />
+            <OctaneCardContentView justifyContent="between">
                 <Text>{LocalizeText(textKey)}</Text>
                 <div className="flex gap-2">
                     <Slider
@@ -58,7 +58,7 @@ export const FurnitureStackHeightView: FC<{}> = (props) => {
                         {LocalizeText('furniture.floor.level')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

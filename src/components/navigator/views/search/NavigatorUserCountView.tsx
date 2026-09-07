@@ -11,7 +11,7 @@ export const NavigatorUserCountView: FC<NavigatorUserCountViewProps> = (props) =
     const { userCount, maxUserCount } = props;
 
     return (
-        <span className="nitro-navigator-air__usercount" style={{ backgroundColor: getNavigatorUserCountColor(userCount, maxUserCount) }}>
+        <span className="octane-navigator-air__usercount" style={{ backgroundColor: getNavigatorUserCountColor(userCount, maxUserCount) }}>
             <img src={userCountIcon} alt="" />
             <span>{userCount}</span>
         </span>

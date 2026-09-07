@@ -1,4 +1,4 @@
-import { FriendCategoryData } from '@nitrots/nitro-renderer';
+import { FriendCategoryData } from '@octane/renderer';
 import { FC } from 'react';
 import { countFriendsByCategory, LocalizeText, MessengerFriend } from '../../../../api';
 

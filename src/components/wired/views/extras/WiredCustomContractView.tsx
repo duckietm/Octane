@@ -38,7 +38,7 @@ export const WiredCustomContractView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <Text bold>The user PAYS:</Text>
                 <WiredContractRulesEditor direction={CONTRACT_DIR_PAY} rules={giveRules} onChange={setGiveRules} />
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
                 <Text bold>The user RECEIVES:</Text>
                 <WiredContractRulesEditor
                     allowAlternatives={false}

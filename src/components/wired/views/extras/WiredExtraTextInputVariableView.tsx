@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import {
     buildWiredVariablePickerEntries,
@@ -126,7 +126,7 @@ export const WiredExtraTextInputVariableView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.texts.capturer_name')}</Text>
-                    <NitroInput
+                    <OctaneInput
                         maxLength={MAX_CAPTURER_NAME_LENGTH}
                         type="text"
                         value={capturerName}

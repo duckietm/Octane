@@ -1,4 +1,4 @@
-import { CreateLinkEvent, GetSessionDataManager, GroupInformationParser, GroupRemoveMemberComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GetSessionDataManager, GroupInformationParser, GroupRemoveMemberComposer } from '@octane/renderer';
 import { FC } from 'react';
 import {
     CatalogPageName,
@@ -45,11 +45,11 @@ export const GroupInformationView: FC<GroupInformationViewProps> = (props) => {
         if (groupInformation.membershipType === GroupMembershipType.NOT_MEMBER || groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING)
             return null;
 
-        if (isRealOwner) return <i className="nitro-icon icon-group-owner" title={LocalizeText('group.youareowner')} />;
+        if (isRealOwner) return <i className="octane-icon icon-group-owner" title={LocalizeText('group.youareowner')} />;
 
-        if (groupInformation.isAdmin) return <i className="nitro-icon icon-group-admin" title={LocalizeText('group.youareadmin')} />;
+        if (groupInformation.isAdmin) return <i className="octane-icon icon-group-admin" title={LocalizeText('group.youareadmin')} />;
 
-        return <i className="nitro-icon icon-group-member" title={LocalizeText('group.youaremember')} />;
+        return <i className="octane-icon icon-group-member" title={LocalizeText('group.youaremember')} />;
     };
 
     const getButtonText = () => {
@@ -108,14 +108,14 @@ export const GroupInformationView: FC<GroupInformationViewProps> = (props) => {
     if (!groupInformation) return null;
 
     return (
-        <div className="nitro-extended-profile-group-info">
-            <div className="nitro-extended-profile-group-info__badge-column">
-                <div className="nitro-extended-profile-group-info__badge-wrap group-badge">
+        <div className="octane-extended-profile-group-info">
+            <div className="octane-extended-profile-group-info__badge-column">
+                <div className="octane-extended-profile-group-info__badge-wrap group-badge">
                     <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} scale={2.1} />
                 </div>
-                <div className="nitro-extended-profile-group-info__meta">
+                <div className="octane-extended-profile-group-info__meta">
                     <span
-                        className="nitro-extended-profile-group-info__member-link"
+                        className="octane-extended-profile-group-info__member-link"
                         role="button"
                         tabIndex={0}
                         onMouseDown={(event) => event.stopPropagation()}
@@ -131,7 +131,7 @@ export const GroupInformationView: FC<GroupInformationViewProps> = (props) => {
                     </span>
                     {groupInformation.pendingRequestsCount > 0 && (
                         <span
-                            className="nitro-extended-profile-group-info__member-link"
+                            className="octane-extended-profile-group-info__member-link"
                             role="button"
                             tabIndex={0}
                             onMouseDown={(event) => event.stopPropagation()}
@@ -147,28 +147,28 @@ export const GroupInformationView: FC<GroupInformationViewProps> = (props) => {
                         </span>
                     )}
                 </div>
-                <div className="nitro-extended-profile-group-info__role" aria-hidden="true">{getRoleIcon()}</div>
+                <div className="octane-extended-profile-group-info__role" aria-hidden="true">{getRoleIcon()}</div>
             </div>
-            <div className="nitro-extended-profile-group-info__content">
-                <div className="nitro-extended-profile-group-info__header-copy">
+            <div className="octane-extended-profile-group-info__content">
+                <div className="octane-extended-profile-group-info__header-copy">
                     <div className="flex items-center gap-2">
                         <Text bold>{groupInformation.title}</Text>
                         <div className="flex gap-1">
                             <i
-                                className={'nitro-icon icon-group-type-' + groupInformation.type}
+                                className={'octane-icon icon-group-type-' + groupInformation.type}
                                 title={LocalizeText(`group.edit.settings.type.${STATES[groupInformation.type]}.help`)}
                             />
                             {groupInformation.canMembersDecorate && (
-                                <i className="nitro-icon icon-group-decorate" title={LocalizeText('group.memberscandecorate')} />
+                                <i className="octane-icon icon-group-decorate" title={LocalizeText('group.memberscandecorate')} />
                             )}
                         </div>
                     </div>
                     <Text small>{LocalizeText('group.created', ['date', 'owner'], [groupInformation.createdAt, groupInformation.ownerName])}</Text>
                 </div>
-                <Text small className="nitro-extended-profile-group-info__description" overflow="auto">
+                <Text small className="octane-extended-profile-group-info__description" overflow="auto">
                     {groupInformation.description}
                 </Text>
-                <div className="nitro-extended-profile-group-info__links">
+                <div className="octane-extended-profile-group-info__links">
                     <Text pointer small underline onClick={() => handleAction('homeroom')}>
                         {LocalizeText('group.linktobase')}
                     </Text>
@@ -192,7 +192,7 @@ export const GroupInformationView: FC<GroupInformationViewProps> = (props) => {
                 {(groupInformation.type !== GroupType.PRIVATE ||
                     (groupInformation.type === GroupType.PRIVATE && groupInformation.membershipType === GroupMembershipType.MEMBER)) && (
                     <Button
-                        className="nitro-extended-profile-group-info__button"
+                        className="octane-extended-profile-group-info__button"
                         disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING || isRealOwner}
                         onClick={handleButtonClick}
                     >

@@ -1,7 +1,7 @@
-import { IObjectData, NitroEvent } from '@nitrots/nitro-renderer';
+import { IObjectData, OctaneEvent } from '@octane/renderer';
 import { CatalogWidgetEvent } from './CatalogWidgetEvent';
 
-export class CatalogSetRoomPreviewerStuffDataEvent extends NitroEvent {
+export class CatalogSetRoomPreviewerStuffDataEvent extends OctaneEvent {
     private _stuffData: IObjectData;
 
     constructor(stuffData: IObjectData) {

@@ -23,7 +23,7 @@ export const CatalogLayouGuildForumView: FC<CatalogLayoutProps> = (props) => {
             <Grid overflow="hidden">
                 <Column overflow="hidden" size={8}>
                     <div
-                        className="nitro-catalog-forum-text grow! min-h-0 overflow-auto text-black"
+                        className="octane-catalog-forum-text grow! min-h-0 overflow-auto text-black"
                         dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(1)) }}
                     />
                     {!!currentOffer && (

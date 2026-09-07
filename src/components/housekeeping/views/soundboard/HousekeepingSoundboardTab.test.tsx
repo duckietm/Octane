@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
     ]
 }));
 
-vi.mock('@nitrots/nitro-renderer', () => ({
+vi.mock('@octane/renderer', () => ({
     GetSoundManager: () => ({ playSoundboard: mocks.playSoundboard })
 }));
 

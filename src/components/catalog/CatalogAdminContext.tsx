@@ -14,7 +14,7 @@ import {
     CatalogAdminSavePageComposer,
     CatalogAdminSetPageEnabledComposer,
     CatalogAdminSetPageVisibleComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ICatalogNode, IPurchasableOffer, NotificationAlertType, SendMessageComposer } from '../../api';
 import { useCatalogUiState, useMessageEvent, useNotification } from '../../hooks';

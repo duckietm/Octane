@@ -57,7 +57,7 @@ import './css/inventory/InventoryView.css';
 
 import './css/layout/LayoutTrophy.css';
 
-import './css/nitrocard/NitroCardView.css';
+import './css/octanecard/OctaneCardView.css';
 import './css/achievements/AchievementsView.css';
 
 import './css/notification/NotificationCenterView.css';

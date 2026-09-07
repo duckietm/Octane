@@ -27,8 +27,8 @@ ${selector} {`);
     };
 
     it('reads its placement from the right edge, not from a fixed offset', () => {
-        const plate = rule(experience, '.nitro-catalog-preview-limited');
-        const productView = rule(catalog, '.nitro-catalog-product-view');
+        const plate = rule(experience, '.octane-catalog-preview-limited');
+        const productView = rule(catalog, '.octane-catalog-product-view');
 
         expect(plate).toContain('top: 5px');
         // The box this sits in is no longer the original's fixed 360: it follows a window that
@@ -40,8 +40,8 @@ ${selector} {`);
     });
 
     it('clears the lane the controls occupy', () => {
-        const plate = rule(experience, '.nitro-catalog-preview-limited');
-        const controls = rule(catalog, '.nitro-catalog-preview-controls');
+        const plate = rule(experience, '.octane-catalog-preview-limited');
+        const controls = rule(catalog, '.octane-catalog-preview-controls');
 
         expect(controls).toContain('right: 6px');
         expect(controls).toContain('width: 54px');
@@ -50,7 +50,7 @@ ${selector} {`);
     });
 
     it('takes the size of the plate rather than imposing one on it', () => {
-        const plate = rule(experience, '.nitro-catalog-preview-limited');
+        const plate = rule(experience, '.octane-catalog-preview-limited');
 
         // `.unique-complete-plate` is the 170x29 of its own background artwork. A width here
         // constrained nothing - the plate overflowed it - so reserving room inside this box

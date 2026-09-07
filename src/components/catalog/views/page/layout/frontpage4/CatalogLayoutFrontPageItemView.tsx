@@ -1,4 +1,4 @@
-import { FrontPageItem } from '@nitrots/nitro-renderer';
+import { FrontPageItem } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { GetConfigurationValue } from '../../../../../../api';
 import { LayoutBackgroundImage, LayoutBackgroundImageProps } from '../../../../../../common';
@@ -12,7 +12,7 @@ export const CatalogLayoutFrontPageItemView: FC<CatalogLayoutFrontPageItemViewPr
     const { item = null, position = 'relative', pointer = true, overflow = 'hidden', fullHeight = true, classNames = [], children = null, ...rest } = props;
 
     const getClassNames = useMemo(() => {
-        const newClassNames: string[] = ['rounded', 'nitro-front-page-item'];
+        const newClassNames: string[] = ['rounded', 'octane-front-page-item'];
 
         if (classNames.length) newClassNames.push(...classNames);
 

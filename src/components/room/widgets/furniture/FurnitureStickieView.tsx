@@ -45,13 +45,13 @@ export const FurnitureStickieView: FC<{}> = (props) => {
     return (
         <DraggableWindow handleSelector=".drag-handler" windowPosition={DraggableWindowPosition.TOP_LEFT}>
             <div
-                className={'nitro-stickie ' + (isThemed ? 'nitro-stickie-image stickie-' + getStickieTypeName(type) : 'stickie-plain')}
+                className={'octane-stickie ' + (isThemed ? 'octane-stickie-image stickie-' + getStickieTypeName(type) : 'stickie-plain')}
                 style={isThemed ? undefined : ({ '--stickie-color': getStickieColor(color) } as CSSProperties)}>
                 <div className="flex items-center stickie-header drag-handler">
                     <div className="flex items-center grow! h-full">
                         {canModify && (
                             <>
-                                <div className="nitro-stickie-image stickie-trash header-trash" onClick={trash}></div>
+                                <div className="octane-stickie-image stickie-trash header-trash" onClick={trash}></div>
                                 {!isThemed && (
                                     <>
                                         {STICKIE_COLORS.map((stickieColor) => {
@@ -69,7 +69,7 @@ export const FurnitureStickieView: FC<{}> = (props) => {
                             </>
                         )}
                     </div>
-                    <div className="flex items-center nitro-stickie-image stickie-close header-close" onClick={onClose}></div>
+                    <div className="flex items-center octane-stickie-image stickie-close header-close" onClick={onClose}></div>
                 </div>
                 <div className="stickie-context">
                     {!isEditing || !canModify ? (

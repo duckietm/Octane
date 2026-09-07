@@ -1,4 +1,4 @@
-import { StringDataType } from '@nitrots/nitro-renderer';
+import { StringDataType } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeBadgeDescription, LocalizeBadgeName, LocalizeText } from '../../../../../api';
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView, LayoutBadgeImageView, LayoutGridItem } from '../../../../../common';
@@ -83,8 +83,8 @@ export const CatalogBadgeSelectorWidgetView: FC<CatalogBadgeSelectorWidgetViewPr
     }, [currentBadgeCode, filteredBadgeCodes]);
 
     return (
-        <div className={`nitro-catalog-badge-selector ${className}`.trim()}>
-            <div className="nitro-catalog-badge-search">
+        <div className={`octane-catalog-badge-selector ${className}`.trim()}>
+            <div className="octane-catalog-badge-search">
                 <input
                     aria-label={LocalizeText('generic.search')}
                     maxLength={MAX_SEARCH_LENGTH}
@@ -103,7 +103,7 @@ export const CatalogBadgeSelectorWidgetView: FC<CatalogBadgeSelectorWidgetViewPr
                 {!!searchText.length && (
                     <button
                         aria-label={LocalizeText('generic.clear')}
-                        className="nitro-catalog-badge-search-clear"
+                        className="octane-catalog-badge-search-clear"
                         type="button"
                         onClick={() => setSearchText('')}
                     >
@@ -111,10 +111,10 @@ export const CatalogBadgeSelectorWidgetView: FC<CatalogBadgeSelectorWidgetViewPr
                     </button>
                 )}
             </div>
-            <ClassicScrollAreaView className="nitro-catalog-badge-scroll-area" scrollStep={45}>
+            <ClassicScrollAreaView className="octane-catalog-badge-scroll-area" scrollStep={45}>
                 <AutoGrid
                     aria-label={LocalizeText('catalog_selectbadge')}
-                    className="nitro-catalog-badge-grid"
+                    className="octane-catalog-badge-grid"
                     columnCount={columnCount}
                     columnMinHeight={44}
                     columnMinWidth={44}
@@ -127,7 +127,7 @@ export const CatalogBadgeSelectorWidgetView: FC<CatalogBadgeSelectorWidgetViewPr
                             key={badgeCode}
                             aria-label={badgeCode}
                             aria-selected={currentBadgeCode === badgeCode}
-                            className="nitro-catalog-badge-tile"
+                            className="octane-catalog-badge-tile"
                             itemActive={currentBadgeCode === badgeCode}
                             role="option"
                             title={LocalizeBadgeName(badgeCode)}
@@ -137,7 +137,7 @@ export const CatalogBadgeSelectorWidgetView: FC<CatalogBadgeSelectorWidgetViewPr
                         </LayoutGridItem>
                     ))}
                 </AutoGrid>
-                {!filteredBadgeCodes.length && <div className="nitro-catalog-badge-empty">{LocalizeText('inventory.empty.title')}</div>}
+                {!filteredBadgeCodes.length && <div className="octane-catalog-badge-empty">{LocalizeText('inventory.empty.title')}</div>}
             </ClassicScrollAreaView>
         </div>
     );

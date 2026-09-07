@@ -1,4 +1,4 @@
-import { CreateLinkEvent } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent } from '@octane/renderer';
 
 export function GetGroupMembers(groupId: number, levelId?: number): void {
     if (levelId === undefined || levelId === null) CreateLinkEvent(`group-members/${groupId}/0`);

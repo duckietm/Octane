@@ -6,7 +6,7 @@ import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -275,16 +275,16 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                 </div>
             }
         >
-            <div className="nitro-wired__give-var">
-                <div className="nitro-wired__give-var-heading">
+            <div className="octane-wired__give-var">
+                <div className="octane-wired__give-var-heading">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="nitro-wired__give-var-targets">
+                    <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
                             <button
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
-                                className={`nitro-wired__give-var-target nitro-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
+                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
                                 onClick={() => handleTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
@@ -300,10 +300,10 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     onSelect={(entry) => setVariableToken(entry.token)}
                 />
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.compare_value')}</div>
+                <div className="octane-wired__give-var-section">
+                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.compare_value')}</div>
                     {COMPARE_VALUE_OPTIONS.map((value) => (
                         <label key={value} className="flex items-center gap-1">
                             <input
@@ -319,10 +319,10 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     ))}
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.choose_type')}</div>
+                <div className="octane-wired__give-var-section">
+                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.choose_type')}</div>
                     {COMPARISON_OPTIONS.map((value) => (
                         <label key={value} className="flex items-center gap-1">
                             <input
@@ -337,14 +337,14 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     ))}
                 </div>
 
-                <div className="nitro-wired__divider" />
+                <div className="octane-wired__divider" />
 
-                <div className="nitro-wired__give-var-section">
-                    <div className="nitro-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.time_selection')}</div>
+                <div className="octane-wired__give-var-section">
+                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.time_selection')}</div>
                     <div className="flex items-center gap-2">
                         <Text>{LocalizeText('wiredfurni.params.variables.duration')}</Text>
-                        <NitroInput
-                            className="nitro-wired__give-var-number"
+                        <OctaneInput
+                            className="octane-wired__give-var-number"
                             type="number"
                             value={durationInput}
                             onChange={(event) => setDurationInput(event.target.value)}

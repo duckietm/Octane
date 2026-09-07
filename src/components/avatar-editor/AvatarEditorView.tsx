@@ -7,7 +7,7 @@ import {
     RemoveLinkEventTracker,
     SetClothingChangeDataMessageComposer,
     UserFigureComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaDice, FaRedo, FaTrash } from 'react-icons/fa';
 import { AvatarEditorAction, LocalizeText, SendMessageComposer } from '../../api';
@@ -19,7 +19,7 @@ import mainTorsoSrc from '../../assets/images/avatareditor/air/main-torso.png';
 import wardrobeHangerSrc from '../../assets/images/avatareditor/wardrobe-hanger.png';
 import mainNftSrc from '../../assets/images/wardrobe/nft.png';
 import mainPetsSrc from '../../assets/images/wardrobe/pets.png';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { useAvatarEditor } from '../../hooks';
 import { AvatarEditorFigurePreviewView } from './AvatarEditorFigurePreviewView';
 import { AvatarEditorModelView } from './AvatarEditorModelView';
@@ -159,39 +159,39 @@ export const AvatarEditorView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView
-            className={`nitro-avatar-editor${isWardrobeOpen ? ' is-wardrobe-open' : ''}`}
+        <OctaneCardView
+            className={`octane-avatar-editor${isWardrobeOpen ? ' is-wardrobe-open' : ''}`}
             frameStyle={3}
             isResizable={false}
             uniqueKey="avatar-editor"
         >
-            <NitroCardHeaderView
+            <OctaneCardHeaderView
                 headerText={LocalizeText(clothingChangeData ? 'widget.furni.clothingchange.editor.title' : 'avatareditor.title')}
                 onCloseClick={(event) => setIsVisible(false)}
             />
-            <NitroCardContentView className="nitro-avatar-editor-content">
-                <div className="nitro-avatar-editor-stage">
-                    <div className="nitro-avatar-editor-nameplate">
+            <OctaneCardContentView className="octane-avatar-editor-content">
+                <div className="octane-avatar-editor-stage">
+                    <div className="octane-avatar-editor-nameplate">
                         <span>{GetSessionDataManager().userName}</span>
                     </div>
-                    <div className="nitro-avatar-editor-tab-row">
-                        <NitroCardTabsView classNames={['avatar-editor-tabs']}>
+                    <div className="octane-avatar-editor-tab-row">
+                        <OctaneCardTabsView classNames={['avatar-editor-tabs']}>
                             {orderedModelKeys.map((modelKey) => (
-                                <NitroCardTabsItemView
+                                <OctaneCardTabsItemView
                                     key={modelKey}
-                                    classNames={['nitro-avatar-editor-main-tab', `is-${modelKey}`]}
+                                    classNames={['octane-avatar-editor-main-tab', `is-${modelKey}`]}
                                     isActive={activeModelKey === modelKey}
                                     onClick={() => setActiveModelKey(modelKey)}
                                 >
-                                    <img className="nitro-avatar-editor-main-tab-icon" src={MAIN_TAB_ICONS[modelKey]} alt="" draggable={false} />
-                                </NitroCardTabsItemView>
+                                    <img className="octane-avatar-editor-main-tab-icon" src={MAIN_TAB_ICONS[modelKey]} alt="" draggable={false} />
+                                </OctaneCardTabsItemView>
                             ))}
-                        </NitroCardTabsView>
+                        </OctaneCardTabsView>
                     </div>
                     {canUseWardrobe && (
                         <button
                             type="button"
-                            className={`nitro-avatar-editor-wardrobe-toggle${isWardrobeOpen ? ' is-open' : ''}`}
+                            className={`octane-avatar-editor-wardrobe-toggle${isWardrobeOpen ? ' is-open' : ''}`}
                             aria-pressed={isWardrobeOpen}
                             aria-label={LocalizeText('avatareditor.wardrobe.title')}
                             onClick={() => setIsWardrobeOpen((open) => !open)}
@@ -199,7 +199,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
                             <img alt="" draggable={false} src={wardrobeHangerSrc} />
                         </button>
                     )}
-                    <div className="nitro-avatar-editor-main">
+                    <div className="octane-avatar-editor-main">
                         {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && (
                             <AvatarEditorModelView categories={avatarModels[activeModelKey]} name={activeModelKey} />
                         )}
@@ -207,7 +207,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
                         {isNftOpen && <AvatarEditorNftView categories={avatarModels[activeModelKey]} />}
                         <AvatarEditorFigurePreviewView />
                         {!clothingChangeData && (
-                            <div className="nitro-avatar-editor-secondary-actions">
+                            <div className="octane-avatar-editor-secondary-actions">
                                 <button
                                     type="button"
                                     aria-label="Reset avatar"
@@ -234,13 +234,13 @@ export const AvatarEditorView: FC<{}> = (props) => {
                                 </button>
                             </div>
                         )}
-                        <button type="button" className="nitro-avatar-editor-save" onClick={() => processAction(AvatarEditorAction.ACTION_SAVE)}>
+                        <button type="button" className="octane-avatar-editor-save" onClick={() => processAction(AvatarEditorAction.ACTION_SAVE)}>
                             {LocalizeText('avatareditor.save')}
                         </button>
                     </div>
                 </div>
                 {isWardrobeOpen && canUseWardrobe && <AvatarEditorWardrobeView />}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

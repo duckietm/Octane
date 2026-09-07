@@ -1,7 +1,7 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, ReportState } from '../../api';
-import { Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import { Column, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { useHelp } from '../../hooks';
 import { DescribeReportView } from './views/DescribeReportView';
 import { HelpIndexView } from './views/HelpIndexView';
@@ -86,12 +86,12 @@ export const HelpView: FC<{}> = (props) => {
     return (
         <>
             {isVisible && (
-                <NitroCardView
-                    className="nitro-help min-w-0 w-[min(560px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                <OctaneCardView
+                    className="octane-help min-w-0 w-[min(560px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
                     theme="primary-slim"
                 >
-                    <NitroCardHeaderView headerText={LocalizeText('help.button.cfh')} onCloseClick={onClose} />
-                    <NitroCardContentView className="text-black">
+                    <OctaneCardHeaderView headerText={LocalizeText('help.button.cfh')} onCloseClick={onClose} />
+                    <OctaneCardContentView className="text-black">
                         {activeReport ? (
                             <Grid>
                                 <Column center overflow="hidden" size={5}>
@@ -104,8 +104,8 @@ export const HelpView: FC<{}> = (props) => {
                         ) : (
                             <CurrentStepView />
                         )}
-                    </NitroCardContentView>
-                </NitroCardView>
+                    </OctaneCardContentView>
+                </OctaneCardView>
             )}
             <SanctionSatusView />
             <NameChangeView />

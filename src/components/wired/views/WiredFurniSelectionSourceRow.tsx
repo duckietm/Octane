@@ -57,14 +57,14 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
     };
 
     return (
-        <div className="nitro-wired__source-row">
+        <div className="octane-wired__source-row">
             <div className="flex items-center justify-between gap-2">
                 <Text>{resolvedTitle}</Text>
                 {headerContent}
                 {showSelectionToggle && (
                     <button
                         type="button"
-                        className={`nitro-wired__selection-toggle nitro-wired__selection-toggle--${selectionKind} ${selectionActive ? 'is-active' : ''}`}
+                        className={`octane-wired__selection-toggle octane-wired__selection-toggle--${selectionKind} ${selectionActive ? 'is-active' : ''}`}
                         disabled={!canActivateSelection}
                         onClick={() => onSelectionActivate && onSelectionActivate()}
                     >
@@ -73,15 +73,15 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
                 )}
             </div>
             <div className="flex items-center gap-1">
-                <Button variant="primary" classNames={['nitro-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(-1)}>
+                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(-1)}>
                     <FaChevronLeft />
                 </Button>
-                <div className="flex min-w-0 flex-1 items-center justify-center nitro-wired__picker-label">
+                <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
                     <Text small className="text-center">
                         {displayText}
                     </Text>
                 </div>
-                <Button variant="primary" classNames={['nitro-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(1)}>
+                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(1)}>
                     <FaChevronRight />
                 </Button>
             </div>

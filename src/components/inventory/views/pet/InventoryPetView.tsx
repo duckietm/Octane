@@ -1,10 +1,10 @@
-import { DeletePetMessageComposer, IRoomSession, RoomPreviewer } from '@nitrots/nitro-renderer';
+import { DeletePetMessageComposer, IRoomSession, RoomPreviewer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { attemptPetPlacement, IPetItem, LocalizeText, SendMessageComposer, UnseenItemCategory } from '../../../../api';
 import { LayoutRoomPreviewerView } from '../../../../common';
 import { useInventoryPets, useInventoryUnseenTracker, useNotification } from '../../../../hooks';
-import { InfiniteGrid, NitroButton } from '../../../../layout';
+import { InfiniteGrid, OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryPetItemView } from './InventoryPetItemView';
 
@@ -80,18 +80,18 @@ export const InventoryPetView: FC<{
                 <div className="relative flex flex-col">
                     <LayoutRoomPreviewerView height={140} roomPreviewer={roomPreviewer} />
                     {selectedPet && (
-                        <NitroButton className="bg-danger! hover:bg-danger/80! absolute bottom-2 inset-e-2 p-1" onClick={attemptDeletePet}>
+                        <OctaneButton className="bg-danger! hover:bg-danger/80! absolute bottom-2 inset-e-2 p-1" onClick={attemptDeletePet}>
                             <FaTrashAlt className="fa-icon" />
-                        </NitroButton>
+                        </OctaneButton>
                     )}
                 </div>
                 {selectedPet && selectedPet.petData && (
                     <div className="flex flex-col justify-between gap-2 grow">
                         <span className="text-sm truncate grow">{selectedPet.petData.name}</span>
                         {!!roomSession && (
-                            <NitroButton className="nitro-inventory-btn-place" onClick={(event) => attemptPetPlacement(selectedPet)}>
+                            <OctaneButton className="octane-inventory-btn-place" onClick={(event) => attemptPetPlacement(selectedPet)}>
                                 {LocalizeText('inventory.furni.placetoroom')}
-                            </NitroButton>
+                            </OctaneButton>
                         )}
                     </div>
                 )}

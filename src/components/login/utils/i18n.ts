@@ -1,4 +1,4 @@
-import { GetConfiguration } from '@nitrots/nitro-renderer';
+import { GetConfiguration } from '@octane/renderer';
 import { LocalizeText } from '../../../api';
 
 export const t = (key: string, fallback: string, params?: string[], replacements?: string[]): string => {

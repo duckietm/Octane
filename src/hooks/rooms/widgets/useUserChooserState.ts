@@ -1,4 +1,4 @@
-import { GetRoomEngine, RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { GetRoomEngine, RoomObjectCategory } from '@octane/renderer';
 import { useState } from 'react';
 import { GetRoomSession, RoomObjectItem } from '../../../api';
 import { useUserAddedEvent, useUserRemovedEvent } from '../engine';

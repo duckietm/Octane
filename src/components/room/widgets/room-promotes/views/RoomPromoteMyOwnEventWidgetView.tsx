@@ -1,4 +1,4 @@
-import { CreateLinkEvent } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText } from '../../../../../api';
 import { Button, Flex, Text } from '../../../../../common';

@@ -1,5 +1,38 @@
 # Changelog
 
+## Octane Rebrand — nitro → octane naming (2026-09-05)
+
+Project-wide rename of the inherited "nitro" naming to Octane, across both
+the UI and the renderer.
+
+### Renamed
+- npm scope `@nitrots/*` → `@octane/*`; root renderer package is now
+  `@octane/renderer`; the UI package is `octane-react`.
+- All `Nitro*` classes, components, hooks, and types → `Octane*`
+  (`NitroCardView` → `OctaneCardView`, `useNitroEvent` → `useOctaneEvent`,
+  `NitroLogger` → `OctaneLogger`, …), including the matching file,
+  directory, and CSS class names (`nitro-*` → `octane-*`; update custom
+  themes accordingly — the bundled themes are already updated).
+- Window globals `NitroConfig` / `NitroPlugins` / `NitroClientMode` /
+  `NitroSecureApiUrl` → `Octane*`. Legacy aliases remain so existing
+  external scripts and plugins keep working.
+- Build env vars `NITRO_JSON_MODE` / `NITRO_SINGLE_BUNDLE` /
+  `NITRO_RENDERER_DIR` → `OCTANE_*` (legacy names still accepted), and
+  `.nitro-build.json` → `.octane-build.json` (legacy file still read).
+- The `:nitro` chat command is now `:octane` (`:nitro` kept as an alias).
+
+### Deliberately NOT renamed (compatibility)
+- The `.nitro` asset bundle extension and all existing compiled assets.
+- Wire contracts with the emulator: the `NITRO-x-y-z` ClientHello version
+  string, the `/nitro-sec/*` secure asset endpoints, the `X-Nitro-*` HTTP
+  headers, the `nitro-secure-assets-v1` key salt, and the
+  `[NITRO_INFO_V1]` broadcast sentinel sent by the emulator's About
+  command.
+- Persisted browser keys (`nitro.*` in localStorage/sessionStorage) and
+  `nitro.*` localization keys in UITexts configs.
+- On-disk asset locations: the `Nitro-Files/` sibling folder and the
+  `/nitro-assets` dev-server path.
+
 ## React 19 Modernization Phase 2 (2026-05-12)
 
 Long-running work on the `feat/react19-modernization` branch — see

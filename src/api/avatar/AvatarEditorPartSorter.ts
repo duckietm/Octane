@@ -1,4 +1,4 @@
-import { IFigurePartSet } from '@nitrots/nitro-renderer';
+import { IFigurePartSet } from '@octane/renderer';
 
 export const AvatarEditorPartSorter = (hcFirst: boolean) => {
     return (a: { partSet: IFigurePartSet; usesColor: boolean; isClear?: boolean }, b: { partSet: IFigurePartSet; usesColor: boolean; isClear?: boolean }) => {

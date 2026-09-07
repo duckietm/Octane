@@ -9,7 +9,7 @@ import {
     RoomUnitGiveHandItemComposer,
     SetRelationshipStatusComposer,
     TradingOpenComposer
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
@@ -254,7 +254,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
     return (
         <ContextMenuView
             category={RoomObjectCategory.UNIT}
-            classNames={['nitro-avatar-action-menu']}
+            classNames={['octane-avatar-action-menu']}
             collapsable={true}
             objectId={avatarInfo.roomIndex}
             userType={avatarInfo.userType}
@@ -417,13 +417,13 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                 <>
                     <Flex className="menu-list-split-3">
                         <ContextMenuListItemView onClick={(event) => processAction('rship_heart')}>
-                            <div className="nitro-friends-spritesheet icon-heart cursor-pointer" />
+                            <div className="octane-friends-spritesheet icon-heart cursor-pointer" />
                         </ContextMenuListItemView>
                         <ContextMenuListItemView onClick={(event) => processAction('rship_smile')}>
-                            <div className="nitro-friends-spritesheet icon-smile cursor-pointer" />
+                            <div className="octane-friends-spritesheet icon-smile cursor-pointer" />
                         </ContextMenuListItemView>
                         <ContextMenuListItemView onClick={(event) => processAction('rship_bobba')}>
-                            <div className="nitro-friends-spritesheet icon-bobba cursor-pointer" />
+                            <div className="octane-friends-spritesheet icon-bobba cursor-pointer" />
                         </ContextMenuListItemView>
                     </Flex>
                     <ContextMenuListItemView onClick={(event) => processAction('rship_none')}>

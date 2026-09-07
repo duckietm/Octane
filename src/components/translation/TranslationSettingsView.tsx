@@ -1,6 +1,6 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useTranslation } from '../../hooks';
 
 export const TranslationSettingsView: FC<{}> = () => {
@@ -55,13 +55,13 @@ export const TranslationSettingsView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <NitroCardView
+        <OctaneCardView
             className="translation-settings-window min-w-0 w-[min(360px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
             theme="primary-slim"
             uniqueKey="translation-settings"
         >
-            <NitroCardHeaderView headerText="Google Translate" onCloseClick={() => setIsVisible(false)} />
-            <NitroCardContentView className="flex flex-col gap-3 text-black">
+            <OctaneCardHeaderView headerText="Google Translate" onCloseClick={() => setIsVisible(false)} />
+            <OctaneCardContentView className="flex flex-col gap-3 text-black">
                 <div className="flex items-center gap-2">
                     <input
                         checked={settings.enabled}
@@ -155,7 +155,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                 {lastError.length > 0 && (
                     <div className="rounded border border-red-300 bg-red-50 px-2 py-1 text-[11px] leading-4 text-red-700">{lastError}</div>
                 )}
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

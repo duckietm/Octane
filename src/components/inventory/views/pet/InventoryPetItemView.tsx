@@ -1,4 +1,4 @@
-import { MouseEventType } from '@nitrots/nitro-renderer';
+import { MouseEventType } from '@octane/renderer';
 import { FC, MouseEvent, PropsWithChildren, useState } from 'react';
 import { attemptPetPlacement, IPetItem, UnseenItemCategory } from '../../../../api';
 import { LayoutPetImageView } from '../../../../common';

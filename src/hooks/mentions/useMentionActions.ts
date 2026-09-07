@@ -1,4 +1,4 @@
-import { CreateLinkEvent, DeleteMentionComposer, MarkMentionsReadComposer } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, DeleteMentionComposer, MarkMentionsReadComposer } from '@octane/renderer';
 import { useMemo } from 'react';
 import { IMentionEntry, SendMessageComposer } from '../../api';
 import { markRead, removeMention } from './mentionsStore';

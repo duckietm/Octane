@@ -1,8 +1,8 @@
-import { RoomChatSettings } from '@nitrots/nitro-renderer';
+import { RoomChatSettings } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { GetClubMemberLevel, IRoomData, LocalizeText } from '../../../../api';
 import { Column, Flex, Grid, Text } from '../../../../common';
-import { NitroInput } from '../../../../layout';
+import { OctaneInput } from '../../../../layout';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
 interface NavigatorRoomSettingsTabViewProps {
@@ -78,7 +78,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <option value={RoomChatSettings.FLOOD_FILTER_STRICT}>{LocalizeText('navigator.roomsettings.chat.flood.strict')}</option>
                         </select>
                         <Text small>{LocalizeText('navigator.roomsettings.chat_settings.hearing.distance')}</Text>
-                        <NitroInput
+                        <OctaneInput
                             className="form-control-sm"
                             disabled={!isHC}
                             min="0"
@@ -144,7 +144,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                                 onChange={(event) => handleChange('idle_sleep_enabled', event.target.checked)}
                             />
                             <Text small>{LocalizeText('navigator.roomsettings.idle_sleep')}</Text>
-                            <NitroInput
+                            <OctaneInput
                                 className="form-control-sm w-20"
                                 disabled={!roomData.idleSleepEnabled}
                                 min="30"
@@ -175,7 +175,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                                 onChange={(event) => handleChange('idle_autokick_enabled', event.target.checked)}
                             />
                             <Text small>{LocalizeText('navigator.roomsettings.idle_autokick')}</Text>
-                            <NitroInput
+                            <OctaneInput
                                 className="form-control-sm w-20"
                                 disabled={!roomData.idleAutokickEnabled}
                                 min={minimumAutokickTimeoutSeconds}

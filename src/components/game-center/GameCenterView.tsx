@@ -1,4 +1,4 @@
-import { AddLinkEventTracker, Game2GetAccountGameStatusMessageComposer, GetGameStatusMessageComposer, ILinkEventTracker, RemoveLinkEventTracker } from '@nitrots/nitro-renderer';
+import { AddLinkEventTracker, Game2GetAccountGameStatusMessageComposer, GetGameStatusMessageComposer, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { useEffect } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../api';
 import { useGameCenter } from '../../hooks';

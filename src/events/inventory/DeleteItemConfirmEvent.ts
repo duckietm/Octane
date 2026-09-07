@@ -1,7 +1,7 @@
-import { NitroEvent } from '@nitrots/nitro-renderer';
+import { OctaneEvent } from '@octane/renderer';
 import { FurnitureItem } from '../../api';
 
-export class DeleteItemConfirmEvent extends NitroEvent {
+export class DeleteItemConfirmEvent extends OctaneEvent {
     public static DELETE_ITEM_CONFIRM: string = 'DICE_DELETE_ITEM_CONFIRM';
 
     constructor(

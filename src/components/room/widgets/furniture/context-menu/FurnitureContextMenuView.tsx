@@ -1,4 +1,4 @@
-import { ContextMenuEnum, CustomUserNotificationMessageEvent, GetSessionDataManager, RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { ContextMenuEnum, CustomUserNotificationMessageEvent, GetSessionDataManager, RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
 import { GetGroupInformation, LocalizeText } from '../../../../../api';
 import {

@@ -1,7 +1,7 @@
-import { ColorConverter } from '@nitrots/nitro-renderer';
+import { ColorConverter } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { ColorUtils, LocalizeText } from '../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Slider, Text } from '../../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../../common';
 import { useFurnitureBackgroundColorWidget } from '../../../../hooks';
 
 export const FurnitureBackgroundColorView: FC<{}> = (props) => {
@@ -27,9 +27,9 @@ export const FurnitureBackgroundColorView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <NitroCardView className="nitro-room-widget-background-color" theme="primary-slim">
-            <NitroCardHeaderView headerText={LocalizeText('widget.backgroundcolour.title')} onCloseClick={onClose} />
-            <NitroCardContentView classNames={['bgcolor-widget-content']} overflow="hidden">
+        <OctaneCardView className="octane-room-widget-background-color" theme="primary-slim">
+            <OctaneCardHeaderView headerText={LocalizeText('widget.backgroundcolour.title')} onCloseClick={onClose} />
+            <OctaneCardContentView classNames={['bgcolor-widget-content']} overflow="hidden">
                 <div className="bgcolor-widget-panel">
                     <div className="bgcolor-widget-top">
                         <Text className="bgcolor-widget-info">{LocalizeText('widget.backgroundcolor.info')}</Text>
@@ -98,7 +98,7 @@ export const FurnitureBackgroundColorView: FC<{}> = (props) => {
                         {LocalizeText('widget.backgroundcolor.button.on')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

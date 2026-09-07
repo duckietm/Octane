@@ -2,13 +2,13 @@ import {
     GetRoomCameraWidgetManager,
     IRoomCameraWidgetEffect,
     IRoomCameraWidgetSelectedEffect,
-    NitroLogger,
+    OctaneLogger,
     RoomCameraWidgetSelectedEffect
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaDownload, FaSearchMinus, FaSearchPlus, FaTrash } from 'react-icons/fa';
 import { CameraEditorTabs, CameraPicture, CameraPictureThumbnail, LocalizeText } from '../../../../api';
-import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView, Slider } from '../../../../common';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider } from '../../../../common';
 import { CameraWidgetEffectListView } from './effect-list';
 
 export interface CameraWidgetEditorViewProps {
@@ -181,7 +181,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                         new CameraPictureThumbnail(effect.name, image.src)
                     ]);
                 } catch (error) {
-                    NitroLogger.error(`Failed to render camera effect thumbnail ${effect.name}`, error);
+                    OctaneLogger.error(`Failed to render camera effect thumbnail ${effect.name}`, error);
                 }
             }
         };
@@ -222,7 +222,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                         setIsRendering(false);
                     }
 
-                    NitroLogger.error('Failed to apply effects to picture', error);
+                    OctaneLogger.error('Failed to apply effects to picture', error);
                 });
         }, EFFECT_RENDER_DEBOUNCE);
 
@@ -236,27 +236,27 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
     }, []);
 
     return (
-        <NitroCardView className="nitro-camera-editor" isResizable={false} style={{ resize: 'none' }}>
-            <NitroCardHeaderView headerText={LocalizeText('camera.editor.button.text')} onCloseClick={() => processAction('close')} />
-            <NitroCardContentView className="nitro-camera-editor__content">
-                <div className="nitro-camera-editor__layout">
-                    <div className="nitro-camera-editor__effect-tabs" role="tablist">
+        <OctaneCardView className="octane-camera-editor" isResizable={false} style={{ resize: 'none' }}>
+            <OctaneCardHeaderView headerText={LocalizeText('camera.editor.button.text')} onCloseClick={() => processAction('close')} />
+            <OctaneCardContentView className="octane-camera-editor__content">
+                <div className="octane-camera-editor__layout">
+                    <div className="octane-camera-editor__effect-tabs" role="tablist">
                         {TABS.map((tab) => (
                             <button
                                 type="button"
                                 key={tab}
                                 role="tab"
                                 aria-selected={currentTab === tab}
-                                className={`nitro-camera-editor__effect-tab${currentTab === tab ? ' nitro-camera-editor__effect-tab--active' : ''}`}
+                                className={`octane-camera-editor__effect-tab${currentTab === tab ? ' octane-camera-editor__effect-tab--active' : ''}`}
                                 title={LocalizeText(`camera.effect.category.${tab}`)}
                                 onClick={() => processAction('change_tab', tab)}
                             >
-                                <i className={`nitro-icon icon-camera-${tab}`} />
+                                <i className={`octane-icon icon-camera-${tab}`} />
                             </button>
                         ))}
                     </div>
 
-                    <div className="nitro-camera-editor__effect-grid-frame has-classic-scrollbar">
+                    <div className="octane-camera-editor__effect-grid-frame has-classic-scrollbar">
                         <CameraWidgetEffectListView
                             myLevel={myLevel}
                             selectedEffectName={selectedEffectName}
@@ -267,18 +267,18 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                         />
                     </div>
 
-                    <div className="nitro-camera-editor__preview" onClick={() => setSelectedEffectName(null)}>
+                    <div className="octane-camera-editor__preview" onClick={() => setSelectedEffectName(null)}>
                         {currentPictureUrl && <img alt="" src={currentPictureUrl} />}
                     </div>
 
                     {currentEffect && currentEffect.effect.type !== 'frame' && (
-                        <div className="nitro-camera-editor__slider-panel">
-                            <div className="nitro-camera-editor__slider-label">
+                        <div className="octane-camera-editor__slider-panel">
+                            <div className="octane-camera-editor__slider-label">
                                 {`${LocalizeText(`camera.effect.name.${currentEffect.effect.name}`)} ${Math.round(currentEffect.strength * 100)}%`}
                             </div>
                             <Slider
                                 disabledButton
-                                className="nitro-camera-editor__slider"
+                                className="octane-camera-editor__slider"
                                 min={0}
                                 max={100}
                                 step={1}
@@ -291,13 +291,13 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                         </div>
                     )}
 
-                    <button type="button" className="nitro-camera-editor__tool nitro-camera-editor__tool--save" onClick={() => processAction('download')}>
+                    <button type="button" className="octane-camera-editor__tool octane-camera-editor__tool--save" onClick={() => processAction('download')}>
                         <FaDownload aria-hidden="true" />
                         <span>{LocalizeText('floor.plan.editor.save')}</span>
                     </button>
                     <button
                         type="button"
-                        className="nitro-camera-editor__tool nitro-camera-editor__tool--zoom"
+                        className="octane-camera-editor__tool octane-camera-editor__tool--zoom"
                         aria-pressed={isZoomed}
                         onClick={() => processAction('zoom')}
                     >
@@ -306,7 +306,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                     </button>
                     <button
                         type="button"
-                        className="nitro-camera-editor__tool nitro-camera-editor__tool--clear"
+                        className="octane-camera-editor__tool octane-camera-editor__tool--clear"
                         disabled={!selectedEffects.length}
                         title={LocalizeText('camera.delete.button.text')}
                         aria-label={LocalizeText('camera.delete.button.text')}
@@ -315,12 +315,12 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                         <FaTrash aria-hidden="true" />
                     </button>
 
-                    <div className="nitro-camera-editor__button-separator" />
-                    <Button className="nitro-camera-editor__cancel" variant="secondary" onClick={() => processAction('cancel')}>
+                    <div className="octane-camera-editor__button-separator" />
+                    <Button className="octane-camera-editor__cancel" variant="secondary" onClick={() => processAction('cancel')}>
                         {LocalizeText('catalog.purchase_confirmation.cancel')}
                     </Button>
                     <Button
-                        className="nitro-camera-editor__purchase"
+                        className="octane-camera-editor__purchase"
                         disabled={isRendering || !currentPictureUrl}
                         variant="success"
                         onClick={() => processAction('checkout')}
@@ -328,7 +328,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                         {LocalizeText('camera.preview.button.text')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

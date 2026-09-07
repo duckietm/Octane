@@ -114,7 +114,7 @@ export const NotificationFurniDataAlertView: FC<NotificationFurniDataAlertViewPr
     };
 
     return (
-        <LayoutNotificationAlertView title={title} onClose={onClose} classNames={[...classNames, 'nitro-alert-furnidata']} {...rest} type={item.alertType}>
+        <LayoutNotificationAlertView title={title} onClose={onClose} classNames={[...classNames, 'octane-alert-furnidata']} {...rest} type={item.alertType}>
             <div className="furnidata-item-banner">
                 <span className="furnidata-item-icon">🛋️</span>
                 <span className="furnidata-item-name">{itemName || 'Unknown item'}</span>

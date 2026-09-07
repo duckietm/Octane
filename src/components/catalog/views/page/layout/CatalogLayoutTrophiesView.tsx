@@ -36,9 +36,9 @@ export const CatalogLayoutTrophiesView: FC<CatalogLayoutProps> = (props) => {
                  Buy button stays inside the panel even when the grid below
                  holds many trophies. */}
             {currentOffer ? (
-                <div className="nitro-catalog-trophy-card flex gap-0 bg-white rounded border-2 border-warning/40 shrink-0">
+                <div className="octane-catalog-trophy-card flex gap-0 bg-white rounded border-2 border-warning/40 shrink-0">
                     {/* Preview */}
-                    <div className="nitro-catalog-trophy-preview w-[120px] min-w-[120px] relative flex items-center justify-center border-r-2 border-warning/30">
+                    <div className="octane-catalog-trophy-preview w-[120px] min-w-[120px] relative flex items-center justify-center border-r-2 border-warning/30">
                         {currentOffer.product.productType !== ProductTypeEnum.BADGE ? (
                             <>
                                 <CatalogViewProductWidgetView />
@@ -88,7 +88,7 @@ export const CatalogLayoutTrophiesView: FC<CatalogLayoutProps> = (props) => {
                 </div>
                 <div className="relative">
                     <textarea
-                        className={`nitro-catalog-trophy-inscription w-full h-[60px] text-[11px] rounded p-2 pr-3 resize-none focus:outline-none transition-all border-2 ${trophyText.length > 0 ? 'has-text' : ''}`}
+                        className={`octane-catalog-trophy-inscription w-full h-[60px] text-[11px] rounded p-2 pr-3 resize-none focus:outline-none transition-all border-2 ${trophyText.length > 0 ? 'has-text' : ''}`}
                         maxLength={200}
                         placeholder={LocalizeText('catalog.trophies.inscription.placeholder')}
                         value={trophyText}

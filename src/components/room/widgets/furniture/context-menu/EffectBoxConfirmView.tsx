@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../../../api';
-import { Button, Column, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../../common';
+import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
 import { useRoom } from '../../../../../hooks';
 
 interface EffectBoxConfirmViewProps {
@@ -19,9 +19,9 @@ export const EffectBoxConfirmView: FC<EffectBoxConfirmViewProps> = (props) => {
     };
 
     return (
-        <NitroCardView className="nitro-use-product-confirmation">
-            <NitroCardHeaderView headerText={LocalizeText('effectbox.header.title')} onCloseClick={onClose} />
-            <NitroCardContentView center>
+        <OctaneCardView className="octane-use-product-confirmation">
+            <OctaneCardHeaderView headerText={LocalizeText('effectbox.header.title')} onCloseClick={onClose} />
+            <OctaneCardContentView center>
                 <div className="flex gap-2">
                     <Column justifyContent="between">
                         <Text>{LocalizeText('effectbox.header.description')}</Text>
@@ -35,7 +35,7 @@ export const EffectBoxConfirmView: FC<EffectBoxConfirmViewProps> = (props) => {
                         </div>
                     </Column>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

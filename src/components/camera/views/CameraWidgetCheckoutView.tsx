@@ -7,15 +7,15 @@ import {
     GetEventDispatcher,
     GetRoomEngine,
     GetSessionDataManager,
-    NitroToolbarAnimateIconEvent,
+    OctaneToolbarAnimateIconEvent,
     PhotoCompetitionMessageComposer,
     PublishPhotoMessageComposer,
     PurchasePhotoMessageComposer,
     ToolbarIconEnum
-} from '@nitrots/nitro-renderer';
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, OpenUrl, SendMessageComposer } from '../../../api';
-import { Button, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../common';
+import { Button, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useMessageEvent, useNotification, usePurse } from '../../../hooks';
 import { joinCameraPhotoUrl } from '../CameraAirUtilities';
 
@@ -96,7 +96,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
 
         const transitionImage = sourceImage.cloneNode(true) as HTMLImageElement;
         const sourceBounds = sourceContainer.getBoundingClientRect();
-        const transitionEvent = new NitroToolbarAnimateIconEvent(transitionImage, sourceBounds.x, sourceBounds.y);
+        const transitionEvent = new OctaneToolbarAnimateIconEvent(transitionImage, sourceBounds.x, sourceBounds.y);
 
         transitionImage.width = 120;
         transitionImage.height = 120;
@@ -256,11 +256,11 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
     if (!price) return null;
 
     return (
-        <NitroCardView className="nitro-camera-checkout" theme="primary-slim" isResizable={false}>
-            <NitroCardHeaderView headerText={LocalizeText('camera.confirm_phase.title')} onCloseClick={() => processAction('close')} />
-            <NitroCardContentView className="nitro-camera-checkout__content">
-                <div ref={productImageContainerRef} className="nitro-camera-checkout__image">
-                    {!isImageLoaded && !hasRenderingFailed && <div className="nitro-camera-checkout__loading">{LocalizeText('camera.loading')}</div>}
+        <OctaneCardView className="octane-camera-checkout" theme="primary-slim" isResizable={false}>
+            <OctaneCardHeaderView headerText={LocalizeText('camera.confirm_phase.title')} onCloseClick={() => processAction('close')} />
+            <OctaneCardContentView className="octane-camera-checkout__content">
+                <div ref={productImageContainerRef} className="octane-camera-checkout__image">
+                    {!isImageLoaded && !hasRenderingFailed && <div className="octane-camera-checkout__loading">{LocalizeText('camera.loading')}</div>}
                     {hasRenderingFailed && <div aria-hidden="true" className="absolute inset-0 bg-black" />}
                     {pictureUrl && !hasRenderingFailed && (
                         <img
@@ -279,11 +279,11 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                     )}
                 </div>
 
-                <div className="nitro-camera-checkout__status">{statusLocalization ? LocalizeText(statusLocalization) : ''}</div>
+                <div className="octane-camera-checkout__status">{statusLocalization ? LocalizeText(statusLocalization) : ''}</div>
 
                 {competitionEnabled && (
-                    <section className="nitro-camera-checkout__section nitro-camera-checkout__section--competition">
-                        <div className="nitro-camera-checkout__section-copy">
+                    <section className="octane-camera-checkout__section octane-camera-checkout__section--competition">
+                        <div className="octane-camera-checkout__section-copy">
                             <h2>
                                 {LocalizeText(
                                     competitionState === 'submitted'
@@ -296,7 +296,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                             <p>{LocalizeText('camera.competition.info')}</p>
                         </div>
                         <Button
-                            className="nitro-camera-checkout__section-button"
+                            className="octane-camera-checkout__section-button"
                             disabled={isWaiting || !isImageLoaded || ['submitted', 'limit', 'error'].includes(competitionState)}
                             variant="success"
                             onClick={() => processAction('competition')}
@@ -306,24 +306,24 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                     </section>
                 )}
 
-                <section className="nitro-camera-checkout__section nitro-camera-checkout__section--purchase">
-                    <div className="nitro-camera-checkout__section-copy">
+                <section className="octane-camera-checkout__section octane-camera-checkout__section--purchase">
+                    <div className="octane-camera-checkout__section-copy">
                         <h2>{LocalizeText('camera.purchase.header')}</h2>
-                        <div className="nitro-camera-checkout__price">
+                        <div className="octane-camera-checkout__price">
                             <span>{LocalizeText('catalog.purchase.confirmation.dialog.cost')}</span>
-                            <span className="nitro-camera-checkout__currency">
+                            <span className="octane-camera-checkout__currency">
                                 <strong>{price.credits}</strong>
                                 <LayoutCurrencyIcon type={-1} />
                             </span>
                             {price.duckets > 0 && (
-                                <span className="nitro-camera-checkout__currency">
+                                <span className="octane-camera-checkout__currency">
                                     <strong>{price.duckets}</strong>
                                     <LayoutCurrencyIcon type={CAMERA_POINT_ICON_TYPE} />
                                 </span>
                             )}
                         </div>
                         {picturesBought > 0 && (
-                            <div className="nitro-camera-checkout__inventory-link">
+                            <div className="octane-camera-checkout__inventory-link">
                                 <strong>{LocalizeText('camera.purchase.count.info')}</strong>
                                 <span>{picturesBought}</span>
                                 <button type="button" onClick={() => CreateLinkEvent('inventory/show/furni')}>
@@ -333,7 +333,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                         )}
                     </div>
                     <Button
-                        className="nitro-camera-checkout__section-button"
+                        className="octane-camera-checkout__section-button"
                         disabled={isWaiting || !isImageLoaded || !disclaimerAccepted}
                         variant="success"
                         onClick={() => processAction('buy')}
@@ -343,8 +343,8 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                 </section>
 
                 {!publishDisabled && (
-                    <section className="nitro-camera-checkout__section nitro-camera-checkout__section--publish">
-                        <div className="nitro-camera-checkout__section-copy">
+                    <section className="octane-camera-checkout__section octane-camera-checkout__section--publish">
+                        <div className="octane-camera-checkout__section-copy">
                             <h2>{LocalizeText(wasPicturePublished ? 'camera.publish.successful' : 'camera.publish.explanation')}</h2>
                             <p>{LocalizeText(wasPicturePublished ? 'camera.publish.success.short.info' : 'camera.publish.detailed.explanation')}</p>
                             {wasPicturePublished && publishedPhotoUrl && (
@@ -353,9 +353,9 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                                 </a>
                             )}
                             {!wasPicturePublished && (
-                                <div className="nitro-camera-checkout__price">
+                                <div className="octane-camera-checkout__price">
                                     <span>{LocalizeText('catalog.purchase.confirmation.dialog.cost')}</span>
-                                    <span className="nitro-camera-checkout__currency">
+                                    <span className="octane-camera-checkout__currency">
                                         <strong>{price.publishDucketPrice}</strong>
                                         <LayoutCurrencyIcon type={CAMERA_POINT_ICON_TYPE} />
                                     </span>
@@ -364,7 +364,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                         </div>
                         {!wasPicturePublished && (
                             <Button
-                                className="nitro-camera-checkout__section-button"
+                                className="octane-camera-checkout__section-button"
                                 disabled={isWaiting || !isImageLoaded || publishCooldown > 0}
                                 variant="success"
                                 onClick={() => processAction('publish')}
@@ -375,21 +375,21 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                     </section>
                 )}
 
-                <div className="nitro-camera-checkout__removal-disclaimer">{LocalizeText('camera.warning.disclaimer')}</div>
+                <div className="octane-camera-checkout__removal-disclaimer">{LocalizeText('camera.warning.disclaimer')}</div>
 
                 {spendingDisclaimerEnabled && (
-                    <label className="nitro-camera-checkout__spending-disclaimer">
+                    <label className="octane-camera-checkout__spending-disclaimer">
                         <input type="checkbox" checked={disclaimerAccepted} onChange={(event) => setDisclaimerAccepted(event.target.checked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}
 
-                <div className="nitro-camera-checkout__buttons">
+                <div className="octane-camera-checkout__buttons">
                     <Button variant="secondary" onClick={() => processAction('cancel')}>
                         {LocalizeText(isWaiting ? 'generic.close' : 'catalog.purchase_confirmation.cancel')}
                     </Button>
                 </div>
-            </NitroCardContentView>
-        </NitroCardView>
+            </OctaneCardContentView>
+        </OctaneCardView>
     );
 };

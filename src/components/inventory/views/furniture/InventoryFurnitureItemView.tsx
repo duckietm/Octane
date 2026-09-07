@@ -1,4 +1,4 @@
-import { MouseEventType } from '@nitrots/nitro-renderer';
+import { MouseEventType } from '@octane/renderer';
 import { FC, MouseEvent, useState } from 'react';
 import { attemptItemPlacement, GroupItem } from '../../../../api';
 import { classNames, InfiniteGrid } from '../../../../layout';

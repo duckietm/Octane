@@ -9,16 +9,16 @@ describe('standard catalog product view structure', () => {
         const layoutSource = readSource('src/components/catalog/views/page/layout/CatalogLayoutDefaultView.tsx');
         const experienceCss = readSource('src/css/catalog/CatalogExperience.css');
 
-        expect(layoutSource).not.toContain('nitro-catalog-offer-info');
-        expect(layoutSource).toMatch(/nitro-catalog-offer-preview[\s\S]*CatalogProductDetailsView/);
-        expect(layoutSource).toMatch(/nitro-catalog-preview-limited[\s\S]*CatalogLimitedItemWidgetView/);
+        expect(layoutSource).not.toContain('octane-catalog-offer-info');
+        expect(layoutSource).toMatch(/octane-catalog-offer-preview[\s\S]*CatalogProductDetailsView/);
+        expect(layoutSource).toMatch(/octane-catalog-preview-limited[\s\S]*CatalogLimitedItemWidgetView/);
         expect(experienceCss).not.toContain('238px');
-        expect(experienceCss).toContain('.nitro-catalog-preview-details');
+        expect(experienceCss).toContain('.octane-catalog-preview-details');
         expect(experienceCss).toMatch(
-            /nitro-catalog-offer-preview:not\(\.is-badge\)[\s\S]*nitro-catalog-product-details-description[\s\S]*color:\s*#fff\s*!important/
+            /octane-catalog-offer-preview:not\(\.is-badge\)[\s\S]*octane-catalog-product-details-description[\s\S]*color:\s*#fff\s*!important/
         );
-        expect(experienceCss).toMatch(/nitro-catalog-grid-shell\s*\{[\s\S]*bottom: 60px/);
-        expect(experienceCss).toMatch(/nitro-catalog-price-row\s*\{[\s\S]*bottom: 30px/);
-        expect(experienceCss).toMatch(/nitro-catalog-purchase-row\s*\{[\s\S]*bottom: 0/);
+        expect(experienceCss).toMatch(/octane-catalog-grid-shell\s*\{[\s\S]*bottom: 60px/);
+        expect(experienceCss).toMatch(/octane-catalog-price-row\s*\{[\s\S]*bottom: 30px/);
+        expect(experienceCss).toMatch(/octane-catalog-purchase-row\s*\{[\s\S]*bottom: 0/);
     });
 });

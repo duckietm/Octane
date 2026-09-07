@@ -1,4 +1,4 @@
-import { CreateLinkEvent, GetSessionDataManager, RelationshipStatusInfoMessageParser, RequestFriendComposer, UserProfileParser } from '@nitrots/nitro-renderer';
+import { CreateLinkEvent, GetSessionDataManager, RelationshipStatusInfoMessageParser, RequestFriendComposer, UserProfileParser } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FriendlyTime, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
 import { badgeEmblemDefault } from '../../assets/images/leaderboard_badge';
@@ -35,18 +35,18 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
     }, [userProfile]);
 
     return (
-        <div className="nitro-extended-profile">
-            <div className="nitro-extended-profile__top">
-                <div className="nitro-extended-profile__left">
-                    <div className="nitro-extended-profile__identity">
-                        <div className={`nitro-extended-profile__avatar-shell profile-background ${infostandBackgroundClass}`}>
-                            <div className={`nitro-extended-profile__avatar-stand profile-stand ${infostandStandClass}`} />
-                            <LayoutAvatarImageView figure={userProfile.figure} direction={2} classNames={['nitro-extended-profile__avatar-image']} />
-                            <div className={`nitro-extended-profile__avatar-overlay profile-overlay ${infostandOverlayClass}`} />
+        <div className="octane-extended-profile">
+            <div className="octane-extended-profile__top">
+                <div className="octane-extended-profile__left">
+                    <div className="octane-extended-profile__identity">
+                        <div className={`octane-extended-profile__avatar-shell profile-background ${infostandBackgroundClass}`}>
+                            <div className={`octane-extended-profile__avatar-stand profile-stand ${infostandStandClass}`} />
+                            <LayoutAvatarImageView figure={userProfile.figure} direction={2} classNames={['octane-extended-profile__avatar-image']} />
+                            <div className={`octane-extended-profile__avatar-overlay profile-overlay ${infostandOverlayClass}`} />
                         </div>
-                        <div className="nitro-extended-profile__identity-copy">
+                        <div className="octane-extended-profile__identity-copy">
                             <UserIdentityView
-                                className="nitro-extended-profile__username"
+                                className="octane-extended-profile__username"
                                 displayOrder={userProfile.displayOrder}
                                 nickIcon={userProfile.nickIcon}
                                 prefixColor={userProfile.prefixColor}
@@ -56,36 +56,36 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                                 prefixText={userProfile.prefixText}
                                 username={userProfile.username}
                             />
-                            <p className="nitro-extended-profile__motto">{userProfile.motto || '\u00A0'}</p>
-                            <p className="nitro-extended-profile__meta">
+                            <p className="octane-extended-profile__motto">{userProfile.motto || '\u00A0'}</p>
+                            <p className="octane-extended-profile__meta">
                                 <span
                                     dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('extendedprofile.created').replace(/%\w+%/g, '').trim()) }}
                                 />{' '}
                                 {userProfile.registration}
                             </p>
-                            <p className="nitro-extended-profile__meta">
+                            <p className="octane-extended-profile__meta">
                                 <span
                                     dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('extendedprofile.last.login').replace(/%\w+%/g, '').trim()) }}
                                 />{' '}
                                 {FriendlyTime.format(userProfile.secondsSinceLastVisit, '.ago', 2)}
                             </p>
-                            <p className="nitro-extended-profile__meta nitro-extended-profile__meta--strong">
+                            <p className="octane-extended-profile__meta octane-extended-profile__meta--strong">
                                 <b>{LocalizeText('extendedprofile.achievementscore')}</b> {userProfile.achievementPoints}
                             </p>
-                            <div className="nitro-extended-profile__status">
-                                <div className="nitro-extended-profile__presence">
-                                    <i className={`nitro-icon ${userProfile.isOnline ? 'icon-pf-online' : 'icon-pf-offline'}`} />
+                            <div className="octane-extended-profile__status">
+                                <div className="octane-extended-profile__presence">
+                                    <i className={`octane-icon ${userProfile.isOnline ? 'icon-pf-online' : 'icon-pf-offline'}`} />
                                 </div>
-                                <div className="nitro-extended-profile__status-copy">
+                                <div className="octane-extended-profile__status-copy">
                                     {canSendFriendRequest && (
-                                        <button className="nitro-extended-profile__friend-button" type="button" onClick={addFriend}>
+                                        <button className="octane-extended-profile__friend-button" type="button" onClick={addFriend}>
                                             {LocalizeText('extendedprofile.addasafriend')}
                                         </button>
                                     )}
                                     {!canSendFriendRequest && (
                                         <>
-                                            <i className="nitro-icon icon-pf-tick" />
-                                            <span className="nitro-extended-profile__status-text">
+                                            <i className="octane-icon icon-pf-tick" />
+                                            <span className="octane-extended-profile__status-text">
                                                 {isOwnProfile && LocalizeText('extendedprofile.me')}
                                                 {userProfile.isMyFriend && LocalizeText('extendedprofile.friend')}
                                                 {(requestSent || userProfile.requestSent) && LocalizeText('extendedprofile.friendrequestsent')}
@@ -98,35 +98,35 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                     </div>
 
                     {isOwnProfile && (
-                        <div className="nitro-extended-profile__actions">
-                            <button className="nitro-extended-profile__link" type="button" onClick={() => CreateLinkEvent('avatar-editor/show')}>
+                        <div className="octane-extended-profile__actions">
+                            <button className="octane-extended-profile__link" type="button" onClick={() => CreateLinkEvent('avatar-editor/show')}>
                                 {LocalizeText('extended.profile.change.looks')}
                             </button>
-                            <button className="nitro-extended-profile__link" type="button" onClick={() => CreateLinkEvent('inventory/show/badges')}>
+                            <button className="octane-extended-profile__link" type="button" onClick={() => CreateLinkEvent('inventory/show/badges')}>
                                 {LocalizeText('extended.profile.change.badges')}
                             </button>
                         </div>
                     )}
 
-                    <div className="nitro-extended-profile__badges">
+                    <div className="octane-extended-profile__badges">
                         {[0, 1, 2, 3, 4].map((index) => (
-                            <button key={index} className="nitro-extended-profile__badge-slot" type="button">
+                            <button key={index} className="octane-extended-profile__badge-slot" type="button">
                                 {selectedBadges[index] && <LayoutBadgeImageView badgeCode={selectedBadges[index]} highlightRarity showInfo showRarityInfo />}
                             </button>
                         ))}
                     </div>
                 </div>
 
-                <div className="nitro-extended-profile__separator" />
+                <div className="octane-extended-profile__separator" />
 
-                <div className="nitro-extended-profile__right">
+                <div className="octane-extended-profile__right">
                     <p
                         className="text-sm leading-none"
                         dangerouslySetInnerHTML={{
                             __html: SanitizeHtml(LocalizeText('extendedprofile.friends.count', ['count'], [userProfile.friendsCount.toString()]))
                         }}
                     />
-                    <p className="nitro-extended-profile__relationships-label">{LocalizeText('extendedprofile.relstatus')}</p>
+                    <p className="octane-extended-profile__relationships-label">{LocalizeText('extendedprofile.relstatus')}</p>
                     {userRelationships && <RelationshipsContainerView relationships={userRelationships} />}
                     {!userRelationships && (
                         <Text small variant="muted">
@@ -136,28 +136,28 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                 </div>
             </div>
 
-            <div className="nitro-extended-profile__summary-bar">
-                <button className="nitro-extended-profile__summary-button" type="button" onClick={onOpenRooms}>
-                    <img className="nitro-extended-profile__summary-icon" src={profileRoomsIcon} alt="" />
-                    <span className="nitro-extended-profile__summary-label">{LocalizeText('extendedprofile.rooms')}</span>
+            <div className="octane-extended-profile__summary-bar">
+                <button className="octane-extended-profile__summary-button" type="button" onClick={onOpenRooms}>
+                    <img className="octane-extended-profile__summary-icon" src={profileRoomsIcon} alt="" />
+                    <span className="octane-extended-profile__summary-label">{LocalizeText('extendedprofile.rooms')}</span>
                 </button>
                 <button
-                    className="nitro-extended-profile__summary-button nitro-extended-profile__summary-button--center"
+                    className="octane-extended-profile__summary-button octane-extended-profile__summary-button--center"
                     type="button"
                     onClick={() => CreateLinkEvent('badge-leaderboard/show')}
                 >
-                    <img className="nitro-extended-profile__summary-icon nitro-extended-profile__summary-icon--badge" src={badgeEmblemDefault} alt="" />
-                    <span className="nitro-extended-profile__summary-label">{LocalizeText('inventory.badges')}</span>
-                    <span className="nitro-extended-profile__summary-value">{totalBadges}</span>
+                    <img className="octane-extended-profile__summary-icon octane-extended-profile__summary-icon--badge" src={badgeEmblemDefault} alt="" />
+                    <span className="octane-extended-profile__summary-label">{LocalizeText('inventory.badges')}</span>
+                    <span className="octane-extended-profile__summary-value">{totalBadges}</span>
                 </button>
                 <button
-                    className="nitro-extended-profile__summary-button nitro-extended-profile__summary-button--center"
+                    className="octane-extended-profile__summary-button octane-extended-profile__summary-button--center"
                     type="button"
                     onClick={() => CreateLinkEvent('achievements/toggle')}
                 >
-                    <img className="nitro-extended-profile__summary-icon" src={profileLevelIcon} alt="" />
-                    <span className="nitro-extended-profile__summary-label">{LocalizeText('extendedprofile.achievementscore')}</span>
-                    <span className="nitro-extended-profile__summary-value">{userProfile.achievementPoints}</span>
+                    <img className="octane-extended-profile__summary-icon" src={profileLevelIcon} alt="" />
+                    <span className="octane-extended-profile__summary-label">{LocalizeText('extendedprofile.achievementscore')}</span>
+                    <span className="octane-extended-profile__summary-value">{userProfile.achievementPoints}</span>
                 </button>
             </div>
         </div>

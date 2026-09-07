@@ -1,4 +1,4 @@
-import { IPartColor } from '@nitrots/nitro-renderer';
+import { IPartColor } from '@octane/renderer';
 import { ButtonHTMLAttributes, CSSProperties, FC } from 'react';
 import { ColorUtils, GetClubMemberLevel, GetConfigurationValue } from '../../../api';
 import hcSmallSrc from '../../../assets/images/avatareditor/air/hc-small.png';
