@@ -54,8 +54,8 @@ const readCollapsedPreference = (key: string): boolean =>
  * The official navigator icon unfolds a small menu while hovered
  * (ToolbarHoverCtrl.as, 3075_toolbar_hover_xml): navigator, home,
  * favourites, create, and the visited / frequent room lists that reuse
- * the room visit history. The bubble sits centred over the icon with a
- * tail pointing at it, like the toolbar hints. The wrapper fills the slot so
+ * the room visit history. The bubble opens flush with the slot (the icon
+ * sits by the screen edge) with a tail pointing at it, like the toolbar hints. The wrapper fills the slot so
  * the icon's absolute offsets keep measuring from the slot. Pointer-only, so
  * the touch layout never mounts it.
  */
@@ -151,7 +151,7 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
             { children }
             { isOpen &&
                 <div
-                    className="tb-navigator-hover absolute bottom-full left-1/2 z-[90] w-[238px] -translate-x-1/2 text-[12px] font-bold text-white"
+                    className="tb-navigator-hover absolute bottom-full left-0 z-[90] w-[238px] text-[12px] font-bold text-white"
                     data-testid="navigator-hover-panel"
                     onMouseEnter={ open }
                     onMouseLeave={ scheduleHide }>

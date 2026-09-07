@@ -68,7 +68,7 @@
 
 .tb-navigator-hover-tail {
     position: absolute;
-    left: 50%;
+    left: 22px; /* the centre of the 44px navigator icon */
     bottom: -9px;
     width: 0;
     height: 0;
