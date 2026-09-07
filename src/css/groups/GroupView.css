@@ -524,6 +524,18 @@
     align-items: center;
 }
 
+/* AIR 13 member_entry: block_region (x 130) sits left of remove_region, so a
+   third cross widens the strip without touching the 77px name column. */
+.octane-group-member-row__actions:has(.octane-group-member-row__block) {
+    width: 51px;
+}
+
+.octane-group-member-row__unblock {
+    font-style: normal;
+    color: #000000 !important;
+    text-decoration: underline;
+}
+
 .octane-group-member-row__actions .octane-icon,
 .octane-group-member-row__actions .octane-friends-spritesheet {
     margin: 0 !important;
