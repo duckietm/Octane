@@ -269,6 +269,10 @@ export class ThumbnailStatusMessageEvent extends MessageEvent {}
 export class MentionReceivedEvent extends MessageEvent {}
 export class MentionsListEvent extends MessageEvent {}
 
+// Per-user preferences (chat mode/width/speed, wired whisper, friend-online notification)
+// arrive with the UserSettings packet; the hooks subscribe to it directly.
+export class UserSettingsEvent extends MessageEvent {}
+
 // ---------------------------------------------------------------------------
 // Navigator event classes — MessageEvent subclasses needed by useNavigatorStore
 // ---------------------------------------------------------------------------
@@ -413,6 +417,9 @@ export class GroupInformationEvent extends StubClass {}
 export class GroupJoinComposer extends StubClass {}
 export class GroupUnfavoriteComposer extends StubClass {}
 export class UserProfileComposer extends StubClass {}
+export class UserSettingsChatPreferencesComposer extends StubClass {}
+export class UserSettingsOnlineIndicatorComposer extends StubClass {}
+export class WiredMenuSettingsComposer extends StubClass {}
 
 // Catalog Studio — keep request arguments observable so provider tests can
 // verify the renderer/emulator field order without loading Pixi.
@@ -762,6 +769,12 @@ export class SnowWarGameChatComposer extends StubClass {}
 export class SnowWarJoinQueueComposer extends StubClass {}
 export class SnowWarLeaveQueueComposer extends StubClass {}
 
+// Game center directory / account status — consumed by useGameCenter.
+export class Game2AccountGameStatusMessageEvent extends MessageEvent {}
+export class Game2GameDirectoryStatusMessageEvent extends MessageEvent {}
+export class Game2GetAccountGameStatusMessageComposer extends StubClass {}
+export class Game2CheckGameDirectoryStatusMessageComposer extends StubClass {}
+
 // ---------------------------------------------------------------------------
 // Composers whose payload a test asserts on, plus the avatar expression
 // table the chat-command handler reads. `PayloadComposer` mirrors the real
@@ -833,3 +846,40 @@ export class RemoveFriendCategoryComposer extends StubClass {}
 export class RenameFriendCategoryComposer extends StubClass {}
 export class RequestOfflineMessagesComposer extends StubClass {}
 export class SetRelationshipStatusComposer extends StubClass {}
+
+// Help centre: the Habbo Way quiz packets and the tour request composer
+// (hooks/help/useHabboWay, useWelcomeTour).
+export class QuizDataMessageEvent extends MessageEvent {}
+export class QuizResultsMessageEvent extends MessageEvent {}
+export class GetQuizQuestionsComposer extends StubClass {}
+export class PostQuizAnswersComposer extends StubClass {}
+export class GuideSessionCreateMessageComposer extends StubClass {}
+
+// ---------------------------------------------------------------------------
+// AIR 13 parity (infostand / navigator enforce category / friend bar tokens)
+// ---------------------------------------------------------------------------
+
+export class RoomSettingsSavedEvent extends MessageEvent {}
+export class ShowEnforceRoomCategoryDialogEvent extends MessageEvent {}
+export class FriendNotificationEvent extends MessageEvent {}
+export class UpdateRoomCategoryAndTradeSettingsComposer extends StubClass {}
+
+// ---------------------------------------------------------------------------
+// AIR 13 personal word filter (components/user-settings/wordfilter)
+// ---------------------------------------------------------------------------
+
+class WordFilterComposerStub {
+    private readonly data: unknown[];
+    constructor(...args: unknown[]) { this.data = args; }
+    public getMessageArray() { return this.data; }
+}
+
+export class CustomFilterResultEvent extends MessageEvent {}
+export class ModifyCustomFilterResultEvent extends MessageEvent {
+    public static FAILED = 0;
+    public static ADDED = 1;
+    public static REMOVED = 3;
+}
+export class GetCustomFilterMessageComposer extends WordFilterComposerStub {}
+export class AddCustomFilterWordMessageComposer extends WordFilterComposerStub {}
+export class RemoveCustomFilterWordMessageComposer extends WordFilterComposerStub {}

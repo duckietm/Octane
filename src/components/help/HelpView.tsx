@@ -1,9 +1,11 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, ReportState } from '../../api';
+import { GetConfigurationValue, LocalizeText, ReportState } from '../../api';
 import { Column, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
-import { useHelp } from '../../hooks';
+import { useHelp, useWelcomeTour } from '../../hooks';
 import { DescribeReportView } from './views/DescribeReportView';
+import { HabboWayQuizView } from './views/HabboWayQuizView';
+import { HabboWayView } from './views/HabboWayView';
 import { HelpIndexView } from './views/HelpIndexView';
 import { NameChangeView } from './views/name-change/NameChangeView';
 import { ReportSummaryView } from './views/ReportSummaryView';
@@ -11,10 +13,12 @@ import { SanctionSatusView } from './views/SanctionStatusView';
 import { SelectReportedChatsView } from './views/SelectReportedChatsView';
 import { SelectReportedUserView } from './views/SelectReportedUserView';
 import { SelectTopicView } from './views/SelectTopicView';
+import { WelcomeTourPopupView } from './views/WelcomeTourPopupView';
 
 export const HelpView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const { activeReport = null, setActiveReport = null, report = null } = useHelp();
+    const { acceptTour = null } = useWelcomeTour();
 
     const onClose = () => {
         setActiveReport(null);
@@ -39,7 +43,8 @@ export const HelpView: FC<{}> = (props) => {
                         setIsVisible((prevValue) => !prevValue);
                         return;
                     case 'tour':
-                        // todo: launch tour
+                        // Official requestGuide(): a tour-type guide request, only when guides are enabled.
+                        if (GetConfigurationValue<boolean>('guides.enabled', false)) acceptTour();
                         return;
                     case 'report':
                         if (parts.length >= 5 && parts[2] === 'room') {
@@ -56,7 +61,7 @@ export const HelpView: FC<{}> = (props) => {
         AddLinkEventTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
+    }, [acceptTour]);
 
     useEffect(() => {
         if (!activeReport) return;
@@ -109,6 +114,9 @@ export const HelpView: FC<{}> = (props) => {
             )}
             <SanctionSatusView />
             <NameChangeView />
+            <HabboWayView />
+            <HabboWayQuizView />
+            <WelcomeTourPopupView />
         </>
     );
 };

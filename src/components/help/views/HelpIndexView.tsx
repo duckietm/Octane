@@ -1,15 +1,25 @@
 import { GetCfhStatusMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { FaArrowCircleRight } from 'react-icons/fa';
-import { CreateLinkEvent, DispatchUiEvent, GetConfigurationValue, LocalizeText, ReportState, ReportType, SendMessageComposer } from '../../../api';
+import {
+    CreateLinkEvent,
+    DispatchUiEvent,
+    GetConfigurationValue,
+    LocalizeText,
+    localizeWithFallback,
+    ReportState,
+    ReportType,
+    SendMessageComposer
+} from '../../../api';
 import helpDuck from '../../../assets/images/help/help-duck.png';
 import { Text } from '../../../common';
 import { GuideToolEvent } from '../../../events';
-import { useHelp } from '../../../hooks';
+import { useHabboWay, useHelp } from '../../../hooks';
 import { MyReportsStatusView } from './MyReportsStatusView';
 
 export const HelpIndexView: FC<{}> = (props) => {
     const { setActiveReport = null } = useHelp();
+    const { showHabboWay = null } = useHabboWay();
     const [reportsStatusVisible, setReportsStatusVisible] = useState(false);
 
     const onReportClick = () => {
@@ -19,6 +29,19 @@ export const HelpIndexView: FC<{}> = (props) => {
 
             return { ...prevValue, currentStep, reportType };
         });
+    };
+
+    /** Official habboway_link: the in-client booklet unless the hotel points it at a web page. */
+    const onHabboWayClick = () => {
+        const habboWayUrl = GetConfigurationValue<string>('habboway.url', '');
+
+        if (!GetConfigurationValue<boolean>('habboway.enabled', true) && habboWayUrl.length) {
+            window.open(habboWayUrl, 'habboMain');
+
+            return;
+        }
+
+        showHabboWay();
     };
 
     return (
@@ -49,6 +72,10 @@ export const HelpIndexView: FC<{}> = (props) => {
                 <button type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.faq.link.text')}
+                </button>
+                <button type="button" className="help-link" onClick={onHabboWayClick}>
+                    <FaArrowCircleRight className="help-link__icon" />
+                    {localizeWithFallback('help.main.self.habboway.title', 'The Habbo Way')}
                 </button>
                 <button type="button" className="help-link" onClick={() => SendMessageComposer(new GetCfhStatusMessageComposer(false))}>
                     <FaArrowCircleRight className="help-link__icon" />
