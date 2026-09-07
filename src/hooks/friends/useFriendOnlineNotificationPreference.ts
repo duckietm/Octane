@@ -1,5 +1,7 @@
+import { UserSettingsEvent, UserSettingsOnlineIndicatorComposer } from '@octane/renderer';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { LocalStorageKeys, MessengerFriend } from '../../api';
+import { LocalStorageKeys, MessengerFriend, SendMessageComposer } from '../../api';
+import { useMessageEvent } from '../events';
 import { useLocalStorage } from '../useLocalStorage';
 
 // Same numbering as the official online indicator preference (FriendCategories.shouldNotifyFriendOnline).
@@ -32,9 +34,24 @@ export const shouldNotifyFriendOnline = (preference: number, relationshipStatus:
     }
 };
 
+/**
+ * Kept server-side like the official client: SetOnlineIndicatorPreference (818) on change
+ * (OtherSettingsView), read back from the UserSettings packet on login. Local storage only bridges
+ * the gap until that packet arrives.
+ */
 const useFriendOnlineNotificationPreferenceState = () => {
     const [storedValue, setStoredValue] = useLocalStorage<number>(LocalStorageKeys.FRIEND_ONLINE_NOTIFICATION, FRIEND_ONLINE_NOTIFY_EVERYONE);
-    const setPreference = (value: number) => setStoredValue(sanitizeFriendOnlineNotificationPreference(value));
+
+    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, (event) => {
+        setStoredValue(sanitizeFriendOnlineNotificationPreference(event.getParser().onlineIndicatorPreference));
+    });
+
+    const setPreference = (value: number) => {
+        const preference = sanitizeFriendOnlineNotificationPreference(value);
+
+        setStoredValue(preference);
+        SendMessageComposer(new UserSettingsOnlineIndicatorComposer(preference));
+    };
 
     return [sanitizeFriendOnlineNotificationPreference(storedValue), setPreference] as const;
 };

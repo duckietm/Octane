@@ -1,6 +1,7 @@
-import { RoomChatSettings } from '@octane/renderer';
+import { RoomChatSettings, UserSettingsChatPreferencesComposer, UserSettingsEvent } from '@octane/renderer';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { IRoomChatSettings, LocalStorageKeys } from '../../api';
+import { IRoomChatSettings, LocalStorageKeys, SendMessageComposer } from '../../api';
+import { useMessageEvent } from '../events';
 import { useLocalStorage } from '../useLocalStorage';
 
 /**
@@ -38,6 +39,9 @@ export const sanitizeChatPreferences = (value: Partial<ChatPreferences> | null |
     )
 });
 
+export const areChatPreferencesEqual = (a: ChatPreferences, b: ChatPreferences): boolean =>
+    a.mode === b.mode && a.bubbleWidth === b.bubbleWidth && a.scrollSpeed === b.scrollSpeed;
+
 /**
  * The settings the chat widget actually renders with. The official client builds them from the
  * user's own mode, width and speed and only takes the flood sensitivity from the room, so a room
@@ -55,10 +59,30 @@ export const resolveEffectiveChatSettings = (roomSettings: IRoomChatSettings, pr
     };
 };
 
+/**
+ * Kept server-side like the official client: SetChatPreferences (2506) on every change, read back
+ * from the UserSettings packet on login. Local storage only bridges the gap until that packet
+ * arrives (and keeps the last known values when the emulator predates the columns).
+ */
 const useChatPreferencesState = () => {
     const [storedValue, setStoredValue] = useLocalStorage<ChatPreferences>(LocalStorageKeys.CHAT_PREFERENCES, DEFAULT_CHAT_PREFERENCES);
     const preferences = sanitizeChatPreferences(storedValue);
-    const setPreferences = (update: Partial<ChatPreferences>) => setStoredValue(sanitizeChatPreferences({ ...preferences, ...update }));
+
+    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, (event) => {
+        const parser = event.getParser();
+
+        setStoredValue(sanitizeChatPreferences({ mode: parser.chatMode, bubbleWidth: parser.chatBubbleWidth, scrollSpeed: parser.chatScrollSpeed }));
+    });
+
+    const setPreferences = (update: Partial<ChatPreferences>) => {
+        const next = sanitizeChatPreferences({ ...preferences, ...update });
+
+        // HabboFreeFlowChat.updateChatPreferences only stores and sends when something changed.
+        if (areChatPreferencesEqual(next, preferences)) return;
+
+        setStoredValue(next);
+        SendMessageComposer(new UserSettingsChatPreferencesComposer(next.mode, next.bubbleWidth, next.scrollSpeed));
+    };
 
     return [preferences, setPreferences] as const;
 };

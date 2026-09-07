@@ -2,6 +2,8 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const storage = vi.hoisted(() => new Map<string, unknown>());
+const sent = vi.hoisted(() => [] as unknown[]);
+const settingsHandlers = vi.hoisted(() => [] as ((event: unknown) => void)[]);
 
 vi.mock('@octane/renderer', () => ({
     RoomChatSettings: {
@@ -14,6 +16,14 @@ vi.mock('@octane/renderer', () => ({
         CHAT_SCROLL_SPEED_NORMAL: 1,
         CHAT_SCROLL_SPEED_SLOW: 2
     },
+    UserSettingsEvent: class UserSettingsEvent {},
+    UserSettingsChatPreferencesComposer: class UserSettingsChatPreferencesComposer {
+        constructor(
+            public chatMode: number,
+            public chatBubbleWidth: number,
+            public chatScrollSpeed: number
+        ) {}
+    },
     OctaneLogger: { error: vi.fn(), warn: vi.fn() }
 }));
 
@@ -22,19 +32,38 @@ vi.mock('@/state/useSharedHook', () => ({
     useSharedHook: <T>(useSourceHook: () => T) => useSourceHook()
 }));
 
+vi.mock('../events', () => ({
+    useMessageEvent: (_eventType: unknown, handler: (event: unknown) => void) => {
+        settingsHandlers.push(handler);
+    }
+}));
+
 vi.mock('../../api', () => ({
     LocalStorageKeys: { CHAT_PREFERENCES: 'chatPreferences' },
     GetLocalStorage: (key: string) => storage.get(key),
-    SetLocalStorage: (key: string, value: unknown) => storage.set(key, value)
+    SetLocalStorage: (key: string, value: unknown) => storage.set(key, value),
+    SendMessageComposer: (composer: unknown) => sent.push(composer)
 }));
 
-import { DEFAULT_CHAT_PREFERENCES, resolveEffectiveChatSettings, sanitizeChatPreferences, useChatPreferences } from './useChatPreferences';
+import {
+    areChatPreferencesEqual,
+    DEFAULT_CHAT_PREFERENCES,
+    resolveEffectiveChatSettings,
+    sanitizeChatPreferences,
+    useChatPreferences
+} from './useChatPreferences';
 
 const roomSettings = { mode: 1, weight: 0, speed: 2, distance: 12, protection: 2 };
+
+const userSettingsEvent = (chatMode: number, chatBubbleWidth: number, chatScrollSpeed: number) => ({
+    getParser: () => ({ chatMode, chatBubbleWidth, chatScrollSpeed })
+});
 
 describe('chat preferences', () => {
     beforeEach(() => {
         storage.clear();
+        sent.length = 0;
+        settingsHandlers.length = 0;
         vi.useFakeTimers();
     });
 
@@ -58,7 +87,12 @@ describe('chat preferences', () => {
         });
     });
 
-    it('persists a partial update merged with the current preferences', () => {
+    it('compares the three values', () => {
+        expect(areChatPreferencesEqual({ mode: 0, bubbleWidth: 1, scrollSpeed: 1 }, DEFAULT_CHAT_PREFERENCES)).toBe(true);
+        expect(areChatPreferencesEqual({ mode: 0, bubbleWidth: 2, scrollSpeed: 1 }, DEFAULT_CHAT_PREFERENCES)).toBe(false);
+    });
+
+    it('persists a partial update merged with the current preferences and sends it to the server', () => {
         const { result } = renderHook(() => useChatPreferences());
 
         expect(result.current[0]).toEqual(DEFAULT_CHAT_PREFERENCES);
@@ -70,6 +104,15 @@ describe('chat preferences', () => {
 
         expect(result.current[0]).toEqual({ mode: 0, bubbleWidth: 2, scrollSpeed: 1 });
         expect(storage.get('chatPreferences')).toEqual({ mode: 0, bubbleWidth: 2, scrollSpeed: 1 });
+        expect(sent).toEqual([{ chatMode: 0, chatBubbleWidth: 2, chatScrollSpeed: 1 }]);
+    });
+
+    it('does not send anything when the update changes nothing', () => {
+        const { result } = renderHook(() => useChatPreferences());
+
+        act(() => result.current[1]({ mode: 0 }));
+
+        expect(sent).toEqual([]);
     });
 
     it('sanitizes what it reads back from storage', () => {
@@ -78,5 +121,22 @@ describe('chat preferences', () => {
         const { result } = renderHook(() => useChatPreferences());
 
         expect(result.current[0]).toEqual({ mode: 1, bubbleWidth: 1, scrollSpeed: 2 });
+    });
+
+    it('adopts the server values from the user settings packet over the local fallback', () => {
+        storage.set('chatPreferences', { mode: 1, bubbleWidth: 2, scrollSpeed: 2 });
+
+        const { result } = renderHook(() => useChatPreferences());
+
+        expect(result.current[0]).toEqual({ mode: 1, bubbleWidth: 2, scrollSpeed: 2 });
+
+        act(() => settingsHandlers.at(-1)?.(userSettingsEvent(0, 0, 9)));
+        act(() => {
+            vi.advanceTimersByTime(300);
+        });
+
+        expect(result.current[0]).toEqual({ mode: 0, bubbleWidth: 0, scrollSpeed: 1 });
+        expect(storage.get('chatPreferences')).toEqual({ mode: 0, bubbleWidth: 0, scrollSpeed: 1 });
+        expect(sent).toEqual([]);
     });
 });

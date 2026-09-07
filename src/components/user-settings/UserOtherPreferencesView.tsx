@@ -9,7 +9,8 @@ import {
 } from '../../hooks';
 
 // The wired whisper checkbox and the friend-online drop-menu of the official me_menu_other_settings
-// layout (OtherSettingsView). Both stay in localStorage: the client has no packet for either yet.
+// layout (OtherSettingsView). Both are saved server-side through the official packets (wired menu
+// preferences 1226 and SetOnlineIndicatorPreference 818) and read back from the UserSettings packet.
 export const UserOtherPreferencesView: FC<{}> = () => {
     const [wiredWhisperDisabled, setWiredWhisperDisabled] = useWiredWhisperDisabled();
     const [friendOnlinePreference, setFriendOnlinePreference] = useFriendOnlineNotificationPreference();

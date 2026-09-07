@@ -1,6 +1,7 @@
-import { RoomSessionChatEvent } from '@octane/renderer';
+import { RoomSessionChatEvent, UserSettingsEvent, WiredMenuSettingsComposer } from '@octane/renderer';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { LocalStorageKeys } from '../../api';
+import { LocalStorageKeys, SendMessageComposer } from '../../api';
+import { useMessageEvent } from '../events';
 import { useLocalStorage } from '../useLocalStorage';
 
 // The emulator sends every wired whisper with the WIRED bubble (RoomChatMessageBubbles.WIRED, id
@@ -11,7 +12,28 @@ export const WIRED_CHAT_STYLE_ID = 34;
 export const isWiredWhisper = (chatType: number, styleId: number): boolean =>
     chatType === RoomSessionChatEvent.CHAT_TYPE_WHISPER && styleId === WIRED_CHAT_STYLE_ID;
 
-const useWiredWhisperDisabledState = () => useLocalStorage(LocalStorageKeys.WIRED_WHISPER_DISABLED, false);
+/**
+ * The official client saves the switch with the rest of the wired menu preferences
+ * (WiredMenuController.sendPreferences, header 1226) and reads it back from the UserSettings packet.
+ * The menu/inspect/play-test flags and the ui style of that packet belong to the official wired
+ * menu this client does not have, so they travel as their official defaults.
+ */
+export const composeWiredWhisperPreference = (disabled: boolean) => new WiredMenuSettingsComposer(false, false, false, disabled, false, '');
+
+const useWiredWhisperDisabledState = () => {
+    const [storedValue, setStoredValue] = useLocalStorage(LocalStorageKeys.WIRED_WHISPER_DISABLED, false);
+
+    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, (event) => {
+        setStoredValue(event.getParser().wiredWhisperDisabled);
+    });
+
+    const setDisabled = (disabled: boolean) => {
+        setStoredValue(disabled);
+        SendMessageComposer(composeWiredWhisperPreference(disabled));
+    };
+
+    return [storedValue, setDisabled] as const;
+};
 
 export const useWiredWhisperDisabled = () => useSharedHook(useWiredWhisperDisabledState);
 
