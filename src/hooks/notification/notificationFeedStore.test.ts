@@ -7,7 +7,7 @@ const entry = (message: string, category: 'me' | 'friends' | 'hotel' = 'me') => 
 describe('notification feed store', () => {
     beforeEach(() => {
         window.localStorage.clear();
-        useNotificationFeedStore.setState({ entries: [], settings: { friends: true, me: true, hotel: true }, isOpen: false, unreadCount: 0 });
+        useNotificationFeedStore.setState({ entries: [], settings: { mentions: true, friends: true, me: true, hotel: true }, isOpen: false, unreadCount: 0 });
     });
 
     it('keeps the newest entry first', () => {
@@ -48,10 +48,10 @@ describe('notification feed store', () => {
         useNotificationFeedStore.getState().toggleCategory('hotel');
 
         expect(useNotificationFeedStore.getState().settings.hotel).toBe(false);
-        expect(JSON.parse(window.localStorage.getItem('notificationFeedSettings'))).toEqual({ friends: true, me: true, hotel: false });
+        expect(JSON.parse(window.localStorage.getItem('notificationFeedSettings'))).toEqual({ mentions: true, friends: true, me: true, hotel: false });
 
         useNotificationFeedStore.getState().setAllCategories(true);
-        expect(JSON.parse(window.localStorage.getItem('notificationFeedSettings'))).toEqual({ friends: true, me: true, hotel: true });
+        expect(JSON.parse(window.localStorage.getItem('notificationFeedSettings'))).toEqual({ mentions: true, friends: true, me: true, hotel: true });
     });
 
     it('remembers whether the panel was left open', () => {
@@ -66,15 +66,15 @@ describe('notification feed store', () => {
             { ...entry('hotel', 'hotel'), id: 2, title: '', iconUrl: null, linkUrl: null, senderName: '', receivedAt: 0 }
         ];
 
-        expect(filterFeedEntries(entries, { friends: true, me: true, hotel: false }).map((item) => item.message)).toEqual(['friend']);
+        expect(filterFeedEntries(entries, { mentions: true, friends: true, me: true, hotel: false }).map((item) => item.message)).toEqual(['friend']);
     });
 });
 
 describe('getFeedCategoryForBubbleType', () => {
-    it('files friend presence and mentions under friends', () => {
+    it('files friend presence under friends and mentions under their own section', () => {
         expect(getFeedCategoryForBubbleType(NotificationBubbleType.FRIENDONLINE)).toBe('friends');
         expect(getFeedCategoryForBubbleType(NotificationBubbleType.FRIENDOFFLINE)).toBe('friends');
-        expect(getFeedCategoryForBubbleType(NotificationBubbleType.MENTION)).toBe('friends');
+        expect(getFeedCategoryForBubbleType(NotificationBubbleType.MENTION)).toBe('mentions');
     });
 
     it('files hotel chatter under hotel and the rest under me', () => {

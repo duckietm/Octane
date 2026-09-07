@@ -28,6 +28,66 @@
     overflow: visible;
 }
 
+/* toolbar_hover (3075_toolbar_hover_xml): border style 6 with a 3px drop
+   shadow, rows of 238x20 in 0x57544d, Ubuntu bold 12 white, etched. The bubble
+   hangs over the navigator icon and points at it with a tail. */
+.tb-navigator-hover {
+    padding: 7px 7px 4px;
+    margin-bottom: 9px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background: #79756e;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 3px 3px 0 rgba(0, 0, 0, 0.6);
+    text-shadow: 1px 1px 0 #000;
+}
+
+.tb-navigator-hover-row {
+    height: 20px;
+    padding: 0 7px;
+    border: 0;
+    border-radius: 2px;
+    background: #57544d;
+    color: inherit;
+    font: inherit;
+    line-height: 20px;
+}
+
+.tb-navigator-hover-row:not(:disabled):hover,
+.tb-navigator-hover-row.is-open {
+    background: #6b675f;
+}
+
+.tb-navigator-hover-row.is-current {
+    text-decoration: underline;
+}
+
+.tb-navigator-hover-list {
+    margin: 1px 0 1px 10px;
+    gap: 1px;
+}
+
+.tb-navigator-hover-tail {
+    position: absolute;
+    left: 50%;
+    bottom: -9px;
+    width: 0;
+    height: 0;
+    margin-left: -8px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 9px solid #000;
+}
+
+.tb-navigator-hover-tail::after {
+    content: "";
+    position: absolute;
+    left: -7px;
+    bottom: 2px;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 8px solid #79756e;
+}
+
 .tb-icon {
     opacity: 1;
     cursor: pointer;

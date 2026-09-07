@@ -3,11 +3,12 @@ import { GetLocalStorage, NotificationBubbleType, SetLocalStorage } from '../../
 
 /**
  * The three feed categories of the official notification feed (`FeedSettings`): what
- * happened to me, what my friends did, and what the hotel announced.
+ * happened to me, what my friends did, and what the hotel announced; plus the mentions
+ * the server keeps for the user, which this client folds into the same feed.
  */
-export type NotificationFeedCategory = 'me' | 'friends' | 'hotel';
+export type NotificationFeedCategory = 'mentions' | 'me' | 'friends' | 'hotel';
 
-export const NOTIFICATION_FEED_CATEGORIES: NotificationFeedCategory[] = ['friends', 'me', 'hotel'];
+export const NOTIFICATION_FEED_CATEGORIES: NotificationFeedCategory[] = ['mentions', 'friends', 'me', 'hotel'];
 
 export interface NotificationFeedEntry {
     id: number;
@@ -27,13 +28,21 @@ export type NotificationFeedEntryInput = Pick<NotificationFeedEntry, 'category' 
 
 export type NotificationFeedSettings = Record<NotificationFeedCategory, boolean>;
 
+/** The panes of the feed panel: the filtered history and the raw stream. */
+export type NotificationFeedPane = 'notifications' | 'stream';
+
 /** The feed keeps a session's worth of history; older entries fall off the end. */
 export const MAX_FEED_ENTRIES = 200;
 
 const STORAGE_SETTINGS_KEY = 'notificationFeedSettings';
 const STORAGE_OPEN_KEY = 'notificationFeedOpen';
+const STORAGE_TAB_KEY = 'notificationFeedTab';
 
-const DEFAULT_SETTINGS: NotificationFeedSettings = { friends: true, me: true, hotel: true };
+/** Where the folded tab sits by default, in pixels from the bottom of the screen; the user can drag it. */
+export const DEFAULT_FEED_TAB_BOTTOM = 64;
+export const MIN_FEED_TAB_BOTTOM = 56;
+
+const DEFAULT_SETTINGS: NotificationFeedSettings = { mentions: true, friends: true, me: true, hotel: true };
 
 /** Same per-user suffix `useLocalStorage` applies, so two accounts on one browser keep their own feed settings. */
 const storageKey = (name: string): string => {
@@ -56,6 +65,16 @@ const readSettings = (): NotificationFeedSettings => {
     }
 };
 
+const readTabBottom = (): number => {
+    try {
+        const stored = GetLocalStorage<number>(storageKey(STORAGE_TAB_KEY));
+
+        return typeof stored === 'number' && Number.isFinite(stored) ? Math.max(MIN_FEED_TAB_BOTTOM, stored) : DEFAULT_FEED_TAB_BOTTOM;
+    } catch {
+        return DEFAULT_FEED_TAB_BOTTOM;
+    }
+};
+
 const readOpen = (): boolean => {
     try {
         const stored = GetLocalStorage<boolean>(storageKey(STORAGE_OPEN_KEY));
@@ -75,8 +94,8 @@ const persist = <T>(name: string, value: T) => {
 };
 
 /**
- * Where a bubble belongs in the feed. Friend presence and mentions are about other
- * people, hotel-wide chatter (info, sound machines, room messages) is about the hotel,
+ * Where a bubble belongs in the feed. Mentions have their own section, friend presence
+ * is about other people, hotel-wide chatter (info, sound machines, room messages) is about the hotel,
  * and everything else (badges, respect, pets, club, purchases) happened to me.
  */
 export const getFeedCategoryForBubbleType = (type: string): NotificationFeedCategory => {
@@ -85,8 +104,9 @@ export const getFeedCategoryForBubbleType = (type: string): NotificationFeedCate
         case NotificationBubbleType.FRIENDOFFLINE:
         case NotificationBubbleType.THIRDPARTYFRIENDONLINE:
         case NotificationBubbleType.THIRDPARTYFRIENDOFFLINE:
-        case NotificationBubbleType.MENTION:
             return 'friends';
+        case NotificationBubbleType.MENTION:
+            return 'mentions';
         case NotificationBubbleType.INFO:
         case NotificationBubbleType.SOUNDMACHINE:
         case NotificationBubbleType.SOUNDBOARD:
@@ -101,6 +121,9 @@ interface NotificationFeedState {
     entries: NotificationFeedEntry[];
     settings: NotificationFeedSettings;
     isOpen: boolean;
+    pane: NotificationFeedPane;
+    /** Pixels from the bottom of the screen where the folded tab sits. */
+    tabBottom: number;
     unreadCount: number;
     addEntry: (entry: NotificationFeedEntryInput) => void;
     clearEntries: () => void;
@@ -108,6 +131,10 @@ interface NotificationFeedState {
     setAllCategories: (visible: boolean) => void;
     setOpen: (open: boolean) => void;
     toggleOpen: () => void;
+    setPane: (pane: NotificationFeedPane) => void;
+    /** Opens the panel on a pane, or folds it away when it already shows that pane. */
+    togglePane: (pane: NotificationFeedPane) => void;
+    setTabBottom: (bottom: number) => void;
     markAllRead: () => void;
 }
 
@@ -117,6 +144,8 @@ export const useNotificationFeedStore = createOctaneStore<NotificationFeedState>
     entries: [],
     settings: readSettings(),
     isOpen: readOpen(),
+    pane: 'notifications',
+    tabBottom: readTabBottom(),
     unreadCount: 0,
     addEntry: (entry) =>
         set((state) => {
@@ -150,7 +179,7 @@ export const useNotificationFeedStore = createOctaneStore<NotificationFeedState>
         }),
     setAllCategories: (visible) =>
         set(() => {
-            const settings: NotificationFeedSettings = { friends: visible, me: visible, hotel: visible };
+            const settings: NotificationFeedSettings = { mentions: visible, friends: visible, me: visible, hotel: visible };
 
             persist(STORAGE_SETTINGS_KEY, settings);
 
@@ -169,6 +198,23 @@ export const useNotificationFeedStore = createOctaneStore<NotificationFeedState>
             persist(STORAGE_OPEN_KEY, isOpen);
 
             return { isOpen, unreadCount: 0 };
+        }),
+    setPane: (pane) => set({ pane }),
+    togglePane: (pane) =>
+        set((state) => {
+            const isOpen = !(state.isOpen && state.pane === pane);
+
+            persist(STORAGE_OPEN_KEY, isOpen);
+
+            return { isOpen, pane, unreadCount: 0 };
+        }),
+    setTabBottom: (bottom) =>
+        set(() => {
+            const tabBottom = Math.max(MIN_FEED_TAB_BOTTOM, Math.round(bottom));
+
+            persist(STORAGE_TAB_KEY, tabBottom);
+
+            return { tabBottom };
         }),
     markAllRead: () => set({ unreadCount: 0 })
 }));

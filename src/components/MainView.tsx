@@ -4,15 +4,13 @@ import {
     GetRoomSessionManager,
     HabboWebTools,
     ILinkEventTracker,
-    MarkMentionsReadComposer,
     RemoveLinkEventTracker,
     RoomSessionEvent
 } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
-import { GetConfigurationValue, IsTouchDevice, SendMessageComposer } from '../api';
+import { GetConfigurationValue, IsTouchDevice } from '../api';
 import { useMentionMessages, useOctaneEventReducer } from '../hooks';
-import { markAllRead } from '../hooks/mentions/mentionsStore';
 import { AchievementsView } from './achievements/AchievementsView';
 import { GoogleAdsView } from './ads/GoogleAdsView';
 import { AvatarEditorView } from './avatar-editor';
@@ -40,7 +38,6 @@ import { HelpView } from './help/HelpView';
 import { HotelView } from './hotel-view/HotelView';
 import { HousekeepingView } from './housekeeping/HousekeepingView';
 import { InventoryView } from './inventory/InventoryView';
-import { MentionsView } from './mentions';
 import { ModToolsView } from './mod-tools/ModToolsView';
 import { NavigatorView } from './navigator/NavigatorView';
 import { OctanebubbleHiddenView } from './octanebubblehidden/OctanebubbleHiddenView';
@@ -66,7 +63,6 @@ export const MainView: FC<{}> = (props) =>
 {
     const [isReady, setIsReady] = useState(false);
     const [localizationVersion, setLocalizationVersion] = useState(0);
-    const [mentionsVisible, setMentionsVisible] = useState(false);
 
     useMentionMessages();
 
@@ -127,49 +123,6 @@ export const MainView: FC<{}> = (props) =>
                 }
             },
             eventUrlPrefix: 'habblet/'
-        };
-
-        AddLinkEventTracker(linkTracker);
-
-        return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
-
-    useEffect(() =>
-    {
-        const clearMentionsBadge = () =>
-        {
-            markAllRead();
-            SendMessageComposer(new MarkMentionsReadComposer(0, 0));
-        };
-
-        const linkTracker: ILinkEventTracker = {
-            linkReceived: (url: string) =>
-            {
-                const parts = url.split('/');
-
-                if (parts.length < 2) return;
-
-                switch (parts[1])
-                {
-                    case 'show':
-                        setMentionsVisible(true);
-                        clearMentionsBadge();
-                        return;
-                    case 'hide':
-                        setMentionsVisible(false);
-                        return;
-                    case 'toggle':
-                        setMentionsVisible((prevValue) =>
-                        {
-                            if (prevValue) return false;
-
-                            queueMicrotask(clearMentionsBadge);
-                            return true;
-                        });
-                        return;
-                }
-            },
-            eventUrlPrefix: 'mentions/'
         };
 
         AddLinkEventTracker(linkTracker);
@@ -241,7 +194,6 @@ export const MainView: FC<{}> = (props) =>
             <SoundboardView />
             <TraxEditorView />
             {GetConfigurationValue<boolean>('radio_ui.enabled', false) && !IsTouchDevice() && <RadioView />}
-            {GetConfigurationValue<boolean>('mentions_ui.enabled', true) && mentionsVisible && <MentionsView onClose={() => setMentionsVisible(false)} />}
             <ExternalPluginLoader />
         </>
     );

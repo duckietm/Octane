@@ -171,15 +171,8 @@ const useNotificationStore = () => {
     const showMentionBubble = useCallback((mention: IMentionEntry) => {
         const item = new MentionNotificationBubbleItem(mention);
 
+        // The feed lists the mentions store itself, so nothing is pushed here.
         setBubbleAlerts((prevValue) => [item, ...prevValue]);
-        pushNotificationFeedEntry({
-            category: 'friends',
-            type: NotificationBubbleType.MENTION,
-            title: mention.roomName || '',
-            message: mention.message,
-            linkUrl: mention.roomId > 0 ? `navigator/goto/${mention.roomId}` : null,
-            senderName: mention.senderUsername
-        });
     }, []);
 
     const showNotification = (type: string, options: Map<string, string> = null) => {

@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_MS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_MS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -54,7 +54,9 @@ const readCollapsedPreference = (key: string): boolean =>
  * The official navigator icon unfolds a small menu while hovered
  * (ToolbarHoverCtrl.as, 3075_toolbar_hover_xml): navigator, home,
  * favourites, create, and the visited / frequent room lists that reuse
- * the room visit history. Pointer-only, so the touch layout never mounts it.
+ * the room visit history. The bubble sits centred over the icon with a
+ * tail pointing at it, like the toolbar hints. Pointer-only, so the touch
+ * layout never mounts it.
  */
 const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
 {
@@ -148,35 +150,38 @@ const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
             { children }
             { isOpen &&
                 <div
-                    className="tb-navigator-hover absolute bottom-full left-0 z-[90] mb-1 min-w-[190px] rounded-md border border-black/40 bg-[#1f1f1f]/95 p-1 text-[12px] text-white shadow-lg"
+                    className="tb-navigator-hover absolute bottom-full left-1/2 z-[90] w-[238px] -translate-x-1/2 text-[12px] font-bold text-white"
                     data-testid="navigator-hover-panel"
                     onMouseEnter={ open }
                     onMouseLeave={ scheduleHide }>
-                    { items.map(item => (
-                        <div key={ item.id }>
-                            <button
-                                type="button"
-                                disabled={ item.disabled }
-                                aria-expanded={ item.expandable ? expandedList === item.id : undefined }
-                                className={ `flex w-full items-center justify-between rounded px-2 py-1 text-left ${ item.disabled ? 'cursor-default text-white/40' : 'cursor-pointer hover:bg-white/10' } ${ expandedList === item.id ? 'bg-white/10' : '' }` }
-                                onClick={ () => activate(item.id) }>
-                                <span>{ localizeWithFallback(item.key, item.fallback) }</span>
-                                { item.expandable && <span aria-hidden="true">{ expandedList === item.id ? '▾' : '▸' }</span> }
-                            </button>
-                            { item.expandable && expandedList === item.id && expandedRooms.length > 0 &&
-                                <div className="ml-2 flex max-h-[220px] flex-col overflow-y-auto border-l border-white/20 pl-2">
-                                    { expandedRooms.map(room => (
-                                        <button
-                                            key={ room.roomId }
-                                            type="button"
-                                            className={ `truncate rounded px-2 py-[2px] text-left hover:bg-white/10 ${ room.roomId === navigatorData?.currentRoomId ? 'font-bold' : '' }` }
-                                            onClick={ () => visitRoom(room.roomId) }>
-                                            { room.roomName }
-                                        </button>
-                                    )) }
-                                </div> }
-                        </div>
-                    )) }
+                    <div className="tb-navigator-hover-body flex flex-col gap-[1px]">
+                        { items.map(item => (
+                            <div key={ item.id }>
+                                <button
+                                    type="button"
+                                    disabled={ item.disabled }
+                                    aria-expanded={ item.expandable ? expandedList === item.id : undefined }
+                                    className={ `tb-navigator-hover-row flex w-full items-center justify-between text-left ${ item.disabled ? 'cursor-default text-white/40' : 'cursor-pointer' } ${ expandedList === item.id ? 'is-open' : '' }` }
+                                    onClick={ () => activate(item.id) }>
+                                    <span className="truncate">{ localizeWithFallback(item.key, item.fallback) }</span>
+                                    { item.expandable && <span aria-hidden="true">{ expandedList === item.id ? '▾' : '▸' }</span> }
+                                </button>
+                                { item.expandable && expandedList === item.id && expandedRooms.length > 0 &&
+                                    <div className="tb-navigator-hover-list flex max-h-[220px] flex-col overflow-y-auto">
+                                        { expandedRooms.map(room => (
+                                            <button
+                                                key={ room.roomId }
+                                                type="button"
+                                                className={ `tb-navigator-hover-row truncate text-left ${ room.roomId === navigatorData?.currentRoomId ? 'is-current' : '' }` }
+                                                onClick={ () => visitRoom(room.roomId) }>
+                                                { room.roomName }
+                                            </button>
+                                        )) }
+                                    </div> }
+                            </div>
+                        )) }
+                    </div>
+                    <div className="tb-navigator-hover-tail" aria-hidden="true" />
                 </div> }
         </div>
     );
@@ -202,8 +207,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { getTotalUnseen = 0 } = useAchievements();
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
-    const { unreadCount: mentionsUnread = 0 } = useMentionsSnapshot();
-    const mentionsEnabled = useMemo(() => GetConfigurationValue<boolean>('mentions_ui.enabled', true), []);
     const buildersClubEnabled = useMemo(() => GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)), []);
     const fortuneWheelEnabled = useMemo(() => GetConfigurationValue<boolean>('toolbar.fortunewheel.enabled', true), []);
     const { openMonitor, showToolbarButton } = useWiredTools();
@@ -388,7 +391,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
         isInRoom,
         isMod,
         leftCollapsed,
-        mentionsEnabled,
         rightCollapsed,
         showToolbarButton,
         soundboardEnabled,
@@ -630,12 +632,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         <ToolbarItemView className={ `tb-icon ${ iconState === MessengerIconState.UNREAD ? (messengerNotifyFrame === 1 ? 'is-notify-1' : 'is-notify-0') : '' }` } icon="message" onClick={ () => OpenMessengerChat() } />
                     </motion.div>
                     { !rightCollapsed && (<>
-                    { mentionsEnabled &&
-                        <motion.div variants={ itemVariants } className="relative tb-slot">
-                            <ToolbarItemView icon="mentions" onClick={ () => CreateLinkEvent('mentions/toggle') } className="tb-icon" />
-                            { (mentionsUnread > 0) &&
-                                <LayoutItemCountView count={ mentionsUnread } className="absolute -right-2 -top-1" /> }
-                        </motion.div> }
                     <div className={ `h-full shrink-0 ${ desktopBlockClasses }` } id="toolbar-friend-bar-container-desktop" />
                     </>) }
                 </motion.div>
@@ -735,12 +731,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             { (requests.length > 0) &&
                                 <LayoutItemCountView count={ requests.length } className="absolute -right-2 -top-1" /> }
                         </motion.div> }
-                    { (!socialInSideStack && mentionsEnabled) &&
-                        <motion.div variants={ itemVariants } className="relative">
-                            <ToolbarItemView icon="mentions" onClick={ () => CreateLinkEvent('mentions/toggle') } className="tb-icon" />
-                            { (mentionsUnread > 0) &&
-                                <LayoutItemCountView count={ mentionsUnread } className="absolute -right-2 -top-1" /> }
-                        </motion.div> }
                 </motion.div>
             </motion.div>
             { /* Mobile side tools — moved out of the bottom bar into a
@@ -775,7 +765,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 { /* Below the compact breakpoint the right rail's social icons
                      live in the stack — on narrow desktop windows too, so they
                      don't jump back into the bottom bar. Real touch devices
-                     keep friends + mentions in the mobile bar instead. */ }
+                     keep friends in the mobile bar instead. */ }
                 { socialInSideStack &&
                     <motion.div variants={ itemVariants } className="relative">
                         <ToolbarItemView icon="friendall" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
@@ -785,12 +775,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 { socialInSideStack &&
                     <motion.div variants={ itemVariants }>
                         <ToolbarItemView icon="friendsearch" onClick={ () => SendMessageComposer(new FindNewFriendsMessageComposer()) } className="tb-icon" />
-                    </motion.div> }
-                { (socialInSideStack && mentionsEnabled) &&
-                    <motion.div variants={ itemVariants } className="relative">
-                        <ToolbarItemView icon="mentions" onClick={ () => CreateLinkEvent('mentions/toggle') } className="tb-icon" />
-                        { (mentionsUnread > 0) &&
-                            <LayoutItemCountView count={ mentionsUnread } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
                     </motion.div> }
                 { (socialInSideStack && ((iconState === MessengerIconState.SHOW) || (iconState === MessengerIconState.UNREAD))) &&
                     <motion.div variants={ itemVariants }>
