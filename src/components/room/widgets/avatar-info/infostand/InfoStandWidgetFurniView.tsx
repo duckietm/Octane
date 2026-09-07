@@ -25,6 +25,7 @@ import {
     AvatarInfoFurni,
     FriendlyTime,
     GetConfigurationValue,
+    GetFurnitureDataForRoomObject,
     GetGroupInformation,
     GetUserProfile,
     IPhotoData,
@@ -45,7 +46,7 @@ import {
     Text,
     UserProfileIconView
 } from '../../../../../common';
-import { useHasPermission, useMessageEvent, useOctaneEvent, useRareValues, useRoom, useWiredTools } from '../../../../../hooks';
+import { useHasPermission, useMessageEvent, useOctaneEvent, useRareValues, useRentConfirmation, useRoom, useWiredTools } from '../../../../../hooks';
 import { OctaneInput } from '../../../../../layout';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
 import { getFurniOfferButtons, isWiredFurniType } from './infostandFurniOffers.helpers';
@@ -114,6 +115,7 @@ function getValidRoomObjectDirection(roomObject: any, isPositive: boolean) {
 export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (props) => {
     const { avatarInfo = null, onClose = null } = props;
     const { roomSession = null } = useRoom();
+    const { openRentConfirmation = null } = useRentConfirmation();
     const { openInspectionForFurni, showInspectButton } = useWiredTools();
     const isModerator = useHasPermission('acc_anyroomowner');
     const { getValue: getRareValue } = useRareValues();
@@ -589,14 +591,15 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                 case 'buy_one':
                     CreateLinkEvent(`catalog/open/offerId/${avatarInfo.purchaseOfferId}`);
                     return;
-                // The official client opens a rent confirmation for extend and
-                // buy-out; we have no such dialog, so the matching catalogue
-                // offer is opened instead and the purchase happens there.
                 case 'rent':
-                case 'extend':
                     CreateLinkEvent(`catalog/open/offerId/${avatarInfo.rentOfferId}`);
                     return;
+                // Like the official InfoStandFurniView, extend and buy-out open the
+                // catalog's rent confirmation for this room item.
+                case 'extend':
                 case 'buyout':
+                    openRentConfirmation?.(GetFurnitureDataForRoomObject(roomSession?.roomId, avatarInfo.id, avatarInfo.category), action === 'buyout', avatarInfo.id);
+                    return;
                 case 'place_more':
                     CreateLinkEvent(`catalog/open/offerId/${avatarInfo.purchaseOfferId}`);
                     return;

@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { WidgetErrorBoundary } from '../../../../common';
+import { RentConfirmationView } from '../../../catalog/views/RentConfirmationView';
 import { FurnitureContextMenuView } from './context-menu/FurnitureContextMenuView';
 import { FurnitureAreaHideView } from './FurnitureAreaHideView';
 import { FurnitureBackgroundColorView } from './FurnitureBackgroundColorView';
@@ -15,6 +16,7 @@ import { FurnitureGiftOpeningView } from './FurnitureGiftOpeningView';
 import { FurnitureHighScoreView } from './FurnitureHighScoreView';
 import { FurnitureInternalLinkView } from './FurnitureInternalLinkView';
 import { FurnitureMannequinView } from './FurnitureMannequinView';
+import { FurnitureRentableSpaceView } from './FurnitureRentableSpaceView';
 import { FurnitureRoomLinkView } from './FurnitureRoomLinkView';
 import { FurnitureSpamWallPostItView } from './FurnitureSpamWallPostItView';
 import { FurnitureStackHeightView } from './FurnitureStackHeightView';
@@ -70,6 +72,13 @@ export const FurnitureWidgetsView: FC<{}> = (props) => {
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="FurniturePlaylistEditorWidget">
                 <FurniturePlaylistEditorWidgetView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="FurnitureRentableSpace">
+                <FurnitureRentableSpaceView />
+            </WidgetErrorBoundary>
+            {/* The official rent confirmation belongs to the catalog but opens from the infostand extend / buy-out buttons. */}
+            <WidgetErrorBoundary name="RentConfirmation">
+                <RentConfirmationView />
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="FurnitureRoomLink">
                 <FurnitureRoomLinkView />

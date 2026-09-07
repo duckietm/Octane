@@ -9,4 +9,5 @@ export * from './useClubOffers';
 export * from './useGiftConfiguration';
 export * from './useMarketplaceConfiguration';
 export * from './useMarketplaceItemStats';
+export * from './useRentConfirmation';
 export * from './useSellablePetPalette';

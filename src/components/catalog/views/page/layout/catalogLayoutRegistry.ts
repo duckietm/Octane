@@ -10,6 +10,7 @@ export type CatalogLayoutRenderer =
     | 'guildFrontpage'
     | 'info'
     | 'infoLoyalty'
+    | 'infoRentables'
     | 'marketplaceOwnItems'
     | 'marketplacePublicItems'
     | 'petCustomization'
@@ -64,7 +65,7 @@ export const CATALOG_LAYOUT_REGISTRY = [
     { studioCode: 'recycler_prizes', runtimeCodes: ['recycler_prizes'], renderer: 'recyclerPrizes', availability: 'ready' },
     { studioCode: 'info_loyalty', runtimeCodes: ['info_loyalty'], renderer: 'infoLoyalty', availability: 'ready' },
     { studioCode: 'info_duckets', runtimeCodes: ['info_duckets'], renderer: 'info', availability: 'ready' },
-    { studioCode: 'info_rentables', runtimeCodes: ['info_rentables'], renderer: 'info', availability: 'ready' },
+    { studioCode: 'info_rentables', runtimeCodes: ['info_rentables'], renderer: 'infoRentables', availability: 'ready' },
     { studioCode: 'info_pets', runtimeCodes: ['info_pets'], renderer: 'info', availability: 'ready' },
     { studioCode: 'loyalty_vip_buy', runtimeCodes: ['loyalty_vip_buy'], renderer: 'info', availability: 'ready' },
     { studioCode: 'badge_display', runtimeCodes: ['badge_display'], renderer: 'badgeDisplay', availability: 'ready' },

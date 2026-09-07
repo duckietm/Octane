@@ -826,3 +826,28 @@
         height: auto;
     }
 }
+
+/* Official rentable space widget (layout rentablespace, 256x224) and the catalog rent confirmation (370x300). */
+.octane-widget-rentable-space {
+    width: 256px;
+}
+
+.octane-widget-rentable-space__rent-button {
+    width: 100%;
+    padding: 8px 10px;
+}
+
+.octane-rent-confirmation {
+    width: 370px;
+}
+
+.octane-rent-confirmation__image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 180px;
+    flex-shrink: 0;
+    border: 1px solid #aaa;
+    background: #fff;
+}

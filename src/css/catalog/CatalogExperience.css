@@ -1357,3 +1357,51 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Official ctlg_info_rentables: the five rules with the ducket icon and rentables_rulepicN.gif. */
+.octane-catalog-info-rentables {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    min-height: 0;
+    color: #222;
+    font-size: 11px;
+    line-height: 15px;
+}
+
+.octane-catalog-info-rentables__description {
+    padding: 4px 6px;
+}
+
+.octane-catalog-info-rentables__rules {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-height: 0;
+    margin: 0;
+    padding: 9px 10px;
+    overflow: auto;
+    list-style: none;
+    border: 1px solid #d8d8d8;
+    background: #f7f7f2;
+}
+
+.octane-catalog-info-rentables__rule {
+    display: grid;
+    grid-template-columns: 23px minmax(0, 1fr) 40px;
+    align-items: start;
+    gap: 8px;
+    min-height: 47px;
+    padding-top: 3px;
+}
+
+.octane-catalog-info-rentables__icon {
+    transform: scaleX(-1);
+}
+
+.octane-catalog-info-rentables__picture {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
