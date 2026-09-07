@@ -886,3 +886,46 @@ export class ModifyCustomFilterResultEvent extends MessageEvent {
 export class GetCustomFilterMessageComposer extends WordFilterComposerStub {}
 export class AddCustomFilterWordMessageComposer extends WordFilterComposerStub {}
 export class RemoveCustomFilterWordMessageComposer extends WordFilterComposerStub {}
+
+// ---------------------------------------------------------------------------
+// Quest engine (AIR 13 quests, daily tasks, reward track) — the hooks under
+// src/hooks/quests register these events and send these composers.
+// ---------------------------------------------------------------------------
+
+export class QuestsMessageEvent extends MessageEvent {}
+export class QuestMessageEvent extends MessageEvent {}
+export class QuestCompletedMessageEvent extends MessageEvent {}
+export class QuestCancelledMessageEvent extends MessageEvent {}
+export class QuestDailyMessageEvent extends MessageEvent {}
+export class ActiveDailyTasksMessageEvent extends MessageEvent {}
+export class DailyTasksAddedMessageEvent extends MessageEvent {}
+export class DailyTaskUpdatedMessageEvent extends MessageEvent {}
+export class RewardTracksMessageEvent extends MessageEvent {}
+export class RewardTrackClaimResultMessageEvent extends MessageEvent {}
+export class RewardTrackProgressMessageEvent extends MessageEvent {}
+export class RewardTrackPremiumPurchaseResultMessageEvent extends MessageEvent {}
+export class QuestMessageData extends StubClass {}
+export class DailyTaskData extends StubClass {
+    public static STATUS_IN_PROGRESS = 0;
+    public static STATUS_COMPLETED = 1;
+    public static STATUS_CLAIMED = 2;
+}
+export class DailyTaskRewardData extends StubClass {}
+export class RewardTrackData extends StubClass {}
+export class RewardTrackTaskData extends StubClass {}
+export class RewardTrackTaskLevelData extends StubClass {}
+export class RewardTrackPrizeData extends StubClass {}
+export class AcceptQuestMessageComposer extends PayloadComposer {}
+export class ActivateQuestMessageComposer extends PayloadComposer {}
+export class CancelQuestMessageComposer extends PayloadComposer {}
+export class GetDailyQuestMessageComposer extends PayloadComposer {}
+export class GetQuestsMessageComposer extends PayloadComposer {}
+export class GetSeasonalQuestsOnlyMessageComposer extends PayloadComposer {}
+export class OpenQuestTrackerMessageComposer extends PayloadComposer {}
+export class RejectQuestMessageComposer extends PayloadComposer {}
+export class StartCampaignMessageComposer extends PayloadComposer {}
+export class GetDailyTasksMessageComposer extends PayloadComposer {}
+export class ClaimDailyTaskMessageComposer extends PayloadComposer {}
+export class GetRewardTracksMessageComposer extends PayloadComposer {}
+export class ClaimRewardTrackPrizeMessageComposer extends PayloadComposer {}
+export class PurchaseRewardTrackPremiumMessageComposer extends PayloadComposer {}

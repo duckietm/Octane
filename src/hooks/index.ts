@@ -20,6 +20,7 @@ export * from './mod-tools';
 export * from './navigator';
 export * from './notification';
 export * from './purse';
+export * from './quests';
 export * from './radio/useRadio';
 export * from './rare-values/useRareValues';
 export * from './rooms';

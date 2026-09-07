@@ -59,6 +59,7 @@ import './css/layout/LayoutTrophy.css';
 
 import './css/octanecard/OctaneCardView.css';
 import './css/achievements/AchievementsView.css';
+import './css/quests/QuestsView.css';
 
 import './css/notification/NotificationCenterView.css';
 import './css/notification/HotelAlertToast.css';

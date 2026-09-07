@@ -57,6 +57,7 @@ import { UserAccountSettingsView } from './user-settings/UserAccountSettingsView
 import { WordFilterSettingsView } from './user-settings/wordfilter/WordFilterSettingsView';
 import { UserSettingsView } from './user-settings/UserSettingsView';
 import { VaultView } from './vault/VaultView';
+import { DailyTasksView, QuestCompletedView, QuestsView, QuestTrackerView, RewardTrackView } from './quests';
 import { WiredView } from './wired/WiredView';
 import { WiredCreatorToolsView } from './wired-tools/WiredCreatorToolsView';
 
@@ -177,6 +178,11 @@ export const MainView: FC<{}> = (props) =>
             <WordFilterSettingsView />
             <DiscordSettingsView />
             <VaultView />
+            <QuestsView />
+            <QuestTrackerView />
+            <QuestCompletedView />
+            <DailyTasksView />
+            <RewardTrackView />
             <TranslationSettingsView />
             <UserProfileView />
             <GroupsView />
