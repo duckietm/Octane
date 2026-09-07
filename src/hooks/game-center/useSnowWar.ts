@@ -92,8 +92,29 @@ export interface SnowWarResultsState {
     teams: {
         teamId: number;
         score: number;
-        players: { userId: number; name: string; score: number }[];
+        players: SnowWarResultPlayer[];
     }[];
+    /** AIR Game2SnowWarGameStats: user ids of the "Most Hits" / "Most K.O.'s" players (absent from our packet). */
+    playerWithMostHits?: number;
+    playerWithMostKills?: number;
+}
+
+/**
+ * One row of the end-of-game screen. AIR's Game2TeamPlayerData also carries
+ * the figure, gender and per-player stats (hits, kills, ...); our OnGameEnding
+ * packet only sends id, name and score, so those stay optional and the view
+ * falls back to the arena's level data for the figure.
+ */
+export interface SnowWarResultPlayer {
+    userId: number;
+    name: string;
+    score: number;
+    figure?: string;
+    gender?: string;
+    snowballHits?: number;
+    kills?: number;
+    /** AIR GameLobbyPlayerData.skillLevel (1-30), drawn as ten tiered stars. */
+    skillLevel?: number;
 }
 
 export interface SnowWarChatMessage {
