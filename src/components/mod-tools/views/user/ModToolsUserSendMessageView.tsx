@@ -9,11 +9,13 @@ import { ModToolsTemplateSelect } from '../../common/ModToolsTemplateSelect';
 
 interface ModToolsUserSendMessageViewProps {
     user: ISelectedUser;
+    /** Set when the window opens from an issue handler: the message is filed against that issue (SendMsgsCtrl). */
+    issueId?: number;
     onCloseClick: () => void;
 }
 
 export const ModToolsUserSendMessageView: FC<ModToolsUserSendMessageViewProps> = (props) => {
-    const { user = null, onCloseClick = null } = props;
+    const { user = null, issueId = -1, onCloseClick = null } = props;
     const [message, setMessage] = useState('');
     const { simpleAlert = null } = useNotification();
     const { settings = null } = useModTools();
@@ -38,7 +40,7 @@ export const ModToolsUserSendMessageView: FC<ModToolsUserSendMessageViewProps> =
             return;
         }
 
-        SendMessageComposer(new ModMessageMessageComposer(user.userId, message, -999));
+        SendMessageComposer(new ModMessageMessageComposer(user.userId, message, -999, issueId));
         onCloseClick();
     };
 

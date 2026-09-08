@@ -1,0 +1,161 @@
+/* Polls: poll_offer (382x250), poll_question (382 wide), poll_cancel_confim (221x153). */
+
+.octane-poll-offer,
+.octane-poll-question {
+    width: min(382px, calc(100vw - 16px));
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+    resize: none;
+}
+
+.octane-poll-cancel-confirm {
+    width: min(260px, calc(100vw - 16px));
+    min-width: 0;
+    resize: none;
+
+    .octane-poll-cancel-confirm-long {
+        white-space: pre-wrap;
+    }
+}
+
+.octane-poll-offer-content,
+.octane-poll-question-content {
+    color: black;
+}
+
+/* header_container / header_region: the dark strip with the portrait and the headline */
+.octane-poll-offer-header,
+.octane-poll-question-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 -8px 8px -8px;
+    padding: 8px 12px;
+    background-color: #0e3f52;
+    color: white;
+}
+
+.octane-poll-offer-portrait {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 80px;
+    background: url('@/assets/images/notifications/frank.gif') no-repeat center / contain;
+}
+
+.octane-poll-question-portrait {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    background: url('@/assets/images/notifications/frank.gif') no-repeat center / contain;
+}
+
+.octane-poll-offer-headline {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.octane-poll-question-headline {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+/* poll_offer_border: the summary box and the option row */
+.octane-poll-offer-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+.octane-poll-offer-summary,
+.octane-poll-question-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.octane-poll-offer-options,
+.octane-poll-question-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.octane-poll-question-footer {
+    margin-top: 10px;
+}
+
+.octane-poll-question-number {
+    margin-right: auto;
+    font-weight: 700;
+}
+
+.octane-poll-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+}
+
+.octane-poll-ok {
+    min-width: 80px;
+}
+
+/* poll_content_wrapper: the question and its answer control scroll when they outgrow the card */
+.octane-poll-question-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: min(424px, calc(100vh - 220px));
+    overflow: auto;
+}
+
+.octane-poll-answer-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.octane-poll-answer-entity {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    min-height: 32px;
+    padding: 2px 7px;
+    cursor: pointer;
+
+    input {
+        margin-top: 3px;
+    }
+
+    span {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* poll_answer_text_input: a 300x90 bordered box */
+.octane-poll-answer-text {
+    padding: 4px 10px;
+}
+
+.octane-poll-answer-input {
+    width: 100%;
+    min-height: 90px;
+    padding: 4px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    border-radius: 4px;
+    resize: vertical;
+}

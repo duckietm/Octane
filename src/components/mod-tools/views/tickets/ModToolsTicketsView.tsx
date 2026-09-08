@@ -114,7 +114,7 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
     // "Give me the next priority issue": the client chooses like the official IssueManager
     // and asks for that one issue; the pick either lands in "my issues" or fails with the
     // usual pick-failed alert. One request at a time, the server answers in its own time.
-    const autoPick = () => {
+    const autoPick = (reason: string = 'issue browser pick next') => {
         if (autoPickPendingRef.current) return;
 
         const next = pickNextPriorityIssue(tickets);
@@ -122,7 +122,7 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
         if (!next) return;
 
         autoPickPendingRef.current = true;
-        SendMessageComposer(new PickIssuesMessageComposer([next.issueId], false, 0, 'issue browser pick next'));
+        SendMessageComposer(new PickIssuesMessageComposer([next.issueId], false, 0, reason));
         setCurrentTab(1);
 
         window.setTimeout(() => {
@@ -170,7 +170,7 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
                             gap={1}
                             title={localizeWithFallback('modtools.tickets.auto_pick.title', 'Picks the most urgent open issue for you')}
                             variant="success"
-                            onClick={autoPick}
+                            onClick={() => autoPick()}
                         >
                             <FaBolt size={11} /> {localizeWithFallback('modtools.tickets.auto_pick', 'Give me the next priority issue')}
                         </Button>
@@ -179,7 +179,9 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
             </OctaneCardView>
             {issueInfoWindows &&
                 issueInfoWindows.length > 0 &&
-                issueInfoWindows.map((issueId) => <ModToolsIssueInfoView key={issueId} issueId={issueId} onIssueInfoClosed={closeIssue} />)}
+                issueInfoWindows.map((issueId) => (
+                    <ModToolsIssueInfoView key={issueId} issueId={issueId} onHandleNext={() => autoPick('issue handler pick next')} onIssueInfoClosed={closeIssue} />
+                ))}
         </>
     );
 };

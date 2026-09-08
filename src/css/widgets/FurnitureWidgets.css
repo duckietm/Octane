@@ -191,19 +191,48 @@
     }
 }
 
+/* credit_redeem.xml (315x165): value line at 20/17, "Read more" link at 20/60, buttons at y=100. */
 .octane-widget-exchange-credit {
-    width: min(375px, calc(100vw - 16px));
+    width: min(315px, calc(100vw - 16px));
     min-width: 0;
     max-width: calc(100vw - 16px);
-    height: min(150px, calc(100vh - 16px));
+    height: min(165px, calc(100vh - 16px));
     min-height: 0;
     max-height: calc(100vh - 16px);
+}
 
-    .exchange-image {
-        background-image: url('@/assets/images/room-widgets/exchange-credit/exchange-credit-image.png');
-        width: 103px;
-        height: 103px;
-    }
+.octane-widget-exchange-credit-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 20px 10px !important;
+}
+
+.octane-widget-exchange-credit-text {
+    margin: 0;
+    min-height: 26px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 13px;
+}
+
+.octane-widget-exchange-credit-link {
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #1c4b6e;
+    font-size: 12px;
+    line-height: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-widget-exchange-credit-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: auto;
 }
 
 .octane-external-image-widget {
@@ -850,4 +879,112 @@
     flex-shrink: 0;
     border: 1px solid #aaa;
     background: #fff;
+}
+
+/* ecotronbox_card / ecotronbox_card_furnimatic (257x114): the card is the image, the texts sit on it */
+.octane-ecotron-box {
+    position: relative;
+    width: 257px;
+    height: 114px;
+    color: black;
+    pointer-events: all;
+    background-color: #e8e2c6;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    border-radius: 4px;
+
+    .octane-ecotron-box-date {
+        position: absolute;
+        top: 9px;
+        left: 12px;
+        width: 104px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .octane-ecotron-box-msg {
+        position: absolute;
+        top: 39px;
+        left: 49px;
+        width: 139px;
+        height: 45px;
+        font-weight: 700;
+        overflow: hidden;
+    }
+
+    .octane-ecotron-box-buttons {
+        position: absolute;
+        right: 6px;
+        bottom: 4px;
+        display: flex;
+        gap: 4px;
+    }
+}
+
+/* placeholder (250x150) */
+.octane-furni-placeholder {
+    width: 250px;
+    min-width: 0;
+
+    .octane-furni-placeholder-body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80px;
+        font-weight: 700;
+        text-align: center;
+    }
+}
+
+/* niko_trophy (428x325) */
+.octane-niko-trophy {
+    width: min(428px, calc(100vw - 16px));
+    min-width: 0;
+    color: black;
+
+    .octane-niko-trophy-top {
+        display: flex;
+        gap: 16px;
+        padding: 8px 12px;
+    }
+
+    .octane-niko-trophy-image {
+        flex: 0 0 93px;
+        width: 93px;
+        height: 112px;
+        object-fit: contain;
+    }
+
+    .octane-niko-trophy-text {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .octane-niko-trophy-link {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: #1a5fb4;
+        font: inherit;
+        font-weight: 700;
+        text-align: left;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .octane-niko-trophy-store {
+        display: flex;
+        justify-content: center;
+        padding: 8px;
+    }
+
+    .octane-niko-trophy-store-image {
+        max-width: 320px;
+        max-height: 92px;
+        cursor: pointer;
+    }
 }
