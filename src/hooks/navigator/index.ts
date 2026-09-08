@@ -11,6 +11,25 @@ export {
 export type { NavigatorEnforceCategoryState } from './navigatorEnforceCategoryStore';
 export { useNavigatorEnforceCategoryStore } from './navigatorEnforceCategoryStore';
 export type { NavigatorHoverItem, NavigatorHoverItemId } from './navigatorHoverMenu';
+export type { NavigatorSearchContext } from './navigatorLegacySearch';
+export {
+    EMULATOR_CATEGORY_CODES,
+    getSearchCodeByLegacySearchType,
+    LEGACY_SEARCH_TYPE_CODES,
+    resolveNavigatorSearchLink,
+    resolveNavigatorTabCode
+} from './navigatorLegacySearch';
+export type { NavigatorSearchHistoryState } from './navigatorSearchHistory';
+export {
+    addSearchContextAtCurrentOffset,
+    EMPTY_SEARCH_HISTORY,
+    getCurrentSearchContext,
+    goBackInSearchHistory,
+    goForwardInSearchHistory,
+    hasNextSearchContext,
+    hasPreviousSearchContext,
+    isSameSearchContext
+} from './navigatorSearchHistory';
 export { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NAVIGATOR_HOVER_LINKS } from './navigatorHoverMenu';
 export type { NavigatorRoomInfoAnchorKind, NavigatorRoomInfoPopupActions, NavigatorRoomInfoPopupState } from './navigatorRoomInfoPopupStore';
 export { useNavigatorRoomInfoPopupStore } from './navigatorRoomInfoPopupStore';

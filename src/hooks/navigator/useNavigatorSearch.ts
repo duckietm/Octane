@@ -57,6 +57,7 @@ export const useNavigatorSearch = () => {
 
         setSearchResult(result);
         setIsFetching(false);
+        useNavigatorUiStore.getState().recordSearchContext(result.code, result.data ?? '');
     });
 
     // A newly created room refetches the current search.

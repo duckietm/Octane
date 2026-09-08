@@ -3,7 +3,6 @@ import {
     GetCustomRoomFilterMessageComposer,
     GetGuestRoomMessageComposer,
     GetSessionDataManager,
-    NavigatorSearchComposer,
     RemoveOwnRoomRightsRoomMessageComposer,
     RoomControllerLevel,
     RoomMuteComposer,
@@ -82,8 +81,10 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                 return;
             }
             case 'navigator_search_tag':
-                CreateLinkEvent(`navigator/search/${value}`);
-                SendMessageComposer(new NavigatorSearchComposer('hotel_view', `tag:${value}`));
+                // TagRenderer.tagProcedure -> HabboNewNavigator.performTagSearch:
+                // performSearch("hotel_view", "tag:" + tag) and open the navigator.
+                if (!value) return;
+                CreateLinkEvent(`navigator/tag/${value}`);
                 return;
             case 'open_room_thumbnail_camera':
                 DispatchUiEvent(new RoomWidgetThumbnailEvent(RoomWidgetThumbnailEvent.TOGGLE_THUMBNAIL));
@@ -140,6 +141,9 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
     // RoomInfoViewCtrl.as shows the ranking row only for a positive rank,
     // and only hotels that compute one switch it on.
     const showRanking = GetConfigurationValue<boolean>('room.ranking.enabled', false) && navigatorData.enteredGuestRoom.ranking > 0;
+    // TagRenderer.refreshTags renders at most four "#tag" chips (hash tags on),
+    // placed between the ranking row and the description.
+    const roomTags = (navigatorData.enteredGuestRoom.tags ?? []).filter((tag) => !!tag).slice(0, 4);
 
     return (
         <OctaneCardView
@@ -176,6 +180,20 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                         <Text small bold variant="muted">{LocalizeText('navigator.roompopup.property.ranking')}</Text>
                         <Text small>{navigatorData.enteredGuestRoom.ranking}</Text>
                     </Flex>
+                )}
+                {roomTags.length > 0 && (
+                    <div className="octane-room-info__tags" aria-label={LocalizeText('navigator.tags')}>
+                        {roomTags.map((tag) => (
+                            <button
+                                key={tag}
+                                type="button"
+                                className="octane-room-info__tag"
+                                onClick={() => processAction('navigator_search_tag', tag)}
+                            >
+                                #{tag}
+                            </button>
+                        ))}
+                    </div>
                 )}
                 <Text className="octane-room-info__description">{navigatorData.enteredGuestRoom.description}</Text>
                 <LayoutRoomThumbnailView

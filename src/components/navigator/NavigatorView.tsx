@@ -1,5 +1,6 @@
 import {
     AddLinkEventTracker,
+    CanCreateRoomMessageComposer,
     ConvertGlobalRoomIdMessageComposer,
     ForwardToSomeRoomMessageComposer,
     GetCategoriesWithUserCountMessageComposer,
@@ -19,6 +20,8 @@ import quicklinkAdd from '../../assets/images/navigator/air/quicklink-add.png';
 import randomRoomImg from '../../assets/images/navigator/air/random-room.png';
 import { DraggableWindow, WidgetErrorBoundary } from '../../common';
 import {
+    resolveNavigatorSearchLink,
+    resolveNavigatorTabCode,
     useMessageEvent,
     useNavigatorData,
     useNavigatorRoomInfoPopupStore,
@@ -106,8 +109,10 @@ export const NavigatorView: FC<{}> = () => {
                             TryVisitRoom(navigatorData.homeRoomId);
                             return;
                         }
-                        if (target === 'random_friending_room') {
-                            SendMessageComposer(new ForwardToSomeRoomMessageComposer('random_friending_room'));
+                        // Official `HabboNavigator.as:790-803`: named targets are forwarded to the
+                        // server (`:avisit` uses the predefined lobbies).
+                        if (target === 'random_friending_room' || target === 'predefined_noob_lobby' || target === 'predefined_group_lobby') {
+                            SendMessageComposer(new ForwardToSomeRoomMessageComposer(target));
                             return;
                         }
                         const roomId = Number.parseInt(target, 10);
@@ -119,18 +124,26 @@ export const NavigatorView: FC<{}> = () => {
                         return;
                     }
                     case 'create':
-                        store.openCreator();
+                        // The creator opens on the server's answer (`CanCreateRoom`), which
+                        // is where the room-limit alert comes from.
+                        SendMessageComposer(new CanCreateRoomMessageComposer());
                         return;
-                    case 'search':
-                        store.setSearch('hotel_view', parts.slice(2).join('/'));
+                    case 'search': {
+                        // Legacy search-code bridge (FakeMainViewCtrl.getSearchCodeByLegacySearchType):
+                        // numeric types, legacy codes and tab codes all resolve to a search.
+                        const context = resolveNavigatorSearchLink(parts, topLevelContexts?.map((item) => item.code) ?? []);
+                        if (!context) return;
+                        store.setSearch(context.code, context.filter);
                         store.show();
                         return;
+                    }
                     case 'tag':
                         store.setSearch('hotel_view', `tag:${parts.slice(2).join('/')}`);
                         store.show();
                         return;
                     case 'tab':
-                        if (parts[2]) store.setTab(parts[2]);
+                        // HabboNewNavigator.getSearchCodeForTabLink: "me" is the myworld view.
+                        if (parts[2]) store.setTab(resolveNavigatorTabCode(parts[2]));
                         store.show();
                         return;
                     case 'me':
@@ -144,7 +157,7 @@ export const NavigatorView: FC<{}> = () => {
         };
         AddLinkEventTracker(linkTracker);
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [navigatorData]);
+    }, [navigatorData, topLevelContexts]);
 
     useEffect(() => {
         if (!searchResult) return;
@@ -201,7 +214,9 @@ export const NavigatorView: FC<{}> = () => {
 
     const onCreateRoom = () => {
         useNavigatorRoomInfoPopupStore.getState().hide();
-        useNavigatorUiStore.getState().openCreator();
+        // Ask first, as the official navigator does: the answer opens the creator or
+        // shows the room-limit alert (useNavigatorStore).
+        SendMessageComposer(new CanCreateRoomMessageComposer());
     };
 
     const onRandomRoom = () => {
