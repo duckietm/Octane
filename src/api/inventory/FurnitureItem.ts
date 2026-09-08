@@ -40,7 +40,7 @@ export class FurnitureItem implements IFurnitureItem {
         this._stuffData = parser.stuffData;
         this._extra = parser.extra;
         this._secondsToExpiration = parser.secondsToExpiration;
-        this._expirationTimeStamp = parser.expirationTimeStamp;
+        this._expirationTimeStamp = FurnitureItem.resolveExpirationTimeStamp(parser);
         this._hasRentPeriodStarted = parser.hasRentPeriodStarted;
         this._creationDay = parser.creationDay;
         this._creationMonth = parser.creationMonth;
@@ -50,6 +50,17 @@ export class FurnitureItem implements IFurnitureItem {
         this._flatId = parser.flatId;
         this._isRented = parser.rentable;
         this._isWallItem = parser.isWallItem;
+    }
+
+    // The official parser stamps the item with getTimer() when it arrives so the rent countdown
+    // can run locally; the renderer parser leaves the stamp at 0, which would subtract the whole
+    // session uptime from the remaining time. Stamp it here instead.
+    private static resolveExpirationTimeStamp(parser: IFurnitureItemData): number {
+        return parser.expirationTimeStamp > 0 ? parser.expirationTimeStamp : GetTickerTime();
+    }
+
+    public get isRented(): boolean {
+        return this._isRented;
     }
 
     public get rentable(): boolean {
@@ -171,7 +182,7 @@ export class FurnitureItem implements IFurnitureItem {
         this._stuffData = parser.stuffData;
         this._extra = parser.extra;
         this._secondsToExpiration = parser.secondsToExpiration;
-        this._expirationTimeStamp = parser.expirationTimeStamp;
+        this._expirationTimeStamp = FurnitureItem.resolveExpirationTimeStamp(parser);
         this._hasRentPeriodStarted = parser.hasRentPeriodStarted;
         this._creationDay = parser.creationDay;
         this._creationMonth = parser.creationMonth;

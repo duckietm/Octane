@@ -130,6 +130,171 @@
     display: none;
 }
 
+/* inventory_thumb overlays: rarity plaque (rarity_item_overlay_grid, 36x9 at the bottom) and the
+   rent_state dot (10x10 at 4,4; not started / started / ending). */
+.octane-inventory-window .octane-inventory-thumb-rarity {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 9px;
+    line-height: 9px;
+    border-radius: 2px;
+    background: #f5d35b;
+    border: 1px solid #8a6d13;
+    color: #3a2c00;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-not_started {
+    background: #9a9a9a;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-started {
+    background: #5ca843;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-ending {
+    background: #d13e31;
+}
+
+/* Preview pane: tradeable / recyclable counters (FurniView.as:298-339) with the white glow on
+   the number, the extra line (rarity / rent countdown) and the rent buttons. */
+.octane-inventory-window .octane-inventory-preview-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    min-width: 40px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 3px;
+    border: 1px solid var(--inv-line);
+    background: #fff;
+    color: var(--inv-accent);
+    font-size: 11px;
+}
+
+.octane-inventory-window .octane-inventory-preview-counter.is-unavailable {
+    color: #9a9a9a;
+    opacity: 0.7;
+}
+
+.octane-inventory-window .octane-inventory-preview-counter__number {
+    font-weight: 700;
+    color: #2f6982;
+    text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+}
+
+.octane-inventory-window .octane-inventory-preview-extra {
+    color: #55544e;
+}
+
+.octane-inventory-window .octane-inventory-btn-goto,
+.octane-inventory-window .octane-inventory-btn-rent {
+    border: 2px solid var(--inv-border) !important;
+    border-radius: 4px;
+    color: #fff !important;
+    font-weight: 700;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    background: var(--inv-blue) !important;
+    box-shadow: inset -2px -2px 0 #2b6a88, inset 2px 2px 0 #7fbcd8;
+}
+
+.octane-inventory-window .octane-inventory-btn-goto:hover,
+.octane-inventory-window .octane-inventory-btn-rent:hover {
+    background: #4f9dc2 !important;
+}
+
+/* badge_details card: bold name, description, coloured rarity tag, owner count. */
+.octane-inventory-window .octane-inventory-badge-details__rarity {
+    letter-spacing: 0.04em;
+    text-shadow: none;
+}
+
+.octane-inventory-window .octane-inventory-badge-details__owners {
+    color: #555555;
+}
+
+/* item_popup: 203px white card to the right (or left) of the hovered trade thumb. */
+.octane-inventory-item-popup {
+    position: fixed;
+    z-index: 9999;
+    box-sizing: border-box;
+    padding: 5px 5px 10px;
+    border: 2px solid #6b6f73;
+    border-radius: 6px;
+    background: #fff;
+    color: #111;
+    font-family: Ubuntu, sans-serif;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.octane-inventory-item-popup__name {
+    min-height: 19px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 19px;
+}
+
+.octane-inventory-item-popup__ltd {
+    position: absolute;
+    top: 23px;
+    right: 4px;
+}
+
+.octane-inventory-item-popup__image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 55px;
+    margin-top: 3px;
+}
+
+.octane-inventory-item-popup__image img {
+    max-width: 180px;
+    max-height: 200px;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-item-popup__arrow {
+    position: absolute;
+    top: 50%;
+    width: 0;
+    height: 0;
+    margin-top: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.octane-inventory-item-popup.is-right .octane-inventory-item-popup__arrow {
+    left: -10px;
+    border-right: 10px solid #6b6f73;
+}
+
+.octane-inventory-item-popup.is-left .octane-inventory-item-popup__arrow {
+    right: -10px;
+    border-left: 10px solid #6b6f73;
+}
+
 @media (max-width: 1024px) and (min-width: 641px) {
     .octane-inventory-window {
         width: min(calc(100vw - 24px), 640px) !important;

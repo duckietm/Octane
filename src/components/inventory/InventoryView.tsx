@@ -12,7 +12,7 @@ import {
     RoomSessionEvent
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { isObjectMoverRequested, LocalizeBadgeName, LocalizeText, setObjectMoverRequested, UnseenItemCategory } from '../../api';
+import { ensureBadgeLeaderboardLoaded, GetConfigurationValue, isObjectMoverRequested, LocalizeText, setObjectMoverRequested, UnseenItemCategory } from '../../api';
 import { OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import {
     useInventoryBadges,
@@ -24,6 +24,13 @@ import {
     useOctaneEvent,
     useWiredTrading
 } from '../../hooks';
+import {
+    BADGE_FILTER_ALL,
+    BADGE_RARITY_FILTER_ALL,
+    getInventoryBadgeRarityFilterIds,
+    isAchievementBadgeCode,
+    passInventoryBadgeFilter
+} from './views/badge/inventoryBadgeFilters';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitureDeleteView';
@@ -52,6 +59,14 @@ const TAB_BY_CODE: Record<string, string> = {
 };
 const UNSEEN_CATEGORIES = [UnseenItemCategory.FURNI, UnseenItemCategory.PET, UnseenItemCategory.BADGE, UnseenItemCategory.PREFIX, UnseenItemCategory.BOT];
 
+// AIR 13 keeps rented furni in the furni tab (HabboInventory.mergeRentFurni is always true), so
+// their unseen counter (category 2) lands on the same tab as the owned furni.
+const getTabUnseenCount = (index: number, getCount: (category: number) => number) => {
+    const count = getCount(UNSEEN_CATEGORIES[index]);
+
+    return UNSEEN_CATEGORIES[index] === UnseenItemCategory.FURNI ? count + getCount(UnseenItemCategory.RENTABLE) : count;
+};
+
 export const InventoryView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const [currentTab, setCurrentTab] = useState<string>(TABS[0]);
@@ -60,6 +75,11 @@ export const InventoryView: FC<{}> = (props) => {
     const [searchValue, setSearchValue] = useState('');
     const [mainFilter, setMainFilter] = useState<string>(MAIN_FILTER_ALL);
     const [typeFilter, setTypeFilter] = useState<string>(TYPE_FILTER_ANY);
+    const [badgeTypeFilter, setBadgeTypeFilter] = useState<string>(BADGE_FILTER_ALL);
+    const [badgeRarityFilter, setBadgeRarityFilter] = useState<number>(BADGE_RARITY_FILTER_ALL);
+    // The rarity tiers come from caches that fill asynchronously; bumping this recomputes the
+    // badge filters once the leaderboard classification has arrived.
+    const [badgeRarityRevision, setBadgeRarityRevision] = useState(0);
     const { isTrading = false, stopTrading = null } = useInventoryTrade();
     const { isOpen: isWiredTrading = false } = useWiredTrading();
     const { getCount = null } = useInventoryUnseenTracker();
@@ -70,6 +90,24 @@ export const InventoryView: FC<{}> = (props) => {
         setSearchValue('');
         setMainFilter(MAIN_FILTER_ALL);
         setTypeFilter(TYPE_FILTER_ANY);
+        setBadgeTypeFilter(BADGE_FILTER_ALL);
+        setBadgeRarityFilter(BADGE_RARITY_FILTER_ALL);
+    }, [currentTab]);
+
+    useEffect(() => {
+        if (currentTab !== TAB_BADGES) return;
+
+        let cancelled = false;
+
+        ensureBadgeLeaderboardLoaded()
+            .then(() => {
+                if (!cancelled) setBadgeRarityRevision((previous) => previous + 1);
+            })
+            .catch(() => undefined);
+
+        return () => {
+            cancelled = true;
+        };
     }, [currentTab]);
 
     // Changing the main filter swaps the type list underneath it; keeping the old type id would
@@ -84,10 +122,11 @@ export const InventoryView: FC<{}> = (props) => {
         [groupItems, searchValue, mainFilter, typeFilter]
     );
 
-    const filteredBadgeCodes = useMemo(() => {
-        const comparison = searchValue.toLocaleLowerCase().replace(' ', '');
+    const uncommonRarityEnabled = GetConfigurationValue<boolean>('badge_rarity.uncommon', false) === true;
 
-        const achievementBadges = badgeCodes.filter((badge) => badge.startsWith('ACH_'));
+    // Achievement badges are collapsed to the highest level owned before any filter runs.
+    const dedupedBadgeCodes = useMemo(() => {
+        const achievementBadges = badgeCodes.filter((badge) => isAchievementBadgeCode(badge));
         const numberMap: { [key: string]: number } = {};
 
         achievementBadges.forEach((badge) => {
@@ -97,12 +136,22 @@ export const InventoryView: FC<{}> = (props) => {
             if (numberMap[name] === undefined || number > numberMap[name]) numberMap[name] = number;
         });
 
-        const deduped = Object.keys(numberMap)
+        return Object.keys(numberMap)
             .map((name) => `${name}${numberMap[name]}`)
-            .concat(badgeCodes.filter((badge) => !badge.startsWith('ACH_')));
+            .concat(badgeCodes.filter((badge) => !isAchievementBadgeCode(badge)));
+    }, [badgeCodes]);
 
-        return deduped.filter((badgeCode) => LocalizeBadgeName(badgeCode).toLocaleLowerCase().includes(comparison));
-    }, [badgeCodes, searchValue]);
+    // `badgeRarityRevision` is a dependency on purpose: the tier caches the helpers read are not
+    // React state, so the memos have to be told when they filled.
+    const badgeRarityFilterIds = useMemo(
+        () => getInventoryBadgeRarityFilterIds(dedupedBadgeCodes, uncommonRarityEnabled),
+        [dedupedBadgeCodes, uncommonRarityEnabled, badgeRarityRevision]
+    );
+
+    const filteredBadgeCodes = useMemo(
+        () => dedupedBadgeCodes.filter((badgeCode) => passInventoryBadgeFilter(badgeCode, badgeTypeFilter, badgeRarityFilter, searchValue, uncommonRarityEnabled)),
+        [dedupedBadgeCodes, badgeTypeFilter, badgeRarityFilter, searchValue, uncommonRarityEnabled, badgeRarityRevision]
+    );
 
     const onClose = () => {
         if (isTrading) stopTrading();
@@ -201,7 +250,7 @@ export const InventoryView: FC<{}> = (props) => {
                                 return (
                                     <OctaneCardTabsItemView
                                         key={index}
-                                        count={getCount(UNSEEN_CATEGORIES[index])}
+                                        count={getTabUnseenCount(index, getCount)}
                                         isActive={currentTab === name}
                                         onClick={(event) => setCurrentTab(name)}
                                     >
@@ -213,10 +262,16 @@ export const InventoryView: FC<{}> = (props) => {
                         <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full gap-2">
                             {showFilter && (
                                 <InventoryCategoryFilterView
+                                    badgeRarityFilter={badgeRarityFilter}
+                                    badgeRarityFilterIds={badgeRarityFilterIds}
+                                    badgeTypeFilter={badgeTypeFilter}
                                     currentTab={currentTab}
                                     mainFilter={mainFilter}
                                     searchValue={searchValue}
                                     typeFilter={typeFilter}
+                                    uncommonRarityEnabled={uncommonRarityEnabled}
+                                    onBadgeRarityFilterChange={setBadgeRarityFilter}
+                                    onBadgeTypeFilterChange={setBadgeTypeFilter}
                                     onMainFilterChange={onMainFilterChange}
                                     onSearchChange={setSearchValue}
                                     onTypeFilterChange={setTypeFilter}
