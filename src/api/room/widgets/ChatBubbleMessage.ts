@@ -15,6 +15,8 @@ export class ChatBubbleMessage {
     public prefixFont: string = '';
     public nickIcon: string = '';
     public displayOrder: string = 'icon-prefix-name';
+    /** -1 follows the room setting; a wired message may ask for 0 wide, 1 normal or 2 thin. */
+    public bubbleWidthOverride: number = -1;
     public originalText: string = '';
     public originalFormattedText: string = '';
     public translatedText: string = '';

@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { localizeWithFallback } from '../../api';
 import { Button, Text } from '../../common';
 import { VARIABLES_ELEMENTS } from './WiredCreatorTools.constants';
 import { VariableDefinition, VariableTextValue } from './WiredCreatorTools.types';
@@ -11,6 +12,8 @@ export interface WiredVariablesTabViewProps {
     canVariableHighlight: boolean;
     variableManageCanOpen: boolean;
     onOpenManagePanel: () => void;
+    canVariableClear: boolean;
+    onClearVariable: () => void;
     selectedVariableProperties: { key: string; value: string }[];
     selectedVariableTextValues: VariableTextValue[];
 }
@@ -29,6 +32,8 @@ export const WiredVariablesTabView: FC<WiredVariablesTabViewProps> = ({
     canVariableHighlight,
     variableManageCanOpen,
     onOpenManagePanel,
+    canVariableClear,
+    onClearVariable,
     selectedVariableProperties,
     selectedVariableTextValues
 }) => {
@@ -83,6 +88,9 @@ export const WiredVariablesTabView: FC<WiredVariablesTabViewProps> = ({
                     </Button>
                     <Button disabled={!variableManageCanOpen} variant="secondary" onClick={onOpenManagePanel}>
                         Manage
+                    </Button>
+                    <Button disabled={!canVariableClear} variant="secondary" onClick={onClearVariable}>
+                        {localizeWithFallback('wiredmenu.variable_overview.delete_all.title', 'Clear this variable')}
                     </Button>
                 </div>
             </div>

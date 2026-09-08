@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useRef } from 'react';
-import { ChatBubbleMessage, GetConfigurationValue } from '../../../../api';
+import { ChatBubbleMessage, GetConfigurationValue, resolveChatBubbleWidth } from '../../../../api';
 import { useChatWidget, useChatWindow } from '../../../../hooks';
 import IntervalWebWorker from '../../../../workers/IntervalWebWorker';
 import { WorkerBuilder } from '../../../../workers/WorkerBuilder';
@@ -188,7 +188,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
                 chatMessages.map((chat) => (
                     <ChatWidgetMessageView
                         key={chat.id}
-                        bubbleWidth={chatSettings.weight}
+                        bubbleWidth={resolveChatBubbleWidth(chat.bubbleWidthOverride, chatSettings.weight)}
                         chat={chat}
                         makeRoom={makeRoom}
                         showPointer={false}

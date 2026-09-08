@@ -27,6 +27,7 @@ import { WiredExtraTextInputVariableView } from '../extras/WiredExtraTextInputVa
 import { WiredExtraTextOutputFurniNameView } from '../extras/WiredExtraTextOutputFurniNameView';
 import { WiredExtraTextOutputUsernameView } from '../extras/WiredExtraTextOutputUsernameView';
 import { WiredExtraTextOutputVariableView } from '../extras/WiredExtraTextOutputVariableView';
+import { WiredExtraVariableWebApiView } from '../extras/WiredExtraVariableWebApiView';
 import { WiredExtraTimeUtilitiesView } from '../extras/WiredExtraTimeUtilitiesView';
 import { WiredExtraUnseenView } from '../extras/WiredExtraUnseenView';
 import { WiredExtraUserVariableView } from '../extras/WiredExtraUserVariableView';
@@ -103,10 +104,12 @@ import { WiredActionResetView } from './WiredActionResetView';
 import { WiredActionSendSignalView } from './WiredActionSendSignalView';
 import { WiredActionSetAltitudeView } from './WiredActionSetAltitudeView';
 import { WiredActionSetFurniStateToView } from './WiredActionSetFurniStateToView';
+import { WiredActionOverrideHeightView } from './WiredActionOverrideHeightView';
 import { WiredActionSetRollerSpeedView } from './WiredActionSetRollerSpeedView';
 import { WiredActionSetRoomAdView } from './WiredActionSetRoomAdView';
 import { WiredActionTeleportView } from './WiredActionTeleportView';
 import { WiredActionToggleFurniStateView } from './WiredActionToggleFurniStateView';
+import { WiredActionToggleToRandomStateView } from './WiredActionToggleToRandomStateView';
 import { WiredActionUnfreezeView } from './WiredActionUnfreezeView';
 
 export const WiredActionLayoutView = (code: number) => {
@@ -143,6 +146,19 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionControlClockView />;
         case WiredActionLayoutCode.FURNI_TO_USER:
             return <WiredActionTeleportView />;
+        case WiredActionLayoutCode.WALK_TO_FURNI:
+            return <WiredActionTeleportView />;
+        case WiredActionLayoutCode.EFFECT_AMOUNT:
+        case WiredActionLayoutCode.EFFECT_BADGE:
+        case WiredActionLayoutCode.EFFECT_TAG:
+        case WiredActionLayoutCode.EFFECT_ID:
+        case WiredActionLayoutCode.EFFECT_MESSAGE:
+        case WiredActionLayoutCode.EFFECT_TEXT:
+            return <WiredActionChatView />;
+        case WiredActionLayoutCode.USER_TARGET:
+            return <WiredActionKickFromRoomView />;
+        case WiredActionLayoutCode.MOVE_USER_TILES:
+            return <WiredActionMoveRotateUserView />;
         case WiredActionLayoutCode.FURNI_TO_FURNI:
             return <WiredActionFurniToFurniView />;
         case WiredActionLayoutCode.SET_ALTITUDE:
@@ -163,6 +179,7 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionJoinTeamView />;
         case WiredActionLayoutCode.KICK_FROM_ROOM:
             return <WiredActionKickFromRoomView />;
+        case WiredActionLayoutCode.ALL_USERS_LEAVE_TEAM:
         case WiredActionLayoutCode.LEAVE_TEAM:
             return <WiredActionLeaveTeamView />;
         case WiredActionLayoutCode.MOVE_FURNI:
@@ -185,6 +202,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionTeleportView />;
         case WiredActionLayoutCode.TOGGLE_FURNI_STATE:
             return <WiredActionToggleFurniStateView />;
+        case WiredActionLayoutCode.TOGGLE_TO_RANDOM_STATE:
+            return <WiredActionToggleToRandomStateView />;
         case WiredActionLayoutCode.UNFREEZE:
             return <WiredActionUnfreezeView />;
         case WiredActionLayoutCode.USER_TO_FURNI:
@@ -261,6 +280,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredExtraVariableTextConnectorView />;
         case WiredActionLayoutCode.TEXT_OUTPUT_VARIABLE_EXTRA:
             return <WiredExtraTextOutputVariableView />;
+        case WiredActionLayoutCode.VARIABLE_WEB_API_EXTRA:
+            return <WiredExtraVariableWebApiView />;
         case WiredActionLayoutCode.USER_VARIABLE_EXTRA:
             return <WiredExtraUserVariableView />;
         case WiredActionLayoutCode.FURNI_VARIABLE_EXTRA:
@@ -281,6 +302,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionSendSignalView />;
         case WiredActionLayoutCode.NEG_SEND_SIGNAL:
             return <WiredActionSendSignalView />;
+        case WiredActionLayoutCode.OVERRIDE_HEIGHT:
+            return <WiredActionOverrideHeightView />;
         case WiredActionLayoutCode.SET_ROLLER_SPEED:
             return <WiredActionSetRollerSpeedView />;
         case WiredActionLayoutCode.BOT_DANCE:

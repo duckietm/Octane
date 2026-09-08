@@ -11,7 +11,15 @@ import {
 } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook } from '@/state/useSharedHook';
-import { createPacketCooldownGate, LocalizeText, NotificationAlertType, SendMessageComposer } from '../../api';
+import {
+    createPacketCooldownGate,
+    LocalizeText,
+    NotificationAlertType,
+    normalizeWiredStyle,
+    SendMessageComposer,
+    WIRED_STYLE_DEFAULT,
+    WiredStyleName
+} from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 import { useRoom } from '../rooms';
@@ -20,6 +28,8 @@ export interface IWiredAccountPreferences {
     showInspectButton: boolean;
     showSystemNotifications: boolean;
     showToolbarButton: boolean;
+    /** The look of the wired box windows; one of WIRED_STYLE_OPTIONS. */
+    wiredStyle: WiredStyleName;
 }
 
 export interface IWiredRoomSettings {
@@ -97,13 +107,15 @@ const WIRED_VARIABLE_TARGET_FURNI = 1;
 const WIRED_VARIABLE_TARGET_ROOM = 3;
 const WIRED_VARIABLE_MANAGE_ACTION_ASSIGN = 0;
 const WIRED_VARIABLE_MANAGE_ACTION_REMOVE = 1;
+const WIRED_VARIABLE_MANAGE_ACTION_CLEAR_ALL = 2;
 
 const WIRED_TOOLS_STORAGE_PREFIX = 'nitro.wired.tools.preferences';
 const getCurrentUnixTime = () => Math.floor(Date.now() / 1000);
 const DEFAULT_ACCOUNT_PREFERENCES: IWiredAccountPreferences = {
     showToolbarButton: false,
     showInspectButton: false,
-    showSystemNotifications: false
+    showSystemNotifications: false,
+    wiredStyle: WIRED_STYLE_DEFAULT
 };
 
 const DEFAULT_ROOM_SETTINGS: IWiredRoomSettings = {
@@ -173,7 +185,8 @@ export const useWiredToolsStore = () => {
 
             setAccountPreferences({
                 ...DEFAULT_ACCOUNT_PREFERENCES,
-                ...(parsedValue || {})
+                ...(parsedValue || {}),
+                wiredStyle: normalizeWiredStyle(parsedValue?.wiredStyle)
             });
         } catch {
             setAccountPreferences(DEFAULT_ACCOUNT_PREFERENCES);
@@ -564,6 +577,43 @@ export const useWiredToolsStore = () => {
         [roomSettings.canModify]
     );
 
+    /**
+     * Takes a variable away from every holder at once, the official "clear this variable". The
+     * server decides who may (the owner of the definition box); the room is told through the next
+     * snapshot, but the local copy drops the holders straight away so the tab does not lag behind.
+     */
+    const clearVariableForAllHolders = useCallback(
+        (scope: 'user' | 'furni', variableItemId: number) => {
+            if (!roomSettings.canModify || !variableItemId) return;
+
+            const strip = (prevValue: Record<number, { variableItemId: number }[]>) => {
+                const nextValue: typeof prevValue = {};
+
+                for (const [holderId, assignments] of Object.entries(prevValue)) {
+                    const remaining = assignments.filter((assignment) => assignment.variableItemId !== variableItemId);
+
+                    if (remaining.length) nextValue[Number(holderId)] = remaining;
+                }
+
+                return nextValue;
+            };
+
+            if (scope === 'furni') setFurniVariableAssignments((prevValue) => strip(prevValue) as typeof prevValue);
+            else setUserVariableAssignments((prevValue) => strip(prevValue) as typeof prevValue);
+
+            SendMessageComposer(
+                new WiredUserVariableManageComposer(
+                    WIRED_VARIABLE_MANAGE_ACTION_CLEAR_ALL,
+                    scope === 'furni' ? WIRED_VARIABLE_TARGET_FURNI : WIRED_VARIABLE_TARGET_USER,
+                    0,
+                    variableItemId,
+                    0
+                )
+            );
+        },
+        [roomSettings.canModify]
+    );
+
     const showInvalidRoomAlert = useCallback(() => {
         if (!simpleAlert) return;
 
@@ -627,6 +677,7 @@ export const useWiredToolsStore = () => {
         updateUserVariableValue,
         assignFurniVariable,
         removeFurniVariable,
+        clearVariableForAllHolders,
         updateFurniVariableValue,
         updateRoomVariableValue,
         openMonitor,

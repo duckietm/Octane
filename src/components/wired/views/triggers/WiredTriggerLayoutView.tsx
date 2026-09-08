@@ -12,6 +12,7 @@ import { WiredTriggerClickUserView } from './WiredTriggerClickUserView';
 import { WiredTriggerClockCounterView } from './WiredTriggerClockCounterView';
 import { WiredTriggerCollisionView } from './WiredTriggerCollisionView';
 import { WiredTriggerDiceRolledView } from './WiredTriggerDiceRolledView';
+import { WiredTriggerExecuteOnceLongView } from './WiredTriggerExecuteOnceLongView';
 import { WiredTriggeExecuteOnceView } from './WiredTriggerExecuteOnceView';
 import { WiredTriggeExecutePeriodicallyLongView } from './WiredTriggerExecutePeriodicallyLongView';
 import { WiredTriggeExecutePeriodicallyShortView } from './WiredTriggerExecutePeriodicallyShortView';
@@ -36,6 +37,8 @@ export const WiredTriggerLayoutView = (code: number) => {
             return <WiredTriggerAvatarLeaveRoomView />;
         case WiredTriggerLayout.AVATAR_SAYS_SOMETHING:
             return <WiredTriggerAvatarSaysSomethingView />;
+        case WiredTriggerLayout.AVATAR_SAYS_USERNAME:
+            return <WiredTriggerAvatarSaysSomethingView usernameOnly={true} />;
         case WiredTriggerLayout.AVATAR_WALKS_OFF_FURNI:
             return <WiredTriggerAvatarWalksOffFurniView />;
         case WiredTriggerLayout.AVATAR_WALKS_ON_FURNI:
@@ -60,6 +63,8 @@ export const WiredTriggerLayoutView = (code: number) => {
             return <WiredTriggerCollisionView />;
         case WiredTriggerLayout.EXECUTE_ONCE:
             return <WiredTriggeExecuteOnceView />;
+        case WiredTriggerLayout.EXECUTE_ONCE_LONG:
+            return <WiredTriggerExecuteOnceLongView />;
         case WiredTriggerLayout.EXECUTE_PERIODICALLY:
             return <WiredTriggeExecutePeriodicallyView />;
         case WiredTriggerLayout.EXECUTE_PERIODICALLY_SHORT:
@@ -68,6 +73,7 @@ export const WiredTriggerLayoutView = (code: number) => {
             return <WiredTriggeExecutePeriodicallyLongView />;
         case WiredTriggerLayout.GAME_ENDS:
             return <WiredTriggerGameEndsView />;
+        case WiredTriggerLayout.TEAM_GAME_RESULT:
         case WiredTriggerLayout.GAME_STARTS:
             return <WiredTriggerGameStartsView />;
         case WiredTriggerLayout.SCORE_ACHIEVED:
