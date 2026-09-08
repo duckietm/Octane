@@ -32,6 +32,7 @@ export * from './session';
 export * from './soundboard/useSoundboard';
 export * from './soundboard/useSoundboardCatalog';
 export * from './soundboard/useSoundboardManifest';
+export * from './talent';
 export * from './translation';
 export * from './traxeditor/useTraxEditor';
 export * from './useChatWindow';

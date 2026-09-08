@@ -19,12 +19,15 @@ import { FurniChooserWidgetView } from './choosers/FurniChooserWidgetView';
 import { UserChooserWidgetView } from './choosers/UserChooserWidgetView';
 import { DoorbellWidgetView } from './doorbell/DoorbellWidgetView';
 import { FriendRequestWidgetView } from './friend-request/FriendRequestWidgetView';
+import { FpsCounterView } from './fps-counter/FpsCounterView';
 import { FurnitureWidgetsView } from './furniture/FurnitureWidgetsView';
 import { PetPackageWidgetView } from './pet-package/PetPackageWidgetView';
+import { PollWidgetView } from './poll/PollWidgetView';
 import { RoomKeybindView } from './RoomKeybindView';
 import { RoomFilterWordsWidgetView } from './room-filter-words/RoomFilterWordsWidgetView';
 import { RoomThumbnailWidgetView } from './room-thumbnail/RoomThumbnailWidgetView';
 import { RoomToolsWidgetView } from './room-tools/RoomToolsWidgetView';
+import { UiHelpBubblesView } from './ui-help-bubbles/UiHelpBubblesView';
 import { animateRoomZoom, applyRoomZoom, roomZoomLevelToScale } from './room-tools/roomZoom.helpers';
 import { WordQuizWidgetView } from './word-quiz/WordQuizWidgetView';
 
@@ -212,6 +215,9 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             <WidgetErrorBoundary name="PetPackageWidget">
                 <PetPackageWidgetView />
             </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="PollWidget">
+                <PollWidgetView />
+            </WidgetErrorBoundary>
             <WidgetErrorBoundary name="UserChooserWidget">
                 <UserChooserWidgetView />
             </WidgetErrorBoundary>
@@ -220,6 +226,12 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="FriendRequestWidget">
                 <FriendRequestWidgetView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="UiHelpBubbles">
+                <UiHelpBubblesView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="FpsCounter">
+                <FpsCounterView />
             </WidgetErrorBoundary>
         </WidgetErrorBoundary>
     );

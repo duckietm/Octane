@@ -30,7 +30,24 @@ const OFFICIAL_CLIENT_COMMANDS = [
     'wired',
     'var',
     'inspect',
-    'link'
+    'link',
+    // ChatInputWidgetHandler.as:246-442 additions
+    'kick',
+    'mute',
+    'shutup',
+    'drop',
+    'aalert',
+    'anew',
+    'avisit',
+    'uc',
+    'wiredreset',
+    'playtest',
+    'ping',
+    'fps',
+    'showstats',
+    'lang',
+    'news',
+    'mail'
 ];
 
 describe('useChatCommandSelector', () => {

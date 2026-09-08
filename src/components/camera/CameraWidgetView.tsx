@@ -2,13 +2,14 @@ import {
     AddLinkEventTracker,
     GetSessionDataManager,
     ILinkEventTracker,
+    PerkEnum,
     RemoveLinkEventTracker,
     RoomEngineEvent,
     RoomSessionEvent
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../api';
-import { useAchievements, useCamera, useOctaneEvent, useNotification, useRoom } from '../../hooks';
+import { useAchievements, useCamera, useOctaneEvent, useNotification, usePerkAllowances, useRoom } from '../../hooks';
 import { isRoomZoomPhotoReady } from '../room/widgets/room-tools/roomZoom.helpers';
 import { getCameraAchievementLevel } from './CameraAirUtilities';
 import { CameraWidgetCaptureView } from './views/CameraWidgetCaptureView';
@@ -35,6 +36,7 @@ export const CameraWidgetView: FC<{}> = (props) => {
     const { achievementCategories = [] } = useAchievements();
     const { simpleAlert = null } = useNotification();
     const { roomSession = null } = useRoom();
+    const { isPerkAllowed } = usePerkAllowances();
 
     const myLevel = useMemo(() => getCameraAchievementLevel(achievementCategories), [achievementCategories]);
 
@@ -122,6 +124,9 @@ export const CameraWidgetView: FC<{}> = (props) => {
 
                 if (parts.length < 2) return;
 
+                // Official CameraWidgetHandler.as:128: the camera only opens with the CAMERA perk.
+                if ((parts[1] === 'show' || parts[1] === 'toggle') && !isPerkAllowed(PerkEnum.CAMERA)) return;
+
                 switch (parts[1]) {
                     case 'show':
                         openCamera();
@@ -144,7 +149,7 @@ export const CameraWidgetView: FC<{}> = (props) => {
         AddLinkEventTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [mode, openCamera, setSelectedPictureIndex]);
+    }, [mode, openCamera, setSelectedPictureIndex, isPerkAllowed]);
 
     if (mode === MODE_NONE) return null;
 

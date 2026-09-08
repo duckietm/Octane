@@ -33,13 +33,16 @@ import { SnowWarView } from './game-center/views/snowwar/SnowWarView';
 import { GroupsView } from './groups/GroupsView';
 import { GroupForumView } from './groups/views/forums/GroupForumView';
 import { GuideToolView } from './guide-tool/GuideToolView';
+import { ChatReviewReporterFeedbackView } from './guide-tool/views/ChatReviewReporterFeedbackView';
 import { HcCenterView } from './hc-center/HcCenterView';
+import { VipBenefitsView } from './hc-center/VipBenefitsView';
 import { HelpView } from './help/HelpView';
 import { HotelView } from './hotel-view/HotelView';
 import { HousekeepingView } from './housekeeping/HousekeepingView';
 import { InventoryView } from './inventory/InventoryView';
 import { ModToolsView } from './mod-tools/ModToolsView';
 import { NavigatorView } from './navigator/NavigatorView';
+import { NuxView } from './nux/NuxView';
 import { OctanebubbleHiddenView } from './octanebubblehidden/OctanebubbleHiddenView';
 import { OctanepediaView } from './octanepedia/OctanepediaView';
 import { ExternalPluginLoader } from './plugins/ExternalPluginLoader';
@@ -48,6 +51,7 @@ import { RareValuesView } from './rare-values/RareValuesView';
 import { RightSideView } from './right-side/RightSideView';
 import { RoomView } from './room/RoomView';
 import { SoundboardView } from './soundboard/SoundboardView';
+import { CitizenshipWelcomeView, TalentLevelUpView, TalentTrackView } from './talent';
 import { ToolbarView } from './toolbar/ToolbarView';
 import { TranslationBootstrap } from './translation/TranslationBootstrap';
 import { TranslationSettingsView } from './translation/TranslationSettingsView';
@@ -189,9 +193,12 @@ export const MainView: FC<{}> = (props) =>
             <GroupForumView />
             <CameraWidgetView />
             <HelpView />
+            <NuxView />
             <OctanepediaView />
             <GuideToolView />
+            <ChatReviewReporterFeedbackView />
             <HcCenterView />
+            <VipBenefitsView />
             <CampaignView />
             <GameCenterView />
             <SnowWarView />
@@ -200,6 +207,9 @@ export const MainView: FC<{}> = (props) =>
             <RareValuesView />
             <FortuneWheelView />
             <SoundboardView />
+            <TalentTrackView />
+            <TalentLevelUpView />
+            <CitizenshipWelcomeView />
             <TraxEditorView />
             {GetConfigurationValue<boolean>('radio_ui.enabled', false) && !IsTouchDevice() && <RadioView />}
             <ExternalPluginLoader />

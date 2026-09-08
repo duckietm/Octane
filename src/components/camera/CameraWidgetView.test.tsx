@@ -35,6 +35,7 @@ vi.mock('../../hooks', () => ({
         if (type === 'REE_ROOM_ZOOMED') mocks.zoomHandlers.push(handler);
     },
     useNotification: () => ({ simpleAlert: mocks.simpleAlert }),
+    usePerkAllowances: () => ({ hasReceivedPerks: true, isPerkAllowed: () => true }),
     useRoom: () => ({ roomSession: { roomId: 42 } })
 }));
 

@@ -1,11 +1,26 @@
 import { FurnitureStackHeightComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, SendMessageComposer } from '../../../../api';
+import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../../common';
 import { useFurnitureStackHeightWidget } from '../../../../hooks';
 
+/**
+ * Official `CustomStackHeightWidget` (`custom_stack_height` layout, 320x210): the stacking helper
+ * and, for the `tile_walkmagic*` items, the walking helper with the multi-walk checkbox
+ * (`walktile_container`). The adjacent-height buttons (`button_move_up` / `button_move_down`,
+ * composer 2687) are left out: the renderer has no composer for them.
+ */
 export const FurnitureStackHeightView: FC<{}> = (props) => {
-    const { objectId = -1, height = 0, maxHeight = 40, isWalkHeightHelper = false, onClose = null, updateHeight = null } = useFurnitureStackHeightWidget();
+    const {
+        objectId = -1,
+        height = 0,
+        maxHeight = 40,
+        isWalkHeightHelper = false,
+        isMultiWalkMode = false,
+        onClose = null,
+        updateHeight = null,
+        updateMultiWalkMode = null
+    } = useFurnitureStackHeightWidget();
     const [tempHeight, setTempHeight] = useState('');
     const titleKey = isWalkHeightHelper ? 'widget.custom.walk.height.title' : 'widget.custom.stack.height.title';
     const textKey = isWalkHeightHelper ? 'widget.custom.walk.height.text' : 'widget.custom.stack.height.text';
@@ -58,6 +73,17 @@ export const FurnitureStackHeightView: FC<{}> = (props) => {
                         {LocalizeText('furniture.floor.level')}
                     </Button>
                 </div>
+                {isWalkHeightHelper && (
+                    <label className="flex items-center gap-2 cursor-pointer octane-stack-height-multiwalk" data-testid="stack-height-multiwalk">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            checked={isMultiWalkMode}
+                            onChange={(event) => updateMultiWalkMode(event.target.checked)}
+                        />
+                        <Text>{localizeWithFallback('widget.custom.multiwalk_mode.text', 'Allow multiple users on this location')}</Text>
+                    </label>
+                )}
             </OctaneCardContentView>
         </OctaneCardView>
     );

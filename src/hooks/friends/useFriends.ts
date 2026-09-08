@@ -236,6 +236,7 @@ const useFriendsStore = () => {
         const parser = event.getParser();
         const previousFriends = new Map(friendsRef.current.map((friend) => [friend.id, friend]));
         const onlineNotifications: MessengerFriend[] = [];
+        const offlineNotifications: MessengerFriend[] = [];
 
         for (const friend of parser.updatedFriends) {
             const previousFriend = previousFriends.get(friend.id);
@@ -243,6 +244,8 @@ const useFriendsStore = () => {
             newFriend.populate(friend);
 
             if (previousFriend && !previousFriend.online && newFriend.online) onlineNotifications.push(newFriend);
+
+            if (previousFriend && previousFriend.online && !newFriend.online) offlineNotifications.push(newFriend);
         }
 
         setSettings((previous) => withUpdatedFriendCategories(previous, parser.categories));
@@ -284,6 +287,16 @@ const useFriendsStore = () => {
             const text = localizeWithFallback('notifications.friend_online', `${friend.name} is online`, ['name'], [friend.name]);
 
             showSingleBubble?.(text, NotificationBubbleType.FRIENDONLINE, friend.figure, `friends-messenger/${friend.id}`);
+        }
+
+        // The `friendoffline` style of the official notification config, under the same
+        // preference as the online bubble; it carries no messenger shortcut.
+        for (const friend of offlineNotifications) {
+            if (!shouldNotifyFriendOnline(friendOnlineNotificationPreference, friend.relationshipStatus)) continue;
+
+            const text = localizeWithFallback('notifications.friend_offline', `${friend.name} is offline`, ['name'], [friend.name]);
+
+            showSingleBubble?.(text, NotificationBubbleType.FRIENDOFFLINE, friend.figure);
         }
     });
 

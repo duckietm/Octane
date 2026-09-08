@@ -20,6 +20,10 @@ export const CLIENT_COMMANDS: { key: string; descriptionKey: string; fallback: s
     { key: 'fs', descriptionKey: 'chatcmd.client.fullscreen', fallback: 'Toggle fullscreen' },
     { key: 'hidemouse', descriptionKey: 'chatcmd.client.hidemouse', fallback: 'Hide/show the mouse cursor' },
     { key: 'cam', descriptionKey: 'chatcmd.client.camera', fallback: 'Open the camera' },
+    { key: 'fps', descriptionKey: 'chatcmd.client.fps', fallback: 'Set the frame rate: :fps <5-10000>' },
+    { key: 'showstats', descriptionKey: 'chatcmd.client.showstats', fallback: 'Show the FPS counter' },
+    { key: 'ping', descriptionKey: 'chatcmd.client.ping', fallback: 'Show your latency' },
+    { key: 'lang', descriptionKey: 'chatcmd.client.lang', fallback: 'Switch the client language: :lang <code>' },
     // Expressions
     { key: 'd', descriptionKey: 'chatcmd.client.laugh', fallback: 'Laugh (VIP)' },
     { key: 'kiss', descriptionKey: 'chatcmd.client.kiss', fallback: 'Blow a kiss (VIP)' },
@@ -36,6 +40,17 @@ export const CLIENT_COMMANDS: { key: string; descriptionKey: string; fallback: s
     { key: 'ignore', descriptionKey: 'chatcmd.client.ignore', fallback: 'Ignore a user in this room: :ignore <name>' },
     { key: 'unignore', descriptionKey: 'chatcmd.client.unignore', fallback: 'Stop ignoring a user: :unignore <name>' },
     { key: 'mutepets', descriptionKey: 'chatcmd.client.mutepets', fallback: 'Mute the pets in this room' },
+    { key: 'kick', descriptionKey: 'chatcmd.client.kick', fallback: 'Kick a user from your room: :kick <name>' },
+    { key: 'mute', descriptionKey: 'chatcmd.client.mute', fallback: 'Mute a user in your room for 2 minutes: :mute <name>' },
+    { key: 'shutup', descriptionKey: 'chatcmd.client.mute', fallback: 'Mute a user in your room for 2 minutes: :mute <name>' },
+    { key: 'drop', descriptionKey: 'chatcmd.client.drop', fallback: 'Drop the item you are carrying' },
+    { key: 'news', descriptionKey: 'chatcmd.client.news', fallback: 'Open the news' },
+    { key: 'mail', descriptionKey: 'chatcmd.client.mail', fallback: 'Open your mail' },
+    // Ambassadors and staff
+    { key: 'aalert', descriptionKey: 'chatcmd.client.aalert', fallback: 'Ambassador alert: :aalert <name>' },
+    { key: 'anew', descriptionKey: 'chatcmd.client.anew', fallback: 'Classify the users of this room as new' },
+    { key: 'avisit', descriptionKey: 'chatcmd.client.avisit', fallback: 'Go to the newbie lobby (:avisit group for the group lobby)' },
+    { key: 'uc', descriptionKey: 'chatcmd.client.uc', fallback: 'Classify users: :uc <type> or :uc hotel <type>' },
     // Room management
     { key: 'furni', descriptionKey: 'chatcmd.client.furni', fallback: 'Furni chooser' },
     { key: 'chooser', descriptionKey: 'chatcmd.client.chooser', fallback: 'User chooser' },
@@ -49,6 +64,8 @@ export const CLIENT_COMMANDS: { key: string; descriptionKey: string; fallback: s
     { key: 'wf', descriptionKey: 'chatcmd.client.wired', fallback: 'Open the wired creator tools' },
     { key: 'var', descriptionKey: 'chatcmd.client.variables', fallback: 'Wired tools: variables tab' },
     { key: 'inspect', descriptionKey: 'chatcmd.client.inspection', fallback: 'Wired tools: inspection tab' },
+    { key: 'wiredreset', descriptionKey: 'chatcmd.client.wiredreset', fallback: 'Close the wired window and reset its cache' },
+    { key: 'playtest', descriptionKey: 'chatcmd.client.playtest', fallback: 'Toggle the wired play-test mode' },
     // Info
     { key: 'client', descriptionKey: 'chatcmd.client.info', fallback: 'Client info' },
     { key: 'octane', descriptionKey: 'chatcmd.client.info', fallback: 'Client info' }

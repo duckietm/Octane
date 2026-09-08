@@ -1,24 +1,30 @@
-import { CreateLinkEvent, GetRoomEngine, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
+import { CreateLinkEvent, GetRoomEngine, PerkEnum, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, localizeWithFallback, SendMessageComposer, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
-import { useAchievements, useNavigatorData, useOctaneEvent, useRoom, useRoomVisitHistory } from '../../../../hooks';
+import { useAchievements, useNavigatorData, useOctaneEvent, usePerkAllowances, useRoom, useRoomVisitHistory, useUserDataSnapshot } from '../../../../hooks';
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { RoomToolsInfoView } from './RoomToolsInfoView';
+import { ROOM_TOOL_HELP_BUBBLE_NAMES, resolveRoomToolsCollapsed } from './roomToolsState.helpers';
 import { applyRoomZoom, getRoomZoomLevel, getRoomZoomScale, stepRoomZoom } from './roomZoom.helpers';
 
-// The official client stores the collapsed state server-side (uiFlags & 2);
-// we keep it in the browser, per client, instead.
+// The official client stores the collapsed state server-side (uiFlags & 2, `RoomToolsWidget.as:49`)
+// and forces it for new users. The renderer has no composer to write the flag back, so the
+// server value only seeds the first visit and the browser keeps the toggles made here.
 const TOOLS_COLLAPSED_STORAGE_KEY = 'octane.room.tools.collapsed';
 const WIRED_ACHIEVEMENTS_CATEGORY = 'wired_games';
 
-const readToolsCollapsed = (): boolean => {
+const readToolsCollapsed = (): boolean | null => {
     try {
-        return window.localStorage.getItem(TOOLS_COLLAPSED_STORAGE_KEY) === '1';
+        const stored = window.localStorage.getItem(TOOLS_COLLAPSED_STORAGE_KEY);
+
+        if (stored === null) return null;
+
+        return stored === '1';
     } catch {
-        return false;
+        return null;
     }
 };
 
@@ -35,16 +41,20 @@ const snapZoomScale = (scale: number): number => getRoomZoomScale(getRoomZoomLev
 export const RoomToolsWidgetView: FC<{}> = (props) => {
     const [zoomScale, setZoomScale] = useState<number>(1);
     const [hasLikedRoom, setHasLikedRoom] = useState<boolean>(false);
-    const [isToolsOpen, setIsToolsOpen] = useState<boolean>(() => !readToolsCollapsed());
+    const { uiFlags = 0, isNoob = false } = useUserDataSnapshot();
+    const [isToolsOpen, setIsToolsOpen] = useState<boolean>(() => !resolveRoomToolsCollapsed({ storedCollapsed: readToolsCollapsed(), uiFlags, isNoob }));
     const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
     const [plugins, setPlugins] = useState<IOctanePlugin[]>([]);
     const { navigatorData } = useNavigatorData();
     const { roomSession = null } = useRoom();
     const { historyView = [], canGoBack = false, canGoForward = false, goBack = null, goForward = null, isNavigating = false } = useRoomVisitHistory();
     const { achievementCategories = [], setSelectedCategoryCode = null } = useAchievements();
+    const { isPerkAllowed } = usePerkAllowances();
 
+    // Official `RoomToolsWidget.as:48`: the camera entry needs the CAMERA perk and the
+    // `camera.launch.ui.position` of the room menu.
     const cameraPosition = GetConfigurationValue<string>('camera.launch.ui.position', '') ?? '';
-    const showCameraTool = cameraPosition === '' || cameraPosition === 'room-menu';
+    const showCameraTool = isPerkAllowed(PerkEnum.CAMERA) && (cameraPosition === '' || cameraPosition === 'room-menu');
 
     useEffect(() => {
         setPlugins(getRegisteredPlugins());
@@ -204,6 +214,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                             key={tool.action}
                             className={classNames('room-tool-row', tool.disabled && 'is-disabled')}
                             title={tool.label}
+                            data-help-bubble={ROOM_TOOL_HELP_BUBBLE_NAMES[tool.action]}
                             onClick={() => !tool.disabled && handleToolClick(tool.action)}
                         >
                             <div className={classNames('octane-icon', tool.icon)} />
@@ -227,6 +238,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                             role="button"
                             aria-disabled={!canGoBack}
                             title={LocalizeText('room.history.button.back.tooltip')}
+                            data-help-bubble="button_history_back"
                             onClick={() => handleToolClick('room_history_back')}
                         />
                         <div
@@ -234,6 +246,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                             role="button"
                             aria-disabled={!hasHistory}
                             title={LocalizeText('room.history.button.tooltip')}
+                            data-help-bubble="button_history"
                             onClick={() => handleToolClick('room_history')}
                         />
                         <div
@@ -241,6 +254,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                             role="button"
                             aria-disabled={!canGoForward}
                             title={LocalizeText('room.history.button.forward.tooltip')}
+                            data-help-bubble="button_history_forward"
                             onClick={() => handleToolClick('room_history_next')}
                         />
                     </div>

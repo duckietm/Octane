@@ -54,6 +54,19 @@ const css = readFileSync(join(process.cwd(), 'src/css/room/RoomWidgets.css'), 'u
         expect(source).not.toContain('initial={{ opacity: 0, x: -12 }}');
     });
 
+    it('seeds the collapsed state from the server uiFlags and gates the camera on the CAMERA perk (RoomToolsWidget.as:48-49)', () => {
+        expect(source).toContain('resolveRoomToolsCollapsed({ storedCollapsed: readToolsCollapsed(), uiFlags, isNoob })');
+        expect(source).toContain('const { uiFlags = 0, isNoob = false } = useUserDataSnapshot();');
+        expect(source).toContain("isPerkAllowed(PerkEnum.CAMERA) && (cameraPosition === '' || cameraPosition === 'room-menu')");
+    });
+
+    it('exposes the official room_tools_toolbar names as help bubble anchors', () => {
+        expect(source).toContain('data-help-bubble={ROOM_TOOL_HELP_BUBBLE_NAMES[tool.action]}');
+        expect(source).toContain('data-help-bubble="button_history_back"');
+        expect(source).toContain('data-help-bubble="button_history"');
+        expect(source).toContain('data-help-bubble="button_history_forward"');
+    });
+
     it('anchors the collapsed handle to the viewport edge', () => {
         expect(css).toMatch(/&\.is-collapsed\s*\{[^}]*width:\s*158px;/s);
         expect(css).toMatch(/&\.is-collapsed\s+\.room-tools-collapse-toggle\s*\{[^}]*transform:\s*translateY\(-50%\);/s);

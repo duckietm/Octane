@@ -337,6 +337,19 @@ export class WiredRewardResultMessageEvent extends MessageEvent {
     static readonly PRODUCT_DONATED_CODE = 7;
     static readonly BADGE_DONATED_CODE = 8;
 }
+export class AccountSafetyLockStatusChangeMessageEvent extends MessageEvent {}
+export class EpicPopupMessageEvent extends MessageEvent {}
+export class RoomMessageNotificationMessageEvent extends MessageEvent {}
+export class RecyclerFinishedMessageEvent extends MessageEvent {
+    static readonly FINISHED_OK = 1;
+    static readonly FINISHED_FAIL = 2;
+}
+export class CanCreateRoomEvent extends MessageEvent {}
+export class CanCreateRoomMessageComposer extends StubClass {}
+// The sound manager's "song started" OctaneEvent; useNotification listens for its type string.
+export class NotifyPlayedSongEvent extends OctaneEvent {
+    static readonly NOTIFY_PLAYED_SONG = 'UIEW_NOTIFY_PLAYED_SONG';
+}
 
 // RoomEnterEffect — used by useNotificationStore to check if the room-enter
 // animation is still running before showing the mod disclaimer bubble.
@@ -857,6 +870,23 @@ export class QuizResultsMessageEvent extends MessageEvent {}
 export class GetQuizQuestionsComposer extends StubClass {}
 export class PostQuizAnswersComposer extends StubClass {}
 export class GuideSessionCreateMessageComposer extends StubClass {}
+// Guardian chat review jury + reporter feedback (GuideToolView, ChatReviewReporterFeedbackView).
+export class ChatReviewSessionOfferedToGuideMessageEvent extends MessageEvent {}
+export class ChatReviewSessionStartedMessageEvent extends MessageEvent {}
+export class ChatReviewSessionVotingStatusMessageEvent extends MessageEvent {}
+export class ChatReviewSessionResultsMessageEvent extends MessageEvent {}
+export class ChatReviewSessionDetachedMessageEvent extends MessageEvent {}
+export class GuideTicketCreationResultMessageEvent extends MessageEvent {}
+export class GuideTicketResolutionMessageEvent extends MessageEvent {}
+export class ChatReviewGuideDecidesOnOfferMessageComposer extends PayloadComposer {}
+export class ChatReviewGuideVoteMessageComposer extends PayloadComposer {}
+export class ChatReviewGuideDetachedMessageComposer extends PayloadComposer {}
+// Talent track / citizenship (useTalentTrack, TalentTrackView).
+export class TalentTrackMessageEvent extends MessageEvent {}
+export class TalentLevelUpEvent extends MessageEvent {}
+export class TalentTrackLevelMessageEvent extends MessageEvent {}
+export class TalentTrackComposer extends PayloadComposer {}
+export class GetTalentTrackLevelMessageComposer extends PayloadComposer {}
 
 // ---------------------------------------------------------------------------
 // AIR 13 parity (infostand / navigator enforce category / friend bar tokens)
@@ -929,3 +959,53 @@ export class ClaimDailyTaskMessageComposer extends PayloadComposer {}
 export class GetRewardTracksMessageComposer extends PayloadComposer {}
 export class ClaimRewardTrackPrizeMessageComposer extends PayloadComposer {}
 export class PurchaseRewardTrackPremiumMessageComposer extends PayloadComposer {}
+
+// ---------------------------------------------------------------------------
+// Chat commands / perks / stack height (useChatInputActions, usePerkAllowances,
+// useFurnitureStackHeightWidget) register these events and send these composers.
+// ---------------------------------------------------------------------------
+
+export class PerkEnum {
+    public static USE_GUIDE_TOOL = 'USE_GUIDE_TOOL';
+    public static GIVE_GUIDE_TOUR = 'GIVE_GUIDE_TOUR';
+    public static JUDGE_CHAT_REVIEWS = 'JUDGE_CHAT_REVIEWS';
+    public static VOTE_IN_COMPETITIONS = 'VOTE_IN_COMPETITIONS';
+    public static CALL_ON_HELPERS = 'CALL_ON_HELPERS';
+    public static CITIZEN = 'CITIZEN';
+    public static TRADE = 'TRADE';
+    public static HEIGHTMAP_EDITOR_BETA = 'HEIGHTMAP_EDITOR_BETA';
+    public static BUILDER_AT_WORK = 'BUILDER_AT_WORK';
+    public static NAVIGATOR_ROOM_THUMBNAIL_CAMERA = 'NAVIGATOR_ROOM_THUMBNAIL_CAMERA';
+    public static CAMERA = 'CAMERA';
+    public static MOUSE_ZOOM = 'MOUSE_ZOOM';
+}
+export class PerkAllowancesMessageEvent extends MessageEvent {}
+export class RoomSessionChatEvent {
+    public static CHAT_EVENT = 'RSCE_CHAT_EVENT';
+    public static CHAT_TYPE_SPEAK = 0;
+    public static CHAT_TYPE_WHISPER = 1;
+    public static CHAT_TYPE_SHOUT = 2;
+    public static CHAT_TYPE_RESPECT = 3;
+    public static CHAT_TYPE_PETRESPECT = 4;
+    public static CHAT_TYPE_HAND_ITEM_RECEIVED = 5;
+    public static CHAT_TYPE_PETTREAT = 6;
+    public static CHAT_TYPE_PETREVIVE = 7;
+    public static CHAT_TYPE_PET_REBREED_FERTILIZE = 8;
+    public static CHAT_TYPE_PET_SPEED_FERTILIZE = 9;
+    public static CHAT_TYPE_MUTE_REMAINING = 10;
+
+    constructor(
+        public type: string,
+        public session: unknown,
+        public objectId: number,
+        public message: string,
+        public chatType: number,
+        public style: number = 0,
+        public chatColours: string = '',
+        public links: string[] = null,
+        public extraParam: number = -1
+    ) {}
+}
+export class RoomUnitDropHandItemComposer extends PayloadComposer {}
+export class FurnitureStackHeightComposer extends PayloadComposer {}
+export class ObjectTileCursorUpdateMessage extends StubClass {}

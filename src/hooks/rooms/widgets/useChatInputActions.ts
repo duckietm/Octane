@@ -6,29 +6,68 @@ import {
     GetSessionDataManager,
     GetTicker,
     HabboClubLevelEnum,
+    IRoomObjectController,
+    ObjectTileCursorUpdateMessage,
+    PerkEnum,
     RoomControllerLevel,
     RoomRotatingEffect,
+    RoomSessionChatEvent,
     RoomSettingsComposer,
     RoomShakingEffect,
+    RoomUnitDropHandItemComposer,
     RoomZoomEvent,
     TextureUtils,
     UseHabbiconComposer,
     VisitUserComposer
 } from '@octane/renderer';
 import { useCallback } from 'react';
-import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../api';
+import {
+    ChatMessageTypeEnum,
+    GetClubMemberLevel,
+    GetConfigurationValue,
+    LocalizeText,
+    NotificationBubbleType,
+    OpenUrl,
+    SendMessageComposer,
+    TryVisitRoom
+} from '../../../api';
 import { useWiredCreatorToolsUiStore } from '../../../components/wired-tools/wiredCreatorToolsUiStore';
+import { useWiredWhisperDisabled } from '../../chat';
+import { useNavigatorData } from '../../navigator';
 import { useNotification } from '../../notification';
-import { useTranslation } from '../../translation';
+import { isPerkAllowedNow } from '../../session/usePerkAllowances';
+import { applyTextTranslationLocale, useTranslation } from '../../translation';
+import { switchWiredPlayTestMode, useWired } from '../../wired';
 import { useRoom } from '../useRoom';
+import {
+    CHAT_TYPE_PING,
+    canOpenFurniChooser,
+    canOpenUserChooser,
+    canUseAmbassadorCommand,
+    canUseClassificationCommand,
+    canUseRoomModerationCommand,
+    ChatCommandActor,
+    clampFpsCommandValue,
+    getAmbassadorVisitLink,
+    getScreenshotFileName
+} from './useChatInputActions.helpers';
+import { setFpsCounterEnabled } from './useFpsCounter';
 
 // `:hidemouse` is a session-wide toggle in the official client, so the flag
 // lives at module scope instead of following the widget's mount cycle.
 let isMouseHidden = false;
 
-const toggleMouseCursor = () => {
+// The tile cursor object is reachable on the engine but not on its interface.
+type RoomEngineWithCursor = { getRoomObjectCursor?: (roomId: number) => IRoomObjectController };
+
+// Official `:484-491`: hide/show the OS cursor and toggle the tile cursor with it.
+const toggleMouseCursor = (roomId: number) => {
     isMouseHidden = !isMouseHidden;
     document.body.style.cursor = isMouseHidden ? 'none' : '';
+
+    const cursor = (GetRoomEngine() as unknown as RoomEngineWithCursor).getRoomObjectCursor?.(roomId);
+
+    cursor?.processUpdateMessage(new ObjectTileCursorUpdateMessage(null, 0, !isMouseHidden, `hidemouse-${Date.now()}`, true));
 };
 
 // The browser only honours a fullscreen request from a user gesture; pressing
@@ -50,6 +89,16 @@ const openWiredCreatorTools = (tab?: 'variables' | 'inspection') => {
     store.setIsVisible(true);
 };
 
+const getCommandActor = (controllerLevel: number): ChatCommandActor => {
+    const sessionDataManager = GetSessionDataManager();
+
+    return {
+        controllerLevel,
+        securityLevel: sessionDataManager.securityLevel ?? 0,
+        isAmbassador: sessionDataManager.isAmbassador === true
+    };
+};
+
 /**
  * Pure imperative dispatch for the chat-input widget. Exposes
  * `sendChat(text, chatType, recipientName?, styleId?)` which:
@@ -57,7 +106,8 @@ const openWiredCreatorTools = (tab?: 'variables' | 'inspection') => {
  *  1. Intercepts in-room slash commands (`:shake`, `:rotate`, `:zoom`,
  *     `:screenshot`, `:pickall`, ...) and turns them into the matching
  *     renderer/composer call — these never reach the server as chat
- *     payload.
+ *     payload. The set and the gates follow the official
+ *     `ChatInputWidgetHandler.as:178-541`.
  *  2. Falls back to the regular default/shout/whisper composer path,
  *     optionally piping the text through the translation pipeline if
  *     outgoing translation is enabled.
@@ -66,9 +116,14 @@ const openWiredCreatorTools = (tab?: 'variables' | 'inspection') => {
  * to useChatInputState.
  */
 export const useChatInputActions = () => {
-    const { showOctaneAlert = null, showConfirm = null } = useNotification();
+    const { showOctaneAlert = null, showConfirm = null, showSingleBubble = null } = useNotification();
     const { settings, translateOutgoing, enqueueOutgoingTranslation } = useTranslation();
     const { roomSession = null } = useRoom();
+    const { navigatorData = null } = useNavigatorData();
+    const { setTrigger: setWiredTrigger = null } = useWired();
+    const [wiredWhisperDisabled] = useWiredWhisperDisabled();
+
+    const enteredRoomName = navigatorData?.enteredGuestRoom?.roomName ?? '';
 
     const sendChat = useCallback(
         (text: string, chatType: number, recipientName: string = '', styleId: number = 0) => {
@@ -94,6 +149,9 @@ export const useChatInputActions = () => {
                         }
                     }
                 }
+
+                const actor = getCommandActor(roomSession?.controllerLevel ?? 0);
+                const findRoomUser = (name: string) => (name ? roomSession?.userDataManager?.getUserDataByName(name) : null);
 
                 switch (firstPart.toLowerCase()) {
                     case ':shake':
@@ -135,6 +193,60 @@ export const useChatInputActions = () => {
                         }
 
                         break;
+                    case ':news': {
+                        // Official `:216`: the embedded news tool, only when the hotel enables it.
+                        const newsUrl = GetConfigurationValue<string>('client.news.url', '');
+
+                        if (GetConfigurationValue<boolean>('client.news.embed.enabled', false) && newsUrl) {
+                            OpenUrl(newsUrl);
+
+                            return null;
+                        }
+
+                        break;
+                    }
+                    case ':mail': {
+                        // Official `:223`: the minimail inbox, only when the hotel enables it.
+                        const minimailUrl = GetConfigurationValue<string>('client.minimail.url', '');
+
+                        if (GetConfigurationValue<boolean>('client.minimail.embed.enabled', false) && minimailUrl) {
+                            OpenUrl(minimailUrl);
+
+                            return null;
+                        }
+
+                        break;
+                    }
+                    case ':kick': {
+                        // Official `:246-259`: room controllers kick by name here; staff let the
+                        // line reach the server so its own command handler answers.
+                        const access = canUseRoomModerationCommand(actor);
+
+                        if (access === 'server') break;
+
+                        if (access === 'client') {
+                            const userData = findRoomUser(secondPart);
+
+                            if (userData) roomSession?.sendKickMessage(userData.webID);
+                        }
+
+                        return null;
+                    }
+                    case ':shutup':
+                    case ':mute': {
+                        // Official `:260-274`: a two minute room mute by name.
+                        const access = canUseRoomModerationCommand(actor);
+
+                        if (access === 'server') break;
+
+                        if (access === 'client') {
+                            const userData = findRoomUser(secondPart);
+
+                            if (userData) roomSession?.sendMuteMessage(userData.webID, 2);
+                        }
+
+                        return null;
+                    }
                     case ':idle':
                         roomSession?.sendExpressionMessage(AvatarExpressionEnum.IDLE.ordinal);
 
@@ -143,8 +255,37 @@ export const useChatInputActions = () => {
                         roomSession?.sendExpressionMessage(AvatarExpressionEnum.RESPECT.ordinal);
 
                         return null;
+                    case ':showstats':
+                        // Official `:290`: `roomEngine.setFpsCounterEnabled(true)`.
+                        setFpsCounterEnabled(true);
+
+                        return null;
+                    case ':ping':
+                        // Official `:293`: a chat bubble of type 11 carrying the measured latency;
+                        // without a latency source the bubble reads "measuring".
+                        if (roomSession) {
+                            GetEventDispatcher().dispatchEvent(
+                                new RoomSessionChatEvent(RoomSessionChatEvent.CHAT_EVENT, roomSession, roomSession.ownRoomIndex, '', CHAT_TYPE_PING, 1, null, null, -1)
+                            );
+                        }
+
+                        return null;
+                    case ':fps': {
+                        // Official `:300`: clamp the frame rate to 5..10000.
+                        const fps = clampFpsCommandValue(secondPart);
+
+                        if (fps !== null) GetTicker().maxFPS = fps;
+
+                        return null;
+                    }
                     case ':sign':
                         roomSession?.sendSignMessage(parseInt(secondPart));
+
+                        return null;
+                    case ':drop':
+                    case ':dropitem':
+                        // Official `:307`: drop the carried hand item.
+                        SendMessageComposer(new RoomUnitDropHandItemComposer());
 
                         return null;
                     case ':habbicon': {
@@ -170,6 +311,8 @@ export const useChatInputActions = () => {
                         if (!roomSession) return null;
 
                         {
+                            // Official `:455-462`: the file is named after the entered room.
+                            const fileName = getScreenshotFileName(enteredRoomName);
                             const texture = GetRoomEngine().createTextureFromRoom(roomSession.roomId, 1);
 
                             (async () => {
@@ -179,7 +322,7 @@ export const useChatInputActions = () => {
 
                                     const link = document.createElement('a');
                                     link.href = imageUrl;
-                                    link.download = `room_${roomSession.roomId}_${Date.now()}.png`;
+                                    link.download = fileName;
                                     document.body.appendChild(link);
                                     link.click();
                                     document.body.removeChild(link);
@@ -204,7 +347,11 @@ export const useChatInputActions = () => {
                         }
 
                         return null;
-                    case ':ejectall':
+                    case ':ejectall': {
+                        // Official `SessionDataManager.ejectAllFurniture(roomId, text)`: the whole
+                        // typed line goes to the server after the confirm.
+                        const specialCommand = text;
+
                         if (
                             roomSession?.isRoomOwner ||
                             GetSessionDataManager().isModerator ||
@@ -213,7 +360,7 @@ export const useChatInputActions = () => {
                             showConfirm(
                                 LocalizeText('room.confirm.eject_all'),
                                 () => {
-                                    GetSessionDataManager().sendSpecialCommandMessage(':ejectall');
+                                    GetSessionDataManager().sendSpecialCommandMessage(specialCommand);
                                 },
                                 null,
                                 null,
@@ -222,11 +369,15 @@ export const useChatInputActions = () => {
                             );
                         }
                         return null;
+                    }
                     case ':furni':
-                        CreateLinkEvent('furni-chooser/');
+                        // Official `:320`: controller >= 1, security 2 or ambassador.
+                        if (canOpenFurniChooser(actor)) CreateLinkEvent('furni-chooser/');
                         return null;
                     case ':chooser':
-                        CreateLinkEvent('user-chooser/');
+                        // Official `:313` also honours the room's "chooser disabled" flag
+                        // (`ConfigurationItemStates`, header 1508), which this client does not receive.
+                        if (canOpenUserChooser(actor, false)) CreateLinkEvent('user-chooser/');
                         return null;
                     case ':floor':
                     case ':bcfloor':
@@ -254,6 +405,40 @@ export const useChatInputActions = () => {
                     case ':customize':
                         CreateLinkEvent('customize/show');
                         return null;
+                    case ':lang':
+                        // Official `:398`: hot-swap the localisation definition.
+                        if (secondPart) void applyTextTranslationLocale(secondPart);
+
+                        return null;
+                    case ':uc':
+                        // Official `:401-411`: staff classify the room's users, or the whole
+                        // hotel's with `:uc hotel <type>`.
+                        if (canUseClassificationCommand(actor) && roomSession) {
+                            if (secondPart === 'hotel') roomSession.sendPeerUsersClassificationMessage(parts[2] ?? '');
+                            else roomSession.sendRoomUsersClassificationMessage(secondPart);
+                        }
+
+                        return null;
+                    case ':anew':
+                        // Official `:412-418`: ambassadors classify the room's users as new.
+                        if (canUseAmbassadorCommand(actor)) roomSession?.sendRoomUsersClassificationMessage('new');
+
+                        return null;
+                    case ':avisit':
+                        // Official `:419-431`: ambassadors jump to the predefined lobbies.
+                        if (canUseAmbassadorCommand(actor)) CreateLinkEvent(getAmbassadorVisitLink(secondPart));
+
+                        return null;
+                    case ':aalert': {
+                        // Official `:432-442`: ambassador alert to a user of the room, by name.
+                        if (canUseAmbassadorCommand(actor)) {
+                            const userData = findRoomUser(secondPart);
+
+                            if (userData) roomSession?.sendAmbassadorAlertMessage(userData.webID);
+                        }
+
+                        return null;
+                    }
                     case ':visit':
                         if (secondPart) SendMessageComposer(new VisitUserComposer(secondPart));
 
@@ -267,7 +452,8 @@ export const useChatInputActions = () => {
                     }
                     case ':cam':
                     case ':camera':
-                        CreateLinkEvent('camera/show');
+                        // Official `:451`: only with the CAMERA perk.
+                        if (isPerkAllowedNow(PerkEnum.CAMERA)) CreateLinkEvent('camera/show');
                         return null;
                     case ':fs':
                     case ':fullscreen':
@@ -277,7 +463,7 @@ export const useChatInputActions = () => {
                     case ':unignore': {
                         // The official client only ignores people who are in the room, so the
                         // name has to resolve against the room's user list before anything is sent.
-                        const userData = secondPart ? roomSession?.userDataManager?.getUserDataByName(secondPart) : null;
+                        const userData = findRoomUser(secondPart);
 
                         if (userData) {
                             if (firstPart.toLowerCase() === ':ignore') GetSessionDataManager().ignoreUser(userData.name);
@@ -291,8 +477,13 @@ export const useChatInputActions = () => {
                     case ':habnam':
                         GetSessionDataManager().sendSpecialCommandMessage(firstPart.toLowerCase());
                         return null;
+                    case ':wiredreset':
+                        // Official `:368`: `userDefinedRoomEvents.resetCache()` closes the open
+                        // wired window and drops the cached configuration frames.
+                        setWiredTrigger?.(null);
+                        return null;
                     case ':hidemouse':
-                        toggleMouseCursor();
+                        toggleMouseCursor(roomSession?.roomId ?? -1);
                         return null;
                     case ':wf':
                     case ':wired':
@@ -306,8 +497,17 @@ export const useChatInputActions = () => {
                     case ':inspection':
                         openWiredCreatorTools('inspection');
                         return null;
+                    case ':playtest': {
+                        // Official `:506`: `userDefinedRoomEvents.switchPlayTestMode()`.
+                        const { notification } = switchWiredPlayTestMode(wiredWhisperDisabled);
+
+                        showSingleBubble?.(notification, NotificationBubbleType.INFO);
+                        return null;
+                    }
                     case ':link':
-                        // The official handler groups `:link` with the wave shortcuts.
+                    case ':rewardtrack':
+                    case ':q':
+                        // The official handler groups these with the wave shortcuts.
                         roomSession?.sendExpressionMessage(AvatarExpressionEnum.WAVE.ordinal);
                         return null;
                 }
@@ -318,7 +518,7 @@ export const useChatInputActions = () => {
             const preserveTrailingSpaces = (message: string) => {
                 if (message.startsWith(':')) return message;
 
-                return message.replace(/ +$/g, (match) => ' '.repeat(match.length));
+                return message.replace(/ +$/g, (match) => ' '.repeat(match.length));
             };
 
             const dispatchChatMessage = (message: string) => {
@@ -359,7 +559,18 @@ export const useChatInputActions = () => {
 
             return null;
         },
-        [roomSession, settings, translateOutgoing, enqueueOutgoingTranslation, showConfirm, showOctaneAlert]
+        [
+            roomSession,
+            settings,
+            translateOutgoing,
+            enqueueOutgoingTranslation,
+            showConfirm,
+            showOctaneAlert,
+            showSingleBubble,
+            enteredRoomName,
+            setWiredTrigger,
+            wiredWhisperDisabled
+        ]
     );
 
     return { sendChat };

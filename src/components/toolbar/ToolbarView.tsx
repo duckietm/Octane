@@ -9,7 +9,8 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NAVIGATOR_HOVER_LINKS, NavigatorHoverItemId, useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { SafetyLockedNotificationView } from '../notification-center/views/SafetyLockedNotificationView';
+import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NAVIGATOR_HOVER_LINKS, NavigatorHoverItemId, useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, usePerkAllowances, useRewardTracks, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -227,8 +228,15 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const leftDockRef = useRef<HTMLDivElement>(null);
     const rightDockRef = useRef<HTMLDivElement>(null);
     const { userFigure = null } = useSessionInfo();
+    const { isPerkAllowed } = usePerkAllowances();
+    // Official BottomBarLeft.as:672-676: the camera icon needs the CAMERA perk.
+    const cameraPerkAllowed = isPerkAllowed(PerkEnum.CAMERA);
     const { getFullCount = 0 } = useInventoryUnseenTracker();
     const { getTotalUnseen = 0 } = useAchievements();
+    const { unseenCount: unseenDailyTaskCount = 0 } = useDailyTasks();
+    const { unseenCount: unseenRewardTrackCount = 0 } = useRewardTracks();
+    // HabboToolbar.setUnseenItemCount("HTIE_ICON_PROGRESSION", unseenProgMenuCount): achievements + daily tasks + reward track rewards.
+    const unseenProgMenuCount = getTotalUnseen + unseenDailyTaskCount + unseenRewardTrackCount;
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
     const buildersClubEnabled = useMemo(() => GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)), []);
@@ -493,6 +501,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     return (
         <>
             { youtubeEnabled && <YouTubePlayerView /> }
+            <SafetyLockedNotificationView />
 
             { isInRoom &&
                 <div
@@ -533,17 +542,17 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     { !leftCollapsed && (<>
                     <motion.div variants={ itemVariants } className="tb-slot">
                         { isInRoom
-                            ? <ToolbarItemView icon="habbo" onClick={ () => VisitDesktop() } className="tb-icon" />
-                            : <ToolbarItemView icon="house" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
+                            ? <ToolbarItemView icon="habbo" data-help-bubble="HTIE_ICON_RECEPTION" onClick={ () => VisitDesktop() } className="tb-icon" />
+                            : <ToolbarItemView icon="house" data-help-bubble="HTIE_ICON_HOME" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
                     </motion.div>
                     <motion.div variants={ itemVariants } className="tb-slot">
                         <NavigatorHoverPanel>
-                            <ToolbarItemView icon="rooms" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
+                            <ToolbarItemView icon="rooms" data-help-bubble="HTIE_ICON_NAVIGATOR" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
                         </NavigatorHoverPanel>
                     </motion.div>
                     { isInRoom &&
                         <motion.div variants={ itemVariants } className="tb-slot">
-                            <ToolbarItemView icon="progression" onClick={ () => CreateLinkEvent('achievements/toggle') } className="tb-icon" />
+                            <ToolbarItemView icon="progression" data-help-bubble="HTIE_ICON_PROGRESSION" onClick={ () => CreateLinkEvent('achievements/toggle') } className="tb-icon" />
                         </motion.div> }
                     { GetConfigurationValue('game.center.enabled') &&
                         <motion.div variants={ itemVariants } className="tb-slot">
@@ -551,19 +560,19 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         </motion.div> }
                     { (!isInRoom && storiesEnabled) &&
                         <motion.div variants={ itemVariants } className="tb-slot">
-                            <ToolbarItemView icon="stories" onClick={ () => CreateLinkEvent('stories/toggle') } className="tb-icon" />
+                            <ToolbarItemView icon="stories" data-help-bubble="HTIE_ICON_STORIES" onClick={ () => CreateLinkEvent('stories/toggle') } className="tb-icon" />
                         </motion.div> }
                     </>) }
                     <motion.div variants={ itemVariants } className="tb-slot">
-                        <ToolbarItemView icon="catalog" onClick={ () => CreateLinkEvent('catalog/toggle/normal') } className="tb-icon" />
+                        <ToolbarItemView icon="catalog" data-help-bubble="HTIE_ICON_CATALOGUE" onClick={ () => CreateLinkEvent('catalog/toggle/normal') } className="tb-icon" />
                     </motion.div>
                     { (!leftCollapsed && buildersClubEnabled) &&
                         <motion.div variants={ itemVariants } className="tb-slot">
-                            <ToolbarItemView icon="buildersclub" onClick={ () => CreateLinkEvent('catalog/toggle/builder') } className="tb-icon" />
+                            <ToolbarItemView icon="buildersclub" data-help-bubble="HTIE_ICON_BUILDER" onClick={ () => CreateLinkEvent('catalog/toggle/builder') } className="tb-icon" />
                         </motion.div> }
                     { (!leftCollapsed && isInRoom) &&
                         <motion.div variants={ itemVariants } className="relative tb-slot tb-slot-inventory">
-                            <ToolbarItemView icon="inventory" onClick={ () => CreateLinkEvent('inventory/toggle') } className="tb-icon" />
+                            <ToolbarItemView icon="inventory" data-help-bubble="HTIE_ICON_INVENTORY" onClick={ () => CreateLinkEvent('inventory/toggle') } className="tb-icon" />
                             { (getFullCount > 0) &&
                                 <LayoutItemCountView count={ getFullCount } className="absolute -right-1 top-0" /> }
                         </motion.div> }
@@ -583,6 +592,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         </AnimatePresence>
                         <motion.div
                             className="tb-memenu-avatar"
+                            data-help-bubble="HTIE_ICON_MEMENU"
                             onClick={ event =>
                             {
                                 setMeExpanded(value => !value);
@@ -591,16 +601,16 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <LayoutAvatarImageView airMeMenu={ true } direction={ 3 } figure={ userFigure } />
                         </motion.div>
                         <img src={ memenuCircleImg } alt="" className="tb-memenu-circle" />
-                        { (getTotalUnseen > 0) &&
-                            <LayoutItemCountView count={ getTotalUnseen } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
+                        { (unseenProgMenuCount > 0) &&
+                            <LayoutItemCountView count={ unseenProgMenuCount } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
                     </motion.div> }
                     { (!leftCollapsed && isInRoom && showToolbarButton) &&
                         <motion.div variants={ itemVariants } className="tb-slot tb-slot-tall">
                             <ToolbarItemView icon="wired-tools" onClick={ openMonitor } className="tb-icon" />
                         </motion.div> }
-                    { isInRoom &&
+                    { (isInRoom && cameraPerkAllowed) &&
                         <motion.div variants={ itemVariants } className="tb-slot tb-slot-tall">
-                            <ToolbarItemView icon="camera" onClick={ () => CreateLinkEvent('camera/toggle') } className="tb-icon" />
+                            <ToolbarItemView icon="camera" data-help-bubble="HTIE_ICON_CAMERA" onClick={ () => CreateLinkEvent('camera/toggle') } className="tb-icon" />
                         </motion.div> }
                     <img src={ dividerImg } alt="" className="tb-divider" />
                     { !leftCollapsed && (<>
@@ -645,12 +655,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     className="tb-open-shell tb-open-shell-right flex h-[46px] max-w-full items-start overflow-visible bg-transparent">
                     <img src={ dividerImg } alt="" className="tb-divider" />
                     <motion.div variants={ itemVariants } className="relative tb-slot">
-                        <ToolbarItemView icon="friendall" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
+                        <ToolbarItemView icon="friendall" data-help-bubble="icon_all_friends" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
                         { (requests.length > 0) &&
                             <LayoutItemCountView count={ requests.length } className="absolute -right-2 -top-1" /> }
                     </motion.div>
                     <motion.div variants={ itemVariants } className="tb-slot">
-                        <ToolbarItemView icon="friendsearch" onClick={ () => SendMessageComposer(new FindNewFriendsMessageComposer()) } className="tb-icon" />
+                        <ToolbarItemView icon="friendsearch" data-help-bubble="icon_find_friends" onClick={ () => SendMessageComposer(new FindNewFriendsMessageComposer()) } className="tb-icon" />
                     </motion.div>
                     <motion.div variants={ itemVariants } className="tb-slot tb-slot-messenger">
                         <ToolbarItemView className={ `tb-icon ${ iconState === MessengerIconState.UNREAD ? (messengerNotifyFrame === 1 ? 'is-notify-1' : 'is-notify-0') : '' }` } icon="message" onClick={ () => OpenMessengerChat() } />
@@ -678,18 +688,18 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     className="tb-bar-scroll flex h-full min-w-0 flex-1 items-center gap-2 overflow-x-auto overflow-y-visible px-1">
                     <motion.div variants={ itemVariants }>
                         { isInRoom
-                            ? <ToolbarItemView icon="habbo" onClick={ () => VisitDesktop() } className="tb-icon" />
-                            : <ToolbarItemView icon="house" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
+                            ? <ToolbarItemView icon="habbo" data-help-bubble="HTIE_ICON_RECEPTION" onClick={ () => VisitDesktop() } className="tb-icon" />
+                            : <ToolbarItemView icon="house" data-help-bubble="HTIE_ICON_HOME" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
                     </motion.div>
                     <motion.div variants={ itemVariants }>
-                        <ToolbarItemView icon="rooms" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
+                        <ToolbarItemView icon="rooms" data-help-bubble="HTIE_ICON_NAVIGATOR" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
                     </motion.div>
                     { GetConfigurationValue('game.center.enabled') &&
                         <motion.div variants={ itemVariants }>
                             <ToolbarItemView icon="game" onClick={ () => CreateLinkEvent('games/toggle') } className="tb-icon" />
                         </motion.div> }
                     <motion.div variants={ itemVariants }>
-                        <ToolbarItemView icon="catalog" onClick={ () => CreateLinkEvent('catalog/toggle/normal') } className="tb-icon" />
+                        <ToolbarItemView icon="catalog" data-help-bubble="HTIE_ICON_CATALOGUE" onClick={ () => CreateLinkEvent('catalog/toggle/normal') } className="tb-icon" />
                     </motion.div>
                     <motion.div variants={ itemVariants } className="relative tb-slot tb-slot-tall tb-slot-memenu shrink-0">
                         <img src={ memenuBgImg } alt="" className="tb-memenu-bg" />
@@ -706,6 +716,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         </AnimatePresence>
                         <motion.div
                             className="tb-memenu-avatar"
+                            data-help-bubble="HTIE_ICON_MEMENU"
                             onClick={ event =>
                             {
                                 setMeExpanded(value => !value);
@@ -714,12 +725,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <LayoutAvatarImageView airMeMenu={ true } direction={ 3 } figure={ userFigure } />
                         </motion.div>
                         <img src={ memenuCircleImg } alt="" className="tb-memenu-circle" />
-                        { (getTotalUnseen > 0) &&
-                            <LayoutItemCountView count={ getTotalUnseen } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
+                        { (unseenProgMenuCount > 0) &&
+                            <LayoutItemCountView count={ unseenProgMenuCount } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
                     </motion.div>
                     { isInRoom &&
                         <motion.div variants={ itemVariants } className="relative">
-                            <ToolbarItemView icon="inventory" onClick={ () => CreateLinkEvent('inventory/toggle') } className="tb-icon" />
+                            <ToolbarItemView icon="inventory" data-help-bubble="HTIE_ICON_INVENTORY" onClick={ () => CreateLinkEvent('inventory/toggle') } className="tb-icon" />
                             { (getFullCount > 0) &&
                                 <LayoutItemCountView count={ getFullCount } className="absolute -right-1 top-0" /> }
                         </motion.div> }
@@ -751,7 +762,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                          left side stack — only real touch devices get them here. */ }
                     { !socialInSideStack &&
                         <motion.div variants={ itemVariants } className="relative">
-                            <ToolbarItemView icon="friendall" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
+                            <ToolbarItemView icon="friendall" data-help-bubble="icon_all_friends" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
                             { (requests.length > 0) &&
                                 <LayoutItemCountView count={ requests.length } className="absolute -right-2 -top-1" /> }
                         </motion.div> }
@@ -770,11 +781,11 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 className={ `absolute left-1 z-[71] flex flex-col items-center gap-[2px] bg-[#55534e] px-[2px] py-[4px] ${ staffStackBottom == null ? 'top-1/2 -translate-y-1/2' : '' } ${ sideStackClasses }` }>
                 { touchLayout && buildersClubEnabled &&
                     <motion.div variants={ itemVariants }>
-                        <ToolbarItemView icon="buildersclub" onClick={ () => CreateLinkEvent('catalog/toggle/builder') } className="tb-icon" />
+                        <ToolbarItemView icon="buildersclub" data-help-bubble="HTIE_ICON_BUILDER" onClick={ () => CreateLinkEvent('catalog/toggle/builder') } className="tb-icon" />
                     </motion.div> }
-                { isInRoom &&
+                { (isInRoom && cameraPerkAllowed) &&
                     <motion.div variants={ itemVariants }>
-                        <ToolbarItemView icon="camera" onClick={ () => CreateLinkEvent('camera/toggle') } className="tb-icon" />
+                        <ToolbarItemView icon="camera" data-help-bubble="HTIE_ICON_CAMERA" onClick={ () => CreateLinkEvent('camera/toggle') } className="tb-icon" />
                     </motion.div> }
                 { isMod &&
                     <motion.div variants={ itemVariants } className="relative">
@@ -792,13 +803,13 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                      keep friends in the mobile bar instead. */ }
                 { socialInSideStack &&
                     <motion.div variants={ itemVariants } className="relative">
-                        <ToolbarItemView icon="friendall" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
+                        <ToolbarItemView icon="friendall" data-help-bubble="icon_all_friends" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
                         { (requests.length > 0) &&
                             <LayoutItemCountView count={ requests.length } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
                     </motion.div> }
                 { socialInSideStack &&
                     <motion.div variants={ itemVariants }>
-                        <ToolbarItemView icon="friendsearch" onClick={ () => SendMessageComposer(new FindNewFriendsMessageComposer()) } className="tb-icon" />
+                        <ToolbarItemView icon="friendsearch" data-help-bubble="icon_find_friends" onClick={ () => SendMessageComposer(new FindNewFriendsMessageComposer()) } className="tb-icon" />
                     </motion.div> }
                 { (socialInSideStack && ((iconState === MessengerIconState.SHOW) || (iconState === MessengerIconState.UNREAD))) &&
                     <motion.div variants={ itemVariants }>
