@@ -83,5 +83,4 @@ export const getTradeHelpText = (tradeState: number): string => {
  * TradingModel.isCreditFurniPresent: either side's credit-furni value is above zero, which turns on
  * the highlighted `inventory.trading.warning.credits` strip (TradingView.updateActionState).
  */
-export const hasTradeCreditFurni = (ownCreditsCount: number, otherCreditsCount: number): boolean =>
-    (ownCreditsCount ?? 0) > 0 || (otherCreditsCount ?? 0) > 0;
+export const hasTradeCreditFurni = (ownCreditsCount: number, otherCreditsCount: number): boolean => (ownCreditsCount ?? 0) > 0 || (otherCreditsCount ?? 0) > 0;

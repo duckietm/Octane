@@ -312,28 +312,42 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
                         <Text small className="octane-inventory-trade-summary" data-testid="trade-summary-other">
                             {otherSummary.itemCount} / {otherSummary.creditValue}
                         </Text>
-                        <AutoGrid columnCount={TRADE_GRID_COLUMNS}>
-                            {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
-                                const item = otherUser.userItems.getWithIndex(i) || null;
+                        {accountWarnings.otherNotification !== null ? (
+                            <div className="octane-inventory-trade-notification" data-testid="trade-notification-other" role="status">
+                                {accountWarnings.otherNotification}
+                            </div>
+                        ) : (
+                            <AutoGrid columnCount={TRADE_GRID_COLUMNS}>
+                                {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
+                                    const item = otherUser.userItems.getWithIndex(i) || null;
 
-                                if (!item) return <LayoutGridItem key={i} />;
+                                    if (!item) return <LayoutGridItem key={i} />;
 
-                                return (
-                                    <LayoutGridItem
-                                        key={i}
-                                        itemActive={otherGroupItem === item}
-                                        itemCount={item.getTotalCount()}
-                                        itemImage={item.iconUrl}
-                                        itemUniqueNumber={item.stuffData.uniqueNumber}
-                                        onClick={(event) => setOtherGroupItem(item)}
-                                        {...getPopupAnchorProps(item)}
-                                    />
-                                );
-                            })}
-                        </AutoGrid>
+                                    return (
+                                        <LayoutGridItem
+                                            key={i}
+                                            itemActive={otherGroupItem === item}
+                                            itemCount={item.getTotalCount()}
+                                            itemImage={item.iconUrl}
+                                            itemUniqueNumber={item.stuffData.uniqueNumber}
+                                            onClick={(event) => setOtherGroupItem(item)}
+                                            {...getPopupAnchorProps(item)}
+                                        />
+                                    );
+                                })}
+                            </AutoGrid>
+                        )}
                         <div className="badge bg-muted w-full">{otherGroupItem ? otherGroupItem.name : LocalizeText('catalog_selectproduct')}</div>
                     </Column>
                 </Grid>
+                {showCreditsWarning && (
+                    <div className="octane-inventory-trade-highlight" data-testid="trade-credits-warning" role="alert">
+                        {localizeWithFallback(
+                            'inventory.trading.warning.credits',
+                            "Any credit furni offered will be converted to credits in the recipient's purse!"
+                        )}
+                    </div>
+                )}
                 <div className="flex grow! justify-between">
                     <Button variant="danger" onClick={cancelTrade}>
                         {LocalizeText('generic.cancel')}

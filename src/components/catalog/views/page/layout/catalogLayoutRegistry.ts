@@ -67,6 +67,8 @@ export const CATALOG_LAYOUT_REGISTRY = [
     { studioCode: 'info_duckets', runtimeCodes: ['info_duckets'], renderer: 'info', availability: 'ready' },
     { studioCode: 'info_rentables', runtimeCodes: ['info_rentables'], renderer: 'infoRentables', availability: 'ready' },
     { studioCode: 'info_pets', runtimeCodes: ['info_pets'], renderer: 'info', availability: 'ready' },
+    { studioCode: 'info_pets2', runtimeCodes: ['info_pets2'], renderer: 'pets2', availability: 'ready' },
+    { studioCode: 'info_pets3', runtimeCodes: ['info_pets3'], renderer: 'pets3', availability: 'ready' },
     { studioCode: 'loyalty_vip_buy', runtimeCodes: ['loyalty_vip_buy'], renderer: 'info', availability: 'ready' },
     { studioCode: 'badge_display', runtimeCodes: ['badge_display'], renderer: 'badgeDisplay', availability: 'ready' },
     { studioCode: 'bots', runtimeCodes: ['bots'], renderer: 'default', availability: 'ready' },

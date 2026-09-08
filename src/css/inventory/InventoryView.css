@@ -295,6 +295,173 @@
     border-left: 10px solid #6b6f73;
 }
 
+/* inventory_trading.xml: help_text line, info_text_0/1 replacing a disabled side's grid,
+   info_border_highlighted credits strip (0xfc9228) and the 3 x 3 grids. */
+.octane-inventory-window .octane-inventory-trade-help {
+    min-height: 15px;
+    color: #4a4a4a;
+    opacity: 0.85;
+}
+
+.octane-inventory-window .octane-inventory-trade-notification {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 132px;
+    padding: 6px;
+    border: 2px solid var(--inv-border, #27556a);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.55);
+    color: #333;
+    font-size: 11px;
+    line-height: 14px;
+    text-align: center;
+}
+
+.octane-inventory-window .octane-inventory-trade-highlight {
+    box-sizing: border-box;
+    padding: 5px 6px;
+    border: 2px solid #fc9228;
+    border-radius: 4px;
+    background: #fff4e5;
+    color: #222;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+}
+
+/* inventory_trading_minimized.xml (478x68): panic icon, "Trade in progress", Continue / Cancel. */
+.octane-inventory-window .octane-inventory-trade-minimized {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 4px;
+    row-gap: 4px;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 6px 7px 4px 11px;
+    border: 2px solid var(--inv-border, #27556a);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 45%, #ffe27a 0 40%, #f5a623 41% 100%);
+    box-shadow: inset 0 0 0 2px #7a4a00;
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-icon::after {
+    content: "!";
+    display: block;
+    color: #7a4a00;
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 30px;
+    text-align: center;
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-title {
+    color: #222;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 24px;
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+/* inventory_trading_name_scam_warning.xml (356x333, red 0xd43d59 title). */
+.octane-inventory-namescam-window {
+    width: min(356px, calc(100vw - 16px));
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+}
+
+.octane-inventory-namescam-window > .octane-card-header-shell {
+    background: #d43d59 !important;
+}
+
+.octane-inventory-namescam-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-inventory-namescam-warning {
+    margin: 0;
+}
+
+.octane-inventory-namescam-trader {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    min-height: 58px;
+    padding: 4px 8px 4px 0;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    background: #f1f1f1;
+}
+
+.octane-inventory-namescam-avatar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 56px;
+    overflow: hidden;
+}
+
+.octane-inventory-namescam-trader-name {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.octane-inventory-namescam-trader-label {
+    color: #555555;
+}
+
+.octane-inventory-namescam-trader-name strong {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-inventory-namescam-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.octane-inventory-namescam-matches span {
+    white-space: pre-line;
+}
+
+.octane-inventory-namescam-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding-top: 4px;
+}
+
+.octane-inventory-namescam-countdown {
+    color: #555555;
+}
+
 @media (max-width: 1024px) and (min-width: 641px) {
     .octane-inventory-window {
         width: min(calc(100vw - 24px), 640px) !important;

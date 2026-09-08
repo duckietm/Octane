@@ -35,6 +35,8 @@ import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitureDeleteView';
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
+import { InventoryTradeMinimizedView } from './views/furniture/InventoryTradeMinimizedView';
+import { InventoryTradeNameScamWarningView } from './views/furniture/InventoryTradeNameScamWarningView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
 import { filterInventoryGroupItems, MAIN_FILTER_ALL, TYPE_FILTER_ANY } from './views/furniture/inventoryFurniFilters';
@@ -80,7 +82,7 @@ export const InventoryView: FC<{}> = (props) => {
     // The rarity tiers come from caches that fill asynchronously; bumping this recomputes the
     // badge filters once the leaderboard classification has arrived.
     const [badgeRarityRevision, setBadgeRarityRevision] = useState(0);
-    const { isTrading = false, stopTrading = null } = useInventoryTrade();
+    const { isTrading = false, stopTrading = null, nameScamWarning = null, dismissNameScamWarning = null } = useInventoryTrade();
     const { isOpen: isWiredTrading = false } = useWiredTrading();
     const { getCount = null } = useInventoryUnseenTracker();
     const { groupItems = [] } = useInventoryFurni();
@@ -232,9 +234,17 @@ export const InventoryView: FC<{}> = (props) => {
         if (!isVisible && (isTrading || isWiredTrading)) setIsVisible(true);
     }, [isVisible, isTrading, isWiredTrading]);
 
+    useEffect(() => {
+        // TradingModel.startTrading ends with toggleInventoryPage("furni"): the trade lives in the
+        // furni tab, every other tab only shows the minimised strip.
+        if (isTrading) setCurrentTab(TAB_FURNITURE);
+    }, [isTrading]);
+
     if (!isVisible) return null;
 
-    const showFilter = !isTrading && (currentTab === TAB_FURNITURE || currentTab === TAB_BADGES);
+    const showTradeView = isTrading && currentTab === TAB_FURNITURE;
+    const showTradeMinimized = isTrading && currentTab !== TAB_FURNITURE;
+    const showFilter = !showTradeView && (currentTab === TAB_FURNITURE || currentTab === TAB_BADGES);
 
     return (
         <>
@@ -243,7 +253,7 @@ export const InventoryView: FC<{}> = (props) => {
                 uniqueKey="inventory"
             >
                 <OctaneCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
-                {!isTrading && !isWiredTrading && (
+                {!isWiredTrading && (
                     <>
                         <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
                             {TABS.map((name, index) => {
@@ -278,7 +288,8 @@ export const InventoryView: FC<{}> = (props) => {
                                 />
                             )}
                             <div className="flex-1 overflow-hidden">
-                                {currentTab === TAB_FURNITURE && (
+                                {showTradeView && <InventoryTradeView cancelTrade={onClose} />}
+                                {currentTab === TAB_FURNITURE && !showTradeView && (
                                     <InventoryFurnitureView filteredGroupItems={filteredGroupItems} roomPreviewer={roomPreviewer} roomSession={roomSession} />
                                 )}
                                 {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
@@ -286,13 +297,9 @@ export const InventoryView: FC<{}> = (props) => {
                                 {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
                                 {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
                             </div>
+                            {showTradeMinimized && <InventoryTradeMinimizedView onCancel={stopTrading} onContinue={() => setCurrentTab(TAB_FURNITURE)} />}
                         </div>
                     </>
-                )}
-                {isTrading && (
-                    <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full">
-                        <InventoryTradeView cancelTrade={onClose} />
-                    </div>
                 )}
                 {!isTrading && isWiredTrading && (
                     <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full">
@@ -301,6 +308,7 @@ export const InventoryView: FC<{}> = (props) => {
                 )}
             </OctaneCardView>
             <InventoryFurnitureDeleteView />
+            {nameScamWarning && <InventoryTradeNameScamWarningView warning={nameScamWarning} onClose={dismissNameScamWarning} />}
         </>
     );
 };
