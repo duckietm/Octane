@@ -85,6 +85,17 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
         return newStyle;
     }, [avatarUrl, scale, style, headOnly, fit, compactHead, compactHeadSize, airMeMenu, nativeCroppedHead]);
 
+    // React reactivates effects in declaration order; enable requests before starting one.
+    useEffect(() => {
+        isDisposed.current = false;
+
+        setIsReady(true);
+
+        return () => {
+            isDisposed.current = true;
+        };
+    }, []);
+
     useEffect(() => {
         if (!isReady) return;
 
@@ -144,16 +155,6 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
             resetFigure(figure);
         }
     }, [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, airMeMenu, nativeCroppedHead, isReady]);
-
-    useEffect(() => {
-        isDisposed.current = false;
-
-        setIsReady(true);
-
-        return () => {
-            isDisposed.current = true;
-        };
-    }, []);
 
     return (
         <Base classNames={getClassNames} style={getStyle} {...rest}>

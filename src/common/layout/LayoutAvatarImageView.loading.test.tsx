@@ -1,4 +1,5 @@
 import { act, cleanup, render } from '@testing-library/react';
+import { Activity } from 'react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { LayoutAvatarImageView } from './LayoutAvatarImageView';
 
@@ -65,4 +66,23 @@ it('keeps the loaded toolbar face when the placeholder crop finishes last', asyn
     expect(container.querySelector('img')).toHaveAttribute('src', 'loaded-face.png');
     expect(placeholder.dispose).toHaveBeenCalledOnce();
     expect(face.dispose).toHaveBeenCalledOnce();
+});
+
+it('restarts a pending toolbar face when its effects are reactivated', async () => {
+    mocks.crop.mockImplementation(async (url: string) => url);
+    const placeholder = { setDirection: vi.fn(), processAsImageUrl: () => 'reactivation-placeholder.png', isPlaceholder: () => true, dispose: vi.fn() };
+    const face = { setDirection: vi.fn(), processAsImageUrl: () => 'reactivation-face.png', isPlaceholder: () => false, dispose: vi.fn() };
+    mocks.createAvatarImage.mockReturnValueOnce(placeholder).mockReturnValue(face);
+    const view = (mode: 'visible' | 'hidden') => (
+        <Activity mode={mode}>
+            <LayoutAvatarImageView figure="reactivation-look" airMeMenu />
+        </Activity>
+    );
+    const { container, rerender } = render(view('visible'));
+    await act(async () => {});
+    expect(container.querySelector('img')).toHaveAttribute('src', 'reactivation-placeholder.png');
+    rerender(view('hidden'));
+    rerender(view('visible'));
+    await act(async () => {});
+    expect(container.querySelector('img')).toHaveAttribute('src', 'reactivation-face.png');
 });
