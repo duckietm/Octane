@@ -1028,3 +1028,132 @@
         transform: scaleX(0);
     }
 }
+
+/* epic_popup_frame (16_class_522): a 215x275 frame holding one 200x200 picture, a
+   separator and a 140x48 Close button; the header only carries the close cross. */
+.octane-alert.octane-alert-epic {
+    width: 215px;
+    min-height: 275px;
+    max-height: 275px;
+}
+
+.octane-alert.octane-alert-epic .octane-epic-popup__image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.octane-alert.octane-alert-epic .octane-epic-popup__image img {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+.octane-alert.octane-alert-epic .octane-epic-popup__close {
+    align-self: center;
+    min-width: 140px;
+}
+
+/* nav_promo_alert (3000): 224x182 frame, body text 186x57 at (7,12), a 199x43 promo strip
+   with the HC icon at (7,72) and a 60x24 OK button centred at y=122. */
+.octane-alert.octane-alert-club-promo {
+    width: 224px;
+    min-height: 182px;
+    max-height: 182px;
+}
+
+.octane-alert.octane-alert-club-promo .octane-club-promo-alert__body {
+    min-height: 57px;
+    padding: 4px 1px 0;
+}
+
+.octane-alert.octane-alert-club-promo .octane-club-promo-alert__promo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 199px;
+    min-height: 43px;
+    margin: 4px 1px 0;
+    padding: 0 2px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-alert.octane-alert-club-promo .octane-club-promo-alert__promo:hover span {
+    text-decoration: underline;
+}
+
+.octane-alert.octane-alert-club-promo .octane-club-promo-alert__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.octane-alert.octane-alert-club-promo .octane-club-promo-alert__actions .btn {
+    min-width: 60px;
+}
+
+/* safety_locked_notification (2969): a 192x80 titled border (style 6, 0x6f6f6f) attached
+   above the toolbar; Ubuntu 12 white text at (8,6) 174x36 and an underlined Unlock link
+   at (8,51) that turns 0xBADFF9 on hover. */
+.octane-safety-locked-notification {
+    position: absolute;
+    left: 8px;
+    bottom: 52px;
+    z-index: 72;
+    box-sizing: border-box;
+    width: 192px;
+    height: 80px;
+    padding: 0 8px 0;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background: #6f6f6f;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 4px rgba(0, 0, 0, 0.35);
+    color: #fff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.octane-safety-locked-notification__title {
+    position: absolute;
+    top: -9px;
+    left: 6px;
+    padding: 0 4px;
+    background: #6f6f6f;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.octane-safety-locked-notification__text {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    width: 174px;
+    height: 36px;
+    overflow: hidden;
+}
+
+.octane-safety-locked-notification__link {
+    position: absolute;
+    top: 53px;
+    left: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-safety-locked-notification__link:hover {
+    color: #badff9;
+}

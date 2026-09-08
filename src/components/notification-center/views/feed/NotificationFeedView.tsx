@@ -34,10 +34,18 @@ const CategoryIcon: FC<{ category: NotificationFeedCategory }> = ({ category }) 
     }
 };
 
+/**
+ * One feed row, laid out as the official `FeedEntity`: icon, title and text, an optional
+ * decoration picture under the text and, when the entry carries a caption, an action
+ * button; the row itself is the link when there is no button. `OpenUrl` sends `http`
+ * links to the browser and the rest through the client's link events, as
+ * `NotificationController.executeAction` and the internal links do.
+ */
 const FeedEntryView: FC<{ entry: NotificationFeedEntry; now: number }> = ({ entry, now }) => {
     const htmlText = (entry.message || '').replace(/\r\n|\r|\n/g, '<br />');
     const ageSeconds = Math.max(0, Math.floor((now - entry.receivedAt) / 1000));
-    const clickable = !!entry.linkUrl;
+    const hasButton = !!entry.linkUrl && !!entry.buttonCaption;
+    const clickable = !!entry.linkUrl && !hasButton;
 
     return (
         <div
@@ -53,6 +61,22 @@ const FeedEntryView: FC<{ entry: NotificationFeedEntry; now: number }> = ({ entr
                     <span className="text-[.65rem] uppercase tracking-wide text-white/60 truncate">{entry.title || entry.senderName}</span>
                 )}
                 <span className="text-sm break-words" dangerouslySetInnerHTML={{ __html: SanitizeHtml(htmlText) }} />
+                {entry.decorationUrl && (
+                    <img alt="" className="max-w-full self-center my-1 rounded" data-testid="feed-entry-decoration" src={entry.decorationUrl} />
+                )}
+                {hasButton && (
+                    <button
+                        className="self-start mt-1 px-2 py-0.5 rounded text-xs bg-white/15 hover:bg-white/25"
+                        data-testid="feed-entry-button"
+                        type="button"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            OpenUrl(entry.linkUrl);
+                        }}
+                    >
+                        {entry.buttonCaption}
+                    </button>
+                )}
                 <span className="text-[.65rem] text-white/50">{FriendlyTime.format(ageSeconds, '.ago', 1)}</span>
             </div>
         </div>

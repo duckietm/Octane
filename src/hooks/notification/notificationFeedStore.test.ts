@@ -62,8 +62,8 @@ describe('notification feed store', () => {
 
     it('hides the categories the user switched off', () => {
         const entries = [
-            { ...entry('friend', 'friends'), id: 1, title: '', iconUrl: null, linkUrl: null, senderName: '', receivedAt: 0 },
-            { ...entry('hotel', 'hotel'), id: 2, title: '', iconUrl: null, linkUrl: null, senderName: '', receivedAt: 0 }
+            { ...entry('friend', 'friends'), id: 1, title: '', iconUrl: null, decorationUrl: null, linkUrl: null, buttonCaption: '', senderName: '', receivedAt: 0 },
+            { ...entry('hotel', 'hotel'), id: 2, title: '', iconUrl: null, decorationUrl: null, linkUrl: null, buttonCaption: '', senderName: '', receivedAt: 0 }
         ];
 
         expect(filterFeedEntries(entries, { mentions: true, friends: true, me: true, hotel: false }).map((item) => item.message)).toEqual(['friend']);

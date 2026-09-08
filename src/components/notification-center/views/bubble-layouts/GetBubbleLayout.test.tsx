@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../../api', async (importOriginal) => ({
@@ -20,7 +20,7 @@ vi.mock('../../../../common', async (importOriginal) => ({
 }));
 
 import { NotificationBubbleItem, NotificationBubbleType } from '../../../../api';
-import { GetBubbleLayout } from './GetBubbleLayout';
+import { GetBubbleLayout, getBubbleTimingProps } from './GetBubbleLayout';
 
 afterEach(cleanup);
 
@@ -39,6 +39,37 @@ describe('GetBubbleLayout', () => {
 
         expect(screen.getByTestId('roommessagesposted-icon')).toBeTruthy();
         expect(screen.getByText('New messages in your room')).toBeTruthy();
+    });
+
+    it('shows a level-up as its own achievement bubble with the badge', () => {
+        const item = new NotificationBubbleItem('You advanced to Builder II!', NotificationBubbleType.ACHIEVEMENT, 'badge.png', 'questengine/achievements/building');
+
+        render(<>{GetBubbleLayout(item, () => null)}</>);
+
+        expect(screen.getByTestId('achievement-icon').querySelector('img')?.getAttribute('src')).toBe('badge.png');
+        expect(screen.getByText('You advanced to Builder II!')).toBeTruthy();
+    });
+
+    it('adds the stop / resume button when the bubble carries a toggle callback', () => {
+        const toggleCallback = vi.fn();
+        const item = new NotificationBubbleItem('Wired running', NotificationBubbleType.INFO, null, null, '', { toggleCallback });
+
+        render(<>{GetBubbleLayout(item, () => null)}</>);
+
+        const button = screen.getByTestId('bubble-toggle');
+
+        expect(button.textContent).toBe('Stop');
+        fireEvent.click(button);
+        expect(toggleCallback).toHaveBeenCalledWith(true);
+        expect(button.textContent).toBe('Resume');
+    });
+
+    it('turns stay and time_display into the fade props of the bubble frame', () => {
+        expect(getBubbleTimingProps(new NotificationBubbleItem('a', NotificationBubbleType.INFO))).toEqual({});
+        expect(getBubbleTimingProps(new NotificationBubbleItem('a', NotificationBubbleType.INFO, null, null, '', { stay: true }))).toEqual({ fadesOut: false });
+        expect(getBubbleTimingProps(new NotificationBubbleItem('a', NotificationBubbleType.INFO, null, null, '', { timeDisplayMs: 2500 }))).toEqual({
+            timeoutMs: 2500
+        });
     });
 
     it('shows a sound machine song with its caption', () => {

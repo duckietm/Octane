@@ -18,13 +18,17 @@ export interface NotificationFeedEntry {
     title: string;
     message: string;
     iconUrl: string | null;
+    /** A picture shown under the text, as the official `decorationImage` of a feed row. */
+    decorationUrl: string | null;
     linkUrl: string | null;
+    /** The caption of the action button; without one the whole row is the link. */
+    buttonCaption: string;
     senderName: string;
     receivedAt: number;
 }
 
 export type NotificationFeedEntryInput = Pick<NotificationFeedEntry, 'category' | 'type' | 'message'> &
-    Partial<Pick<NotificationFeedEntry, 'title' | 'iconUrl' | 'linkUrl' | 'senderName'>>;
+    Partial<Pick<NotificationFeedEntry, 'title' | 'iconUrl' | 'decorationUrl' | 'linkUrl' | 'buttonCaption' | 'senderName'>>;
 
 export type NotificationFeedSettings = Record<NotificationFeedCategory, boolean>;
 
@@ -156,7 +160,9 @@ export const useNotificationFeedStore = createOctaneStore<NotificationFeedState>
                 title: entry.title || '',
                 message: entry.message || '',
                 iconUrl: entry.iconUrl || null,
+                decorationUrl: entry.decorationUrl || null,
                 linkUrl: entry.linkUrl || null,
+                buttonCaption: entry.buttonCaption || '',
                 senderName: entry.senderName || '',
                 receivedAt: Date.now()
             };

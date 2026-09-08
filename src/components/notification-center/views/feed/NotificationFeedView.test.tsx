@@ -196,3 +196,28 @@ describe('NotificationFeedView', () => {
         expect(useNotificationFeedStore.getState().isOpen).toBe(false);
     });
 });
+
+describe('NotificationFeedView rows', () => {
+    it('renders the decoration picture and the captioned action button of a row', async () => {
+        const { OpenUrl } = await import('../../../../api');
+
+        useNotificationFeedStore.setState({ isOpen: true, pane: 'stream' });
+        useNotificationFeedStore.getState().addEntry({
+            category: 'me',
+            type: 'moderator',
+            title: 'Message from staff',
+            message: 'Read the Habbo Way',
+            decorationUrl: 'https://cdn.test/decoration.png',
+            linkUrl: 'https://help.test/habbo-way',
+            buttonCaption: 'Read more'
+        });
+
+        render(<NotificationFeedView />);
+
+        expect(screen.getByTestId('feed-entry-decoration').getAttribute('src')).toBe('https://cdn.test/decoration.png');
+
+        fireEvent.click(screen.getByTestId('feed-entry-button'));
+
+        expect(OpenUrl).toHaveBeenCalledWith('https://help.test/habbo-way');
+    });
+});
