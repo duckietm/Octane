@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredTextCounter, WiredTextFormattingHelp } from '../common/WiredTextFormattingHelp';
+import { WiredBubbleWidthSelect } from '../WiredBubbleWidthSelect';
 import { BOT_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -14,12 +15,13 @@ export const WiredActionBotTalkView: FC<{}> = (props) => {
     const [message, setMessage] = useState('');
     const [talkMode, setTalkMode] = useState(-1);
     const [botSource, setBotSource] = useState<number>(100);
+    const [bubbleWidth, setBubbleWidth] = useState<number>(-1);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
     const maxMessageLength = 200;
 
     const save = () => {
         setStringParam((botSource === 100 ? botName : '') + WIRED_STRING_DELIMETER + message);
-        setIntParams([talkMode, botSource]);
+        setIntParams([talkMode, botSource, bubbleWidth]);
     };
 
     useEffect(() => {
@@ -33,6 +35,7 @@ export const WiredActionBotTalkView: FC<{}> = (props) => {
         setBotSource(
             trigger.intData.length > 1 ? normalizeBotSource(trigger.intData[1], nextBotName.length > 0) : normalizeBotSource(-1, nextBotName.length > 0)
         );
+        setBubbleWidth(trigger.intData.length > 2 ? trigger.intData[2] : -1);
     }, [trigger]);
 
     return (
@@ -92,6 +95,7 @@ export const WiredActionBotTalkView: FC<{}> = (props) => {
                     <Text>{LocalizeText('wiredfurni.params.shout')}</Text>
                 </div>
             </div>
+            <WiredBubbleWidthSelect value={bubbleWidth} onChange={setBubbleWidth} />
         </WiredActionBaseView>
     );
 };

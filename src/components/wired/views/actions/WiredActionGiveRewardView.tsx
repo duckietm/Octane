@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { FaPlus, FaTrash } from 'react-icons/fa';
-import { LocalizeText, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Button, Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
@@ -19,14 +19,14 @@ interface RewardEntry {
 const DEFAULT_PROBABILITY = 100;
 const DEFAULT_POINTS_TYPE = 5;
 
-const REWARD_TYPES: { value: RewardType; label: string }[] = [
-    { value: 'badge', label: 'Badge' },
-    { value: 'credits', label: 'Credits' },
-    { value: 'pixels', label: 'Pixels / Duckets' },
-    { value: 'diamonds', label: 'Diamonds' },
-    { value: 'points', label: 'Extra Currency' },
-    { value: 'furni', label: 'Furni' },
-    { value: 'respect', label: 'Respect' }
+const REWARD_TYPES: { value: RewardType; key: string; label: string }[] = [
+    { value: 'badge', key: 'wiredfurni.params.reward.type.badge', label: 'Badge' },
+    { value: 'credits', key: 'wiredfurni.params.reward.type.credits', label: 'Credits' },
+    { value: 'pixels', key: 'wiredfurni.params.reward.type.pixels', label: 'Pixels / Duckets' },
+    { value: 'diamonds', key: 'wiredfurni.params.reward.type.diamonds', label: 'Diamonds' },
+    { value: 'points', key: 'wiredfurni.params.reward.type.points', label: 'Extra Currency' },
+    { value: 'furni', key: 'wiredfurni.params.reward.type.furni', label: 'Furni' },
+    { value: 'respect', key: 'wiredfurni.params.reward.type.respect', label: 'Respect' }
 ];
 
 const SELECTABLE_REWARD_TYPES = REWARD_TYPES.filter((entry) => entry.value !== 'respect');
@@ -208,7 +208,13 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
             footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
         >
             <div className="flex items-center gap-1">
-                <input checked={limitEnabled} className="form-check-input" id="limitEnabled" type="checkbox" onChange={(event) => setLimitEnabled(event.target.checked)} />
+                <input
+                    checked={limitEnabled}
+                    className="form-check-input"
+                    id="limitEnabled"
+                    type="checkbox"
+                    onChange={(event) => setLimitEnabled(event.target.checked)}
+                />
                 <Text>{LocalizeText('wiredfurni.params.prizelimit', ['amount'], [limitEnabled ? rewardsLimit.toString() : ''])}</Text>
             </div>
             {!limitEnabled && (
@@ -241,10 +247,13 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                     type="checkbox"
                     onChange={(e) => setUniqueRewards(e.target.checked)}
                 />
-                <Text>Unique rewards</Text>
+                <Text>{localizeWithFallback('wiredfurni.params.reward.unique', 'Unique rewards')}</Text>
             </div>
             <Text center small className="p-1 rounded bg-muted">
-                If checked each reward will be given once to each user. This will disable the probabilities option.
+                {localizeWithFallback(
+                    'wiredfurni.params.reward.unique.info',
+                    'If checked each reward will be given once to each user. This will disable the probabilities option.'
+                )}
             </Text>
             <hr className="m-0 bg-dark" />
             <div className="flex items-center justify-between">
@@ -286,7 +295,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                 >
                                     {rewardTypeOptions.map((entry) => (
                                         <option key={entry.value} value={entry.value}>
-                                            {entry.label}
+                                            {localizeWithFallback(entry.key, entry.label)}
                                         </option>
                                     ))}
                                 </select>

@@ -38,7 +38,9 @@ import {
     createPacketCooldownGate,
     GetRoomObjectBounds,
     GetRoomObjectScreenLocation,
+    IsOwnerOfFloorFurniture,
     LocalizeText,
+    localizeWithFallback,
     NotificationAlertType,
     SendMessageComposer,
     WiredSelectionVisualizer
@@ -59,6 +61,7 @@ import {
     Text
 } from '../../common';
 import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredTools } from '../../hooks';
+import { WiredChestsTabView } from './WiredChestsTabView';
 import {
     DIRECTION_NAMES,
     EDITABLE_FURNI_VARIABLES,
@@ -116,8 +119,6 @@ import {
     VariableTextValue,
     WiredToolsTab
 } from './WiredCreatorTools.types';
-
-import { WiredChestsTabView } from './WiredChestsTabView';
 import { WiredInspectionTabView } from './WiredInspectionTabView';
 import { WiredMonitorTabView } from './WiredMonitorTabView';
 import { WiredToolsSettingsTabView } from './WiredToolsSettingsTabView';
@@ -219,6 +220,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const { ownUser: tradeOwnUser = null, otherUser: tradeOtherUser = null, isTrading = false } = useInventoryTrade();
     const {
         roomSettings,
+        clearVariableForAllHolders,
         userVariableDefinitions,
         userVariableAssignments,
         furniVariableDefinitions,
@@ -235,7 +237,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         updateFurniVariableValue,
         updateRoomVariableValue
     } = useWiredTools();
-    const { simpleAlert = null } = useNotification();
+    const { simpleAlert = null, showConfirm = null } = useNotification();
 
     const getFurniLiveState = useCallback(
         (objectId: number, category: number): InspectionFurniLiveState => {
@@ -1019,11 +1021,15 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const [selectedUserRoomObject, setSelectedUserRoomObject] = useState<ReturnType<ReturnType<typeof GetRoomEngine>['getRoomObject']> | null>(null);
 
     useEffect(() => {
-        setSelectedRoomObject(roomSession && selectedFurni ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedFurni.objectId, selectedFurni.category) : null);
+        setSelectedRoomObject(
+            roomSession && selectedFurni ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedFurni.objectId, selectedFurni.category) : null
+        );
     }, [roomSession, selectedFurni, furniInternalRevision]);
 
     useEffect(() => {
-        setSelectedUserRoomObject(roomSession && selectedUser ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedUser.roomIndex, RoomObjectCategory.UNIT) : null);
+        setSelectedUserRoomObject(
+            roomSession && selectedUser ? GetRoomEngine().getRoomObject(roomSession.roomId, selectedUser.roomIndex, RoomObjectCategory.UNIT) : null
+        );
     }, [roomSession, selectedUser, selectedUserActionVersion]);
 
     const selectedMonitorErrorInfo = useMemo(() => {
@@ -2440,6 +2446,31 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     }, [clampedVariableManagePage, filteredVariableManageEntries]);
     const variableManageNoValueLabel = selectedVariableDefinition?.hasValue ? '/' : 'Not supported';
     const variableManageCanOpen = !!selectedVariableDefinition && selectedVariableDefinition.type === 'Custom' && variablesType !== 'context';
+    // Clearing reaches holders outside the room, so only the owner of the definition box gets the
+    // button; the server enforces the same rule.
+    const canVariableClear =
+        variableManageCanOpen &&
+        (variablesType === 'user' || variablesType === 'furni') &&
+        roomSettings.canModify &&
+        !!selectedVariableDefinition?.itemId &&
+        IsOwnerOfFloorFurniture(selectedVariableDefinition.itemId);
+    const confirmClearVariable = () => {
+        if (!canVariableClear || !showConfirm || !selectedVariableDefinition?.itemId) return;
+        const scope = variablesType === 'furni' ? 'furni' : 'user';
+        const itemId = selectedVariableDefinition.itemId;
+
+        showConfirm(
+            localizeWithFallback(
+                'wiredmenu.variable_overview.delete_all.desc',
+                'Are you sure you want to clear this variable? All users/furni that hold this variable will lose it. This action cannot be undone'
+            ),
+            () => clearVariableForAllHolders(scope, itemId),
+            null,
+            LocalizeText('generic.ok'),
+            LocalizeText('generic.cancel'),
+            localizeWithFallback('wiredmenu.variable_overview.delete_all.title', 'Clear this variable')
+        );
+    };
     const commitManagedHolderValueEdit = useCallback(() => {
         if (!selectedManagedVariableEntry || !selectedManagedHolderVariableEntry || !roomSettings.canModify || selectedManagedHolderVariableEntry.isReadOnly)
             return;
@@ -3300,6 +3331,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             onPickVariable={(key) => setSelectedVariableKeys((prev) => ({ ...prev, [variablesType]: key }))}
                             canVariableHighlight={canVariableHighlight}
                             variableManageCanOpen={variableManageCanOpen}
+                            canVariableClear={canVariableClear}
+                            onClearVariable={confirmClearVariable}
                             onOpenManagePanel={() => {
                                 requestUserVariables();
                                 setVariableManagePage(1);

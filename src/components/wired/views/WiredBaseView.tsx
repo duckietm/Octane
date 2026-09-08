@@ -1,6 +1,6 @@
 import { GetRoomEngine, GetSessionDataManager } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
-import { LocalizeText, WiredFurniType, WiredSelectionVisualizer } from '../../../api';
+import { LocalizeText, WiredFurniType, WiredSelectionVisualizer, wiredStyleClassName } from '../../../api';
 import wiredBgLeft from '../../../assets/images/wired/wired_bg_left.png';
 import wiredBgRight from '../../../assets/images/wired/wired_bg_right.png';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
@@ -45,7 +45,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
         setAllowsFurni = null,
         saveWired = null
     } = useWired();
-    const { roomSettings } = useWiredTools();
+    const { roomSettings, accountPreferences } = useWiredTools();
 
     const clearRoomAreaSelection = () => {
         GetRoomEngine().areaSelectionManager.clearHighlight();
@@ -135,7 +135,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
 
     return (
         <OctaneCardView
-            className="octane-wired max-h-[calc(100vh-16px)]"
+            className={`octane-wired ${wiredStyleClassName(accountPreferences?.wiredStyle)} max-h-[calc(100vh-16px)]`}
             theme="primary-slim"
             uniqueKey="octane-wired"
             isResizable={false}

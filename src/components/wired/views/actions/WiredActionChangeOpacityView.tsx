@@ -19,11 +19,11 @@ import {
 } from './WiredActionChangeOpacityState';
 
 const EASING_OPTIONS = [
-    { value: WIRED_OPACITY_EASING_INSTANT, label: 'Instant' },
-    { value: 1, label: 'Linear' },
-    { value: 2, label: 'Ease in' },
-    { value: 3, label: 'Ease out' },
-    { value: 4, label: 'Ease in-out' }
+    { value: WIRED_OPACITY_EASING_INSTANT, key: 'wiredfurni.params.easing.instant', label: 'Instant' },
+    { value: 1, key: 'wiredfurni.params.easing.linear', label: 'Linear' },
+    { value: 2, key: 'wiredfurni.params.easing.ease_in', label: 'Ease in' },
+    { value: 3, key: 'wiredfurni.params.easing.ease_out', label: 'Ease out' },
+    { value: 4, key: 'wiredfurni.params.easing.ease_in_out', label: 'Ease in-out' }
 ];
 
 export const WiredActionChangeOpacityView: FC<{}> = () => {
@@ -116,7 +116,7 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
                 <select className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
                     {EASING_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
-                            {option.label}
+                            {localizeWithFallback(option.key, option.label)}
                         </option>
                     ))}
                 </select>

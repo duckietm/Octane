@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -39,9 +39,9 @@ export const WiredActionJoinTeamView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.choose_type')}</Text>
                 {[
-                    { value: 0, label: 'Wired' },
-                    { value: 1, label: 'Banzai' },
-                    { value: 2, label: 'Freeze' }
+                    { value: 0, key: 'wiredfurni.params.team.game.0', label: 'Wired' },
+                    { value: 1, key: 'wiredfurni.params.team.game.1', label: 'Banzai' },
+                    { value: 2, key: 'wiredfurni.params.team.game.2', label: 'Freeze' }
                 ].map((option) => {
                     return (
                         <div key={option.value} className="flex gap-1">
@@ -53,7 +53,7 @@ export const WiredActionJoinTeamView: FC<{}> = (props) => {
                                 type="radio"
                                 onChange={() => setSelectedTeamType(option.value)}
                             />
-                            <Text>{option.label}</Text>
+                            <Text>{localizeWithFallback(option.key, option.label)}</Text>
                         </div>
                     );
                 })}
