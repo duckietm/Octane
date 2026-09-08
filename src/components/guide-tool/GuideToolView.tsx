@@ -1,5 +1,13 @@
 import {
     AddLinkEventTracker,
+    ChatReviewGuideDecidesOnOfferMessageComposer,
+    ChatReviewGuideDetachedMessageComposer,
+    ChatReviewGuideVoteMessageComposer,
+    ChatReviewSessionDetachedMessageEvent,
+    ChatReviewSessionOfferedToGuideMessageEvent,
+    ChatReviewSessionResultsMessageEvent,
+    ChatReviewSessionStartedMessageEvent,
+    ChatReviewSessionVotingStatusMessageEvent,
     GetSessionDataManager,
     GuideOnDutyStatusMessageEvent,
     GuideSessionAttachedMessageEvent,
@@ -17,10 +25,23 @@ import {
     RemoveLinkEventTracker
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { GetConfigurationValue, GuideSessionState, GuideToolMessage, GuideToolMessageGroup, LocalizeText, SendMessageComposer } from '../../api';
+import {
+    CHAT_REVIEW_VOTE_NONE,
+    GetConfigurationValue,
+    GuideSessionState,
+    GuideToolMessage,
+    GuideToolMessageGroup,
+    LocalizeText,
+    localizeWithFallback,
+    PlaySound,
+    SendMessageComposer
+} from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { GuideToolEvent } from '../../events';
 import { useMessageEvent, useNotification, useUiEvent } from '../../hooks';
+import { GuardianChatReviewAcceptView } from './views/GuardianChatReviewAcceptView';
+import { GuardianChatReviewResultsView } from './views/GuardianChatReviewResultsView';
+import { GuardianChatReviewVoteView } from './views/GuardianChatReviewVoteView';
 import { GuideToolAcceptView } from './views/GuideToolAcceptView';
 import { GuideToolMenuView } from './views/GuideToolMenuView';
 import { GuideToolOngoingView } from './views/GuideToolOngoingView';
@@ -56,6 +77,14 @@ export const GuideToolView: FC<{}> = (props) => {
     const [ongoingFigure, setOngoingFigure] = useState<string>(null);
     const [ongoingIsTyping, setOngoingIsTyping] = useState<boolean>(false);
     const [ongoingMessageGroups, setOngoingMessageGroups] = useState<GuideToolMessageGroup[]>([]);
+
+    // Guardian chat review jury (GuideSessionController.as:1055-1320).
+    const [chatReviewAcceptanceTimeout, setChatReviewAcceptanceTimeout] = useState<number>(0);
+    const [chatReviewVotingTimeout, setChatReviewVotingTimeout] = useState<number>(0);
+    const [chatReviewRecord, setChatReviewRecord] = useState<string>('');
+    const [chatReviewOwnVote, setChatReviewOwnVote] = useState<number>(CHAT_REVIEW_VOTE_NONE);
+    const [chatReviewWinningVote, setChatReviewWinningVote] = useState<number>(CHAT_REVIEW_VOTE_NONE);
+    const [chatReviewStatuses, setChatReviewStatuses] = useState<number[]>([]);
 
     const { simpleAlert = null } = useNotification();
 
@@ -99,6 +128,23 @@ export const GuideToolView: FC<{}> = (props) => {
                 break;
             case GuideSessionState.USER_SOMETHING_WRONG:
                 setHeaderText(LocalizeText('guide.help.request.user.guide.disconnected.error.heading'));
+                setNoCloseButton(false);
+                break;
+            case GuideSessionState.GUARDIAN_CHAT_REVIEW_ACCEPT:
+                setHeaderText(localizeWithFallback('guide.bully.request.guide.accept.title', 'Your help requests'));
+                setNoCloseButton(true);
+                break;
+            case GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS:
+            case GuideSessionState.GUARDIAN_CHAT_REVIEW_VOTE:
+                setHeaderText(localizeWithFallback('guide.bully.request.guide.vote.title', 'A bully case'));
+                setNoCloseButton(true);
+                break;
+            case GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS:
+                setHeaderText(localizeWithFallback('guide.bully.request.guide.results.title', 'Waiting for votes'));
+                setNoCloseButton(false);
+                break;
+            case GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS:
+                setHeaderText(localizeWithFallback('guide.bully.request.guide.results.final.title', 'The final verdict'));
                 setNoCloseButton(false);
                 break;
         }
@@ -248,6 +294,77 @@ export const GuideToolView: FC<{}> = (props) => {
         }
     });
 
+    /**
+     * setStateClosed: drop the review; when the guardian is on duty the guide tool
+     * comes back, otherwise the window closes.
+     */
+    const closeChatReview = useCallback(
+        (reopenGuideTool: boolean) => {
+            setChatReviewRecord('');
+            setChatReviewStatuses([]);
+            setChatReviewOwnVote(CHAT_REVIEW_VOTE_NONE);
+            setChatReviewWinningVote(CHAT_REVIEW_VOTE_NONE);
+
+            if (reopenGuideTool && isOnDuty) {
+                updateSessionState(GuideSessionState.GUIDE_TOOL_MENU);
+            } else {
+                setIsVisible(false);
+                setSessionState(GuideSessionState.GUIDE_TOOL_MENU);
+            }
+        },
+        [isOnDuty, updateSessionState]
+    );
+
+    const decideChatReviewOffer = (accept: boolean) => {
+        SendMessageComposer(new ChatReviewGuideDecidesOnOfferMessageComposer(accept));
+
+        if (accept) updateSessionState(GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS);
+        else closeChatReview(true);
+    };
+
+    const voteChatReview = (vote: number) => {
+        SendMessageComposer(new ChatReviewGuideVoteMessageComposer(vote));
+        setChatReviewOwnVote(vote);
+        updateSessionState(GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS);
+    };
+
+    const detachChatReview = () => {
+        SendMessageComposer(new ChatReviewGuideDetachedMessageComposer());
+        closeChatReview(true);
+    };
+
+    useMessageEvent<ChatReviewSessionOfferedToGuideMessageEvent>(ChatReviewSessionOfferedToGuideMessageEvent, (event) => {
+        setChatReviewAcceptanceTimeout(event.getParser().acceptanceTimeout);
+        PlaySound('HBST_guide_request');
+        updateSessionState(GuideSessionState.GUARDIAN_CHAT_REVIEW_ACCEPT);
+    });
+
+    useMessageEvent<ChatReviewSessionStartedMessageEvent>(ChatReviewSessionStartedMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        setChatReviewVotingTimeout(parser.votingTimeout);
+        setChatReviewRecord(parser.chatRecord);
+        updateSessionState(GuideSessionState.GUARDIAN_CHAT_REVIEW_VOTE);
+    });
+
+    useMessageEvent<ChatReviewSessionVotingStatusMessageEvent>(ChatReviewSessionVotingStatusMessageEvent, (event) => {
+        // onChatReviewSessionVotingStatus only refreshes the wait-for-results window.
+        if (sessionState !== GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS) return;
+
+        setChatReviewStatuses([...(event.getParser().status ?? [])]);
+    });
+
+    useMessageEvent<ChatReviewSessionResultsMessageEvent>(ChatReviewSessionResultsMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        setChatReviewWinningVote(parser.winningVoteCode);
+        setChatReviewOwnVote(parser.ownVoteCode);
+        setChatReviewStatuses([...(parser.finalStatus ?? [])]);
+        updateSessionState(GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS);
+    });
+
+    useMessageEvent<ChatReviewSessionDetachedMessageEvent>(ChatReviewSessionDetachedMessageEvent, (event) => closeChatReview(true));
+
     useMessageEvent<GuideSessionDetachedMessageEvent>(GuideSessionDetachedMessageEvent, (event) => {
         setOngoingUserId(0);
         setOngoingUsername(null);
@@ -287,6 +404,14 @@ export const GuideToolView: FC<{}> = (props) => {
         (action: string) => {
             switch (action) {
                 case 'close':
+                    if (
+                        sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS ||
+                        sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS
+                    ) {
+                        detachChatReview();
+                        return;
+                    }
+
                     setIsVisible(false);
                     setUserRequest('');
                     setSessionState(GuideSessionState.GUIDE_TOOL_MENU);
@@ -326,13 +451,25 @@ export const GuideToolView: FC<{}> = (props) => {
                     return;
             }
         },
-        [isHandlingBullyReports, isHandlingGuideRequests, isHandlingHelpRequests, simpleAlert]
+        [closeChatReview, isHandlingBullyReports, isHandlingGuideRequests, isHandlingHelpRequests, sessionState, simpleAlert]
     );
 
     if (!isVisible) return null;
 
+    const isChatReviewAccept = sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_ACCEPT;
+    const isChatReviewVote = sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_VOTE || sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS;
+    const isChatReviewResults =
+        sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_RESULTS || sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS;
+    const chatReviewClassName = isChatReviewAccept
+        ? ' octane-guardian-chat-review-accept'
+        : isChatReviewVote
+          ? ' octane-guardian-chat-review-vote'
+          : isChatReviewResults
+            ? ' octane-guardian-chat-review-results'
+            : '';
+
     return (
-        <OctaneCardView className="octane-guide-tool" theme="primary-slim">
+        <OctaneCardView className={`octane-guide-tool${chatReviewClassName}`} theme="primary-slim">
             <OctaneCardHeaderView headerText={headerText} noCloseButton={noCloseButton} onCloseClick={(event) => processAction('close')} />
             <OctaneCardContentView className="text-black">
                 {sessionState === GuideSessionState.GUIDE_TOOL_MENU && (
@@ -371,6 +508,31 @@ export const GuideToolView: FC<{}> = (props) => {
                 {sessionState === GuideSessionState.USER_THANKS && <GuideToolUserThanksView />}
                 {sessionState === GuideSessionState.USER_NO_HELPERS && <GuideToolUserNoHelpersView />}
                 {sessionState === GuideSessionState.USER_SOMETHING_WRONG && <GuideToolUserSomethingWrogView />}
+                {isChatReviewAccept && (
+                    <GuardianChatReviewAcceptView
+                        acceptanceTimeout={chatReviewAcceptanceTimeout}
+                        onAccept={() => decideChatReviewOffer(true)}
+                        onSkip={() => decideChatReviewOffer(false)}
+                    />
+                )}
+                {isChatReviewVote && (
+                    <GuardianChatReviewVoteView
+                        chatRecord={chatReviewRecord}
+                        votingTimeout={chatReviewVotingTimeout}
+                        waitingForVoters={sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_WAIT_FOR_VOTERS}
+                        onClose={detachChatReview}
+                        onVote={voteChatReview}
+                    />
+                )}
+                {isChatReviewResults && (
+                    <GuardianChatReviewResultsView
+                        final={sessionState === GuideSessionState.GUARDIAN_CHAT_REVIEW_RESULTS}
+                        ownVote={chatReviewOwnVote}
+                        statuses={chatReviewStatuses}
+                        winningVote={chatReviewWinningVote}
+                        onClose={detachChatReview}
+                    />
+                )}
             </OctaneCardContentView>
         </OctaneCardView>
     );
