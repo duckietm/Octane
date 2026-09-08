@@ -1145,39 +1145,28 @@
     justify-content: space-between;
 }
 
-/* ---- ME menu entries (no official sprites in this client; simple lettered badges) ---- */
+/* ---- ME menu icons ---- */
 
 .icon-me-quests,
 .icon-me-dailytasks,
 .icon-me-rewardtrack {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: bold;
-    font-size: 13px;
-    background: #418db0;
+    width: 32px;
+    height: 30px;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
 }
 
-.icon-me-quests::after {
-    content: 'Q';
+.icon-me-quests {
+    background-image: url("@/assets/images/toolbar/icons/me-menu/quests.png");
 }
 
 .icon-me-dailytasks {
-    background: #4bb245;
-}
-
-.icon-me-dailytasks::after {
-    content: 'D';
+    background-image: url("@/assets/images/toolbar/icons/me-menu/daily-tasks.png");
 }
 
 .icon-me-rewardtrack {
-    background: #7b3fa1;
-}
-
-.icon-me-rewardtrack::after {
-    content: 'R';
+    width: 33px;
+    height: 32px;
+    background-image: url("@/assets/images/toolbar/icons/me-menu/reward-track.png");
 }
