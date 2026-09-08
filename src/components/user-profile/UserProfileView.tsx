@@ -1,6 +1,9 @@
 import {
     ExtendedProfileChangedMessageEvent,
+    GetIgnoredUsersComposer,
     GetSessionDataManager,
+    IgnoredUsersEvent,
+    IgnoreUserComposer,
     RelationshipStatusInfoEvent,
     RelationshipStatusInfoMessageParser,
     RoomEngineObjectEvent,
@@ -9,6 +12,7 @@ import {
     UserCurrentBadgesComposer,
     UserCurrentBadgesEvent,
     UserProfileEvent,
+    UnignoreUserComposer,
     UserProfileParser,
     UserRelationshipsComposer
 } from '@octane/renderer';
@@ -23,6 +27,8 @@ export const UserProfileView: FC<{}> = () => {
     const [userProfile, setUserProfile] = useState<UserProfileParser>(null);
     const [userBadges, setUserBadges] = useState<string[]>([]);
     const [userRelationships, setUserRelationships] = useState<RelationshipStatusInfoMessageParser>(null);
+    // Official new_extended_profile block_button: the profile shows whether the user is on the ignore list.
+    const [ignoredUsers, setIgnoredUsers] = useState<string[]>([]);
 
     const onClose = () => {
         setUserProfile(null);
@@ -59,6 +65,17 @@ export const UserProfileView: FC<{}> = () => {
         setUserRelationships(parser);
     });
 
+    useMessageEvent<IgnoredUsersEvent>(IgnoredUsersEvent, (event) => setIgnoredUsers(event.getParser().ignoredUsers ?? []));
+
+    const toggleBlock = () => {
+        if (!userProfile) return;
+
+        const blocked = ignoredUsers.includes(userProfile.username);
+
+        SendMessageComposer(blocked ? new UnignoreUserComposer(userProfile.username) : new IgnoreUserComposer(userProfile.username));
+        setIgnoredUsers((current) => (blocked ? current.filter((name) => name !== userProfile.username) : [...current, userProfile.username]));
+    };
+
     useMessageEvent<UserProfileEvent>(UserProfileEvent, (event) => {
         const parser = event.getParser();
 
@@ -77,6 +94,7 @@ export const UserProfileView: FC<{}> = () => {
 
         SendMessageComposer(new UserCurrentBadgesComposer(parser.id));
         SendMessageComposer(new UserRelationshipsComposer(parser.id));
+        if (parser.id !== GetSessionDataManager().userId) SendMessageComposer(new GetIgnoredUsersComposer(GetSessionDataManager().userName));
     });
 
     useMessageEvent<ExtendedProfileChangedMessageEvent>(ExtendedProfileChangedMessageEvent, (event) => {
@@ -109,7 +127,14 @@ export const UserProfileView: FC<{}> = () => {
             <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
             <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
                 <div className="px-[10px] pt-[8px]">
-                    <UserContainerView userBadges={userBadges} userProfile={userProfile} userRelationships={userRelationships} onOpenRooms={onOpenRooms} />
+                    <UserContainerView
+                        userBadges={userBadges}
+                        userProfile={userProfile}
+                        userRelationships={userRelationships}
+                        isBlocked={ignoredUsers.includes(userProfile.username)}
+                        onToggleBlock={toggleBlock}
+                        onOpenRooms={onOpenRooms}
+                    />
                 </div>
                 <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
                     <div className="octane-extended-profile-window__panel h-full p-2">

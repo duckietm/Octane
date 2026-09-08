@@ -1176,3 +1176,15 @@
         overflow: auto !important;
     }
 }
+
+/* Official avatar_name_change link (premium.name.change.enabled) next to the name plate. */
+.octane-avatar-editor-name-change {
+    margin-left: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #0655b7;
+    font-size: 11px;
+    text-decoration: underline;
+    cursor: pointer;
+}

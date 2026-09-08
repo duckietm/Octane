@@ -51,6 +51,15 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
         wasVisibleRef.current = isVisible;
     }, [friendId, isVisible]);
 
+    // HabboFriendBarView.setCollapsedState -> deSelect(true): collapsing the bar (or
+    // paging the tab away) closes the open tab and drops its view-once tokens too.
+    useEffect(
+        () => () => {
+            if (wasVisibleRef.current && friendId !== 0) useFriendNotificationsStore.getState().markViewed(friendId);
+        },
+        [friendId]
+    );
+
     useEffect(() => {
         const onClick = (event: MouseEvent) => {
             const element = elementRef.current;

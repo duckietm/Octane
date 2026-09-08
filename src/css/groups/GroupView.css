@@ -1193,3 +1193,89 @@
     grid-auto-rows: max-content;
     align-content: start;
 }
+
+/* HC required popup (official club_required, 428x215): a dark hero strip
+   with the HC banner and the white info text, then cancel / join below. */
+.octane-group-hc-required .octane-card-content {
+    padding: 0;
+}
+
+.octane-group-hc-required__hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    min-height: 125px;
+    padding: 19px 16px 16px 23px;
+    background: #3c3c3c;
+    color: #fff;
+}
+
+.octane-group-hc-required__icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.octane-group-hc-required__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 9px;
+}
+
+.octane-group-hc-required__info {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.3;
+}
+
+.octane-group-hc-required__more {
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #0078ff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-group-hc-required__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 16px 15px 35px;
+}
+
+.octane-group-hc-required__cancel {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #000;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-group-hc-required__join {
+    min-width: 109px;
+}
+
+/* Forum report buttons (official forum_forum_report icon on threads and messages). */
+.octane-group-forum-report {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: #8a8a8a;
+    cursor: pointer;
+}
+
+.octane-group-forum-report:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #c8382b;
+}

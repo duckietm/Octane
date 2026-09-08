@@ -14,6 +14,8 @@ import { SeasonalView } from './views/SeasonalView';
 export const PurseView: FC<{}> = (props) => {
     const { purse = null, hcDisabled = false } = usePurse();
     const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+    // Official toolbar logout_confirmation: "Are you sure you want to log out?" before the reboot.
+    const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
     // The menu portals to the body, so no widget stacked on the right side can cover it;
     // it hangs under the purse, aligned to its right edge.
     const purseRef = useRef<HTMLDivElement>(null);
@@ -103,8 +105,9 @@ export const PurseView: FC<{}> = (props) => {
         CreateLinkEvent('habboUI/open/vault');
     }, []);
 
-    const handleLogout = useCallback(async (event: React.MouseEvent) => {
-        event.stopPropagation();
+    const handleLogout = useCallback(async (event?: React.MouseEvent) => {
+        event?.stopPropagation();
+        setLogoutConfirmOpen(false);
 
         const logoutUrl = GetConfigurationValue<string>('login.logout.endpoint', '/api/auth/logout');
         const ssoTicket = (window.OctaneConfig?.['sso.ticket'] as string) ?? '';
@@ -210,11 +213,28 @@ export const PurseView: FC<{}> = (props) => {
                         <button
                             type="button"
                             className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--logout octane-purse-right-button disconnect"
-                            onClick={handleLogout}
-                            title="Log out"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                setSettingsMenuOpen(false);
+                                setLogoutConfirmOpen((value) => !value);
+                            }}
+                            title={localizeWithFallback('toolbar.logout', 'Log out')}
                         >
                             <img src={logoutIcon} alt="" className="octane-purse__btn-img" />
                         </button>
+                        {logoutConfirmOpen && (
+                            <div className="octane-purse-logout-confirm" role="dialog" onClick={(event) => event.stopPropagation()}>
+                                <p className="octane-purse-logout-confirm__text">{localizeWithFallback('toolbar.logout.confirmation', 'Are you sure you want to log out?')}</p>
+                                <div className="octane-purse-logout-confirm__buttons">
+                                    <button type="button" className="octane-purse-logout-confirm__button" onClick={() => handleLogout()}>
+                                        {localizeWithFallback('toolbar.logout.ok', 'Log out')}
+                                    </button>
+                                    <button type="button" className="octane-purse-logout-confirm__button" onClick={() => setLogoutConfirmOpen(false)}>
+                                        {localizeWithFallback('toolbar.logout.cancel', 'Cancel')}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                         <button
                             type="button"
                             className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--settings octane-purse-right-button settings"

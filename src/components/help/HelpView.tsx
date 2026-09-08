@@ -1,6 +1,6 @@
-import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
+import { AddLinkEventTracker, GetGuideReportingStatusMessageComposer, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { GetConfigurationValue, LocalizeText, ReportState } from '../../api';
+import { GetConfigurationValue, LocalizeText, ReportState, ReportType, SendMessageComposer } from '../../api';
 import { Column, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { useHelp, useWelcomeTour } from '../../hooks';
 import { DescribeReportView } from './views/DescribeReportView';
@@ -8,7 +8,9 @@ import { HabboWayQuizView } from './views/HabboWayQuizView';
 import { HabboWayView } from './views/HabboWayView';
 import { HelpIndexView } from './views/HelpIndexView';
 import { NameChangeView } from './views/name-change/NameChangeView';
+import { PendingGuideTicketView } from './views/PendingGuideTicketView';
 import { ReportSummaryView } from './views/ReportSummaryView';
+import { SafetyBookletView } from './views/SafetyBookletView';
 import { SanctionSatusView } from './views/SanctionStatusView';
 import { SelectReportedChatsView } from './views/SelectReportedChatsView';
 import { SelectReportedUserView } from './views/SelectReportedUserView';
@@ -35,22 +37,30 @@ export const HelpView: FC<{}> = (props) => {
                 switch (parts[1]) {
                     case 'show':
                         setIsVisible(true);
+                        // Official HabboHelp.onGuideReportingStatus: an open guide ticket shows its pending popup.
+                        SendMessageComposer(new GetGuideReportingStatusMessageComposer());
                         return;
                     case 'hide':
                         setIsVisible(false);
                         return;
                     case 'toggle':
-                        setIsVisible((prevValue) => !prevValue);
+                        setIsVisible((prevValue) => {
+                            if (!prevValue) SendMessageComposer(new GetGuideReportingStatusMessageComposer());
+
+                            return !prevValue;
+                        });
                         return;
                     case 'tour':
                         // Official requestGuide(): a tour-type guide request, only when guides are enabled.
                         if (GetConfigurationValue<boolean>('guides.enabled', false)) acceptTour();
                         return;
                     case 'report':
+                        // Official HabboHelp.linkReceived("help/report/room/<id>/<name>") -> reportRoom.
                         if (parts.length >= 5 && parts[2] === 'room') {
                             const roomId = parseInt(parts[3]);
-                            const unknown = unescape(parts.splice(4).join('/'));
-                            //this.reportRoom(roomId, unknown, "");
+                            const roomName = unescape(parts.slice(4).join('/'));
+
+                            if (!isNaN(roomId)) report?.(ReportType.ROOM, { roomId, roomName });
                         }
                         return;
                 }
@@ -61,7 +71,7 @@ export const HelpView: FC<{}> = (props) => {
         AddLinkEventTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [acceptTour]);
+    }, [acceptTour, report]);
 
     useEffect(() => {
         if (!activeReport) return;
@@ -116,6 +126,8 @@ export const HelpView: FC<{}> = (props) => {
             <NameChangeView />
             <HabboWayView />
             <HabboWayQuizView />
+            <SafetyBookletView />
+            <PendingGuideTicketView />
             <WelcomeTourPopupView />
         </>
     );

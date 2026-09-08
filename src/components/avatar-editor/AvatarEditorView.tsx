@@ -8,9 +8,10 @@ import {
     SetClothingChangeDataMessageComposer,
     UserFigureComposer
 } from '@octane/renderer';
+import { HelpNameChangeEvent } from '../../events';
 import { FC, useEffect, useState } from 'react';
 import { FaDice, FaRedo, FaTrash } from 'react-icons/fa';
-import { AvatarEditorAction, LocalizeText, SendMessageComposer } from '../../api';
+import { AvatarEditorAction, DispatchUiEvent, GetConfigurationValue, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
 import mainGenericSrc from '../../assets/images/avatareditor/air/main-generic.png';
 import mainHeadSrc from '../../assets/images/avatareditor/air/main-head.png';
 import mainHotLooksSrc from '../../assets/images/avatareditor/air/main-hotlooks.png';
@@ -188,6 +189,17 @@ export const AvatarEditorView: FC<{}> = (props) => {
                 <div className="octane-avatar-editor-stage">
                     <div className="octane-avatar-editor-nameplate">
                         <span>{GetSessionDataManager().userName}</span>
+                        {/* Official avatar_name_change (premium.name.change.enabled): opens the name change flow next to the editor. */}
+                        {!clothingChangeData && GetConfigurationValue<boolean>('premium.name.change.enabled', false) && (
+                            <button
+                                type="button"
+                                className="octane-avatar-editor-name-change"
+                                title={localizeWithFallback('tutorial.name_change.change', 'Change my name')}
+                                onClick={() => DispatchUiEvent(new HelpNameChangeEvent(HelpNameChangeEvent.INIT))}
+                            >
+                                {localizeWithFallback('tutorial.name_change.change', 'Change my name')}
+                            </button>
+                        )}
                     </div>
                     <div className="octane-avatar-editor-tab-row">
                         <OctaneCardTabsView classNames={['avatar-editor-tabs']}>

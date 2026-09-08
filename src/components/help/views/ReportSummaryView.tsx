@@ -16,6 +16,10 @@ export const ReportSummaryView: FC<{}> = (props) => {
     const submitReport = () => {
         const chats: (string | number)[] = [];
 
+        // Unlawful-activity reports also collect the reporter's name and e-mail
+        // (activeReport.reporterName / reporterEmail); the official composers
+        // append them as two strings, ours do not carry them yet.
+
         switch (activeReport.reportType) {
             case ReportType.BULLY:
             case ReportType.EMERGENCY:

@@ -1,5 +1,6 @@
 import {
     AddLinkEventTracker,
+    ApproveAllMembershipRequestsMessageComposer,
     GetSessionDataManager,
     GroupAdminGiveComposer,
     GroupAdminTakeComposer,
@@ -250,6 +251,15 @@ export const GroupMembersView: FC<{}> = (props) => {
                                 </option>
                             ))}
                         </select>
+                        {membersData.admin && levelId === GROUP_MEMBER_LEVEL.PENDING && membersData.result.length > 0 && (
+                            <Button
+                                variant="success"
+                                className="btn-sm octane-group-members-accept-all"
+                                onClick={() => SendMessageComposer(new ApproveAllMembershipRequestsMessageComposer(membersData.groupId))}
+                            >
+                                {LocalizeText('group.members.acceptall')}
+                            </Button>
+                        )}
                     </Column>
                 </div>
                 <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">

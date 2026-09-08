@@ -7,16 +7,16 @@ import {
     PostThreadMessageEvent
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
+import { GetUserProfile, LocalizeText, localizeWithFallback, ReportType, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, LayoutBadgeImageView, Text } from '../../../../common';
-import { useMessageEvent } from '../../../../hooks';
+import { resolveFirstUnreadMessageIndex, resolveLastReadMessageIndex, useGroupForumUnread, useHelp, useMessageEvent } from '../../../../hooks';
 
 const THREADS_PER_PAGE = 20;
 
 interface GroupForumThreadListViewProps {
     groupId: number;
     forumData: ExtendedForumData;
-    onOpenThread: (groupId: number, threadId: number, thread?: GuildForumThread) => void;
+    onOpenThread: (groupId: number, threadId: number, thread?: GuildForumThread, messageIndex?: number) => void;
     onNewThread: () => void;
     onOpenSettings: () => void;
     onBack: () => void;
@@ -28,6 +28,8 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = (prop
     const [threads, setThreads] = useState<GuildForumThread[]>([]);
     const [startIndex, setStartIndex] = useState<number>(0);
     const [totalThreads, setTotalThreads] = useState<number>(0);
+    const { getThreadLastReadIndex = null } = useGroupForumUnread();
+    const { report = null } = useHelp();
 
     useMessageEvent<GuildForumThreadsEvent>(GuildForumThreadsEvent, (event) => {
         const parser = event.getParser();
@@ -75,6 +77,24 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = (prop
     };
 
     const canModerate = forumData && forumData.hasModeratePermissionError;
+    const canReport = !!(forumData && forumData.canReport);
+
+    /** ThreadListView.updateListItem: unread = messages after the last read one (local marker first). */
+    const getUnreadCount = (thread: GuildForumThread): number => {
+        const lastRead = resolveLastReadMessageIndex(thread.totalMessages, thread.unreadMessagesCount, getThreadLastReadIndex?.(thread.threadId));
+
+        return Math.max(0, thread.totalMessages - lastRead - 1);
+    };
+
+    /** ThreadListView.onGoToFirstUnread: the header and the unread counter both open the thread at its first unread message. */
+    const goToFirstUnread = (thread: GuildForumThread) => {
+        const lastRead = resolveLastReadMessageIndex(thread.totalMessages, thread.unreadMessagesCount, getThreadLastReadIndex?.(thread.threadId));
+
+        onOpenThread(effectiveGroupId, thread.threadId, thread, resolveFirstUnreadMessageIndex(thread.totalMessages, lastRead));
+    };
+
+    /** ThreadListView.onReport -> HabboHelp.reportThread: the call for help flow with reason category 7. */
+    const reportThread = (thread: GuildForumThread) => report?.(ReportType.THREAD, { groupId: effectiveGroupId, threadId: thread.threadId });
 
     const pinnedThreads = threads.filter((t) => t.isPinned);
     const normalThreads = threads.filter((t) => !t.isPinned);
@@ -162,20 +182,22 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = (prop
                             );
                         }
 
+                        const unreadCount = getUnreadCount(thread);
+
                         return (
                             <Flex
                                 key={thread.threadId}
-                                className={`p-2 border-b hover:bg-muted cursor-pointer ${thread.isPinned ? 'bg-warning bg-opacity-10' : ''} ${thread.unreadMessagesCount > 0 ? 'fw-bold' : ''}`}
+                                className={`p-2 border-b hover:bg-muted cursor-pointer ${thread.isPinned ? 'bg-warning bg-opacity-10' : ''} ${unreadCount > 0 ? 'fw-bold' : ''}`}
                                 gap={2}
                                 alignItems="center"
-                                onClick={() => onOpenThread(effectiveGroupId, thread.threadId, thread)}
+                                onClick={() => goToFirstUnread(thread)}
                             >
                                 <Column className="flex-1 overflow-hidden" gap={0}>
                                     <Flex gap={1} alignItems="center">
                                         {thread.isPinned && <i className="fas fa-thumbtack text-warning" />}
                                         {thread.isLocked && <i className="fas fa-lock text-muted" />}
-                                        <Text bold={thread.unreadMessagesCount > 0} className="truncate">
-                                            {thread.header}
+                                        <Text bold={unreadCount > 0} className="truncate">
+                                            {thread.header || '(No Subject)'}
                                         </Text>
                                     </Flex>
                                     <Flex gap={1}>
@@ -204,10 +226,10 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = (prop
                                         {LocalizeText('messageboard.messages')}
                                     </Text>
                                 </Column>
-                                {thread.unreadMessagesCount > 0 && (
+                                {unreadCount > 0 && (
                                     <Column className="flex-shrink-0 text-center min-w-[60px]" gap={0}>
                                         <Text small bold variant="danger">
-                                            {thread.unreadMessagesCount}
+                                            {unreadCount}
                                         </Text>
                                         <Text small variant="danger">
                                             {LocalizeText('messageboard.unread')}
@@ -233,6 +255,20 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = (prop
                                         {formatTimeAgo(thread.lastCommentTime)}
                                     </Text>
                                 </Column>
+                                {canReport && (
+                                    <button
+                                        type="button"
+                                        className="octane-group-forum-report flex-shrink-0"
+                                        title={localizeWithFallback('groupforum.thread.report', 'Report thread')}
+                                        aria-label={localizeWithFallback('groupforum.thread.report', 'Report thread')}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            reportThread(thread);
+                                        }}
+                                    >
+                                        <i className="fas fa-flag" />
+                                    </button>
+                                )}
                             </Flex>
                         );
                     })}

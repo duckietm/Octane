@@ -4,3 +4,6 @@ export * from './habboWayQuiz';
 export * from './useHabboWay';
 export * from './useWelcomeTour';
 export * from './welcomeTour';
+export * from './safetyBooklet';
+export * from './useSafetyBooklet';
+export * from './pendingGuideTicket';

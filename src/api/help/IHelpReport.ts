@@ -15,4 +15,7 @@ export interface IHelpReport {
     roomObjectId: number;
     message: string;
     currentStep: number;
+    /** Unlawful-activity reports (official `help_message_name` / `help_message_email`). */
+    reporterName?: string;
+    reporterEmail?: string;
 }

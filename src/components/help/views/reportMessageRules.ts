@@ -28,3 +28,29 @@ export const getReportMessageError = (message: string, minimumLength: number): R
 };
 
 export const isUnlawfulActivityCategory = (categoryName: string): boolean => categoryName === UNLAWFUL_ACTIVITY_CATEGORY;
+
+/**
+ * Room / group / event reports (official `populateRoomReportButton`): the
+ * reason list collapses to the single topic 34, whose text carries the name
+ * of the reported room / group / event.
+ */
+export const ROOM_REPORT_TOPIC_ID = 34;
+
+export const getRoomReportTopicKey = (): string => `help.cfh.topic.${ROOM_REPORT_TOPIC_ID}`;
+
+export type UnlawfulReportError = 'confirm' | 'name' | 'email';
+
+/**
+ * Official verifyMessage for the unlawful-activity category: the confirmation
+ * box must be ticked and both the name and the e-mail filled, otherwise the
+ * step is refused with the "tell us what happened" alert.
+ */
+export const getUnlawfulReportError = (confirmed: boolean, name: string, email: string): UnlawfulReportError | null => {
+    if (!confirmed) return 'confirm';
+
+    if (!(name || '').trim().length) return 'name';
+
+    if (!(email || '').trim().length) return 'email';
+
+    return null;
+};

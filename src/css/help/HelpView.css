@@ -42,3 +42,102 @@
     color: #46a01e;
     font-size: 0.95rem;
 }
+
+/* Official ui_help_modal: help modals (safety booklet) sit on a dimmed,
+   60% blended dark backdrop that swallows clicks on the rest of the client. */
+.octane-help-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(36, 35, 30, 0.6);
+}
+
+.octane-help-modal-backdrop .octane-card {
+    position: relative;
+}
+
+/* Unlawful-activity branch of the report flow (official unlawful_message_content):
+   name + e-mail inputs side by side and the confirmation checkbox below. */
+.help-unlawful__input {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 4px 8px;
+    border: 1px solid #b6b6b6;
+    border-radius: 3px;
+    font-size: 0.78rem;
+}
+
+.help-unlawful__confirm {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.74rem;
+    line-height: 1.3;
+    cursor: pointer;
+}
+
+.help-unlawful__confirm input {
+    margin-top: 2px;
+}
+
+/* Pending guide ticket popups (official pending_*_request, 369px wide): the
+   illustration hangs over the top-right of the close button. */
+.octane-pending-guide-ticket__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 4px;
+}
+
+.octane-pending-guide-ticket__subtitle {
+    color: #c30000;
+    font-size: 1rem;
+}
+
+.octane-pending-guide-ticket__report {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px 8px;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+    background: #f4f4f4;
+}
+
+.octane-pending-guide-ticket__party {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.octane-pending-guide-ticket__avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.octane-pending-guide-ticket__footer {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 56px;
+    margin-top: 6px;
+}
+
+.octane-pending-guide-ticket__close {
+    min-width: 140px;
+}
+
+.octane-pending-guide-ticket__illustration {
+    position: absolute;
+    right: -8px;
+    bottom: -4px;
+    max-height: 109px;
+    pointer-events: none;
+    image-rendering: pixelated;
+}

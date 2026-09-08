@@ -16,9 +16,9 @@ import {
     UpdateThreadMessageEvent
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
+import { GetUserProfile, LocalizeText, localizeWithFallback, ReportType, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, Text } from '../../../../common';
-import { useMessageEvent } from '../../../../hooks';
+import { resolveMessagePageStart, useGroupForumUnread, useHelp, useMessageEvent } from '../../../../hooks';
 
 const MESSAGES_PER_PAGE = 20;
 
@@ -32,19 +32,25 @@ interface GroupForumThreadViewProps {
     groupId: number;
     threadId: number;
     initialThread?: GuildForumThread;
+    /** GroupForumController.goToMessageIndex: the message the view opens on (its page is loaded first). */
+    initialMessageIndex?: number;
     forumData: ExtendedForumData;
     onBack: () => void;
 }
 
 export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
-    const { groupId = 0, threadId = 0, initialThread = null, forumData = null, onBack = null } = props;
+    const { groupId = 0, threadId = 0, initialThread = null, initialMessageIndex = 0, forumData = null, onBack = null } = props;
     const effectiveGroupId = forumData?.groupId || groupId;
     const [messages, setMessages] = useState<MessageData[]>([]);
+    const { markThreadRead = null } = useGroupForumUnread();
+    const { report = null } = useHelp();
+    const pendingScrollIndexRef = useRef<number>(-1);
     const [totalMessages, setTotalMessages] = useState<number>(0);
     const [replyText, setReplyText] = useState<string>('');
     const [threadInfo, setThreadInfo] = useState<GuildForumThread>(initialThread);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesListRef = useRef<HTMLDivElement>(null);
 
     useMessageEvent<ThreadMessagesMessageEvent>(ThreadMessagesMessageEvent, (event) => {
         const parser = event.getParser();
@@ -53,16 +59,21 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
 
         setTotalMessages(parser.amount);
 
-        if (parser.startIndex === 0) {
-            setMessages(parser.messages);
-        } else {
-            setMessages((prev) => [...prev, ...parser.messages]);
-        }
+        // Pages can arrive before or after the ones already shown (jump to the
+        // first unread message, then "earlier" / "more"): merge by message index.
+        setMessages((prev) => {
+            const byId = new Map<number, MessageData>();
+
+            for (const message of [...prev, ...parser.messages]) byId.set(message.messageId, message);
+
+            return [...byId.values()].sort((a, b) => a.messageIndex - b.messageIndex);
+        });
 
         // Mark messages as read
         if (parser.messages.length > 0) {
             const lastMessage = parser.messages[parser.messages.length - 1];
             SendMessageComposer(new UpdateForumReadMarkerMessageComposer(new UpdateForumReadMarkerEntry(effectiveGroupId, lastMessage.messageId, true)));
+            markThreadRead?.(threadId, lastMessage.messageIndex);
         }
     });
 
@@ -72,6 +83,7 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
         if (parser.groupId !== effectiveGroupId || parser.threadId !== threadId) return;
 
         setMessages((prev) => [...prev, parser.message]);
+        markThreadRead?.(threadId, parser.message.messageIndex);
     });
 
     useMessageEvent<PostThreadMessageEvent>(PostThreadMessageEvent, (event) => {
@@ -115,8 +127,34 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
         if (!effectiveGroupId || !threadId) return;
 
         setMessages([]);
-        SendMessageComposer(new GetMessagesMessageComposer(effectiveGroupId, threadId, 0, MESSAGES_PER_PAGE));
-    }, [effectiveGroupId, threadId]);
+        pendingScrollIndexRef.current = initialMessageIndex;
+        SendMessageComposer(new GetMessagesMessageComposer(effectiveGroupId, threadId, resolveMessagePageStart(initialMessageIndex, MESSAGES_PER_PAGE), MESSAGES_PER_PAGE));
+    }, [effectiveGroupId, threadId, initialMessageIndex]);
+
+    // Once the requested page is in, land on the message the thread was opened for.
+    useEffect(() => {
+        const index = pendingScrollIndexRef.current;
+
+        if (index < 0 || !messages.some((message) => message.messageIndex === index)) return;
+
+        pendingScrollIndexRef.current = -1;
+        messagesListRef.current?.querySelector<HTMLElement>(`[data-message-index="${index}"]`)?.scrollIntoView({ block: 'start' });
+    }, [messages]);
+
+    const firstLoadedIndex = messages.length ? messages[0].messageIndex : 0;
+    const lastLoadedIndex = messages.length ? messages[messages.length - 1].messageIndex : -1;
+
+    const loadEarlierMessages = useCallback(() => {
+        const start = Math.max(0, firstLoadedIndex - MESSAGES_PER_PAGE);
+
+        SendMessageComposer(new GetMessagesMessageComposer(effectiveGroupId, threadId, start, Math.min(MESSAGES_PER_PAGE, firstLoadedIndex - start)));
+    }, [effectiveGroupId, threadId, firstLoadedIndex]);
+
+    /** MessageListView.onReport -> HabboHelp.reportMessage: the call for help flow with reason category 8. */
+    const reportMessage = useCallback(
+        (messageId: number) => report?.(ReportType.MESSAGE, { groupId: effectiveGroupId, threadId, messageId }),
+        [report, effectiveGroupId, threadId]
+    );
 
     const sendReply = useCallback(() => {
         if (replyText.trim().length < 10 || isSubmitting) return;
@@ -188,6 +226,7 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
 
     const canModerate = forumData && forumData.hasModeratePermissionError;
     const canPost = forumData && forumData.hasPostMessagePermissionError;
+    const canReport = !!(forumData && forumData.canReport);
     const isLocked = threadInfo ? threadInfo.isLocked : false;
 
     // Derive thread info from first message if we don't have explicit thread info
@@ -231,7 +270,14 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
                     </Flex>
                 )}
             </Flex>
-            <Column className="overflow-auto flex-1" gap={0}>
+            <Column className="overflow-auto flex-1" gap={0} innerRef={messagesListRef}>
+                {firstLoadedIndex > 0 && (
+                    <Flex justifyContent="center" className="p-2">
+                        <Text pointer underline onClick={loadEarlierMessages}>
+                            {localizeWithFallback('groupforum.thread.load_earlier', 'Show earlier messages')}
+                        </Text>
+                    </Flex>
+                )}
                 {messages.map((message, index) => {
                     const stateText = getMessageStateText(message);
 
@@ -246,7 +292,12 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
                     }
 
                     return (
-                        <Flex key={message.messageId} className={`p-3 border-b ${message.state !== STATE_NORMAL ? 'bg-danger bg-opacity-10' : ''}`} gap={3}>
+                        <Flex
+                            key={message.messageId}
+                            className={`p-3 border-b ${message.state !== STATE_NORMAL ? 'bg-danger bg-opacity-10' : ''}`}
+                            gap={3}
+                            data-message-index={message.messageIndex}
+                        >
                             <Column className="flex-shrink-0 items-center w-[50px]" gap={1}>
                                 <div className="relative w-[40px] h-[40px] rounded-full mx-auto overflow-hidden bg-[rgba(255,255,255,0.1)]">
                                     <LayoutAvatarImageView
@@ -278,11 +329,18 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
                                             </Text>
                                         </Flex>
                                     )}
-                                    {canModerate && message.state === STATE_NORMAL && (
-                                        <Text small pointer underline variant="danger" onClick={() => hideMessage(message.messageId)}>
-                                            {LocalizeText('groupforum.message.hide')}
-                                        </Text>
-                                    )}
+                                    <Flex gap={2} alignItems="center">
+                                        {canReport && message.state === STATE_NORMAL && (
+                                            <Text small pointer underline variant="muted" onClick={() => reportMessage(message.messageId)}>
+                                                {localizeWithFallback('groupforum.message.report', 'Report')}
+                                            </Text>
+                                        )}
+                                        {canModerate && message.state === STATE_NORMAL && (
+                                            <Text small pointer underline variant="danger" onClick={() => hideMessage(message.messageId)}>
+                                                {LocalizeText('groupforum.message.hide')}
+                                            </Text>
+                                        )}
+                                    </Flex>
                                 </Flex>
                                 {(message.state === STATE_NORMAL || canModerate) && (
                                     <Text className="whitespace-pre-wrap break-words">{message.messageText}</Text>
@@ -291,13 +349,13 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
                         </Flex>
                     );
                 })}
-                {messages.length < totalMessages && (
+                {lastLoadedIndex + 1 < totalMessages && (
                     <Flex justifyContent="center" className="p-2">
                         <Text
                             pointer
                             underline
                             onClick={() => {
-                                SendMessageComposer(new GetMessagesMessageComposer(effectiveGroupId, threadId, messages.length, MESSAGES_PER_PAGE));
+                                SendMessageComposer(new GetMessagesMessageComposer(effectiveGroupId, threadId, lastLoadedIndex + 1, MESSAGES_PER_PAGE));
                             }}
                         >
                             {LocalizeText('groupforum.thread.load_more')}

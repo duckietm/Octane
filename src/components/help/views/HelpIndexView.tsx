@@ -14,12 +14,13 @@ import {
 import helpDuck from '../../../assets/images/help/help-duck.png';
 import { Text } from '../../../common';
 import { GuideToolEvent } from '../../../events';
-import { useHabboWay, useHelp } from '../../../hooks';
+import { useHabboWay, useHelp, useSafetyBooklet } from '../../../hooks';
 import { MyReportsStatusView } from './MyReportsStatusView';
 
 export const HelpIndexView: FC<{}> = (props) => {
     const { setActiveReport = null } = useHelp();
     const { showHabboWay = null } = useHabboWay();
+    const { showSafetyBooklet = null } = useSafetyBooklet();
     const [reportsStatusVisible, setReportsStatusVisible] = useState(false);
 
     const onReportClick = () => {
@@ -76,6 +77,11 @@ export const HelpIndexView: FC<{}> = (props) => {
                 <button type="button" className="help-link" onClick={onHabboWayClick}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {localizeWithFallback('help.main.self.habboway.title', 'The Habbo Way')}
+                </button>
+                {/* Official safetybooklet_link -> HabboHelp.showSafetyBooklet */}
+                <button type="button" className="help-link" onClick={showSafetyBooklet}>
+                    <FaArrowCircleRight className="help-link__icon" />
+                    {localizeWithFallback('help.main.self.safetybooklet.title', 'Safety Policy')}
                 </button>
                 <button type="button" className="help-link" onClick={() => SendMessageComposer(new GetCfhStatusMessageComposer(false))}>
                     <FaArrowCircleRight className="help-link__icon" />

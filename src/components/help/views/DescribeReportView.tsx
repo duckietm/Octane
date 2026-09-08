@@ -2,10 +2,13 @@ import { FC, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, localizeWithFallback, NotificationAlertType, ReportState, ReportType } from '../../../api';
 import { Button, Flex, Text } from '../../../common';
 import { useHelp, useModTools, useNotification } from '../../../hooks';
-import { getReportMessageError, isUnlawfulActivityCategory, resolveReportMessageMinimumLength } from './reportMessageRules';
+import { getReportMessageError, getUnlawfulReportError, isUnlawfulActivityCategory, resolveReportMessageMinimumLength } from './reportMessageRules';
 
 export const DescribeReportView: FC<{}> = (props) => {
     const [message, setMessage] = useState('');
+    const [reporterName, setReporterName] = useState('');
+    const [reporterEmail, setReporterEmail] = useState('');
+    const [unlawfulConfirmed, setUnlawfulConfirmed] = useState(false);
     const { activeReport = null, setActiveReport = null } = useHelp();
     const { cfhCategories = [] } = useModTools();
     const { simpleAlert = null } = useNotification();
@@ -15,6 +18,20 @@ export const DescribeReportView: FC<{}> = (props) => {
     const isUnlawful = isUnlawfulActivityCategory(cfhCategories[activeReport?.cfhCategory]?.name ?? '');
 
     const submitMessage = () => {
+        // Official verifyMessage: the unlawful branch is refused with the generic
+        // "tell us what happened" alert until the box is ticked and both fields filled.
+        if (isUnlawful && getUnlawfulReportError(unlawfulConfirmed, reporterName, reporterEmail)) {
+            simpleAlert?.(
+                localizeWithFallback('help.emergency.main.step.one.description', 'Please tell us what happened. The more detailed report we get, the faster we can help you.'),
+                NotificationAlertType.DEFAULT,
+                null,
+                null,
+                localizeWithFallback('generic.alert.title', 'Alert')
+            );
+
+            return;
+        }
+
         const error = getReportMessageError(message, minimumLength);
 
         if (error) {
@@ -38,7 +55,13 @@ export const DescribeReportView: FC<{}> = (props) => {
         setActiveReport((prevValue) => {
             const currentStep = ReportState.REPORT_SUMMARY;
 
-            return { ...prevValue, message, currentStep };
+            return {
+                ...prevValue,
+                message,
+                currentStep,
+                reporterName: isUnlawful ? reporterName.trim() : '',
+                reporterEmail: isUnlawful ? reporterEmail.trim() : ''
+            };
         });
     };
 
@@ -66,6 +89,37 @@ export const DescribeReportView: FC<{}> = (props) => {
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
             />
+            {isUnlawful && (
+                <div className="help-unlawful flex flex-col gap-1">
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            className="help-unlawful__input"
+                            aria-label={localizeWithFallback('help.cfh.unlawful_activity.name', 'Your name')}
+                            placeholder={localizeWithFallback('help.cfh.unlawful_activity.name', 'Your name')}
+                            value={reporterName}
+                            onChange={(event) => setReporterName(event.target.value)}
+                        />
+                        <input
+                            type="email"
+                            className="help-unlawful__input"
+                            aria-label={localizeWithFallback('help.cfh.unlawful_activity.email', 'Your e-mail address')}
+                            placeholder={localizeWithFallback('help.cfh.unlawful_activity.email', 'Your e-mail address')}
+                            value={reporterEmail}
+                            onChange={(event) => setReporterEmail(event.target.value)}
+                        />
+                    </div>
+                    <label className="help-unlawful__confirm">
+                        <input type="checkbox" checked={unlawfulConfirmed} onChange={(event) => setUnlawfulConfirmed(event.target.checked)} />
+                        <span>
+                            {localizeWithFallback(
+                                'help.cfh.unlawful_activity.confirm_label',
+                                'It is my genuine belief that the information and allegations contained herein are accurate and complete.'
+                            )}
+                        </span>
+                    </label>
+                </div>
+            )}
             <Flex gap={2} justifyContent="between">
                 <Button
                     disabled={!(activeReport.reportType === ReportType.BULLY || activeReport.reportType === ReportType.EMERGENCY)}
