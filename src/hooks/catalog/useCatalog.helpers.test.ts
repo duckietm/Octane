@@ -175,7 +175,7 @@ describe('catalog page request correlation', () => {
         expect(correlation.matches(9)).toBe(false);
     });
 
-    it('expires the active request and ignores a late response', () => {
+    it('reports the timeout but still accepts a late response for the same page', () => {
         vi.useFakeTimers();
         const correlation = createCatalogPageRequestCorrelation();
         let timedOutPageId = -1;
@@ -190,7 +190,9 @@ describe('catalog page request correlation', () => {
         vi.advanceTimersByTime(5000);
 
         expect(timedOutPageId).toBe(12);
-        expect(correlation.matches(12)).toBe(false);
+        expect(correlation.matches(12)).toBe(true);
+        expect(correlation.matches(9)).toBe(false);
+        expect(correlation.complete(12)).toBe(true);
         expect(correlation.complete(12)).toBe(false);
     });
 

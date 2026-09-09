@@ -1,22 +1,6 @@
 import { NodeData, RoomControllerLevel, RoomObjectCategory, RoomObjectType } from '@octane/renderer';
 import { BuilderFurniPlaceableStatus, CatalogNode, CatalogPage, CatalogType, ICatalogNode, ICatalogPage, IPurchasableOffer } from '../../api';
 
-/**
- * Pure helpers extracted from `useCatalog.ts`. Each function takes the
- * relevant pieces of state as inputs (instead of closing over them via
- * useCallback) so it can be unit-tested without rendering a React tree.
- *
- * Keep these dependency-free at the React layer: no `useState`, no
- * refs, no `vi.fn`-able side effects beyond what the renderer SDK
- * already exposes (`GetRoomEngine`, etc., which the call sites guard).
- */
-
-/**
- * The catalog has two top-level "types" — the regular catalog and the
- * Builders Club catalog. Anything else maps to NORMAL. Centralising
- * the coercion in one place keeps the switch from drifting between
- * call sites and the message-event handlers.
- */
 export const normalizeCatalogType = (type?: string): string => {
     if (type === CatalogType.BUILDER) return CatalogType.BUILDER;
 
@@ -79,12 +63,6 @@ export const createCatalogIndexPrewarmController = (request: (catalogType: strin
                 const openedNow = state.visible && !previous.visible;
                 const switchedVisibleCatalog = state.visible && state.catalogType !== previous.catalogType;
 
-                // Opening the catalog is a request the user is waiting on, so it
-                // goes out immediately. The login prewarm is not: it lands in the
-                // middle of authentication and room entry, and the index packet is
-                // large enough — 1700 pages and ~49k offer ids on a full hotel —
-                // that parsing it there is felt as a freeze. Wait for an idle
-                // moment instead; the catalog is still warm by the time it opens.
                 if (openedNow || switchedVisibleCatalog) request(state.catalogType);
                 else if (authenticatedNow) scheduleWhenIdle(() => request(state.catalogType));
             }
@@ -94,7 +72,6 @@ export const createCatalogIndexPrewarmController = (request: (catalogType: strin
     };
 };
 
-/** requestIdleCallback where available, a short timeout everywhere else. */
 const scheduleWhenIdle = (run: () => void): void => {
     const idle = (globalThis as { requestIdleCallback?: (cb: () => void, options?: { timeout: number }) => number }).requestIdleCallback;
 
@@ -149,10 +126,8 @@ export const createCatalogPageRequestCorrelation = (): CatalogPageRequestCorrela
 
             if (onTimeout) {
                 timeout = setTimeout(() => {
-                    const expiredPageId = requestedPageId;
-
-                    clearRequest();
-                    onTimeout(expiredPageId);
+                    timeout = null;
+                    onTimeout(requestedPageId);
                 }, timeoutMs);
             }
         },
@@ -168,11 +143,6 @@ export const createCatalogPageRequestCorrelation = (): CatalogPageRequestCorrela
     };
 };
 
-/**
- * Build the canonical product-key list for a purchasable offer. Used
- * by the resolved-offer cache so the same offer can be looked up by
- * either `productType:id:classId` or `productType:class:className`.
- */
 export const getOfferProductKeys = (offer: IPurchasableOffer | null | undefined): string[] => {
     const keys: string[] = [];
     const product = offer?.product;
@@ -190,11 +160,6 @@ export const getOfferProductKeys = (offer: IPurchasableOffer | null | undefined)
     return keys;
 };
 
-/**
- * Depth-first search by pageId. The root is excluded so callers never
- * select the synthetic "root" node by mistake. Recursive but bounded
- * by the tree the server sends (typically 3-4 levels deep).
- */
 export const findNodeById = (id: number, node: ICatalogNode | null, rootNode: ICatalogNode | null): ICatalogNode | null => {
     if (!node) return null;
     if (node.pageId === id && node !== rootNode) return node;
@@ -208,10 +173,6 @@ export const findNodeById = (id: number, node: ICatalogNode | null, rootNode: IC
     return null;
 };
 
-/**
- * Depth-first search by pageName. Same exclusion of the root as
- * `findNodeById`.
- */
 export const findNodeByName = (name: string, node: ICatalogNode | null, rootNode: ICatalogNode | null): ICatalogNode | null => {
     if (!node) return null;
     if (node.pageName === name && node !== rootNode) return node;
@@ -225,12 +186,6 @@ export const findNodeByName = (name: string, node: ICatalogNode | null, rootNode
     return null;
 };
 
-/**
- * Lookup the list of catalog nodes a given offer appears under. When
- * `onlyVisible` is true the helper falls back to the full list if the
- * filtered subset is empty — matches the original behavior in
- * `getNodesByOfferId(offerId, true)`.
- */
 export const getNodesByOfferIdFromMap = (
     offerId: number,
     offersToNodes: Map<number, ICatalogNode[]> | null | undefined,
@@ -254,14 +209,6 @@ export const getNodesByOfferIdFromMap = (
     return offersToNodes.get(offerId) ?? null;
 };
 
-/**
- * Turn the server-side NodeData tree into a CatalogNode tree paired
- * with an offerId → nodes index map. Pure (besides the `new
- * CatalogNode` construction).
- *
- * Original lived inline inside the `CatalogPagesListEvent` handler;
- * extracted so the reducer is testable without rendering the hook.
- */
 export const buildCatalogNodeTree = (root: NodeData): { rootNode: ICatalogNode; offersToNodes: Map<number, ICatalogNode[]> } => {
     const offersToNodes: Map<number, ICatalogNode[]> = new Map();
 
@@ -283,19 +230,6 @@ export const buildCatalogNodeTree = (root: NodeData): { rootNode: ICatalogNode; 
     return { rootNode: walk(root, 0, null), offersToNodes };
 };
 
-/**
- * Pure-input version of the placement-status decision. The original
- * `getBuilderFurniPlaceableStatus` closes over a handful of state
- * slices + reads `GetRoomSession()` / `GetRoomEngine()` /
- * `GetSessionDataManager()` directly. Pulling those reads up to the
- * call site (the hook still does them) makes the rest of the
- * decision tree testable in isolation.
- *
- * `roomSession` may be null (user is in the hotel view, not a room).
- * `usersInRoomMinusSelf` is the number of non-moderator, non-self
- * users sharing the room — only consulted when `secondsLeft <= 0`,
- * because the limit-reached / not-in-room paths short-circuit first.
- */
 export interface BuilderPlacementStatusInput {
     offer: IPurchasableOffer | null | undefined;
     roomSession: { isGuildRoom: boolean; isRoomOwner: boolean; controllerLevel: number } | null;
@@ -304,7 +238,6 @@ export interface BuilderPlacementStatusInput {
     furniLimit: number;
     builderPlacementAllowedInCurrentRoom: boolean;
     builderPlacementBlockedByVisitors: boolean;
-    /** Count of non-moderator, non-self users in the room. Only consulted when `secondsLeft <= 0`. */
     visitorCount?: number;
 }
 
@@ -351,7 +284,4 @@ export const replaceCatalogPageOffers = (page: ICatalogPage, offers: IPurchasabl
     return new CatalogPage(page.pageId, page.layoutCode, page.localization, offers, page.acceptSeasonCurrencyAsCredits, page.mode);
 };
 
-// Re-exports for the legacy categories so the call site in useCatalog
-// doesn't need to know whether the constant comes from the renderer
-// SDK enum or our own copy.
 export { RoomControllerLevel, RoomObjectCategory, RoomObjectType };
