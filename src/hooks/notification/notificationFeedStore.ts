@@ -115,6 +115,7 @@ export const getFeedCategoryForBubbleType = (type: string): NotificationFeedCate
         case NotificationBubbleType.SOUNDMACHINE:
         case NotificationBubbleType.SOUNDBOARD:
         case NotificationBubbleType.ROOMMESSAGESPOSTED:
+        case NotificationBubbleType.EARNING:
             return 'hotel';
         default:
             return 'me';

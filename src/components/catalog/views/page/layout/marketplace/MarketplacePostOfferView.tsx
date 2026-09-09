@@ -1,4 +1,4 @@
-import { MakeOfferMessageComposer } from '@octane/renderer';
+import { MakeMultipleOffersMessageComposer, MakeOfferMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FurnitureItem, LocalizeText, localizeWithFallback, ProductTypeEnum, SendMessageComposer } from '../../../../../../api';
 import { Button, Column, Grid, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../../common';
@@ -11,6 +11,10 @@ let isPostingMarketplaceOffer = false;
 
 export const MarketplacePostOfferView: FC<{}> = (props) => {
     const [item, setItem] = useState<FurnitureItem>(null);
+    // Every copy of the same furni the player could put in this offer, newest last, as the
+    // official window keeps the inventory selection in `MarketplaceModel._offerItems`.
+    const [sellableItems, setSellableItems] = useState<FurnitureItem[]>([]);
+    const [offerCount, setOfferCount] = useState(1);
     const [askingPrice, setAskingPrice] = useState(0);
     const [tempAskingPrice, setTempAskingPrice] = useState('0');
     const { data: marketplaceConfiguration = null } = useMarketplaceConfiguration({ enabled: !!item });
@@ -30,7 +34,11 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
         setAskingPrice(parseInt(price));
     };
 
-    useUiEvent<CatalogPostMarketplaceOfferEvent>(CatalogPostMarketplaceOfferEvent.POST_MARKETPLACE, (event) => setItem(event.item));
+    useUiEvent<CatalogPostMarketplaceOfferEvent>(CatalogPostMarketplaceOfferEvent.POST_MARKETPLACE, (event) => {
+        setItem(event.item);
+        setSellableItems(event.sellableItems);
+        setOfferCount(1);
+    });
 
     useEffect(() => {
         if (!item) return;
@@ -54,18 +62,38 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
 
     const copySuggestedPrice = () => updateAskingPrice(resolveCopiedSuggestedPrice(suggestedPrice, askingPrice).toString());
 
+    // `MarketplaceModel.makeOffer` clamps the amount to what the selection actually holds.
+    const maximumOfferCount = Math.max(1, sellableItems.length);
+    const requestedCount = Math.max(1, Math.min(offerCount, maximumOfferCount));
+
     const postItem = () => {
         if (!item || askingPrice < marketplaceConfiguration.minimumPrice || isPostingMarketplaceOffer) return;
 
+        const furniType = item.isWallItem ? 2 : 1;
+        const itemIds = (sellableItems.length ? sellableItems : [item]).slice(0, requestedCount).map((sellable) => sellable.id);
+
         showConfirm(
-            LocalizeText('inventory.marketplace.confirm_offer.info', ['furniname', 'price'], [getFurniTitle, askingPrice.toString()]),
+            requestedCount > 1
+                ? localizeWithFallback(
+                      'inventory.marketplace.confirm_offer.info.multiple',
+                      'Do you want to sell %count% x %furniname% for %price% credits each?',
+                      ['count', 'furniname', 'price'],
+                      [requestedCount.toString(), getFurniTitle, askingPrice.toString()]
+                  )
+                : LocalizeText('inventory.marketplace.confirm_offer.info', ['furniname', 'price'], [getFurniTitle, askingPrice.toString()]),
             () => {
                 if (isPostingMarketplaceOffer) return;
 
                 isPostingMarketplaceOffer = true;
                 setTimeout(() => (isPostingMarketplaceOffer = false), 5000);
 
-                SendMessageComposer(new MakeOfferMessageComposer(askingPrice, item.isWallItem ? 2 : 1, item.id));
+                // One item still goes through the single-item composer the hotel has always
+                // used; several go in one request, which is what header 1551 exists for.
+                SendMessageComposer(
+                    itemIds.length > 1
+                        ? new MakeMultipleOffersMessageComposer(askingPrice, furniType, itemIds)
+                        : new MakeOfferMessageComposer(askingPrice, furniType, itemIds[0])
+                );
                 setItem(null);
             },
             () => {
@@ -137,6 +165,21 @@ export const MarketplacePostOfferView: FC<{}> = (props) => {
                                     <Button variant="secondary" onClick={copySuggestedPrice}>
                                         {localizeWithFallback('inventory.marketplace.make_offer.copy_suggested_price', 'Copy suggested price')}
                                     </Button>
+                                </div>
+                            )}
+                            {maximumOfferCount > 1 && (
+                                <div className="flex items-center gap-1">
+                                    <Text small shrink>
+                                        {LocalizeText('sellinmarketplace.amount', ['max_amount'], [maximumOfferCount.toString()])}
+                                    </Text>
+                                    <OctaneInput
+                                        data-testid="marketplace-offer-count"
+                                        max={maximumOfferCount}
+                                        min={1}
+                                        type="number"
+                                        value={offerCount}
+                                        onChange={(event) => setOfferCount(Math.max(1, Math.min(event.target.valueAsNumber || 1, maximumOfferCount)))}
+                                    />
                                 </div>
                             )}
                             <div className="input-group has-validation">

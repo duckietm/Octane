@@ -1,6 +1,7 @@
 import {
     CreateLinkEvent,
     PetRespectComposer,
+    PetSupplementComposer,
     PetType,
     RoomObjectCategory,
     RoomObjectType,
@@ -8,7 +9,7 @@ import {
     RoomUnitGiveHandItemPetComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { AvatarInfoPet, GetConfigurationValue, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { AvatarInfoPet, GetConfigurationValue, GetOwnRoomObject, LocalizeText, localizeWithFallback, PetSupplementEnum, SendMessageComposer } from '../../../../../api';
 import { useRoom, useSessionInfo } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
@@ -58,6 +59,14 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     break;
                 case 'treat':
                     SendMessageComposer(new PetRespectComposer(avatarInfo.id));
+                    break;
+                // Official `InfoStandWidgetHandler` RWUAM_GIVE_WATER_TO_PET / RWUAM_GIVE_LIGHT_TO_PET:
+                // `PetSupplementComposer(petId, supplement)` with the two monsterplant supplements.
+                case 'give_water':
+                    SendMessageComposer(new PetSupplementComposer(avatarInfo.id, PetSupplementEnum.WATER));
+                    break;
+                case 'give_light':
+                    SendMessageComposer(new PetSupplementComposer(avatarInfo.id, PetSupplementEnum.LIGHT));
                     break;
                 case 'pass_handitem':
                     SendMessageComposer(new RoomUnitGiveHandItemPetComposer(avatarInfo.id));
@@ -191,6 +200,16 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                         <ContextMenuListItemView onClick={(event) => processAction('treat')}>
                             {LocalizeText('infostand.button.pettreat')}
                         </ContextMenuListItemView>
+                    )}
+                    {!avatarInfo.dead && (
+                        <>
+                            <ContextMenuListItemView onClick={(event) => processAction('give_water')}>
+                                {localizeWithFallback('infostand.button.givewater', 'Give water')}
+                            </ContextMenuListItemView>
+                            <ContextMenuListItemView onClick={(event) => processAction('give_light')}>
+                                {localizeWithFallback('infostand.button.givelight', 'Give light')}
+                            </ContextMenuListItemView>
+                        </>
                     )}
                     {!avatarInfo.dead && avatarInfo.level === avatarInfo.maximumLevel && avatarInfo.breedable && (
                         <>

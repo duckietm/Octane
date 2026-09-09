@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
     areCommunityGoalVoteButtonsVisible,
+    getWidgetContainerWidgetKey,
+    isWidgetContainerAnswerForSchedule,
     ConcurrentUsersState,
     getCommunityGoalNeedleAngle,
     getCommunityGoalVsNeedleFrame,
@@ -119,6 +121,21 @@ describe('hotelViewWidgets', () => {
         it('shows the vote buttons only before the user contributed', () => {
             expect(areCommunityGoalVoteButtonsVisible(0)).toBe(true);
             expect(areCommunityGoalVoteButtonsVisible(3)).toBe(false);
+        });
+    });
+
+    describe('WidgetContainerWidget', () => {
+        it('only accepts a timing answer for its own scheduling string', () => {
+            expect(isWidgetContainerAnswerForSchedule('2001-01-01 00:00,promo', '2001-01-01 00:00,promo')).toBe(true);
+            expect(isWidgetContainerAnswerForSchedule('2001-01-01 00:00,other', '2001-01-01 00:00,promo')).toBe(false);
+        });
+
+        it('builds the configuration key of the scheduled widget', () => {
+            expect(getWidgetContainerWidgetKey('promo')).toBe('landing.view.promo.widget');
+        });
+
+        it('lists widgetcontainer among the official widget types', () => {
+            expect(isHotelViewOfficialWidgetType('widgetcontainer')).toBe(true);
         });
     });
 });

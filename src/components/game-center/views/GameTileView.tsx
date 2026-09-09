@@ -2,7 +2,7 @@ import { GameConfigurationData, JoinQueueMessageComposer } from '@octane/rendere
 import { FC } from 'react';
 import { ColorUtils, CreateLinkEvent, formatBlockCountdown, GetConfigurationValue, getGamesLeftStatus, LocalizeText, SendMessageComposer } from '../../../api';
 import snowStormLogo from '../../../assets/images/snowstorm/snowstorm.png';
-import { useGameCenter, useSnowWar } from '../../../hooks';
+import { SNOWWAR_ERROR_GAME_CANCELLED, SNOWWAR_ERROR_GAME_NOT_FOUND, useGameCenter, useSnowWar } from '../../../hooks';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -16,6 +16,16 @@ const ERROR_TEXTS: Record<number, [string, string]> = {
     3: ['snowwar.error.not_enough_players', 'Not enough players to start.'],
     4: ['snowwar.error.no_tickets', 'You have no games left.'],
     5: ['snowwar.error.internal', 'Something went wrong, try again.'],
+    [SNOWWAR_ERROR_GAME_CANCELLED]: ['snowwar.error.game_cancelled', 'The game was cancelled.'],
+    [SNOWWAR_ERROR_GAME_NOT_FOUND]: ['snowwar.error.game_not_found', 'That game could not be found.'],
+};
+
+// AIR games_main: btn_more_games_10 / _100 / _300, each bound to one game-token
+// offer by its localization id (GamesMainViewController.as:114-133).
+const TOKEN_OFFER_LABELS: Record<string, [string, string]> = {
+    GET_SNOWWAR_TOKENS: ['snowwar.buy_games.10', '+10 games'],
+    GET_SNOWWAR_TOKENS2: ['snowwar.buy_games.100', '+100 games'],
+    GET_SNOWWAR_TOKENS3: ['snowwar.buy_games.300', '+300 games'],
 };
 
 /**
@@ -25,7 +35,7 @@ const ERROR_TEXTS: Record<number, [string, string]> = {
  */
 export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
 {
-    const { accountStatus, setSelectedGame, setInstructionsOpen, blockSeconds } = useGameCenter();
+    const { accountStatus, setSelectedGame, setInstructionsOpen, blockSeconds, tokenOffers, purchaseTokenOffer } = useGameCenter();
     const { phase, queuePosition, queueSize, lobbySeconds, queueInfo, errorCode, leaveQueue, requestLeaderboard, startEditing } = useSnowWar();
 
     const isSnowWar = (game.gameNameId === 'snowwar');
@@ -48,13 +58,17 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
         CreateLinkEvent(`catalog/open/${links?.['hc.buy_hc'] ?? 'habbo_club'}`);
     };
 
+    // AIR games_main only shows the token buttons the server sent offers for.
+    const offers = (tokenOffers ?? []).filter(offer => TOKEN_OFFER_LABELS[offer.localizationId]);
+
     const onPlay = () =>
     {
         if (!gamesLeft.canStart)
         {
-            // AIR onPlay with freeGamesLeft == 0: openGetMoreGames — no token
-            // offer exists here, so the button sells HC like games_vip_region.
-            openClubCenter();
+            // AIR onPlay with freeGamesLeft == 0: openGetMoreGames — buy more
+            // games with tokens when the hotel sells them, otherwise fall back
+            // to the HC upsell of games_vip_region.
+            if (!offers.length) openClubCenter();
             return;
         }
 
@@ -106,7 +120,7 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                             {localizeWithFallback('snowwar.instructions.link', 'How To Play')}
                         </button>
                         {showLeaderboard && (
-                            <button className="game-tile__link" type="button" onClick={() => requestLeaderboard(true, false, 0)}>
+                            <button className="game-tile__link" type="button" onClick={() => requestLeaderboard(true, 'all', 0)}>
                                 {localizeWithFallback('snowwar.leaderboards.link', 'Leaderboard')}
                             </button>
                         )}
@@ -120,7 +134,24 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                                 <span className={`game-tile__games-left-count game-tile__games-left-count--${gamesLeft.counterTone}`}>{accountStatus?.freeGamesLeft ?? 0}</span>
                             </div>
                         )}
-                        {gamesLeft.showCounter && (
+                        {offers.length > 0 && (
+                            <div className="game-tile__tokens">
+                                <span className="game-tile__tokens-label">{localizeWithFallback('snowwar.buy_more_games', 'Buy more games:')}</span>
+                                <div className="game-tile__tokens-buttons">
+                                    {offers.map(offer => (
+                                        <button
+                                            key={offer.offerId}
+                                            className="game-tile__token"
+                                            type="button"
+                                            title={`${offer.priceInCredits} ${localizeWithFallback('purse.credits', 'Credits')}`}
+                                            onClick={() => purchaseTokenOffer(offer.offerId)}>
+                                            {localizeWithFallback(...TOKEN_OFFER_LABELS[offer.localizationId])}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {!offers.length && gamesLeft.showCounter && (
                             <button className="game-tile__vip" type="button" onClick={openClubCenter}>
                                 <span className="game-tile__hc-icon" />
                                 <span>{localizeWithFallback('snowwar.get_more_games', 'Get additional free daily games with HC!')}</span>

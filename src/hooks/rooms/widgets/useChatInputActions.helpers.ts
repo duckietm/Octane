@@ -75,3 +75,9 @@ export const getScreenshotFileName = (roomName: string | null | undefined, now: 
 
 // `ChatBubbleFactory` (freeflowchat, chat type 11): hardcoded English in the official client too.
 export const getPingBubbleText = (latencyMs: number): string => (latencyMs >= 0 ? `Ping: ${latencyMs} ms` : 'Ping: measuring...');
+
+/**
+ * AIR 13 `SpecialSystemChat` (1971): the only special system type
+ * `ChatBubbleFactory.applySpecialChatContent` renders (`extraParam - 67 == 0`).
+ */
+export const SPECIAL_SYSTEM_CHAT_TYPE_SIXES = 67;

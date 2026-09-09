@@ -2,7 +2,7 @@ import { GetEventDispatcher, GetRenderer, RoomObjectMouseEvent, RoomObjectTileMo
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useRef } from 'react';
 import { DispatchMouseEvent, DispatchTouchEvent } from '../../api';
-import { useRoom, useRoomKeyboardMovement } from '../../hooks';
+import { useRoom, useRoomKeyboardMovement, useRoomSpecialEvents } from '../../hooks';
 import { classNames } from '../../layout';
 import { RoomSpectatorView } from './spectator/RoomSpectatorView';
 import { RoomWidgetsView } from './widgets/RoomWidgetsView';
@@ -13,6 +13,8 @@ export const RoomView: FC<{}> = (props) => {
     const elementRef = useRef<HTMLDivElement>(null);
 
     useRoomKeyboardMovement();
+    // AIR 13 SpecialRoomEvent (2163): room-wide rotate / shake / zoom / disco.
+    useRoomSpecialEvents();
 
     useEffect(() => {
         if (!roomSession) return;

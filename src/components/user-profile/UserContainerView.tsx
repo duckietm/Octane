@@ -10,7 +10,7 @@ interface UserContainerViewProps {
     userProfile: UserProfileParser;
     userBadges?: string[];
     userRelationships?: RelationshipStatusInfoMessageParser;
-    /** Official block_button / blocked_container: the user is on the ignore list. */
+    /** Official block_button / blocked_container: the user is on the session block list. */
     isBlocked?: boolean;
     onToggleBlock?: () => void;
     onOpenRooms?: () => void;
@@ -37,7 +37,9 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
         setRequestSent(userProfile.requestSent);
     }, [userProfile]);
 
-    const blockLabel = isBlocked ? LocalizeText('infostand.button.unignore') : LocalizeText('infostand.button.ignore');
+    const blockLabel = isBlocked
+        ? localizeWithFallback('extendedprofile.unblock', 'Unblock')
+        : localizeWithFallback('extendedprofile.block', 'Block');
 
     return (
         <div className={`octane-extended-profile${isBlocked ? ' is-blocked' : ''}`}>
@@ -55,7 +57,7 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
             )}
             {isBlocked && (
                 <div className="octane-extended-profile__blocked-overlay" aria-hidden="true">
-                    <span>{localizeWithFallback('extendedprofile.blocked', 'You are ignoring this Habbo')}</span>
+                    <span>{localizeWithFallback('extendedprofile.blocked', 'You are blocking this Habbo')}</span>
                 </div>
             )}
             <div className="octane-extended-profile__top">

@@ -33,7 +33,7 @@ import { useMessageEvent, useOctaneEvent, useUiEvent } from '../../events';
 import { useUserDataSnapshot } from '../../session/useSessionSnapshots';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
-import { CHAT_TYPE_PING, getPingBubbleText } from './useChatInputActions.helpers';
+import { CHAT_TYPE_PING, getPingBubbleText, SPECIAL_SYSTEM_CHAT_TYPE_SIXES } from './useChatInputActions.helpers';
 
 const CHAT_MESSAGES_MAX = 250;
 
@@ -210,6 +210,15 @@ const useChatWidgetState = () => {
                 // Official `ChatBubbleFactory` (chat type 11): the `:ping` latency read-out.
                 text = getPingBubbleText(event.extraParam);
                 break;
+            case RoomSessionChatEvent.CHAT_TYPE_SPECIAL_SYSTEM: {
+                // AIR 13 `SpecialSystemChat` (1971). `ChatBubbleFactory.applySpecialChatContent`
+                // only renders one special system type (67) and drops the rest.
+                if (event.extraParam !== SPECIAL_SYSTEM_CHAT_TYPE_SIXES) return;
+
+                text = '<b>6666666...  77777777777777...</b>';
+                styleId = SystemChatStyleEnum.GENERIC;
+                break;
+            }
             case RoomSessionChatEvent.CHAT_TYPE_MUTE_REMAINING: {
                 const remainingSeconds = Math.max(0, event.extraParam);
                 const hours = Math.floor(remainingSeconds / 3600).toString();

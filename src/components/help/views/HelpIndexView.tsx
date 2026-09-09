@@ -87,7 +87,7 @@ export const HelpIndexView: FC<{}> = (props) => {
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.sanction.status')}
                 </button>
-                {/* The official client opens its "My reports" table here; ours opens the same window over a stub until the renderer parses the packet. */}
+                {/* The official client opens its "My reports" table here; the window asks the server for the list itself. */}
                 <button type="button" className="help-link" onClick={() => setReportsStatusVisible(true)}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.reports.status')}

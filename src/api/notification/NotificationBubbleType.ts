@@ -17,4 +17,10 @@ export class NotificationBubbleType {
     public static VIP: string = 'vip';
     public static ROOMMESSAGESPOSTED: string = 'roommessagesposted';
     public static MENTION: string = 'mention';
+    /** EarningsController.onIncomeRewardNotificationMessageEvent: addItem(..., 'earning', ...). */
+    public static EARNING: string = 'earning';
+    /** AIR 13 LTD raffle result (`HabboCatalog.onLtdRaffleResult` adds its item with type "ltd"). */
+    public static LTD: string = 'ltd';
+    /** AIR 13 treasure hunt (`NotificationType.TREASURE_HUNT`, layout `notification_treasurehunt`). */
+    public static TREASURE_HUNT: string = 'treasure_hunt';
 }

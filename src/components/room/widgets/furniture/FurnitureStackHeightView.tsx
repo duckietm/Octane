@@ -1,4 +1,4 @@
-import { FurnitureStackHeightComposer } from '@octane/renderer';
+import { FurnitureAdjacentStackHeightComposer, FurnitureStackHeightComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../../common';
@@ -7,8 +7,8 @@ import { useFurnitureStackHeightWidget } from '../../../../hooks';
 /**
  * Official `CustomStackHeightWidget` (`custom_stack_height` layout, 320x210): the stacking helper
  * and, for the `tile_walkmagic*` items, the walking helper with the multi-walk checkbox
- * (`walktile_container`). The adjacent-height buttons (`button_move_up` / `button_move_down`,
- * composer 2687) are left out: the renderer has no composer for them.
+ * (`walktile_container`), plus the adjacent-height arrows (`button_move_up` / `button_move_down`)
+ * that ask the server for the next height over composer 2687.
  */
 export const FurnitureStackHeightView: FC<{}> = (props) => {
     const {
@@ -64,6 +64,22 @@ export const FurnitureStackHeightView: FC<{}> = (props) => {
                         value={tempHeight}
                         onChange={(event) => updateTempHeight(event.target.value)}
                     />
+                    <div className="flex flex-col gap-1 octane-stack-height-adjacent">
+                        <Button
+                            data-testid="stack-height-move-up"
+                            title={localizeWithFallback('widget.custom.height.move_up', 'Move up')}
+                            onClick={(event) => SendMessageComposer(new FurnitureAdjacentStackHeightComposer(objectId, false))}
+                        >
+                            {'▲'}
+                        </Button>
+                        <Button
+                            data-testid="stack-height-move-down"
+                            title={localizeWithFallback('widget.custom.height.move_down', 'Move down')}
+                            onClick={(event) => SendMessageComposer(new FurnitureAdjacentStackHeightComposer(objectId, true))}
+                        >
+                            {'▼'}
+                        </Button>
+                    </div>
                 </div>
                 <div className="flex flex-col gap-1">
                     <Button onClick={(event) => SendMessageComposer(new FurnitureStackHeightComposer(objectId, -100))}>

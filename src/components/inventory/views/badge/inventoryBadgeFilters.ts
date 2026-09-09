@@ -58,10 +58,10 @@ export const getInventoryBadgeRarityFilterLabel = (id: number, uncommonEnabled: 
 export const isAchievementBadgeCode = (badgeCode: string): boolean => !!badgeCode && badgeCode.startsWith('ACH_');
 
 /**
- * The official badge list packet carries the rarity tier and the owner count per badge. Our
- * renderer parser does not read them yet, so the tier comes from what the client already knows:
- * the worn-badges packets (rememberBadgeRarityFromPacket) first, the leaderboard classification
- * cache second. Unknown badges have no tier at all.
+ * The official badge list packet carries the rarity tier and the owner count per badge, and the
+ * inventory reads them from there (rememberBadgeRarityFromPacket, fed by the badges, worn-badges
+ * and badge-info packets). The leaderboard classification cache is only the fallback for badges no
+ * packet has described yet; unknown badges have no tier at all.
  */
 export const getInventoryBadgeRarity = (badgeCode: string): { tier: BadgeRarityTierId; ownerCount: number } | null => {
     if (!badgeCode) return null;

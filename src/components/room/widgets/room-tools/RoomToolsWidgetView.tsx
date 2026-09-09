@@ -1,9 +1,9 @@
-import { CreateLinkEvent, GetRoomEngine, PerkEnum, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
+import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, PerkEnum, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, localizeWithFallback, SendMessageComposer, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
-import { useAchievements, useNavigatorData, useOctaneEvent, usePerkAllowances, useRoom, useRoomVisitHistory, useUserDataSnapshot } from '../../../../hooks';
+import { useAchievements, useNavigatorData, useOctaneEvent, usePerkAllowances, useRoom, useRoomVisitHistory, useUserDataSnapshot, useWiredToolsState } from '../../../../hooks';
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { RoomToolsInfoView } from './RoomToolsInfoView';
@@ -11,8 +11,8 @@ import { ROOM_TOOL_HELP_BUBBLE_NAMES, resolveRoomToolsCollapsed } from './roomTo
 import { applyRoomZoom, getRoomZoomLevel, getRoomZoomScale, stepRoomZoom } from './roomZoom.helpers';
 
 // The official client stores the collapsed state server-side (uiFlags & 2, `RoomToolsWidget.as:49`)
-// and forces it for new users. The renderer has no composer to write the flag back, so the
-// server value only seeds the first visit and the browser keeps the toggles made here.
+// and forces it for new users. The toggle is written back with `setRoomToolsState` (UpdateUIFlags,
+// header 2313) and mirrored in the browser so the rail keeps its state before the next login.
 const TOOLS_COLLAPSED_STORAGE_KEY = 'octane.room.tools.collapsed';
 const WIRED_ACHIEVEMENTS_CATEGORY = 'wired_games';
 
@@ -49,6 +49,10 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const { roomSession = null } = useRoom();
     const { historyView = [], canGoBack = false, canGoForward = false, goBack = null, goForward = null, isNavigating = false } = useRoomVisitHistory();
     const { achievementCategories = [], setSelectedCategoryCode = null } = useAchievements();
+    // RoomToolsWidget.as:50-52 only shows the achievements button when the room's wired
+    // can actually hand one out, which the WiredEnvironment packet reports on entry.
+    const { wiredEnvironment } = useWiredToolsState();
+    const hasWiredAchievements = wiredEnvironment.enabledAchievements.length > 0;
     const { isPerkAllowed } = usePerkAllowances();
 
     // Official `RoomToolsWidget.as:48`: the camera entry needs the CAMERA perk and the
@@ -161,6 +165,8 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const toggleTools = () => {
         setIsToolsOpen((prevValue) => {
             writeToolsCollapsed(prevValue);
+            // Official `SessionDataManager.setRoomToolsState(expanded)` -> uiFlags bit 2.
+            GetSessionDataManager()?.setRoomToolsState?.(!prevValue);
 
             return !prevValue;
         });
@@ -184,7 +190,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
         { action: 'chat_history', icon: 'icon-chat-history', label: LocalizeText('room.chathistory.button.text') },
         ...(navigatorData.canRate || hasLikedRoom ? [{ action: 'like_room', icon: 'icon-like-room', label: LocalizeText('room.like.button.text'), disabled: hasLikedRoom }] : []),
         { action: 'toggle_room_link', icon: 'icon-room-link', label: LocalizeText('navigator.embed.caption') },
-        { action: 'achievements', icon: 'icon-room-achievements', label: localizeWithFallback('room.achievements.button.text', 'Achievements') },
+        ...(hasWiredAchievements ? [{ action: 'achievements', icon: 'icon-room-achievements', label: localizeWithFallback('room.achievements.button.text', 'Achievements') }] : []),
         ...(showCameraTool ? [{ action: 'camera', icon: 'icon-camera-small', label: localizeWithFallback('room.camera.button.text', 'Camera') }] : [])
     ];
 

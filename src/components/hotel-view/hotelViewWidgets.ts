@@ -10,7 +10,8 @@ export const HOTEL_VIEW_OFFICIAL_WIDGET_TYPES = [
     'roomhoppernetwork',
     'generic',
     'communitygoalvsmode',
-    'communitygoalvsmodevote'
+    'communitygoalvsmodevote',
+    'widgetcontainer'
 ] as const;
 
 export type HotelViewOfficialWidgetType = (typeof HOTEL_VIEW_OFFICIAL_WIDGET_TYPES)[number];
@@ -199,3 +200,20 @@ export const getCommunityGoalNeedleAngle = (frame: number): number =>
 
 /** `CommunityGoalVsModeWidgetWithVoting.refresh`: the vote buttons show until the user contributed. */
 export const areCommunityGoalVoteButtonsVisible = (personalContributionScore: number): boolean => personalContributionScore === 0;
+
+// ---------------------------------------------------------------------------
+// WidgetContainerWidget.as
+// ---------------------------------------------------------------------------
+
+/**
+ * `WidgetContainerWidget`: the slot sends its scheduling string
+ * (`landing.view.dynamic.slot.<n>.conf`, `<yyyy-MM-dd HH:mm>,<code>` entries
+ * separated by `;`) with `GetCurrentTimingCode` and swaps to the widget of the
+ * code the server answers with. `onTimingCode` only accepts an answer whose
+ * scheduling string came back unchanged.
+ */
+export const isWidgetContainerAnswerForSchedule = (answerSchedulingStr: string, schedulingStr: string): boolean =>
+    answerSchedulingStr === schedulingStr;
+
+/** `createWidgetContainer`: `landing.view.<code>.widget` names the widget to build. */
+export const getWidgetContainerWidgetKey = (code: string): string => `landing.view.${code}.widget`;

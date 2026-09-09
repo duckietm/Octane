@@ -52,6 +52,7 @@ import {
     getScreenshotFileName
 } from './useChatInputActions.helpers';
 import { setFpsCounterEnabled } from './useFpsCounter';
+import { getLatencyPingMs, sendLatencyPing, useLatencyPing } from './useLatencyPing';
 
 // `:hidemouse` is a session-wide toggle in the official client, so the flag
 // lives at module scope instead of following the widget's mount cycle.
@@ -118,10 +119,14 @@ const getCommandActor = (controllerLevel: number): ChatCommandActor => {
 export const useChatInputActions = () => {
     const { showOctaneAlert = null, showConfirm = null, showSingleBubble = null } = useNotification();
     const { settings, translateOutgoing, enqueueOutgoingTranslation } = useTranslation();
-    const { roomSession = null } = useRoom();
+    const { roomSession = null, configurationItemStates } = useRoom();
     const { navigatorData = null } = useNavigatorData();
     const { setTrigger: setWiredTrigger = null } = useWired();
     const [wiredWhisperDisabled] = useWiredWhisperDisabled();
+
+    // Official `LatencyTracker`: keeps a fresh round-trip measurement so
+    // `:ping` has a number to print instead of "measuring...".
+    useLatencyPing();
 
     const enteredRoomName = navigatorData?.enteredGuestRoom?.roomName ?? '';
 
@@ -261,12 +266,15 @@ export const useChatInputActions = () => {
 
                         return null;
                     case ':ping':
-                        // Official `:293`: a chat bubble of type 11 carrying the measured latency;
-                        // without a latency source the bubble reads "measuring".
+                        // Official `:293`: a chat bubble of type 11 carrying `habboTracking.latencyPingMs`,
+                        // which reads "measuring" until the first LatencyPing round trip completes.
                         if (roomSession) {
                             GetEventDispatcher().dispatchEvent(
-                                new RoomSessionChatEvent(RoomSessionChatEvent.CHAT_EVENT, roomSession, roomSession.ownRoomIndex, '', CHAT_TYPE_PING, 1, null, null, -1)
+                                new RoomSessionChatEvent(RoomSessionChatEvent.CHAT_EVENT, roomSession, roomSession.ownRoomIndex, '', CHAT_TYPE_PING, 1, null, null, getLatencyPingMs())
                             );
+                            // Keep the next `:ping` current instead of reusing a value
+                            // that may be up to `latencytest.interval` old.
+                            sendLatencyPing();
                         }
 
                         return null;
@@ -286,6 +294,11 @@ export const useChatInputActions = () => {
                     case ':dropitem':
                         // Official `:307`: drop the carried hand item.
                         SendMessageComposer(new RoomUnitDropHandItemComposer());
+
+                        return null;
+                    case ':donate':
+                        // Official `:509`: open the sandbox self donation tool.
+                        CreateLinkEvent('selfdonation/open');
 
                         return null;
                     case ':habbicon': {
@@ -375,9 +388,9 @@ export const useChatInputActions = () => {
                         if (canOpenFurniChooser(actor)) CreateLinkEvent('furni-chooser/');
                         return null;
                     case ':chooser':
-                        // Official `:313` also honours the room's "chooser disabled" flag
-                        // (`ConfigurationItemStates`, header 1508), which this client does not receive.
-                        if (canOpenUserChooser(actor, false)) CreateLinkEvent('user-chooser/');
+                        // Official `:313` honours the room's "chooser disabled" flag
+                        // (`ConfigurationItemStates`, header 1508), which the emulator now sends.
+                        if (canOpenUserChooser(actor, configurationItemStates?.chooserDisabled ?? false)) CreateLinkEvent('user-chooser/');
                         return null;
                     case ':floor':
                     case ':bcfloor':
@@ -561,6 +574,7 @@ export const useChatInputActions = () => {
         },
         [
             roomSession,
+            configurationItemStates,
             settings,
             translateOutgoing,
             enqueueOutgoingTranslation,

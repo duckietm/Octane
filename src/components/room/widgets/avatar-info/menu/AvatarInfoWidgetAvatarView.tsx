@@ -15,6 +15,7 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
     AvatarInfoUser,
     DispatchUiEvent,
+    GetConfigurationValue,
     GetOwnRoomObject,
     GetUserProfile,
     LocalizeText,
@@ -26,7 +27,18 @@ import {
     SendMessageComposer
 } from '../../../../../api';
 import { Flex } from '../../../../../common';
-import { useFriends, useHelp, useIsUserIgnored, useMessageEvent, useRoom, useSessionInfo, useWiredTools } from '../../../../../hooks';
+import {
+    useFriends,
+    useHelp,
+    useIsUserBlocked,
+    useIsUserIgnored,
+    useMessageEvent,
+    useNotification,
+    useRoom,
+    useSessionInfo,
+    useUserDataSnapshot,
+    useWiredTools
+} from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -51,6 +63,12 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
     const { report = null } = useHelp();
     const { roomSession = null, isHandItemBlocked = false } = useRoom();
     const { userRespectRemaining = 0, respectUser = null } = useSessionInfo();
+    // Official AvatarMenuView.as:108: the replenish row replaces the respect row once the daily
+    // respects are spent and the user object still reports a replenish left.
+    const { respectReplenishesLeft = 0 } = useUserDataSnapshot();
+    const { showConfirm = null } = useNotification();
+    // Official AvatarMenuView.as:95: a blocked user hides almost every row of the menu.
+    const isBlocked = useIsUserBlocked(avatarInfo.webID);
     const { openInspectionForUser, showInspectButton } = useWiredTools();
     // Reactive: the menu auto-flips Ignore <-> Unignore if the state
     // changes while the popup is open. Direct snapshot hook call
@@ -163,6 +181,20 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     if (userRespectRemaining - 1 >= 1) hideMenu = false;
                     break;
                 }
+                case 'replenish_respect': {
+                    // Official InfoStandWidgetHandler.as:380 - confirm, then replenishRespect().
+                    const cost = GetConfigurationValue<number>('respect.replenish_cost_duckets', 50);
+
+                    showConfirm?.(
+                        LocalizeText('respect.replenish.desc', ['amount'], [cost.toString()]),
+                        () => GetSessionDataManager().replenishRespect(),
+                        null,
+                        null,
+                        null,
+                        LocalizeText('respect.replenish.title')
+                    );
+                    break;
+                }
                 case 'ignore':
                     GetSessionDataManager().ignoreUser(avatarInfo.name);
                     break;
@@ -241,6 +273,10 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                 case 'ambassador_mute_72hour':
                     roomSession.sendMuteMessage(avatarInfo.webID, 72 * 60);
                     break;
+                case 'ambassador_unmute':
+                    // Official RoomSession.unmuteUser -> composer 3302 (userId, roomId).
+                    roomSession.sendUnmuteMessage(avatarInfo.webID);
+                    break;
                 case 'rship_heart':
                     SendMessageComposer(new SetRelationshipStatusComposer(avatarInfo.webID, MessengerFriend.RELATIONSHIP_HEART));
                     break;
@@ -290,6 +326,11 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     )}
                     <ContextMenuListItemView onClick={(event) => processAction('trade')}>{LocalizeText('infostand.button.trade')}</ContextMenuListItemView>
                     <ContextMenuListItemView onClick={(event) => processAction('whisper')}>{LocalizeText('infostand.button.whisper')}</ContextMenuListItemView>
+                    {userRespectRemaining <= 0 && respectReplenishesLeft > 0 && !isBlocked && (
+                        <ContextMenuListItemView onClick={(event) => processAction('replenish_respect')}>
+                            {localizeWithFallback('infostand.button.replenish_respect', 'Buy more respects')}
+                        </ContextMenuListItemView>
+                    )}
                     {userRespectRemaining > 0 && (
                         <ContextMenuListItemView onClick={(event) => processAction('respect')}>
                             {LocalizeText('infostand.button.respect', ['count'], [userRespectRemaining.toString()])}
@@ -411,7 +452,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
             )}
             {mode === MODE_AMBASSADOR_MUTE && (
                 <>
-                    {/* AIR 13 ambassador durations (AvatarMenuView.as, mode 7); an unmute row needs a packet the renderer does not have. */}
+                    {/* AIR 13 ambassador durations and unmute (AvatarMenuView.as, mode 7). */}
                     <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_15min')}>
                         {LocalizeText('infostand.button.mute_15min')}
                     </ContextMenuListItemView>
@@ -426,6 +467,9 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     </ContextMenuListItemView>
                     <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_72hour')}>
                         {LocalizeText('infostand.button.mute_72hour')}
+                    </ContextMenuListItemView>
+                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_unmute')}>
+                        {localizeWithFallback('infostand.button.ambassador_unmute', 'Unmute')}
                     </ContextMenuListItemView>
                     <ContextMenuListItemView onClick={(event) => processAction('back_ambassador')}>
                         <FaChevronLeft className="left fa-icon" />

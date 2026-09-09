@@ -273,6 +273,10 @@ export class MentionsListEvent extends MessageEvent {}
 // arrive with the UserSettings packet; the hooks subscribe to it directly.
 export class UserSettingsEvent extends MessageEvent {}
 
+// AIR LatencyTracker: the chat-input hook pings the server so `:ping` has a
+// round-trip measurement to print.
+export class LatencyPingResponseEvent extends MessageEvent {}
+
 // ---------------------------------------------------------------------------
 // Navigator event classes — MessageEvent subclasses needed by useNavigatorStore
 // ---------------------------------------------------------------------------
@@ -313,6 +317,9 @@ export class UserPermissionsEvent extends MessageEvent {}
 export class AchievementNotificationMessageEvent extends MessageEvent {}
 export class ActivityPointNotificationMessageEvent extends MessageEvent {}
 export class BadgeReceivedEvent extends MessageEvent {}
+export class BanInfoEvent extends MessageEvent {}
+export class DiscordPreferencesEvent extends MessageEvent {}
+export class PetRespectFailedEvent extends MessageEvent {}
 export class ChestNotificationEvent extends MessageEvent {}
 export class ClubGiftNotificationEvent extends MessageEvent {}
 export class ClubGiftSelectedEvent extends MessageEvent {}
@@ -340,6 +347,12 @@ export class WiredRewardResultMessageEvent extends MessageEvent {
 export class AccountSafetyLockStatusChangeMessageEvent extends MessageEvent {}
 export class EpicPopupMessageEvent extends MessageEvent {}
 export class RoomMessageNotificationMessageEvent extends MessageEvent {}
+export class IncomeRewardNotificationEvent extends MessageEvent {}
+export class TreasureHuntFirstWinnerMessageEvent extends MessageEvent {}
+export class TreasureHuntFailMessageEvent extends MessageEvent {}
+export class TreasureHuntUpdateMessageEvent extends MessageEvent {}
+export class EmailStatusResultEvent extends MessageEvent {}
+export class ChangeEmailResultEvent extends MessageEvent {}
 export class RecyclerFinishedMessageEvent extends MessageEvent {
     static readonly FINISHED_OK = 1;
     static readonly FINISHED_FAIL = 2;
@@ -410,7 +423,14 @@ export class HabboWebTools extends StubClass {}
 
 // Composers — symbol-only constructors; only their identity matters in the
 // codebase ("did the SUT call SendMessageComposer(new FooComposer(args))").
+export class ActivateNotificationsComposer extends StubClass {}
+export class LatencyPingRequestMessageComposer extends StubClass {}
+export class GetDiscordPreferencesComposer extends StubClass {}
+export class UpdateDiscordPreferencesComposer extends StubClass {}
 export class AddFavouriteRoomMessageComposer extends StubClass {}
+export class ChatReviewSessionCreateMessageComposer extends StubClass {}
+export class GetEmailStatusComposer extends StubClass {}
+export class ChangeEmailComposer extends StubClass {}
 export class AvatarEffectActivatedComposer extends StubClass {}
 export class DeleteFavouriteRoomMessageComposer extends StubClass {}
 export class FollowFriendMessageComposer extends StubClass {}
@@ -993,6 +1013,7 @@ export class RoomSessionChatEvent {
     public static CHAT_TYPE_PET_REBREED_FERTILIZE = 8;
     public static CHAT_TYPE_PET_SPEED_FERTILIZE = 9;
     public static CHAT_TYPE_MUTE_REMAINING = 10;
+    public static CHAT_TYPE_SPECIAL_SYSTEM = 12;
 
     constructor(
         public type: string,
@@ -1009,3 +1030,36 @@ export class RoomSessionChatEvent {
 export class RoomUnitDropHandItemComposer extends PayloadComposer {}
 export class FurnitureStackHeightComposer extends PayloadComposer {}
 export class ObjectTileCursorUpdateMessage extends StubClass {}
+
+// AIR 13 room queue, room flags, batched removals and the room hopper network.
+export class RoomQueueStatusEvent extends MessageEvent {}
+export class ConfigurationItemStatesEvent extends MessageEvent {}
+export class SpecialRoomEventEvent extends MessageEvent {}
+export class SpecialSystemChatEvent extends MessageEvent {}
+export class YouAreNotSpectatorMessageEvent extends MessageEvent {}
+export class ObjectRemoveMultipleEvent extends MessageEvent {}
+export class ItemRemoveMultipleEvent extends MessageEvent {}
+export class ItemsStateUpdateEvent extends MessageEvent {}
+export class ObjectRemoveConfirmEvent extends MessageEvent {}
+export class FurnitureListRemoveMultipleEvent extends MessageEvent {}
+export class OfficialRoomsEvent extends MessageEvent {}
+export class ChangeQueueMessageComposer extends PayloadComposer {}
+export class RoomNetworkOpenConnectionMessageComposer extends PayloadComposer {}
+export class GetOfficialRoomsMessageComposer extends PayloadComposer {}
+
+// AIR 13 marketplace batch actions, LTD raffle, purchasable chat styles, club extend
+// confirmation and the my-reports window.
+export class MarketplaceCancelAllOffersResultEvent extends MessageEvent {}
+export class MarketplaceClearOwnHistoryResultEvent extends MessageEvent {}
+export class LtdRaffleEnteredMessageEvent extends MessageEvent {}
+export class LtdRaffleResultMessageEvent extends MessageEvent {}
+export class PurchasableChatStylesMessageEvent extends MessageEvent {}
+export class ChatStyleNotificationMessageEvent extends MessageEvent {}
+export class MyReportsStatusMessageEvent extends MessageEvent {}
+export class HabboClubExtendOfferMessageEvent extends MessageEvent {}
+export class CancelAllMarketplaceOffersMessageComposer extends PayloadComposer {}
+export class ClearOwnMarketplaceHistoryMessageComposer extends PayloadComposer {}
+export class MakeMultipleOffersMessageComposer extends PayloadComposer {}
+export class HabboClubExtendConfirmMessageComposer extends PayloadComposer {}
+export class GetMyReportsStatusMessageComposer extends PayloadComposer {}
+export class AppealReportMessageComposer extends PayloadComposer {}

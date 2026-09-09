@@ -14,6 +14,9 @@ export interface NotificationBubbleExtras {
     rarity?: string;
     rarityColor?: string;
     toggleCallback?: (paused: boolean) => void;
+    /** AIR 13 treasure hunt winner bubble: the head of the winner instead of an icon. */
+    figure?: string;
+    gender?: string;
 }
 
 export class NotificationBubbleItem {

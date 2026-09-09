@@ -48,7 +48,9 @@ import { OctanepediaView } from './octanepedia/OctanepediaView';
 import { ExternalPluginLoader } from './plugins/ExternalPluginLoader';
 import { RadioView } from './radio/RadioView';
 import { RareValuesView } from './rare-values/RareValuesView';
+import { SelfDonationToolView } from './wired-tools/SelfDonationToolView';
 import { RightSideView } from './right-side/RightSideView';
+import { RoomQueueView } from './room/RoomQueueView';
 import { RoomView } from './room/RoomView';
 import { SoundboardView } from './soundboard/SoundboardView';
 import { CitizenshipWelcomeView, TalentLevelUpView, TalentTrackView } from './talent';
@@ -162,6 +164,7 @@ export const MainView: FC<{}> = (props) =>
             <HousekeepingView />
             <WiredCreatorToolsView />
             <RoomView />
+            <RoomQueueView />
             <ChatHistoryView />
             <CustomizeNickIconView />
             <WiredView />
@@ -205,6 +208,7 @@ export const MainView: FC<{}> = (props) =>
             <FloorplanEditorView />
             <FurniEditorView />
             <RareValuesView />
+            <SelfDonationToolView />
             <FortuneWheelView />
             <SoundboardView />
             <TalentTrackView />

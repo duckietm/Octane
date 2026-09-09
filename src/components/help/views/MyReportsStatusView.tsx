@@ -1,7 +1,8 @@
-import { FC, useMemo, useState } from 'react';
-import { FaInfoCircle } from 'react-icons/fa';
-import { GetConfigurationValue, LocalizeText, localizeWithFallback, OpenUrl } from '../../../api';
+import { AppealReportMessageComposer, GetMyReportsStatusMessageComposer, MyReportsStatusMessageEvent } from '@octane/renderer';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { GetConfigurationValue, LocalizeText, localizeWithFallback, OpenUrl, SendMessageComposer } from '../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
+import { useMessageEvent } from '../../../hooks';
 
 /**
  * Appeal states as the official `ReportStatusMessage` numbers them: 0 no appeal, 1 appeal
@@ -13,9 +14,8 @@ export const REPORT_APPEAL_ACTION = 2;
 export const REPORT_APPEAL_NO_ACTION = 3;
 
 /**
- * One row of the official "My reports" window (`help/MyReportStatus.as`). The renderer
- * has no parser for the report-status packet yet, so this is the typed shape the window
- * expects once one exists: the field order follows the AIR reader.
+ * One row of the official "My reports" window (`help/MyReportStatus.as`), in the order the
+ * AIR reader reads it out of event 2981.
  */
 export interface IMyReportStatusEntry {
     id: number;
@@ -35,18 +35,48 @@ export interface IMyReportStatusEntry {
 
 export interface IMyReportsStatusSource {
     reports: IMyReportStatusEntry[];
-    /** False until the renderer can parse the report-status packet; the window says so instead of showing an empty table. */
-    isSupported: boolean;
     appeal: (reportId: number) => void;
 }
 
 /**
- * Stub source: the renderer exposes `GetCfhStatusMessageComposer` but no event for the
- * report list the official client renders (`class_3608` in AIR 13), so the window has
- * nothing to ask for and nothing to send an appeal with. Swap this for a hook over the
- * real event when the renderer grows one; the view needs no other change.
+ * The window asks the server for the player's own reports when it opens
+ * (`HabboHelp.requestReportsStatus`) and appeals one of them through
+ * `MyReportStatus.onClickAppeal`. The server answers an appeal with the refreshed list, so
+ * the row redraws itself as "appealed" without any local guessing.
  */
-export const useMyReportsStatusSource = (): IMyReportsStatusSource => ({ reports: [], isSupported: false, appeal: () => undefined });
+export const useMyReportsStatusSource = (): IMyReportsStatusSource => {
+    const [reports, setReports] = useState<IMyReportStatusEntry[]>([]);
+
+    useMessageEvent<MyReportsStatusMessageEvent>(MyReportsStatusMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setReports(
+            parser.reports.map((report) => ({
+                id: report.id,
+                creationTime: report.creationTime,
+                userMessage: report.userMessage,
+                userCategory: report.userCategory,
+                reportedAccountName: report.reportedAccountName,
+                closeTime: report.closeTime,
+                sanctioned: report.sanctioned,
+                sanctionGivenByAutoModeration: report.sanctionGivenByAutoModeration,
+                appealStatus: report.appealStatus,
+                appealCreationTime: report.appealCreationTime,
+                appealResolutionTime: report.appealResolutionTime
+            }))
+        );
+    });
+
+    useEffect(() => {
+        SendMessageComposer(new GetMyReportsStatusMessageComposer());
+    }, []);
+
+    const appeal = useCallback((reportId: number) => SendMessageComposer(new AppealReportMessageComposer(reportId)), []);
+
+    return { reports, appeal };
+};
 
 /** Newest report first, as the official table sorts on creation time. */
 export const sortReportsNewestFirst = (reports: IMyReportStatusEntry[]): IMyReportStatusEntry[] =>
@@ -88,7 +118,7 @@ interface MyReportsStatusViewProps {
 
 export const MyReportsStatusView: FC<MyReportsStatusViewProps> = (props) => {
     const { onClose = null } = props;
-    const { reports, isSupported, appeal } = useMyReportsStatusSource();
+    const { reports, appeal } = useMyReportsStatusSource();
     const [selectedId, setSelectedId] = useState<number>(null);
     const rows = useMemo(() => sortReportsNewestFirst(reports), [reports]);
     const selected = rows.find((report) => report.id === selectedId) || null;
@@ -145,12 +175,6 @@ export const MyReportsStatusView: FC<MyReportsStatusViewProps> = (props) => {
                     {rows.length === 0 ? (
                         <div className="flex flex-col items-center justify-center gap-1 py-6 opacity-60 text-sm text-center">
                             <span>{LocalizeText('report.status.no_reports')}</span>
-                            {!isSupported && (
-                                <span className="inline-flex items-center gap-1 text-xs italic">
-                                    <FaInfoCircle size={11} />
-                                    {localizeWithFallback('report.status.unsupported', 'This hotel does not send the status of your reports yet.')}
-                                </span>
-                            )}
                         </div>
                     ) : (
                         <div className="flex flex-col max-h-[220px] overflow-auto">

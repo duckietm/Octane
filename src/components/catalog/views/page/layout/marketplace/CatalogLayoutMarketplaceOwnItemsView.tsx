@@ -1,7 +1,11 @@
 import {
+    CancelAllMarketplaceOffersMessageComposer,
     CancelMarketplaceOfferMessageComposer,
+    ClearOwnMarketplaceHistoryMessageComposer,
     GetMarketplaceOwnOffersMessageComposer,
+    MarketplaceCancelAllOffersResultEvent,
     MarketplaceCancelOfferResultEvent,
+    MarketplaceClearOwnHistoryResultEvent,
     MarketplaceOwnOffersEvent,
     RedeemMarketplaceOfferCreditsMessageComposer
 } from '@octane/renderer';
@@ -21,6 +25,7 @@ import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { CatalogLayoutMarketplaceItemView, OWN_OFFER } from './CatalogLayoutMarketplaceItemView';
 import {
     filterOwnOffers,
+    getOwnOfferCategory,
     getOwnOfferCategoryLabel,
     getRecallableOfferIds,
     isOwnOfferCategoryClearable,
@@ -39,9 +44,10 @@ const getOfferSearchText = (offer: MarketplaceOfferData): string => {
  * `layout_marketplace_own_items_xml`: the player's own offers with the open/sold/expired
  * dropdown, a name search, "recall all" for the open list and "mark as seen" for the others.
  *
- * The workspace renderer has no bulk recall or clear-history composer, so "recall all" cancels
- * each open offer one by one and "mark as seen" only hides the current list until the next
- * refresh from the server.
+ * Both buttons are one request, exactly as the official widget sends them
+ * (`MarketPlaceLogic.recallAllOffers` and `clearOwnHistory`): the server answers with the
+ * offers it recalled, respectively with whether the tab was cleared, and the list is
+ * redrawn from that answer instead of being hidden locally.
  */
 export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = (props) => {
     const [creditsWaiting, setCreditsWaiting] = useState(0);
@@ -49,10 +55,11 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = (pro
     const [category, setCategory] = useState(OWN_OFFER_CATEGORY_OPEN);
     const [searchInput, setSearchInput] = useState('');
     const [activeSearch, setActiveSearch] = useState('');
-    const [seenOfferIds, setSeenOfferIds] = useState<number[]>([]);
     const { simpleAlert = null, showConfirm = null } = useNotification();
     const isRedeemingRef = useRef<boolean>(false);
     const pendingCancelsRef = useRef<Set<number>>(new Set());
+    const isRecallingAllRef = useRef<boolean>(false);
+    const pendingClearCategoryRef = useRef<number>(null);
 
     useMessageEvent<MarketplaceOwnOffersEvent>(MarketplaceOwnOffersEvent, (event) => {
         const parser = event.getParser();
@@ -79,8 +86,6 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = (pro
 
         setCreditsWaiting(parser.creditsWaiting);
         setOffers(offers);
-        // The server list is the truth again, so anything hidden locally comes back.
-        setSeenOfferIds([]);
     });
 
     useMessageEvent<MarketplaceCancelOfferResultEvent>(MarketplaceCancelOfferResultEvent, (event) => {
@@ -105,13 +110,60 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = (pro
         setOffers((prevValue) => prevValue.filter((value) => value.offerId !== parser.offerId));
     });
 
+    useMessageEvent<MarketplaceCancelAllOffersResultEvent>(MarketplaceCancelAllOffersResultEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        isRecallingAllRef.current = false;
+
+        if (!parser.success) {
+            simpleAlert(
+                LocalizeText('catalog.marketplace.cancel_failed'),
+                NotificationAlertType.DEFAULT,
+                null,
+                null,
+                LocalizeText('catalog.marketplace.operation_failed.topic')
+            );
+
+            return;
+        }
+
+        // The server says which offers it actually pulled back, so only those disappear.
+        setOffers((prevValue) => prevValue.filter((value) => parser.offerIds.indexOf(value.offerId) === -1));
+    });
+
+    useMessageEvent<MarketplaceClearOwnHistoryResultEvent>(MarketplaceClearOwnHistoryResultEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        const clearedCategory = pendingClearCategoryRef.current;
+
+        pendingClearCategoryRef.current = null;
+
+        if (!parser.success || clearedCategory === null) {
+            simpleAlert(
+                LocalizeText('catalog.marketplace.cancel_failed'),
+                NotificationAlertType.DEFAULT,
+                null,
+                null,
+                LocalizeText('catalog.marketplace.operation_failed.topic')
+            );
+
+            return;
+        }
+
+        setOffers((prevValue) => prevValue.filter((value) => getOwnOfferCategory(value) !== clearedCategory));
+    });
+
     const soldOffers = useMemo(() => {
         return offers.filter((value) => value.status === MarketPlaceOfferState.SOLD);
     }, [offers]);
 
     const visibleOffers = useMemo(
-        () => filterOwnOffers(offers, category, activeSearch, getOfferSearchText).filter((offer) => seenOfferIds.indexOf(offer.offerId) === -1),
-        [offers, category, activeSearch, seenOfferIds]
+        () => filterOwnOffers(offers, category, activeSearch, getOfferSearchText),
+        [offers, category, activeSearch]
     );
 
     const redeemSoldOffers = useCallback(() => {
@@ -147,13 +199,15 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = (pro
     const takeItemBack = (offerData: MarketplaceOfferData) => cancelOffer(offerData.offerId);
 
     const recallAllOffers = () => {
-        const offerIds = getRecallableOfferIds(offers);
-
-        if (!offerIds.length) return;
+        if (isRecallingAllRef.current || !getRecallableOfferIds(offers).length) return;
 
         showConfirm(
             localizeWithFallback('shop.marketplace.recall.all.items', 'Are you sure you want to recall all your offers from the marketplace?'),
-            () => offerIds.forEach((offerId) => cancelOffer(offerId)),
+            () => {
+                isRecallingAllRef.current = true;
+
+                SendMessageComposer(new CancelAllMarketplaceOffersMessageComposer());
+            },
             null,
             null,
             null,
@@ -162,13 +216,15 @@ export const CatalogLayoutMarketplaceOwnItemsView: FC<CatalogLayoutProps> = (pro
     };
 
     const markAsSeen = () => {
-        if (!isOwnOfferCategoryClearable(category) || !visibleOffers.length) return;
-
-        const offerIds = visibleOffers.map((offer) => offer.offerId);
+        if (!isOwnOfferCategoryClearable(category) || !visibleOffers.length || pendingClearCategoryRef.current !== null) return;
 
         showConfirm(
             localizeWithFallback('shop.marketplace.mark.as.seen.items', 'Are you sure you want to mark all these offers as seen?'),
-            () => setSeenOfferIds((prevValue) => [...prevValue, ...offerIds]),
+            () => {
+                pendingClearCategoryRef.current = category;
+
+                SendMessageComposer(new ClearOwnMarketplaceHistoryMessageComposer(category));
+            },
             null,
             null,
             null,
