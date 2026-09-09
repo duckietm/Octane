@@ -4,19 +4,11 @@ import { FurniCategory, GetProductIconUrl, Offer, ProductTypeEnum } from '../../
 import { AutoGrid, Column, LayoutGridItem, LayoutRoomPreviewerView } from '../../../../../common';
 import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
 
-/**
- * How much higher than dead centre anything in this box sits.
- *
- * The original lifts its zoomed avatar preview by 41 in
- * `ProductViewCatalogWidget.applyRoomCanvasZoom`, on a canvas that same step has already scaled
- * by two - half that in the engine's own pixels, which is what this offset is in. It gives
- * furniture no lift of its own, but our canvas is centred in a box shorter than itself where
- * the original's is top-aligned, so furniture came out sitting low in the same way. One number
- * for the whole box rather than a rule per product type.
- *
- * A unique limited item keeps the original's extra -15 on top.
- */
 const PREVIEW_LIFT = 21;
+
+const NEUTRAL_FLOOR = 'default';
+const NEUTRAL_WALL = 'default';
+const NEUTRAL_LANDSCAPE = 'default';
 
 export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => {
     const { height = 240 } = props;
@@ -29,8 +21,6 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
 
         const product = currentOffer.product;
 
-        // The previewer is shared with every other catalog layout, and this offset is a live
-        // Point on it: whatever is left here is inherited by the next thing drawn in it.
         const clearViewOffset = () => {
             roomPreviewer.addViewOffset.y = 0;
         };
@@ -77,13 +67,12 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
 
                         const figureString = avatarRenderManager.getFigureStringWithFigureIds(sessionDataManager.figure, sessionDataManager.gender, figureSets);
 
+                        roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                         roomPreviewer.addAvatarIntoRoom(figureString || sessionDataManager.figure, 0);
                         roomPreviewer.zoomIn();
                     } else {
-                        // RoomPreviewer only keys its fast path by class/extra,
-                        // so force a transactional refresh when stuff data
-                        // changes for the same product.
                         roomPreviewer.reset(true);
+                        roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                         roomPreviewer.addFurnitureIntoRoom(product.productClassId, new Vector3d(90), previewStuffData, product.extraParam);
                         animateFurnitureState = true;
                     }
@@ -100,14 +89,14 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
                     switch (product.furnitureData.specialType) {
                         case FurniCategory.FLOOR:
                             roomPreviewer.reset(true);
-                            roomPreviewer.updateObjectRoom(product.extraParam);
+                            roomPreviewer.updateObjectRoom(product.extraParam, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                             return;
                         case FurniCategory.WALL_PAPER:
                             roomPreviewer.reset(true);
-                            roomPreviewer.updateObjectRoom(null, product.extraParam);
+                            roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, product.extraParam, NEUTRAL_LANDSCAPE);
                             return;
                         case FurniCategory.LANDSCAPE: {
-                            roomPreviewer.updateObjectRoom(null, null, product.extraParam);
+                            roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, product.extraParam);
 
                             const furniData = GetSessionDataManager().getWallItemDataByName('window_double_default');
 
@@ -116,17 +105,19 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
                             return;
                         }
                         default:
-                            roomPreviewer.updateObjectRoom('101', '101', '1.1');
+                            roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                             roomPreviewer.addWallItemIntoRoom(product.productClassId, new Vector3d(90), product.extraParam);
                             animateFurnitureState = true;
                             return;
                     }
                 }
                 case ProductTypeEnum.ROBOT:
+                    roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                     roomPreviewer.addAvatarIntoRoom(product.extraParam, 0);
                     roomPreviewer.zoomIn();
                     return;
                 case ProductTypeEnum.EFFECT:
+                    roomPreviewer.updateObjectRoom(NEUTRAL_FLOOR, NEUTRAL_WALL, NEUTRAL_LANDSCAPE);
                     roomPreviewer.addAvatarIntoRoom(GetSessionDataManager().figure, product.productClassId);
                     roomPreviewer.zoomIn();
                     return;
