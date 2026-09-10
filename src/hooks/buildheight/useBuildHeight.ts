@@ -1,4 +1,4 @@
-import { BuildHeightAvailableEvent, SetBuildHeightComposer } from '@octane/renderer';
+import { BuildHeightAvailableEvent, SetBuildHeightComposer, SetBuildUnderpassComposer } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../api';
@@ -14,6 +14,7 @@ const useBuildHeightState = () => {
     const [maxHeight, setMaxHeight] = useState(40);
     const [isOpen, setIsOpen] = useState(false);
     const [height, setHeight] = useState(0);
+    const [underpass, setUnderpass] = useState(false);
 
     const lastSentRef = useRef(0);
     const trailingRef = useRef<number | null>(null);
@@ -40,6 +41,7 @@ const useBuildHeightState = () => {
         cancelTrailing();
         setIsOpen(false);
         setHeight(0);
+        setUnderpass(false);
     });
 
     const applyHeight = useCallback((value: number) => {
@@ -60,12 +62,19 @@ const useBuildHeightState = () => {
 
     const open = useCallback(() => setIsOpen(true), []);
 
+    const toggleUnderpass = useCallback((enabled: boolean) => {
+        setUnderpass(enabled);
+        SendMessageComposer(new SetBuildUnderpassComposer(enabled));
+    }, []);
+
     const close = useCallback(() => {
         cancelTrailing();
         setIsOpen(false);
         setHeight(0);
         lastSentRef.current = Date.now();
         SendMessageComposer(new SetBuildHeightComposer(false, 0));
+        SendMessageComposer(new SetBuildUnderpassComposer(false));
+        setUnderpass(false);
     }, [cancelTrailing]);
 
     const toggle = useCallback(() => {
@@ -75,7 +84,7 @@ const useBuildHeightState = () => {
 
     useEffect(() => cancelTrailing, [cancelTrailing]);
 
-    return { available, minHeight, maxHeight, isOpen, height, applyHeight, open, close, toggle };
+    return { available, minHeight, maxHeight, isOpen, height, underpass, applyHeight, toggleUnderpass, open, close, toggle };
 };
 
 export const useBuildHeight = () => useSharedHook(useBuildHeightState);

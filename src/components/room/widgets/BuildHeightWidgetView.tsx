@@ -1,14 +1,22 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { LocalizeText } from '../../../api';
 import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../common';
 import { useBuildHeight } from '../../../hooks';
 
 const STEP = 0.1;
 
+const UNDERPASS_MIN_HEIGHT = 1.5;
+
 const format = (value: number) => (Number.isInteger(value) ? value.toString() : value.toFixed(1));
 
 export const BuildHeightWidgetView: FC<{}> = () => {
-    const { available, minHeight, maxHeight, isOpen, height, applyHeight, close } = useBuildHeight();
+    const { available, minHeight, maxHeight, isOpen, height, underpass, applyHeight, toggleUnderpass, close } = useBuildHeight();
+
+    const underpassAllowed = height >= UNDERPASS_MIN_HEIGHT;
+
+    useEffect(() => {
+        if (!underpassAllowed && underpass) toggleUnderpass(false);
+    }, [underpassAllowed, underpass, toggleUnderpass]);
 
     if (!available || !isOpen) return null;
 
@@ -35,6 +43,21 @@ export const BuildHeightWidgetView: FC<{}> = () => {
                     <Flex justifyContent="between">
                         <Text small>{format(minHeight)}</Text>
                         <Text small>{format(maxHeight)}</Text>
+                    </Flex>
+                    <Flex
+                        alignItems="center"
+                        gap={1}
+                        className={underpassAllowed ? undefined : 'opacity-50'}
+                        title={underpassAllowed ? undefined : LocalizeText('widget.buildheight.underpass.min_height', ['height'], [format(UNDERPASS_MIN_HEIGHT)])}
+                    >
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            checked={underpass && underpassAllowed}
+                            disabled={!underpassAllowed}
+                            onChange={(event) => toggleUnderpass(event.target.checked)}
+                        />
+                        <Text>{LocalizeText('widget.buildheight.underpass')}</Text>
                     </Flex>
                     <Button variant="danger" onClick={close}>{LocalizeText('widget.buildheight.reset')}</Button>
                 </Column>
