@@ -353,6 +353,10 @@ export class TreasureHuntFailMessageEvent extends MessageEvent {}
 export class TreasureHuntUpdateMessageEvent extends MessageEvent {}
 export class EmailStatusResultEvent extends MessageEvent {}
 export class ChangeEmailResultEvent extends MessageEvent {}
+// Room competition: the window listens for these three and sends the four composers below.
+export class CompetitionEntrySubmitResultEvent extends MessageEvent {}
+export class CompetitionVotingInfoMessageEvent extends MessageEvent {}
+export class NoOwnedRoomsAlertMessageEvent extends MessageEvent {}
 export class RecyclerFinishedMessageEvent extends MessageEvent {
     static readonly FINISHED_OK = 1;
     static readonly FINISHED_FAIL = 2;
@@ -875,6 +879,10 @@ export class AcceptFriendMessageComposer extends StubClass {}
 export class AddFriendCategoryComposer extends StubClass {}
 export class DeclineFriendMessageComposer extends StubClass {}
 export class FriendListUpdateComposer extends StubClass {}
+export class ForwardToASubmittableRoomMessageComposer extends StubClass {}
+export class RoomCompetitionInitMessageComposer extends StubClass {}
+export class SubmitRoomToCompetitionMessageComposer extends StubClass {}
+export class VoteForRoomMessageComposer extends StubClass {}
 export class GetFriendRequestsComposer extends StubClass {}
 export class MessengerInitComposer extends StubClass {}
 export class MoveFriendToCategoryComposer extends StubClass {}
