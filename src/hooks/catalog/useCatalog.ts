@@ -696,6 +696,7 @@ const useCatalogStore = () => {
 
         if (pageRequestCorrelation.current.complete(parser.pageId)) {
             setIsBusy(false);
+            setCatalogLoadError(null);
             showCatalogPage(
                 parsedCatalogPage.pageId,
                 parsedCatalogPage.layoutCode,

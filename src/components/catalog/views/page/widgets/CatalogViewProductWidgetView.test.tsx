@@ -136,7 +136,9 @@ describe('catalog product preview', () => {
             // than itself, so dead centre reads low for everything in it, not just avatars.
             expect(roomPreviewer.addViewOffset.y).toBe(-21);
             expect(roomPreviewer.centerWallItems).toBe(true);
-            expect(roomPreviewer.updateObjectRoom).not.toHaveBeenCalled();
+            // The previewer is shared: without the neutral repaint, a wallpaper
+            // or landscape previewed earlier would still be on the walls here.
+            expect(roomPreviewer.updateObjectRoom).toHaveBeenCalledWith('default', 'default', 'default');
             expect(roomPreviewer.setAutomaticStateChange).toHaveBeenLastCalledWith(true);
         });
     });
@@ -193,6 +195,43 @@ describe('catalog product preview', () => {
         view.unmount();
 
         expect(roomPreviewer.addViewOffset.y).toBe(0);
+    });
+
+    it('previews a plain wall item on the neutral room instead of a picked wallpaper and landscape', async () => {
+        const roomPreviewer = createRoomPreviewer();
+        const offer = {
+            pricingModel: 'single',
+            product: {
+                productType: 'i',
+                productClassId: 700,
+                extraParam: '',
+                furnitureData: { id: 700, specialType: 1 }
+            }
+        };
+
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer: offer, roomPreviewer } as any);
+
+        render(<CatalogViewProductWidgetView />);
+
+        await waitFor(() => {
+            expect(roomPreviewer.updateObjectRoom).toHaveBeenCalledWith('default', 'default', 'default');
+            expect(roomPreviewer.addWallItemIntoRoom).toHaveBeenCalledWith(700, expect.anything(), '');
+        });
+    });
+
+    it('previews a landscape on neutral floor and walls', async () => {
+        const roomPreviewer = createRoomPreviewer();
+
+        vi.mocked(GetSessionDataManager).mockReturnValue({
+            getWallItemDataByName: () => ({ id: 600 })
+        } as any);
+        vi.mocked(useCatalogData).mockReturnValue({ currentOffer: createLandscapeOffer(), roomPreviewer } as any);
+
+        render(<CatalogViewProductWidgetView />);
+
+        await waitFor(() => {
+            expect(roomPreviewer.updateObjectRoom).toHaveBeenCalledWith('default', 'default', 'landscape');
+        });
     });
 
     it('keeps landscape previews static after the wall object is loaded', async () => {
