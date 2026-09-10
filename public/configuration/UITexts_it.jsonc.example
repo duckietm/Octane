@@ -7,10 +7,15 @@
     "infostand.plant.ready": "Pronto",
     "infostand.plant.needswater": "Ha bisogno d'acqua!",
     "infostand.plant.dead": "La tua pianta è morta",
+    "infostand.button.remove_landscape": "Rimuovi paesaggio",
+    "navigator.roomsettings.remove_floor": "Rimuovi pavimento",
+    "navigator.roomsettings.remove_wallpaper": "Rimuovi carta da parati",
     "friendlist.search": "Cerca amici",
     "widget.buildheight.title": "Altezza di costruzione",
     "widget.buildheight.description": "Imposta l'altezza di impilamento dei mobili che posizioni.",
     "widget.buildheight.reset": "Reimposta (off)",
+    "widget.buildheight.underpass": "Consenti di passare sotto i mobili posizionati",
+    "widget.buildheight.underpass.min_height": "Alza l'altezza ad almeno %height% per consentire di passarci sotto.",
 
     // ------------------------------------------------------------------------
     // Purse / Currency

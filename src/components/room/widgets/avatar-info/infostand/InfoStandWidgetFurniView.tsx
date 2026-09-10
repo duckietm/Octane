@@ -11,6 +11,7 @@ import {
     RoomObjectCategory,
     RoomObjectOperationType,
     RoomObjectVariable,
+    RoomRemoveBackgroundComposer,
     RoomWidgetEnumItemExtradataParameter,
     RoomWidgetFurniInfoUsagePolicyEnum,
     SetObjectDataMessageComposer,
@@ -19,7 +20,7 @@ import {
     UpdateFurniturePositionComposer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { FaCrosshairs, FaTimes } from 'react-icons/fa';
+import { FaCrosshairs, FaEraser, FaTimes } from 'react-icons/fa';
 import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
 import { AvatarInfoFurni, GetConfigurationValue, GetGroupInformation, IPhotoData, isSafeExternalUrl, LocalizeText, SendMessageComposer } from '../../../../../api';
 import {
@@ -46,6 +47,12 @@ interface InfoStandWidgetFurniViewProps {
 const PICKUP_MODE_NONE: number = 0;
 const PICKUP_MODE_EJECT: number = 1;
 const PICKUP_MODE_FULL: number = 2;
+
+const removeLandscapeLabel = () => {
+    const localized = LocalizeText('infostand.button.remove_landscape');
+
+    return !localized || localized === 'infostand.button.remove_landscape' ? 'Remove Landscape' : localized;
+};
 
 function formatPlantDuration(totalSeconds: number): string {
     const seconds = Math.max(0, Math.floor(totalSeconds));
@@ -130,6 +137,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
     const [canMove, setCanMove] = useState(false);
     const [canRotate, setCanRotate] = useState(false);
     const [canUse, setCanUse] = useState(false);
+    const [canRemoveBackground, setCanRemoveBackground] = useState(false);
     const [furniKeys, setFurniKeys] = useState<string[]>([]);
     const [furniValues, setFurniValues] = useState<string[]>([]);
     const [customKeys, setCustomKeys] = useState<string[]>([]);
@@ -281,10 +289,18 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
 
         const isValidController = avatarInfo.roomControllerLevel >= RoomControllerLevel.GUEST;
 
+        let removeBackgroundAllowed = false;
+
         if (isValidController || avatarInfo.isOwner || avatarInfo.isRoomOwner || avatarInfo.isAnyRoomController) {
             canMove = true;
             canRotate = !avatarInfo.isWallItem;
             if (avatarInfo.roomControllerLevel >= RoomControllerLevel.MODERATOR) godMode = true;
+
+            if (avatarInfo.isWallItem) {
+                const maskType = roomObjForLocation?.model?.getValue<string>(RoomObjectVariable.FURNITURE_PLANE_MASK_TYPE);
+
+                if (maskType && maskType.length) removeBackgroundAllowed = true;
+            }
         }
 
         if (avatarInfo.isAnyRoomController) {
@@ -377,6 +393,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         setCanMove(canMove);
         setCanRotate(canRotate);
         setCanUse(canUse);
+        setCanRemoveBackground(removeBackgroundAllowed);
         setFurniKeys(furniKeyss);
         setFurniValues(furniValuess);
         setCustomKeys(customKeyss);
@@ -563,6 +580,9 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                     break;
                 case 'use':
                     GetRoomEngine().useRoomObject(avatarInfo.id, avatarInfo.category);
+                    break;
+                case 'remove_background':
+                    SendMessageComposer(new RoomRemoveBackgroundComposer());
                     break;
                 case 'save_branding_configuration': {
                     const mapData = new Map<string, string>();
@@ -863,7 +883,6 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                         </button>
                                         {dropdownOpen && (
                                             <div className="flex gap-[4px] w-full">
-                                                {/* Left panel: position + rotation */}
                                                 <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
                                                     <Text small variant="white">
                                                         {LocalizeText('group.edit.badge.position')}
@@ -916,7 +935,6 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {/* Right panel: height */}
                                                 <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
                                                     <Text small variant="white">
                                                         {LocalizeText('stack.magic.tile.height.label')}
@@ -1067,6 +1085,14 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                 {canUse && (
                     <Button variant="dark" onClick={(event) => processButtonAction('use')}>
                         {LocalizeText('infostand.button.use')}
+                    </Button>
+                )}
+                {canRemoveBackground && (
+                    <Button variant="dark" onClick={(event) => processButtonAction('remove_background')}>
+                        <Flex alignItems="center" gap={1}>
+                            <FaEraser className="fa-icon" />
+                            {removeLandscapeLabel()}
+                        </Flex>
                     </Button>
                 )}
                 {hasBrandingOffsets && (
