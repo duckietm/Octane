@@ -2228,7 +2228,7 @@
     pointer-events: none;
 }
 
-.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item:not(.unique-item) > .octane-catalog-grid-offer-icon {
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item > .octane-catalog-grid-offer-icon {
     position: absolute;
     top: 2px;
     left: 8px;
@@ -2238,6 +2238,7 @@
     max-width: none !important;
     max-height: none !important;
     object-fit: none !important;
+    margin: 0;
 }
 
 /* AIR gridItem_with_price: multiContainer is painted after the 36px image at
@@ -2342,6 +2343,62 @@
     align-items: center;
     column-gap: 4px;
     row-gap: 0;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.unique-item:not(.is-active)::before,
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.unique-item::after {
+    top: 2px;
+    left: 8px;
+    right: auto;
+    bottom: auto;
+    width: 36px;
+    height: 36px;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.unique-item > .unique-bg-override {
+    display: none;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.unique-item > .octane-catalog-grid-offer-icon {
+    z-index: 2;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .layout-grid-item.unique-item > .unique-item-counter {
+    top: 28px;
+    right: auto;
+    bottom: auto;
+    left: 8px;
+    z-index: 3;
+    width: 36px;
+    margin: 0;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .unique-item .octane-catalog-grid-price {
+    right: auto;
+    bottom: auto;
+    transform: none;
+    max-width: none;
+    justify-content: flex-end;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .unique-item .octane-catalog-grid-price.is-single-price {
+    top: 36px;
+    left: -3px;
+    width: 54px;
+    height: 19px;
+    min-height: 19px;
+}
+
+.octane-catalog-window .octane-catalog-grid-density-standard .unique-item .octane-catalog-grid-price.is-multi-price {
+    top: 36px;
+    left: 8px;
+    display: block;
+    width: 43px;
+    height: 34px;
+    min-height: 34px;
 }
 
 
@@ -2514,10 +2571,11 @@
 }
 
 .octane-catalog-grid-density-standard .octane-catalog-grid-price-currency {
-    width: 15px !important;
-    height: 15px !important;
-    min-width: 15px !important;
-    min-height: 15px !important;
+    /* Match the 13px coin size used by the legacy grid rows. */
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    min-height: 12px !important;
     object-fit: contain !important;
 }
 
