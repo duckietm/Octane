@@ -1,5 +1,5 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect } from 'react';
 import { AchievementUtilities, LocalizeText } from '../../api';
 import { DraggableWindowPosition } from '../../common';
 import { useAchievements } from '../../hooks';
@@ -8,9 +8,12 @@ import { AchievementCategoryView } from './AchievementCategoryView';
 import { AirAchievementProgressBar } from './AirAchievementProgressBar';
 import { AchievementsCategoryListView } from './category-list';
 
-export const AchievementsView: FC<{}> = (props) => {
-    const [isVisible, setIsVisible] = useState(false);
+export const AchievementsView: FC = () => {
     const {
+        isVisible,
+        isLoaded,
+        show,
+        close,
         achievementCategories = [],
         selectedCategoryCode = null,
         setSelectedCategoryCode = null,
@@ -29,35 +32,49 @@ export const AchievementsView: FC<{}> = (props) => {
 
                 switch (parts[1]) {
                     case 'show':
-                        setIsVisible(true);
+                        show(parts[2]);
                         return;
                     case 'hide':
-                        setIsVisible(false);
+                        close();
                         return;
                     case 'toggle':
-                        setIsVisible((prevValue) => !prevValue);
+                        if (isVisible) close();
+                        else show();
                         return;
                 }
             },
             eventUrlPrefix: 'achievements/'
         };
 
+        const questTracker: ILinkEventTracker = {
+            eventUrlPrefix: 'questengine/achievements',
+            linkReceived: (url) => {
+                const category = url.split('/')[2];
+                if (category) show(category);
+                else show();
+            }
+        };
+
         AddLinkEventTracker(linkTracker);
+        AddLinkEventTracker(questTracker);
 
-        return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
+        return () => {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(questTracker);
+        };
+    }, [close, isVisible, show]);
 
-    if (!isVisible) return null;
+    if (!isVisible || !isLoaded) return null;
 
     return (
         <OctaneCard
-            className="octane-achievements-air"
+            className="octane-achievements-air octane-card-frame-3"
             uniqueKey="achievements"
             windowPosition={DraggableWindowPosition.TOP_CENTER}
             offsetTop={-30}
             data-view={selectedCategory ? 'category' : 'categories'}
         >
-            <OctaneCard.Header headerText={LocalizeText('inventory.achievements')} onCloseClick={() => setIsVisible(false)} />
+            <OctaneCard.Header headerText={LocalizeText('inventory.achievements')} onCloseClick={close} />
             <OctaneCard.Content className="air-achievements-content">
                 {!selectedCategory && (
                     <>
@@ -72,11 +89,8 @@ export const AchievementsView: FC<{}> = (props) => {
                                 width={246}
                                 maxProgress={getMaxProgress}
                                 progress={getProgress}
-                                text={LocalizeText(
-                                    'achievements.categories.totalprogress',
-                                    ['progress', 'limit'],
-                                    [getProgress.toString(), getMaxProgress.toString()]
-                                )}
+                                key={getMaxProgress}
+                                localizationKey="achievements.categories.totalprogress"
                             />
                             <div className="air-achievements-score">
                                 {LocalizeText('achievements.categories.score', ['score'], [achievementScore.toString()])}
@@ -93,7 +107,7 @@ export const AchievementsView: FC<{}> = (props) => {
                                 onClick={() => setSelectedCategoryCode(null)}
                                 aria-label={LocalizeText('generic.back')}
                             />
-                            <div className="air-achievements-category-name">{LocalizeText(`quests.${selectedCategory.code}.name`)}</div>
+                            <div className="air-achievements-category-name">{AchievementUtilities.getAchievementCategoryName(selectedCategory)}</div>
                             <div className="air-achievements-category-progress">
                                 {LocalizeText(
                                     'achievements.details.categoryprogress',
@@ -103,7 +117,13 @@ export const AchievementsView: FC<{}> = (props) => {
                             </div>
                             <img
                                 className="air-achievements-category-icon"
-                                src={AchievementUtilities.getAchievementCategoryImageUrl(selectedCategory, null, true)}
+                                src={AchievementUtilities.getAchievementCategoryImageUrl(selectedCategory, true)}
+                                onError={(event) => {
+                                    event.currentTarget.style.visibility = 'hidden';
+                                }}
+                                onLoad={(event) => {
+                                    event.currentTarget.style.visibility = 'visible';
+                                }}
                                 alt=""
                                 draggable={false}
                             />

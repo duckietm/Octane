@@ -5,3 +5,4 @@ export * from './NotificationBubbleItem';
 export * from './NotificationBubbleType';
 export * from './NotificationConfirmItem';
 export * from './NotificationConfirmType';
+export * from './AchievementNotificationBubbleItem';

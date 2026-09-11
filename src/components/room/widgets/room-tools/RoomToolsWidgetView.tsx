@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, SendMessageComposer, SetLocalStorage, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
-import { useMessageEvent, useNavigatorData, useOctaneEvent, useRoom } from '../../../../hooks';
+import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
+import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, useRoom } from '../../../../hooks';
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { applyRoomZoom } from './roomZoom.helpers';
@@ -65,6 +66,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const [roomHistory, setRoomHistory] = useState<RoomHistoryEntry[]>([]);
     const [plugins, setPlugins] = useState<IOctanePlugin[]>([]);
     const { navigatorData } = useNavigatorData();
+    const { hasWiredAchievements } = useAchievements();
     const { roomSession = null } = useRoom();
 
     useEffect(() => {
@@ -121,6 +123,9 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
         if (!roomSession) return;
 
         switch (action) {
+            case 'achievements':
+                CreateLinkEvent('questengine/achievements/wired_games');
+                return;
             case 'settings':
                 CreateLinkEvent('navigator/toggle-room-info');
                 return;
@@ -198,6 +203,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     });
 
     const tools = [
+        ...(hasWiredAchievements ? [{ action: 'achievements', icon: 'icon-room-achievements', label: localizeWithFallback('room.achievements.button.text', 'Achievements') }] : []),
         { action: 'settings', icon: 'icon-cog', label: LocalizeText('room.settings.button.text') },
         { action: 'chat_history', icon: 'icon-chat-history', label: LocalizeText('room.chathistory.button.text') },
         ...(navigatorData.canRate || hasLikedRoom ? [{ action: 'like_room', icon: 'icon-like-room', label: LocalizeText('room.like.button.text'), disabled: hasLikedRoom }] : []),

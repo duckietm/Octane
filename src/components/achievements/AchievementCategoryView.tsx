@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect } from 'react';
+import { FC } from 'react';
 import { AchievementCategory } from '../../api';
 import { useAchievements } from '../../hooks';
 import { AchievementDetailsView } from './AchievementDetailsView';
@@ -10,21 +10,13 @@ interface AchievementCategoryViewProps {
 
 export const AchievementCategoryView: FC<AchievementCategoryViewProps> = (props) => {
     const { category = null } = props;
-    const { selectedAchievement = null, setSelectedAchievementId = null } = useAchievements();
-
-    useLayoutEffect(() => {
-        if (!category) return;
-
-        if (!selectedAchievement) {
-            setSelectedAchievementId(category?.achievements?.[0]?.achievementId);
-        }
-    }, [category, selectedAchievement, setSelectedAchievementId]);
+    const { selectedAchievement = null, visibleAchievements = [] } = useAchievements();
 
     if (!category) return null;
 
     return (
         <div className="air-achievements-category-body">
-            <AchievementListView achievements={category.achievements} />
+            <AchievementListView achievements={visibleAchievements} isScrollable={category.achievements.length > 24} />
             {!!selectedAchievement && <AchievementDetailsView achievement={selectedAchievement} />}
         </div>
     );

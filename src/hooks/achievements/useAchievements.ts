@@ -1,172 +1,206 @@
-import { AchievementData, AchievementEvent, AchievementsEvent, AchievementsScoreEvent, RequestAchievementsMessageComposer } from '@octane/renderer';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+    AchievementData,
+    AchievementEvent,
+    AchievementsEvent,
+    AchievementsScoreEvent,
+    AuthenticatedEvent,
+    RequestAchievementsMessageComposer,
+    RoomSessionEvent,
+    WiredEnvironmentEvent
+} from '@octane/renderer';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { AchievementCategory, AchievementUtilities, CloneObject, SendMessageComposer } from '../../api';
-import { useMessageEvent } from '../events';
+import { AchievementCategory, AchievementUtilities, GetOptionalConfigurationValue, SendMessageComposer } from '../../api';
+import { useMessageEvent, useOctaneEvent } from '../events';
+
+const copyAchievement = (achievement: AchievementData): AchievementData => Object.assign(Object.create(AchievementData.prototype), achievement);
 
 const useAchievementsState = () => {
-    const [needsUpdate, setNeedsUpdate] = useState<boolean>(true);
-    const [achievementCategories, setAchievementCategories] = useState<AchievementCategory[]>([]);
+    const [achievements, setAchievements] = useState<AchievementData[]>([]);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
     const [selectedCategoryCode, setSelectedCategoryCode] = useState<string>(null);
-    const [selectedAchievementId, setSelectedAchievementId] = useState<number>(-1);
-    const [achievementScore, setAchievementScore] = useState<number>(0);
+    const [selectedAchievementId, setSelectedAchievementId] = useState(-1);
+    const [achievementScore, setAchievementScore] = useState(0);
+    const [enabledWiredAchievements, setEnabledWiredAchievements] = useState<string[]>([]);
+    const pendingLevel = useRef<{ achievement: AchievementData; timeout: ReturnType<typeof setTimeout> }>(null);
 
-    const getTotalUnseen = useMemo(() => {
-        let unseen = 0;
+    const achievementCategories = useMemo(() => {
+        const categories = new Map<string, AchievementCategory>();
+        const archive = new AchievementCategory('archive');
+        const wiredGames = new AchievementCategory('wired_games');
+        const newAchievements = new AchievementCategory('new');
+        const newCodes = GetOptionalConfigurationValue<string>('achievements.new', '').split(',');
+        categories.set(archive.code, archive);
+        categories.set(wiredGames.code, wiredGames);
 
-        achievementCategories.forEach((category) => (unseen += AchievementUtilities.getAchievementCategoryTotalUnseen(category)));
+        for (const achievement of achievements) {
+            if (!achievement.category || (achievement.state === AchievementData.STATE_CONTROLLED_BY_WIRED && achievement.category !== 'wired_games')) continue;
 
-        return unseen;
-    }, [achievementCategories]);
+            const code = achievement.state === AchievementData.STATE_ARCHIVED ? archive.code : achievement.category;
+            if (!categories.has(code)) categories.set(code, new AchievementCategory(code));
 
-    const getProgress = useMemo(() => {
-        let progress = 0;
+            categories.get(code).achievements.push(achievement);
+            if (newCodes.includes(achievement.code)) newAchievements.achievements.push(achievement);
+        }
 
-        achievementCategories.forEach((category) => (progress += category.getProgress()));
+        const regular = [...categories.values()].filter((category) => !['archive', 'wired_games', 'misc'].includes(category.code));
+        if (categories.has('misc')) regular.push(categories.get('misc'));
+        regular.push(archive, wiredGames);
+        if (newAchievements.achievements.length) regular.push(newAchievements);
 
-        return progress;
-    }, [achievementCategories]);
+        return regular;
+    }, [achievements]);
 
-    const getMaxProgress = useMemo(() => {
-        let progress = 0;
+    const selectedCategory = achievementCategories.find((category) => category.code === selectedCategoryCode) ?? null;
+    const visibleAchievements =
+        selectedCategory?.achievements.filter(
+            (achievement) =>
+                selectedCategory.code !== 'wired_games' || (achievement.code.startsWith('WF_') && enabledWiredAchievements.includes(achievement.code.slice(3)))
+        ) ?? [];
+    const selectedAchievement =
+        visibleAchievements.find((achievement) => achievement.achievementId === selectedAchievementId) ?? visibleAchievements[0] ?? null;
+    const getTotalUnseen = achievements.filter((achievement) => achievement.unseen && !AchievementUtilities.getAchievementIsIgnored(achievement)).length;
+    const getProgress = achievementCategories.reduce((total, category) => total + category.getProgress(), 0);
+    const getMaxProgress = achievementCategories.reduce((total, category) => total + category.getMaxProgress(), 0);
 
-        achievementCategories.forEach((category) => (progress += category.getMaxProgress()));
+    const updateAchievement = useCallback((achievement: AchievementData) => {
+        setAchievements((previous) =>
+            previous.some((entry) => entry.achievementId === achievement.achievementId)
+                ? previous.map((entry) => (entry.achievementId === achievement.achievementId ? achievement : entry))
+                : [...previous, achievement]
+        );
+    }, []);
 
-        return progress;
-    }, [achievementCategories]);
+    const clearUnseen = useCallback((categoryCode?: string) => {
+        setAchievements((previous) =>
+            previous.map((achievement) => {
+                if (
+                    !achievement.unseen ||
+                    (categoryCode &&
+                        achievement.category !== categoryCode &&
+                        !(categoryCode === 'archive' && achievement.state === AchievementData.STATE_ARCHIVED))
+                )
+                    return achievement;
 
-    const scaledProgressPercent = useMemo(() => {
-        return ~~(((getProgress - 0) * (100 - 0)) / (getMaxProgress - 0) + 0);
-    }, [getProgress, getMaxProgress]);
+                const seen = copyAchievement(achievement);
+                seen.unseen = 0;
+                return seen;
+            })
+        );
+    }, []);
 
-    const selectedCategory = useMemo(() => {
-        if (selectedCategoryCode === null) return null;
+    const close = useCallback(() => {
+        setIsVisible(false);
+        if (pendingLevel.current) pendingLevel.current.achievement.unseen = 0;
+        clearUnseen();
+    }, [clearUnseen]);
 
-        return achievementCategories.find((category) => category.code === selectedCategoryCode);
-    }, [achievementCategories, selectedCategoryCode]);
+    const selectCategory = useCallback(
+        (code: string) => {
+            if (!code) clearUnseen(selectedCategoryCode);
+            setSelectedCategoryCode(code);
+            setSelectedAchievementId(-1);
+        },
+        [clearUnseen, selectedCategoryCode]
+    );
 
-    const selectedAchievement = useMemo(() => {
-        if (selectedAchievementId === -1 || !selectedCategory) return null;
+    const show = useCallback(
+        (categoryCode?: string) => {
+            if (!isLoaded) SendMessageComposer(new RequestAchievementsMessageComposer());
+            if (categoryCode) selectCategory(categoryCode);
+            setIsVisible(true);
+        },
+        [isLoaded, selectCategory]
+    );
 
-        return selectedCategory.achievements.find((achievement) => achievement.achievementId === selectedAchievementId);
-    }, [selectedCategory, selectedAchievementId]);
-
-    const setAchievementSeen = useCallback((categoryCode: string, achievementId: number) => {
-        setAchievementCategories((prevValue) => {
-            const newValue = [...prevValue];
-
-            for (const category of newValue) {
-                if (category.code !== categoryCode) continue;
-
-                for (const achievement of category.achievements) {
-                    if (achievement.achievementId !== achievementId) continue;
-
-                    achievement.unseen = 0;
-                }
-            }
-
-            return newValue;
-        });
+    const clearPendingLevel = useCallback(() => {
+        if (pendingLevel.current) clearTimeout(pendingLevel.current.timeout);
+        pendingLevel.current = null;
     }, []);
 
     useMessageEvent<AchievementEvent>(AchievementEvent, (event) => {
-        const parser = event.getParser();
-        const achievement = parser.achievement;
+        const achievement = event.getParser().achievement;
+        const previous = achievements.find((entry) => entry.achievementId === achievement.achievementId);
+        achievement.unseen = previous?.unseen || (selectedAchievement?.achievementId !== achievement.achievementId ? 1 : 0);
 
-        setAchievementCategories((prevValue) => {
-            const newValue = [...prevValue];
-            const categoryIndex = newValue.findIndex((existing) => existing.code === achievement.category);
+        if (pendingLevel.current?.achievement.achievementId === achievement.achievementId) {
+            pendingLevel.current.achievement = achievement;
+            return;
+        }
 
-            if (categoryIndex === -1) {
-                const category = new AchievementCategory(achievement.category);
+        if (isVisible && selectedAchievement?.achievementId === achievement.achievementId && achievement.level > selectedAchievement.level) {
+            if (pendingLevel.current) updateAchievement(pendingLevel.current.achievement);
+            clearPendingLevel();
+            const completed = copyAchievement(selectedAchievement);
+            completed.setMaxProgress();
+            updateAchievement(completed);
+            pendingLevel.current = {
+                achievement,
+                timeout: setTimeout(() => {
+                    updateAchievement(pendingLevel.current.achievement);
+                    pendingLevel.current = null;
+                }, 2000)
+            };
+            return;
+        }
 
-                category.achievements.push(achievement);
-
-                newValue.push(category);
-            } else {
-                const category = CloneObject(newValue[categoryIndex]);
-                const newAchievements = [...category.achievements];
-                const achievementIndex = newAchievements.findIndex((existing) => existing.achievementId === achievement.achievementId);
-                let previousAchievement: AchievementData = null;
-
-                if (achievementIndex === -1) {
-                    newAchievements.push(achievement);
-                } else {
-                    previousAchievement = newAchievements[achievementIndex];
-
-                    newAchievements[achievementIndex] = achievement;
-                }
-
-                if (!AchievementUtilities.getAchievementIsIgnored(achievement)) {
-                    achievement.unseen++;
-
-                    if (previousAchievement) achievement.unseen += previousAchievement.unseen;
-                }
-
-                category.achievements = newAchievements;
-
-                newValue[categoryIndex] = category;
-            }
-
-            return newValue;
-        });
+        updateAchievement(achievement);
     });
 
     useMessageEvent<AchievementsEvent>(AchievementsEvent, (event) => {
         const parser = event.getParser();
-        const categories: AchievementCategory[] = [];
-
-        for (const achievement of parser.achievements) {
-            const categoryName = achievement.category;
-
-            let existing = categories.find((category) => category.code === categoryName);
-
-            if (!existing) {
-                existing = new AchievementCategory(categoryName);
-
-                categories.push(existing);
-            }
-
-            existing.achievements.push(achievement);
-        }
-
-        setAchievementCategories(categories);
+        clearPendingLevel();
+        setAchievements(parser.achievements);
+        setIsLoaded(true);
+        if (isVisible && !selectedCategoryCode && parser.defaultCategory) selectCategory(parser.defaultCategory);
     });
 
-    useMessageEvent<AchievementsScoreEvent>(AchievementsScoreEvent, (event) => {
-        const parser = event.getParser();
+    useMessageEvent<AchievementsScoreEvent>(AchievementsScoreEvent, (event) => setAchievementScore(event.getParser().score));
 
-        setAchievementScore(parser.score);
-    });
-
-    useEffect(() => {
-        if (!needsUpdate) return;
-
+    useMessageEvent<AuthenticatedEvent>(AuthenticatedEvent, () => {
+        clearPendingLevel();
+        setAchievements([]);
+        setAchievementScore(0);
+        setEnabledWiredAchievements([]);
+        setIsLoaded(false);
+        setIsVisible(false);
+        setSelectedCategoryCode(null);
+        setSelectedAchievementId(-1);
         SendMessageComposer(new RequestAchievementsMessageComposer());
+    });
 
-        setNeedsUpdate(false);
-    }, [needsUpdate]);
+    useMessageEvent<WiredEnvironmentEvent>(WiredEnvironmentEvent, (event) => setEnabledWiredAchievements(event.getParser().enabledAchievements));
+
+    useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, () => {
+        setEnabledWiredAchievements([]);
+        close();
+    });
 
     useEffect(() => {
-        if (!selectedCategoryCode || selectedAchievementId === -1) return;
-
-        setAchievementSeen(selectedCategoryCode, selectedAchievementId);
-    }, [selectedCategoryCode, selectedAchievementId, setAchievementSeen]);
+        SendMessageComposer(new RequestAchievementsMessageComposer());
+        return clearPendingLevel;
+    }, [clearPendingLevel]);
 
     return {
         achievementCategories,
         selectedCategoryCode,
-        setSelectedCategoryCode,
+        setSelectedCategoryCode: selectCategory,
         selectedAchievementId,
         setSelectedAchievementId,
         achievementScore,
         getTotalUnseen,
         getProgress,
         getMaxProgress,
-        scaledProgressPercent,
+        scaledProgressPercent: getMaxProgress ? Math.floor((getProgress / getMaxProgress) * 100) : 0,
         selectedCategory,
         selectedAchievement,
-        setAchievementSeen
+        visibleAchievements,
+        hasWiredAchievements: enabledWiredAchievements.length > 0,
+        isLoaded,
+        isVisible,
+        show,
+        close
     };
 };
 

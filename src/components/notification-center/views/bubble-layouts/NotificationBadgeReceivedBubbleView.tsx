@@ -1,6 +1,6 @@
 import { RequestBadgesComposer } from '@octane/renderer';
 import { FC, useEffect } from 'react';
-import { LocalizeText, NotificationBubbleItem, SendMessageComposer } from '../../../../api';
+import { AchievementNotificationBubbleItem, CreateLinkEvent, LocalizeText, NotificationBubbleItem, SendMessageComposer } from '../../../../api';
 import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';
 import { useInventoryBadges } from '../../../../hooks';
 
@@ -16,7 +16,8 @@ export const NotificationBadgeReceivedBubbleView: FC<NotificationBadgeReceivedBu
         if (activeBadgeCodes.length === 0) SendMessageComposer(new RequestBadgesComposer());
     }, [activeBadgeCodes.length]);
 
-    const badgeCode = item?.linkUrl ?? null;
+    const isAchievement = item instanceof AchievementNotificationBubbleItem;
+    const badgeCode = isAchievement ? item.badgeCode : (item?.linkUrl ?? null);
     const isLoaded = activeBadgeCodes.length > 0;
     const alreadyWearing = !!badgeCode && !!isWearingBadge && isWearingBadge(badgeCode);
     const slotsAvailable = !!canWearBadges && canWearBadges();
@@ -37,20 +38,32 @@ export const NotificationBadgeReceivedBubbleView: FC<NotificationBadgeReceivedBu
 
     return (
         <LayoutNotificationBubbleView className="flex-col" onClose={onClose} {...rest}>
-            <div onClick={(e) => e.stopPropagation()}>
+            <div
+                onClick={(event) => {
+                    event.stopPropagation();
+                    if (isAchievement) {
+                        CreateLinkEvent(item.linkUrl);
+                        onClose();
+                    }
+                }}
+            >
                 <Flex alignItems="center" gap={2} className="mb-2">
                     <Flex center className="w-[50px] h-[50px] shrink-0">
                         {item.iconUrl && <img alt="" className="no-select" src={item.iconUrl} />}
                     </Flex>
                     <Flex column gap={0}>
                         <Text bold variant="white">
-                            {item.senderName
-                                ? LocalizeText('notifications.text.received.badge', ['user_name'], [item.senderName])
-                                : LocalizeText('prereg.reward.you.received')}
+                            {isAchievement
+                                ? item.message
+                                : item.senderName
+                                  ? LocalizeText('notifications.text.received.badge', ['user_name'], [item.senderName])
+                                  : LocalizeText('prereg.reward.you.received')}
                         </Text>
-                        <Text variant="white" small>
-                            {item.message}
-                        </Text>
+                        {!isAchievement && (
+                            <Text variant="white" small>
+                                {item.message}
+                            </Text>
+                        )}
                     </Flex>
                 </Flex>
                 <Flex alignItems="center" justifyContent="end" gap={2}>
