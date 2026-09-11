@@ -63,19 +63,17 @@ export const useRaidProtection = () => {
 
         if (!parser) return;
 
-        const saved = parser.settings;
-
         setSettings({
-            roomId: saved.roomId,
-            enabled: saved.enabled,
-            detectionSensitivity: saved.detectionSensitivity,
-            actionType: saved.actionType,
-            banDurationSeconds: saved.banDurationSeconds,
-            guardEnabled: saved.guardEnabled,
-            guardDurationSeconds: saved.guardDurationSeconds,
-            guardSensitivity: saved.guardSensitivity,
-            incidentActive: saved.incidentActive,
-            lastRaidAtEpochSeconds: saved.lastRaidAtEpochSeconds
+            roomId: parser.roomId,
+            enabled: parser.enabled,
+            detectionSensitivity: parser.detectionSensitivity,
+            actionType: parser.actionType,
+            banDurationSeconds: parser.banDurationSeconds,
+            guardEnabled: parser.guardEnabled,
+            guardDurationSeconds: parser.guardDurationSeconds,
+            guardSensitivity: parser.guardSensitivity,
+            incidentActive: parser.incidentActive,
+            lastRaidAtEpochSeconds: parser.lastRaidAtEpochSeconds
         });
     });
 
