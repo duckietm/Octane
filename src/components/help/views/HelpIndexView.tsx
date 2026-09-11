@@ -90,7 +90,7 @@ export const HelpIndexView: FC<{}> = (props) => {
                 {/* The official client opens its "My reports" table here; the window asks the server for the list itself. */}
                 <button type="button" className="help-link" onClick={() => setReportsStatusVisible(true)}>
                     <FaArrowCircleRight className="help-link__icon" />
-                    {LocalizeText('help.main.my.reports.status')}
+                    {localizeWithFallback('help.main.my.reports.status', 'My reports')}
                 </button>
             </div>
             {reportsStatusVisible && <MyReportsStatusView onClose={() => setReportsStatusVisible(false)} />}

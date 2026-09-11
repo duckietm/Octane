@@ -2,13 +2,21 @@ import {
     CompetitionEntrySubmitResultEvent,
     CompetitionVotingInfoMessageEvent,
     ForwardToASubmittableRoomMessageComposer,
-    NoOwnedRoomsAlertMessageEvent,
+    NavigatorOpenRoomCreatorEvent,
     RoomCompetitionInitMessageComposer,
     SubmitRoomToCompetitionMessageComposer,
     VoteForRoomMessageComposer
 } from '@octane/renderer';
+<<<<<<< f797991d820fe1e839cc1b1c842d9cd8e44ec614
 import { useEffect, useState } from 'react';
 import { SendMessageComposer } from '../../../api';
+||||||| d7c782c6455d76df76cf64e5a780753d871f292d^
+import { useEffect, useState } from 'react';
+import { CreateLinkEvent, SendMessageComposer } from '../../../api';
+=======
+import { useEffect, useRef, useState } from 'react';
+import { CreateLinkEvent, SendMessageComposer } from '../../../api';
+>>>>>>> d7c782c6455d76df76cf64e5a780753d871f292d
 import { useMessageEvent } from '../../events';
 import { useRoom } from '../useRoom';
 
@@ -44,6 +52,9 @@ const isHiddenToday = () => {
 const useRoomCompetitionState = () => {
     const [competition, setCompetition] = useState<IRoomCompetitionState>(null);
     const [noOwnedRooms, setNoOwnedRooms] = useState(false);
+
+    /** Whether a submit is waiting for its answer; only then is the room creator packet ours. */
+    const awaitingSubmitAnswer = useRef(false);
     const { roomSession = null } = useRoom();
 
     const close = () => setCompetition(null);
@@ -61,6 +72,9 @@ const useRoomCompetitionState = () => {
     const send = (level: number) => {
         if (!competition) return;
 
+        // The answer to a submit can be the room creator packet, which says "you have no room of
+        // your own". Nothing else does, so the question has to be remembered to recognise it.
+        awaitingSubmitAnswer.current = true;
         SendMessageComposer(new SubmitRoomToCompetitionMessageComposer(competition.goalCode, level));
     };
 
@@ -84,6 +98,8 @@ const useRoomCompetitionState = () => {
 
     useMessageEvent<CompetitionEntrySubmitResultEvent>(CompetitionEntrySubmitResultEvent, (event) => {
         const parser = event.getParser();
+
+        awaitingSubmitAnswer.current = false;
         const requiredFurnis = parser.requiredFurnis ?? [];
 
         setCompetition({
@@ -111,7 +127,17 @@ const useRoomCompetitionState = () => {
         });
     });
 
-    useMessageEvent<NoOwnedRoomsAlertMessageEvent>(NoOwnedRoomsAlertMessageEvent, () => setNoOwnedRooms(true));
+    /**
+     * The hotel answers "you have no room of your own" with the packet that opens the room creator:
+     * one header, two meanings. Without the pending question this banner would appear every time
+     * the navigator opens the creator for its own reasons.
+     */
+    useMessageEvent<NavigatorOpenRoomCreatorEvent>(NavigatorOpenRoomCreatorEvent, () => {
+        if (!awaitingSubmitAnswer.current) return;
+
+        awaitingSubmitAnswer.current = false;
+        setNoOwnedRooms(true);
+    });
 
     return {
         competition,
