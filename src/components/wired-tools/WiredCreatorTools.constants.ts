@@ -112,10 +112,20 @@ export const VARIABLES_ELEMENTS: VariablesElementButton[] = [
 export const INTERNAL_FURNI_OPACITY_VARIABLE_ITEM_ID = -1001;
 export const INTERNAL_FURNI_GRAVITY_VARIABLE_ITEM_ID = -1002;
 
-export const EDITABLE_FURNI_VARIABLES: string[] = ['@position_x', '@position_y', '@rotation', '@altitude', '@state', '@opacity', '@gravity', '@wallitem_offset'];
+export const EDITABLE_FURNI_VARIABLES: string[] = [
+    '@position_x',
+    '@position_y',
+    '@rotation',
+    '@altitude',
+    '@state',
+    '@opacity',
+    '@gravity',
+    '@wallitem_offset'
+];
 export const WIRED_FURNI_RUNTIME_ACTION_READ = 0;
 export const WIRED_FURNI_RUNTIME_ACTION_WRITE = 1;
-export const EDITABLE_USER_VARIABLES: string[] = ['@position_x', '@position_y', '@direction'];
+export const EDITABLE_USER_VARIABLES: string[] = ['@position_x', '@position_y', '@direction', '@altitude'];
+export const EDITABLE_GLOBAL_VARIABLES: string[] = ['@team_red_score', '@team_green_score', '@team_blue_score', '@team_yellow_score'];
 
 const createVariableDefinition = (
     key: string,
@@ -174,18 +184,19 @@ export const VARIABLE_DEFINITIONS: Record<VariablesElementType, VariableDefiniti
         createVariableDefinition('@is_muted', 'User', 'Conditional'),
         createVariableDefinition('@is_trading', 'User', 'Conditional'),
         createVariableDefinition('@is_frozen', 'User', 'Conditional'),
-        createVariableDefinition('@effect_id', 'User', 'Conditional'),
-        createVariableDefinition('@team_score', 'User', 'Conditional'),
+        createVariableDefinition('@effect_id', 'User', 'Conditional', true),
+        createVariableDefinition('@team_score', 'User', 'Conditional', true),
+        createVariableDefinition('@player_score', 'User', 'Conditional', true),
         createVariableDefinition('@team_color', 'User', 'Conditional'),
         createVariableDefinition('@team_type', 'User', 'Conditional'),
         createVariableDefinition('@sign', 'User', 'Conditional'),
         createVariableDefinition('@dance', 'User', 'Conditional'),
         createVariableDefinition('@is_idle', 'User', 'Conditional'),
-        createVariableDefinition('@handitem_id', 'User', 'Conditional'),
+        createVariableDefinition('@handitem_id', 'User', 'Conditional', true),
         createVariableDefinition('@position_x', 'User', 'Always', true),
         createVariableDefinition('@position_y', 'User', 'Always', true),
         createVariableDefinition('@direction', 'User', 'Always', true),
-        createVariableDefinition('@altitude', 'User'),
+        createVariableDefinition('@altitude', 'User', 'Always', true),
         createVariableDefinition('@favourite_group_id', 'User', 'Conditional'),
         createVariableDefinition('@room_entry.method', 'User', 'Conditional'),
         createVariableDefinition('@room_entry.teleport_id', 'User', 'Conditional'),
@@ -198,10 +209,10 @@ export const VARIABLE_DEFINITIONS: Record<VariablesElementType, VariableDefiniti
         createVariableDefinition('@furni_count', 'Global'),
         createVariableDefinition('@user_count', 'Global'),
         createVariableDefinition('@wired_timer', 'Global'),
-        createVariableDefinition('@team_red_score', 'Global'),
-        createVariableDefinition('@team_green_score', 'Global'),
-        createVariableDefinition('@team_blue_score', 'Global'),
-        createVariableDefinition('@team_yellow_score', 'Global'),
+        createVariableDefinition('@team_red_score', 'Global', 'Always', true),
+        createVariableDefinition('@team_green_score', 'Global', 'Always', true),
+        createVariableDefinition('@team_blue_score', 'Global', 'Always', true),
+        createVariableDefinition('@team_yellow_score', 'Global', 'Always', true),
         createVariableDefinition('@team_red_size', 'Global'),
         createVariableDefinition('@team_green_size', 'Global'),
         createVariableDefinition('@team_blue_size', 'Global'),
@@ -229,7 +240,16 @@ export const VARIABLE_DEFINITIONS: Record<VariablesElementType, VariableDefiniti
         createVariableDefinition('@signal_user_count', 'Context', 'Conditional'),
         createVariableDefinition('@antenna_id', 'Context', 'Conditional'),
         createVariableDefinition('@chat_type', 'Context', 'Conditional'),
-        createVariableDefinition('@chat_style', 'Context', 'Conditional')
+        createVariableDefinition('@chat_style', 'Context', 'Conditional'),
+        createVariableDefinition('@array.change_type', 'Context', 'Conditional'),
+        createVariableDefinition('@array.index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.source_index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.destination_index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.field_index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.old_value', 'Context', 'Conditional'),
+        createVariableDefinition('@array.new_value', 'Context', 'Conditional'),
+        createVariableDefinition('@array.old_length', 'Context', 'Conditional'),
+        createVariableDefinition('@array.new_length', 'Context', 'Conditional')
     ]
 };
 

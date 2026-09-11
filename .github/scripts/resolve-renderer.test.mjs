@@ -90,3 +90,22 @@ describe('remote ref lookup failures', () => {
         assert.equal(isAbsentRefFailure(bug), false);
     });
 });
+
+describe('array companion branch resolution', () => {
+    it('pairs a client suffix with its protocol branch in the PR owner repository', async () => {
+        const hasRef = refLookup(new Set([
+            'duckietm/Octane-Renderer@Dev',
+            'duckietm/Octane-Renderer@feature/wired-arrays-protocol',
+        ]));
+        assert.deepEqual(await resolveRenderer({ ...baseInput, headOwner: 'duckietm', headRef: 'feature/wired-arrays-client' }, hasRef), {
+            repository: 'duckietm/Octane-Renderer', ref: 'feature/wired-arrays-protocol',
+        });
+    });
+
+    it('keeps a missing client companion on current upstream Dev', async () => {
+        const hasRef = refLookup(new Set(['duckietm/Octane-Renderer@Dev']));
+        assert.deepEqual(await resolveRenderer({ ...baseInput, headRef: 'feature/missing-client' }, hasRef), {
+            repository: 'duckietm/Octane-Renderer', ref: 'Dev',
+        });
+    });
+});

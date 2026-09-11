@@ -10,6 +10,7 @@ const TARGET_ROOM = 3;
 const MAX_NAME_LENGTH = 40;
 
 interface IVariableReferenceEditorVariable {
+    definition?: { valueShape?: 'single' | 'array' };
     hasValue: boolean;
     itemId: number;
     name: string;
@@ -237,7 +238,7 @@ export const WiredExtraVariableReferenceView: FC<{}> = () => {
                         <option value="0:0">{LocalizeText('wiredfurni.variable_picker.search')}</option>
                         {selectedRoomVariables.map((variable) => (
                             <option key={`${variable.itemId}:${variable.targetType}`} value={`${variable.itemId}:${variable.targetType}`}>
-                                {`${variable.name} (${getTargetLabel(variable.targetType)})`}
+                                {`${variable.name} (${getTargetLabel(variable.targetType)}${variable.definition?.valueShape === 'array' ? ', Array' : ''})`}
                             </option>
                         ))}
                     </select>
