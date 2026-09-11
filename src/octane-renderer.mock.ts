@@ -868,6 +868,7 @@ export class GetIsBadgeRequestFulfilledComposer extends StubClass {}
 export class RequestABadgeComposer extends StubClass {}
 export class GetResolutionAchievementsMessageComposer extends StubClass {}
 export class ResetResolutionAchievementMessageComposer extends StubClass {}
+export class CompetitionRoomsSearchMessageComposer extends StubClass {}
 export class ForwardToASubmittableRoomMessageComposer extends StubClass {}
 export class RoomCompetitionInitMessageComposer extends StubClass {}
 export class SubmitRoomToCompetitionMessageComposer extends StubClass {}
