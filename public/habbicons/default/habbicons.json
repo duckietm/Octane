@@ -55,8 +55,8 @@
       "height": 42
     },
     {
-      "x": 0,
-      "y": 42,
+      "x": 252,
+      "y": 0,
       "id": 34,
       "name": "duck_nosee",
       "dir": -1,
@@ -64,7 +64,7 @@
       "height": 42
     },
     {
-      "x": 42,
+      "x": 0,
       "y": 42,
       "id": 35,
       "name": "duck_nosay",
@@ -73,7 +73,7 @@
       "height": 42
     },
     {
-      "x": 84,
+      "x": 42,
       "y": 42,
       "id": 36,
       "name": "duck_angel",
@@ -82,7 +82,7 @@
       "height": 42
     },
     {
-      "x": 126,
+      "x": 84,
       "y": 42,
       "id": 37,
       "name": "duck_devil",
@@ -91,7 +91,7 @@
       "height": 42
     },
     {
-      "x": 168,
+      "x": 126,
       "y": 42,
       "id": 38,
       "name": "duck_spinning",
@@ -203,7 +203,7 @@
       "height": 42
     },
     {
-      "x": 210,
+      "x": 168,
       "y": 42,
       "id": 39,
       "name": "duck_cool",
@@ -212,8 +212,8 @@
       "height": 42
     },
     {
-      "x": 0,
-      "y": 84,
+      "x": 210,
+      "y": 42,
       "id": 40,
       "name": "duck_pleased",
       "dir": -1,
@@ -221,8 +221,8 @@
       "height": 42
     },
     {
-      "x": 42,
-      "y": 84,
+      "x": 252,
+      "y": 42,
       "id": 41,
       "name": "duck_laughing",
       "dir": -1,
@@ -230,7 +230,7 @@
       "height": 42
     },
     {
-      "x": 84,
+      "x": 0,
       "y": 84,
       "id": 42,
       "name": "duck_grimace",
@@ -239,7 +239,7 @@
       "height": 42
     },
     {
-      "x": 126,
+      "x": 42,
       "y": 84,
       "id": 43,
       "name": "duck_devious",
@@ -248,7 +248,7 @@
       "height": 42
     },
     {
-      "x": 168,
+      "x": 84,
       "y": 84,
       "id": 44,
       "name": "duck_metal",
@@ -257,7 +257,7 @@
       "height": 42
     },
     {
-      "x": 210,
+      "x": 126,
       "y": 84,
       "id": 45,
       "name": "duck_pleading",
@@ -266,8 +266,8 @@
       "height": 42
     },
     {
-      "x": 0,
-      "y": 126,
+      "x": 168,
+      "y": 84,
       "id": 46,
       "name": "duck_silly",
       "dir": -1,
@@ -275,8 +275,8 @@
       "height": 42
     },
     {
-      "x": 42,
-      "y": 126,
+      "x": 210,
+      "y": 84,
       "id": 47,
       "name": "duck_wink",
       "dir": -1,
@@ -284,8 +284,8 @@
       "height": 42
     },
     {
-      "x": 84,
-      "y": 126,
+      "x": 252,
+      "y": 84,
       "id": 48,
       "name": "duck_party",
       "dir": -1,
@@ -293,7 +293,7 @@
       "height": 42
     },
     {
-      "x": 126,
+      "x": 0,
       "y": 126,
       "id": 49,
       "name": "duck_love",
@@ -454,7 +454,7 @@
       "height": 42
     },
     {
-      "x": 168,
+      "x": 42,
       "y": 126,
       "id": 50,
       "name": "frank_frank",
@@ -463,7 +463,7 @@
       "height": 42
     },
     {
-      "x": 210,
+      "x": 84,
       "y": 126,
       "id": 51,
       "name": "frank_smile",
@@ -472,8 +472,8 @@
       "height": 42
     },
     {
-      "x": 0,
-      "y": 168,
+      "x": 126,
+      "y": 126,
       "id": 52,
       "name": "frank_happy",
       "dir": -1,
@@ -481,8 +481,8 @@
       "height": 42
     },
     {
-      "x": 42,
-      "y": 168,
+      "x": 168,
+      "y": 126,
       "id": 53,
       "name": "frank_sad",
       "dir": -1,
@@ -490,8 +490,8 @@
       "height": 42
     },
     {
-      "x": 84,
-      "y": 168,
+      "x": 210,
+      "y": 126,
       "id": 54,
       "name": "frank_scared",
       "dir": -1,
@@ -499,8 +499,8 @@
       "height": 42
     },
     {
-      "x": 126,
-      "y": 168,
+      "x": 252,
+      "y": 126,
       "id": 55,
       "name": "frank_surprised",
       "dir": -1,
@@ -508,7 +508,7 @@
       "height": 42
     },
     {
-      "x": 168,
+      "x": 0,
       "y": 168,
       "id": 56,
       "name": "frank_thinking",
@@ -517,7 +517,7 @@
       "height": 42
     },
     {
-      "x": 210,
+      "x": 42,
       "y": 168,
       "id": 57,
       "name": "frank_silly",
@@ -526,8 +526,8 @@
       "height": 42
     },
     {
-      "x": 0,
-      "y": 210,
+      "x": 84,
+      "y": 168,
       "id": 58,
       "name": "frank_relief",
       "dir": -1,
@@ -535,8 +535,8 @@
       "height": 42
     },
     {
-      "x": 42,
-      "y": 210,
+      "x": 126,
+      "y": 168,
       "id": 59,
       "name": "frank_wink",
       "dir": -1,
@@ -544,8 +544,8 @@
       "height": 42
     },
     {
-      "x": 84,
-      "y": 210,
+      "x": 168,
+      "y": 168,
       "id": 60,
       "name": "frank_stareyes",
       "dir": -1,
@@ -658,6 +658,164 @@
       ],
       "width": 42,
       "height": 42
+    },
+    {
+      "x": 210,
+      "y": 168,
+      "id": 61,
+      "name": "toast_toast",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 252,
+      "y": 168,
+      "id": 62,
+      "name": "toast_happy",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 0,
+      "y": 210,
+      "id": 63,
+      "name": "toast_cute",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 42,
+      "y": 210,
+      "id": 64,
+      "name": "toast_wink",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 84,
+      "y": 210,
+      "id": 65,
+      "name": "toast_sad",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 126,
+      "y": 210,
+      "id": 66,
+      "name": "toast_cry",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 168,
+      "y": 210,
+      "id": 67,
+      "name": "toast_grumpy",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 210,
+      "y": 210,
+      "id": 68,
+      "name": "toast_sleep",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 252,
+      "y": 210,
+      "id": 69,
+      "name": "toast_shock",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 0,
+      "y": 252,
+      "id": 70,
+      "name": "toast_flustered",
+      "dir": -1,
+      "width": 42,
+      "height": 42
+    },
+    {
+      "x": 42,
+      "y": 252,
+      "id": 71,
+      "name": "toast_fine",
+      "dir": -1,
+      "frameCount": 5,
+      "loop": true,
+      "animation": {
+        "steps": [
+          {
+            "sourceFrame": 1,
+            "durationMs": 100
+          },
+          {
+            "sourceFrame": 2,
+            "durationMs": 100
+          },
+          {
+            "sourceFrame": 3,
+            "durationMs": 100
+          },
+          {
+            "sourceFrame": 4,
+            "durationMs": 100
+          }
+        ]
+      },
+      "frameData": [
+        {
+          "id": 0,
+          "x": 0,
+          "y": 38,
+          "width": 42,
+          "height": 42
+        },
+        {
+          "id": 1,
+          "x": 72,
+          "y": 2,
+          "width": 70,
+          "height": 78
+        },
+        {
+          "id": 2,
+          "x": 144,
+          "y": 2,
+          "width": 70,
+          "height": 78
+        },
+        {
+          "id": 3,
+          "x": 0,
+          "y": 82,
+          "width": 70,
+          "height": 78
+        },
+        {
+          "id": 4,
+          "x": 72,
+          "y": 82,
+          "width": 70,
+          "height": 78
+        }
+      ],
+      "width": 42,
+      "height": 42
     }
   ],
   "collectionIcons": [
@@ -674,6 +832,11 @@
     {
       "id": 7,
       "x": 0,
+      "y": 0
+    },
+    {
+      "id": 8,
+      "x": 20,
       "y": 0
     }
   ]
