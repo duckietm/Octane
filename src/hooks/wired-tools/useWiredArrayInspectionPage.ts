@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { WIRED_VARIABLES_POLL_MS } from './WiredCreatorTools.constants';
+import { WIRED_VARIABLES_POLL_MS } from '../../components/wired-tools/WiredCreatorTools.constants';
 
 export interface WiredArrayInspectionTarget {
     variableType: number;

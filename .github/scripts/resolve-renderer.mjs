@@ -15,6 +15,11 @@ const companionRefsFor = (headRef) => {
         refs.push(`${baseRef}-renderer`, baseRef);
     }
 
+    if (headRef.endsWith('-client')) {
+        const baseRef = headRef.slice(0, -7);
+        refs.push(`${baseRef}-protocol`, `${baseRef}-renderer`, baseRef);
+    }
+
     refs.push(headRef);
 
     return refs;

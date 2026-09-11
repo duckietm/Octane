@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { useWiredArrayInspectionPage } from './useWiredArrayInspectionPage';
-import { WIRED_VARIABLES_POLL_MS } from './WiredCreatorTools.constants';
+import { WIRED_VARIABLES_POLL_MS } from '../../components/wired-tools/WiredCreatorTools.constants';
 
 afterEach(() => vi.useRealTimers());
 

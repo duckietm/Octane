@@ -61,7 +61,7 @@ import {
     OctaneCardView,
     Text
 } from '../../common';
-import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredTools } from '../../hooks';
+import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredArrayInspectionPage, useWiredTools } from '../../hooks';
 import { WiredChestsTabView } from './WiredChestsTabView';
 import {
     DIRECTION_NAMES,
@@ -125,7 +125,6 @@ import { WiredInspectionTabView } from './WiredInspectionTabView';
 import { WiredMonitorTabView } from './WiredMonitorTabView';
 import { WiredToolsSettingsTabView } from './WiredToolsSettingsTabView';
 import { WiredVariablesTabView } from './WiredVariablesTabView';
-import { useWiredArrayInspectionPage } from './useWiredArrayInspectionPage';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
 
 const WIRED_FURNI_GRAVITY_MODEL_KEY = 'wired_furni_gravity';
