@@ -1,16 +1,18 @@
 import {
     BreedingPetInfo,
+    BreedPetsMessageComposer,
     CancelPetBreedingComposer,
     ConfirmBreedingRequestEvent,
     ConfirmBreedingResultEvent,
     ConfirmPetBreedingComposer,
     NestBreedingSuccessEvent,
     PetBreedingMessageEvent,
-    PetBreedingResultEvent,
     PetBreedingResultData,
+    PetBreedingResultEvent,
     RarityCategoryData
 } from '@octane/renderer';
 import { useState } from 'react';
+import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { SendMessageComposer } from '../../../api';
 import { useMessageEvent } from '../../events';
 
@@ -30,6 +32,9 @@ export const PET_BREEDING_RESULT_OK = 0;
 export const PET_BREEDING_RESULT_NO_NEST = 1;
 export const PET_BREEDING_RESULT_PETS_MISSING = 2;
 export const PET_BREEDING_RESULT_NAME_INVALID = 3;
+
+/** Official `BreedPets` composer states, as the client sends them. */
+export const PET_BREEDING_STATE_START = 0;
 
 /** Official `PetBreedingMessageParser` states. */
 export const PET_BREEDING_STATE_CANCEL = 1;
@@ -67,6 +72,22 @@ const usePetBreedingWidgetState = () => {
     const [nestSuccess, setNestSuccess] = useState<PetBreedingNestSuccess>(null);
     const [outcome, setOutcome] = useState<PetBreedingOutcome>(null);
     const [confirmation, setConfirmation] = useState<PetBreedingConfirmation>(null);
+    const [pendingPlantId, setPendingPlantId] = useState<number>(null);
+
+    /**
+     * Breeding two monsterplants takes two of them, and the official client picks the second one by
+     * clicking it. The first click only remembers which plant asked.
+     */
+    const beginMonsterplantBreeding = (petId: number) => setPendingPlantId(petId);
+
+    const cancelMonsterplantBreeding = () => setPendingPlantId(null);
+
+    const breedMonsterplantWith = (petId: number) => {
+        if (!pendingPlantId || pendingPlantId === petId) return;
+
+        SendMessageComposer(new BreedPetsMessageComposer(PET_BREEDING_STATE_START, pendingPlantId, petId));
+        setPendingPlantId(null);
+    };
 
     const confirmBreeding = (name: string) => {
         if (!request) return;
@@ -139,6 +160,10 @@ const usePetBreedingWidgetState = () => {
     });
 
     return {
+        pendingPlantId,
+        beginMonsterplantBreeding,
+        cancelMonsterplantBreeding,
+        breedMonsterplantWith,
         request,
         requestFailure,
         nestSuccess,
@@ -153,4 +178,6 @@ const usePetBreedingWidgetState = () => {
     };
 };
 
-export const usePetBreedingWidget = usePetBreedingWidgetState;
+export const usePetBreedingWidget = () => useSharedHook(usePetBreedingWidgetState);
+
+registerSharedHook(usePetBreedingWidgetState);
