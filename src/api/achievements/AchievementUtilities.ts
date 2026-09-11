@@ -1,8 +1,17 @@
 import { AchievementData, GetLocalizationManager } from '@octane/renderer';
-import { GetConfigurationValue } from '../octane';
+import { GetConfigurationValue, GetOptionalConfigurationValue } from '../octane';
+import { localizeWithFallback } from '../utils/localizeWithFallback';
 import { IAchievementCategory } from './IAchievementCategory';
 
+const categoryNameFallbacks: Record<string, string> = { new: 'New achievements', wired_games: 'Wired games' };
+const achievementImages = import.meta.glob('../../assets/images/achievements/*.png', { eager: true, import: 'default' });
+
 export class AchievementUtilities {
+    public static getAchievementCategoryName(category: IAchievementCategory): string {
+        const key = `quests.${category.code}.name`;
+        return localizeWithFallback(key, categoryNameFallbacks[category.code] ?? key);
+    }
+
     public static getAchievementBadgeCode(achievement: AchievementData): string {
         if (!achievement) return null;
 
@@ -14,6 +23,9 @@ export class AchievementUtilities {
     }
 
     public static getAchievementImageUrl(imageName: string): string {
+        const bundledImage = achievementImages[`../../assets/images/achievements/${imageName}.png`];
+        if (bundledImage) return bundledImage;
+
         const imageUrl = GetConfigurationValue<string>('achievements.images.url', '');
 
         if (!imageUrl) return '';
@@ -21,14 +33,15 @@ export class AchievementUtilities {
         return imageUrl.replace('%image%', imageName);
     }
 
-    public static getAchievementCategoryImageUrl(category: IAchievementCategory, progress: number = null, icon: boolean = false): string {
-        let imageName = icon ? 'achicon_' : 'achcategory_';
+    public static hasBundledCategoryImage(category: IAchievementCategory): boolean {
+        return !!achievementImages[`../../assets/images/achievements/ach_category_${category.code}.png`];
+    }
 
-        imageName += category.code;
+    public static getAchievementCategoryImageUrl(category: IAchievementCategory, icon: boolean = false): string {
+        const imageName = `${icon ? 'achicon_' : 'ach_category_'}${category.code}`;
+        const fallbackName = `achcategory_${category.code}_${AchievementUtilities.getAchievementCategoryProgress(category) > 0 ? 'active' : 'inactive'}`;
 
-        if (progress !== null) imageName += `_${progress > 0 ? 'active' : 'inactive'}`;
-
-        return AchievementUtilities.getAchievementImageUrl(imageName);
+        return AchievementUtilities.getAchievementImageUrl(icon || AchievementUtilities.hasBundledCategoryImage(category) ? imageName : fallbackName);
     }
 
     public static getAchievementCategoryMaxProgress(category: IAchievementCategory): number {
@@ -74,13 +87,10 @@ export class AchievementUtilities {
     public static getAchievementIsIgnored(achievement: AchievementData): boolean {
         if (!achievement) return false;
 
-        const ignored = GetConfigurationValue<string[]>('achievements.unseen.ignored') ?? [];
-        const value = achievement.badgeId.replace(/[0-9]/g, '');
-        const index = ignored.indexOf(value);
+        const ignored = GetConfigurationValue<string[]>('achievements.unseen.ignored', []);
+        const skipped = GetOptionalConfigurationValue<string>('toolbar.unseen_notification.skipped_badge_ids', '').split(',').filter(Boolean);
 
-        if (index >= 0) return true;
-
-        return false;
+        return ignored.includes(achievement.badgeId.replace(/[0-9]/g, '')) || skipped.some((code) => achievement.badgeId.includes(code));
     }
 
     public static getAchievementLevel(achievement: AchievementData): number {

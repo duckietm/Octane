@@ -4,12 +4,12 @@ import { AchievementListItemView } from './AchievementListItemView';
 
 interface AchievementListViewProps {
     achievements: AchievementData[];
+    isScrollable: boolean;
 }
 
 export const AchievementListView: FC<AchievementListViewProps> = (props) => {
-    const { achievements = null } = props;
-    const isScrollable = (achievements?.length ?? 0) > 24;
-    const itemCount = isScrollable ? achievements.length : Math.max(12, achievements?.length ?? 0);
+    const { achievements = [], isScrollable } = props;
+    const itemCount = Math.max(isScrollable ? 10 : 12, achievements.length);
 
     return (
         <div className={`air-achievements-list${isScrollable ? ' is-scrollable has-classic-scrollbar' : ''}`}>

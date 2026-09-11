@@ -30,6 +30,8 @@ import {
     WiredRewardResultMessageEvent
 } from '@octane/renderer';
 import { useCallback, useState } from 'react';
+import { AchievementNotificationBubbleItem } from '../../api/notification/AchievementNotificationBubbleItem';
+import { localizeWithFallback } from '../../api/utils/localizeWithFallback';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     GetConfigurationValue,
@@ -342,7 +344,7 @@ const useNotificationStore = () => {
     useMessageEvent<AchievementNotificationMessageEvent>(AchievementNotificationMessageEvent, (event) => {
         const parser = event.getParser();
 
-        if (recentBadgeNotifications.has(parser.data.badgeCode)) return;
+        if (bubblesDisabled) return;
 
         recentBadgeNotifications.add(parser.data.badgeCode);
         setTimeout(() => recentBadgeNotifications.delete(parser.data.badgeCode), 3000);
@@ -350,7 +352,15 @@ const useNotificationStore = () => {
         const badgeName = LocalizeBadgeName(parser.data.badgeCode);
         const badgeImage = GetSessionDataManager().getBadgeUrl(parser.data.badgeCode);
 
-        showSingleBubble(badgeName, NotificationBubbleType.BADGE_RECEIVED, badgeImage, parser.data.badgeCode);
+        const notification = new AchievementNotificationBubbleItem(
+            parser.data,
+            localizeWithFallback('notification.new.achievement', `Achievement unlocked: ${badgeName}`, ['achievement_name'], [badgeName]),
+            badgeImage
+        );
+
+        setBubbleAlerts((previous) => [notification, ...previous.filter((item) => item instanceof AchievementNotificationBubbleItem
+            ? item.badgeCode !== parser.data.badgeCode
+            : item.notificationType !== NotificationBubbleType.BADGE_RECEIVED || item.linkUrl !== parser.data.badgeCode)]);
     });
 
     useMessageEvent<ChestNotificationEvent>(ChestNotificationEvent, (event) => {
