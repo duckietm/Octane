@@ -1,8 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { createElement } from 'react';
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+    ArrayVariableSelect,
     ARRAY_REFERENCE_CONSTANT,
     ARRAY_REFERENCE_VARIABLE,
     ARRAY_VARIABLE_ROOM,
+    ARRAY_VARIABLE_USER,
+    arrayFieldIsTextConnected,
     collectWiredArrayDefinitions,
     createArrayAddress,
     createArrayReference,
@@ -13,6 +18,8 @@ import {
     validReference,
     WiredArrayDefinitionMetadata
 } from './WiredArrayControls';
+
+afterEach(cleanup);
 
 const definition = (patch: Partial<WiredArrayDefinitionMetadata> = {}): WiredArrayDefinitionMetadata => ({
     itemId: 10,
@@ -89,4 +96,48 @@ describe('Wired array editor contracts', () => {
         expect(definitionsForType(collected, ARRAY_VARIABLE_ROOM, true).map((entry) => entry.itemId)).toEqual([10]);
         expect(definitionsForType(collected, ARRAY_VARIABLE_ROOM, false)).toEqual([]);
     });
+});
+
+describe('array reference and text metadata parity', () => {
+    it('accepts internal scalar operands and legacy/custom references, excluding missing or array definitions', () => {
+        const scalar = definition({ itemId: 20, valueShape: 'single' });
+        const reference = { ...createArrayReference(), mode: ARRAY_REFERENCE_VARIABLE };
+
+        expect(validReference({ ...reference, variableType: ARRAY_VARIABLE_USER, variableToken: 'internal:@user_id' }, [])).toBe(true);
+        expect(validReference({ ...reference, variableToken: 'custom:20' }, [scalar])).toBe(true);
+        expect(validReference({ ...reference, variableItemId: 20 }, [scalar])).toBe(true);
+        expect(validReference({ ...reference, variableToken: 'internal:@made_up' }, [])).toBe(false);
+        expect(validReference({ ...reference, variableToken: 'custom:10' }, [definition()])).toBe(false);
+        expect(validReference({ ...reference, variableToken: 'custom:21' }, [scalar])).toBe(false);
+        expect(
+            validAddress(
+                { ...createArrayAddress(), mode: ARRAY_REFERENCE_VARIABLE, variableType: ARRAY_VARIABLE_USER, variableToken: 'internal:@user_id' },
+                definition(),
+                []
+            )
+        ).toBe(true);
+    });
+
+    it('uses the selected record field connector rather than a scalar connector on the same variable', () => {
+        const array = definition({
+            fields: [
+                { id: 4, name: 'Kind', order: 0, textConnected: true },
+                { id: 9, name: 'Count', order: 1 }
+            ]
+        });
+
+        expect(arrayFieldIsTextConnected(array, 4, false)).toBe(true);
+        expect(arrayFieldIsTextConnected(array, 9, true)).toBe(false);
+        expect(arrayFieldIsTextConnected(undefined, 0, true)).toBe(true);
+    });
+});
+
+it('hides read-only arrays from mutation destinations while keeping them available to readers', () => {
+    const definitions = [definition({ writable: false, name: 'SharedInventory' })];
+    const props = { definitions, variableType: ARRAY_VARIABLE_ROOM, itemId: 0, array: true, onTypeChange: vi.fn(), onItemChange: vi.fn() };
+    const { rerender } = render(createElement(ArrayVariableSelect, { ...props, writableOnly: true }));
+
+    expect(screen.queryByRole('option', { name: 'SharedInventory' })).not.toBeInTheDocument();
+    rerender(createElement(ArrayVariableSelect, props));
+    expect(screen.getByRole('option', { name: 'SharedInventory' })).toBeInTheDocument();
 });

@@ -121,7 +121,7 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
     }, [availableOperations, definition, operation]);
 
     const chooseType = (nextType: number) => {
-        const firstDefinition = definitionsForType(definitions, nextType, true)[0];
+        const firstDefinition = definitionsForType(definitions, nextType, true).find((definition) => definition.writable !== false);
 
         setVariableType(nextType);
         setVariableItemId(firstDefinition?.itemId ?? 0);
@@ -154,7 +154,7 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
     };
 
     const validate = () => {
-        if (!definition || !availableOperations.some((current) => current.value === operation)) return false;
+        if (!definition || definition.writable === false || !availableOperations.some((current) => current.value === operation)) return false;
         if (needsFirst(operation) && !validAddress(firstIndex, definition, definitions)) return false;
         if (needsSecond(operation) && !validAddress(secondIndex, definition, definitions)) return false;
         if (!needsEntry(operation)) return true;
@@ -169,6 +169,7 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
             <div className="flex flex-col gap-1">
                 <ArrayVariableSelect
                     array
+                    writableOnly
                     definitions={definitions}
                     itemId={variableItemId}
                     label="Array variable"

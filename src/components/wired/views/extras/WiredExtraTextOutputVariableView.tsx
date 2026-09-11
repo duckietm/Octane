@@ -13,6 +13,7 @@ import {
     ARRAY_VARIABLE_ROOM,
     ARRAY_VARIABLE_USER,
     ArrayAddressEditor,
+    arrayFieldIsTextConnected,
     collectWiredArrayDefinitions,
     createArrayAddress,
     validAddress,
@@ -190,7 +191,6 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
         return targetDefinitions.find((definition) => definition.itemId === itemId) ?? null;
     }, [targetDefinitions, variableToken]);
 
-    const canUseTextDisplay = !!selectedCustomDefinition?.isTextConnected;
     const arrayVariableType =
         targetType === 'furni'
             ? ARRAY_VARIABLE_FURNI
@@ -209,6 +209,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
             ),
         [arrayDefinitions, arrayVariableType, variableToken]
     );
+    const canUseTextDisplay = arrayFieldIsTextConnected(arrayDefinition, arrayAddress.fieldId, !!selectedCustomDefinition?.isTextConnected);
     const addressNeedsFurni =
         !!arrayDefinition && arrayAddress.mode === 1 && arrayAddress.variableType === ARRAY_VARIABLE_FURNI && arrayAddress.variableSource === 100;
 

@@ -1,6 +1,13 @@
 import { FC, SelectHTMLAttributes } from 'react';
 import { Text } from '../../../common';
 import { OctaneInput } from '../../../layout';
+import { WiredVariablePicker } from './WiredVariablePicker';
+import {
+    buildWiredVariablePickerEntries,
+    flattenWiredVariablePickerEntries,
+    getCustomVariableItemId,
+    WiredVariablePickerTarget
+} from './WiredVariablePickerData';
 
 export const ARRAY_VARIABLE_FURNI = 0;
 export const ARRAY_VARIABLE_ROOM = 1;
@@ -14,6 +21,7 @@ export interface WiredArrayFieldMetadata {
     id: number;
     name: string;
     order: number;
+    textConnected?: boolean;
 }
 
 export type WiredArrayValueShape = 'single' | 'array';
@@ -32,6 +40,7 @@ export interface WiredArrayDefinitionMetadata {
     fields: WiredArrayFieldMetadata[];
     permanent: boolean;
     hasValue: boolean;
+    writable?: boolean;
 }
 
 export interface WiredVariableDefinitionData {
@@ -54,6 +63,7 @@ export interface WiredArrayReferenceData {
     variableItemId: number;
     variableSource: number;
     capturePath: string;
+    variableToken?: string;
 }
 
 export interface WiredArrayAddressData {
@@ -63,6 +73,7 @@ export interface WiredArrayAddressData {
     variableItemId: number;
     variableSource: number;
     capturePath: string;
+    variableToken?: string;
     fieldId: number;
 }
 
@@ -70,6 +81,7 @@ export type WiredArrayDefinitionInput = Omit<Partial<WiredArrayDefinitionMetadat
     itemId: number;
     name: string;
     valueShape?: WiredArrayServerValueShape;
+    isReadOnly?: boolean;
 };
 
 export interface WiredArrayCriterionData {
@@ -211,7 +223,8 @@ export const collectWiredArrayDefinitions = (
                     maxEntries: definition.maxEntries ?? 0,
                     fields: definition.fields ?? [],
                     permanent: definition.permanent === true,
-                    hasValue: definition.hasValue !== false
+                    hasValue: definition.hasValue !== false,
+                    writable: definition.writable ?? !definition.isReadOnly
                 })
             );
 
@@ -413,13 +426,16 @@ interface ArrayVariableSelectProps {
     variableType: number;
     itemId: number;
     array: boolean;
+    writableOnly?: boolean;
     onTypeChange: (value: number) => void;
     onItemChange: (value: number) => void;
     label?: string;
 }
 
 export const ArrayVariableSelect: FC<ArrayVariableSelectProps> = (props) => {
-    const options = definitionsForType(props.definitions, props.variableType, props.array);
+    const options = definitionsForType(props.definitions, props.variableType, props.array).filter(
+        (definition) => !props.writableOnly || definition.writable !== false
+    );
 
     return (
         <div className="flex flex-col gap-1">
@@ -452,7 +468,8 @@ interface ArrayReferenceEditorProps {
 
 export const ArrayReferenceEditor: FC<ArrayReferenceEditorProps> = ({ label, value, definitions, onChange }) => {
     const kind = value.mode === ARRAY_REFERENCE_CONSTANT ? 'constant' : value.capturePath ? 'capture' : 'variable';
-    const scalarDefinitions = definitionsForType(definitions, value.variableType, false);
+    const entries = arrayReferenceEntries(definitions, value.variableType);
+    const selectedToken = value.variableToken || (value.variableItemId ? `custom:${value.variableItemId}` : '');
 
     return (
         <div className="flex flex-col gap-1">
@@ -465,7 +482,8 @@ export const ArrayReferenceEditor: FC<ArrayReferenceEditorProps> = ({ label, val
                     onChange({
                         ...value,
                         mode: nextKind === 'constant' ? ARRAY_REFERENCE_CONSTANT : ARRAY_REFERENCE_VARIABLE,
-                        capturePath: nextKind === 'capture' ? '@array.' : ''
+                        capturePath: nextKind === 'capture' ? '@array.' : '',
+                        variableToken: nextKind === 'capture' ? '' : value.variableToken
                     });
                 }}
             >
@@ -492,6 +510,7 @@ export const ArrayReferenceEditor: FC<ArrayReferenceEditorProps> = ({ label, val
                                 ...value,
                                 variableType: Number(event.target.value),
                                 variableItemId: 0,
+                                variableToken: '',
                                 variableSource: 0
                             })
                         }
@@ -502,14 +521,14 @@ export const ArrayReferenceEditor: FC<ArrayReferenceEditorProps> = ({ label, val
                             </option>
                         ))}
                     </ArraySelect>
-                    <ArraySelect value={value.variableItemId || 0} onChange={(event) => onChange({ ...value, variableItemId: Number(event.target.value) })}>
-                        <option value={0}>Choose scalar…</option>
-                        {scalarDefinitions.map((definition) => (
-                            <option key={definition.itemId} value={definition.itemId}>
-                                {definition.name}
-                            </option>
-                        ))}
-                    </ArraySelect>
+                    <WiredVariablePicker
+                        entries={entries}
+                        recentScope="array-reference"
+                        selectedToken={selectedToken}
+                        onSelect={(entry) =>
+                            onChange({ ...value, variableToken: entry.token, variableItemId: getCustomVariableItemId(entry.token), capturePath: '' })
+                        }
+                    />
                     <ArraySelect value={value.variableSource} onChange={(event) => onChange({ ...value, variableSource: Number(event.target.value) })}>
                         {sourceOptions(value.variableType).map((option) => (
                             <option key={option.value} value={option.value}>
@@ -549,8 +568,30 @@ export const ArrayAddressEditor: FC<ArrayAddressEditorProps> = ({ label, value, 
     );
 };
 
+const ARRAY_PICKER_TARGETS: Record<number, WiredVariablePickerTarget> = {
+    [ARRAY_VARIABLE_FURNI]: 'furni',
+    [ARRAY_VARIABLE_ROOM]: 'global',
+    [ARRAY_VARIABLE_USER]: 'user',
+    [ARRAY_VARIABLE_CONTEXT]: 'context'
+};
+
+export const arrayReferenceEntries = (definitions: WiredArrayDefinitionMetadata[], variableType: number) =>
+    buildWiredVariablePickerEntries(
+        ARRAY_PICKER_TARGETS[variableType] ?? 'global',
+        'change-reference',
+        definitionsForType(definitions, variableType, false).map((definition) => ({ ...definition, availability: 0 }))
+    );
+
+export const arrayFieldIsTextConnected = (definition: WiredArrayDefinitionMetadata | undefined, fieldId: number, scalarConnected: boolean) =>
+    definition ? definition.fields.some((field) => field.id === fieldId && field.textConnected === true) : scalarConnected;
+
 export const validReference = (reference: WiredArrayReferenceData, definitions: WiredArrayDefinitionMetadata[]) => {
     if (reference.mode === ARRAY_REFERENCE_CONSTANT) return isSignedLong(reference.value);
+    if (reference.variableToken) {
+        return flattenWiredVariablePickerEntries(arrayReferenceEntries(definitions, reference.variableType)).some(
+            (entry) => entry.token === reference.variableToken && entry.selectable && entry.hasValue && entry.valueShape !== 'array'
+        );
+    }
     if (reference.capturePath) return /^@array\.[A-Za-z0-9_]{1,40}\.[A-Za-z0-9_]{1,40}$/i.test(reference.capturePath);
 
     return definitions.some(

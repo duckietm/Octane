@@ -49,7 +49,7 @@ export interface IWiredRoomSettings {
 export interface IWiredArrayVariableMetadata {
     arrayFormat?: 'simple' | 'record';
     arrayMode?: 'list' | 'slots';
-    fields?: { id: number; name: string; order: number }[];
+    fields?: { id: number; name: string; order: number; textConnected?: boolean }[];
     maxEntries?: number;
     permanent?: boolean;
     valueShape?: 'single' | 'array';

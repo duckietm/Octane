@@ -35,3 +35,23 @@ describe('Wired variable picker internal furniture variables', () => {
         }
     });
 });
+
+it('offers supported user and room built-ins as change destinations', () => {
+    const user = flattenWiredVariablePickerEntries(buildWiredVariablePickerEntries('user', 'change-destination', []));
+    const room = flattenWiredVariablePickerEntries(buildWiredVariablePickerEntries('global', 'change-destination', []));
+
+    for (const token of ['@altitude', '@effect_id', '@handitem_id', '@team_score']) {
+        expect(user.find((entry) => entry.token === `internal:${token}`)?.selectable).toBe(true);
+    }
+    for (const color of ['red', 'green', 'blue', 'yellow']) {
+        expect(room.find((entry) => entry.token === `internal:@team_${color}_score`)?.selectable).toBe(true);
+    }
+});
+
+it('keeps writable capture projections as internal tokens', () => {
+    const entries = flattenWiredVariablePickerEntries(buildWiredVariablePickerEntries('context', 'change-destination', [
+        { itemId: -1, name: 'inventory.quantity', hasValue: true, availability: 0, isReadOnly: false }
+    ]));
+
+    expect(entries.find((entry) => entry.token === 'internal:inventory.quantity')?.selectable).toBe(true);
+});

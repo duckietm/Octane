@@ -30,6 +30,7 @@ import {
     WiredFurniRuntimeStateRequestComposer,
     WiredMonitorDataEvent,
     WiredMonitorRequestComposer,
+    WiredUserVariableUpdateComposer,
     WiredUserInspectMoveComposer
 } from '@octane/renderer';
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -66,6 +67,7 @@ import {
     DIRECTION_NAMES,
     EDITABLE_FURNI_VARIABLES,
     EDITABLE_USER_VARIABLES,
+    EDITABLE_GLOBAL_VARIABLES,
     INSPECTION_ELEMENTS,
     MONITOR_ERROR_INFO,
     MONITOR_LOG_ORDER,
@@ -123,6 +125,7 @@ import { WiredInspectionTabView } from './WiredInspectionTabView';
 import { WiredMonitorTabView } from './WiredMonitorTabView';
 import { WiredToolsSettingsTabView } from './WiredToolsSettingsTabView';
 import { WiredVariablesTabView } from './WiredVariablesTabView';
+import { useWiredArrayInspectionPage } from './useWiredArrayInspectionPage';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
 
 const WIRED_FURNI_GRAVITY_MODEL_KEY = 'wired_furni_gravity';
@@ -1431,7 +1434,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@position_x', value: String(liveState?.positionX ?? 0), editable: canEditSelectedUser },
             { key: '@position_y', value: String(liveState?.positionY ?? 0), editable: canEditSelectedUser },
             { key: '@direction', value: String(liveState?.direction ?? 0), editable: canEditSelectedUser },
-            { key: '@altitude', value: String(liveState?.altitude ?? 0) },
+            { key: '@altitude', value: String(liveState?.altitude ?? 0), editable: canEditSelectedUser },
             ...(Number(selectedUser.favouriteGroupId ?? 0) > 0 ? [{ key: '@favourite_group_id', value: String(selectedUser.favouriteGroupId) }] : []),
             ...(selectedUser.roomEntryMethod && selectedUser.roomEntryMethod !== 'unknown'
                 ? [{ key: '@room_entry.method', value: `${getRoomEntryMethodNumericValue(selectedUser.roomEntryMethod)} (${selectedUser.roomEntryMethod})` }]
@@ -1515,10 +1518,10 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@furni_count', value: String(floorObjects.length + wallObjects.length) },
             { key: '@user_count', value: String(userCount) },
             { key: '@wired_timer', value: String(Math.max(0, Math.floor((globalClock - roomEnteredAt) / 500))) },
-            { key: '@team_red_score', value: String(getRoomTeamScore(1)) },
-            { key: '@team_green_score', value: String(getRoomTeamScore(2)) },
-            { key: '@team_blue_score', value: String(getRoomTeamScore(3)) },
-            { key: '@team_yellow_score', value: String(getRoomTeamScore(4)) },
+            { key: '@team_red_score', value: String(getRoomTeamScore(1)), editable: canEditInspection },
+            { key: '@team_green_score', value: String(getRoomTeamScore(2)), editable: canEditInspection },
+            { key: '@team_blue_score', value: String(getRoomTeamScore(3)), editable: canEditInspection },
+            { key: '@team_yellow_score', value: String(getRoomTeamScore(4)), editable: canEditInspection },
             { key: '@team_red_size', value: String(teamSizes[1]) },
             { key: '@team_green_size', value: String(teamSizes[2]) },
             { key: '@team_blue_size', value: String(teamSizes[3]) },
@@ -1587,19 +1590,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return arrayInspection;
     }, [arrayInspection, selectedArrayInspectionTarget]);
 
-    useEffect(() => {
-        if (activeTab !== 'inspection' || !selectedArrayInspectionTarget) {
-            clearArrayInspection();
-            return;
-        }
-        requestArrayInspection(
-            selectedArrayInspectionTarget.variableType,
-            selectedArrayInspectionTarget.requestedOwnerId,
-            selectedArrayInspectionTarget.definitionItemId,
-            0,
-            25
-        );
-    }, [activeTab, clearArrayInspection, requestArrayInspection, selectedArrayInspectionTarget]);
+    const changeArrayInspectionPage = useWiredArrayInspectionPage(
+        isVisible && activeTab === 'inspection',
+        selectedArrayInspectionTarget,
+        requestArrayInspection,
+        clearArrayInspection
+    );
     const availableInspectionDefinitions = useMemo(() => {
         if (inspectionType === 'global') return [];
         if (inspectionType === 'user' && !selectedUser) return [];
@@ -2617,7 +2613,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             const customDefinition = roomCustomVariableDefinitionMap.get(variable.key);
             const isEditableCustom = !!customDefinition && !customDefinition.isReadOnly;
 
-            if (!isEditableCustom) return;
+            if (!isEditableCustom && !EDITABLE_GLOBAL_VARIABLES.includes(variable.key)) return;
         }
 
         setEditingVariable(variable.key);
@@ -2625,6 +2621,27 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     };
 
     const commitVariableEdit = () => {
+        const builtInGlobal = inspectionType === 'global' && EDITABLE_GLOBAL_VARIABLES.includes(editingVariable);
+        const builtInAltitude = inspectionType === 'user' && selectedUser && editingVariable === '@altitude';
+
+        if (builtInGlobal || builtInAltitude) {
+            const parsed = Number(editingValue.trim());
+
+            if (roomSettings.canModify && editingValue.trim() && Number.isInteger(parsed) && parsed >= -2147483648 && parsed <= 2147483647) {
+                const token = builtInGlobal ? editingVariable.replace(/^@team_(red|green|blue|yellow)_score$/, '@teams.$1.score') : editingVariable;
+                SendMessageComposer(new WiredUserVariableUpdateComposer(
+                    builtInGlobal ? 3 : 0,
+                    builtInGlobal ? roomSession?.roomId ?? 0 : selectedUser.userId,
+                    0,
+                    parsed,
+                    `internal:${token}`
+                ));
+            }
+
+            cancelVariableEdit();
+            return;
+        }
+
         if (inspectionType === 'global') {
             const customDefinition = roomCustomVariableDefinitionMap.get(editingVariable);
 
@@ -3362,16 +3379,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             onRemoveInspectionVariable={() => removeInspectionVariable()}
                             arrayInspection={activeArrayInspection}
                             canModifyArray={roomSettings.canModify}
-                            onArrayPageChange={(page) => {
-                                if (!selectedArrayInspectionTarget) return;
-                                requestArrayInspection(
-                                    selectedArrayInspectionTarget.variableType,
-                                    selectedArrayInspectionTarget.requestedOwnerId,
-                                    selectedArrayInspectionTarget.definitionItemId,
-                                    page,
-                                    activeArrayInspection?.pageSize ?? 25
-                                );
-                            }}
+                            onArrayPageChange={changeArrayInspectionPage}
                             onArrayFieldUpdate={(index, fieldId, value) => {
                                 if (!selectedArrayInspectionTarget || !activeArrayInspection) return;
                                 updateArrayInspectionField(

@@ -103,18 +103,18 @@ const INTERNAL_VARIABLES: Record<'user' | 'furni' | 'global' | 'context', IInter
         createInternalMeta('@is_muted', false, true),
         createInternalMeta('@is_trading', false, true),
         createInternalMeta('@is_frozen', false, true),
-        createInternalMeta('@effect_id', false, true),
-        createInternalMeta('@team_score', false, true),
+        createInternalMeta('@effect_id', true, true),
+        createInternalMeta('@team_score', true, true),
         createInternalMeta('@team_color', false, true),
         createInternalMeta('@team_type', false, true),
         createInternalMeta('@sign', false, true),
         createInternalMeta('@dance', false, true),
         createInternalMeta('@is_idle', false, true),
-        createInternalMeta('@handitem_id', false, true),
+        createInternalMeta('@handitem_id', true, true),
         createInternalMeta('@position_x', true, true),
         createInternalMeta('@position_y', true, true),
         createInternalMeta('@direction', true, true),
-        createInternalMeta('@altitude', false, true),
+        createInternalMeta('@altitude', true, true),
         createInternalMeta('@favourite_group_id', false, true),
         createInternalMeta('@room_entry.method', false, true),
         createInternalMeta('@room_entry.teleport_id', false, true),
@@ -127,10 +127,10 @@ const INTERNAL_VARIABLES: Record<'user' | 'furni' | 'global' | 'context', IInter
         createInternalMeta('@furni_count', false, true),
         createInternalMeta('@user_count', false, true),
         createInternalMeta('@wired_timer', false, true),
-        createInternalMeta('@team_red_score', false, true),
-        createInternalMeta('@team_green_score', false, true),
-        createInternalMeta('@team_blue_score', false, true),
-        createInternalMeta('@team_yellow_score', false, true),
+        createInternalMeta('@team_red_score', true, true),
+        createInternalMeta('@team_green_score', true, true),
+        createInternalMeta('@team_blue_score', true, true),
+        createInternalMeta('@team_yellow_score', true, true),
         createInternalMeta('@team_red_size', false, true),
         createInternalMeta('@team_green_size', false, true),
         createInternalMeta('@team_blue_size', false, true),
@@ -235,7 +235,7 @@ const createCustomEntry = (
     usage: WiredVariablePickerUsage,
     definition: IWiredVariableDefinitionLike
 ): IWiredVariablePickerEntry => {
-    const isCaptureProjection = definition.itemId < 0 && !!definition.isReadOnly;
+    const isCaptureProjection = definition.itemId < 0;
     const token = isCaptureProjection
         ? `${INTERNAL_TOKEN_PREFIX}${normalizeInternalVariableKey(definition.name)}`
         : `${CUSTOM_TOKEN_PREFIX}${definition.itemId}`;
