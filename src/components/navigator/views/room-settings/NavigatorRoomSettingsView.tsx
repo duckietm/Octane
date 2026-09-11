@@ -2,10 +2,11 @@ import { RoomBannedUsersComposer, RoomDataParser, RoomSettingsDataEvent, SaveRoo
 import { FC, useState } from 'react';
 import { CreateLinkEvent, IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../../../common';
-import { useMessageEvent } from '../../../../hooks';
+import { useMessageEvent, useRaidProtection } from '../../../../hooks';
 import { NavigatorRoomSettingsAccessTabView } from './NavigatorRoomSettingsAccessTabView';
 import { NavigatorRoomSettingsBasicTabView } from './NavigatorRoomSettingsBasicTabView';
 import { NavigatorRoomSettingsModTabView } from './NavigatorRoomSettingsModTabView';
+import { NavigatorRoomSettingsRaidProtectionTabView } from './NavigatorRoomSettingsRaidProtectionTabView';
 import { NavigatorRoomSettingsRightsTabView } from './NavigatorRoomSettingsRightsTabView';
 import { NavigatorRoomSettingsVipChatTabView } from './NavigatorRoomSettingsVipChatTabView';
 
@@ -17,9 +18,13 @@ const TABS: string[] = [
     'navigator.roomsettings.tab.5'
 ];
 
+const RAID_PROTECTION_TAB: string = 'navigator.roomsettings.tab.raidprotection';
+
 export const NavigatorRoomSettingsView: FC<{}> = (props) => {
     const [roomData, setRoomData] = useState<IRoomData>(null);
     const [currentTab, setCurrentTab] = useState(TABS[0]);
+    const { canManage: canManageRaidProtection } = useRaidProtection();
+    const tabs = canManageRaidProtection ? [ ...TABS, RAID_PROTECTION_TAB ] : TABS;
 
     useMessageEvent<RoomSettingsDataEvent>(RoomSettingsDataEvent, (event) => {
         const parser = event.getParser();
@@ -230,7 +235,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
                 onCloseClick={onClose}
             />
             <OctaneCardTabsView>
-                {TABS.map((tab) => {
+                {tabs.map((tab) => {
                     return (
                         <OctaneCardTabsItemView key={tab} isActive={currentTab === tab} onClick={(event) => setCurrentTab(tab)}>
                             {LocalizeText(tab)}
@@ -244,6 +249,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
                 {currentTab === TABS[2] && <NavigatorRoomSettingsRightsTabView handleChange={handleChange} roomData={roomData} />}
                 {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView handleChange={handleChange} roomData={roomData} />}
                 {currentTab === TABS[4] && <NavigatorRoomSettingsModTabView handleChange={handleChange} roomData={roomData} />}
+                {currentTab === RAID_PROTECTION_TAB && <NavigatorRoomSettingsRaidProtectionTabView />}
             </OctaneCardContentView>
         </OctaneCardView>
     );
