@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { FaArrowCircleRight } from 'react-icons/fa';
-import { CreateLinkEvent, LocalizeText } from '../../../api';
+import { CreateLinkEvent, LocalizeText, openHelpFaq } from '../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useHelp } from '../../../hooks';
 
@@ -74,7 +74,7 @@ export const SanctionSatusView: FC<{}> = (props) => {
                         )}
                     </div>
                     <div className="mt-auto flex items-end justify-between gap-3 pt-3">
-                        <button type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
+                        <button type="button" className="help-link" onClick={openHelpFaq}>
                             <FaArrowCircleRight className="help-link__icon" />
                             {LocalizeText('help.main.faq.link.text')}
                         </button>
