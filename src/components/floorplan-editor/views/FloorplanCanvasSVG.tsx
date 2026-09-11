@@ -153,11 +153,32 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
         fitToRoom();
     }, [fitToRoom]);
 
-    const onWheel = useCallback((e: WheelEvent<SVGSVGElement>) => {
-        if (!(e.ctrlKey || e.metaKey)) return;
-        e.preventDefault();
-        setZoom((z) => clampZoom(z + (e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP)));
-    }, []);
+    const onWheel = useCallback(
+        (e: WheelEvent<SVGSVGElement>) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                setZoom((z) => clampZoom(z + (e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP)));
+                return;
+            }
+
+            if (!e.shiftKey) return;
+
+            // Shift+wheel pans sideways. Some browsers already turn the gesture
+            // into a horizontal delta, others keep it vertical; use whichever
+            // axis carries it, in viewBox units so the pan matches the drag.
+            const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
+
+            if (delta === 0) return;
+
+            e.preventDefault();
+
+            const rect = svgRef.current?.getBoundingClientRect();
+            const scale = rect && rect.width > 0 ? visW / rect.width : 1;
+
+            setPan((p) => ({ x: p.x + delta * scale, y: p.y }));
+        },
+        [visW]
+    );
 
     useEffect(() => {
         const onMove = (e: PointerEvent) => {

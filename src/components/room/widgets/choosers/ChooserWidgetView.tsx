@@ -1,9 +1,10 @@
 import { FurniturePickupAllComposer } from '@octane/renderer';
 import { FC, useEffect, useEffectEvent, useMemo, useState } from 'react';
-import { chooserSelectionVisualizer, LocalizeText, RoomObjectItem, SendMessageComposer } from '../../../../api';
+import { chooserSelectionVisualizer, LocalizeText, localizeWithFallback, RoomObjectItem, SendMessageComposer } from '../../../../api';
 import { Button, Flex, InfiniteScroll, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
-import { useHasPermission } from '../../../../hooks';
+import { filterUserChooserItems, USER_CHOOSER_TYPE_OPTIONS, UserChooserTypeFilter, useHasPermission } from '../../../../hooks';
 import { classNames, OctaneInput } from '../../../../layout';
+
 
 const LIMIT_FURNI_PICKALL = 100;
 
@@ -22,7 +23,9 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
     const [searchValue, setSearchValue] = useState('');
     const [checkAll, setCheckAll] = useState(false);
     const [checkedIds, setCheckedIds] = useState<number[]>([]);
+    const [userTypeFilter, setUserTypeFilter] = useState<UserChooserTypeFilter>('all');
     const canSeeId = useHasPermission('acc_supporttool');
+    const isUserChooser = type === 'users';
 
     const ownerNames = useMemo(() => {
         const names = Array.from(new Set(items.map((item) => item.ownerName || 'Unknown')));
@@ -70,6 +73,10 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
     const filteredItems = useMemo(() => {
         const value = searchValue.toLocaleLowerCase();
 
+        // The user chooser filters on name and type like UsersView.as; owners
+        // only matter for furni.
+        if (isUserChooser) return filterUserChooserItems(items, searchValue, userTypeFilter).sort((a, b) => a.name.localeCompare(b.name));
+
         return items
             .filter((item) => {
                 const matchesSearch = item.name?.toLocaleLowerCase().includes(value);
@@ -81,7 +88,7 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                 return matchesSearch && matchesFilter;
             })
             .sort((a, b) => a.name.localeCompare(b.name));
-    }, [items, searchValue, selectedFilter, pickallFurni]);
+    }, [items, searchValue, selectedFilter, pickallFurni, isUserChooser, userTypeFilter]);
 
     const notifySelectionChange = useEffectEvent((items: RoomObjectItem[]) => {
         selectItem(items[items.length - 1]);
@@ -126,6 +133,21 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                         value={searchValue}
                         onChange={(event) => setSearchValue(event.target.value)}
                     />
+                    {isUserChooser && (
+                        <select
+                            aria-label={localizeWithFallback('new_user_chooser.col.type', 'Type')}
+                            className="form-control form-control-sm"
+                            data-testid="user-chooser-type"
+                            value={userTypeFilter}
+                            onChange={(event) => setUserTypeFilter(event.target.value as UserChooserTypeFilter)}
+                        >
+                            {USER_CHOOSER_TYPE_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {localizeWithFallback(option.key, option.fallback)}
+                                </option>
+                            ))}
+                        </select>
+                    )}
                     {pickallFurni && (
                         <select className="form-control form-control-sm" value={selectedFilter} onChange={(event) => setSelectedFilter(event.target.value)}>
                             <option value="all">{LocalizeText('roomsettings.access_rights.anyone')}</option>
@@ -141,6 +163,11 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                         </select>
                     )}
                 </Flex>
+                {isUserChooser && (
+                    <Text small variant="muted" className="octane-chooser-amount" data-testid="user-chooser-amount">
+                        {localizeWithFallback('new_user_chooser.amount_indicator', '%amount% users found', ['amount'], [filteredItems.length.toString()])}
+                    </Text>
+                )}
                 {pickallFurni && (
                     <Flex gap={2}>
                         <input className="form-check-input" type="checkbox" checked={checkAll} onChange={() => checkedId()} />

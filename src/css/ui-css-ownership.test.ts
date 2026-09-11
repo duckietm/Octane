@@ -76,7 +76,6 @@ describe('UI CSS ownership', () =>
         const vaultCss = readSource('src/css/vault/VaultView.css');
         const userSettingsCss = readSource('src/css/user-settings/UserSettingsView.css');
         const sanctionStatusView = readSource('src/components/help/views/SanctionStatusView.tsx');
-        const mentionsView = readSource('src/components/mentions/MentionsView.tsx');
         const translationSettingsView = readSource('src/components/translation/TranslationSettingsView.tsx');
         const userAccountSettingsView = readSource('src/components/user-settings/UserAccountSettingsView.tsx');
         const hcCenterView = readSource('src/components/hc-center/HcCenterView.tsx');
@@ -166,7 +165,6 @@ describe('UI CSS ownership', () =>
         expect(vaultCss).toContain('.octane-vault-content');
         expect(userSettingsCss).toContain('.user-settings-window');
         expect(sanctionStatusView).toContain('max-w-[calc(100vw-16px)]');
-        expect(mentionsView).toContain('max-w-[calc(100vw-16px)]');
         expect(translationSettingsView).toContain('max-w-[calc(100vw-16px)]');
         expect(userAccountSettingsView).toContain('max-w-[calc(100vw-16px)]');
         expect(hcCenterView).toContain('max-w-[calc(100vw-16px)]');

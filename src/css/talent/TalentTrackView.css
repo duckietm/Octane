@@ -1,0 +1,1017 @@
+/* Talent tracks (friendbar/talent/*): the talent_track panorama (1000x490 modal, width =
+   desktop - 2 * 100), the level_up popup (430x362), the task_progress_dialog (378x370 /
+   tour 378x289) and the citizenship_welcome popup (480x302). */
+
+.octane-talent-link {
+    cursor: pointer;
+    color: #222;
+}
+
+.octane-talent-link:hover {
+    color: #000;
+}
+
+/* ---- modal layer (MODAL_DIALOG_LAYER) ---- */
+
+.octane-talent-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+/* ---- talent_track ---- */
+
+.octane-talent-track {
+    width: calc(100vw - 200px);
+    min-width: 640px;
+    max-width: 1400px;
+    height: 490px;
+    display: flex;
+    flex-direction: column;
+    color: #000;
+    filter: drop-shadow(0 0 40px rgba(0, 0, 0, 0.75));
+}
+
+.octane-talent-track-header {
+    height: 53px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0 8px 0 18px;
+    background: #2d2d2d;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid #111;
+    border-bottom: 0;
+}
+
+.octane-talent-track-subtitle {
+    font-size: 11px;
+    color: #ccc;
+    padding-top: 6px;
+}
+
+.octane-talent-track-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 24px;
+}
+
+.octane-talent-track-close {
+    width: 22px;
+    height: 22px;
+    margin-top: 6px;
+    border: 0;
+    border-radius: 50%;
+    background: #555;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+}
+
+.octane-talent-track-close::before {
+    content: '\00d7';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.octane-talent-track-close:hover {
+    background: #777;
+}
+
+.octane-talent-track-frame {
+    position: relative;
+    flex: 1 1 auto;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+
+.octane-talent-panorama {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 20px;
+    height: 280px;
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+}
+
+.octane-talent-end-padding {
+    flex: 0 0 100px;
+}
+
+.octane-talent-mask {
+    position: absolute;
+    top: 20px;
+    width: 24px;
+    height: 280px;
+    pointer-events: none;
+}
+
+.octane-talent-mask-left {
+    left: 0;
+    background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0));
+}
+
+.octane-talent-mask-right {
+    right: 0;
+    background: linear-gradient(270deg, #fff, rgba(255, 255, 255, 0));
+}
+
+/* begin panes (250x280) */
+
+.octane-talent-begin {
+    position: relative;
+    flex: 0 0 250px;
+    padding: 20px 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.octane-talent-begin-title {
+    font-size: 18px;
+    line-height: 22px;
+    width: 230px;
+}
+
+.octane-talent-begin-description {
+    width: 230px;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-talent-begin-avatar {
+    position: absolute;
+    left: 169px;
+    top: 144px;
+    width: 90px;
+    height: 130px;
+}
+
+.octane-talent-begin-avatar .octane-talent-check {
+    position: absolute;
+    left: 47px;
+    top: 28px;
+}
+
+.octane-talent-begin-label {
+    position: absolute;
+    left: 113px;
+    top: 201px;
+    width: 76px;
+    text-align: right;
+    font-size: 11px;
+    line-height: 13px;
+    color: #333;
+}
+
+.octane-talent-begin-citizenship {
+    position: absolute;
+    left: 124px;
+    top: 166px;
+    width: 112px;
+    display: flex;
+    gap: 4px;
+    align-items: flex-start;
+}
+
+.octane-talent-begin-citizenship .octane-talent-begin-label {
+    position: static;
+    width: 76px;
+}
+
+/* talent_citizenship_accomplished (32x46) */
+.octane-talent-citizenship-accomplished {
+    width: 32px;
+    height: 46px;
+    border-radius: 16px 16px 4px 4px;
+    background: linear-gradient(180deg, #ffd25e, #e0961e);
+    box-shadow: inset 0 0 0 2px #7a4b00;
+}
+
+.octane-talent-citizenship-button {
+    position: absolute;
+    left: 54px;
+    top: 227px;
+    width: 200px;
+}
+
+/* level panes */
+
+.octane-talent-level-pane {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: flex-start;
+    min-width: 320px;
+    padding-right: 10px;
+}
+
+.octane-talent-level-separator {
+    flex: 0 0 50px;
+    height: 250px;
+    margin-top: 30px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0), #cfcfcf 15%, #cfcfcf 85%, rgba(0, 0, 0, 0)) center / 2px 100% no-repeat;
+}
+
+.octane-talent-level-content {
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+}
+
+.octane-talent-level-title {
+    font-size: 16px;
+    line-height: 19px;
+}
+
+.octane-talent-level-description {
+    width: 320px;
+    padding-top: 6px;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-talent-status-list {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    height: 180px;
+}
+
+.octane-talent-level-illustration {
+    align-self: flex-end;
+    width: 170px;
+    height: 120px;
+    object-fit: contain;
+    object-position: bottom center;
+    margin-bottom: 0;
+    margin-left: -20px;
+}
+
+.octane-talent-level-illustration.is-big {
+    width: 220px;
+    height: 280px;
+    margin-left: 0;
+}
+
+/* level_reward */
+
+.octane-talent-level-reward {
+    position: relative;
+    min-width: 220px;
+    max-width: 420px;
+    padding-top: 20px;
+}
+
+.octane-talent-level-reward-border {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px 10px;
+    border-radius: 6px;
+    min-height: 100px;
+}
+
+.octane-talent-level-reward.is-locked .octane-talent-level-reward-border {
+    background: #bdbdbd;
+    color: #222;
+}
+
+.octane-talent-level-reward.is-unlocked .octane-talent-level-reward-border {
+    background: #453b3b;
+    color: #fff;
+}
+
+.octane-talent-level-reward-unlocked {
+    color: #fff;
+    font-size: 10px;
+}
+
+.octane-talent-level-reward-title {
+    font-size: 14px;
+}
+
+.octane-talent-level-reward.is-unlocked .octane-talent-level-reward-title,
+.octane-talent-level-reward.is-unlocked .octane-talent-level-reward-description {
+    color: #fff;
+}
+
+.octane-talent-level-reward-description {
+    width: 200px;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.octane-talent-reward-list {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.octane-talent-reward {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 60px;
+    padding: 0 6px 0 0;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.octane-talent-reward.is-locked {
+    background: rgba(151, 151, 151, 0.6);
+}
+
+.octane-talent-reward-perk {
+    width: 200px;
+}
+
+.octane-talent-reward-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.octane-talent-level-reward.is-unlocked .octane-talent-reward-text .octane-text,
+.octane-talent-level-reward.is-unlocked .octane-talent-reward-vip .octane-text {
+    color: #fff;
+}
+
+.octane-talent-reward-product,
+.octane-talent-reward-vip {
+    width: 61px;
+    justify-content: center;
+    padding: 0;
+}
+
+.octane-talent-reward-vip {
+    width: 69px;
+    gap: 4px;
+}
+
+.octane-talent-reward-product img {
+    width: 33px;
+    height: 33px;
+    object-fit: contain;
+    background: #ccc;
+    border-radius: 4px;
+    padding: 1px;
+}
+
+.octane-talent-reward-product.is-locked img,
+.octane-talent-reward-vip.is-locked .octane-talent-vip-icon {
+    opacity: 0.6;
+    filter: grayscale(1);
+}
+
+/* talent_vip_reward (33x33) */
+.octane-talent-vip-icon {
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #ffe38a, #d59a1c 70%);
+    box-shadow: inset 0 0 0 2px #7a4b00;
+}
+
+/* talent_locked_achievement (60x60) and talent_locked_stripe (70x25) */
+.octane-talent-locked-icon {
+    flex: 0 0 60px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at 50% 45%, #9a9a9a 0 14px, transparent 15px), radial-gradient(circle at 50% 45%, #6f6f6f 0 17px, transparent 18px);
+}
+
+.octane-talent-locked-stripe {
+    position: absolute;
+    left: 1px;
+    top: 21px;
+    width: 70px;
+    height: 25px;
+    background: repeating-linear-gradient(45deg, #333 0 6px, #f0c419 6px 12px);
+    border-radius: 3px;
+    opacity: 0.9;
+}
+
+/* talent_check_mark_circle (20x20) */
+.octane-talent-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4bb245;
+    box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px #2c7a28;
+    position: relative;
+}
+
+.octane-talent-check::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 3px;
+    width: 6px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.octane-talent-level-reward > .octane-talent-check {
+    position: absolute;
+    right: 10px;
+    top: 11px;
+}
+
+/* tasks (210x80) */
+
+.octane-talent-level-task {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.octane-talent-task-row {
+    display: flex;
+    gap: 10px;
+    min-height: 80px;
+}
+
+.octane-talent-task {
+    position: relative;
+    width: 210px;
+    height: 80px;
+    padding-top: 20px;
+}
+
+.octane-talent-task-ongoing {
+    cursor: pointer;
+}
+
+.octane-talent-task-border {
+    position: relative;
+    display: flex;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.octane-talent-task-achieved .octane-talent-task-border {
+    background: #e2e2e2;
+    border: 1px solid #bdbdbd;
+}
+
+.octane-talent-task-ongoing .octane-talent-task-border {
+    background: #fff;
+    border: 1px solid #8f8f8f;
+}
+
+.octane-talent-task-ongoing:hover .octane-talent-task-border {
+    border-color: #444;
+}
+
+.octane-talent-task-locked .octane-talent-task-border {
+    background: #bdbdbd;
+    border: 1px solid #a5a5a5;
+}
+
+.octane-talent-task-badge {
+    flex: 0 0 60px;
+    width: 60px;
+    height: 60px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.octane-talent-task-ongoing .octane-talent-task-badge {
+    height: 45px;
+    margin-top: 5px;
+}
+
+.octane-talent-task-text {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 4px 0 0;
+    min-width: 0;
+}
+
+.octane-talent-task-title {
+    font-size: 12px;
+    line-height: 14px;
+    max-height: 28px;
+    overflow: hidden;
+}
+
+.octane-talent-task-description {
+    font-size: 11px;
+    line-height: 13px;
+    max-height: 39px;
+    overflow: hidden;
+}
+
+.octane-talent-task > .octane-talent-check {
+    position: absolute;
+    left: 182px;
+    top: 11px;
+}
+
+/* talent_task_progress_* (50x6) */
+.octane-talent-task-progress {
+    position: absolute;
+    left: 5px;
+    top: 48px;
+    width: 50px;
+    height: 6px;
+    border-radius: 3px;
+    background: #d3d3d3;
+    box-shadow: inset 0 0 0 1px #8f8f8f;
+    overflow: hidden;
+}
+
+.octane-talent-task-progress-fg {
+    height: 100%;
+    background: #4bb245;
+}
+
+/* talent_action_overlay (214x84) */
+.octane-talent-action-overlay {
+    position: absolute;
+    left: -2px;
+    top: 19px;
+    width: 214px;
+    height: 84px;
+    padding: 4px 0 0 41px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 -1px 0 #000;
+    border: 3px solid #f0c419;
+    border-radius: 8px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(240, 196, 25, 0.9) 0 16px, rgba(240, 196, 25, 0) 16px);
+}
+
+/* progress meter (progress_container 80px) */
+
+.octane-talent-progress-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 309px;
+    height: 80px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.octane-talent-progress-text {
+    position: absolute;
+    left: 24px;
+    top: 18px;
+    font-size: 14px;
+}
+
+.octane-talent-progress-bar {
+    position: relative;
+    height: 16px;
+    border-radius: 8px;
+    background: #d3d3d3;
+    box-shadow: inset 0 0 0 1px #a5a5a5;
+    overflow: hidden;
+}
+
+.octane-talent-meter {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 40px;
+    border-radius: 0;
+}
+
+.octane-talent-progress-bar-achieved {
+    height: 100%;
+    background: linear-gradient(180deg, #7fd45e, #4bb245);
+}
+
+.octane-talent-progress-divider {
+    position: absolute;
+    top: 2px;
+    width: 2px;
+    height: 11px;
+    margin-left: -1px;
+}
+
+.octane-talent-progress-divider.is-achieved {
+    background: #2c7a28;
+}
+
+.octane-talent-progress-divider.is-unachieved {
+    background: #8f8f8f;
+}
+
+.octane-talent-progress-needle {
+    position: absolute;
+    top: 27px;
+    width: 33px;
+    height: 34px;
+    margin-left: -16px;
+}
+
+.octane-talent-avatar-glow {
+    position: absolute;
+    left: -10px;
+    top: -10px;
+    width: 53px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 45%, rgba(255, 255, 255, 0) 70%);
+}
+
+.octane-talent-needle-avatar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 33px;
+    height: 34px;
+    overflow: hidden;
+}
+
+.octane-talent-progress-balloon {
+    position: absolute;
+    left: 50%;
+    top: 37px;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    background: #a3201d;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.octane-talent-progress-balloon::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -5px;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top: 0;
+    border-bottom-color: #a3201d;
+}
+
+/* ---- level_up (430x362) ---- */
+
+.octane-talent-levelup {
+    width: 430px;
+}
+
+.octane-talent-levelup-body {
+    position: relative;
+    display: flex;
+    min-height: 306px;
+    padding: 4px 4px 0;
+}
+
+.octane-talent-levelup-text {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.octane-talent-levelup-title {
+    font-size: 18px;
+}
+
+.octane-talent-levelup-message {
+    color: #444;
+    padding-bottom: 8px;
+}
+
+.octane-talent-levelup-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 70px;
+    padding: 12px 14px;
+    width: 406px;
+}
+
+.octane-talent-levelup-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 10px;
+}
+
+.octane-talent-levelup-rewards-title {
+    color: #333;
+}
+
+.octane-talent-levelup-reward-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.octane-talent-levelup-reward-slot {
+    display: flex;
+    align-items: center;
+}
+
+.octane-talent-levelup-plus {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    padding: 0 5px;
+}
+
+.octane-talent-levelup-reward {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 35px;
+}
+
+.octane-talent-levelup-reward-product {
+    width: 35px;
+    object-fit: contain;
+}
+
+/* perk badge image (badge_image type=perk, 35x35 / 60x60) */
+.octane-talent-perk-image {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #9fd8ff, #2f7fc1 70%);
+    box-shadow: inset 0 0 0 2px #163f66;
+}
+
+.octane-talent-reward-perk .octane-talent-perk-image {
+    flex: 0 0 60px;
+    width: 60px;
+    height: 60px;
+}
+
+.octane-talent-levelup-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 10px;
+}
+
+.octane-talent-levelup-actions button {
+    min-width: 221px;
+}
+
+.octane-talent-levelup-decoration {
+    position: absolute;
+    right: -20px;
+    bottom: 0;
+    width: 260px;
+    height: 260px;
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+}
+
+/* ---- task_progress_dialog (378x370) / tour (378x289) ---- */
+
+.octane-talent-task-progress {
+    width: 378px;
+}
+
+.octane-talent-task-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    margin: 4px 4px 0;
+    background: #e2e2e2 !important;
+    min-height: 100px;
+}
+
+.octane-talent-task-head {
+    display: flex;
+    gap: 6px;
+}
+
+.octane-talent-task-head .octane-talent-task-badge {
+    flex: 0 0 60px;
+    width: 60px;
+    height: 70px;
+}
+
+.octane-talent-task-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 6px;
+}
+
+.octane-talent-task-instruction {
+    font-size: 14px;
+}
+
+.octane-talent-task-action {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.octane-talent-task-progress-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 14px 0;
+}
+
+.octane-talent-task-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 0 6px;
+}
+
+/* email_container of task_progress_dialog: the e-mail row of ACH_EmailVerification1. */
+.octane-talent-email-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 10px 14px;
+}
+
+.octane-talent-email-unverified {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.octane-talent-email-input {
+    width: 100%;
+    padding: 3px 5px;
+    border: 1px solid #a3a3a3;
+    border-radius: 3px;
+    background: #fff;
+    color: #000;
+}
+
+.octane-talent-email-input.is-invalid {
+    border-color: #c73535;
+}
+
+.octane-talent-email-error {
+    color: #c73535;
+}
+
+.octane-talent-task-actions button {
+    min-width: 246px;
+}
+
+.octane-talent-tour-panel {
+    position: relative;
+    padding-left: 118px;
+    min-height: 211px;
+}
+
+/* help_frank_greeting (261x160, bottom-left) */
+.octane-talent-tour-frank {
+    position: absolute;
+    left: 10px;
+    bottom: 0;
+    width: 100px;
+    height: 110px;
+    border-radius: 50px 50px 0 0;
+    background: linear-gradient(180deg, #ffd9a8, #f0a86a);
+    box-shadow: inset 0 0 0 3px #7a4b00;
+}
+
+.octane-talent-tour-header,
+.octane-talent-tour-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.octane-talent-tour-info button {
+    align-self: flex-start;
+    min-width: 153px;
+    margin-top: 6px;
+}
+
+.octane-talent-tour-decline {
+    padding: 10px 0 6px;
+}
+
+/* ---- citizenship_welcome (480x302) ---- */
+
+.octane-citizenship-welcome {
+    position: relative;
+    width: 480px;
+    height: 302px;
+    color: #000;
+}
+
+.octane-citizenship-welcome-subtitle {
+    position: absolute;
+    left: 10px;
+    top: 7px;
+    z-index: 1;
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 0 1px 0 #000;
+}
+
+.octane-citizenship-welcome-frame {
+    position: absolute;
+    left: 0;
+    top: 20px;
+    width: 480px;
+    height: 282px;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 8px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
+}
+
+.octane-citizenship-welcome-title {
+    height: 30px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    color: #fff;
+    background: #2d2d2d;
+}
+
+.octane-citizenship-welcome-body {
+    position: relative;
+    height: 252px;
+}
+
+.octane-citizenship-welcome-text {
+    position: absolute;
+    left: 14px;
+    top: 7px;
+    width: 334px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.octane-citizenship-welcome-text .octane-text {
+    width: 294px;
+}
+
+.octane-citizenship-welcome-heading {
+    font-size: 16px;
+    line-height: 18px;
+    width: 334px !important;
+}
+
+.octane-citizenship-welcome-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 449px;
+    padding-top: 4px;
+}
+
+.octane-citizenship-welcome-actions button {
+    min-width: 139px;
+}
+
+.octane-citizenship-welcome-image {
+    position: absolute;
+    right: -20px;
+    top: 8px;
+    width: 178px;
+    height: 193px;
+    object-fit: contain;
+    pointer-events: none;
+}

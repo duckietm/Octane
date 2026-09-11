@@ -1,12 +1,13 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, FC, PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBars, FaCog } from 'react-icons/fa';
-import { CatalogType, GetConfigurationValue, LocalizeShortNumber, LocalizeText, SanitizeHtml } from '../../api';
+import { CatalogType, GetConfigurationValue, LocalizeShortNumber, LocalizeText, localizeWithFallback, SanitizeHtml } from '../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import { useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
 import { CatalogStudioProvider } from './admin/studio/CatalogStudioProvider';
 import { CatalogAdminProvider, useCatalogAdmin } from './CatalogAdminContext';
 import { getCatalogHeaderDescription } from './catalogLocalization.helpers';
+import { CATALOG_WINDOW_DEFAULT_HEIGHT, CATALOG_WINDOW_MIN_HEIGHT, clampCatalogWindowHeight } from './catalogWindowHeight';
 import { parseCatalogTabLabel, useCatalogWindowWidth } from './useCatalogWindowWidth';
 import { CatalogAdminManagerView } from './views/admin/CatalogAdminManagerView';
 import { CatalogAdminOfferEditView } from './views/admin/CatalogAdminOfferEditView';
@@ -68,7 +69,7 @@ const CatalogViewInner: FC<{}> = () => {
         }).length;
     }, [rootNode]);
 
-    const catalogWindowStyle = useCatalogWindowWidth(
+    const catalogWindowWidthStyle = useCatalogWindowWidth(
         tabsShellRef,
         isVisible,
         visibleRootTabCount,
@@ -78,6 +79,39 @@ const CatalogViewInner: FC<{}> = () => {
         rootNode?.pageId,
         activeCatalogNode?.pageId
     );
+    // The official frame keeps its width and only grows downwards; the height var feeds the
+    // draggable wrapper rule that pins the window size.
+    const [windowHeight, setWindowHeight] = useState(CATALOG_WINDOW_DEFAULT_HEIGHT);
+    const catalogWindowStyle = useMemo<CSSProperties>(
+        () => ({
+            ...catalogWindowWidthStyle,
+            '--octane-catalog-window-height': `${windowHeight}px`,
+            height: `${windowHeight}px`,
+            minHeight: `${CATALOG_WINDOW_MIN_HEIGHT}px`
+        }),
+        [catalogWindowWidthStyle, windowHeight]
+    );
+
+    const onResizeHandlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+        if (event.button !== 0) return;
+
+        event.preventDefault();
+
+        const startY = event.clientY;
+        const startHeight = windowHeight;
+
+        const onPointerMove = (moveEvent: PointerEvent) => {
+            setWindowHeight(clampCatalogWindowHeight(startHeight + (moveEvent.clientY - startY), window.innerHeight));
+        };
+
+        const onPointerUp = () => {
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+        };
+
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+    };
 
     useEffect(() => {
         const getCatalogTypeFromLink = (type?: string) => {
@@ -286,6 +320,14 @@ const CatalogViewInner: FC<{}> = () => {
                         </div>
                     </OctaneCardContentView>
                     {(isBusy || catalogLoadError) && <CatalogLoadingStateView error={catalogLoadError} onRetry={retryCurrentPage} />}
+                    <div
+                        aria-label={localizeWithFallback('generic.resize', 'Resize')}
+                        className="octane-catalog-resize-handle"
+                        data-testid="catalog-resize-handle"
+                        role="separator"
+                        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 6, cursor: 'ns-resize', zIndex: 5 }}
+                        onPointerDown={onResizeHandlePointerDown}
+                    />
                 </OctaneCardView>
             )}
             <CatalogAdminManagerView />

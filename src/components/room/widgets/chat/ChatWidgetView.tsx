@@ -1,13 +1,14 @@
+import { RoomChatSettings } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef } from 'react';
 import { ChatBubbleMessage, GetConfigurationValue, resolveChatBubbleWidth } from '../../../../api';
 import { useChatWidget, useChatWindow } from '../../../../hooks';
 import IntervalWebWorker from '../../../../workers/IntervalWebWorker';
 import { WorkerBuilder } from '../../../../workers/WorkerBuilder';
-import { CHAT_TEXT_SIZE_EVENT } from '../chat-input/chatTextSize';
+import { CHAT_TEXT_SIZE_EVENT, CHAT_TEXT_SIZE_PIXELS, getStoredChatTextSize } from '../chat-input/chatTextSize';
 import { ChatWidgetMessageView } from './ChatWidgetMessageView';
 import { ChatWidgetWindowView } from './ChatWidgetWindowView';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
-import { getChatViewerHeight } from './freeFlowChatLayout';
+import { getBubbleCollisionHeight, getChatFontSizeScale, getChatViewerHeight, resolveLineByLineLayout } from './freeFlowChatLayout';
 
 const CHAT_MOVE_UP_PIXELS = 19;
 const CHAT_COLLISION_ITERATIONS = 20;
@@ -19,6 +20,8 @@ export const ChatWidgetView: FC<{}> = (props) => {
     const { chatMessages = [], setChatMessages = null, chatSettings = null, getScrollSpeed = 6000 } = useChatWidget();
     const [chatWindowEnabled] = useChatWindow();
     const elementRef = useRef<HTMLDivElement>(null);
+    // Settings > Chat: line by line gives every message its own row instead of the free flow.
+    const isLineByLine = chatSettings?.mode === RoomChatSettings.CHAT_MODE_LINE_BY_LINE;
 
     const removeHiddenChats = useCallback(() => {
         setChatMessages((prevValue) => {
@@ -39,7 +42,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
             const visualOffsets = measureBubbleVisualOffsets(chat.elementRef);
 
             chat.width = chat.elementRef.offsetWidth;
-            chat.height = chat.elementRef.offsetHeight;
+            chat.height = getBubbleCollisionHeight(chat.elementRef.offsetHeight, getChatFontSizeScale(CHAT_TEXT_SIZE_PIXELS[getStoredChatTextSize()]));
             chat.visualOffsetTop = visualOffsets.top;
             chat.visualOffsetBottom = visualOffsets.bottom;
         });
@@ -59,6 +62,30 @@ export const ChatWidgetView: FC<{}> = (props) => {
 
     const resolveOverlappingChats = useCallback(() => {
         const visibleChats = chatMessages.filter((chat) => chat.elementRef && chat.width > 0 && chat.height > 0);
+
+        if (isLineByLine) {
+            const byId = new Map(visibleChats.map((chat) => [chat.id, chat]));
+            const positions = resolveLineByLineLayout(
+                visibleChats.map((chat) => ({
+                    id: chat.id,
+                    left: chat.left,
+                    top: chat.top,
+                    width: chat.width,
+                    height: chat.height,
+                    anchorX: chat.left + chat.width / 2,
+                    overflowTop: chat.visualOffsetTop,
+                    overflowBottom: chat.visualOffsetBottom
+                }))
+            );
+
+            for (const position of positions) {
+                const chat = byId.get(position.id);
+
+                if (chat && chat.top !== position.top) chat.top = position.top;
+            }
+
+            return;
+        }
 
         for (let iteration = 0; iteration < CHAT_COLLISION_ITERATIONS; iteration++) {
             let moved = false;
@@ -90,7 +117,7 @@ export const ChatWidgetView: FC<{}> = (props) => {
 
             if (!moved) break;
         }
-    }, [chatMessages, getChatCollisionRect]);
+    }, [chatMessages, getChatCollisionRect, isLineByLine]);
 
     const makeRoom = useCallback(
         (_chat: ChatBubbleMessage) => {

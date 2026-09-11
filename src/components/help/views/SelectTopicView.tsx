@@ -1,13 +1,17 @@
 import { FC, useState } from 'react';
-import { LocalizeText, ReportState } from '../../../api';
+import { LocalizeText, ReportState, ReportType } from '../../../api';
 import { Button, Column, Flex, Text } from '../../../common';
 import { useHelp, useModTools } from '../../../hooks';
+import { getRoomReportTopicKey, ROOM_REPORT_TOPIC_ID } from './reportMessageRules';
 
 export const SelectTopicView: FC<{}> = (props) => {
     const [selectedCategory, setSelectedCategory] = useState(-1);
     const [selectedTopic, setSelectedTopic] = useState(-1);
-    const { setActiveReport = null } = useHelp();
+    const { activeReport = null, setActiveReport = null } = useHelp();
     const { cfhCategories = [] } = useModTools();
+    // Official populateRoomReportButton: a room / group / event report offers one
+    // topic only, "Inappropriate room/group/event", named after what is reported.
+    const isRoomReport = activeReport?.reportType === ReportType.ROOM;
 
     const submitTopic = () => {
         if (selectedCategory < 0 || selectedTopic < 0) return;
@@ -22,11 +26,35 @@ export const SelectTopicView: FC<{}> = (props) => {
         });
     };
 
+    const submitRoomTopic = () => {
+        setActiveReport((prevValue) => {
+            const cfhCategory = cfhCategories.findIndex((category) => category.topics.some((topic) => topic.id === ROOM_REPORT_TOPIC_ID));
+
+            return { ...prevValue, cfhCategory, cfhTopic: ROOM_REPORT_TOPIC_ID, currentStep: ReportState.INPUT_REPORT_MESSAGE };
+        });
+    };
+
     const back = () => {
         setActiveReport((prevValue) => {
             return { ...prevValue, currentStep: prevValue.currentStep - 1 };
         });
     };
+
+    if (isRoomReport) {
+        return (
+            <>
+                <div className="flex flex-col gap-1">
+                    <Text fontSize={4}>{LocalizeText('help.emergency.chat_report.subtitle')}</Text>
+                    <Text>{LocalizeText('help.cfh.pick.topic')}</Text>
+                </div>
+                <Column gap={1} overflow="auto">
+                    <Button variant="danger" onClick={submitRoomTopic}>
+                        {LocalizeText(getRoomReportTopicKey(), ['name'], [activeReport?.roomName ?? ''])}
+                    </Button>
+                </Column>
+            </>
+        );
+    }
 
     return (
         <>

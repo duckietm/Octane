@@ -5,6 +5,7 @@ import { Column, Flex, LayoutBadgeImageView, Text } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 
 const FORUMS_PER_PAGE = 20;
+const FORUM_LIST_MODES = [0, 1, 2];
 
 interface GroupForumListViewProps {
     onOpenForum: (groupId: number) => void;
@@ -13,7 +14,8 @@ interface GroupForumListViewProps {
 export const GroupForumListView: FC<GroupForumListViewProps> = (props) => {
     const { onOpenForum = null } = props;
     const [forums, setForums] = useState<ForumData[]>([]);
-    const [listMode, setListMode] = useState<number>(0); // 0 = most active
+    // Official GetForumsListMessageComposer list codes: 0 most active, 1 most viewed, 2 my forums.
+    const [listMode, setListMode] = useState<number>(0);
     const [startIndex, setStartIndex] = useState<number>(0);
     const [totalForums, setTotalForums] = useState<number>(0);
 
@@ -44,7 +46,7 @@ export const GroupForumListView: FC<GroupForumListViewProps> = (props) => {
     return (
         <Column className="h-full" gap={0}>
             <Flex className="bg-muted p-2 border-b" gap={2} alignItems="center" justifyContent="between">
-                <Text bold>{LocalizeText('messageboard.all.threads.header')}</Text>
+                <Text bold>{LocalizeText(`groupforum.view.forums_header.${listMode}`)}</Text>
                 <Flex gap={1}>
                     <select
                         className="form-select form-select-sm"
@@ -54,8 +56,11 @@ export const GroupForumListView: FC<GroupForumListViewProps> = (props) => {
                             setStartIndex(0);
                         }}
                     >
-                        <option value={0}>{LocalizeText('groupforum.list.tab.most_active')}</option>
-                        <option value={2}>{LocalizeText('groupforum.list.tab.my_forums')}</option>
+                        {FORUM_LIST_MODES.map((mode) => (
+                            <option key={mode} value={mode}>
+                                {LocalizeText(`groupforum.view.forums_list.${mode}`)}
+                            </option>
+                        ))}
                     </select>
                 </Flex>
             </Flex>

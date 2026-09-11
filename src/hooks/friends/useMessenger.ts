@@ -15,6 +15,7 @@ import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     CloneObject,
     LocalizeText,
+    localizeWithFallback,
     MessengerIconState,
     MessengerThread,
     MessengerThreadChat,
@@ -74,7 +75,7 @@ const useMessengerState = () => {
             thread.setRead();
 
             messageThreadsRef.current = [...messageThreadsRef.current, thread];
-            setMessageThreads((prevValue) => prevValue.some((existing) => existing.threadId === thread.threadId) ? prevValue : [...prevValue, thread]);
+            setMessageThreads((prevValue) => (prevValue.some((existing) => existing.threadId === thread.threadId) ? prevValue : [...prevValue, thread]));
         } else {
             const hiddenIndex = hiddenThreadIdsRef.current.indexOf(thread.threadId);
 
@@ -134,13 +135,7 @@ const useMessengerState = () => {
             if (ownMessage && thread.groups.length === 1) PlaySound(SoundNames.MESSENGER_NEW_THREAD);
 
             const isNotification = messageType === MessengerThreadChat.ROOM_INVITE || messageType === MessengerThreadChat.STATUS_NOTIFICATION;
-            const addedChat = thread.addMessage(
-                isNotification ? null : senderId,
-                messageText,
-                secondsSinceSent,
-                extraData,
-                messageType
-            );
+            const addedChat = thread.addMessage(isNotification ? null : senderId, messageText, secondsSinceSent, extraData, messageType);
 
             addedChatId = addedChat?.id || -1;
 
@@ -273,19 +268,14 @@ const useMessengerState = () => {
                 if (!conversation || !persistentState.historyByConversation[conversation.id]?.loaded) continue;
 
                 const knownMessageIds = historyMessageIdsRef.current.get(conversation.id) ?? new Set<number>();
-                const historyMessages = selectMessages(persistentState, conversation.id)
-                    .filter((message) => message.id > 0 && !knownMessageIds.has(message.id));
+                const historyMessages = selectMessages(persistentState, conversation.id).filter(
+                    (message) => message.id > 0 && !knownMessageIds.has(message.id)
+                );
                 if (!historyMessages.length) continue;
 
                 const thread = CloneObject(currentThread);
                 for (const message of historyMessages) {
-                    thread.addMessage(
-                        message.senderId,
-                        message.message,
-                        Math.max(0, now - message.createdAt),
-                        message.metadata || null,
-                        message.type
-                    );
+                    thread.addMessage(message.senderId, message.message, Math.max(0, now - message.createdAt), message.metadata || null, message.type);
                     knownMessageIds.add(message.id);
                 }
                 thread.setRead();
@@ -309,9 +299,17 @@ const useMessengerState = () => {
 
     useMessageEvent<RoomInviteErrorEvent>(RoomInviteErrorEvent, (event) => {
         const parser = event.getParser();
+        const missed = parser.failedRecipients ?? [];
+
+        if (!missed.length) return;
+
+        // The names read better than the ids, and we have them in the friend list already.
+        const names = missed.map((id) => getFriend?.(id)?.name).filter(Boolean);
 
         simpleAlert(
-            `Received room invite error: ${parser.errorCode},recipients: ${parser.failedRecipients.join(',')}`,
+            names.length
+                ? localizeWithFallback('friendlist.invite.failed', 'Some friends did not get your invitation: %names%').replace('%names%', names.join(', '))
+                : localizeWithFallback('friendlist.invite.failed.count', 'Some friends did not get your invitation.'),
             NotificationAlertType.DEFAULT,
             null,
             null,
@@ -388,7 +386,13 @@ const useMessengerState = () => {
     }, [activeThreadId]);
 
     useEffect(() => {
-        setIconState(selectMessengerIconState(persistentState, visibleThreads.length > 0, visibleThreads.some(thread => thread.unreadCount > 0)));
+        setIconState(
+            selectMessengerIconState(
+                persistentState,
+                visibleThreads.length > 0,
+                visibleThreads.some((thread) => thread.unreadCount > 0)
+            )
+        );
     }, [persistentState, visibleThreads]);
 
     return {

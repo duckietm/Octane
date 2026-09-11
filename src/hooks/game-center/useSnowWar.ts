@@ -1,6 +1,12 @@
 import {
-    Game2WeeklyFriendsLeaderboardEvent,
-    Game2WeeklyLeaderboardEvent,
+    Game2FriendsLeaderboardEvent,
+    Game2GameCancelledMessageEvent,
+    Game2GameNotFoundMessageEvent,
+    Game2GetTotalGroupLeaderboardComposer,
+    Game2GetWeeklyGroupLeaderboardComposer,
+    Game2TotalGroupLeaderboardEvent,
+    Game2TotalLeaderboardEvent,
+    Game2WeeklyGroupLeaderboardEvent,
     SnowWarCreateSnowballComposer,
     SnowWarEditRoomComposer,
     SnowWarExitEditorComposer,
@@ -84,7 +90,7 @@ export interface SnowWarLobbyTeamsState {
     leaderUserId: number;
     selectedArenaId: number;
     arenas: { id: number; name: string; official: boolean }[];
-    players: { userId: number; teamId: number; name: string; figure: string; gender: string }[];
+    players: { userId: number; teamId: number; name: string; figure: string; gender: string; skillLevel?: number }[];
 }
 
 export interface SnowWarResultsState {
@@ -92,8 +98,34 @@ export interface SnowWarResultsState {
     teams: {
         teamId: number;
         score: number;
-        players: { userId: number; name: string; score: number }[];
+        players: SnowWarResultPlayer[];
     }[];
+    /**
+     * AIR Game2SnowWarGameStats: user ids of the "Most Hits" / "Most K.O.'s"
+     * players, read from the optional stats tail of OnGameEnding (5022);
+     * undefined when the server sent none.
+     */
+    playerWithMostHits?: number;
+    playerWithMostKills?: number;
+}
+
+/**
+ * One row of the end-of-game screen. AIR's Game2TeamPlayerData also carries
+ * the figure, gender and per-player stats (hits, kills, ...); OnGameEnding
+ * (5022) appends them as an optional tail, so they stay optional and the view
+ * falls back to the arena's level data for the figure when an older server
+ * omits them.
+ */
+export interface SnowWarResultPlayer {
+    userId: number;
+    name: string;
+    score: number;
+    figure?: string;
+    gender?: string;
+    snowballHits?: number;
+    kills?: number;
+    /** AIR GameLobbyPlayerData.skillLevel (1-30), drawn as ten tiered stars. */
+    skillLevel?: number;
 }
 
 export interface SnowWarChatMessage {
@@ -104,10 +136,17 @@ export interface SnowWarChatMessage {
     receivedAt: number;
 }
 
+/**
+ * The three columns AIR's `LeaderboardViewController` switches between
+ * (`changeView` / `changeFriendsView` / `changeGroupView`), each with a
+ * this-week and an all-time table.
+ */
+export type SnowWarLeaderboardScope = 'all' | 'friends' | 'group';
+
 export interface SnowWarLeaderboardState {
     isOpen: boolean;
     weekly: boolean;
-    friendsOnly: boolean;
+    scope: SnowWarLeaderboardScope;
     loading: boolean;
     year: number;
     week: number;
@@ -115,6 +154,8 @@ export interface SnowWarLeaderboardState {
     currentOffset: number;
     minutesUntilReset: number;
     totalListSize: number;
+    /** AIR: the viewer's own guild, highlighted in the group tables. */
+    favouriteGroupId: number;
     entries: { userId: number; score: number; rank: number; name: string; figure: string; gender: string }[];
 }
 
@@ -153,6 +194,14 @@ SNOWWAR_SIMULATION.onEventApplied = event =>
 };
 
 const SNOWWAR_QUEUE_MAX_WAIT_MS = 120000;
+
+/**
+ * The server's SnowWar error codes stop at 5 (SnowWarConstants); AIR's
+ * Game2GameCancelled (3493) and Game2GameNotFound (444) carry no code of their
+ * own, so they reuse the tile's error banner with these two client-side ids.
+ */
+export const SNOWWAR_ERROR_GAME_CANCELLED = 6;
+export const SNOWWAR_ERROR_GAME_NOT_FOUND = 7;
 
 let CHAT_MESSAGE_ID = 0;
 
@@ -224,7 +273,7 @@ const useSnowWarState = () =>
     const [leaderboard, setLeaderboard] = useState<SnowWarLeaderboardState>({
         isOpen: false,
         weekly: true,
-        friendsOnly: false,
+        scope: 'all',
         loading: false,
         year: 0,
         week: 0,
@@ -232,6 +281,7 @@ const useSnowWarState = () =>
         currentOffset: 0,
         minutesUntilReset: 0,
         totalListSize: 0,
+        favouriteGroupId: 0,
         entries: [],
     });
     // In-arena WYSIWYG editor: the client edits the current level snapshot and
@@ -412,6 +462,7 @@ const useSnowWarState = () =>
                 name: player.name,
                 figure: player.figure,
                 gender: player.gender,
+                skillLevel: player.skillLevel,
             })),
         });
     }, []);
@@ -497,7 +548,11 @@ const useSnowWarState = () =>
     {
         const parser = event.getParser();
         if (!parser) return;
-        const nextResults = { secondsToResults: parser.secondsToResults, teams: parser.teams };
+        const nextResults: SnowWarResultsState = { secondsToResults: parser.secondsToResults, teams: parser.teams };
+        if (parser.hasPlayerStats) {
+            nextResults.playerWithMostHits = parser.playerWithMostHits || undefined;
+            nextResults.playerWithMostKills = parser.playerWithMostKills || undefined;
+        }
         setResults(nextResults);
         setPhase('results');
     }, []);
@@ -570,21 +625,30 @@ const useSnowWarState = () =>
         setQueueInfo({ playersInQueue: parser.playersInQueue, gamesPlayed: parser.gamesPlayed, minPlayers: parser.minPlayers, canEdit: parser.canEdit });
     }, []);
 
-    const applyLeaderboard = useCallback((event: Game2WeeklyLeaderboardEvent | Game2WeeklyFriendsLeaderboardEvent | WeeklyCompetitiveLeaderboardEvent | WeeklyCompetitiveFriendsLeaderboardEvent, weekly: boolean, friendsOnly: boolean) =>
+    // AIR sends five different leaderboard parsers for the same table: the
+    // weekly ones carry a year/week/offset header, the all-time ones do not,
+    // and the two group ones append the viewer's own guild.
+    type SnowWarWeeklyLeaderboardEvent = WeeklyCompetitiveLeaderboardEvent | WeeklyCompetitiveFriendsLeaderboardEvent | Game2WeeklyGroupLeaderboardEvent;
+    type SnowWarAllTimeLeaderboardEvent = Game2FriendsLeaderboardEvent | Game2TotalLeaderboardEvent | Game2TotalGroupLeaderboardEvent;
+
+    const applyLeaderboard = useCallback((event: SnowWarWeeklyLeaderboardEvent | SnowWarAllTimeLeaderboardEvent, weekly: boolean, scope: SnowWarLeaderboardScope) =>
     {
         const parser = event.getParser();
         if (!parser || parser.gameTypeId !== 0) return;
+        const weeklyParser = weekly ? parser as ReturnType<SnowWarWeeklyLeaderboardEvent['getParser']> : null;
+        const groupParser = (scope === 'group') ? parser as ReturnType<Game2TotalGroupLeaderboardEvent['getParser'] | Game2WeeklyGroupLeaderboardEvent['getParser']> : null;
         setLeaderboard({
             isOpen: true,
             weekly,
-            friendsOnly,
+            scope,
             loading: false,
-            year: parser.year,
-            week: parser.week,
-            maxOffset: parser.maxOffset,
-            currentOffset: parser.currentOffset,
-            minutesUntilReset: parser.minutesUntilReset,
+            year: weeklyParser?.year ?? 0,
+            week: weeklyParser?.week ?? 0,
+            maxOffset: weeklyParser?.maxOffset ?? 0,
+            currentOffset: weeklyParser?.currentOffset ?? 0,
+            minutesUntilReset: weeklyParser?.minutesUntilReset ?? 0,
             totalListSize: parser.totalListSize,
+            favouriteGroupId: groupParser?.favouriteGroupId ?? 0,
             entries: parser.leaderboard.map(entry => ({
                 userId: entry.userId,
                 score: entry.score,
@@ -596,14 +660,33 @@ const useSnowWarState = () =>
         });
     }, []);
 
-    const onAllTimeLeaderboard = useCallback((event: Game2WeeklyLeaderboardEvent) =>
-        applyLeaderboard(event, false, false), [applyLeaderboard]);
-    const onAllTimeFriendsLeaderboard = useCallback((event: Game2WeeklyFriendsLeaderboardEvent) =>
-        applyLeaderboard(event, false, true), [applyLeaderboard]);
+    const onAllTimeLeaderboard = useCallback((event: Game2TotalLeaderboardEvent) =>
+        applyLeaderboard(event, false, 'all'), [applyLeaderboard]);
+    const onAllTimeFriendsLeaderboard = useCallback((event: Game2FriendsLeaderboardEvent) =>
+        applyLeaderboard(event, false, 'friends'), [applyLeaderboard]);
+    const onAllTimeGroupLeaderboard = useCallback((event: Game2TotalGroupLeaderboardEvent) =>
+        applyLeaderboard(event, false, 'group'), [applyLeaderboard]);
+    const onWeeklyGroupLeaderboard = useCallback((event: Game2WeeklyGroupLeaderboardEvent) =>
+        applyLeaderboard(event, true, 'group'), [applyLeaderboard]);
     const onWeeklyLeaderboard = useCallback((event: WeeklyCompetitiveLeaderboardEvent) =>
-        applyLeaderboard(event, true, false), [applyLeaderboard]);
+        applyLeaderboard(event, true, 'all'), [applyLeaderboard]);
     const onWeeklyFriendsLeaderboard = useCallback((event: WeeklyCompetitiveFriendsLeaderboardEvent) =>
-        applyLeaderboard(event, true, true), [applyLeaderboard]);
+        applyLeaderboard(event, true, 'friends'), [applyLeaderboard]);
+
+    // AIR Game2GameCancelled (3493) / Game2GameNotFound (444): the lobby fell
+    // apart or the game type is not hosted; both drop us back to the hub with
+    // a message instead of leaving the tile stuck on "in queue".
+    const onGameCancelled = useCallback(() =>
+    {
+        resetToIdle();
+        setErrorCode(SNOWWAR_ERROR_GAME_CANCELLED);
+    }, [resetToIdle]);
+
+    const onGameNotFound = useCallback(() =>
+    {
+        resetToIdle();
+        setErrorCode(SNOWWAR_ERROR_GAME_NOT_FOUND);
+    }, [resetToIdle]);
 
     useMessageEvent<SnowWarQueuePositionEvent>(SnowWarQueuePositionEvent, onQueuePosition);
     useMessageEvent<SnowWarStartLobbyCounterEvent>(SnowWarStartLobbyCounterEvent, onStartLobbyCounter);
@@ -624,26 +707,37 @@ const useSnowWarState = () =>
     useMessageEvent<SnowWarUserRematchedEvent>(SnowWarUserRematchedEvent, onUserRematched);
     useMessageEvent<SnowWarGamesLeftEvent>(SnowWarGamesLeftEvent, onGamesLeft);
     useMessageEvent<SnowWarGamesInformationEvent>(SnowWarGamesInformationEvent, onGamesInformation);
-    useMessageEvent<Game2WeeklyLeaderboardEvent>(Game2WeeklyLeaderboardEvent, onAllTimeLeaderboard);
-    useMessageEvent<Game2WeeklyFriendsLeaderboardEvent>(Game2WeeklyFriendsLeaderboardEvent, onAllTimeFriendsLeaderboard);
+    useMessageEvent<Game2TotalLeaderboardEvent>(Game2TotalLeaderboardEvent, onAllTimeLeaderboard);
+    useMessageEvent<Game2FriendsLeaderboardEvent>(Game2FriendsLeaderboardEvent, onAllTimeFriendsLeaderboard);
+    useMessageEvent<Game2TotalGroupLeaderboardEvent>(Game2TotalGroupLeaderboardEvent, onAllTimeGroupLeaderboard);
+    useMessageEvent<Game2WeeklyGroupLeaderboardEvent>(Game2WeeklyGroupLeaderboardEvent, onWeeklyGroupLeaderboard);
     useMessageEvent<WeeklyCompetitiveLeaderboardEvent>(WeeklyCompetitiveLeaderboardEvent, onWeeklyLeaderboard);
     useMessageEvent<WeeklyCompetitiveFriendsLeaderboardEvent>(WeeklyCompetitiveFriendsLeaderboardEvent, onWeeklyFriendsLeaderboard);
+    useMessageEvent<Game2GameCancelledMessageEvent>(Game2GameCancelledMessageEvent, onGameCancelled);
+    useMessageEvent<Game2GameNotFoundMessageEvent>(Game2GameNotFoundMessageEvent, onGameNotFound);
 
-    const requestLeaderboard = useCallback((weekly = true, friendsOnly = false, weekOffset = 0) =>
+    const requestLeaderboard = useCallback((weekly = true, scope: SnowWarLeaderboardScope = 'all', weekOffset = 0) =>
     {
-        setLeaderboard(current => ({ ...current, isOpen: true, weekly, friendsOnly, loading: true }));
+        setLeaderboard(current => ({ ...current, isOpen: true, weekly, scope, loading: true }));
+        // AIR LeaderboardTable: (gameType, [weekOffset,] firstRank, scrollDirection,
+        // games.highscores.viewSize, games.highscores.windowSize); -1 asks for the
+        // default page centred on the viewer.
         const common = [ 0, -1, 0, 8, 50 ] as const;
         if (weekly)
         {
-            SendMessageComposer(friendsOnly
-                ? new SnowWarGetWeeklyFriendsLeaderboardComposer(0, weekOffset, -1, 0, 8, 50)
-                : new SnowWarGetWeeklyLeaderboardComposer(0, weekOffset, -1, 0, 8, 50));
+            SendMessageComposer(scope === 'group'
+                ? new Game2GetWeeklyGroupLeaderboardComposer(0, weekOffset, -1, 0, 8, 50)
+                : scope === 'friends'
+                    ? new SnowWarGetWeeklyFriendsLeaderboardComposer(0, weekOffset, -1, 0, 8, 50)
+                    : new SnowWarGetWeeklyLeaderboardComposer(0, weekOffset, -1, 0, 8, 50));
         }
         else
         {
-            SendMessageComposer(friendsOnly
-                ? new SnowWarGetAllTimeFriendsLeaderboardComposer(...common)
-                : new SnowWarGetAllTimeLeaderboardComposer(...common));
+            SendMessageComposer(scope === 'group'
+                ? new Game2GetTotalGroupLeaderboardComposer(...common)
+                : scope === 'friends'
+                    ? new SnowWarGetAllTimeFriendsLeaderboardComposer(...common)
+                    : new SnowWarGetAllTimeLeaderboardComposer(...common));
         }
     }, []);
 

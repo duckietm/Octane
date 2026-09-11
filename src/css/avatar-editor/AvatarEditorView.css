@@ -185,6 +185,95 @@
     top: 4px;
 }
 
+/* AIR 13 tab_container_button "hotlooks": 41x22 bitmap centred, y -7 in a 52x42 slot. */
+.octane-avatar-editor .octane-avatar-editor-main-tab.is-hotlooks .octane-avatar-editor-main-tab-icon {
+    left: 5px;
+    top: 3px;
+}
+
+/* AIR 13 hotlooks_content: container (20,10) 310x290 inside the tab panel that starts at (1,109). */
+.octane-avatar-editor-hotlooks {
+    inset: auto;
+    left: 21px;
+    top: 119px;
+    z-index: 2;
+    width: 310px;
+    height: 290px;
+    overflow: hidden;
+}
+
+.octane-avatar-editor-hotlooks-title {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 262px;
+    height: 26px;
+    color: #000000;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 26px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.octane-avatar-editor-hotlooks-choose {
+    position: absolute;
+    left: 0;
+    top: 28px;
+    width: 168px;
+    height: 17px;
+    color: #000000;
+    font-size: 11px;
+    line-height: 17px;
+    white-space: nowrap;
+}
+
+/* itemgrid_vertical (4,65) 299x220, spacing 7, scale_to_fit_items. */
+.octane-avatar-editor-hotlooks-grid {
+    position: absolute;
+    left: 4px;
+    top: 65px;
+    display: grid;
+    box-sizing: border-box;
+    width: 299px;
+    height: 220px;
+    grid-template-columns: repeat(4, 69px);
+    grid-auto-rows: 106px;
+    gap: 7px 7px;
+    align-content: start;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.octane-avatar-editor-hotlooks-item {
+    appearance: none;
+    position: relative;
+    box-sizing: border-box;
+    width: 69px;
+    height: 106px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    border: 1px solid #b6b6b6;
+    border-radius: 2px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.octane-avatar-editor-hotlooks-item:hover {
+    border-color: #ffd95a;
+    background: #fff8dd;
+}
+
+.octane-avatar-editor-hotlooks-item:disabled {
+    cursor: default;
+    opacity: .5;
+}
+
+.octane-avatar-editor-hotlooks-item .avatar-image {
+    image-rendering: pixelated;
+}
+
 .octane-avatar-editor-wardrobe-toggle {
     appearance: none;
     position: absolute;
@@ -1086,4 +1175,16 @@
         flex: none;
         overflow: auto !important;
     }
+}
+
+/* Official avatar_name_change link (premium.name.change.enabled) next to the name plate. */
+.octane-avatar-editor-name-change {
+    margin-left: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #0655b7;
+    font-size: 11px;
+    text-decoration: underline;
+    cursor: pointer;
 }

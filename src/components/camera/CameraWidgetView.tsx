@@ -1,16 +1,16 @@
 import {
     AddLinkEventTracker,
-    GetRoomEngine,
     GetSessionDataManager,
     ILinkEventTracker,
+    PerkEnum,
     RemoveLinkEventTracker,
     RoomEngineEvent,
-    RoomGeometry,
     RoomSessionEvent
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../api';
-import { useAchievements, useCamera, useOctaneEvent, useNotification, useRoom } from '../../hooks';
+import { useAchievements, useCamera, useOctaneEvent, useNotification, usePerkAllowances, useRoom } from '../../hooks';
+import { isRoomZoomPhotoReady } from '../room/widgets/room-tools/roomZoom.helpers';
 import { getCameraAchievementLevel } from './CameraAirUtilities';
 import { CameraWidgetCaptureView } from './views/CameraWidgetCaptureView';
 import { CameraWidgetCheckoutView } from './views/CameraWidgetCheckoutView';
@@ -20,20 +20,6 @@ const MODE_NONE: number = 0;
 const MODE_CAPTURE: number = 1;
 const MODE_EDITOR: number = 2;
 const MODE_CHECKOUT: number = 3;
-const CAMERA_CANVAS_ID = 1;
-const DEFAULT_ROOM_ZOOM = 1;
-const ROOM_ZOOM_EPSILON = 0.001;
-
-const getLogicalRoomZoom = (roomId: number): number => {
-    const roomEngine = GetRoomEngine();
-    const displayScale = roomEngine.getRoomInstanceRenderingCanvasScale(roomId, CAMERA_CANVAS_ID);
-    const geometry = roomEngine.getRoomInstanceGeometry(roomId, CAMERA_CANVAS_ID);
-    const geometryScale = geometry?.scale ?? RoomGeometry.SCALE_ZOOMED_IN;
-
-    return displayScale * (geometryScale / RoomGeometry.SCALE_ZOOMED_IN);
-};
-
-const isDefaultRoomZoom = (roomId: number): boolean => Math.abs(getLogicalRoomZoom(roomId) - DEFAULT_ROOM_ZOOM) <= ROOM_ZOOM_EPSILON;
 
 export const CameraWidgetView: FC<{}> = (props) => {
     const [mode, setMode] = useState<number>(MODE_NONE);
@@ -50,13 +36,16 @@ export const CameraWidgetView: FC<{}> = (props) => {
     const { achievementCategories = [] } = useAchievements();
     const { simpleAlert = null } = useNotification();
     const { roomSession = null } = useRoom();
+    const { isPerkAllowed } = usePerkAllowances();
 
     const myLevel = useMemo(() => getCameraAchievementLevel(achievementCategories), [achievementCategories]);
 
     const openCamera = useCallback(() => {
         if (!roomSession) return;
 
-        if (!isDefaultRoomZoom(roomSession.roomId)) {
+        // The official camera only refuses zoomed-out or flipped rooms;
+        // zoomed-in photos are allowed.
+        if (!isRoomZoomPhotoReady(roomSession.roomId)) {
             simpleAlert(LocalizeText('camera.zoom.missing.body'), null, null, null, LocalizeText('camera.zoom.missing.header'));
             return;
         }
@@ -122,7 +111,7 @@ export const CameraWidgetView: FC<{}> = (props) => {
     });
 
     useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, (event) => {
-        if (!roomSession || event.roomId !== roomSession.roomId || isDefaultRoomZoom(event.roomId)) return;
+        if (!roomSession || event.roomId !== roomSession.roomId || isRoomZoomPhotoReady(event.roomId)) return;
 
         setSelectedPictureIndex(-1);
         setMode(MODE_NONE);
@@ -134,6 +123,9 @@ export const CameraWidgetView: FC<{}> = (props) => {
                 const parts = url.split('/');
 
                 if (parts.length < 2) return;
+
+                // Official CameraWidgetHandler.as:128: the camera only opens with the CAMERA perk.
+                if ((parts[1] === 'show' || parts[1] === 'toggle') && !isPerkAllowed(PerkEnum.CAMERA)) return;
 
                 switch (parts[1]) {
                     case 'show':
@@ -157,7 +149,7 @@ export const CameraWidgetView: FC<{}> = (props) => {
         AddLinkEventTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [mode, openCamera, setSelectedPictureIndex]);
+    }, [mode, openCamera, setSelectedPictureIndex, isPerkAllowed]);
 
     if (mode === MODE_NONE) return null;
 

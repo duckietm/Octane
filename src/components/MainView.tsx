@@ -4,15 +4,13 @@ import {
     GetRoomSessionManager,
     HabboWebTools,
     ILinkEventTracker,
-    MarkMentionsReadComposer,
     RemoveLinkEventTracker,
     RoomSessionEvent
 } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC, useEffect, useState } from 'react';
-import { GetConfigurationValue, IsTouchDevice, SendMessageComposer } from '../api';
+import { GetConfigurationValue, IsTouchDevice } from '../api';
 import { useMentionMessages, useOctaneEventReducer } from '../hooks';
-import { markAllRead } from '../hooks/mentions/mentionsStore';
 import { AchievementsView } from './achievements/AchievementsView';
 import { GoogleAdsView } from './ads/GoogleAdsView';
 import { AvatarEditorView } from './avatar-editor';
@@ -35,30 +33,37 @@ import { SnowWarView } from './game-center/views/snowwar/SnowWarView';
 import { GroupsView } from './groups/GroupsView';
 import { GroupForumView } from './groups/views/forums/GroupForumView';
 import { GuideToolView } from './guide-tool/GuideToolView';
+import { ChatReviewReporterFeedbackView } from './guide-tool/views/ChatReviewReporterFeedbackView';
 import { HcCenterView } from './hc-center/HcCenterView';
+import { VipBenefitsView } from './hc-center/VipBenefitsView';
 import { HelpView } from './help/HelpView';
 import { HotelView } from './hotel-view/HotelView';
 import { HousekeepingView } from './housekeeping/HousekeepingView';
 import { InventoryView } from './inventory/InventoryView';
-import { MentionsView } from './mentions';
 import { ModToolsView } from './mod-tools/ModToolsView';
 import { NavigatorView } from './navigator/NavigatorView';
+import { NuxView } from './nux/NuxView';
 import { OctanebubbleHiddenView } from './octanebubblehidden/OctanebubbleHiddenView';
 import { OctanepediaView } from './octanepedia/OctanepediaView';
 import { ExternalPluginLoader } from './plugins/ExternalPluginLoader';
 import { RadioView } from './radio/RadioView';
 import { RareValuesView } from './rare-values/RareValuesView';
+import { SelfDonationToolView } from './wired-tools/SelfDonationToolView';
 import { RightSideView } from './right-side/RightSideView';
+import { RoomQueueView } from './room/RoomQueueView';
 import { RoomView } from './room/RoomView';
 import { SoundboardView } from './soundboard/SoundboardView';
+import { CitizenshipWelcomeView, TalentLevelUpView, TalentTrackView } from './talent';
 import { ToolbarView } from './toolbar/ToolbarView';
 import { TranslationBootstrap } from './translation/TranslationBootstrap';
 import { TranslationSettingsView } from './translation/TranslationSettingsView';
 import { TraxEditorView } from './trax-editor/TraxEditorView';
 import { UserProfileView } from './user-profile/UserProfileView';
 import { UserAccountSettingsView } from './user-settings/UserAccountSettingsView';
+import { WordFilterSettingsView } from './user-settings/wordfilter/WordFilterSettingsView';
 import { UserSettingsView } from './user-settings/UserSettingsView';
 import { VaultView } from './vault/VaultView';
+import { DailyTasksView, QuestCompletedView, QuestsView, QuestTrackerView, RewardTrackView } from './quests';
 import { WiredView } from './wired/WiredView';
 import { WiredCreatorToolsView } from './wired-tools/WiredCreatorToolsView';
 
@@ -66,7 +71,6 @@ export const MainView: FC<{}> = (props) =>
 {
     const [isReady, setIsReady] = useState(false);
     const [localizationVersion, setLocalizationVersion] = useState(0);
-    const [mentionsVisible, setMentionsVisible] = useState(false);
 
     useMentionMessages();
 
@@ -136,49 +140,6 @@ export const MainView: FC<{}> = (props) =>
 
     useEffect(() =>
     {
-        const clearMentionsBadge = () =>
-        {
-            markAllRead();
-            SendMessageComposer(new MarkMentionsReadComposer(0, 0));
-        };
-
-        const linkTracker: ILinkEventTracker = {
-            linkReceived: (url: string) =>
-            {
-                const parts = url.split('/');
-
-                if (parts.length < 2) return;
-
-                switch (parts[1])
-                {
-                    case 'show':
-                        setMentionsVisible(true);
-                        clearMentionsBadge();
-                        return;
-                    case 'hide':
-                        setMentionsVisible(false);
-                        return;
-                    case 'toggle':
-                        setMentionsVisible((prevValue) =>
-                        {
-                            if (prevValue) return false;
-
-                            queueMicrotask(clearMentionsBadge);
-                            return true;
-                        });
-                        return;
-                }
-            },
-            eventUrlPrefix: 'mentions/'
-        };
-
-        AddLinkEventTracker(linkTracker);
-
-        return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
-
-    useEffect(() =>
-    {
         const refreshLocalization = () => setLocalizationVersion((value) => value + 1);
 
         window.addEventListener('octane-localization-updated', refreshLocalization);
@@ -203,6 +164,7 @@ export const MainView: FC<{}> = (props) =>
             <HousekeepingView />
             <WiredCreatorToolsView />
             <RoomView />
+            <RoomQueueView />
             <ChatHistoryView />
             <CustomizeNickIconView />
             <WiredView />
@@ -220,28 +182,40 @@ export const MainView: FC<{}> = (props) =>
             <RightSideView />
             <UserSettingsView />
             <UserAccountSettingsView />
+            <WordFilterSettingsView />
             <DiscordSettingsView />
             <VaultView />
+            <QuestsView />
+            <QuestTrackerView />
+            <QuestCompletedView />
+            <DailyTasksView />
+            <RewardTrackView />
             <TranslationSettingsView />
             <UserProfileView />
             <GroupsView />
             <GroupForumView />
             <CameraWidgetView />
             <HelpView />
+            <NuxView />
             <OctanepediaView />
             <GuideToolView />
+            <ChatReviewReporterFeedbackView />
             <HcCenterView />
+            <VipBenefitsView />
             <CampaignView />
             <GameCenterView />
             <SnowWarView />
             <FloorplanEditorView />
             <FurniEditorView />
             <RareValuesView />
+            <SelfDonationToolView />
             <FortuneWheelView />
             <SoundboardView />
+            <TalentTrackView />
+            <TalentLevelUpView />
+            <CitizenshipWelcomeView />
             <TraxEditorView />
             {GetConfigurationValue<boolean>('radio_ui.enabled', false) && !IsTouchDevice() && <RadioView />}
-            {GetConfigurationValue<boolean>('mentions_ui.enabled', true) && mentionsVisible && <MentionsView onClose={() => setMentionsVisible(false)} />}
             <ExternalPluginLoader />
         </>
     );

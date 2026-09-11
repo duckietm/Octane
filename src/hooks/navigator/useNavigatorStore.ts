@@ -1,4 +1,5 @@
 import {
+    CanCreateRoomEvent,
     CanCreateRoomEventEvent,
     CantConnectMessageParser,
     CategoriesWithVisitorCountEvent,
@@ -43,15 +44,36 @@ import {
     GetConfigurationValue,
     INavigatorData,
     LocalizeText,
+    localizeWithFallback,
     NotificationAlertType,
     SendMessageComposer,
     TryVisitRoom,
     VisitDesktop
 } from '../../api';
+import { CLUB_PROMO_LINK_KEY, CLUB_PROMO_TEXT_KEY } from '../../components/notification-center/views/alert-layouts/NotificationClubPromoAlertView';
 import { useMessageEvent, useOctaneEvent } from '../events';
 import { useNotification } from '../notification';
 import { useNavigatorFavouritesStore } from './navigatorFavouritesStore';
 import { useNavigatorUiStore } from './navigatorUiStore';
+
+/** `CanCreateRoom` result codes (`CanCreateRoomMessageParser`): 0 opens the creator, 1 is the room limit. */
+const CAN_CREATE_ROOM_ALLOWED = 0;
+
+/**
+ * `CantConnect` reason 5 is the room the user is blocked from (`navigator.blocked`); the
+ * renderer only names the four before it.
+ */
+const CANT_CONNECT_REASON_BLOCKED = 5;
+
+/**
+ * What the navigator does with a `CanCreateRoom` answer (`class_1873.onCanCreateRoom`): open
+ * the creator, tell a club member the limit, or tell everyone else the limit with the HC upsell.
+ */
+export const resolveCanCreateRoomOutcome = (resultCode: number, hasClub: boolean): 'open' | 'limit' | 'limit-promo' => {
+    if (resultCode === CAN_CREATE_ROOM_ALLOWED) return 'open';
+
+    return hasClub ? 'limit' : 'limit-promo';
+};
 
 export const useNavigatorStore = () => {
     const [categories, setCategories] = useState<NavigatorCategoryDataParser[]>(null);
@@ -92,6 +114,47 @@ export const useNavigatorStore = () => {
             const parser = event.getParser();
             useNavigatorFavouritesStore.getState().apply(parser.flatId, !!parser.added);
         }, [])
+    );
+
+    // The answer to "can I create a room?" (`class_1873.onCanCreateRoom`): the creator opens
+    // only on a positive answer; at the room limit a club member reads the limit, everyone
+    // else reads it with the HC upsell strip that opens the club page (`ClubPromoAlertView`).
+    useMessageEvent<CanCreateRoomEvent>(
+        CanCreateRoomEvent,
+        useCallback(
+            (event) => {
+                const parser = event.getParser();
+                const outcome = resolveCanCreateRoomOutcome(parser.resultCode, GetSessionDataManager().clubLevel > 0);
+
+                if (outcome === 'open') {
+                    useNavigatorUiStore.getState().openCreator();
+                    return;
+                }
+
+                const limit = String(parser.roomLimit);
+                const message = localizeWithFallback(
+                    'navigator.createroom.limitreached',
+                    `You are not allowed to own more than ${limit} rooms.`,
+                    ['limit'],
+                    [limit]
+                );
+                const title = localizeWithFallback('navigator.createroom.error', 'Cannot create room');
+
+                if (outcome === 'limit') {
+                    simpleAlert(message, NotificationAlertType.DEFAULT, null, null, title);
+                    return;
+                }
+
+                const clubLink = `catalog/open/${GetConfigurationValue<{ [key: string]: string }>('catalog.links', {})['hc.buy_hc'] || 'habbo_club'}`;
+                const data = new Map<string, string>([
+                    [CLUB_PROMO_TEXT_KEY, localizeWithFallback('navigator.createroom.vippromo', 'HC members can have more rooms! >>')],
+                    [CLUB_PROMO_LINK_KEY, clubLink]
+                ]);
+
+                simpleAlert(message, NotificationAlertType.CLUB_PROMO, null, null, title, null, null, data);
+            },
+            [simpleAlert]
+        )
     );
 
     useMessageEvent<CanCreateRoomEventEvent>(
@@ -358,6 +421,15 @@ export const useNavigatorStore = () => {
                         break;
                     case CantConnectMessageParser.REASON_BANNED:
                         simpleAlert(LocalizeText('navigator.banned.text'), NotificationAlertType.DEFAULT, null, null, LocalizeText('navigator.banned.title'));
+                        break;
+                    case CANT_CONNECT_REASON_BLOCKED:
+                        simpleAlert(
+                            localizeWithFallback('navigator.blocked.text', 'You cannot enter this room: its owner has blocked you.'),
+                            NotificationAlertType.DEFAULT,
+                            null,
+                            null,
+                            localizeWithFallback('navigator.blocked.title', 'Blocked')
+                        );
                         break;
                     default:
                         simpleAlert(LocalizeText('room.queue.error.title'), NotificationAlertType.DEFAULT, null, null, LocalizeText('room.queue.error.title'));

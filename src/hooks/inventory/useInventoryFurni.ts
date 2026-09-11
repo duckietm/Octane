@@ -4,6 +4,7 @@ import {
     FurnitureListEvent,
     FurnitureListInvalidateEvent,
     FurnitureListItemParser,
+    FurnitureListRemoveMultipleEvent,
     FurnitureListRemovedEvent
 } from '@octane/renderer';
 import { useEffect, useRef, useState } from 'react';
@@ -14,6 +15,7 @@ import { useMessageEvent } from '../events';
 import { useSharedVisibility } from '../useSharedVisibility';
 import {
     applyFurnitureListAddOrUpdate,
+    applyFurnitureListRemoveMultiple,
     applyFurnitureListRemoved,
     applyMergedFurnitureList,
     clearUnseenFlags,
@@ -94,6 +96,11 @@ const useInventoryFurniState = () => {
 
     useMessageEvent<FurnitureListRemovedEvent>(FurnitureListRemovedEvent, (event) => {
         setGroupItems((prev) => applyFurnitureListRemoved(prev, event));
+    });
+
+    // AIR 13 batched inventory removal (FurniListRemoveMultiple, 2813).
+    useMessageEvent<FurnitureListRemoveMultipleEvent>(FurnitureListRemoveMultipleEvent, (event) => {
+        setGroupItems((prev) => applyFurnitureListRemoveMultiple(prev, event));
     });
 
     useEffect(() => {

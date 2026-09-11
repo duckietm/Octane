@@ -53,7 +53,12 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
             useNavigatorUiStore.getState().setSearch(searchResult.code, parentFilter);
             return;
         }
-        if (searchResult.action == 2 && topLevelContext) useNavigatorUiStore.getState().setSearch(topLevelContext.code, '');
+        if (searchResult.action != 2) return;
+        // BlockResultsView.onCategoryBackClicked -> HabboNewNavigator.goBack(): the
+        // previous search context of the back-stack; the top-level view when
+        // there is nothing to go back to.
+        if (useNavigatorUiStore.getState().goBackSearch()) return;
+        if (topLevelContext) useNavigatorUiStore.getState().setSearch(topLevelContext.code, '');
     };
 
     const isTileMode = displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;
@@ -64,7 +69,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
 
     return (
-        <section className="octane-navigator-air__category">
+        <section className="octane-navigator-air__category" data-result-code={searchResult.code}>
             <header className="octane-navigator-air__category-header">
                 <button
                     type="button"

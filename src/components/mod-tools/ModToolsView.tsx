@@ -1,16 +1,20 @@
 import {
     AddLinkEventTracker,
     CreateLinkEvent,
+    HabboSearchComposer,
+    HabboSearchResultData,
+    HabboSearchResultEvent,
     ILinkEventTracker,
     RemoveLinkEventTracker,
     RoomEngineEvent,
     RoomId,
     RoomObjectCategory,
-    RoomObjectType, HabboSearchComposer, HabboSearchResultData, HabboSearchResultEvent } from '@octane/renderer';
+    RoomObjectType
+} from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
-import { GetRoomSession, ISelectedUser, LocalizeText, SendMessageComposer } from '../../api';
-import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
+import { GetRoomSession, ISelectedUser, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
+import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Tooltip } from '../../common';
 import { useMessageEvent, useModTools, useOctaneEvent, useObjectSelectedEvent, useRoomUserListSnapshot } from '../../hooks';
 import { ModToolsChatlogView } from './views/room/ModToolsChatlogView';
 import { ModToolsRoomView } from './views/room/ModToolsRoomView';
@@ -221,31 +225,34 @@ export const ModToolsView: FC<{}> = (props) => {
                             <div className="text-[.6rem] uppercase tracking-wide opacity-60 font-semibold pl-1">
                                 {LocalizeText('modtools.window.section.room')}
                             </div>
-                            <Button
-                                active={isRoomInfoOpen}
-                                disabled={!isInRoom}
-                                gap={2}
-                                variant="secondary"
-                                justifyContent="start"
-                                title={!isInRoom ? noRoomHint : undefined}
-                                onClick={() => CreateLinkEvent(`mod-tools/toggle-room-info/${currentRoomId}`)}
-                            >
-                                <div className="octane-icon icon-small-room shrink-0" />
-                                <span className="grow text-start">{LocalizeText('modtools.window.tools.room')}</span>
-                            </Button>
-                            <Button
-                                active={isRoomChatlogOpen}
-                                disabled={!isInRoom}
-                                gap={2}
-                                variant="secondary"
-                                innerRef={elementRef}
-                                justifyContent="start"
-                                title={!isInRoom ? noRoomHint : undefined}
-                                onClick={() => CreateLinkEvent(`mod-tools/toggle-room-chatlog/${currentRoomId}`)}
-                            >
-                                <div className="octane-icon icon-chat-history shrink-0" />
-                                <span className="grow text-start">{LocalizeText('modtools.window.tools.chatlog')}</span>
-                            </Button>
+                            {/* The Tooltip wraps the buttons because a disabled button gets no pointer events of its own. */}
+                            <Tooltip block content={!isInRoom ? noRoomHint : null}>
+                                <Button
+                                    active={isRoomInfoOpen}
+                                    disabled={!isInRoom}
+                                    gap={2}
+                                    variant="secondary"
+                                    justifyContent="start"
+                                    onClick={() => CreateLinkEvent(`mod-tools/toggle-room-info/${currentRoomId}`)}
+                                >
+                                    <div className="octane-icon icon-small-room shrink-0" />
+                                    <span className="grow text-start">{LocalizeText('modtools.window.tools.room')}</span>
+                                </Button>
+                            </Tooltip>
+                            <Tooltip block content={!isInRoom ? noRoomHint : null}>
+                                <Button
+                                    active={isRoomChatlogOpen}
+                                    disabled={!isInRoom}
+                                    gap={2}
+                                    variant="secondary"
+                                    innerRef={elementRef}
+                                    justifyContent="start"
+                                    onClick={() => CreateLinkEvent(`mod-tools/toggle-room-chatlog/${currentRoomId}`)}
+                                >
+                                    <div className="octane-icon icon-chat-history shrink-0" />
+                                    <span className="grow text-start">{LocalizeText('modtools.window.tools.chatlog')}</span>
+                                </Button>
+                            </Tooltip>
                         </div>
 
                         {/* Selected user */}
@@ -258,30 +265,35 @@ export const ModToolsView: FC<{}> = (props) => {
                                     className={`flex flex-col gap-1.5 rounded p-1.5 border ${isSelectedUserPresent ? 'bg-gradient-to-r from-emerald-50 to-transparent border-emerald-100' : 'bg-gradient-to-r from-zinc-50 to-transparent border-zinc-200'}`}
                                 >
                                     <div className="flex items-center gap-1.5">
-                                        <span
-                                            className={`inline-block w-2 h-2 rounded-full shrink-0 ${isSelectedUserPresent ? 'bg-emerald-500' : 'bg-zinc-400'}`}
-                                            title={
+                                        <Tooltip
+                                            content={
                                                 isSelectedUserPresent
                                                     ? LocalizeText('modtools.window.user.in_room')
                                                     : LocalizeText('modtools.window.user.left_room')
                                             }
-                                            aria-label={
-                                                isSelectedUserPresent
-                                                    ? LocalizeText('modtools.userinfo.presence.in_room')
-                                                    : LocalizeText('modtools.window.user.left_room')
-                                            }
-                                        />
-                                        <span className="truncate grow text-start text-sm font-semibold leading-tight">{selectedUser.username}</span>
-                                        <button
-                                            className="inline-flex items-center justify-center w-5 h-5 rounded text-zinc-500 hover:text-rose-600 hover:bg-rose-100 shrink-0 transition-colors"
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                setSelectedUser(null);
-                                            }}
-                                            title={LocalizeText('modtools.window.user.clear')}
                                         >
-                                            <FaTimes size={10} />
-                                        </button>
+                                            <span
+                                                className={`inline-block w-2 h-2 rounded-full shrink-0 ${isSelectedUserPresent ? 'bg-emerald-500' : 'bg-zinc-400'}`}
+                                                aria-label={
+                                                    isSelectedUserPresent
+                                                        ? LocalizeText('modtools.userinfo.presence.in_room')
+                                                        : LocalizeText('modtools.window.user.left_room')
+                                                }
+                                            />
+                                        </Tooltip>
+                                        <span className="truncate grow text-start text-sm font-semibold leading-tight">{selectedUser.username}</span>
+                                        <Tooltip content={LocalizeText('modtools.window.user.clear')}>
+                                            <button
+                                                className="inline-flex items-center justify-center w-5 h-5 rounded text-zinc-500 hover:text-rose-600 hover:bg-rose-100 shrink-0 transition-colors"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    setSelectedUser(null);
+                                                }}
+                                                aria-label={LocalizeText('modtools.window.user.clear')}
+                                            >
+                                                <FaTimes size={10} />
+                                            </button>
+                                        </Tooltip>
                                     </div>
                                     <Button
                                         active={!!isUserInfoOpen}
@@ -308,25 +320,28 @@ export const ModToolsView: FC<{}> = (props) => {
                                             placeholder={LocalizeText('generic.search')}
                                             onChange={(event) => setUserQuery(event.target.value)}
                                         />
-                                        <FaSearch
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none"
-                                            size={10}
-                                        />
+                                        <FaSearch className="absolute right-2 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none" size={10} />
                                     </div>
-                                    {userResults && !userResults.length && <div className="text-[.65rem] italic opacity-60 pl-1">
-                                        {LocalizeText('generic.no_results_found')}
-                                    </div>}
-                                    {userResults && userResults.length > 0 && <div className="flex flex-col gap-0.5 max-h-28 overflow-y-auto">
-                                        {userResults.slice(0, 12).map((result) => <button
-                                            key={result.avatarId}
-                                            className="flex items-center gap-2 rounded px-2 py-1 text-start hover:bg-zinc-100"
-                                            type="button"
-                                            onClick={() => pickUser(result)}
-                                        >
-                                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${result.isAvatarOnline ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
-                                            <span className="truncate text-xs">{result.avatarName}</span>
-                                        </button>)}
-                                    </div>}
+                                    {userResults && !userResults.length && (
+                                        <div className="text-[.65rem] italic opacity-60 pl-1">{LocalizeText('generic.no_results_found')}</div>
+                                    )}
+                                    {userResults && userResults.length > 0 && (
+                                        <div className="flex flex-col gap-0.5 max-h-28 overflow-y-auto">
+                                            {userResults.slice(0, 12).map((result) => (
+                                                <button
+                                                    key={result.avatarId}
+                                                    className="flex items-center gap-2 rounded px-2 py-1 text-start hover:bg-zinc-100"
+                                                    type="button"
+                                                    onClick={() => pickUser(result)}
+                                                >
+                                                    <span
+                                                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${result.isAvatarOnline ? 'bg-emerald-500' : 'bg-zinc-300'}`}
+                                                    />
+                                                    <span className="truncate text-xs">{result.avatarName}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -336,20 +351,27 @@ export const ModToolsView: FC<{}> = (props) => {
                             <div className="text-[.6rem] uppercase tracking-wide opacity-60 font-semibold pl-1">
                                 {LocalizeText('modtools.window.section.reports')}
                             </div>
-                            <Button active={isTicketsVisible} gap={2} justifyContent="start" variant="secondary" onClick={() => setIsTicketsVisible((prevValue) => !prevValue)}>
+                            <Button
+                                active={isTicketsVisible}
+                                gap={2}
+                                justifyContent="start"
+                                variant="secondary"
+                                onClick={() => setIsTicketsVisible((prevValue) => !prevValue)}
+                            >
                                 <div className="octane-icon icon-tickets shrink-0" />
                                 <span className="grow text-start">{LocalizeText('modtools.window.tools.report')}</span>
                                 {openTicketsCount > 0 && (
-                                    <span
-                                        className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-rose-500 text-white text-xs font-semibold shrink-0 [box-shadow:0_0_0_2px_rgba(244,63,94,.25)]"
-                                        title={LocalizeText(
+                                    <Tooltip
+                                        content={LocalizeText(
                                             openTicketsCount === 1 ? 'modtools.window.tickets.open' : 'modtools.window.tickets.open.many',
                                             ['count'],
                                             [openTicketsCount.toString()]
                                         )}
                                     >
-                                        {openTicketsCount > 99 ? '99+' : openTicketsCount}
-                                    </span>
+                                        <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-rose-500 text-white text-xs font-semibold shrink-0 [box-shadow:0_0_0_2px_rgba(244,63,94,.25)]">
+                                            {openTicketsCount > 99 ? '99+' : openTicketsCount}
+                                        </span>
+                                    </Tooltip>
                                 )}
                             </Button>
                         </div>

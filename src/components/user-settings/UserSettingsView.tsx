@@ -13,7 +13,7 @@ import {
     UserSettingsSoundComposer
 } from '@octane/renderer';
 import { FC, ReactNode, useEffect, useState } from 'react';
-import { DispatchMainEvent, DispatchUiEvent, localizeWithFallback, SendMessageComposer } from '../../api';
+import { DispatchMainEvent, DispatchUiEvent, GetConfigurationValue, localizeWithFallback, SendMessageComposer } from '../../api';
 import { DraggableWindow } from '../../common';
 import {
     useCatalogDisplayPreferences,
@@ -25,6 +25,8 @@ import {
 } from '../../hooks';
 import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
 import { SoundboardVolumeControl } from './SoundboardVolumeControl';
+import { UserChatPreferencesView } from './UserChatPreferencesView';
+import { UserOtherPreferencesView } from './UserOtherPreferencesView';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -242,6 +244,18 @@ export const UserSettingsView: FC<{}> = () => {
                     <button className="air-settings-button" onClick={() => openMenuSection('privacy')} type="button">
                         {localizeWithFallback('privacy.settings.title', 'Game Privacy')}
                     </button>
+                    {GetConfigurationValue<boolean>('user.custom.filter.enabled', true) && (
+                        <button
+                            className="air-settings-button"
+                            onClick={() => {
+                                CreateLinkEvent('word-filter/show');
+                                closeView();
+                            }}
+                            type="button"
+                        >
+                            {localizeWithFallback('word_filter.settings.title', 'Word filter')}
+                        </button>
+                    )}
                     <button className="air-settings-button" onClick={() => CreateLinkEvent('user-account-settings/show')} type="button">
                         {localizeWithFallback('usersettings.open.title', 'User Settings')}
                     </button>
@@ -302,7 +316,7 @@ export const UserSettingsView: FC<{}> = () => {
             <AirSettingsFrame
                 backLabel={backLabel}
                 onBack={handleBack}
-                title={localizeWithFallback('room.chat.settings.title', 'Chat settings')}
+                title={localizeWithFallback('toolbar.chat.settings.title', 'Chat settings')}
                 variant="chat"
             >
                 <p className="air-settings-chat__info">{localizeWithFallback('toolbar.chat.settings.info', 'Choose how chat appears for you.')}</p>
@@ -325,6 +339,7 @@ export const UserSettingsView: FC<{}> = () => {
                         />
                         <span>{localizeWithFallback('memenu.settings.other.enable.chat.window', 'Enable chat window')}</span>
                     </label>
+                    <UserChatPreferencesView />
                 </div>
             </AirSettingsFrame>
         );
@@ -357,6 +372,7 @@ export const UserSettingsView: FC<{}> = () => {
                         />
                         <span>{localizeWithFallback('memenu.settings.other.disable.room.camera.follow', "Don't focus on own avatar")}</span>
                     </label>
+                    <UserOtherPreferencesView />
                     <label className="air-settings-check-row">
                         <input
                             checked={catalogPlaceMultipleObjects}

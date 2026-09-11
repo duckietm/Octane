@@ -1,19 +1,26 @@
 import { ModMessageMessageComposer } from '@octane/renderer';
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { FaEnvelope, FaPaperPlane, FaUser } from 'react-icons/fa';
-import { ISelectedUser, LocalizeText, SendMessageComposer } from '../../../../api';
+import { ISelectedUser, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
-import { useNotification } from '../../../../hooks';
+import { useModTools, useNotification } from '../../../../hooks';
+import { CONFIG_USER_MESSAGE_TEMPLATES, resolveMessageTemplates } from '../../common/ModToolsMessageTemplates';
+import { ModToolsTemplateSelect } from '../../common/ModToolsTemplateSelect';
 
 interface ModToolsUserSendMessageViewProps {
     user: ISelectedUser;
+    /** Set when the window opens from an issue handler: the message is filed against that issue (SendMsgsCtrl). */
+    issueId?: number;
     onCloseClick: () => void;
 }
 
 export const ModToolsUserSendMessageView: FC<ModToolsUserSendMessageViewProps> = (props) => {
-    const { user = null, onCloseClick = null } = props;
+    const { user = null, issueId = -1, onCloseClick = null } = props;
     const [message, setMessage] = useState('');
     const { simpleAlert = null } = useNotification();
+    const { settings = null } = useModTools();
+    // The official window fills its drop-down from the init message's `messageTemplates`.
+    const templates = useMemo(() => resolveMessageTemplates(settings?.messageTemplates, CONFIG_USER_MESSAGE_TEMPLATES), [settings]);
 
     if (!user) return null;
 
@@ -22,11 +29,18 @@ export const ModToolsUserSendMessageView: FC<ModToolsUserSendMessageViewProps> =
 
     const sendMessage = () => {
         if (!canSend) {
-            simpleAlert('Please write a message to user.', null, null, null, 'Error', null);
+            simpleAlert(
+                localizeWithFallback('modtools.user.message.error.empty', 'You must input a message to the user'),
+                null,
+                null,
+                null,
+                localizeWithFallback('generic.alert', 'Alert'),
+                null
+            );
             return;
         }
 
-        SendMessageComposer(new ModMessageMessageComposer(user.userId, message, -999));
+        SendMessageComposer(new ModMessageMessageComposer(user.userId, message, -999, issueId));
         onCloseClick();
     };
 
@@ -49,6 +63,9 @@ export const ModToolsUserSendMessageView: FC<ModToolsUserSendMessageViewProps> =
                         </div>
                     </div>
                 </div>
+
+                {/* Canned templates, when the hotel provides any */}
+                <ModToolsTemplateSelect templates={templates} onSelect={(template) => setMessage(template)} />
 
                 {/* Body */}
                 <div className="flex flex-col gap-1">

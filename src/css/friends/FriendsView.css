@@ -3248,3 +3248,46 @@ button.swf-friends-section-header {
 .swf-friends-window .swf-friends-close::after {
     display: none;
 }
+
+/* Friend bar notification tokens (official FriendEntityTab "icons" list:
+   icon_tag_message / icon_tag_notify / icon_tag_game, 25x25, newest first). */
+.friend-bar .friend-bar-tab.has-tokens {
+    padding-right: 26px;
+}
+
+.friend-bar .friend-bar-tokens {
+    position: absolute;
+    top: 50%;
+    right: 2px;
+    display: flex;
+    flex-direction: row;
+    gap: 1px;
+    transform: translateY(-50%);
+    pointer-events: auto;
+}
+
+.friend-bar .friend-bar-token {
+    display: inline-flex;
+    width: 25px;
+    height: 25px;
+    align-items: center;
+    justify-content: center;
+    animation: friend-bar-token-drop 0.6s ease-out;
+}
+
+.friend-bar .friend-bar-token img {
+    max-width: 25px;
+    max-height: 25px;
+    image-rendering: pixelated;
+}
+
+.friend-bar .friend-bar-token--message {
+    cursor: pointer;
+}
+
+@keyframes friend-bar-token-drop {
+    0% { transform: translateY(-32px); opacity: 0; }
+    60% { transform: translateY(4px); opacity: 1; }
+    80% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+}

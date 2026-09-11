@@ -1,9 +1,17 @@
-import { GetSessionDataManager, RoomSettingsComposer, UpdateHomeRoomMessageComposer } from '@octane/renderer';
-import { FC } from 'react';
-import { FriendlyTime, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, ReportType, SendMessageComposer } from '../../../../api';
+import { GetSessionDataManager, GroupInformationComposer, GroupInformationEvent, RoomSettingsComposer, UpdateHomeRoomMessageComposer } from '@octane/renderer';
+import { FC, useEffect, useState } from 'react';
+import { FriendlyTime, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, localizeWithFallback, ReportType, SendMessageComposer } from '../../../../api';
 import { LayoutBadgeImageView, LayoutRoomThumbnailView, UserProfileIconView } from '../../../../common';
-import { useHelp, useNavigatorData, useNavigatorFavourite, useNavigatorRoomInfoPopupStore, useNavigatorUiStore } from '../../../../hooks';
+import { useHelp, useMessageEvent, useNavigatorData, useNavigatorFavourite, useNavigatorRoomInfoPopupStore, useNavigatorUiStore } from '../../../../hooks';
 import { classNames } from '../../../../layout';
+
+interface PopupGroupDetails {
+    groupId: number;
+    isOwner: boolean;
+    isAdmin: boolean;
+    type: number;
+    canMembersDecorate: boolean;
+}
 
 const getTradeModeText = (tradeMode: number) => {
     switch (tradeMode) {
@@ -24,10 +32,39 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
     const { navigatorData } = useNavigatorData();
     const { isFavourite, toggle: toggleFavourite } = useNavigatorFavourite(room?.roomId ?? 0);
     const { report = null } = useHelp();
+    const [groupDetails, setGroupDetails] = useState<PopupGroupDetails>(null);
+
+    const groupId = room?.habboGroupId ?? 0;
+
+    // RoomInfoPopup.as decorates the group row with the viewer's role, the
+    // group type and the "members may decorate" flag from the cached group
+    // details; we ask the server once per group instead of caching.
+    useEffect(() => {
+        setGroupDetails(null);
+
+        if (!visible || groupId <= 0) return;
+
+        SendMessageComposer(new GroupInformationComposer(groupId, false));
+    }, [visible, groupId]);
+
+    useMessageEvent<GroupInformationEvent>(GroupInformationEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser || parser.id !== groupId || parser.flag) return;
+
+        setGroupDetails({
+            groupId: parser.id,
+            isOwner: parser.isOwner,
+            isAdmin: parser.isAdmin,
+            type: parser.type,
+            canMembersDecorate: parser.canMembersDecorate
+        });
+    });
 
     if (!visible || !room) return null;
 
     const hasGroup = room.groupBadgeCode?.length > 0;
+    const showGroupDetails = hasGroup && groupDetails && groupDetails.groupId === groupId;
     const showOwner = room.showOwner && room.ownerName?.length > 0;
     const hasActiveRoomAd = room.roomAdExpiresInMin > 0;
     const rankingEnabled = GetConfigurationValue<boolean>('room.ranking.enabled', false);
@@ -90,6 +127,23 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                                 <i className="octane-navigator-air__group" />
                                 <span>{room.groupName}</span>
                             </button>
+                        )}
+                        {showGroupDetails && (
+                            <span className="octane-navigator-air__room-group-icons flex items-center gap-1" data-testid="room-popup-group-icons">
+                                {groupDetails.isOwner && (
+                                    <i className="octane-icon icon-group-owner" title={localizeWithFallback('group.youareowner', 'You are the owner of this group')} />
+                                )}
+                                {!groupDetails.isOwner && groupDetails.isAdmin && (
+                                    <i className="octane-icon icon-group-admin" title={localizeWithFallback('group.youareadmin', 'You are an administrator of this group')} />
+                                )}
+                                <i
+                                    className={`octane-icon icon-group-type-${Math.max(0, Math.min(2, groupDetails.type))}`}
+                                    title={localizeWithFallback(`group.type.${groupDetails.type}`, 'Group type')}
+                                />
+                                {groupDetails.canMembersDecorate && (
+                                    <i className="octane-icon icon-group-decorate" title={localizeWithFallback('group.decorate.info', 'Members may decorate the group room')} />
+                                )}
+                            </span>
                         )}
                     </div>
                 )}

@@ -1,4 +1,4 @@
-import { AdvancedMap, GetSessionDataManager, IObjectData, ItemDataStructure, StringDataType } from '@octane/renderer';
+import { AdvancedMap, GetSessionDataManager, ItemDataStructure } from '@octane/renderer';
 import { FurniCategory } from './FurniCategory';
 import { FurnitureItem } from './FurnitureItem';
 import { createGroupItem } from './FurnitureUtilities';
@@ -40,20 +40,4 @@ export const parseTradeItems = (items: ItemDataStructure[]) => {
     }
 
     return existingItems;
-};
-
-export const getGuildFurniType = (spriteId: number, stuffData: IObjectData) => {
-    let type = spriteId.toString();
-
-    if (!(stuffData instanceof StringDataType)) return type;
-
-    let i = 1;
-
-    while (i < 5) {
-        type = type + (',' + stuffData.getValue(i));
-
-        i++;
-    }
-
-    return type;
 };

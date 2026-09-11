@@ -30,11 +30,47 @@
     50%      { box-shadow: 0 0 14px rgba(255, 193, 7, 0.7); }
 }
 
+/* The official client (1788_styles_css) sets every u_* text style in the
+   Ubuntu family and reserves the condensed cut for ubuntu_condensed_regular /
+   ubuntu_condensed_title. The family name "Ubuntu" is what tailwind's `sans`
+   stack and most stylesheets ask for, so it has to resolve to the regular
+   faces; the condensed file keeps its own name for the few places that want it. */
 @font-face {
     font-family: Ubuntu;
-    src: url("@/assets/webfonts/Ubuntu-C.ttf");
+    src: url("@/assets/webfonts/Ubuntu.ttf");
+    font-style: normal;
+    font-weight: 400;
 }
 
+@font-face {
+    font-family: Ubuntu;
+    src: url("@/assets/webfonts/Ubuntu-m.ttf");
+    font-style: normal;
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("@/assets/webfonts/Ubuntu-b.ttf");
+    font-style: normal;
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("@/assets/webfonts/Ubuntu-i.ttf");
+    font-style: italic;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("@/assets/webfonts/Ubuntu-ib.ttf");
+    font-style: italic;
+    font-weight: 700;
+}
+
+/* Kept for stylesheets that still name the regular face explicitly. */
 @font-face {
     font-family: UbuntuRegular;
     src: url("@/assets/webfonts/Ubuntu.ttf");
@@ -42,7 +78,9 @@
 
 @font-face {
     font-family: UbuntuCondensed;
-    src: local("Ubuntu Condensed"), local("Ubuntu");
+    src: url("@/assets/webfonts/Ubuntu-C.ttf");
+    font-style: normal;
+    font-weight: 400;
 }
 
 html,
@@ -497,6 +535,71 @@ body {
 
 .fs-custom {
     font-size: var(--font-size, 16px);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tooltip. habbo_skin_tooltip.xml cuts a 6px-corner bubble out of             */
+/* habbo_blue_skin (x 0-13, y 49-71: #232323 at 90%); text is u_tool_tip,      */
+/* Ubuntu 11 white. HintManager.as parks it 10px above or below the target,    */
+/* slides it in and bobs it 5px on |sin(t * 0.003)|, i.e. about once a second.  */
+/* -------------------------------------------------------------------------- */
+.octane-tooltip {
+    position: fixed;
+    z-index: 9999;
+    box-sizing: border-box;
+    max-width: 260px;
+    padding: 0 1px;
+    border: 6px solid transparent;
+    border-image: url("@/assets/images/habbo-skin/slices/tooltip-blue.png") 6 fill / 6px stretch;
+    image-rendering: pixelated;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 13px;
+    text-align: center;
+    white-space: pre-line;
+    pointer-events: none;
+    user-select: none;
+}
+
+.octane-tooltip.is-measuring {
+    visibility: hidden;
+}
+
+.octane-tooltip--above {
+    animation: octane-tooltip-in-above 120ms ease-out, octane-tooltip-bob-above 1050ms ease-in-out 120ms infinite;
+}
+
+.octane-tooltip--below {
+    animation: octane-tooltip-in-below 120ms ease-out, octane-tooltip-bob-below 1050ms ease-in-out 120ms infinite;
+}
+
+@keyframes octane-tooltip-in-above {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes octane-tooltip-in-below {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes octane-tooltip-bob-above {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes octane-tooltip-bob-below {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .octane-tooltip--above,
+    .octane-tooltip--below {
+        animation: none;
+    }
 }
 
 .octane-mod-tools,

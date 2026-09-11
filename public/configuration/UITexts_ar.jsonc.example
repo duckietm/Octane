@@ -298,6 +298,8 @@
     "nitro.login.firsttime.link": "يمكنك إنشاء واحد هنا",
     "nitro.login.card.title": "تسجيل الدخول إلى هابو",
     "nitro.login.server.offline.short": "خادم اللعبة غير متصل حاليًا. يرجى المحاولة مرة أخرى قريبًا.",
+    "nitro.login.maintenance.title": "وضع الصيانة",
+    "nitro.login.maintenance.notice": "الفندق قيد الصيانة حاليًا. يمكن للطاقم فقط تسجيل الدخول الآن.",
     "nitro.login.server.offline.long": "خادم اللعبة غير متصل حاليًا، لذا لا يمكن إنشاء حسابات جديدة. يرجى المحاولة مرة أخرى قريبًا.",
     "nitro.login.server.checking": "جارٍ التحقق…",
     "nitro.login.server.retry": "حاول مرة أخرى",

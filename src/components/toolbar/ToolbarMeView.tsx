@@ -1,8 +1,9 @@
-import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, RoomObjectCategory } from '@octane/renderer';
+import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, RoomObjectCategory, TalentTrackComposer } from '@octane/renderer';
 import { Dispatch, FC, PropsWithChildren, SetStateAction, useEffect, useRef } from 'react';
-import { DispatchUiEvent, GetConfigurationValue, GetRoomSession, GetUserProfile, LocalizeText } from '../../api';
+import { DispatchUiEvent, GetConfigurationValue, GetRoomSession, GetUserProfile, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
 import { Flex, LayoutItemCountView } from '../../common';
 import { GuideToolEvent } from '../../events';
+import { useDailyTasks, useGroupForumUnread, useRewardTracks } from '../../hooks';
 
 export const ToolbarMeView: FC<
     PropsWithChildren<{
@@ -13,6 +14,12 @@ export const ToolbarMeView: FC<
 > = (props) => {
     const { useGuideTool = false, unseenAchievementCount = 0, setMeExpanded = null, children = null, ...rest } = props;
     const elementRef = useRef<HTMLDivElement>(null);
+    const { unseenCount: unseenDailyTaskCount = 0 } = useDailyTasks();
+    const { unseenCount: unseenRewardTrackCount = 0 } = useRewardTracks();
+    const { unreadForumsCount = 0 } = useGroupForumUnread();
+    // Official MeMenuNewController: "talents" and "collectibles" only show when the hotel enables them.
+    const talentTrackEnabled = GetConfigurationValue<boolean>('talent.track.enabled', false);
+    const collectiblesEnabled = GetConfigurationValue<boolean>('collectibles.hub.enabled', false);
 
     useEffect(() => {
         const roomSession = GetRoomSession();
@@ -57,6 +64,25 @@ export const ToolbarMeView: FC<
                 {unseenAchievementCount > 0 && <LayoutItemCountView count={unseenAchievementCount} />}
             </div>
             <div
+                className="navigation-item relative icon-me-quests cursor-pointer"
+                title={localizeWithFallback('toolbar.me.quests', 'Quests')}
+                onClick={(event) => CreateLinkEvent('quests/toggle')}
+            />
+            <div
+                className="navigation-item relative icon-me-dailytasks cursor-pointer"
+                title={localizeWithFallback('toolbar.me.dailytasks', 'Daily rewards')}
+                onClick={(event) => CreateLinkEvent('dailytasks/toggle')}
+            >
+                {unseenDailyTaskCount > 0 && <LayoutItemCountView count={unseenDailyTaskCount} />}
+            </div>
+            <div
+                className="navigation-item relative icon-me-rewardtrack cursor-pointer"
+                title={localizeWithFallback('toolbar.me.rewardtrack', 'Reward track')}
+                onClick={(event) => CreateLinkEvent('reward_track/toggle')}
+            >
+                {unseenRewardTrackCount > 0 && <LayoutItemCountView count={unseenRewardTrackCount} />}
+            </div>
+            <div
                 className="navigation-item relative octane-icon icon-me-profile cursor-pointer"
                 onClick={(event) => GetUserProfile(GetSessionDataManager().userId)}
             />
@@ -75,7 +101,23 @@ export const ToolbarMeView: FC<
                 className="navigation-item relative octane-icon icon-me-forums cursor-pointer"
                 onClick={(event) => CreateLinkEvent('groupforum/toggle')}
                 title={LocalizeText('toolbar.icon.label.forums')}
-            />
+            >
+                {unreadForumsCount > 0 && <LayoutItemCountView count={unreadForumsCount} />}
+            </div>
+            {talentTrackEnabled && (
+                <div
+                    className="navigation-item relative octane-icon icon-me-talents cursor-pointer"
+                    title={localizeWithFallback('widget.memenu.talents', 'Talents')}
+                    onClick={(event) => SendMessageComposer(new TalentTrackComposer(GetConfigurationValue<string>('talent.track.default', 'citizenship')))}
+                />
+            )}
+            {collectiblesEnabled && (
+                <div
+                    className="navigation-item relative octane-icon icon-me-collectibles cursor-pointer"
+                    title={localizeWithFallback('widget.memenu.collectibles', 'Collectibles')}
+                    onClick={(event) => CreateLinkEvent('collectibles/open')}
+                />
+            )}
             {children}
         </Flex>
     );

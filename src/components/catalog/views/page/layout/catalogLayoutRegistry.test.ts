@@ -30,6 +30,8 @@ const expectedStudioCodes = [
     'info_duckets',
     'info_rentables',
     'info_pets',
+    'info_pets2',
+    'info_pets3',
     'loyalty_vip_buy',
     'badge_display',
     'bots',
@@ -60,6 +62,12 @@ describe('catalog layout registry', () => {
         expect(getCatalogLayoutDefinition('guild_custom_furni')?.renderer).toBe('guildCustomFurni');
         expect(getCatalogLayoutDefinition('club_gifts')?.renderer).toBe('clubGifts');
         expect(getCatalogLayoutDefinition('default_3x3')?.renderer).toBe('default');
+    });
+
+    it('routes the official info_pets2 / info_pets3 layouts (layout_info_pets2.xml, layout_info_pets3.xml) to the pet info renderers', () => {
+        expect(getCatalogLayoutDefinition('info_pets2')?.renderer).toBe('pets2');
+        expect(getCatalogLayoutDefinition('info_pets3')?.renderer).toBe('pets3');
+        expect(isCatalogStudioLayoutCode('info_pets2')).toBe(true);
     });
 
     it('rejects unknown layout identifiers instead of treating them as standard pages', () => {

@@ -14,6 +14,7 @@ export const useWiredToolsState = () => {
     const {
         accountPreferences,
         roomSettings,
+        wiredEnvironment,
         showInspectButton,
         showToolbarButton,
         userVariableDefinitions,
@@ -30,6 +31,7 @@ export const useWiredToolsState = () => {
     return {
         accountPreferences,
         roomSettings,
+        wiredEnvironment,
         showInspectButton,
         showToolbarButton,
         userVariableDefinitions,

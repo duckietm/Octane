@@ -19,7 +19,7 @@ const markReadOnServer = (mention: IMentionEntry): void => {
     SendMessageComposer(new MarkMentionsReadComposer(1, mention.mentionId));
 };
 
-// Shared action handlers used by both MentionsView and the chat-history
+// Shared action handlers used by both the notification feed and the chat-history
 // "Menzioni" tab so behaviour can't diverge.
 export const useMentionActions = (): MentionActions =>
     useMemo(

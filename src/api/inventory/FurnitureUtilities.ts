@@ -1,4 +1,4 @@
-import { FurnitureListItemParser, GetRoomEngine, IObjectData } from '@octane/renderer';
+import { FurnitureListItemParser, GetRoomEngine, IObjectData, StringDataType } from '@octane/renderer';
 import { FurniCategory } from './FurniCategory';
 import { FurnitureItem } from './FurnitureItem';
 import { GroupItem } from './GroupItem';
@@ -6,8 +6,37 @@ import { GroupItem } from './GroupItem';
 export const createGroupItem = (type: number, category: number, stuffData: IObjectData, extra: number = NaN) =>
     new GroupItem(type, category, GetRoomEngine(), stuffData, extra);
 
-export const getGroupItemKey = (group: GroupItem): string =>
-    `${group.type}:${group.isWallItem ? 1 : 0}:${group.stuffData?.getLegacyString?.() ?? ''}`;
+export const getGuildFurniType = (spriteId: number, stuffData: IObjectData) => {
+    let type = spriteId.toString();
+
+    if (!(stuffData instanceof StringDataType)) return type;
+
+    let i = 1;
+
+    while (i < 5) {
+        type = type + (',' + stuffData.getValue(i));
+
+        i++;
+    }
+
+    return type;
+};
+
+export const getGroupItemKey = (group: GroupItem): string => {
+    let key = `${group.type}:${group.isWallItem ? 1 : 0}:${group.stuffData?.getLegacyString?.() ?? ''}`;
+
+    if (group.category === FurniCategory.GUILD_FURNI && group.stuffData) {
+        key = `${key}:${getGuildFurniType(group.type, group.stuffData)}`;
+    }
+
+    if (!group.isGroupable) {
+        const itemId = group.getLastItem?.()?.id;
+
+        if (itemId != null) key = `${key}:${itemId}`;
+    }
+
+    return key;
+};
 
 const addSingleFurnitureItem = (set: GroupItem[], item: FurnitureItem, unseen: boolean) => {
     const groupItems: GroupItem[] = [];

@@ -13,6 +13,13 @@ import { CSSProperties, FC, FormEvent, PointerEvent, useEffect, useRef, useState
 import { GetConfigurationValue, SendMessageComposer } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { useMessageEvent } from '../../hooks';
+import { HotelViewMovingObjects } from './HotelViewMovingObjectsView';
+import { HotelViewOfficialWidgetType, isHotelViewOfficialWidgetType } from './hotelViewWidgets';
+import { HotelViewOfficialWidget } from './widgets/HotelViewOfficialWidget';
+
+// The emulator slot types plus the official landing-view widget types
+// (LandingViewWidgetType.as) rendered by HotelViewOfficialWidget.
+type HotelViewSlotType = IHotelViewLandingSlot['type'] | HotelViewOfficialWidgetType;
 
 interface HotelViewLandingData {
     canEdit: boolean;
@@ -32,6 +39,9 @@ interface HotelViewSlotConfig {
     userVote?: number;
     voteOptions?: Array<{ id: number; label: string; badgeCode?: string; furniId?: number; currencyType?: number; currencyAmount?: number }>;
     voteCounts?: Record<string, number>;
+    // "generic" widget: the official `landing.view.<code>.conf` / `.layout` strings.
+    conf?: string;
+    layout?: string;
 }
 
 interface HotelViewSlotDrag {
@@ -75,7 +85,7 @@ const HOTEL_VIEW_ACTIONS = [
 ] as const;
 const CUSTOM_ACTION = '__custom__';
 const LTD_COUNTDOWN_ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAlCAMAAAAQnMtIAAAAPFBMVEX///8AAABYXl+zxs3d6u1IT1IAAACxu75HS0zR3eEqMDY5P0Lr8vSPnqRoeYeosbQ/Q1Oep89DR0hUWFqc27bXAAAAAnRSTlMAAHaTzTgAAAELSURBVHhehdTZbsQwCAXQDJuzztL+/78WrphWaBpyH0wsHwnkRJkmu4iLbZvnDZkjKNhmbDJVJVKEIij6G5AzUwmLoLBEWGPxFMJCUdIopymEid7Wg/JHvnUNojCwRMKMZVX9QiNag4RJSzFPLLRmoydOYNLGPDHzs8yiMGmdOI+lEpyBqJOcuRBEBIRFcmYqpN5hzkyzEwJBPu9QQYgK4dyHiUcQNyX1neLqLoxNYscY4yh574fHbpPty7Lv+1KS+zgQbySC0bgEe1SQ3gyQ1oD05nDCvQFpDcjC91NzZ344iSex/xImG71Oe71EQJATk/fSG5DeoFFvQHoD0hqQ8n1E6vfzsOt/3e0H5XQXxtNRv3EAAAAASUVORK5CYII=';
-const SLOT_WIDGET_TYPES: Array<{ value: IHotelViewLandingSlot['type']; label: string; title: string; body: string; buttonText: string; link: string }> = [
+const SLOT_WIDGET_TYPES: Array<{ value: HotelViewSlotType; label: string; title: string; body: string; buttonText: string; link: string }> = [
     { value: 'bonus', label: 'Bonus Bag', title: 'Bonus Bag', body: '', buttonText: 'Get Credits', link: 'catalog/open/credits' },
     { value: 'promotion', label: 'Promotion', title: 'Promotion', body: '', buttonText: 'Learn more', link: '' },
     { value: 'catalogpromo', label: 'Catalog promotion', title: 'What\'s new?', body: 'Check out the latest furni, offers and activities.', buttonText: 'Open Catalogue', link: 'catalog/open' },
@@ -87,10 +97,19 @@ const SLOT_WIDGET_TYPES: Array<{ value: IHotelViewLandingSlot['type']; label: st
     { value: 'nextlimitedrarecountdown', label: 'Limited rare countdown', title: 'Next limited rare', body: 'A new limited rare is coming soon.', buttonText: 'Open Catalogue', link: 'catalog/open' },
     { value: 'achievementcompetition_hall_of_fame', label: 'Achievement competition: hall of fame', title: 'Hall of fame', body: 'See the top achievement competitors.', buttonText: 'Open achievements', link: 'achievements/show' },
     { value: 'achievementcompetition_prizes', label: 'Achievement competition: prizes', title: 'Competition prizes', body: 'See the rewards for this achievement competition.', buttonText: 'Open achievements', link: 'achievements/show' },
-    { value: 'habbotalentspromo', label: 'Habbo Talents promo', title: 'Habbo Talents', body: 'Learn more about Habbo Talents.', buttonText: 'Open Help', link: 'help/show' },
+    { value: 'habbotalentspromo', label: 'Habbo Talents promo', title: 'Habbo Talents', body: 'Check your progress on the talent track and unlock new perks.', buttonText: 'Check your Talent progress', link: 'talent/open' },
     { value: 'habbowaypromo', label: 'Habbo Way promo', title: 'Habbo Way', body: 'Learn how to make the hotel a better place.', buttonText: 'Open Help', link: 'help/show' },
     { value: 'safetyquizpromo', label: 'Safety quiz promo', title: 'Safety quiz', body: 'Take the safety quiz and learn how to stay safe.', buttonText: 'Open Help', link: 'help/show' },
-    { value: 'habbomoderationpromo', label: 'Moderation promo', title: 'Hotel moderation', body: 'Learn more about hotel moderation and safety.', buttonText: 'Open Help', link: 'help/show' }
+    { value: 'habbomoderationpromo', label: 'Moderation promo', title: 'Hotel moderation', body: 'Learn more about hotel moderation and safety.', buttonText: 'Open Help', link: 'help/show' },
+    // Official landing-view widget types (LandingViewWidgetType.as); the emulator must
+    // list them in HotelViewLandingSaveEvent.SLOT_TYPES for the editor to persist them.
+    { value: 'promoarticle', label: 'Promo articles (official)', title: '', body: '', buttonText: '', link: '' },
+    { value: 'avatarimage', label: 'Avatar image (official)', title: '', body: '', buttonText: '', link: '' },
+    { value: 'roomhoppernetwork', label: 'Room hopper network (official)', title: '', body: '', buttonText: '', link: 'navigator/goto/random_friending_room' },
+    { value: 'generic', label: 'Generic widget (official conf)', title: '', body: '', buttonText: '', link: '' },
+    { value: 'communitygoalvsmode', label: 'Community goal VS mode (official)', title: '', body: '', buttonText: '', link: '' },
+    { value: 'communitygoalvsmodevote', label: 'Community goal VS mode + vote (official)', title: '', body: '', buttonText: '', link: '' },
+    { value: 'widgetcontainer', label: 'Widget container (scheduled, official)', title: '', body: '', buttonText: '', link: '' }
 ];
 
 const parseSlotConfig = (configJson: string): HotelViewSlotConfig => {
@@ -142,11 +161,13 @@ const parseEditableCountdownValue = (value: string) => {
     return `${year}-${month}-${day}T${hour}:${minute}`;
 };
 
-const getDefaultConfig = (type: IHotelViewLandingSlot['type']): HotelViewSlotConfig => {
+const getDefaultConfig = (type: HotelViewSlotType): HotelViewSlotConfig => {
     const tomorrow = () => new Date(Date.now() + 86400000).toISOString().slice(0, 16);
 
     switch (type) {
         case 'communitygoal': return { voteOptions: [{ id: 1, label: 'Vote option 1' }, { id: 2, label: 'Vote option 2' }] };
+        case 'communitygoalvsmodevote': return { voteOptions: [{ id: 1, label: 'Vote option 1' }, { id: 2, label: 'Vote option 2' }] };
+        case 'generic': return { conf: 'title,landing.view.pageexpiry.title;caption,landing.view.community.caption;bodytext,landing.view.community.info;catalogbutton,landing.view.community_catalog_button.text', layout: '' };
         case 'nextlimitedrarecountdown': return { useServerLTD: true };
         case 'expiringcatalogpage':
         case 'expiringcatalogpagesmall': return { endsAt: tomorrow() };
@@ -269,12 +290,12 @@ export const HotelView: FC = () => {
 
     const getSelectedAction = (link: string) => HOTEL_VIEW_ACTIONS.some((action) => action.value === link) ? link : CUSTOM_ACTION;
 
-    const selectSlotWidgetType = (type: IHotelViewLandingSlot['type']) => {
+    const selectSlotWidgetType = (type: HotelViewSlotType) => {
         const preset = SLOT_WIDGET_TYPES.find((widget) => widget.value === type);
 
         if (!preset || !editingSlot) return;
 
-        setEditingSlot({ ...editingSlot, type, title: preset.title, body: preset.body, buttonText: preset.buttonText, link: preset.link, progress: type === 'bonus' ? editingSlot.progress : 0, progressLabel: type === 'bonus' ? editingSlot.progressLabel : '', configJson: serializeSlotConfig(getDefaultConfig(type)) });
+        setEditingSlot({ ...editingSlot, type: type as IHotelViewLandingSlot['type'], title: preset.title, body: preset.body, buttonText: preset.buttonText, link: preset.link, progress: type === 'bonus' ? editingSlot.progress : 0, progressLabel: type === 'bonus' ? editingSlot.progressLabel : '', configJson: serializeSlotConfig(getDefaultConfig(type)) });
     };
 
     const updateEditingConfig = (callback: (config: HotelViewSlotConfig) => HotelViewSlotConfig) => {
@@ -510,14 +531,23 @@ export const HotelView: FC = () => {
             <div className="hotelview-stage" style={stageStyle}>
                 <div ref={hotelViewRef} className="hotelview">
                     <div className="hotelview-background" />
+                    <HotelViewMovingObjects width={HOTEL_VIEW_WIDTH} height={HOTEL_VIEW_HEIGHT} />
                     {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-left" onClick={() => setEditingScene(scene)} aria-label="Edit left image">✎</button>}
                     {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-right" onClick={() => setEditingScene(scene)} aria-label="Edit right image">✎</button>}
                     {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-drape" onClick={() => setEditingScene(scene)} aria-label="Edit drape image">✎</button>}
                     {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-background" onClick={() => setEditingScene(scene)} aria-label="Edit HotelView background" title="Edit HotelView background">BG</button>}
                     <main className="hotelview-slots">
                         {landingData.slots.filter((slot) => slot.enabled || landingData.canEdit).map((slot) => (
-                            <section key={slot.id} className={`hotelview-slot hotelview-slot-${slot.id} hotelview-slot-${slot.type}${slot.enabled ? '' : ' hotelview-slot-disabled'}`} style={getSlotPositionStyle(slot)}>
-                                {slot.enabled && <>
+                            <section key={slot.id} className={`hotelview-slot hotelview-slot-${slot.id} hotelview-slot-${slot.type}${isHotelViewOfficialWidgetType(slot.type) ? ' hotelview-slot--official' : ''}${slot.enabled ? '' : ' hotelview-slot-disabled'}`} style={getSlotPositionStyle(slot)}>
+                                {slot.enabled && isHotelViewOfficialWidgetType(slot.type) && (
+                                    <HotelViewOfficialWidget
+                                        slot={slot}
+                                        slotNumber={slot.id}
+                                        resolveImageUrl={(url) => resolveImageUrl(url, imageLibraryUrl, assetUrl)}
+                                        onLinkClick={handleSlotClick}
+                                    />
+                                )}
+                                {slot.enabled && !isHotelViewOfficialWidgetType(slot.type) && <>
                                     {slot.imageUrl && <img className="hotelview-slot-image" src={resolveImageUrl(slot.imageUrl, imageLibraryUrl, assetUrl)} alt="" />}
                                     {!slot.imageUrl && slot.type === 'nextlimitedrarecountdown' && <img className="hotelview-slot-image hotelview-ltd-countdown-icon" src={LTD_COUNTDOWN_ICON} alt="" />}
                                     <div className="hotelview-slot-copy">
@@ -580,13 +610,17 @@ export const HotelView: FC = () => {
                                 {!editingSlot.enabled && <em>Disabled slot</em>}
                             </div>
                             <label className="hotelview-editor-toggle"><input type="checkbox" checked={editingSlot.enabled} onChange={(event) => setEditingSlot({ ...editingSlot, enabled: event.target.checked })} /><span>Enabled: {editingSlot.enabled ? 'Yes' : 'No'}</span></label>
-                            <label>Widget type<select value={editingSlot.type} onChange={(event) => selectSlotWidgetType(event.target.value as IHotelViewLandingSlot['type'])}>{SLOT_WIDGET_TYPES.map((widget) => <option key={widget.value} value={widget.value}>{widget.label}</option>)}</select></label>
+                            <label>Widget type<select value={editingSlot.type} onChange={(event) => selectSlotWidgetType(event.target.value as HotelViewSlotType)}>{SLOT_WIDGET_TYPES.map((widget) => <option key={widget.value} value={widget.value}>{widget.label}</option>)}</select></label>
                             <label>Title<input value={editingSlot.title} onChange={(event) => setEditingSlot({ ...editingSlot, title: event.target.value })} /></label>
                             <label>Body<textarea value={editingSlot.body} onChange={(event) => setEditingSlot({ ...editingSlot, body: event.target.value })} /></label>
                             <label>Image URL<input value={editingSlot.imageUrl} onChange={(event) => setEditingSlot({ ...editingSlot, imageUrl: event.target.value })} /></label>
                             <label>Button<input value={editingSlot.buttonText} onChange={(event) => setEditingSlot({ ...editingSlot, buttonText: event.target.value })} /></label>
                             <label>Button action<select value={getSelectedAction(editingSlot.link)} onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value === CUSTOM_ACTION ? '' : event.target.value })}><option value={CUSTOM_ACTION}>Custom link</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</select></label>
                             <label>Custom link<input value={editingSlot.link} placeholder="navigator/goto/123" onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value })} /></label>
+                            {editingSlot.type === ('generic' as string) && <>
+                                <label>Generic conf (element,arg;...)<textarea value={parseSlotConfig(editingSlot.configJson).conf || ''} placeholder="title,landing.view.x.title;bodytext,landing.view.x.body;catalogbutton,landing.view.x.button,page" onChange={(event) => updateEditingConfig((config) => ({ ...config, conf: event.target.value }))} /></label>
+                                <label>Generic layout (key,value;...)<input value={parseSlotConfig(editingSlot.configJson).layout || ''} placeholder="bitmap.uri,${image.library.url}reception/x.png;bitmap.width,120;content.x,140" onChange={(event) => updateEditingConfig((config) => ({ ...config, layout: event.target.value }))} /></label>
+                            </>}
                             {['catalogpromo', 'catalogpromosmall', 'expiringcatalogpage', 'expiringcatalogpagesmall', 'nextlimitedrarecountdown'].includes(editingSlot.type) && <label>Catalog page name / ID<input value={parseSlotConfig(editingSlot.configJson).catalogPage || ''} placeholder="limited_rares" onChange={(event) => updateEditingConfig((config) => ({ ...config, catalogPage: event.target.value }))} /></label>}
                             {(editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>Featured catalog slot<input type="number" min="1" value={parseSlotConfig(editingSlot.configJson).featuredSlot || ''} placeholder="Optional" onChange={(event) => updateEditingConfig((config) => ({ ...config, featuredSlot: Number(event.target.value) || undefined }))} /></label>}
                             {editingSlot.type !== 'communitygoal' && <><label>Progress<input type="number" min="0" max="100" value={editingSlot.progress} onChange={(event) => setEditingSlot({ ...editingSlot, progress: Number(event.target.value) })} /></label><label>Progress label<input value={editingSlot.progressLabel} onChange={(event) => setEditingSlot({ ...editingSlot, progressLabel: event.target.value })} /></label></>}
