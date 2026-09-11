@@ -7,6 +7,9 @@ export interface IWiredVariableDefinitionLike {
     isReadOnly?: boolean;
     itemId: number;
     name: string;
+    /** Set when the server reported a stored array schema it could not parse. */
+    unavailable?: boolean;
+    valueShape?: 'single' | 'array';
 }
 
 export interface IWiredVariablePickerEntry {
@@ -19,6 +22,7 @@ export interface IWiredVariablePickerEntry {
     hasValue: boolean;
     kind: 'internal' | 'custom';
     target: WiredVariablePickerTarget;
+    valueShape?: 'single' | 'array';
     children?: IWiredVariablePickerEntry[];
 }
 
@@ -188,6 +192,9 @@ const getInternalSelectable = (usage: WiredVariablePickerUsage, meta: IInternalV
 };
 
 const getCustomSelectable = (usage: WiredVariablePickerUsage, definition: IWiredVariableDefinitionLike) => {
+    // a stored schema the server could not parse cannot back any box until it is corrected
+    if (definition.unavailable) return false;
+
     switch (usage) {
         case 'condition':
         case 'filter-main':
@@ -195,9 +202,9 @@ const getCustomSelectable = (usage: WiredVariablePickerUsage, definition: IWired
         case 'echo':
             return definition.name.includes('.');
         case 'change-reference':
-            return !!definition.hasValue;
+            return !!definition.hasValue || definition.valueShape === 'array';
         case 'change-destination':
-            return !!definition.hasValue && !definition.isReadOnly;
+            return (!!definition.hasValue || definition.valueShape === 'array') && !definition.isReadOnly;
         default:
             return !definition.isReadOnly;
     }
@@ -227,17 +234,25 @@ const createCustomEntry = (
     target: WiredVariablePickerTarget,
     usage: WiredVariablePickerUsage,
     definition: IWiredVariableDefinitionLike
-): IWiredVariablePickerEntry => ({
-    id: `${CUSTOM_TOKEN_PREFIX}${definition.itemId}`,
-    token: `${CUSTOM_TOKEN_PREFIX}${definition.itemId}`,
-    label: definition.name,
-    displayLabel: definition.name,
-    searchableText: definition.name,
-    selectable: getCustomSelectable(usage, definition),
-    hasValue: !!definition.hasValue,
-    kind: 'custom',
-    target
-});
+): IWiredVariablePickerEntry => {
+    const isCaptureProjection = definition.itemId < 0 && !!definition.isReadOnly;
+    const token = isCaptureProjection
+        ? `${INTERNAL_TOKEN_PREFIX}${normalizeInternalVariableKey(definition.name)}`
+        : `${CUSTOM_TOKEN_PREFIX}${definition.itemId}`;
+
+    return {
+        id: token,
+        token,
+        label: definition.name,
+        displayLabel: definition.name,
+        searchableText: definition.name,
+        selectable: getCustomSelectable(usage, definition),
+        hasValue: !!definition.hasValue,
+        kind: isCaptureProjection ? 'internal' : 'custom',
+        target,
+        valueShape: definition.valueShape
+    };
+};
 
 const groupEntries = (entries: IWiredVariablePickerEntry[]) => {
     const groupedParents = new Map<string, { exact?: IWiredVariablePickerEntry; children: IWiredVariablePickerEntry[] }>();

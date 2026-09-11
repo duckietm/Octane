@@ -672,12 +672,14 @@ body {
 
     .octane-wired__content {
         position: relative;
+        min-height: 0;
         background: #efefef !important;
         border: 0 !important;
         box-shadow: none !important;
         padding: 0 !important;
         gap: 0 !important;
-        overflow: visible !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
     }
 
     .octane-wired__body {

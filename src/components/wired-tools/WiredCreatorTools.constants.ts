@@ -112,7 +112,16 @@ export const VARIABLES_ELEMENTS: VariablesElementButton[] = [
 export const INTERNAL_FURNI_OPACITY_VARIABLE_ITEM_ID = -1001;
 export const INTERNAL_FURNI_GRAVITY_VARIABLE_ITEM_ID = -1002;
 
-export const EDITABLE_FURNI_VARIABLES: string[] = ['@position_x', '@position_y', '@rotation', '@altitude', '@state', '@opacity', '@gravity', '@wallitem_offset'];
+export const EDITABLE_FURNI_VARIABLES: string[] = [
+    '@position_x',
+    '@position_y',
+    '@rotation',
+    '@altitude',
+    '@state',
+    '@opacity',
+    '@gravity',
+    '@wallitem_offset'
+];
 export const WIRED_FURNI_RUNTIME_ACTION_READ = 0;
 export const WIRED_FURNI_RUNTIME_ACTION_WRITE = 1;
 export const EDITABLE_USER_VARIABLES: string[] = ['@position_x', '@position_y', '@direction'];
@@ -229,7 +238,16 @@ export const VARIABLE_DEFINITIONS: Record<VariablesElementType, VariableDefiniti
         createVariableDefinition('@signal_user_count', 'Context', 'Conditional'),
         createVariableDefinition('@antenna_id', 'Context', 'Conditional'),
         createVariableDefinition('@chat_type', 'Context', 'Conditional'),
-        createVariableDefinition('@chat_style', 'Context', 'Conditional')
+        createVariableDefinition('@chat_style', 'Context', 'Conditional'),
+        createVariableDefinition('@array.change_type', 'Context', 'Conditional'),
+        createVariableDefinition('@array.index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.source_index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.destination_index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.field_index', 'Context', 'Conditional'),
+        createVariableDefinition('@array.old_value', 'Context', 'Conditional'),
+        createVariableDefinition('@array.new_value', 'Context', 'Conditional'),
+        createVariableDefinition('@array.old_length', 'Context', 'Conditional'),
+        createVariableDefinition('@array.new_length', 'Context', 'Conditional')
     ]
 };
 

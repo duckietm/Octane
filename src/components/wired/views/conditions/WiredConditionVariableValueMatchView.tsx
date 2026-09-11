@@ -7,6 +7,17 @@ import userVariableIcon from '../../../../assets/images/wired/var/icon_source_us
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
+import {
+    ARRAY_VARIABLE_CONTEXT,
+    ARRAY_VARIABLE_FURNI,
+    ARRAY_VARIABLE_ROOM,
+    ARRAY_VARIABLE_USER,
+    ArrayAddressEditor,
+    collectWiredArrayDefinitions,
+    createArrayAddress,
+    validAddress,
+    WiredArrayAddressData
+} from '../WiredArrayControls';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -14,6 +25,7 @@ import {
     buildWiredVariablePickerEntries,
     createFallbackVariableEntry,
     flattenWiredVariablePickerEntries,
+    getCustomVariableItemId,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
@@ -27,6 +39,12 @@ interface IVariableDefinition {
     hasValue: boolean;
     itemId: number;
     name: string;
+    valueShape?: 'single' | 'array';
+    arrayFormat?: 'simple' | 'record';
+    arrayMode?: 'list' | 'slots';
+    maxEntries?: number;
+    fields?: { id: number; name: string; order: number }[];
+    permanent?: boolean;
 }
 
 const TARGET_USER = 0;
@@ -86,8 +104,8 @@ const parseIds = (value: string): number[] => {
 
 const serializeIds = (ids: number[]) => (ids?.length ? ids.filter((id) => id > 0).join(';') : '');
 const parseStringData = (value: string) => (value?.length ? value.split('\t', -1) : []);
-const serializeStringData = (destinationVariableToken: string, referenceVariableToken: string, referenceFurniIds: number[]) =>
-    `${destinationVariableToken || ''}\t${referenceVariableToken || ''}\t${serializeIds(referenceFurniIds)}`;
+const serializeStringData = (destinationVariableToken: string, referenceVariableToken: string, referenceFurniIds: number[], arrayData: object) =>
+    `${destinationVariableToken || ''}\t${referenceVariableToken || ''}\t${serializeIds(referenceFurniIds)}\t${JSON.stringify(arrayData)}`;
 
 const normalizeTargetType = (value: number): VariableTargetType => {
     switch (value) {
@@ -148,6 +166,13 @@ const getTargetDefinitions = (
 const isGlobalTarget = (targetType: VariableTargetType) => targetType === 'global';
 const isFurniTarget = (targetType: VariableTargetType) => targetType === 'furni';
 const isContextTarget = (targetType: VariableTargetType) => targetType === 'context';
+const getArrayVariableType = (targetType: VariableTargetType) => {
+    if (targetType === 'furni') return ARRAY_VARIABLE_FURNI;
+    if (targetType === 'global') return ARRAY_VARIABLE_ROOM;
+    if (targetType === 'context') return ARRAY_VARIABLE_CONTEXT;
+
+    return ARRAY_VARIABLE_USER;
+};
 
 export const WiredConditionVariableValueMatchView: FC<{}> = () => {
     const { trigger = null, furniIds = [], setAllowsFurni = null, setFurniIds = null, setIntParams = null, setStringParam = null } = useWired();
@@ -167,6 +192,8 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
     const [destinationFurniIds, setDestinationFurniIds] = useState<number[]>([]);
     const [referenceFurniIds, setReferenceFurniIds] = useState<number[]>([]);
     const [selectionMode, setSelectionMode] = useState<SelectionMode>('destination');
+    const [arrayAddress, setArrayAddress] = useState<WiredArrayAddressData>(createArrayAddress);
+    const [referenceArrayAddress, setReferenceArrayAddress] = useState<WiredArrayAddressData>(createArrayAddress);
     const highlightedIds = useRef<number[]>([]);
 
     const availableUserSources = useAvailableUserSources(trigger, USER_SOURCES);
@@ -180,6 +207,30 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
     const referenceDefinitions = useMemo(
         () => getTargetDefinitions(referenceTargetType, userVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions, contextVariableDefinitions),
         [contextVariableDefinitions, furniVariableDefinitions, referenceTargetType, roomVariableDefinitions, userVariableDefinitions]
+    );
+    const arrayDefinitions = useMemo(
+        () => collectWiredArrayDefinitions(furniVariableDefinitions, roomVariableDefinitions, userVariableDefinitions, contextVariableDefinitions),
+        [contextVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions, userVariableDefinitions]
+    );
+    const arrayDefinition = useMemo(
+        () =>
+            arrayDefinitions.find(
+                (definition) =>
+                    definition.variableType === getArrayVariableType(targetType) &&
+                    definition.itemId === getCustomVariableItemId(variableToken) &&
+                    definition.valueShape === 'array'
+            ),
+        [arrayDefinitions, targetType, variableToken]
+    );
+    const referenceArrayDefinition = useMemo(
+        () =>
+            arrayDefinitions.find(
+                (definition) =>
+                    definition.variableType === getArrayVariableType(referenceTargetType) &&
+                    definition.itemId === getCustomVariableItemId(referenceVariableToken) &&
+                    definition.valueShape === 'array'
+            ),
+        [arrayDefinitions, referenceTargetType, referenceVariableToken]
     );
     const variableEntries = useMemo(() => buildWiredVariablePickerEntries(targetType, 'change-reference', targetDefinitions), [targetDefinitions, targetType]);
     const referenceVariableEntries = useMemo(
@@ -272,6 +323,12 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
         const nextReferenceTargetType = normalizeTargetType(trigger.intData.length > 4 ? trigger.intData[4] : TARGET_USER);
         const nextDestinationFurniIds = [...(trigger.selectedItems ?? [])];
         const nextReferenceFurniIds = parseIds(stringParts.length > 2 ? stringParts[2] : '');
+        let arrayData: { address?: Partial<WiredArrayAddressData>; referenceAddress?: Partial<WiredArrayAddressData>; referenceConstant?: string } = {};
+        try {
+            arrayData = stringParts[3] ? JSON.parse(stringParts[3]) : {};
+        } catch {
+            arrayData = {};
+        }
 
         setTargetType(nextTargetType);
         setVariableToken(normalizeVariableTokenFromWire(stringParts.length > 0 ? stringParts[0] : ''));
@@ -287,6 +344,9 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
         setQuantifier(trigger.intData.length > 9 ? (trigger.intData[9] === QUANTIFIER_ANY ? QUANTIFIER_ANY : QUANTIFIER_ALL) : QUANTIFIER_ALL);
         setDestinationFurniIds(nextDestinationFurniIds);
         setReferenceFurniIds(nextReferenceFurniIds);
+        setArrayAddress({ ...createArrayAddress(), ...(arrayData.address ?? {}) });
+        setReferenceArrayAddress({ ...createArrayAddress(), ...(arrayData.referenceAddress ?? {}) });
+        if (arrayData.referenceConstant !== undefined) setReferenceConstantValueInput(String(arrayData.referenceConstant));
         setSelectionMode('destination');
         setFurniIds([...nextDestinationFurniIds]);
     }, [setFurniIds, trigger]);
@@ -295,6 +355,16 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
         if (selectionMode === 'destination') setDestinationFurniIds([...furniIds]);
         else setReferenceFurniIds([...furniIds]);
     }, [furniIds, selectionMode]);
+
+    useEffect(() => {
+        if (!arrayDefinition || arrayDefinition.fields.some((field) => field.id === arrayAddress.fieldId)) return;
+        setArrayAddress((current) => ({ ...current, fieldId: arrayDefinition.fields[0]?.id ?? 1 }));
+    }, [arrayAddress.fieldId, arrayDefinition]);
+
+    useEffect(() => {
+        if (!referenceArrayDefinition || referenceArrayDefinition.fields.some((field) => field.id === referenceArrayAddress.fieldId)) return;
+        setReferenceArrayAddress((current) => ({ ...current, fieldId: referenceArrayDefinition.fields[0]?.id ?? 1 }));
+    }, [referenceArrayAddress.fieldId, referenceArrayDefinition]);
 
     useEffect(() => syncHighlights(destinationFurniIds, referenceFurniIds), [destinationFurniIds, referenceFurniIds, syncHighlights]);
 
@@ -328,15 +398,25 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
         const nextDestinationFurniIds = selectionMode === 'destination' ? [...furniIds] : [...destinationFurniIds];
         const nextReferenceFurniIds = selectionMode === 'reference' ? [...furniIds] : [...referenceFurniIds];
         const parsedReferenceConstantValue = parseInt(referenceConstantValueInput.trim(), 10);
+        const protocolReferenceConstantValue = Number.isSafeInteger(parsedReferenceConstantValue)
+            ? Math.max(-2147483648, Math.min(2147483647, parsedReferenceConstantValue))
+            : 0;
 
         setDestinationFurniIds(nextDestinationFurniIds);
         setReferenceFurniIds(nextReferenceFurniIds);
-        setStringParam(serializeStringData(variableToken, referenceMode === 'variable' ? referenceVariableToken : '', nextReferenceFurniIds));
+        setStringParam(
+            serializeStringData(variableToken, referenceMode === 'variable' ? referenceVariableToken : '', nextReferenceFurniIds, {
+                address: arrayAddress,
+                referenceAddress: referenceArrayAddress,
+                referenceConstant: referenceConstantValueInput.trim() || '0',
+                metadataVersion: 1
+            })
+        );
         setIntParams([
             getTargetValue(targetType),
             comparison,
             referenceMode === 'variable' ? REFERENCE_VARIABLE : REFERENCE_CONSTANT,
-            Number.isFinite(parsedReferenceConstantValue) ? parsedReferenceConstantValue : 0,
+            protocolReferenceConstantValue,
             getTargetValue(referenceTargetType),
             userSource,
             furniSource,
@@ -350,6 +430,10 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
     const validate = () => {
         if (!variableToken) return false;
         if (referenceMode === 'variable' && !referenceVariableToken) return false;
+        if (arrayDefinition && !validAddress(arrayAddress, arrayDefinition, arrayDefinitions)) return false;
+        if (referenceMode === 'variable' && referenceArrayDefinition && !validAddress(referenceArrayAddress, referenceArrayDefinition, arrayDefinitions))
+            return false;
+        if (arrayDefinition && referenceMode === 'constant' && !/^-?\d{1,19}$/.test(referenceConstantValueInput.trim())) return false;
 
         return true;
     };
@@ -361,6 +445,7 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
 
         setTargetType(nextTargetType);
         setVariableToken('');
+        setArrayAddress(createArrayAddress());
     };
 
     const handleReferenceTargetChange = (nextTargetType: VariableTargetType) => {
@@ -368,6 +453,7 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
 
         setReferenceTargetType(nextTargetType);
         setReferenceVariableToken('');
+        setReferenceArrayAddress(createArrayAddress());
     };
 
     return (
@@ -468,6 +554,24 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                     selectedToken={variableToken}
                     onSelect={(entry) => setVariableToken(entry.token)}
                 />
+                {arrayDefinition && (
+                    <div className="flex flex-col gap-1">
+                        <ArrayAddressEditor definitions={arrayDefinitions} label="Array index" value={arrayAddress} onChange={setArrayAddress} />
+                        {arrayDefinition.fields.length > 1 && (
+                            <select
+                                className="form-select form-select-sm"
+                                value={arrayAddress.fieldId}
+                                onChange={(event) => setArrayAddress({ ...arrayAddress, fieldId: Number(event.target.value) })}
+                            >
+                                {arrayDefinition.fields.map((field) => (
+                                    <option key={field.id} value={field.id}>
+                                        {field.name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+                )}
 
                 <div className="octane-wired__divider" />
 
@@ -497,7 +601,9 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
                     <label className="octane-wired__change-var-radio">
                         <input checked={referenceMode === 'constant'} type="radio" onChange={() => setReferenceMode('constant')} />
-                        <Text>{localizeWithFallback('wiredfurni.params.variables.reference_value.set_value', LocalizeText('wiredfurni.params.operator.2'))}</Text>
+                        <Text>
+                            {localizeWithFallback('wiredfurni.params.variables.reference_value.set_value', LocalizeText('wiredfurni.params.operator.2'))}
+                        </Text>
                         <OctaneInput
                             className="octane-wired__give-var-number"
                             type="number"
@@ -526,12 +632,39 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                         </label>
 
                         {referenceMode === 'variable' && (
-                            <WiredVariablePicker
-                                entries={resolvedReferenceVariableEntries}
-                                recentScope="variable-conditions"
-                                selectedToken={referenceVariableToken}
-                                onSelect={(entry) => setReferenceVariableToken(entry.token)}
-                            />
+                            <>
+                                <WiredVariablePicker
+                                    entries={resolvedReferenceVariableEntries}
+                                    recentScope="variable-conditions"
+                                    selectedToken={referenceVariableToken}
+                                    onSelect={(entry) => setReferenceVariableToken(entry.token)}
+                                />
+                                {referenceArrayDefinition && (
+                                    <div className="flex flex-col gap-1">
+                                        <ArrayAddressEditor
+                                            definitions={arrayDefinitions}
+                                            label="Reference index"
+                                            value={referenceArrayAddress}
+                                            onChange={setReferenceArrayAddress}
+                                        />
+                                        {referenceArrayDefinition.fields.length > 1 && (
+                                            <select
+                                                className="form-select form-select-sm"
+                                                value={referenceArrayAddress.fieldId}
+                                                onChange={(event) =>
+                                                    setReferenceArrayAddress({ ...referenceArrayAddress, fieldId: Number(event.target.value) })
+                                                }
+                                            >
+                                                {referenceArrayDefinition.fields.map((field) => (
+                                                    <option key={field.id} value={field.id}>
+                                                        {field.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>

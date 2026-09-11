@@ -228,7 +228,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         roomVariableDefinitions,
         roomVariableAssignments,
         contextVariableDefinitions,
+        arrayInspection,
         requestUserVariables,
+        requestArrayInspection,
+        updateArrayInspectionField,
+        clearArrayInspection,
         assignUserVariable,
         removeUserVariable,
         updateUserVariableValue,
@@ -1250,10 +1254,10 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return new Map(selectedFurniAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedFurniAssignments]);
     const selectedFurniCustomVariableDefinitions = useMemo(() => {
-        if (!selectedFurniAssignments.length) return [];
+        if (!selectedFurni) return [];
 
         return furniVariableDefinitions
-            .filter((definition) => selectedFurniAssignmentMap.has(definition.itemId))
+            .filter((definition) => definition.valueShape === 'array' || selectedFurniAssignmentMap.has(definition.itemId))
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }) || left.itemId - right.itemId);
     }, [selectedFurniAssignments, selectedFurniAssignmentMap, furniVariableDefinitions]);
     const selectedFurniCustomVariableDefinitionMap = useMemo(() => {
@@ -1265,7 +1269,9 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const classId = selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_TYPE_ID);
         const tileSizeZ = Number(selectedFurnitureData?.tileSizeZ ?? 0);
         const liveState = selectedFurniLiveState ?? getFurniLiveState(selectedFurni.objectId, selectedFurni.category);
-        const opacity = Math.round(Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER) ?? 1)) * 100);
+        const opacity = Math.round(
+            Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER) ?? 1)) * 100
+        );
         const gravity = Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(WIRED_FURNI_GRAVITY_MODEL_KEY) ?? 0));
 
         const dynamicFlags: InspectionVariable[] = [];
@@ -1280,8 +1286,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return {
                 key: definition.name,
-                value: definition.hasValue ? String(assignment?.value ?? 0) : '',
-                editable: canEditInspection && definition.hasValue
+                value: definition.valueShape === 'array' ? '[Array]' : definition.hasValue ? String(assignment?.value ?? 0) : '',
+                editable: definition.valueShape !== 'array' && canEditInspection && definition.hasValue
             };
         });
 
@@ -1345,12 +1351,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return new Map(selectedUserAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedUserAssignments]);
     const selectedUserCustomVariableDefinitions = useMemo(() => {
-        if (!selectedUserAssignments.length) return [];
+        if (!selectedUser) return [];
 
         return userVariableDefinitions
-            .filter((definition) => selectedUserAssignmentMap.has(definition.itemId))
+            .filter((definition) => definition.valueShape === 'array' || selectedUserAssignmentMap.has(definition.itemId))
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }) || left.itemId - right.itemId);
-    }, [selectedUserAssignments.length, selectedUserAssignmentMap, userVariableDefinitions]);
+    }, [selectedUser, selectedUserAssignmentMap, userVariableDefinitions]);
     const selectedUserCustomVariableDefinitionMap = useMemo(() => {
         return new Map(selectedUserCustomVariableDefinitions.map((definition) => [definition.name, definition]));
     }, [selectedUserCustomVariableDefinitions]);
@@ -1408,8 +1414,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return {
                 key: definition.name,
-                value: definition.hasValue ? String(assignment?.value ?? 0) : '',
-                editable: canEditSelectedUser && definition.hasValue
+                value: definition.valueShape === 'array' ? '[Array]' : definition.hasValue ? String(assignment?.value ?? 0) : '',
+                editable: definition.valueShape !== 'array' && canEditSelectedUser && definition.hasValue
             };
         });
 
@@ -1499,8 +1505,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return {
                 key: definition.name,
-                value: String(assignment?.value ?? 0),
-                editable: canEditInspection
+                value: definition.valueShape === 'array' ? '[Array]' : String(assignment?.value ?? 0),
+                editable: definition.valueShape !== 'array' && canEditInspection
             };
         });
 
@@ -1562,6 +1568,38 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         roomCustomVariableDefinitionMap,
         selectedFurniCustomVariableDefinitionMap
     ]);
+    const selectedArrayInspectionTarget = useMemo(() => {
+        if (selectedInspectionCustomDefinition?.valueShape !== 'array') return null;
+        if (inspectionType === 'furni') {
+            return selectedFurni
+                ? { variableType: 0, requestedOwnerId: selectedFurni.objectId, definitionItemId: selectedInspectionCustomDefinition.itemId }
+                : null;
+        }
+        if (inspectionType === 'global') {
+            return { variableType: 1, requestedOwnerId: 0, definitionItemId: selectedInspectionCustomDefinition.itemId };
+        }
+        return selectedUser ? { variableType: 2, requestedOwnerId: selectedUser.roomIndex, definitionItemId: selectedInspectionCustomDefinition.itemId } : null;
+    }, [inspectionType, selectedFurni, selectedInspectionCustomDefinition, selectedUser]);
+    const activeArrayInspection = useMemo(() => {
+        if (!selectedArrayInspectionTarget || !arrayInspection?.definition) return null;
+        if (arrayInspection.definition.itemId !== selectedArrayInspectionTarget.definitionItemId) return null;
+        if (arrayInspection.requestedOwnerId !== selectedArrayInspectionTarget.requestedOwnerId) return null;
+        return arrayInspection;
+    }, [arrayInspection, selectedArrayInspectionTarget]);
+
+    useEffect(() => {
+        if (activeTab !== 'inspection' || !selectedArrayInspectionTarget) {
+            clearArrayInspection();
+            return;
+        }
+        requestArrayInspection(
+            selectedArrayInspectionTarget.variableType,
+            selectedArrayInspectionTarget.requestedOwnerId,
+            selectedArrayInspectionTarget.definitionItemId,
+            0,
+            25
+        );
+    }, [activeTab, clearArrayInspection, requestArrayInspection, selectedArrayInspectionTarget]);
     const availableInspectionDefinitions = useMemo(() => {
         if (inspectionType === 'global') return [];
         if (inspectionType === 'user' && !selectedUser) return [];
@@ -3322,6 +3360,31 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             onGiveInspectionVariable={() => giveInspectionVariable()}
                             canRemoveInspectionVariable={canRemoveInspectionVariable}
                             onRemoveInspectionVariable={() => removeInspectionVariable()}
+                            arrayInspection={activeArrayInspection}
+                            canModifyArray={roomSettings.canModify}
+                            onArrayPageChange={(page) => {
+                                if (!selectedArrayInspectionTarget) return;
+                                requestArrayInspection(
+                                    selectedArrayInspectionTarget.variableType,
+                                    selectedArrayInspectionTarget.requestedOwnerId,
+                                    selectedArrayInspectionTarget.definitionItemId,
+                                    page,
+                                    activeArrayInspection?.pageSize ?? 25
+                                );
+                            }}
+                            onArrayFieldUpdate={(index, fieldId, value) => {
+                                if (!selectedArrayInspectionTarget || !activeArrayInspection) return;
+                                updateArrayInspectionField(
+                                    selectedArrayInspectionTarget.variableType,
+                                    selectedArrayInspectionTarget.requestedOwnerId,
+                                    selectedArrayInspectionTarget.definitionItemId,
+                                    index,
+                                    fieldId,
+                                    value,
+                                    activeArrayInspection.page,
+                                    activeArrayInspection.pageSize
+                                );
+                            }}
                         />
                     )}
                     {activeTab === 'variables' && (

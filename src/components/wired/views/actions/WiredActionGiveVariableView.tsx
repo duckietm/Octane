@@ -144,7 +144,7 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
 
     useEffect(() => {
         if (!selectedVariableDefinition) return;
-        if (selectedVariableDefinition.hasValue) return;
+        if (selectedVariableDefinition.hasValue && selectedVariableDefinition.valueShape !== 'array') return;
 
         setInitialValueInput('0');
     }, [selectedVariableDefinition]);
@@ -239,8 +239,8 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
                         <div className="octane-wired__give-var-input-row">
                             <Text>{LocalizeText('wiredfurni.params.variables.value_settings.initial_value')}</Text>
                             <OctaneInput
-                                className={`octane-wired__give-var-number ${!selectedVariableDefinition?.hasValue ? 'octane-wired__give-var-number--blurred' : ''}`}
-                                readOnly={!selectedVariableDefinition?.hasValue}
+                                className={`octane-wired__give-var-number ${!selectedVariableDefinition?.hasValue || selectedVariableDefinition.valueShape === 'array' ? 'octane-wired__give-var-number--blurred' : ''}`}
+                                readOnly={!selectedVariableDefinition?.hasValue || selectedVariableDefinition.valueShape === 'array'}
                                 type="number"
                                 value={initialValueInput}
                                 onChange={(event) => setInitialValueInput(event.target.value)}
@@ -262,7 +262,9 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
                             <div className="octane-wired__divider" />
 
                             <div className="octane-wired__give-var-section">
-                                <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.sources.merged.title.variables_destination', 'Destinazione variabile:')}</div>
+                                <div className="octane-wired__give-var-section-title">
+                                    {localizeWithFallback('wiredfurni.params.sources.merged.title.variables_destination', 'Destinazione variabile:')}
+                                </div>
                                 <div className="flex items-center gap-1">
                                     <Button
                                         disabled={resolvedSourceOptions.length <= 1}

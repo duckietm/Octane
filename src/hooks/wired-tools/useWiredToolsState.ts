@@ -23,7 +23,8 @@ export const useWiredToolsState = () => {
         roomVariableDefinitions,
         roomVariableAssignments,
         contextVariableDefinitions,
-        areUserVariablesLoaded
+        areUserVariablesLoaded,
+        arrayInspection
     } = useSharedHook(useWiredToolsStore);
 
     return {
@@ -38,6 +39,7 @@ export const useWiredToolsState = () => {
         roomVariableDefinitions,
         roomVariableAssignments,
         contextVariableDefinitions,
-        areUserVariablesLoaded
+        areUserVariablesLoaded,
+        arrayInspection
     };
 };

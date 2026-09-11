@@ -3,6 +3,7 @@ import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
+import { parseVariableDefinition, serializeVariableDefinition, VariableDefinitionArrayEditor, WiredVariableDefinitionData } from '../WiredArrayControls';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
 const MAX_NAME_LENGTH = 40;
@@ -39,39 +40,77 @@ const handleVariableNameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>,
 
 export const WiredExtraContextVariableView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
-    const [variableName, setVariableName] = useState('');
+    const [definition, setDefinition] = useState<WiredVariableDefinitionData>(() => parseVariableDefinition(''));
     const [hasValue, setHasValue] = useState(false);
 
     useEffect(() => {
         if (!trigger) return;
 
-        setVariableName(normalizeVariableName(trigger.stringData));
-        setHasValue(trigger.intData.length > 0 ? trigger.intData[0] === 1 : false);
+        const nextDefinition = parseVariableDefinition(trigger.stringData);
+
+        setDefinition({ ...nextDefinition, name: normalizeVariableName(nextDefinition.name) });
+        setHasValue(nextDefinition.valueShape === 'array' || (trigger.intData.length > 0 ? trigger.intData[0] === 1 : false));
     }, [trigger]);
 
     const save = () => {
-        setStringParam(normalizeVariableName(variableName));
-        setIntParams([hasValue ? 1 : 0]);
+        setStringParam(serializeVariableDefinition({ ...definition, name: normalizeVariableName(definition.name) }));
+        setIntParams([definition.valueShape === 'array' || hasValue ? 1 : 0]);
+    };
+
+    const validate = () => {
+        if (!definition.name.length) return false;
+        if (definition.valueShape !== 'array') return true;
+        if (definition.maxEntries < 1 || definition.maxEntries > (definition.serverMaxEntries ?? 2048)) return false;
+        if (definition.arrayFormat !== 'record') return true;
+
+        const names = definition.fields.map((field) => field.name.toLowerCase());
+
+        return (
+            definition.fields.length >= 1 &&
+            definition.fields.length <= 8 &&
+            definition.fields.every((field) => !!field.name && !['found', 'index', 'length', 'occupied'].includes(field.name.toLowerCase())) &&
+            new Set(names).size === names.length
+        );
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
+        <WiredExtraBaseView
+            hasSpecialInput={true}
+            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+            save={save}
+            validate={validate}
+            cardStyle={{ width: 400 }}
+        >
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
                     <OctaneInput
                         maxLength={MAX_NAME_LENGTH}
                         type="text"
-                        value={variableName}
-                        onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
-                        onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
+                        value={definition.name}
+                        onChange={(event) => setDefinition((current) => ({ ...current, name: normalizeVariableName(event.target.value) }))}
+                        onKeyDown={(event) => handleVariableNameKeyDown(event, (value) => setDefinition((current) => ({ ...current, name: value })))}
                     />
                 </div>
+
+                <VariableDefinitionArrayEditor
+                    definition={definition}
+                    onChange={(nextDefinition) => {
+                        setDefinition(nextDefinition);
+                        if (nextDefinition.valueShape === 'array') setHasValue(true);
+                    }}
+                />
 
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input checked={hasValue} className="form-check-input" type="checkbox" onChange={(event) => setHasValue(event.target.checked)} />
+                        <input
+                            checked={definition.valueShape === 'array' || hasValue}
+                            className="form-check-input"
+                            disabled={definition.valueShape === 'array'}
+                            type="checkbox"
+                            onChange={(event) => setHasValue(event.target.checked)}
+                        />
                         <Text>{LocalizeText('wiredfurni.params.variables.settings.has_value')}</Text>
                     </label>
                 </div>

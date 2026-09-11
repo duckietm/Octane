@@ -7,6 +7,17 @@ import userVariableIcon from '../../../../assets/images/wired/var/icon_source_us
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
+import {
+    ARRAY_VARIABLE_CONTEXT,
+    ARRAY_VARIABLE_FURNI,
+    ARRAY_VARIABLE_ROOM,
+    ARRAY_VARIABLE_USER,
+    ArrayAddressEditor,
+    collectWiredArrayDefinitions,
+    createArrayAddress,
+    validAddress,
+    WiredArrayAddressData
+} from '../WiredArrayControls';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE_VALUE, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -30,6 +41,12 @@ interface IVariableDefinition {
     itemId: number;
     isReadOnly?: boolean;
     name: string;
+    valueShape?: 'single' | 'array';
+    arrayFormat?: 'simple' | 'record';
+    arrayMode?: 'list' | 'slots';
+    maxEntries?: number;
+    fields?: { id: number; name: string; order: number }[];
+    permanent?: boolean;
 }
 
 const TARGET_USER = 0;
@@ -100,14 +117,14 @@ const normalizeDelimiter = (value: string) => {
 };
 
 const splitStringData = (value: string) => {
-    if (!value?.length) return ['', DEFAULT_PLACEHOLDER_NAME, DEFAULT_DELIMITER];
+    if (!value?.length) return ['', DEFAULT_PLACEHOLDER_NAME, DEFAULT_DELIMITER, ''];
 
     const parts = value.split('\t');
 
-    if (parts.length === 1) return [parts[0], DEFAULT_PLACEHOLDER_NAME, DEFAULT_DELIMITER];
-    if (parts.length === 2) return [parts[0], parts[1], DEFAULT_DELIMITER];
+    if (parts.length === 1) return [parts[0], DEFAULT_PLACEHOLDER_NAME, DEFAULT_DELIMITER, ''];
+    if (parts.length === 2) return [parts[0], parts[1], DEFAULT_DELIMITER, ''];
 
-    return [parts[0], parts[1], parts[2]];
+    return [parts[0], parts[1], parts[2], parts[3] ?? ''];
 };
 
 const escapeHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -131,8 +148,8 @@ const getTargetDefinitions = (
     }
 };
 
-const serializeStringData = (variableToken: string, placeholderName: string, delimiter: string) =>
-    `${variableToken || ''}\t${normalizePlaceholderName(placeholderName)}\t${normalizeDelimiter(delimiter)}`;
+const serializeStringData = (variableToken: string, placeholderName: string, delimiter: string, arrayAddress: WiredArrayAddressData) =>
+    `${variableToken || ''}\t${normalizePlaceholderName(placeholderName)}\t${normalizeDelimiter(delimiter)}\t${JSON.stringify({ address: arrayAddress, metadataVersion: 1 })}`;
 
 export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     const { trigger = null, furniIds = [], setFurniIds = null, setIntParams = null, setStringParam = null } = useWired();
@@ -145,10 +162,15 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     const [delimiter, setDelimiter] = useState(DEFAULT_DELIMITER);
     const [userSource, setUserSource] = useState(0);
     const [furniSource, setFurniSource] = useState(0);
+    const [arrayAddress, setArrayAddress] = useState<WiredArrayAddressData>(createArrayAddress);
 
     const targetDefinitions = useMemo(
         () => getTargetDefinitions(targetType, userVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions, contextVariableDefinitions),
         [contextVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions, targetType, userVariableDefinitions]
+    );
+    const arrayDefinitions = useMemo(
+        () => collectWiredArrayDefinitions(furniVariableDefinitions, roomVariableDefinitions, userVariableDefinitions, contextVariableDefinitions),
+        [contextVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions, userVariableDefinitions]
     );
     const variableEntries = useMemo(() => buildWiredVariablePickerEntries(targetType, 'change-reference', targetDefinitions), [targetDefinitions, targetType]);
     const resolvedVariableEntries = useMemo(() => {
@@ -169,11 +191,37 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     }, [targetDefinitions, variableToken]);
 
     const canUseTextDisplay = !!selectedCustomDefinition?.isTextConnected;
+    const arrayVariableType =
+        targetType === 'furni'
+            ? ARRAY_VARIABLE_FURNI
+            : targetType === 'global'
+              ? ARRAY_VARIABLE_ROOM
+              : targetType === 'context'
+                ? ARRAY_VARIABLE_CONTEXT
+                : ARRAY_VARIABLE_USER;
+    const arrayDefinition = useMemo(
+        () =>
+            arrayDefinitions.find(
+                (definition) =>
+                    definition.variableType === arrayVariableType &&
+                    definition.itemId === getCustomVariableItemId(variableToken) &&
+                    definition.valueShape === 'array'
+            ),
+        [arrayDefinitions, arrayVariableType, variableToken]
+    );
+    const addressNeedsFurni =
+        !!arrayDefinition && arrayAddress.mode === 1 && arrayAddress.variableType === ARRAY_VARIABLE_FURNI && arrayAddress.variableSource === 100;
 
     useEffect(() => {
         if (!trigger) return;
 
-        const [nextVariableToken, nextPlaceholderName, nextDelimiter] = splitStringData(trigger.stringData);
+        const [nextVariableToken, nextPlaceholderName, nextDelimiter, nextArrayData] = splitStringData(trigger.stringData);
+        let parsedArrayData: { address?: Partial<WiredArrayAddressData> } = {};
+        try {
+            parsedArrayData = nextArrayData ? JSON.parse(nextArrayData) : {};
+        } catch {
+            parsedArrayData = {};
+        }
 
         setTargetType(normalizeTargetType(trigger.intData.length > 0 ? trigger.intData[0] : TARGET_USER));
         setVariableToken(normalizeVariableTokenFromWire(nextVariableToken));
@@ -183,6 +231,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
         setFurniSource(normalizeFurniSource(trigger.intData.length > 4 ? trigger.intData[4] : 0));
         setPlaceholderName(normalizePlaceholderName(nextPlaceholderName));
         setDelimiter(normalizeDelimiter(nextDelimiter));
+        setArrayAddress({ ...createArrayAddress(), ...(parsedArrayData.address ?? {}) });
         setFurniIds([...(trigger.selectedItems ?? [])]);
     }, [setFurniIds, trigger]);
 
@@ -191,6 +240,11 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
 
         setDisplayType(DISPLAY_NUMERIC);
     }, [canUseTextDisplay, displayType]);
+
+    useEffect(() => {
+        if (!arrayDefinition || arrayDefinition.fields.some((field) => field.id === arrayAddress.fieldId)) return;
+        setArrayAddress((current) => ({ ...current, fieldId: arrayDefinition.fields[0]?.id ?? 1 }));
+    }, [arrayAddress.fieldId, arrayDefinition]);
 
     const previewToken = useMemo(() => {
         const effectiveName = normalizePlaceholderName(placeholderName) || 'placeholder';
@@ -208,12 +262,12 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
             normalizeUserSource(userSource),
             normalizeFurniSource(furniSource)
         ]);
-        setStringParam(serializeStringData(variableToken, placeholderName, delimiter));
-        setFurniIds(targetType === 'furni' && furniSource === 100 ? [...furniIds] : []);
+        setStringParam(serializeStringData(variableToken, placeholderName, delimiter, arrayAddress));
+        setFurniIds((targetType === 'furni' && furniSource === 100) || addressNeedsFurni ? [...furniIds] : []);
     };
 
     const validate = () => {
-        return !!variableToken;
+        return !!variableToken && (!arrayDefinition || validAddress(arrayAddress, arrayDefinition, arrayDefinitions));
     };
 
     const footer = useMemo(() => {
@@ -270,13 +324,16 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
 
         setTargetType(nextTargetType);
         setVariableToken('');
+        setArrayAddress(createArrayAddress());
     };
 
     return (
         <WiredExtraBaseView
             hasSpecialInput={true}
             requiresFurni={
-                targetType === 'furni' ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT : WiredFurniType.STUFF_SELECTION_OPTION_NONE
+                targetType === 'furni' || addressNeedsFurni
+                    ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT
+                    : WiredFurniType.STUFF_SELECTION_OPTION_NONE
             }
             save={save}
             validate={validate}
@@ -319,6 +376,24 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                     selectedToken={variableToken}
                     onSelect={(entry) => setVariableToken(entry.token)}
                 />
+                {arrayDefinition && (
+                    <div className="flex flex-col gap-1">
+                        <ArrayAddressEditor definitions={arrayDefinitions} label="Array index" value={arrayAddress} onChange={setArrayAddress} />
+                        {arrayDefinition.fields.length > 1 && (
+                            <select
+                                className="form-select form-select-sm"
+                                value={arrayAddress.fieldId}
+                                onChange={(event) => setArrayAddress({ ...arrayAddress, fieldId: Number(event.target.value) })}
+                            >
+                                {arrayDefinition.fields.map((field) => (
+                                    <option key={field.id} value={field.id}>
+                                        {field.name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+                )}
 
                 <div className="octane-wired__give-var-section">
                     <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type')}</Text>
