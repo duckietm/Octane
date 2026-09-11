@@ -186,6 +186,7 @@ export const VARIABLE_DEFINITIONS: Record<VariablesElementType, VariableDefiniti
         createVariableDefinition('@is_frozen', 'User', 'Conditional'),
         createVariableDefinition('@effect_id', 'User', 'Conditional', true),
         createVariableDefinition('@team_score', 'User', 'Conditional', true),
+        createVariableDefinition('@player_score', 'User', 'Conditional', true),
         createVariableDefinition('@team_color', 'User', 'Conditional'),
         createVariableDefinition('@team_type', 'User', 'Conditional'),
         createVariableDefinition('@sign', 'User', 'Conditional'),

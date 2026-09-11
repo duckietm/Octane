@@ -1261,7 +1261,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return furniVariableDefinitions
             .filter((definition) => definition.valueShape === 'array' || selectedFurniAssignmentMap.has(definition.itemId))
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }) || left.itemId - right.itemId);
-    }, [selectedFurniAssignments, selectedFurniAssignmentMap, furniVariableDefinitions]);
+    }, [selectedFurni, selectedFurniAssignmentMap, furniVariableDefinitions]);
     const selectedFurniCustomVariableDefinitionMap = useMemo(() => {
         return new Map(selectedFurniCustomVariableDefinitions.map((definition) => [definition.name, definition]));
     }, [selectedFurniCustomVariableDefinitions]);
