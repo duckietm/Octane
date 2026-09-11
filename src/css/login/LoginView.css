@@ -377,6 +377,19 @@
     text-align: center;
 }
 
+.octane-login-card .error-line.maintenance-notice {
+    color: #6b4a00;
+    background: #fff4d6;
+    border-color: #e6c47a;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.octane-login-card .error-line.maintenance-notice strong {
+    font-weight: 700;
+}
+
 .octane-login-card .error-line.ban-message {
     display: flex;
     flex-direction: column;

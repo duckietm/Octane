@@ -67,6 +67,7 @@
     "login.forgot.endpoint": "${api.url}/api/auth/forgot-password",
     "login.logout.endpoint": "${api.url}/api/auth/logout",
 	"login.health.endpoint": "${api.url}/api/health",
+	"login.maintenance.endpoint": "${api.url}/api/maintenance",
     "login.check-email.endpoint": "${api.url}/api/auth/check-email",
     "login.check-username.endpoint": "${api.url}/api/auth/check-username",
     "login.room_templates.endpoint": "${api.url}/api/auth/room-templates",

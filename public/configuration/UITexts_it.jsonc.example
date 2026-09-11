@@ -452,6 +452,8 @@
 
     // Server status checks
     "nitro.login.server.offline.short": "Il server di gioco al momento non è attivo. Riprova tra poco.",
+    "nitro.login.maintenance.title": "Modalità manutenzione",
+    "nitro.login.maintenance.notice": "L'hotel è attualmente in manutenzione. Al momento solo lo staff può accedere.",
     "nitro.login.server.offline.long": "Il server di gioco al momento non è attivo, quindi non è possibile creare nuovi account. Riprova tra poco.",
     "nitro.login.server.checking": "Verifica in corso…",
     "nitro.login.server.retry": "Riprova",

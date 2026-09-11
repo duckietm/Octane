@@ -301,6 +301,8 @@
     "nitro.login.firsttime.link": "Hier kannst du eines erstellen",
     "nitro.login.card.title": "Bei Habbo anmelden",
     "nitro.login.server.offline.short": "Der Spielserver ist derzeit offline. Bitte versuche es in Kürze erneut.",
+    "nitro.login.maintenance.title": "Wartungsmodus",
+    "nitro.login.maintenance.notice": "Das Hotel wird derzeit gewartet. Nur Mitarbeiter können sich gerade anmelden.",
     "nitro.login.server.offline.long": "Der Spielserver ist derzeit offline, daher können keine neuen Konten erstellt werden. Bitte versuche es in Kürze erneut.",
     "nitro.login.server.checking": "Wird geprüft…",
     "nitro.login.server.retry": "Erneut versuchen",

@@ -175,6 +175,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [maintenance, setMaintenance] = useState<{ enabled: boolean; message: string } | null>(null);
     const [info, setInfo] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [loginTurnstileToken, setLoginTurnstileToken] = useState('');
@@ -419,6 +420,41 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
         }
     }, [healthUrl, healthMethod]);
 
+    useEffect(() => {
+        let url = GetConfigurationValue<string>('login.maintenance.endpoint', '');
+
+        if (!url) {
+            try {
+                url = new URL('/api/maintenance', new URL(loginUrl, window.location.href)).toString();
+            } catch {
+                return;
+            }
+        }
+
+        const controller = new AbortController();
+
+        (async () => {
+            try {
+                const response = await fetch(url, { credentials: 'omit', signal: controller.signal });
+
+                if (!response.ok) return;
+
+                const payload = (await response.json()) as { enabled?: unknown; message?: unknown };
+
+                if (controller.signal.aborted) return;
+
+                setMaintenance({
+                    enabled: payload.enabled === true,
+                    message: typeof payload.message === 'string' ? payload.message : ''
+                });
+            } catch {
+                // Offline or older emulator without the route: no banner.
+            }
+        })();
+
+        return () => controller.abort();
+    }, [loginUrl]);
+
     const pingLoginServer = useCallback(async () => {
         setLoginPingingServer(true);
         try {
@@ -478,6 +514,17 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                         StoreRememberLoginFromPayload(payload, typeof payload.username === 'string' ? payload.username : usernameInput, ssoTicket);
                     else ClearRememberLogin();
                     onAuthenticated(ssoTicket);
+                    return null;
+                }
+
+                if (payload.maintenance === true) {
+                    const notice =
+                        typeof payload.error === 'string'
+                            ? payload.error
+                            : t('nitro.login.maintenance.notice', 'The hotel is currently undergoing maintenance. Only staff can log in right now.');
+                    setMaintenance({ enabled: true, message: notice });
+                    setError(notice);
+                    resetLoginTurnstile();
                     return null;
                 }
 
@@ -759,6 +806,15 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                                 onError={() => setLoginTurnstileToken('')}
                                 resetSignal={loginTurnstileResetSignal}
                             />
+                        )}
+                        {maintenance?.enabled && (
+                            <div className="error-line maintenance-notice" role="status">
+                                <strong>{t('nitro.login.maintenance.title', 'Maintenance mode')}</strong>
+                                <span>
+                                    {maintenance.message ||
+                                        t('nitro.login.maintenance.notice', 'The hotel is currently undergoing maintenance. Only staff can log in right now.')}
+                                </span>
+                            </div>
                         )}
                         {loginServerReachable === false && (
                             <div className="error-line server-offline">

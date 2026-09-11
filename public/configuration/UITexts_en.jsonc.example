@@ -314,6 +314,8 @@
     "nitro.login.firsttime.link": "You can create one here",
     "nitro.login.card.title": "Log in to habbo",
     "nitro.login.server.offline.short": "The game server is currently offline. Please try again shortly.",
+    "nitro.login.maintenance.title": "Maintenance mode",
+    "nitro.login.maintenance.notice": "The hotel is currently undergoing maintenance. Only staff can log in right now.",
     "nitro.login.server.offline.long": "The game server is currently offline, so new accounts can't be created. Please try again shortly.",
     "nitro.login.server.checking": "Checking…",
     "nitro.login.server.retry": "Try again",
