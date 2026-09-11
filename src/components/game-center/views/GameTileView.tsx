@@ -1,6 +1,6 @@
 import { GameConfigurationData, JoinQueueMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
-import { ColorUtils, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../../api';
+import { ColorUtils, CreateLinkEvent, formatBlockCountdown, GetConfigurationValue, getGamesLeftStatus, LocalizeText, SendMessageComposer } from '../../../api';
 import snowStormLogo from '../../../assets/images/snowstorm/snowstorm.png';
 import { useGameCenter, useSnowWar } from '../../../hooks';
 
@@ -25,7 +25,7 @@ const ERROR_TEXTS: Record<number, [string, string]> = {
  */
 export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
 {
-    const { accountStatus, setSelectedGame } = useGameCenter();
+    const { accountStatus, setSelectedGame, setInstructionsOpen, blockSeconds } = useGameCenter();
     const { phase, queuePosition, queueSize, lobbySeconds, queueInfo, errorCode, leaveQueue, requestLeaderboard, startEditing } = useSnowWar();
 
     const isSnowWar = (game.gameNameId === 'snowwar');
@@ -35,11 +35,29 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
     const minPlayers = queueInfo?.minPlayers ?? 0;
     const awaitingPlayers = (phase === 'queued') && (minPlayers > 1) && (queueSize < minPlayers);
 
-    const canPlay = accountStatus && (accountStatus.hasUnlimitedGames || (accountStatus.freeGamesLeft > 0));
+    // AIR games_main footer: "Total Games Left: N" (red at 0, hidden for HC's
+    // unlimited games), the HC upsell, and a play button that reads "Join HC!"
+    // once the games run out or counts the leave-game block down as m:ss.
+    const gamesLeft = getGamesLeftStatus(accountStatus?.freeGamesLeft ?? -1, accountStatus?.hasUnlimitedGames ?? true);
+    const blocked = (blockSeconds > 0);
     const showLeaderboard = GetConfigurationValue<boolean>('games.highscores.enabled', true);
+
+    const openClubCenter = () =>
+    {
+        const links = GetConfigurationValue<Record<string, string>>('catalog.links', {});
+        CreateLinkEvent(`catalog/open/${links?.['hc.buy_hc'] ?? 'habbo_club'}`);
+    };
 
     const onPlay = () =>
     {
+        if (!gamesLeft.canStart)
+        {
+            // AIR onPlay with freeGamesLeft == 0: openGetMoreGames — no token
+            // offer exists here, so the button sells HC like games_vip_region.
+            openClubCenter();
+            return;
+        }
+
         setSelectedGame(game);
         SendMessageComposer(new JoinQueueMessageComposer(game.gameId));
     };
@@ -83,22 +101,49 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                     </button>
                 )}
                 {isSnowWar && !inQueue && (
-                    <div className="game-tile__actions">
-                        {canPlay && (
-                            <button className="snowwar-button game-tile__play" type="button" onClick={onPlay}>
-                                {localizeWithFallback('gamecenter.play_now', 'Play now')}
-                            </button>
-                        )}
-                        {queueInfo?.canEdit && (
-                            <button className="snowwar-button snowwar-button--edit" type="button" onClick={() => startEditing()}>
-                                {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
-                            </button>
-                        )}
+                    <div className="game-tile__links">
+                        <button className="game-tile__link" type="button" onClick={() => setInstructionsOpen(true)}>
+                            {localizeWithFallback('snowwar.instructions.link', 'How To Play')}
+                        </button>
                         {showLeaderboard && (
-                            <button className="game-tile__leaderboard" type="button" onClick={() => requestLeaderboard(true, false, 0)}>
-                                {localizeWithFallback('gamecenter.leaderboard_link', 'Leaderboard')}
+                            <button className="game-tile__link" type="button" onClick={() => requestLeaderboard(true, false, 0)}>
+                                {localizeWithFallback('snowwar.leaderboards.link', 'Leaderboard')}
                             </button>
                         )}
+                    </div>
+                )}
+                {isSnowWar && !inQueue && (
+                    <div className="game-tile__footer">
+                        {gamesLeft.showCounter && (
+                            <div className="game-tile__games-left">
+                                <span>{localizeWithFallback('snowwar.games_left', 'Total Games Left:')}</span>
+                                <span className={`game-tile__games-left-count game-tile__games-left-count--${gamesLeft.counterTone}`}>{accountStatus?.freeGamesLeft ?? 0}</span>
+                            </div>
+                        )}
+                        {gamesLeft.showCounter && (
+                            <button className="game-tile__vip" type="button" onClick={openClubCenter}>
+                                <span className="game-tile__hc-icon" />
+                                <span>{localizeWithFallback('snowwar.get_more_games', 'Get additional free daily games with HC!')}</span>
+                            </button>
+                        )}
+                        <div className="game-tile__actions">
+                            <button
+                                className={`snowwar-button game-tile__play${blocked ? ' game-tile__play--blocked' : ''}`}
+                                disabled={blocked}
+                                type="button"
+                                onClick={onPlay}>
+                                {blocked
+                                    ? formatBlockCountdown(blockSeconds)
+                                    : (gamesLeft.playLabelKey === 'snowwar.play')
+                                        ? localizeWithFallback('snowwar.play', 'Play now!')
+                                        : localizeWithFallback('catalog.vip.buy.title', 'Join HC!')}
+                            </button>
+                            {queueInfo?.canEdit && (
+                                <button className="snowwar-button snowwar-button--edit" type="button" onClick={() => startEditing()}>
+                                    {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
                 {errorEntry && <div className="game-tile__error">{localizeWithFallback(errorEntry[0], errorEntry[1])}</div>}

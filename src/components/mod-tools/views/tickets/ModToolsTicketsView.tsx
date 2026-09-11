@@ -1,9 +1,10 @@
-import { GetSessionDataManager, IssueMessageData } from '@octane/renderer';
-import { FC, useMemo, useState } from 'react';
-import { FaCheckSquare, FaListUl, FaUserCheck } from 'react-icons/fa';
-import { LocalizeText } from '../../../../api';
-import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../../../common';
+import { GetSessionDataManager, IssueMessageData, PickIssuesMessageComposer } from '@octane/renderer';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FaBolt, FaCheckSquare, FaListUl, FaUserCheck } from 'react-icons/fa';
+import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
+import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../../../common';
 import { useModTools } from '../../../../hooks';
+import { getIssueOpenMilliseconds, pickNextPriorityIssue } from './IssueBrowserFormat';
 import { ModToolsIssueInfoView } from './ModToolsIssueInfoView';
 import { ModToolsMyIssuesTabView } from './ModToolsMyIssuesTabView';
 import { ModToolsOpenIssuesTabView } from './ModToolsOpenIssuesTabView';
@@ -26,6 +27,9 @@ const TONE_MAP: Record<TabBadgeProps['tone'], string> = {
     zinc: 'bg-zinc-400 text-white'
 };
 
+/** The open-time column ticks once a second; the packet only told us the age at arrival. */
+const CLOCK_TICK_MS = 1000;
+
 const TabLabel: FC<TabBadgeProps> = ({ label, count, icon, tone }) => (
     <span className="inline-flex items-center gap-1.5">
         <span className="opacity-80">{icon}</span>
@@ -42,7 +46,13 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
     const { onCloseClick = null } = props;
     const [currentTab, setCurrentTab] = useState<number>(0);
     const [issueInfoWindows, setIssueInfoWindows] = useState<number[]>([]);
+    const [now, setNow] = useState(() => Date.now());
     const { tickets = [] } = useModTools();
+    // When each issue was first seen, so its open time keeps counting after the packet.
+    // A re-sent issue (state change, new picker) keeps its original arrival time: the age
+    // in the fresh packet already accounts for the time that passed.
+    const receivedAtRef = useRef<Map<number, number>>(new Map());
+    const autoPickPendingRef = useRef(false);
 
     const { openIssues, myIssues, pickedIssues } = useMemo(() => {
         const ownId = GetSessionDataManager()?.userId;
@@ -52,6 +62,31 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
             pickedIssues: tickets.filter((issue) => issue.state === IssueMessageData.STATE_PICKED)
         };
     }, [tickets]);
+
+    useEffect(() => {
+        const seen = receivedAtRef.current;
+        const arrivedAt = Date.now();
+        const liveIds = new Set<number>();
+
+        for (const issue of tickets) {
+            liveIds.add(issue.issueId);
+
+            if (!seen.has(issue.issueId)) seen.set(issue.issueId, arrivedAt);
+        }
+
+        for (const issueId of Array.from(seen.keys())) if (!liveIds.has(issueId)) seen.delete(issueId);
+    }, [tickets]);
+
+    useEffect(() => {
+        const handle = window.setInterval(() => setNow(Date.now()), CLOCK_TICK_MS);
+
+        return () => window.clearInterval(handle);
+    }, []);
+
+    const getOpenMilliseconds = useCallback(
+        (issue: IssueMessageData) => getIssueOpenMilliseconds(issue.issueAgeInMilliseconds, receivedAtRef.current.get(issue.issueId) ?? now, now),
+        [now]
+    );
 
     const closeIssue = (issueId: number) => {
         setIssueInfoWindows((prevValue) => {
@@ -76,21 +111,40 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
         });
     };
 
+    // "Give me the next priority issue": the client chooses like the official IssueManager
+    // and asks for that one issue; the pick either lands in "my issues" or fails with the
+    // usual pick-failed alert. One request at a time, the server answers in its own time.
+    const autoPick = (reason: string = 'issue browser pick next') => {
+        if (autoPickPendingRef.current) return;
+
+        const next = pickNextPriorityIssue(tickets);
+
+        if (!next) return;
+
+        autoPickPendingRef.current = true;
+        SendMessageComposer(new PickIssuesMessageComposer([next.issueId], false, 0, reason));
+        setCurrentTab(1);
+
+        window.setTimeout(() => {
+            autoPickPendingRef.current = false;
+        }, 2000);
+    };
+
     const renderTab = () => {
         switch (currentTab) {
             case 0:
-                return <ModToolsOpenIssuesTabView openIssues={openIssues} />;
+                return <ModToolsOpenIssuesTabView allIssues={tickets} getOpenMilliseconds={getOpenMilliseconds} openIssues={openIssues} />;
             case 1:
-                return <ModToolsMyIssuesTabView handleIssue={handleIssue} myIssues={myIssues} />;
+                return <ModToolsMyIssuesTabView allIssues={tickets} getOpenMilliseconds={getOpenMilliseconds} handleIssue={handleIssue} myIssues={myIssues} />;
             case 2:
-                return <ModToolsPickedIssuesTabView pickedIssues={pickedIssues} />;
+                return <ModToolsPickedIssuesTabView allIssues={tickets} getOpenMilliseconds={getOpenMilliseconds} pickedIssues={pickedIssues} />;
         }
         return null;
     };
 
     return (
         <>
-            <OctaneCardView className="octane-mod-tools-tickets min-w-0 w-[min(640px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]">
+            <OctaneCardView className="octane-mod-tools-tickets min-w-0 w-[min(680px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]">
                 <OctaneCardHeaderView headerText={LocalizeText('modtools.tickets.title')} onCloseClick={onCloseClick} />
                 <OctaneCardTabsView>
                     <OctaneCardTabsItemView isActive={currentTab === 0} onClick={() => setCurrentTab(0)}>
@@ -108,11 +162,26 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = (props) => {
                         />
                     </OctaneCardTabsItemView>
                 </OctaneCardTabsView>
-                <OctaneCardContentView gap={1}>{renderTab()}</OctaneCardContentView>
+                <OctaneCardContentView gap={1}>
+                    {renderTab()}
+                    <div className="flex justify-start pt-1 border-t border-zinc-200">
+                        <Button
+                            disabled={!openIssues.length}
+                            gap={1}
+                            title={localizeWithFallback('modtools.tickets.auto_pick.title', 'Picks the most urgent open issue for you')}
+                            variant="success"
+                            onClick={() => autoPick()}
+                        >
+                            <FaBolt size={11} /> {localizeWithFallback('modtools.tickets.auto_pick', 'Give me the next priority issue')}
+                        </Button>
+                    </div>
+                </OctaneCardContentView>
             </OctaneCardView>
             {issueInfoWindows &&
                 issueInfoWindows.length > 0 &&
-                issueInfoWindows.map((issueId) => <ModToolsIssueInfoView key={issueId} issueId={issueId} onIssueInfoClosed={closeIssue} />)}
+                issueInfoWindows.map((issueId) => (
+                    <ModToolsIssueInfoView key={issueId} issueId={issueId} onHandleNext={() => autoPick('issue handler pick next')} onIssueInfoClosed={closeIssue} />
+                ))}
         </>
     );
 };

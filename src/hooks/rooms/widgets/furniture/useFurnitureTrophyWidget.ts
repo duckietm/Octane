@@ -10,6 +10,8 @@ const useFurnitureTrophyWidgetState = () => {
     const [senderName, setSenderName] = useState('');
     const [date, setDate] = useState('');
     const [message, setMessage] = useState('');
+    // FurnitureTrophyWidgetHandler: parseInt(furniture_extras) picks the view (10 / 20 = Niko silver / gold).
+    const [viewType, setViewType] = useState(0);
 
     const onClose = () => {
         setObjectId(-1);
@@ -18,6 +20,7 @@ const useFurnitureTrophyWidgetState = () => {
         setSenderName('');
         setDate('');
         setMessage('');
+        setViewType(0);
     };
 
     useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_TROPHY, (event) => {
@@ -33,6 +36,7 @@ const useFurnitureTrophyWidgetState = () => {
         setObjectId(event.objectId);
         setCategory(event.category);
         setColor(roomObject.model.getValue<string>(RoomObjectVariable.FURNITURE_COLOR) || '1');
+        setViewType(parseInt(extra) || 0);
 
         const senderName = data.substring(0, data.indexOf('\t'));
 
@@ -52,7 +56,7 @@ const useFurnitureTrophyWidgetState = () => {
         onClose();
     });
 
-    return { objectId, color, senderName, date, message, onClose };
+    return { objectId, color, senderName, date, message, viewType, onClose };
 };
 
 export const useFurnitureTrophyWidget = useFurnitureTrophyWidgetState;

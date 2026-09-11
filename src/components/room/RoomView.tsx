@@ -6,6 +6,7 @@ import { useRoom, useRoomKeyboardMovement } from '../../hooks';
 import { classNames } from '../../layout';
 import { RoomSpectatorView } from './spectator/RoomSpectatorView';
 import { RoomWidgetsView } from './widgets/RoomWidgetsView';
+import { cancelRoomZoomAnimation, handleRoomCanvasWheel } from './widgets/room-tools/roomZoom.helpers';
 
 export const RoomView: FC<{}> = (props) => {
     const { roomSession = null } = useRoom();
@@ -82,9 +83,16 @@ export const RoomView: FC<{}> = (props) => {
             if (event instanceof RoomObjectTileMouseEvent) window.setTimeout(showTouchFeedback, 0);
         };
 
+        // Wheel over the room: rotate the furni being placed, or Ctrl+wheel to
+        // zoom toward the cursor. The listener must not be passive so the
+        // browser's own Ctrl+wheel page zoom can be cancelled.
+        const roomId = roomSession.roomId;
+        const onWheel = (event: WheelEvent) => handleRoomCanvasWheel(event, roomId, canvas);
+
         canvas.addEventListener('touchstart', onTouchStart, { passive: true });
         canvas.addEventListener('touchmove', onTouchMove, { passive: true });
         canvas.addEventListener('touchend', onTouchEnd, { passive: true });
+        canvas.addEventListener('wheel', onWheel, { passive: false });
         GetEventDispatcher().addEventListener(RoomObjectMouseEvent.CLICK, onTileClick);
 
         const element = elementRef.current;
@@ -99,7 +107,10 @@ export const RoomView: FC<{}> = (props) => {
             canvas.removeEventListener('touchstart', onTouchStart);
             canvas.removeEventListener('touchmove', onTouchMove);
             canvas.removeEventListener('touchend', onTouchEnd);
+            canvas.removeEventListener('wheel', onWheel);
             GetEventDispatcher().removeEventListener(RoomObjectMouseEvent.CLICK, onTileClick);
+            // A tween must not keep driving a canvas whose room is gone.
+            cancelRoomZoomAnimation();
         };
     }, [roomSession]);
 

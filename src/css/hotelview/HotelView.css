@@ -933,3 +933,317 @@
         display: none;
     }
 }
+
+/* ------------------------------------------------------------------------- */
+/* Official landing-view widgets (LandingViewWidgetType.as) rendered in slots */
+/* ------------------------------------------------------------------------- */
+
+.hotelview-slot.hotelview-slot--official {
+    display: block;
+    width: auto;
+    min-height: 0;
+    padding: 0;
+}
+
+/* element_title / widget header rows: 12x4 border bar, 9px heading, stretched line. */
+.hotelview-widget-header {
+    position: relative;
+    display: flex;
+    height: 18px;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+.hotelview-widget-header__bar {
+    flex: 0 0 12px;
+    height: 4px;
+    border-top: 1px solid rgb(255 255 255 / 80%);
+    border-bottom: 1px solid rgb(0 0 0 / 15%);
+}
+.hotelview-widget-header__text {
+    flex: 0 0 auto;
+    font: 700 9px Ubuntu, Arial, sans-serif;
+    line-height: 14px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.hotelview-widget-header__line {
+    flex: 1 1 auto;
+    height: 4px;
+    border-top: 1px solid rgb(255 255 255 / 80%);
+    border-bottom: 1px solid rgb(0 0 0 / 15%);
+}
+
+/* The 48px official button skin: 30px visible, no outer bleed. */
+.hotelview-widget-button {
+    display: block;
+    box-sizing: border-box;
+    height: 30px;
+    margin-top: 6px;
+    padding: 0 14px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: linear-gradient(#fff, #d5d5d5);
+    box-shadow: inset 0 1px #fff, 0 1px rgb(0 0 0 / 35%);
+    color: #111;
+    cursor: pointer;
+    font: 700 12px Ubuntu, Arial, sans-serif;
+    white-space: nowrap;
+}
+.hotelview-widget-button:hover {
+    background: linear-gradient(#fff, #c2c2c2);
+}
+.hotelview-widget-button:disabled {
+    cursor: default;
+    filter: grayscale(1);
+    opacity: .72;
+}
+
+/* promo_article (500x118): header, navigation disks at (10,23), image 150x82 at (10,36), content at x=170 w=330. */
+.hotelview-promo-article {
+    position: relative;
+    width: 500px;
+    min-height: 118px;
+}
+.hotelview-promo-article__navigation {
+    position: absolute;
+    top: 23px;
+    left: 10px;
+    display: flex;
+    width: 160px;
+    height: 10px;
+    gap: 2px;
+}
+.hotelview-promo-article__disk {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 1px solid rgb(0 0 0 / 45%);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 45%);
+    cursor: pointer;
+}
+.hotelview-promo-article__disk.is-on {
+    background: #fff;
+}
+.hotelview-promo-article__article {
+    position: relative;
+    display: flex;
+    min-height: 101px;
+    margin-top: 17px;
+    opacity: 1;
+    transition: opacity 500ms linear;
+}
+.hotelview-promo-article__article.is-fading {
+    opacity: 0;
+}
+.hotelview-promo-article__image {
+    position: absolute;
+    top: 19px;
+    left: 10px;
+    width: 150px;
+    height: 82px;
+    object-fit: contain;
+}
+.hotelview-promo-article__content {
+    box-sizing: border-box;
+    width: 330px;
+    margin-left: 170px;
+}
+.hotelview-promo-article__content h2,
+.hotelview-promo-article__content p {
+    display: block;
+    margin: 0;
+    color: #fff;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+.hotelview-promo-article__content h2 {
+    min-height: 24px;
+    font: 700 13px Ubuntu, Arial, sans-serif;
+    line-height: 16px;
+}
+.hotelview-promo-article__content p {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 13px;
+}
+
+/* avatar_image: the 90x130 avatar widget. */
+.hotelview-avatar-image {
+    width: 90px;
+    height: 130px;
+    overflow: hidden;
+}
+
+/* room_hopper_network (250x218): header, 18px caption, info beside a 120x120 image, wide button. */
+.hotelview-room-hopper {
+    width: 250px;
+    min-height: 218px;
+    color: #fff;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+.hotelview-room-hopper__caption {
+    margin: 2px 0 6px;
+    font: 700 18px Ubuntu, Arial, sans-serif;
+    line-height: 24px;
+    letter-spacing: -0.6px;
+}
+.hotelview-room-hopper__body {
+    display: flex;
+    min-height: 120px;
+    gap: 2px;
+}
+.hotelview-room-hopper__info {
+    width: 124px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 13px;
+}
+.hotelview-room-hopper__image {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+}
+.hotelview-room-hopper__button {
+    width: 250px;
+    margin-top: 0;
+}
+
+/* generic_widget: an optional bitmap and a column of elements. */
+.hotelview-generic {
+    position: relative;
+    min-height: 30px;
+    color: #fff;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+.hotelview-generic__bitmap {
+    position: absolute;
+}
+.hotelview-generic__content {
+    position: relative;
+    display: flex;
+    width: 250px;
+    flex-direction: column;
+}
+.hotelview-generic__caption {
+    margin: 0;
+    font: 700 18px Ubuntu, Arial, sans-serif;
+    line-height: 24px;
+    letter-spacing: -0.6px;
+}
+.hotelview-generic__subcaption {
+    margin: 0;
+    font: 700 12px Ubuntu, Arial, sans-serif;
+    line-height: 15px;
+}
+.hotelview-generic__bodytext,
+.hotelview-generic__concurrent-users {
+    margin: 0;
+    font-size: 12px;
+    line-height: 13px;
+}
+.hotelview-generic__link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 17px;
+    text-align: left;
+    text-decoration: underline;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+.hotelview-generic__reward-badge {
+    display: flex;
+    min-height: 46px;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 0 0 9px;
+}
+.hotelview-generic__reward-badge img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+.hotelview-generic__reward-badge span {
+    font-size: 12px;
+    line-height: 13px;
+}
+.hotelview-generic__image {
+    display: block;
+}
+.hotelview-generic__concurrent-users-achieved .hotelview-widget-button {
+    width: 180px;
+}
+
+/* community_goal_voting (516x200): info column 300 wide, meter at x=290 (226 wide). */
+.hotelview-community-vs {
+    position: relative;
+    width: 516px;
+    min-height: 200px;
+    color: #fff;
+    text-shadow: 1px 1px rgb(0 0 0 / 22%);
+}
+.hotelview-community-vs__info {
+    width: 300px;
+    margin-top: 2px;
+}
+.hotelview-community-vs__info h2 {
+    margin: 0;
+    font: 700 18px Ubuntu, Arial, sans-serif;
+    line-height: 24px;
+    letter-spacing: -0.6px;
+}
+.hotelview-community-vs__info p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    line-height: 13px;
+}
+.hotelview-community-vs__votes {
+    margin-top: 6px;
+}
+.hotelview-community-vs__votes .hotelview-widget-button {
+    width: 250px;
+}
+.hotelview-community-vs__meter {
+    position: absolute;
+    top: 20px;
+    left: 310px;
+    width: 183px;
+    height: 144px;
+}
+.hotelview-community-vs__meter img {
+    display: block;
+    width: 183px;
+    height: 144px;
+}
+.hotelview-community-vs__needle {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    width: 4px;
+    height: 70px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: #e83b3b;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 40%);
+    transform-origin: 50% 100%;
+    transition: transform 400ms ease-out;
+}
+
+/* MovingBackgroundObjects.as: sprites drifting behind the slots. */
+.hotelview-moving-objects {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+.hotelview-moving-object {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 50% 50%;
+    will-change: transform;
+}

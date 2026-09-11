@@ -6,13 +6,15 @@ export interface MarketplaceItemViewProps {
     offerData: MarketplaceOfferData;
     type?: number;
     onClick(offerData: MarketplaceOfferData): void;
+    /** Opens the official "Item info" details page; the button stays disabled without it. */
+    onViewMore?(offerData: MarketplaceOfferData): void;
 }
 
 export const OWN_OFFER = 1;
 export const PUBLIC_OFFER = 2;
 
 export const CatalogLayoutMarketplaceItemView: FC<MarketplaceItemViewProps> = (props) => {
-    const { offerData = null, type = PUBLIC_OFFER, onClick = null } = props;
+    const { offerData = null, type = PUBLIC_OFFER, onClick = null, onViewMore = null } = props;
 
     const getMarketplaceOfferTitle = useMemo(() => {
         if (!offerData) return '';
@@ -85,7 +87,7 @@ export const CatalogLayoutMarketplaceItemView: FC<MarketplaceItemViewProps> = (p
                         <Button variant="secondary" onClick={() => onClick(offerData)}>
                             {LocalizeText('buy')}
                         </Button>
-                        <Button disabled variant="secondary">
+                        <Button disabled={!onViewMore} variant="secondary" onClick={() => onViewMore?.(offerData)}>
                             {LocalizeText('catalog.marketplace.view_more')}
                         </Button>
                     </>

@@ -18,6 +18,8 @@ import { useMessageEvent, useNotification, usePurse } from '../../../../../../ho
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { CatalogLayoutMarketplaceItemView, PUBLIC_OFFER } from './CatalogLayoutMarketplaceItemView';
 import { SearchFormView } from './CatalogLayoutMarketplaceSearchFormView';
+import { MarketplaceOfferDetailsView } from './MarketplaceOfferDetailsView';
+import { MARKETPLACE_CONFIRM_MODE_BUY, MARKETPLACE_CONFIRM_MODE_PRICE_CHANGED, MarketplacePurchaseConfirmView } from './MarketplacePurchaseConfirmView';
 
 const SORT_TYPES_VALUE = [1, 2];
 const SORT_TYPES_ACTIVITY = [3, 4, 5, 6];
@@ -28,14 +30,27 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
     const [searchType, setSearchType] = useState(MarketplaceSearchType.BY_ACTIVITY);
     const [totalItemsFound, setTotalItemsFound] = useState(0);
     const [offers, setOffers] = useState(new Map<number, MarketplaceOfferData>());
-    const [lastSearch, setLastSearch] = useState<IMarketplaceSearchOptions>({ minPrice: -1, maxPrice: -1, query: '', type: 3 });
+    const [detailsOffer, setDetailsOffer] = useState<MarketplaceOfferData>(null);
+    const [confirmOffer, setConfirmOffer] = useState<{ offer: MarketplaceOfferData; mode: number }>(null);
+    const [lastSearch, setLastSearch] = useState<IMarketplaceSearchOptions>({ minPrice: -1, maxPrice: -1, query: '', type: 3, combineUniques: true });
     const { getCurrencyAmount = null } = usePurse();
-    const { simpleAlert = null, showConfirm = null } = useNotification();
+    const { simpleAlert = null } = useNotification();
     const isBuyingRef = useRef<boolean>(false);
 
     const requestOffers = useCallback((options: IMarketplaceSearchOptions) => {
         setLastSearch(options);
+        // The official composer (header 2407) carries options.combineUniques as a fifth boolean;
+        // the workspace renderer composer stops at the sort type, so the flag stays client-side.
         SendMessageComposer(new GetMarketplaceOffersMessageComposer(options.minPrice, options.maxPrice, options.query, options.type));
+    }, []);
+
+    const confirmPurchase = useCallback((offerData: MarketplaceOfferData) => {
+        setConfirmOffer(null);
+
+        if (isBuyingRef.current) return;
+
+        isBuyingRef.current = true;
+        SendMessageComposer(new BuyMarketplaceOfferMessageComposer(offerData.offerId));
     }, []);
 
     const getSortTypes = useMemo(() => {
@@ -63,23 +78,9 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                 return;
             }
 
-            const offerId = offerData.offerId;
-
-            showConfirm(
-                LocalizeText('catalog.marketplace.confirm_header'),
-                () => {
-                    if (isBuyingRef.current) return;
-
-                    isBuyingRef.current = true;
-                    SendMessageComposer(new BuyMarketplaceOfferMessageComposer(offerId));
-                },
-                null,
-                null,
-                null,
-                LocalizeText('catalog.marketplace.confirm_title')
-            );
+            setConfirmOffer({ offer: offerData, mode: MARKETPLACE_CONFIRM_MODE_BUY });
         },
-        [getCurrencyAmount, simpleAlert, showConfirm]
+        [getCurrencyAmount, simpleAlert]
     );
 
     useMessageEvent<MarketPlaceOffersEvent>(MarketPlaceOffersEvent, (event) => {
@@ -106,6 +107,8 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
 
         setTotalItemsFound(parser.totalItemsFound);
         setOffers(latestOffers);
+        // A fresh list means the details page could be describing an offer that no longer exists.
+        setDetailsOffer(null);
     });
 
     useMessageEvent<MarketplaceBuyOfferResultEvent>(MarketplaceBuyOfferResultEvent, (event) => {
@@ -133,42 +136,34 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                     LocalizeText('catalog.marketplace.not_available_title')
                 );
                 break;
-            case 3:
-                // our shit was updated
-                // todo: some dialogue modal
+            case 3: {
+                // Someone bought the cheapest copy: the offer moves to the next id / price and the
+                // "price changed" confirmation (MarketplaceConfirmationDialog mode 2) asks again.
+                const repricedOffer = offers.get(parser.requestedOfferId) ?? null;
+
+                if (repricedOffer) {
+                    repricedOffer.offerId = parser.offerId;
+                    repricedOffer.price = parser.newPrice;
+                    repricedOffer.offerCount--;
+                }
+
                 setOffers((prev) => {
                     const newVal = new Map(prev);
 
-                    const item = newVal.get(parser.requestedOfferId);
-                    if (item) {
-                        // Delete the OLD key first, then set under the (possibly
-                        // unchanged) new id. The old code did set()-then-delete(),
-                        // so when the server returned the same id for the re-priced
-                        // offer the set was immediately undone and the offer vanished.
-                        newVal.delete(parser.requestedOfferId);
+                    // Delete the OLD key first, then set under the (possibly
+                    // unchanged) new id. The old code did set()-then-delete(),
+                    // so when the server returned the same id for the re-priced
+                    // offer the set was immediately undone and the offer vanished.
+                    newVal.delete(parser.requestedOfferId);
 
-                        item.offerId = parser.offerId;
-                        item.price = parser.newPrice;
-                        item.offerCount--;
-                        newVal.set(item.offerId, item);
-                    }
+                    if (repricedOffer) newVal.set(repricedOffer.offerId, repricedOffer);
 
                     return newVal;
                 });
 
-                showConfirm(
-                    LocalizeText('catalog.marketplace.confirm_higher_header') +
-                        '\n' +
-                        LocalizeText('catalog.marketplace.confirm_price', ['price'], [parser.newPrice.toString()]),
-                    () => {
-                        SendMessageComposer(new BuyMarketplaceOfferMessageComposer(parser.offerId));
-                    },
-                    null,
-                    null,
-                    null,
-                    LocalizeText('catalog.marketplace.confirm_higher_title')
-                );
+                if (repricedOffer) setConfirmOffer({ offer: repricedOffer, mode: MARKETPLACE_CONFIRM_MODE_PRICE_CHANGED });
                 break;
+            }
             case 4:
                 simpleAlert(
                     LocalizeText('catalog.alert.notenough.credits.description'),
@@ -181,8 +176,22 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
         }
     });
 
+    const confirmView = confirmOffer ? (
+        <MarketplacePurchaseConfirmView mode={confirmOffer.mode} offer={confirmOffer.offer} onCancel={() => setConfirmOffer(null)} onConfirm={confirmPurchase} />
+    ) : null;
+
+    if (detailsOffer) {
+        return (
+            <>
+                {confirmView}
+                <MarketplaceOfferDetailsView offerData={detailsOffer} onBack={() => setDetailsOffer(null)} onBuy={purchaseItem} />
+            </>
+        );
+    }
+
     return (
         <>
+            {confirmView}
             <div className="relative inline-flex align-middle">
                 <Button active={searchType === MarketplaceSearchType.BY_ACTIVITY} onClick={() => setSearchType(MarketplaceSearchType.BY_ACTIVITY)}>
                     {LocalizeText('catalog.marketplace.search_by_activity')}
@@ -201,7 +210,13 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
                 </Text>
                 <Column className="octane-catalog-layout-marketplace-grid" overflow="auto">
                     {Array.from(offers.values()).map((entry, index) => (
-                        <CatalogLayoutMarketplaceItemView key={index} offerData={entry} type={PUBLIC_OFFER} onClick={purchaseItem} />
+                        <CatalogLayoutMarketplaceItemView
+                            key={index}
+                            offerData={entry}
+                            type={PUBLIC_OFFER}
+                            onClick={purchaseItem}
+                            onViewMore={setDetailsOffer}
+                        />
                     ))}
                 </Column>
             </Column>

@@ -11,10 +11,14 @@ import { Button, Text } from '../../../common';
 import { useHelp } from '../../../hooks';
 
 export const ReportSummaryView: FC<{}> = (props) => {
-    const { activeReport = null, setActiveReport = null } = useHelp();
+    const { activeReport = null, setActiveReport = null, ignoreAndUnfriendReportedUser = null } = useHelp();
 
     const submitReport = () => {
         const chats: (string | number)[] = [];
+
+        // Unlawful-activity reports also collect the reporter's name and e-mail
+        // (activeReport.reporterName / reporterEmail); the official composers
+        // append them as two strings, ours do not carry them yet.
 
         switch (activeReport.reportType) {
             case ReportType.BULLY:
@@ -62,6 +66,8 @@ export const ReportSummaryView: FC<{}> = (props) => {
                 );
                 break;
         }
+
+        ignoreAndUnfriendReportedUser?.(activeReport.reportedUserId, activeReport.cfhTopic);
 
         setActiveReport(null);
     };

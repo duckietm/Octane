@@ -85,6 +85,17 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
         return newStyle;
     }, [avatarUrl, scale, style, headOnly, fit, compactHead, compactHeadSize, airMeMenu, nativeCroppedHead]);
 
+    // React reactivates effects in declaration order; enable requests before starting one.
+    useEffect(() => {
+        isDisposed.current = false;
+
+        setIsReady(true);
+
+        return () => {
+            isDisposed.current = true;
+        };
+    }, []);
+
     useEffect(() => {
         if (!isReady) return;
 
@@ -94,9 +105,11 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
         if (AVATAR_IMAGE_CACHE.has(figureKey)) {
             setAvatarUrl(AVATAR_IMAGE_CACHE.get(figureKey));
         } else {
+            let renderVersion = 0;
             const resetFigure = async (_figure: string) => {
                 if (isDisposed.current || requestIdRef.current !== requestId) return;
 
+                const currentRenderVersion = ++renderVersion;
                 const avatarImage = GetAvatarRenderManager().createAvatarImage(_figure, AvatarScaleType.LARGE, gender, {
                     resetFigure: (figure: string) => resetFigure(figure),
                     dispose: null,
@@ -123,7 +136,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
                 // tiny and drifts sideways inside the tile.
                 if (imageUrl && fit && !nativeCroppedHead) imageUrl = await cropOpaqueBoundsImageUrl(imageUrl);
 
-                if (imageUrl && !isDisposed.current && requestIdRef.current === requestId) {
+                if (imageUrl && !isDisposed.current && requestIdRef.current === requestId && currentRenderVersion === renderVersion) {
                     if (!avatarImage.isPlaceholder()) {
                         if (AVATAR_IMAGE_CACHE.size >= AVATAR_CACHE_MAX_SIZE) {
                             const firstKey = AVATAR_IMAGE_CACHE.keys().next().value;
@@ -142,16 +155,6 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
             resetFigure(figure);
         }
     }, [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, airMeMenu, nativeCroppedHead, isReady]);
-
-    useEffect(() => {
-        isDisposed.current = false;
-
-        setIsReady(true);
-
-        return () => {
-            isDisposed.current = true;
-        };
-    }, []);
 
     return (
         <Base classNames={getClassNames} style={getStyle} {...rest}>

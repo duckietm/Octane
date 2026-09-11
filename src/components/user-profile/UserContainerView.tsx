@@ -1,6 +1,6 @@
 import { CreateLinkEvent, GetSessionDataManager, RelationshipStatusInfoMessageParser, RequestFriendComposer, UserProfileParser } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { FriendlyTime, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
+import { FriendlyTime, LocalizeText, localizeWithFallback, SanitizeHtml, SendMessageComposer } from '../../api';
 import { badgeEmblemDefault } from '../../assets/images/leaderboard_badge';
 import { level as profileLevelIcon, rooms as profileRoomsIcon } from '../../assets/images/user-profile';
 import { LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../common';
@@ -10,11 +10,14 @@ interface UserContainerViewProps {
     userProfile: UserProfileParser;
     userBadges?: string[];
     userRelationships?: RelationshipStatusInfoMessageParser;
+    /** Official block_button / blocked_container: the user is on the ignore list. */
+    isBlocked?: boolean;
+    onToggleBlock?: () => void;
     onOpenRooms?: () => void;
 }
 
 export const UserContainerView: FC<UserContainerViewProps> = (props) => {
-    const { userProfile = null, userBadges = [], userRelationships = null, onOpenRooms = null } = props;
+    const { userProfile = null, userBadges = [], userRelationships = null, isBlocked = false, onToggleBlock = null, onOpenRooms = null } = props;
 
     const [requestSent, setRequestSent] = useState(userProfile.requestSent);
     const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
@@ -34,8 +37,27 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
         setRequestSent(userProfile.requestSent);
     }, [userProfile]);
 
+    const blockLabel = isBlocked ? LocalizeText('infostand.button.unignore') : LocalizeText('infostand.button.ignore');
+
     return (
-        <div className="octane-extended-profile">
+        <div className={`octane-extended-profile${isBlocked ? ' is-blocked' : ''}`}>
+            {!isOwnProfile && onToggleBlock && (
+                <button
+                    type="button"
+                    className={`octane-extended-profile__block-button${isBlocked ? ' is-active' : ''}`}
+                    title={blockLabel}
+                    aria-label={blockLabel}
+                    aria-pressed={isBlocked}
+                    onClick={onToggleBlock}
+                >
+                    <i className="fas fa-ban" aria-hidden="true" />
+                </button>
+            )}
+            {isBlocked && (
+                <div className="octane-extended-profile__blocked-overlay" aria-hidden="true">
+                    <span>{localizeWithFallback('extendedprofile.blocked', 'You are ignoring this Habbo')}</span>
+                </div>
+            )}
             <div className="octane-extended-profile__top">
                 <div className="octane-extended-profile__left">
                     <div className="octane-extended-profile__identity">

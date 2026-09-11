@@ -1,0 +1,116 @@
+/* New user experience dialogs (official HabboNuxDialogs): the old-user gift
+   offer (nux_offer_old_user, 456x220), the gift selection (nux_gift_selection,
+   487x287) and the newbie lobby offer (nux_noob_room_offer, 382x222). */
+.octane-nux-offer__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 2px 4px;
+}
+
+.octane-nux-offer__hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.octane-nux-offer__frank {
+    flex-shrink: 0;
+    width: 56px;
+    height: 54px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.octane-nux-offer__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.octane-nux-offer__summary {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+.octane-nux-offer__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 4px;
+}
+
+.octane-nux-offer__skip {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #0655b7;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-nux-offer__go {
+    min-width: 130px;
+}
+
+.octane-nux-offer__lobby-image {
+    max-width: 100%;
+    max-height: 120px;
+    image-rendering: pixelated;
+}
+
+/* Gift selection: a row of 118px wide options, thumbnail on a light grey
+   108x108 tile, the product names, and the "Get this" button. */
+.octane-nux-gifts__heading {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.octane-nux-gifts__list {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 4px 2px;
+}
+
+.octane-nux-gifts__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 118px;
+    flex-shrink: 0;
+}
+
+.octane-nux-gifts__thumbnail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 108px;
+    height: 108px;
+    border-radius: 4px;
+    background: #bfbfb8;
+}
+
+.octane-nux-gifts__thumbnail img {
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+}
+
+.octane-nux-gifts__name {
+    min-height: 24px;
+    font-size: 0.74rem;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.octane-nux-gifts__button {
+    width: 110px;
+}

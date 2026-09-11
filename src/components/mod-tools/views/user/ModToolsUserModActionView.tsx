@@ -8,11 +8,12 @@ import {
     ModMuteMessageComposer,
     ModTradingLockMessageComposer
 } from '@octane/renderer';
-import { FC, useMemo, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBan, FaBolt, FaEnvelope, FaExclamationTriangle, FaGavel, FaHistory, FaUserSlash, FaVolumeMute } from 'react-icons/fa';
-import { ISelectedUser, LocalizeText, ModActionDefinition, NotificationAlertType, SendMessageComposer } from '../../../../api';
+import { ISelectedUser, LocalizeText, localizeWithFallback, ModActionDefinition, NotificationAlertType, SendMessageComposer } from '../../../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useModTools, useNotification } from '../../../../hooks';
+import { formatDefaultSanctionLabel } from '../../common/ModToolsSanctionFormat';
 
 interface ModToolsUserModActionViewProps {
     user: ISelectedUser;
@@ -66,7 +67,7 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
     const [selectedAction, setSelectedAction] = useState(-1);
     const [message, setMessage] = useState<string>('');
     const [pendingSanction, setPendingSanction] = useState<ModActionDefinition>(null);
-    const { cfhCategories = null, settings = null, sanctionLog = null, recordSanction = null } = useModTools();
+    const { cfhCategories = null, settings = null, sanctionLog = null, recordSanction = null, defaultSanctions = null, requestDefaultSanction = null } = useModTools();
     const { simpleAlert = null } = useNotification();
     const isSendingRef = useRef<boolean>(false);
     const appliedThisSession = sanctionLog?.[user?.userId] ?? [];
@@ -82,6 +83,18 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
 
         return values;
     }, [cfhCategories]);
+
+    // ModActionCtrl.onTopicSelected: the server is asked what the default sanction for this
+    // account and topic would be; the answer fills `default_sanction_label`.
+    useEffect(() => {
+        const topic = selectedTopic >= 0 ? topics[selectedTopic] : null;
+
+        if (!user || !topic) return;
+
+        requestDefaultSanction?.(-1, user.userId, topic.id);
+    }, [selectedTopic, topics, user, requestDefaultSanction]);
+
+    const defaultSanctionLabel = formatDefaultSanctionLabel(user ? (defaultSanctions?.byAccount?.[user.userId] ?? null) : null);
 
     const sendAlert = (m: string) => simpleAlert(m, NotificationAlertType.DEFAULT, null, null, 'Error');
 
@@ -285,6 +298,15 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                                 <span className="opacity-60 tabular-nums shrink-0">{formatSanctionTime(entry.at)}</span>
                             </span>
                         ))}
+                    </div>
+                )}
+
+                {/* default_sanction_label: what "Default sanction" would apply, once the server answered */}
+                {defaultSanctionLabel && (
+                    <div className="flex items-center gap-1 text-[.8rem]" data-testid="default-sanction-label">
+                        <FaBolt className="opacity-60 shrink-0" size={10} />
+                        <span className="opacity-60">{localizeWithFallback('modtools.user.modaction.default_sanction', 'Default sanction')}:</span>
+                        <span className="font-semibold truncate">{defaultSanctionLabel}</span>
                     </div>
                 )}
 

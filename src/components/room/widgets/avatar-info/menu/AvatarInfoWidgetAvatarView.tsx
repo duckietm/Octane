@@ -18,6 +18,7 @@ import {
     GetOwnRoomObject,
     GetUserProfile,
     LocalizeText,
+    localizeWithFallback,
     MessengerFriend,
     ReportType,
     RoomWidgetUpdateChatInputContentEvent,
@@ -143,6 +144,9 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                     hideMenu = false;
                     setMode(MODE_NORMAL);
                     break;
+                case 'open_profile':
+                    GetUserProfile(avatarInfo.webID);
+                    break;
                 case 'whisper':
                     DispatchUiEvent(new RoomWidgetUpdateChatInputContentEvent(RoomWidgetUpdateChatInputContentEvent.WHISPER, avatarInfo.name));
                     break;
@@ -222,11 +226,20 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                 case 'ambassador_mute_10min':
                     roomSession.sendMuteMessage(avatarInfo.webID, 10);
                     break;
+                case 'ambassador_mute_15min':
+                    roomSession.sendMuteMessage(avatarInfo.webID, 15);
+                    break;
                 case 'ambassador_mute_60min':
                     roomSession.sendMuteMessage(avatarInfo.webID, 60);
                     break;
                 case 'ambassador_mute_18hour':
-                    roomSession.sendMuteMessage(avatarInfo.webID, 1080);
+                    roomSession.sendMuteMessage(avatarInfo.webID, 18 * 60);
+                    break;
+                case 'ambassador_mute_36hour':
+                    roomSession.sendMuteMessage(avatarInfo.webID, 36 * 60);
+                    break;
+                case 'ambassador_mute_72hour':
+                    roomSession.sendMuteMessage(avatarInfo.webID, 72 * 60);
                     break;
                 case 'rship_heart':
                     SendMessageComposer(new SetRelationshipStatusComposer(avatarInfo.webID, MessengerFriend.RELATIONSHIP_HEART));
@@ -267,6 +280,9 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
             ></ContextMenuHeaderView>
             {mode === MODE_NORMAL && (
                 <>
+                    <ContextMenuListItemView onClick={(event) => processAction('open_profile')}>
+                        {localizeWithFallback('infostand.link.open_profile', 'Open profile')}
+                    </ContextMenuListItemView>
                     {canRequestFriend(avatarInfo.webID) && (
                         <ContextMenuListItemView onClick={(event) => processAction('friend')}>
                             {LocalizeText('infostand.button.friend')}
@@ -395,17 +411,21 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
             )}
             {mode === MODE_AMBASSADOR_MUTE && (
                 <>
-                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_2min')}>
-                        {LocalizeText('infostand.button.mute_2min')}
-                    </ContextMenuListItemView>
-                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_10min')}>
-                        {LocalizeText('infostand.button.mute_10min')}
+                    {/* AIR 13 ambassador durations (AvatarMenuView.as, mode 7); an unmute row needs a packet the renderer does not have. */}
+                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_15min')}>
+                        {LocalizeText('infostand.button.mute_15min')}
                     </ContextMenuListItemView>
                     <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_60min')}>
                         {LocalizeText('infostand.button.mute_60min')}
                     </ContextMenuListItemView>
-                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_18hr')}>
+                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_18hour')}>
                         {LocalizeText('infostand.button.mute_18hour')}
+                    </ContextMenuListItemView>
+                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_36hour')}>
+                        {LocalizeText('infostand.button.mute_36hour')}
+                    </ContextMenuListItemView>
+                    <ContextMenuListItemView onClick={(event) => processAction('ambassador_mute_72hour')}>
+                        {LocalizeText('infostand.button.mute_72hour')}
                     </ContextMenuListItemView>
                     <ContextMenuListItemView onClick={(event) => processAction('back_ambassador')}>
                         <FaChevronLeft className="left fa-icon" />

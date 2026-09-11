@@ -1,14 +1,28 @@
 import { GetCfhStatusMessageComposer } from '@octane/renderer';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { FaArrowCircleRight } from 'react-icons/fa';
-import { CreateLinkEvent, DispatchUiEvent, GetConfigurationValue, LocalizeText, ReportState, ReportType, SendMessageComposer } from '../../../api';
+import {
+    CreateLinkEvent,
+    DispatchUiEvent,
+    GetConfigurationValue,
+    LocalizeText,
+    localizeWithFallback,
+    openHelpFaq,
+    ReportState,
+    ReportType,
+    SendMessageComposer
+} from '../../../api';
 import helpDuck from '../../../assets/images/help/help-duck.png';
 import { Text } from '../../../common';
 import { GuideToolEvent } from '../../../events';
-import { useHelp } from '../../../hooks';
+import { useHabboWay, useHelp, useSafetyBooklet } from '../../../hooks';
+import { MyReportsStatusView } from './MyReportsStatusView';
 
 export const HelpIndexView: FC<{}> = (props) => {
     const { setActiveReport = null } = useHelp();
+    const { showHabboWay = null } = useHabboWay();
+    const { showSafetyBooklet = null } = useSafetyBooklet();
+    const [reportsStatusVisible, setReportsStatusVisible] = useState(false);
 
     const onReportClick = () => {
         setActiveReport((prevValue) => {
@@ -17,6 +31,19 @@ export const HelpIndexView: FC<{}> = (props) => {
 
             return { ...prevValue, currentStep, reportType };
         });
+    };
+
+    /** Official habboway_link: the in-client booklet unless the hotel points it at a web page. */
+    const onHabboWayClick = () => {
+        const habboWayUrl = GetConfigurationValue<string>('habboway.url', '');
+
+        if (!GetConfigurationValue<boolean>('habboway.enabled', true) && habboWayUrl.length) {
+            window.open(habboWayUrl, 'habboMain');
+
+            return;
+        }
+
+        showHabboWay();
     };
 
     return (
@@ -44,19 +71,30 @@ export const HelpIndexView: FC<{}> = (props) => {
                 </button>
             </div>
             <div className="flex flex-col gap-1 pt-1">
-                <button type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
+                <button type="button" className="help-link" onClick={openHelpFaq}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.faq.link.text')}
+                </button>
+                <button type="button" className="help-link" onClick={onHabboWayClick}>
+                    <FaArrowCircleRight className="help-link__icon" />
+                    {localizeWithFallback('help.main.self.habboway.title', 'The Habbo Way')}
+                </button>
+                {/* Official safetybooklet_link -> HabboHelp.showSafetyBooklet */}
+                <button type="button" className="help-link" onClick={showSafetyBooklet}>
+                    <FaArrowCircleRight className="help-link__icon" />
+                    {localizeWithFallback('help.main.self.safetybooklet.title', 'Safety Policy')}
                 </button>
                 <button type="button" className="help-link" onClick={() => SendMessageComposer(new GetCfhStatusMessageComposer(false))}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.sanction.status')}
                 </button>
-                <button type="button" className="help-link" onClick={() => SendMessageComposer(new GetCfhStatusMessageComposer(true))}>
+                {/* The official client opens its "My reports" table here; ours opens the same window over a stub until the renderer parses the packet. */}
+                <button type="button" className="help-link" onClick={() => setReportsStatusVisible(true)}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.reports.status')}
                 </button>
             </div>
+            {reportsStatusVisible && <MyReportsStatusView onClose={() => setReportsStatusVisible(false)} />}
         </div>
     );
 };

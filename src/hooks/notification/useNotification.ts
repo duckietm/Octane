@@ -1,4 +1,5 @@
 import {
+    AccountSafetyLockStatusChangeMessageEvent,
     AchievementNotificationMessageEvent,
     ActivityPointNotificationMessageEvent,
     BadgeReceivedEvent,
@@ -6,6 +7,7 @@ import {
     ClubGiftNotificationEvent,
     ClubGiftSelectedEvent,
     ConnectionErrorEvent,
+    EpicPopupMessageEvent,
     GetLocalizationManager,
     GetRoomEngine,
     GetSessionDataManager,
@@ -19,26 +21,31 @@ import {
     ModeratorCautionEvent,
     ModeratorMessageEvent,
     NotificationDialogMessageEvent,
+    NotifyPlayedSongEvent,
     PetLevelNotificationEvent,
     PetReceivedMessageEvent,
+    RecyclerFinishedMessageEvent,
     RespectReceivedEvent,
     RoomEnterEffect,
     RoomEnterEvent,
+    RoomMessageNotificationMessageEvent,
     SimpleAlertMessageEvent,
     UserBannedMessageEvent,
     Vector3d,
     WiredRewardResultMessageEvent
 } from '@octane/renderer';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     GetConfigurationValue,
     IMentionEntry,
     LocalizeBadgeName,
     LocalizeText,
+    localizeWithFallback,
     MentionNotificationBubbleItem,
     NotificationAlertItem,
     NotificationAlertType,
+    NotificationBubbleExtras,
     NotificationBubbleItem,
     NotificationBubbleType,
     NotificationConfirmItem,
@@ -46,8 +53,10 @@ import {
     ProductImageUtility,
     TradingNotificationType
 } from '../../api';
-import { useMessageEvent } from '../events';
+import { useMessageEvent, useOctaneEvent } from '../events';
 import { useHotelAlertToastStore } from './hotelAlertToastStore';
+import { getFeedCategoryForBubbleType, pushNotificationFeedEntry } from './notificationFeedStore';
+import { isSafetyLockedStatus, useSafetyLockStore } from './safetyLockStore';
 
 const cleanText = (text: string) => (text && text.length ? text.replace(/\\r/g, '\r') : '');
 
@@ -61,6 +70,10 @@ const getTimeZeroPadded = (time: number) => {
 
 let modDisclaimerTimeout: ReturnType<typeof setTimeout> = null;
 const recentBadgeNotifications = new Set<string>();
+const recentAchievementNotifications = new Set<string>();
+
+/** The notification the help tool answers a call for help with; it gets its own illustrated alert. */
+const CALL_FOR_HELP_NOTIFICATION_TYPE = 'cfh.created';
 
 /**
  * Reads the "timeout" the server (or ui-config) sent with a notification: the number
@@ -92,12 +105,24 @@ export const prependSingleBubble = (alerts: NotificationBubbleItem[], item: Noti
     return [item, ...(shouldReplace ? alerts.filter((value) => value.notificationType !== item.notificationType) : alerts)];
 };
 
+/** Whether a bubble with this server id is already on screen (`SingularNotificationController.hasNotificationById`). */
+export const hasBubbleWithId = (alerts: NotificationBubbleItem[], id: string): boolean => !!id && alerts.some((value) => value.notificationId === id);
+
+/** Takes every bubble carrying the id off screen, as `removeNotificationById` does. */
+export const removeBubblesById = (alerts: NotificationBubbleItem[], id: string): NotificationBubbleItem[] =>
+    id ? alerts.filter((value) => value.notificationId !== id) : alerts;
+
 const useNotificationStore = () => {
     const [alerts, setAlerts] = useState<NotificationAlertItem[]>([]);
     const [bubbleAlerts, setBubbleAlerts] = useState<NotificationBubbleItem[]>([]);
     const [confirms, setConfirms] = useState<NotificationConfirmItem[]>([]);
     const [bubblesDisabled, setBubblesDisabled] = useState(false);
     const [modDisclaimerShown, setModDisclaimerShown] = useState(false);
+    // The bubbles as last committed, so a producer can refuse a duplicate id before the
+    // bubble (and its feed entry) is created.
+    const bubbleAlertsRef = useRef<NotificationBubbleItem[]>([]);
+
+    bubbleAlertsRef.current = bubbleAlerts;
 
     const getMainNotificationConfig = () =>
         GetConfigurationValue<{ [key: string]: { delivery?: string; display?: string; title?: string; image?: string } }>('notification', {});
@@ -144,16 +169,7 @@ const useNotificationStore = () => {
 
             if (!type || !type.length) type = NotificationAlertType.DEFAULT;
 
-            const alertItem = new NotificationAlertItem(
-                [cleanText(message)],
-                type,
-                clickUrl,
-                clickUrlText,
-                title,
-                imageUrl,
-                timeoutSeconds,
-                data
-            );
+            const alertItem = new NotificationAlertItem([cleanText(message)], type, clickUrl, clickUrlText, title, imageUrl, timeoutSeconds, data);
 
             setAlerts((prevValue) => prependSingleAlert(prevValue, alertItem));
         },
@@ -163,12 +179,20 @@ const useNotificationStore = () => {
     const showOctaneAlert = useCallback(() => simpleAlert(null, NotificationAlertType.OCTANE), [simpleAlert]);
 
     const showSingleBubble = useCallback(
-        (message: string, type: string, imageUrl: string = null, internalLink: string = null, senderName: string = '') => {
+        (message: string, type: string, imageUrl: string = null, internalLink: string = null, senderName: string = '', extras: NotificationBubbleExtras = null) => {
             if (bubblesDisabled) return;
 
-            const notificationItem = new NotificationBubbleItem(message, type, imageUrl, internalLink, senderName);
+            // A bubble the server gave an id to is shown once; a repeat of the same id
+            // while it is on screen is dropped, as the official controller does.
+            if (extras?.id && hasBubbleWithId(bubbleAlertsRef.current, extras.id)) return;
 
+            const notificationItem = new NotificationBubbleItem(message, type, imageUrl, internalLink, senderName, extras);
+
+            bubbleAlertsRef.current = prependSingleBubble(bubbleAlertsRef.current, notificationItem);
             setBubbleAlerts((prevValue) => prependSingleBubble(prevValue, notificationItem));
+            // The bubble fades in seconds; the feed keeps it for the session, as the official
+            // client's notification feed does.
+            pushNotificationFeedEntry({ category: getFeedCategoryForBubbleType(type), type, message, iconUrl: imageUrl, linkUrl: internalLink, senderName });
         },
         [bubblesDisabled]
     );
@@ -176,6 +200,7 @@ const useNotificationStore = () => {
     const showMentionBubble = useCallback((mention: IMentionEntry) => {
         const item = new MentionNotificationBubbleItem(mention);
 
+        // The feed lists the mentions store itself, so nothing is pushed here.
         setBubbleAlerts((prevValue) => [item, ...prevValue]);
     }, []);
 
@@ -296,6 +321,14 @@ const useNotificationStore = () => {
         });
     }, []);
 
+    /** Retracts the bubble(s) the server sent under this id, e.g. `wired_click_settings_toggle`. */
+    const removeBubbleById = useCallback((id: string) => {
+        if (!id) return;
+
+        bubbleAlertsRef.current = removeBubblesById(bubbleAlertsRef.current, id);
+        setBubbleAlerts((prevValue) => removeBubblesById(prevValue, id));
+    }, []);
+
     const closeConfirm = useCallback((item: NotificationConfirmItem) => {
         setConfirms((prevValue) => {
             const newConfirms = [...prevValue];
@@ -331,6 +364,9 @@ const useNotificationStore = () => {
             return;
         }
 
+        // Hotel alerts are the hotel category of the feed whichever way they are shown.
+        pushNotificationFeedEntry({ category: 'hotel', type: 'broadcast', title: LocalizeText('notifications.broadcast.title'), message: raw });
+
         if (GetConfigurationValue<boolean>('hotel_alert_animated', false) && raw.length <= HOTEL_ALERT_TOAST_MAX_LENGTH) {
             useHotelAlertToastStore.getState().pushToast(raw);
             return;
@@ -339,18 +375,80 @@ const useNotificationStore = () => {
         simpleAlert(raw, null, null, LocalizeText('notifications.broadcast.title'));
     });
 
+    // A level-up is its own "achievement" style in the official client (`class_1873.onLevelUp`):
+    // "You advanced to <name>!" with the badge as icon, opening the achievements window on the
+    // category of the achievement. The badge itself arrives separately as `badge_received`.
     useMessageEvent<AchievementNotificationMessageEvent>(AchievementNotificationMessageEvent, (event) => {
         const parser = event.getParser();
+        const badgeCode = parser.data.badgeCode;
 
-        if (recentBadgeNotifications.has(parser.data.badgeCode)) return;
+        if (recentAchievementNotifications.has(badgeCode)) return;
 
-        recentBadgeNotifications.add(parser.data.badgeCode);
-        setTimeout(() => recentBadgeNotifications.delete(parser.data.badgeCode), 3000);
+        recentAchievementNotifications.add(badgeCode);
+        setTimeout(() => recentAchievementNotifications.delete(badgeCode), 3000);
 
-        const badgeName = LocalizeBadgeName(parser.data.badgeCode);
-        const badgeImage = GetSessionDataManager().getBadgeUrl(parser.data.badgeCode);
+        const badgeName = LocalizeBadgeName(badgeCode);
+        const badgeImage = GetSessionDataManager().getBadgeUrl(badgeCode);
+        const text = localizeWithFallback('notification.new.achievement', `You advanced to ${badgeName}!`, ['achievement_name'], [badgeName]);
 
-        showSingleBubble(badgeName, NotificationBubbleType.BADGE_RECEIVED, badgeImage, parser.data.badgeCode);
+        showSingleBubble(text, NotificationBubbleType.ACHIEVEMENT, badgeImage, `questengine/achievements/${parser.data.category || ''}`);
+    });
+
+    // "New messages were posted in <room>" (`class_1873.onRoomMessagesNotification`); a click
+    // takes the owner to the room.
+    useMessageEvent<RoomMessageNotificationMessageEvent>(RoomMessageNotificationMessageEvent, (event) => {
+        const parser = event.getParser();
+        const count = String(parser.messageCount);
+        const text = localizeWithFallback(
+            'notifications.text.room.messages.posted',
+            `${count} new messages have been posted in ${parser.roomName}`,
+            ['room_name', 'messages_count'],
+            [parser.roomName, count]
+        );
+
+        showSingleBubble(text, NotificationBubbleType.ROOMMESSAGESPOSTED, null, parser.roomId > 0 ? `navigator/goto/${parser.roomId}` : null);
+    });
+
+    // The recycler only announces a finished run (`onRecyclerFinished` ignores the failure code).
+    useMessageEvent<RecyclerFinishedMessageEvent>(RecyclerFinishedMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (parser.recyclerFinishedStatus !== RecyclerFinishedMessageEvent.FINISHED_OK) return;
+
+        showSingleBubble(
+            localizeWithFallback('notifications.text.recycle.ok', 'Recycling complete! You have received a mysterious package!'),
+            NotificationBubbleType.RECYCLEROK
+        );
+    });
+
+    // The sound manager reports every song a sound machine starts (`HabboSoundManager.notifyPlayedSong`).
+    useOctaneEvent<NotifyPlayedSongEvent>(NotifyPlayedSongEvent.NOTIFY_PLAYED_SONG, (event) => {
+        const text = localizeWithFallback(
+            'soundmachine.notification.playing',
+            `Now playing ${event.name} by ${event.creator}`,
+            ['songname', 'songauthor'],
+            [event.name, event.creator]
+        );
+
+        showSingleBubble(text, NotificationBubbleType.SOUNDMACHINE);
+    });
+
+    // The safety-lock notice stays on the toolbar until the account is unlocked
+    // (`showSafetyLockedNotification` / `hideSafetyLockedNotification`).
+    useMessageEvent<AccountSafetyLockStatusChangeMessageEvent>(AccountSafetyLockStatusChangeMessageEvent, (event) => {
+        useSafetyLockStore.getState().setLocked(isSafetyLockedStatus(event.getParser().status));
+    });
+
+    // A campaign popup is one picture in a frame with a Close button (`HabboEpicPopupView`);
+    // a new one replaces the one still open.
+    useMessageEvent<EpicPopupMessageEvent>(EpicPopupMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser.imageUri) return;
+
+        const alertItem = new NotificationAlertItem([], NotificationAlertType.EPIC, null, null, '', parser.imageUri);
+
+        setAlerts((prevValue) => [alertItem, ...prevValue.filter((value) => value.alertType !== NotificationAlertType.EPIC)]);
     });
 
     useMessageEvent<ChestNotificationEvent>(ChestNotificationEvent, (event) => {
@@ -363,14 +461,7 @@ const useNotificationStore = () => {
         // than announcing an empty string.
         const chestName = parser.chestName || LocalizeText('wiredchests.notification.unnamed');
 
-        showSingleBubble(
-            LocalizeText(
-                key,
-                ['chest', 'name', 'amount'],
-                [chestName, parser.actorName, String(parser.amount)],
-            ),
-            NotificationBubbleType.INFO,
-        );
+        showSingleBubble(LocalizeText(key, ['chest', 'name', 'amount'], [chestName, parser.actorName, String(parser.amount)]), NotificationBubbleType.INFO);
     });
 
     useMessageEvent<BadgeReceivedEvent>(BadgeReceivedEvent, (event) => {
@@ -403,6 +494,16 @@ const useNotificationStore = () => {
 
     useMessageEvent<ModeratorMessageEvent>(ModeratorMessageEvent, (event) => {
         const parser = event.getParser();
+
+        // A message from staff is addressed to me, so it files under the "me" category.
+        pushNotificationFeedEntry({
+            category: 'me',
+            type: 'moderator',
+            title: LocalizeText('mod.alert.title'),
+            message: cleanText(parser.message),
+            linkUrl: parser.url,
+            buttonCaption: parser.url ? LocalizeText('mod.alert.link') : ''
+        });
 
         if (GetConfigurationValue<boolean>('hotel_alert_animated', false) && !parser.url && parser.message.length <= HOTEL_ALERT_TOAST_MAX_LENGTH) {
             useHotelAlertToastStore.getState().pushToast(cleanText(parser.message), LocalizeText('mod.alert.title'), 'staff');
@@ -548,6 +649,21 @@ const useNotificationStore = () => {
         const parser = event.getParser();
 
         if (parser.type === 'badge_received' || parser.type === 'badges') return;
+
+        // "Thanks for your call." is the one dialog type with its own illustrated alert and a
+        // safety FAQ link (`class_1873.showCallCreatedNotification`).
+        if (parser.type === CALL_FOR_HELP_NOTIFICATION_TYPE) {
+            const linkUrl = parser.parameters?.get('linkUrl') || null;
+
+            simpleAlert(
+                cleanText(parser.parameters?.get('message') || ''),
+                NotificationAlertType.DEFAULT,
+                linkUrl,
+                linkUrl ? localizeWithFallback('help.main.faq.link.text', 'Read more about Habbo safety') : null,
+                localizeWithFallback('help.cfh.sent.title', 'Thanks for your call.')
+            );
+            return;
+        }
 
         showNotification(parser.type, parser.parameters);
     });
@@ -704,6 +820,7 @@ const useNotificationStore = () => {
         showMentionBubble,
         closeAlert,
         closeBubbleAlert,
+        removeBubbleById,
         closeConfirm
     };
 };
@@ -714,7 +831,7 @@ const CHEST_NOTIFICATION_KEYS = [
     'wiredchests.notification.donation',
     'wiredchests.notification.withdraw',
     'wiredchests.notification.empty',
-    'wiredchests.notification.wired',
+    'wiredchests.notification.wired'
 ];
 
 export const useNotificationState = () => {
@@ -724,8 +841,18 @@ export const useNotificationState = () => {
 };
 
 export const useNotificationActions = () => {
-    const { simpleAlert, showOctaneAlert, showTradeAlert, showConfirm, showSingleBubble, showMentionBubble, closeAlert, closeBubbleAlert, closeConfirm } =
-        useSharedHook(useNotificationStore);
+    const {
+        simpleAlert,
+        showOctaneAlert,
+        showTradeAlert,
+        showConfirm,
+        showSingleBubble,
+        showMentionBubble,
+        closeAlert,
+        closeBubbleAlert,
+        removeBubbleById,
+        closeConfirm
+    } = useSharedHook(useNotificationStore);
 
     return {
         simpleAlert,
@@ -736,6 +863,7 @@ export const useNotificationActions = () => {
         showMentionBubble,
         closeAlert,
         closeBubbleAlert,
+        removeBubbleById,
         closeConfirm
     };
 };

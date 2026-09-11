@@ -1,4 +1,5 @@
 export * from './furniture';
+export * from './useAchievementResolution';
 export * from './useAvatarInfoWidget';
 export * from './useChatCommandSelector';
 export * from './useChatInputWidget';
@@ -16,8 +17,11 @@ export * from './useFurniChooserState';
 export * from './useFurniChooserWidget';
 export * from './usePetPackageWidget';
 export * from './usePollActions';
+export * from './usePollSessions';
 export * from './usePollSubscriptions';
 export * from './usePollWidget';
+export * from './useRoomCompetition';
+export * from './userChooser.helpers';
 export * from './useUserChooserActions';
 export * from './useUserChooserState';
 export * from './useUserChooserWidget';

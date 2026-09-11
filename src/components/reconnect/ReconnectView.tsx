@@ -1,6 +1,12 @@
 import { FC } from 'react';
-import { Base, Column, Text } from '../../common';
+import { localizeWithFallback } from '../../api';
+import { Button } from '../../common';
 import { getReconnectPresentation, useConnectionState } from '../../hooks';
+
+/* habbo_window_alert.xml: a 278x141 frame-3 window whose text starts 27px in
+   and whose buttons sit on a row 10px under it. */
+const ALERT_WIDTH = 278;
+const ALERT_MIN_HEIGHT = 141;
 
 export const ReconnectView: FC<{}> = () => {
     const connectionState = useConnectionState();
@@ -8,52 +14,65 @@ export const ReconnectView: FC<{}> = () => {
 
     if (!isReconnecting && !hasFailed) return null;
 
-    return (
-        <Column fullHeight position="fixed" className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <Column alignItems="center" gap={3} className="p-6 rounded-xl bg-[#1a1a2e]/90 border border-white/10 shadow-2xl max-w-[400px]">
-                {isReconnecting && (
-                    <>
-                        <Base className="w-[48px] h-[48px] border-4 border-white/20 border-t-[#4dabf7] rounded-full animate-spin" />
-                        <Text fontSizeCustom={18} variant="white" className="text-center font-semibold">
-                            Connection lost
-                        </Text>
-                        <Text fontSizeCustom={14} variant="white" className="text-center opacity-70">
-                            Reconnecting to server... (attempt {attempt}/{maxAttempts})
-                        </Text>
-                        <Base className="w-full h-[4px] rounded-full bg-white/10 overflow-hidden mt-1">
-                            <Base
-                                className="h-full bg-[#4dabf7] rounded-full transition-all duration-300"
-                                style={{ width: `${maxAttempts > 0 ? (attempt / maxAttempts) * 100 : 0}%` }}
-                            />
-                        </Base>
-                        <Text fontSizeCustom={12} variant="white" className="text-center opacity-50">
-                            Please wait, your session will be restored automatically
-                        </Text>
-                    </>
-                )}
+    const title = isReconnecting
+        ? localizeWithFallback('disconnected.reconnecting.title', 'Connection lost')
+        : localizeWithFallback('disconnected.expired.title', 'Session expired');
 
-                {hasFailed && (
-                    <>
-                        <Text fontSizeCustom={36} className="text-center text-red-500">
-                            &#9888;
-                        </Text>
-                        <Text fontSizeCustom={18} variant="white" className="text-center font-semibold">
-                            Session expired
-                        </Text>
-                        <Text fontSizeCustom={14} variant="white" className="text-center opacity-70">
-                            Your session has expired. Please log in again to enter the hotel.
-                        </Text>
-                        <Base className="mt-2 flex gap-3">
-                            <a
-                                href={window.location.origin + '/'}
-                                className="px-6 py-2 rounded-lg bg-[#3b82f6] text-white font-semibold cursor-pointer hover:bg-[#2563eb] transition-colors no-underline"
-                            >
-                                Back to Hotel
-                            </a>
-                        </Base>
-                    </>
-                )}
-            </Column>
-        </Column>
+    const attemptText = localizeWithFallback(
+        'disconnected.reconnecting.attempt',
+        `Reconnecting to the hotel... (attempt ${attempt}/${maxAttempts})`,
+        ['attempt', 'max'],
+        [attempt.toString(), maxAttempts.toString()]
+    );
+
+    const progress = maxAttempts > 0 ? Math.min(100, (attempt / maxAttempts) * 100) : 0;
+
+    return (
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="octane-reconnect-title"
+        >
+            {/* Not a OctaneCardView: the alert must not be draggable or closable, and it lives outside the window stack. */}
+            <div
+                className="octane-card octane-card-shell octane-card-frame-3 relative flex flex-col"
+                style={{ width: ALERT_WIDTH, minHeight: ALERT_MIN_HEIGHT, resize: 'none' }}
+                data-testid="reconnect-alert"
+            >
+                <div className="octane-card-header-shell relative flex items-center justify-center">
+                    <span id="octane-reconnect-title" className="octane-card-title text-white">
+                        {title}
+                    </span>
+                </div>
+                <div className="octane-card-content-shell flex flex-col grow gap-[10px] !pt-[14px] !px-[27px] !pb-[10px]">
+                    {isReconnecting && (
+                        <>
+                            <p className="m-0">{attemptText}</p>
+                            <div className="w-full h-[6px] overflow-hidden border border-[#8d8d8d] bg-white" aria-hidden="true">
+                                <div className="h-full bg-[#418db0] transition-[width] duration-300" style={{ width: `${progress}%` }} />
+                            </div>
+                            <p className="m-0 opacity-70">
+                                {localizeWithFallback('disconnected.reconnecting.wait', 'Please wait, your session will be restored automatically.')}
+                            </p>
+                        </>
+                    )}
+
+                    {hasFailed && (
+                        <>
+                            <p className="m-0">{localizeWithFallback('disconnected.generic', 'You have been disconnected. Please try again.')}</p>
+                            <p className="m-0 opacity-70">
+                                {localizeWithFallback('disconnected.expired.body', 'Your session has expired. Please log in again to enter the hotel.')}
+                            </p>
+                            <div className="flex justify-center mt-auto">
+                                <Button variant="primary" onClick={() => window.location.assign(`${window.location.origin}/`)}>
+                                    {localizeWithFallback('disconnected.expired.button', 'Back to Hotel')}
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 };

@@ -9,17 +9,36 @@ import {
     ModeratorActionResultMessageEvent,
     ModeratorInitData,
     ModeratorInitMessageEvent,
-    ModeratorToolPreferencesEvent
+    ModeratorToolPreferencesEvent,
+    ModToolSanctionComposer
 } from '@octane/renderer';
 import { useCallback, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { NotificationAlertType, PlaySound, SoundNames } from '../../api';
+import { NotificationAlertType, PlaySound, SendMessageComposer, SoundNames } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 
 export interface ModToolsSanctionEntry {
     label: string;
     at: number;
+}
+
+/** What the server answers a sanction-data request with (`CfhSanctionTypeData`), kept as plain data. */
+export interface ModToolsDefaultSanction {
+    name: string;
+    sanctionLengthInHours: number;
+    avatarOnly: boolean;
+    tradeLockInfo: string;
+    machineBanInfo: string;
+}
+
+/**
+ * `IssueManager.updateSanctionData` routes an answer by issue id when it carries one (the issue
+ * handler's label) and by account id otherwise (the mod action window's label).
+ */
+export interface ModToolsDefaultSanctions {
+    byIssue: Record<number, ModToolsDefaultSanction>;
+    byAccount: Record<number, ModToolsDefaultSanction>;
 }
 
 const useModToolsState = () => {
@@ -33,6 +52,7 @@ const useModToolsState = () => {
     // What this moderator has already applied to whom, for as long as the client is open.
     // Two panels on the same person is the easy way to sanction twice for one thing.
     const [sanctionLog, setSanctionLog] = useState<Record<number, ModToolsSanctionEntry[]>>({});
+    const [defaultSanctions, setDefaultSanctions] = useState<ModToolsDefaultSanctions>({ byIssue: {}, byAccount: {} });
     const { simpleAlert = null } = useNotification();
 
     const openRoomInfo = (roomId: number) => {
@@ -189,9 +209,32 @@ const useModToolsState = () => {
 
     useMessageEvent<CfhSanctionMessageEvent>(CfhSanctionMessageEvent, (event) => {
         const parser = event.getParser();
+        const sanctionType = parser?.sanctionType;
 
-        // todo: update sanction data
+        if (!sanctionType) return;
+
+        const sanction: ModToolsDefaultSanction = {
+            name: sanctionType.name ?? '',
+            sanctionLengthInHours: sanctionType.sanctionLengthInHours ?? 0,
+            avatarOnly: !!sanctionType.avatarOnly,
+            tradeLockInfo: sanctionType.tradeLockInfo ?? '',
+            machineBanInfo: sanctionType.machineBanInfo ?? ''
+        };
+
+        setDefaultSanctions((prev) =>
+            parser.issueId > 0
+                ? { ...prev, byIssue: { ...prev.byIssue, [parser.issueId]: sanction } }
+                : { ...prev, byAccount: { ...prev.byAccount, [parser.accountId]: sanction } }
+        );
     });
+
+    /**
+     * `IssueManager.requestSanctionData` / `requestSanctionDataForAccount`: ask what the default
+     * sanction for the topic would be, for an issue (account -1) or for an account (issue -1).
+     */
+    const requestDefaultSanction = useCallback((issueId: number, accountId: number, topicId: number) => {
+        SendMessageComposer(new ModToolSanctionComposer(issueId, accountId, topicId));
+    }, []);
 
     const recordSanction = useCallback((userId: number, label: string) => {
         setSanctionLog((prev) => ({ ...prev, [userId]: [...(prev[userId] ?? []), { label, at: Date.now() }] }));
@@ -201,6 +244,8 @@ const useModToolsState = () => {
         settings,
         sanctionLog,
         recordSanction,
+        defaultSanctions,
+        requestDefaultSanction,
         openRooms,
         openRoomChatlogs,
         openUserChatlogs,

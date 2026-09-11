@@ -200,3 +200,12 @@
     width: 0 !important;
     height: 0 !important;
 }
+
+/* OctaneCardView classicScrollbar={false}: the window drops the 17px skin for
+   the slim native scrollbar. The standard properties win over the WebKit
+   pseudo-elements in current engines, so one rule undoes the whole theme. */
+.has-classic-scrollbar .octane-scrollbar-native,
+.has-classic-scrollbar .octane-scrollbar-native * {
+    scrollbar-width: thin !important;
+    scrollbar-color: #8d8d8d transparent !important;
+}
