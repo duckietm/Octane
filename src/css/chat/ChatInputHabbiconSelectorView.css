@@ -206,7 +206,7 @@
     border-image-source: url('../../assets/images/habbicons/slices/selector-tile-hover.png');
 }
 
-.habbicon-selector-item span {
+.habbicon-selector-item > img {
     position: absolute;
     inset: 0;
     display: block;
@@ -247,13 +247,12 @@
     overflow: hidden;
 }
 
-.habbicon-hub-window .octane-card-header-shell {
-    background: #418db0;
-}
-
 .habbicon-hub-body {
-    position: relative;
-    height: 533px;
+    position: absolute;
+    left: 2px;
+    top: 35px;
+    width: 554px;
+    height: 530px;
     background: #d7d1be;
 }
 
@@ -317,7 +316,7 @@
     height: 42px;
     padding: 5px 6px 0;
     text-align: center;
-    background: #41aad3;
+    background: transparent;
     border-radius: 4px;
 }
 
@@ -389,15 +388,13 @@
     min-width: 64px;
     padding: 0 12px;
     color: #222;
-    border: 1px solid #777;
-    border-bottom: 0;
-    border-radius: 6px 6px 0 0;
-    background: linear-gradient(#f7f4ea, #d4cfbf);
+    border: 7px solid transparent;
+    border-image: url("../../assets/images/habbo-skin/slices/tab-3-default.png") 7 fill / 7px stretch;
+    background: transparent;
 }
 
 .habbicon-hub-tabs button.active {
-    background: #f6ebd7;
-    border-bottom: 1px solid #f6ebd7;
+    border-image-source: url("../../assets/images/habbo-skin/slices/tab-3-selected.png");
 }
 
 .habbicon-hub-all-sets {
@@ -494,42 +491,87 @@
 .habbicon-hub-tray-grid {
     display: grid;
     grid-template-columns: repeat(4, 50px);
+    grid-auto-rows: 50px;
+    align-content: start;
     gap: 4px;
     padding: 8px;
 }
 
 .habbicon-hub-grid {
+    position: absolute;
+    left: 8px;
+    top: 106px;
+    padding: 0;
+    width: 234px;
     height: 266px;
     overflow-y: auto;
 }
 
-.habbicon-hub-grid button,
-.habbicon-hub-tray-grid button {
+.habbicon-tile, .habbicon-empty-tile {
     position: relative;
+    box-sizing: border-box;
     width: 50px;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    background: #f8ebd6;
-    border: 1px solid #c8be8d;
+    border: 1px solid #99c176;
+    background: #c3d3a7;
 }
 
-.habbicon-hub-grid button.active,
-.habbicon-hub-tray-grid button.active,
-.habbicon-hub-grid button:hover,
-.habbicon-hub-tray-grid button:hover {
-    background: #fff5d6;
-    border-color: #54a8e8;
+.habbicon-tile.unowned {
+    background: #e0d6c2;
+    border-color: #d4c2ad;
 }
 
-.habbicon-hub-grid button span,
-.habbicon-hub-tray-grid button span {
-    display: block;
-    background-repeat: no-repeat;
-    image-rendering: pixelated;
+.habbicon-tile.owned:hover {
+    background: #cddfb2;
+    border-color: #bcd99f;
 }
+
+.habbicon-tile.owned.active {
+    background: #d4e6b9;
+    border-color: #d3e9bd;
+}
+
+.habbicon-tile.unowned:hover {
+    background: #e8dec9;
+    border-color: #e6ddc8;
+}
+
+.habbicon-tile.unowned.active {
+    background: #ebdfcb;
+    border-color: #eaddcd;
+}
+
+.habbicon-tile.unowned:not(.claimable) .habbicon-tile-image {
+    filter: url(#habbicon-unowned-filter);
+}
+
+.habbicon-tile.unowned:not(.claimable)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #ffffff33;
+    pointer-events: none;
+}
+
+.habbicon-empty-tile {
+    opacity: .2;
+    background: transparent;
+    border-color: #c8be8d;
+}
+
+.habbicon-claimable-marker {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 18px;
+    height: 18px;
+    background: url("../../assets/images/habbicons/claimable.png") no-repeat;
+}
+
 
 .habbicon-hub-fav {
     position: absolute;
@@ -587,21 +629,243 @@
     font-size: 12px;
 }
 
-.habbicon-hub-popup button {
-    width: 156px;
-    height: 28px;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
+
+.habbicon-hub-tray-grid {
+    grid-template-columns: repeat(9, 50px);
+}
+
+.habbicon-hub-tray section {
+    background: #efe1c4;
+    padding: 7px 10px 9px;
+}
+
+.habbicon-hub-tray section > strong {
+    margin: 0 0 6px;
+}
+
+.habbicon-hub-tray-grid {
+    padding: 0;
+}
+
+.habbicon-hub-reward {
+    position: absolute;
+    right: 12px;
+    top: 106px;
+    width: 116px;
+    height: 152px;
+    padding: 0 8px 8px;
+    background: #e7d5b2;
+    text-align: center;
+    font-size: 11px;
+}
+
+.habbicon-hub-reward > strong {
+    display: block;
+    height: 23px;
+}
+
+.habbicon-hub-reward > img {
+    display: block;
+    margin: 0 auto;
+    box-sizing: content-box;
+    padding: 3px;
+    background: #f8ebd6;
+}
+
+.habbicon-hub-reward > p {
+    min-height: 26px;
+    margin: 6px 0;
+}
+
+.habbicon-hub-buy-set {
+    position: absolute;
+    top: 161px;
+    left: 0;
+    width: 116px;
+    min-height: 71px;
+    padding: 4px 8px 8px;
+    background: #e7d5b2;
+}
+
+.habbicon-hub-buy-set > strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.habbicon-hub-buy-set > button {
+    margin-top: 5px;
+}
+
+.habbicon-price {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.habbicon-action {
+    min-height: 28px;
+    padding: 0 8px;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-green) 5 fill / 5px stretch;
+    background: transparent;
+    border-radius: 0;
+    color: white;
+    font: bold 12px Ubuntu, sans-serif;
     text-shadow: 0 1px #000;
-    border: 1px solid #fff;
-    border-radius: 3px;
 }
 
-.habbicon-hub-popup button.add {
-    background: #01a101;
+.habbicon-action:hover {
+    border-image-source: var(--habbo-skin-shiny-green-hover);
 }
 
-.habbicon-hub-popup button.remove {
-    background: #7a0030;
+.habbicon-action:active {
+    border-image-source: var(--habbo-skin-shiny-green-pressed);
+}
+
+.habbicon-action:disabled {
+    border-image-source: var(--habbo-skin-shiny-green-disabled);
+    cursor: default;
+}
+
+.habbicon-action.remove {
+    border-image-source: var(--habbo-skin-shiny-red);
+}
+
+.habbicon-action.remove:hover {
+    border-image-source: var(--habbo-skin-shiny-red-hover);
+}
+
+.habbicon-action.remove:disabled {
+    border-image-source: var(--habbo-skin-shiny-red-disabled);
+}
+
+.habbicon-hub-popup .habbicon-action {
+    max-width: 156px;
+}
+
+.habbicon-hub-popup p {
+    margin: 6px 8px;
+}
+
+.habbicon-popup-purchase {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.habbicon-hub-reward > .habbicon-action, .habbicon-hub-buy-set > .habbicon-action {
+    width: 100%;
+}
+
+.habbicon-chat-trigger {
+    position: relative;
+}
+
+.habbicon-unseen-count {
+    position: absolute;
+    left: 15px;
+    top: -7px;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 2px;
+    border-radius: 6px;
+    background: #c62725;
+    border: 1px solid white;
+    color: white;
+    font-size: 10px;
+    line-height: 13px;
+}
+
+.habbicon-error {
+    position: absolute;
+    bottom: 0;
+    left: 7px;
+    right: 7px;
+    padding: 8px;
+    color: #8a1425;
+    background: #fff4e7;
+}
+
+.habbicon-hub-empty {
+    padding: 12px;
+}
+
+.habbicon-purchase-window {
+    width: 353px !important;
+    min-width: 353px !important;
+    min-height: 296px !important;
+}
+
+.habbicon-purchase-body {
+    margin: 35px 3px 3px;
+    padding: 8px 10px;
+    background: #e9e9e1;
+    font: 12px Ubuntu, sans-serif;
+}
+
+.habbicon-purchase-top {
+    display: grid;
+    grid-template-columns: 126px 1fr;
+    gap: 7px;
+    min-height: 164px;
+}
+
+.habbicon-purchase-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 126px;
+    min-height: 152px;
+    background: #f6f1df;
+    padding: 12px 8px;
+}
+
+.habbicon-purchase-preview > img {
+    box-sizing: content-box;
+    padding: 23px;
+    background: #efefef;
+}
+
+.habbicon-purchase-top h3 {
+    font-size: 14px;
+    margin: 15px 0 6px;
+}
+
+.habbicon-purchase-top p {
+    margin-bottom: 6px;
+}
+
+.habbicon-purchase-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.habbicon-purchase-receive {
+    padding: 5px 8px;
+    background: #f0e8cf;
+    font-weight: bold;
+}
+
+.habbicon-purchase-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.habbicon-cancel {
+    text-decoration: underline;
+    background: none;
+    border: 0;
+}
+
+.habbicon-hub-progress-fill, .habbicon-hub-set-progress-bar > div, .habbicon-hub-rail-progress > div {
+    transition: width 300ms ease;
 }

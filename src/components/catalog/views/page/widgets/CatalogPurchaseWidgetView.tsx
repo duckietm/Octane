@@ -15,6 +15,8 @@ import {
     SendMessageComposer
 } from '../../../../../api';
 import { getCatalogBundlePrice } from '../../../../../api/catalog/CatalogBundleDiscount';
+import { useHabbiconCatalog } from '../../../../../api/habbicons';
+import { localizeWithFallback } from '../../../../../api/utils/localizeWithFallback';
 import { LayoutLoadingSpinnerView, Text } from '../../../../../common';
 import {
     CatalogEvent,
@@ -46,6 +48,7 @@ interface CatalogPurchaseWidgetViewProps {
 export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (props) => {
     const { noGiftOption = false, purchaseCallback = null } = props;
     const [builderPlaceableRefreshTick, setBuilderPlaceableRefreshTick] = useState(0);
+    const habbicons = useHabbiconCatalog();
     const [purchaseWillBeGift, setPurchaseWillBeGift] = useState(false);
     const [purchaseState, setPurchaseState] = useState(CatalogPurchaseState.NONE);
     const purchasePendingRef = useRef(false);
@@ -214,8 +217,12 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
         return false;
     }, [currentOffer, purchaseOptions]);
 
+    const habbiconOwned =
+        currentOffer?.product?.productType === ProductTypeEnum.HABBICON &&
+        habbicons.entries.some((entry) => entry.id === currentOffer.product.productClassId && (entry.owned || entry.claimable));
+
     const purchase = (isGift: boolean = false) => {
-        if (!canPurchaseCatalogOffer(currentOffer) || purchasePendingRef.current) return;
+        if (habbiconOwned || !canPurchaseCatalogOffer(currentOffer) || purchasePendingRef.current) return;
 
         if (GetClubMemberLevel() < currentOffer.clubLevel) {
             CreateLinkEvent('habboUI/open/hccenter');
@@ -324,6 +331,13 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     const PurchaseButton = () => {
         const standardButtonClassNames = ['octane-catalog-standard-button'];
         const purchaseButtonClassNames = [...standardButtonClassNames, 'octane-catalog-standard-buy-button'];
+
+        if (habbiconOwned)
+            return (
+                <button type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                    {localizeWithFallback('generic.owned', 'Owned')}
+                </button>
+            );
 
         if (isBuildersClubPlaceable) {
             const hasMissingExtraParam = purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length);
@@ -457,6 +471,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                         purchaseOptions.quantity > 1 ||
                         isOfferUnavailable ||
                         !currentOffer.giftable ||
+                        currentOffer.product?.productType === ProductTypeEnum.HABBICON ||
                         isLimitedSoldOut ||
                         (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))
                     }
