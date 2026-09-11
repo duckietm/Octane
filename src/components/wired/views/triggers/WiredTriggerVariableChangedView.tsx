@@ -13,7 +13,6 @@ import {
     createFallbackVariableEntry,
     flattenWiredVariablePickerEntries,
     getCustomVariableItemId,
-    IWiredVariablePickerEntry,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
@@ -57,15 +56,6 @@ const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string }> = [
     { key: 'context', icon: contextVariableIcon },
     { key: 'global', icon: globalVariableIcon }
 ];
-
-const filterCustomEntries = (entries: IWiredVariablePickerEntry[]): IWiredVariablePickerEntry[] => {
-    return entries
-        .filter((entry) => entry.kind === 'custom')
-        .map((entry) => ({
-            ...entry,
-            children: entry.children?.filter((child) => child.kind === 'custom')
-        }));
-};
 
 const normalizeTargetType = (value: number): VariableTargetType => {
     switch (value) {
@@ -143,7 +133,7 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
         [arrayDefinitions, arrayVariableType, variableToken]
     );
     const variableEntries = useMemo(
-        () => filterCustomEntries(buildWiredVariablePickerEntries(targetType, 'condition', variableDefinitions)),
+        () => buildWiredVariablePickerEntries(targetType, 'trigger', variableDefinitions),
         [targetType, variableDefinitions]
     );
     const resolvedVariableEntries = useMemo(() => {
@@ -152,7 +142,7 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
 
         const fallbackEntry = createFallbackVariableEntry(targetType, variableToken);
 
-        return fallbackEntry && fallbackEntry.kind === 'custom' ? [fallbackEntry, ...variableEntries] : variableEntries;
+        return fallbackEntry ? [fallbackEntry, ...variableEntries] : variableEntries;
     }, [targetType, variableEntries, variableToken]);
     const effectiveCreatedEnabled = targetType === 'global' ? false : createdEnabled;
     const effectiveDeletedEnabled = targetType === 'global' ? false : deletedEnabled;

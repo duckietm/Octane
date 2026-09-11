@@ -1,5 +1,5 @@
 export type WiredVariablePickerTarget = 'user' | 'furni' | 'global' | 'context';
-export type WiredVariablePickerUsage = 'give' | 'remove' | 'change-destination' | 'change-reference' | 'condition' | 'filter-main' | 'echo';
+export type WiredVariablePickerUsage = 'give' | 'remove' | 'change-destination' | 'change-reference' | 'condition' | 'filter-main' | 'echo' | 'trigger';
 
 export interface IWiredVariableDefinitionLike {
     availability: number;
@@ -37,6 +37,7 @@ const INTERNAL_VARIABLE_ALIASES: Record<string, string> = {
     '@position.y': '@position_y',
     '@effect': '@effect_id',
     '@handitems': '@handitem_id',
+    '@handitem': '@handitem_id',
     '@team.score': '@team_score',
     '@player.score': '@player_score',
     '@is_mute': '@is_muted',
@@ -179,6 +180,12 @@ const getNormalizedInternalTarget = (target: WiredVariablePickerTarget): 'user' 
 
 const getInternalSelectable = (usage: WiredVariablePickerUsage, meta: IInternalVariableMeta) => {
     switch (usage) {
+        case 'give':
+            return ['@effect_id', '@handitem_id', '@has_rights'].includes(meta.key);
+        case 'remove':
+            return meta.key === '@has_rights';
+        case 'trigger':
+            return meta.canUseAsDestination || meta.key === '@has_rights';
         case 'condition':
             return true;
         case 'filter-main':
@@ -199,6 +206,7 @@ const getCustomSelectable = (usage: WiredVariablePickerUsage, definition: IWired
     if (definition.unavailable) return false;
 
     switch (usage) {
+        case 'trigger':
         case 'condition':
         case 'filter-main':
             return true;
@@ -228,7 +236,7 @@ const createInternalEntry = (target: WiredVariablePickerTarget, usage: WiredVari
     displayLabel: meta.key,
     searchableText: meta.key,
     selectable: getInternalSelectable(usage, meta),
-    hasValue: meta.canUseAsReference,
+    hasValue: usage === 'give' && meta.key === '@has_rights' ? false : meta.canUseAsReference,
     kind: 'internal',
     target
 });

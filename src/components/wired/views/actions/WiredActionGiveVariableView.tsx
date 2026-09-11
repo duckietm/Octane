@@ -11,10 +11,10 @@ import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCE
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import {
     buildWiredVariablePickerEntries,
-    createCustomVariableToken,
     createFallbackVariableEntry,
     flattenWiredVariablePickerEntries,
     getCustomVariableItemId,
+    isInternalVariableToken,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredActionBaseView } from './WiredActionBaseView';
@@ -123,17 +123,13 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
     useEffect(() => {
         if (!trigger) return;
 
-        const parsedVariableItemId = parseInt((trigger.stringData || '').trim(), 10);
+        const savedVariableToken = normalizeVariableTokenFromWire(trigger.stringData || '');
         const nextTargetType = normalizeTargetType(trigger.intData.length > 0 ? trigger.intData[0] : TARGET_USER);
 
         setSelectedTargetType(nextTargetType);
         setSelectedVariableToken(
-            normalizeVariableTokenFromWire(
-                !Number.isNaN(parsedVariableItemId) && parsedVariableItemId > 0
-                    ? String(parsedVariableItemId)
-                    : nextTargetType === 'user' && (trigger.selectedItems?.length ?? 0) > 0
-                      ? String(trigger.selectedItems[0])
-                      : ''
+            savedVariableToken || normalizeVariableTokenFromWire(
+                nextTargetType === 'user' && (trigger.selectedItems?.length ?? 0) > 0 ? String(trigger.selectedItems[0]) : ''
             )
         );
         setOverrideExisting(trigger.intData.length > 1 ? trigger.intData[1] === 1 : false);
@@ -154,12 +150,12 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
         const parsedInitialValue = parseInt(initialValueInput.trim(), 10);
         const variableItemId = getCustomVariableItemId(selectedVariableToken);
 
-        setStringParam(variableItemId ? String(variableItemId) : '');
+        setStringParam(isInternalVariableToken(selectedVariableToken) ? selectedVariableToken : variableItemId ? String(variableItemId) : '');
         setIntParams([targetValue, overrideExisting ? 1 : 0, Number.isFinite(parsedInitialValue) ? parsedInitialValue : 0, userSource, furniSource]);
         setFurniIds(selectedTargetType === 'furni' && furniSource === SOURCE_SELECTED ? [...furniIds] : []);
     };
 
-    const validate = () => getCustomVariableItemId(selectedVariableToken) > 0;
+    const validate = () => !!selectedVariableDefinition?.selectable;
 
     const requiresFurni =
         selectedTargetType === 'furni' ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT : WiredFurniType.STUFF_SELECTION_OPTION_NONE;
