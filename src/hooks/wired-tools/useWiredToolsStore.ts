@@ -7,8 +7,7 @@ import {
     WiredUserVariableManageComposer,
     WiredUserVariablesDataEvent,
     WiredUserVariablesRequestComposer,
-    WiredUserVariableUpdateComposer
-} from '@octane/renderer';
+    WiredUserVariableUpdateComposer, WiredEnvironmentEvent} from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook } from '@/state/useSharedHook';
 import {
@@ -23,6 +22,12 @@ import {
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 import { useRoom } from '../rooms';
+
+/** What the room's wired can do to the client, from the official WiredEnvironment packet. */
+export interface IWiredEnvironment {
+    enabledAchievements: string[];
+    hasClickUserWired: boolean;
+}
 
 export interface IWiredAccountPreferences {
     showInspectButton: boolean;
@@ -111,6 +116,11 @@ const WIRED_VARIABLE_MANAGE_ACTION_CLEAR_ALL = 2;
 
 const WIRED_TOOLS_STORAGE_PREFIX = 'nitro.wired.tools.preferences';
 const getCurrentUnixTime = () => Math.floor(Date.now() / 1000);
+const DEFAULT_ENVIRONMENT: IWiredEnvironment = {
+    hasClickUserWired: false,
+    enabledAchievements: []
+};
+
 const DEFAULT_ACCOUNT_PREFERENCES: IWiredAccountPreferences = {
     showToolbarButton: false,
     showInspectButton: false,
@@ -144,6 +154,7 @@ export const useWiredToolsStore = () => {
     const { simpleAlert = null } = useNotification();
     const [accountPreferences, setAccountPreferences] = useState<IWiredAccountPreferences>(DEFAULT_ACCOUNT_PREFERENCES);
     const [roomSettings, setRoomSettings] = useState<IWiredRoomSettings>(DEFAULT_ROOM_SETTINGS);
+    const [wiredEnvironment, setWiredEnvironment] = useState<IWiredEnvironment>(DEFAULT_ENVIRONMENT);
     const [userVariableDefinitions, setUserVariableDefinitions] = useState<IWiredUserVariableDefinition[]>([]);
     const [userVariableAssignments, setUserVariableAssignments] = useState<Record<number, IWiredUserVariableAssignment[]>>({});
     const [furniVariableDefinitions, setFurniVariableDefinitions] = useState<IWiredFurniVariableDefinition[]>([]);
@@ -239,6 +250,15 @@ export const useWiredToolsStore = () => {
 
         requestUserVariables();
     }, [roomSession?.roomId, roomSettings.canInspect, requestUserVariables]);
+
+    useMessageEvent<WiredEnvironmentEvent>(WiredEnvironmentEvent, (event) => {
+        const parser = event.getParser();
+
+        setWiredEnvironment({
+            hasClickUserWired: parser.hasClickUserWired,
+            enabledAchievements: [...(parser.enabledAchievements || [])]
+        });
+    });
 
     useMessageEvent<WiredRoomSettingsDataEvent>(WiredRoomSettingsDataEvent, (event) => {
         const parser = event.getParser();
@@ -659,6 +679,7 @@ export const useWiredToolsStore = () => {
     return {
         accountPreferences,
         roomSettings,
+        wiredEnvironment,
         showInspectButton,
         showToolbarButton,
         userVariableDefinitions,

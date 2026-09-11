@@ -22,4 +22,7 @@ export class FurniCategory {
     public static MONSTERPLANT_REBREED: number = 21;
     public static MONSTERPLANT_FERTILIZE: number = 22;
     public static FIGURE_PURCHASABLE_SET: number = 23;
+    /* Official `FurniCategory` (AIR 13): the two chest kinds the inventory tile draws an overlay for. */
+    public static FURNI_CHEST: number = 24;
+    public static COINS_CHEST: number = 25;
 }

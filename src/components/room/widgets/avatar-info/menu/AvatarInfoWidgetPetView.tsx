@@ -8,8 +8,8 @@ import {
     RoomUnitGiveHandItemPetComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { AvatarInfoPet, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
-import { useHasPermission, useRoom, useSessionInfo } from '../../../../../hooks';
+import { AvatarInfoPet, GetOwnRoomObject, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../api';
+import { useHasPermission, usePetBreedingWidget, useRoom, useSessionInfo } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -30,6 +30,10 @@ export const AvatarInfoWidgetPetView: FC<AvatarInfoWidgetPetViewProps> = (props)
     const { roomSession = null, isHandItemBlocked = false } = useRoom();
     const { petRespectRemaining = 0, respectPet = null } = useSessionInfo();
     const canManageAnyRoom = useHasPermission('acc_anyroomowner');
+    const { pendingPlantId = null, cancelMonsterplantBreeding = null, breedMonsterplantWith = null } = usePetBreedingWidget();
+
+    /** A plant somebody else left open to breeding is a valid second half of a pair. */
+    const isBreedingTarget = pendingPlantId !== null && pendingPlantId !== avatarInfo?.id && !!avatarInfo?.publiclyBreedable && !avatarInfo?.dead;
 
     const canPickUp = useMemo(() => {
         return roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST || canManageAnyRoom;
@@ -75,6 +79,12 @@ export const AvatarInfoWidgetPetView: FC<AvatarInfoWidgetPetViewProps> = (props)
                     break;
                 case 'dismount':
                     roomSession.dismountPet(avatarInfo.id);
+                    break;
+                case 'breed_with':
+                    breedMonsterplantWith(avatarInfo.id);
+                    break;
+                case 'breed_cancel':
+                    cancelMonsterplantBreeding();
                     break;
             }
         }
@@ -126,6 +136,16 @@ export const AvatarInfoWidgetPetView: FC<AvatarInfoWidgetPetViewProps> = (props)
             )}
             {mode === MODE_MONSTER_PLANT && !avatarInfo.dead && avatarInfo.energy / avatarInfo.maximumEnergy < 0.98 && (
                 <ContextMenuListItemView onClick={(event) => processAction('treat')}>{LocalizeText('infostand.button.pettreat')}</ContextMenuListItemView>
+            )}
+            {mode === MODE_MONSTER_PLANT && isBreedingTarget && (
+                <>
+                    <ContextMenuListItemView onClick={(event) => processAction('breed_with')}>
+                        {localizeWithFallback('infostand.button.breed_with', 'Breed with the chosen plant')}
+                    </ContextMenuListItemView>
+                    <ContextMenuListItemView onClick={(event) => processAction('breed_cancel')}>
+                        {localizeWithFallback('infostand.button.breed_cancel', 'Choose another plant')}
+                    </ContextMenuListItemView>
+                </>
             )}
             {canPickUp && (
                 <ContextMenuListItemView onClick={(event) => processAction('pick_up')}>{LocalizeText('infostand.button.pickup')}</ContextMenuListItemView>

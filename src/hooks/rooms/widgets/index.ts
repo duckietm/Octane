@@ -15,6 +15,7 @@ export * from './useFriendRequestWidget';
 export * from './useFurniChooserActions';
 export * from './useFurniChooserState';
 export * from './useFurniChooserWidget';
+export * from './usePetBreedingWidget';
 export * from './usePetPackageWidget';
 export * from './usePollActions';
 export * from './usePollSessions';

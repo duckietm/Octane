@@ -3,5 +3,7 @@ export * from './promotes';
 export * from './roomVisitHistory';
 export * from './useRoom';
 export * from './useRoomKeyboardMovement';
+export * from './useRoomQueue';
+export * from './useRoomSpecialEvents';
 export * from './useRoomVisitHistory';
 export * from './widgets';

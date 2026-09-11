@@ -38,6 +38,7 @@ import { NavigatorRoomLinkView } from './views/NavigatorRoomLinkView';
 import { NavigatorRoomSettingsView } from './views/room-settings/NavigatorRoomSettingsView';
 import { NavigatorEmptyStateView } from './views/search/NavigatorEmptyStateView';
 import { NavigatorRoomInfoPopupView } from './views/search/NavigatorRoomInfoPopupView';
+import { NavigatorOfficialRoomsView } from './views/NavigatorOfficialRoomsView';
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
 import { NavigatorSearchSavesResultView } from './views/search/NavigatorSearchSavesResultView';
 import { NavigatorSearchView } from './views/search/NavigatorSearchView';
@@ -294,6 +295,8 @@ export const NavigatorView: FC<{}> = () => {
                                         <NavigatorSearchView searchResult={searchResult} />
                                         <div ref={elementRef} className="octane-navigator-air__results">
                                             {isFetching && <div className="octane-navigator-air__busy-mask" aria-hidden="true" />}
+                                            {/* AIR 13 official rooms list (OfficialRooms, 438) sits above the search results of the official tab. */}
+                                            {(searchResult?.code === 'official_view' || currentTabCode === 'official_view') && <NavigatorOfficialRoomsView />}
                                             {searchResult &&
                                                 searchResult.results.map((result, index) => (
                                                     <NavigatorSearchResultView

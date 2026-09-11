@@ -2,6 +2,7 @@ import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, IPurchasableOffer, LocalizeText, localizeWithFallback, ProductTypeEnum } from '../../../api';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
 import { LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
+import { useLtdRaffle } from '../../../hooks';
 
 interface CatalogPurchaseConfirmViewProps {
     offer: IPurchasableOffer;
@@ -25,10 +26,12 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
     const spendingDisclaimerEnabled = GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false) === true;
     const [spendingDisclaimerAccepted, setSpendingDisclaimerAccepted] = useState(!spendingDisclaimerEnabled);
     const [raffleTick, setRaffleTick] = useState(0);
-    const isRaffling = isSubmitting && !!offer?.product?.isUniqueLimitedItem;
+    const { raffleActive = false } = useLtdRaffle();
+    // The server says the purchase joined a raffle (event 933) and says when it is over
+    // (event 2316). A hotel that runs no raffle never sends either, so the line still runs
+    // for as long as an LTD purchase is pending, exactly as it did before.
+    const isRaffling = raffleActive || (isSubmitting && !!offer?.product?.isUniqueLimitedItem);
 
-    // The workspace renderer has no LTD raffle entered/result events, so the "hold on" line runs
-    // for as long as the purchase itself is pending instead of for the raffle window.
     useEffect(() => {
         if (!isRaffling) return;
 

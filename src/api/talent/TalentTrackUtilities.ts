@@ -31,6 +31,7 @@ export const TALENT_CITIZENSHIP_ENABLED_CONFIG = 'talent.track.citizenship.enabl
 export const TALENT_PROMO_TRACK_CONFIG = 'talentpromo.track';
 export const CITIZENSHIP_POPUP_ENABLED_CONFIG = 'new.user.citizenship.popup.enabled';
 export const NEW_IDENTITY_CONFIG = 'new.identity';
+export const TALENT_EMAIL_CHANGE_ENABLED_CONFIG = 'talent.progress.emailchange.enabled';
 
 /** The shape the renderer parsers (TalentTrackLevel / TalentTrackTask / reward classes) expose. */
 export interface TalentTrackTaskLike {
@@ -55,7 +56,7 @@ export interface TalentTrackLevelLike {
     items: TalentTrackRewardProductLike[];
 }
 
-/** The level-up rewards: the renderer parser hands perk ids back as numbers, the official (and the emulator) as strings. */
+/** The level-up rewards: perk ids are strings on the wire, kept normalized as strings here. */
 export interface TalentLevelUpRewards {
     perks: string[];
     products: TalentTrackRewardProductLike[];
@@ -66,6 +67,9 @@ export const isTalentTrackEnabled = (): boolean => !!GetConfigurationValue<boole
 
 /** HabboTalent.citizenshipEnabled */
 export const isCitizenshipEnabled = (): boolean => !!GetConfigurationValue<boolean>(TALENT_CITIZENSHIP_ENABLED_CONFIG, false);
+
+/** TalentTrackController.emailChangeEnabled: the e-mail block of the task dialog. */
+export const isTalentEmailChangeEnabled = (): boolean => !!GetConfigurationValue<boolean>(TALENT_EMAIL_CHANGE_ENABLED_CONFIG, false);
 
 /** The talent track the toolbar / landing promos point at (HabboTalentsPromoWidget, TalentPromoCtrl). */
 export const getPromotedTalentTrack = (): string =>

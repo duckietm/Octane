@@ -150,6 +150,35 @@
     pointer-events: none;
 }
 
+/* chest_overlay_(brown|gold)_background + ChestItemGridOverlayWidget: the contents count sits on a
+   small plate at the bottom of the tile, in the chest's own colour. */
+.octane-inventory-window .octane-inventory-thumb-chest {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 11px;
+    line-height: 11px;
+    border-radius: 2px;
+    color: #ffffff;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-brown {
+    background: #7a4a1e;
+    border: 1px solid #4a2a0c;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-gold {
+    background: #d9a521;
+    border: 1px solid #8a6d13;
+    color: #3a2c00;
+}
+
 .octane-inventory-window .octane-inventory-thumb-rent {
     position: absolute;
     top: 4px;

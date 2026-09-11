@@ -855,6 +855,38 @@
     padding: 14px 0 6px;
 }
 
+/* email_container of task_progress_dialog: the e-mail row of ACH_EmailVerification1. */
+.octane-talent-email-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 10px 14px;
+}
+
+.octane-talent-email-unverified {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.octane-talent-email-input {
+    width: 100%;
+    padding: 3px 5px;
+    border: 1px solid #a3a3a3;
+    border-radius: 3px;
+    background: #fff;
+    color: #000;
+}
+
+.octane-talent-email-input.is-invalid {
+    border-color: #c73535;
+}
+
+.octane-talent-email-error {
+    color: #c73535;
+}
+
 .octane-talent-task-actions button {
     min-width: 246px;
 }

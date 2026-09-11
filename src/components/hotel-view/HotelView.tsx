@@ -108,7 +108,8 @@ const SLOT_WIDGET_TYPES: Array<{ value: HotelViewSlotType; label: string; title:
     { value: 'roomhoppernetwork', label: 'Room hopper network (official)', title: '', body: '', buttonText: '', link: 'navigator/goto/random_friending_room' },
     { value: 'generic', label: 'Generic widget (official conf)', title: '', body: '', buttonText: '', link: '' },
     { value: 'communitygoalvsmode', label: 'Community goal VS mode (official)', title: '', body: '', buttonText: '', link: '' },
-    { value: 'communitygoalvsmodevote', label: 'Community goal VS mode + vote (official)', title: '', body: '', buttonText: '', link: '' }
+    { value: 'communitygoalvsmodevote', label: 'Community goal VS mode + vote (official)', title: '', body: '', buttonText: '', link: '' },
+    { value: 'widgetcontainer', label: 'Widget container (scheduled, official)', title: '', body: '', buttonText: '', link: '' }
 ];
 
 const parseSlotConfig = (configJson: string): HotelViewSlotConfig => {

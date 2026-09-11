@@ -26,7 +26,7 @@ vi.mock('../useRoom', () => ({
 vi.mock('@octane/renderer', () => ({
     CompetitionEntrySubmitResultEvent: class {},
     CompetitionVotingInfoMessageEvent: class {},
-    NoOwnedRoomsAlertMessageEvent: class {},
+    NavigatorOpenRoomCreatorEvent: class {},
     ForwardToASubmittableRoomMessageComposer: class {},
     CompetitionRoomsSearchMessageComposer: class CompetitionRoomsSearchMessageComposer {
         constructor(

@@ -55,8 +55,11 @@
     background: rgba(36, 35, 30, 0.6);
 }
 
-.octane-help-modal-backdrop .octane-card {
-    position: relative;
+/* The window inside a help modal is portalled into #draggable-windows-container, where the drag
+   code hands out z-indexes from 400 up: without this it lands underneath the backdrop, which then
+   swallows every click - including the one on its own close button. */
+#draggable-windows-container [data-window-key='safety-booklet'] {
+    z-index: 1201 !important;
 }
 
 /* Unlawful-activity branch of the report flow (official unlawful_message_content):

@@ -3,12 +3,18 @@ import {
     Game2AccountGameStatusMessageParser,
     Game2CheckGameDirectoryStatusMessageComposer,
     Game2GameDirectoryStatusMessageEvent,
+    Game2GetAccountGameStatusMessageComposer,
+    Game2UserBlockedMessageEvent,
     GameConfigurationData,
     GameListMessageEvent,
     GameStatusMessageEvent,
     GetGameListMessageComposer,
+    GetSnowWarGameTokensOfferComposer,
     LoadGameUrlEvent,
-    RoomEnterEvent
+    PurchaseSnowWarGameTokensOfferComposer,
+    RoomEnterEvent,
+    SnowWarGameTokenOffer,
+    SnowWarGameTokensMessageEvent
 } from '@octane/renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
@@ -31,6 +37,9 @@ const useGameCenterState = () => {
     const [gamesPlayed, setGamesPlayed] = useState<number>(0);
     const [blockSeconds, setBlockSeconds] = useState<number>(0);
     const blockDeadlineRef = useRef<number>(null);
+    // AIR SnowWarGameTokens (3419): the offers behind games_main's
+    // btn_more_games_10 / _100 / _300 buttons.
+    const [tokenOffers, setTokenOffers] = useState<SnowWarGameTokenOffer[]>([]);
 
     useMessageEvent<GameListMessageEvent>(GameListMessageEvent, (event) => {
         let parser = event.getParser();
@@ -87,6 +96,34 @@ const useGameCenterState = () => {
         });
     });
 
+    // AIR Game2UserBlocked (3508) -> GamesMainViewController.changeBlockStatus:
+    // leaving a live match blocks the play button for a while.
+    useMessageEvent<Game2UserBlockedMessageEvent>(Game2UserBlockedMessageEvent, (event) => {
+        let parser = event.getParser();
+
+        if (!parser) return;
+
+        const seconds = Math.max(0, parser.playerBlockLength);
+
+        blockDeadlineRef.current = (seconds > 0) ? snowWarDeadlineFromSeconds(Date.now(), seconds) : null;
+        setBlockSeconds(seconds);
+    });
+
+    useMessageEvent<SnowWarGameTokensMessageEvent>(SnowWarGameTokensMessageEvent, (event) => {
+        let parser = event.getParser();
+
+        if (!parser) return;
+
+        setTokenOffers(parser.offers ?? []);
+    });
+
+    // AIR HabboCatalog.purchaseGameTokensOffer: buy by offer id, then refresh
+    // the games-left counter the purchase just changed.
+    const purchaseTokenOffer = useCallback((offerId: number) => {
+        SendMessageComposer(new PurchaseSnowWarGameTokensOfferComposer(offerId));
+        SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(0));
+    }, []);
+
     const blockTicking = (blockSeconds > 0);
 
     useEffect(() => {
@@ -137,6 +174,10 @@ const useGameCenterState = () => {
             // AIR HTIE_ICON_GAMES: refresh the game directory (block status,
             // games played, free games) every time the hub opens.
             SendMessageComposer(new Game2CheckGameDirectoryStatusMessageComposer());
+            // AIR HabboCatalog.buySnowWarTokensOffer: the offers are fetched
+            // once and cached, so the "get more games" buttons can price
+            // themselves before anyone clicks.
+            SendMessageComposer(new GetSnowWarGameTokensOfferComposer());
             VisitDesktop();
         } else {
             setInstructionsOpen(false);
@@ -156,7 +197,9 @@ const useGameCenterState = () => {
         instructionsOpen,
         setInstructionsOpen,
         gamesPlayed,
-        blockSeconds
+        blockSeconds,
+        tokenOffers,
+        purchaseTokenOffer
     };
 };
 

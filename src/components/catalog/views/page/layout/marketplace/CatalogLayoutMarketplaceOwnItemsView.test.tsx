@@ -2,11 +2,17 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const renderer = vi.hoisted(() => ({
+    CancelAllMarketplaceOffersMessageComposer: class {},
     CancelMarketplaceOfferMessageComposer: class {
         public constructor(public readonly offerId: number) {}
     },
+    ClearOwnMarketplaceHistoryMessageComposer: class {
+        public constructor(public readonly state: number) {}
+    },
     GetMarketplaceOwnOffersMessageComposer: class {},
+    MarketplaceCancelAllOffersResultEvent: class {},
     MarketplaceCancelOfferResultEvent: class {},
+    MarketplaceClearOwnHistoryResultEvent: class {},
     MarketplaceOwnOffersEvent: class {},
     RedeemMarketplaceOfferCreditsMessageComposer: class {}
 }));
@@ -127,7 +133,7 @@ describe('CatalogLayoutMarketplaceOwnItemsView', () => {
         expect(screen.getByText('catalog.marketplace.no_items')).toBeInTheDocument();
     });
 
-    it('recalls every open offer after confirmation, one cancel composer each', () => {
+    it('recalls every open offer with one request and drops the offers the server returns', () => {
         render(<CatalogLayoutMarketplaceOwnItemsView hideNavigation={() => undefined} page={null} />);
         dispatchOwnOffers([
             { offerId: 1, furniId: 10, status: 1 },
@@ -141,28 +147,42 @@ describe('CatalogLayoutMarketplaceOwnItemsView', () => {
 
         act(() => confirm.onConfirm?.());
 
-        const cancelled = api.SendMessageComposer.mock.calls
-            .map((call) => call[0])
-            .filter((composer) => composer instanceof renderer.CancelMarketplaceOfferMessageComposer)
-            .map((composer) => (composer as { offerId: number }).offerId);
+        const sent = api.SendMessageComposer.mock.calls.map((call) => call[0]);
 
-        expect(cancelled).toEqual([1, 3]);
+        expect(sent.filter((composer) => composer instanceof renderer.CancelAllMarketplaceOffersMessageComposer)).toHaveLength(1);
+        expect(sent.filter((composer) => composer instanceof renderer.CancelMarketplaceOfferMessageComposer)).toHaveLength(0);
+
+        act(() =>
+            handlers.get(renderer.MarketplaceCancelAllOffersResultEvent)?.({
+                getParser: () => ({ offerIds: [1, 3], success: true })
+            })
+        );
+
+        expect(screen.queryAllByTestId('own-offer')).toHaveLength(0);
     });
 
-    it('hides the sold list when marked as seen until the server sends a new list', () => {
+    it('clears the sold list through the server once the tab is marked as seen', () => {
         render(<CatalogLayoutMarketplaceOwnItemsView hideNavigation={() => undefined} page={null} />);
         dispatchOwnOffers([{ offerId: 2, furniId: 11, status: 2 }]);
 
         fireEvent.change(screen.getByTestId('marketplace-own-category'), { target: { value: '2' } });
         expect(screen.getAllByTestId('own-offer')).toHaveLength(1);
+        api.SendMessageComposer.mockClear();
 
         fireEvent.click(screen.getByText('Mark as seen'));
         act(() => confirm.onConfirm?.());
 
-        expect(screen.queryAllByTestId('own-offer')).toHaveLength(0);
+        const cleared = api.SendMessageComposer.mock.calls
+            .map((call) => call[0])
+            .filter((composer) => composer instanceof renderer.ClearOwnMarketplaceHistoryMessageComposer)
+            .map((composer) => (composer as { state: number }).state);
 
-        dispatchOwnOffers([{ offerId: 2, furniId: 11, status: 2 }]);
-
+        expect(cleared).toEqual([2]);
+        // Nothing disappears until the server confirms the tab was cleared.
         expect(screen.getAllByTestId('own-offer')).toHaveLength(1);
+
+        act(() => handlers.get(renderer.MarketplaceClearOwnHistoryResultEvent)?.({ getParser: () => ({ success: true }) }));
+
+        expect(screen.queryAllByTestId('own-offer')).toHaveLength(0);
     });
 });
