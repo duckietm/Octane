@@ -40,3 +40,4 @@ export { useNavigatorData } from './useNavigatorData';
 export { useNavigatorFavourite } from './useNavigatorFavourite';
 export { useNavigatorSearch } from './useNavigatorSearch';
 export { useNavigatorUiState } from './useNavigatorUiState';
+export * from './useOfficialRooms';

@@ -8,6 +8,7 @@ import { NotificationFriendOnlineBubbleView } from './NotificationFriendOnlineBu
 import { NotificationMentionBubbleView } from './NotificationMentionBubbleView';
 import { NotificationRoomMessagesPostedBubbleView } from './NotificationRoomMessagesPostedBubbleView';
 import { NotificationSoundMachineBubbleView } from './NotificationSoundMachineBubbleView';
+import { NotificationTreasureHuntBubbleView } from './NotificationTreasureHuntBubbleView';
 
 /**
  * The fade behaviour a bubble asked for through its extras: `stay` keeps it until closed
@@ -44,6 +45,8 @@ export const GetBubbleLayout = (item: NotificationBubbleItem, onClose: () => voi
             return <NotificationRoomMessagesPostedBubbleView key={item.id} {...props} />;
         case NotificationBubbleType.SOUNDMACHINE:
             return <NotificationSoundMachineBubbleView key={item.id} {...props} />;
+        case NotificationBubbleType.TREASURE_HUNT:
+            return <NotificationTreasureHuntBubbleView key={item.id} {...timedProps} />;
         case NotificationBubbleType.MENTION:
             return <NotificationMentionBubbleView key={item.id} item={item as MentionNotificationBubbleItem} onClose={onClose} />;
         default:

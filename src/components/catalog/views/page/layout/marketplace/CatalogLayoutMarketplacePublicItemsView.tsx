@@ -39,9 +39,12 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
 
     const requestOffers = useCallback((options: IMarketplaceSearchOptions) => {
         setLastSearch(options);
-        // The official composer (header 2407) carries options.combineUniques as a fifth boolean;
-        // the workspace renderer composer stops at the sort type, so the flag stays client-side.
-        SendMessageComposer(new GetMarketplaceOffersMessageComposer(options.minPrice, options.maxPrice, options.query, options.type));
+        // Header 2407 carries combineUniques as its fifth field, the `combine_uniques_checkbox`
+        // of `marketplace_search_simple`: with it on the server folds every serial of the same
+        // LTD furni into a single row.
+        SendMessageComposer(
+            new GetMarketplaceOffersMessageComposer(options.minPrice, options.maxPrice, options.query, options.type, options.combineUniques)
+        );
     }, []);
 
     const confirmPurchase = useCallback((offerData: MarketplaceOfferData) => {

@@ -3,7 +3,15 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
 import { Text } from '../../../../common';
-import { useChatCommandSelector, useChatInputWidget, useChatMentions, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
+import {
+    useChatCommandSelector,
+    useChatInputWidget,
+    useChatMentions,
+    usePurchasableChatStyles,
+    useRoom,
+    useSessionInfo,
+    useUiEvent
+} from '../../../../hooks';
 import { ChatInputCommandSelectorView } from './ChatInputCommandSelectorView';
 import { ChatInputEmojiSelectorView } from './ChatInputEmojiSelectorView';
 import { ChatInputHabbiconSelectorView } from './ChatInputHabbiconSelectorView';
@@ -18,6 +26,7 @@ export const ChatInputView: FC<{}> = (props) => {
     const [portalTarget, setPortalTarget] = useState<HTMLElement>(null);
     const [showReminder, setShowReminder] = useState<boolean>(() => shouldShowChatReminder(window.localStorage));
     const { chatStyleId = 0, updateChatStyleId = null } = useSessionInfo();
+    const { purchasableChatStyleIds = [] } = usePurchasableChatStyles();
     const {
         selectedUsername = '',
         floodBlocked = false,
@@ -309,8 +318,14 @@ export const ChatInputView: FC<{}> = (props) => {
             if (!style.isHcOnly && !style.isAmbassadorOnly) styleIds.push(style.styleId);
         }
 
+        // RoomChatInputView.as:412-416: a style the account bought is offered even when the
+        // rank, club or ambassador rules above would have left it out.
+        for (const styleId of purchasableChatStyleIds) {
+            if (styleIds.indexOf(styleId) === -1) styleIds.push(styleId);
+        }
+
         return styleIds;
-    }, []);
+    }, [purchasableChatStyleIds]);
 
     useEffect(() => {
         document.body.addEventListener('keydown', onKeyDownEvent);

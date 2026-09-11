@@ -35,8 +35,8 @@ const lookupText = (key: string): string => LocalizeText(key);
  * - `nux_noob_room_offer`, the newbie lobby invitation shown a while after a
  *   real newbie enters the home room (or through `nux/lobbyoffer/show`).
  *
- * The official script-proceed packet carries the reason (0 verify, 2 never
- * again); the renderer composer sends none, so both paths send the same packet.
+ * The official script-proceed packet carries the reason: 0 from "Verify & get
+ * gifts" and 2 from the "never again" confirmation.
  */
 export const NuxView: FC<{}> = () => {
     const [offerVisible, setOfferVisible] = useState(false);
@@ -115,7 +115,7 @@ export const NuxView: FC<{}> = () => {
     useEffect(() => () => clearLobbyTimer(), [clearLobbyTimer]);
 
     const onVerify = () => {
-        SendMessageComposer(new NewUserExperienceScriptProceedComposer());
+        SendMessageComposer(new NewUserExperienceScriptProceedComposer(NewUserExperienceScriptProceedComposer.VERIFY));
         setOfferVisible(false);
     };
 
@@ -124,7 +124,7 @@ export const NuxView: FC<{}> = () => {
             localizeWithFallback('phone.number.never.again.confirm.text', 'Are you sure you never want to see this offer again?'),
             () => {
                 setOfferVisible(false);
-                SendMessageComposer(new NewUserExperienceScriptProceedComposer());
+                SendMessageComposer(new NewUserExperienceScriptProceedComposer(NewUserExperienceScriptProceedComposer.NEVER_AGAIN));
             },
             null,
             null,

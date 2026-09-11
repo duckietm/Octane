@@ -48,6 +48,8 @@ const DEFAULT_USER_DATA: Readonly<IUserDataSnapshot> = Object.freeze({
     respectsReceived: 0,
     respectsLeft: 0,
     respectsPetLeft: 0,
+    respectReplenishesLeft: 0,
+    maxRespectPerDay: 3,
     canChangeName: false,
     clubLevel: 0,
     securityLevel: 0,
@@ -67,6 +69,7 @@ const DEFAULT_USER_DATA: Readonly<IUserDataSnapshot> = Object.freeze({
 }) as Readonly<IUserDataSnapshot>;
 
 const EMPTY_IGNORED_LIST: ReadonlyArray<string> = Object.freeze<string[]>([]) as ReadonlyArray<string>;
+const EMPTY_BLOCKED_LIST: ReadonlyArray<number> = Object.freeze<number[]>([]) as ReadonlyArray<number>;
 const EMPTY_GROUP_BADGES: ReadonlyMap<number, string> = new Map();
 const EMPTY_USER_LIST: ReadonlyArray<IRoomUserData> = Object.freeze<IRoomUserData[]>([]) as ReadonlyArray<IRoomUserData>;
 const EMPTY_PERMISSIONS: ReadonlyMap<string, number> = new Map();
@@ -115,6 +118,26 @@ export const useIgnoredUsersSnapshot = (): ReadonlyArray<string> =>
 
         return inner.getIgnoredUsersSnapshot();
     });
+
+/**
+ * Official `BlockedUsersManager` list (packets 485 / 697 / 1886 / 2649): the block list is
+ * keyed by user id and is separate from the ignore list.
+ */
+export const useBlockedUsersSnapshot = (): ReadonlyArray<number> =>
+    useExternalSnapshot(subscribeTo(OctaneEventType.BLOCKED_USERS_UPDATED), () => {
+        const inner = GetSessionDataManager()?.blockedUsersManager;
+
+        if (!inner || typeof inner.getBlockedUsersSnapshot !== 'function') return EMPTY_BLOCKED_LIST;
+
+        return inner.getBlockedUsersSnapshot();
+    });
+
+/** Reactive predicate built on top of `useBlockedUsersSnapshot`. */
+export const useIsUserBlocked = (userId: number): boolean => {
+    const list = useBlockedUsersSnapshot();
+
+    return useMemo(() => list.includes(userId), [list, userId]);
+};
 
 /**
  * Reactive predicate built on top of `useIgnoredUsersSnapshot`.

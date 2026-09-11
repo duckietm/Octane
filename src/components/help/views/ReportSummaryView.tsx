@@ -3,7 +3,8 @@ import {
     CallForHelpFromForumThreadMessageComposer,
     CallForHelpFromIMMessageComposer,
     CallForHelpFromPhotoMessageComposer,
-    CallForHelpMessageComposer
+    CallForHelpMessageComposer,
+    ChatReviewSessionCreateMessageComposer
 } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, ReportType, SendMessageComposer } from '../../../api';
@@ -16,12 +17,21 @@ export const ReportSummaryView: FC<{}> = (props) => {
     const submitReport = () => {
         const chats: (string | number)[] = [];
 
-        // Unlawful-activity reports also collect the reporter's name and e-mail
-        // (activeReport.reporterName / reporterEmail); the official composers
-        // append them as two strings, ours do not carry them yet.
+        // Official class_2390 and friends: every CallForHelp composer ends with the reporter
+        // name and e-mail, filled in only by the unlawful-activity branch.
+        const reporterName = activeReport.reporterName ?? '';
+        const reporterEmail = activeReport.reporterEmail ?? '';
 
         switch (activeReport.reportType) {
-            case ReportType.BULLY:
+            // A bullying report opens a guardian chat review, not a call for help:
+            // `HabboHelp.reportBully` sends ChatReviewSessionCreate(reportedUserId, roomId)
+            // and the emulator answers it in ReportBullyEvent.
+            case ReportType.BULLY: {
+                const bullyRoomId = activeReport.roomId <= 0 ? (activeReport.reportedChats[0]?.roomId ?? 0) : activeReport.roomId;
+
+                SendMessageComposer(new ChatReviewSessionCreateMessageComposer(activeReport.reportedUserId, bullyRoomId));
+                break;
+            }
             case ReportType.EMERGENCY:
             case ReportType.ROOM: {
                 const reportedRoomId = activeReport.roomId <= 0 ? activeReport.reportedChats[0].roomId : activeReport.roomId;
@@ -29,18 +39,42 @@ export const ReportSummaryView: FC<{}> = (props) => {
                 activeReport.reportedChats.forEach((entry) => chats.push(entry.webId, entry.message));
 
                 SendMessageComposer(
-                    new CallForHelpMessageComposer(activeReport.message, activeReport.cfhTopic, activeReport.reportedUserId, reportedRoomId, chats)
+                    new CallForHelpMessageComposer(
+                        activeReport.message,
+                        activeReport.cfhTopic,
+                        activeReport.reportedUserId,
+                        reportedRoomId,
+                        chats,
+                        reporterName,
+                        reporterEmail
+                    )
                 );
                 break;
             }
             case ReportType.IM:
                 activeReport.reportedChats.forEach((entry) => chats.push(entry.webId, entry.message));
 
-                SendMessageComposer(new CallForHelpFromIMMessageComposer(activeReport.message, activeReport.cfhTopic, activeReport.reportedUserId, chats));
+                SendMessageComposer(
+                    new CallForHelpFromIMMessageComposer(
+                        activeReport.message,
+                        activeReport.cfhTopic,
+                        activeReport.reportedUserId,
+                        chats,
+                        reporterName,
+                        reporterEmail
+                    )
+                );
                 break;
             case ReportType.THREAD:
                 SendMessageComposer(
-                    new CallForHelpFromForumThreadMessageComposer(activeReport.groupId, activeReport.threadId, activeReport.cfhTopic, activeReport.message)
+                    new CallForHelpFromForumThreadMessageComposer(
+                        activeReport.groupId,
+                        activeReport.threadId,
+                        activeReport.cfhTopic,
+                        activeReport.message,
+                        reporterName,
+                        reporterEmail
+                    )
                 );
                 break;
             case ReportType.MESSAGE:
@@ -50,7 +84,9 @@ export const ReportSummaryView: FC<{}> = (props) => {
                         activeReport.threadId,
                         activeReport.messageId,
                         activeReport.cfhTopic,
-                        activeReport.message
+                        activeReport.message,
+                        reporterName,
+                        reporterEmail
                     )
                 );
                 break;
@@ -61,7 +97,9 @@ export const ReportSummaryView: FC<{}> = (props) => {
                         activeReport.roomId,
                         activeReport.reportedUserId,
                         activeReport.cfhTopic,
-                        activeReport.roomObjectId
+                        activeReport.roomObjectId,
+                        reporterName,
+                        reporterEmail
                     )
                 );
                 break;

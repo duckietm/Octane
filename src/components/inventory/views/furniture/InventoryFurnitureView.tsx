@@ -55,7 +55,9 @@ const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
 
     if (!item.sellable) return false;
 
-    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item));
+    // The official make-offer window sells the whole selection of identical copies at one
+    // price (`MarketplaceModel.makeOffer`), so it gets the group and not only this copy.
+    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item, (groupItem.items || []).filter((groupedItem) => groupedItem?.sellable)));
 };
 
 const attemptDeleteItem = (groupItem: GroupItem) => {

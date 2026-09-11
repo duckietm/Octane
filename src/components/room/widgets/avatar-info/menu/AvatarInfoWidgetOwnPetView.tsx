@@ -1,6 +1,7 @@
 import {
     CreateLinkEvent,
     PetRespectComposer,
+    PetSupplementComposer,
     PetType,
     RoomObjectCategory,
     RoomObjectType,
@@ -8,8 +9,16 @@ import {
     RoomUnitGiveHandItemPetComposer
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { AvatarInfoPet, GetConfigurationValue, GetOwnRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
-import { useRoom, useSessionInfo } from '../../../../../hooks';
+import {
+    AvatarInfoPet,
+    GetConfigurationValue,
+    GetOwnRoomObject,
+    LocalizeText,
+    localizeWithFallback,
+    PetSupplementEnum,
+    SendMessageComposer
+} from '../../../../../api';
+import { usePetBreedingWidget, useRoom, useSessionInfo } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -29,6 +38,10 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
     const [mode, setMode] = useState(MODE_NORMAL);
     const { roomSession = null, isHandItemBlocked = false } = useRoom();
     const { petRespectRemaining = 0, respectPet = null } = useSessionInfo();
+    const { pendingPlantId = null, beginMonsterplantBreeding = null, cancelMonsterplantBreeding = null, breedMonsterplantWith = null } = usePetBreedingWidget();
+
+    /** The second plant of a pair being chosen, as the official BreedPetView bubble asks for it. */
+    const isBreedingTarget = pendingPlantId !== null && pendingPlantId !== avatarInfo?.id;
 
     const canGiveHandItem = useMemo(() => {
         if (isHandItemBlocked) return false;
@@ -59,6 +72,14 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                 case 'treat':
                     SendMessageComposer(new PetRespectComposer(avatarInfo.id));
                     break;
+                // Official `InfoStandWidgetHandler` RWUAM_GIVE_WATER_TO_PET / RWUAM_GIVE_LIGHT_TO_PET:
+                // `PetSupplementComposer(petId, supplement)` with the two monsterplant supplements.
+                case 'give_water':
+                    SendMessageComposer(new PetSupplementComposer(avatarInfo.id, PetSupplementEnum.WATER));
+                    break;
+                case 'give_light':
+                    SendMessageComposer(new PetSupplementComposer(avatarInfo.id, PetSupplementEnum.LIGHT));
+                    break;
                 case 'pass_handitem':
                     SendMessageComposer(new RoomUnitGiveHandItemPetComposer(avatarInfo.id));
                     break;
@@ -84,14 +105,16 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     roomSession.removePetSaddle(avatarInfo.id);
                     break;
                 case 'breed':
-                    if (mode === MODE_NORMAL) {
-                        // _local_7 = RoomWidgetPetCommandMessage._Str_16282;
-                        // _local_8 = ("pet.command." + _local_7);
-                        // _local_9 = _Str_2268.catalog.localization.getLocalization(_local_8);
-                        // _local_4 = new RoomWidgetPetCommandMessage(RoomWidgetPetCommandMessage.RWPCM_PET_COMMAND, this._Str_594.id, ((this._Str_594.name + " ") + _local_9));
-                    } else if (mode === MODE_MONSTER_PLANT) {
-                        // messageType = RoomWidgetUserActionMessage.REQUEST_BREED_PET;
+                    if (mode === MODE_MONSTER_PLANT) {
+                        // The plant that asks first; the second one is chosen by clicking it.
+                        beginMonsterplantBreeding(avatarInfo.id);
                     }
+                    break;
+                case 'breed_with':
+                    breedMonsterplantWith(avatarInfo.id);
+                    break;
+                case 'breed_cancel':
+                    cancelMonsterplantBreeding();
                     break;
                 case 'harvest':
                     roomSession.harvestPet(avatarInfo.id);
@@ -192,15 +215,37 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                             {LocalizeText('infostand.button.pettreat')}
                         </ContextMenuListItemView>
                     )}
+                    {!avatarInfo.dead && (
+                        <>
+                            <ContextMenuListItemView onClick={(event) => processAction('give_water')}>
+                                {localizeWithFallback('infostand.button.givewater', 'Give water')}
+                            </ContextMenuListItemView>
+                            <ContextMenuListItemView onClick={(event) => processAction('give_light')}>
+                                {localizeWithFallback('infostand.button.givelight', 'Give light')}
+                            </ContextMenuListItemView>
+                        </>
+                    )}
                     {!avatarInfo.dead && avatarInfo.level === avatarInfo.maximumLevel && avatarInfo.breedable && (
                         <>
                             <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_breeding_permission')}>
                                 <input checked={avatarInfo.publiclyBreedable} readOnly={true} type="checkbox" />
                                 {LocalizeText('infostand.button.toggle_breeding_permission')}
                             </ContextMenuListItemView>
-                            <ContextMenuListItemView onClick={(event) => processAction('breed')}>
-                                {LocalizeText('infostand.button.breed')}
-                            </ContextMenuListItemView>
+                            {!isBreedingTarget && (
+                                <ContextMenuListItemView onClick={(event) => processAction('breed')}>
+                                    {LocalizeText('infostand.button.breed')}
+                                </ContextMenuListItemView>
+                            )}
+                            {isBreedingTarget && (
+                                <>
+                                    <ContextMenuListItemView onClick={(event) => processAction('breed_with')}>
+                                        {localizeWithFallback('infostand.button.breed_with', 'Breed with the chosen plant')}
+                                    </ContextMenuListItemView>
+                                    <ContextMenuListItemView onClick={(event) => processAction('breed_cancel')}>
+                                        {localizeWithFallback('infostand.button.breed_cancel', 'Choose another plant')}
+                                    </ContextMenuListItemView>
+                                </>
+                            )}
                         </>
                     )}
                 </>

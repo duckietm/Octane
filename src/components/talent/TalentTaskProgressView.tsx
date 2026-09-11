@@ -1,16 +1,18 @@
 import { CreateLinkEvent } from '@octane/renderer';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
     GetConfigurationValue,
     GetGroupInformation,
     getTalentTaskActionKey,
     hasTalentTaskProgressDisplay,
     isCitizenshipEnabled,
+    isTalentEmailChangeEnabled,
     LocalizeBadgeDescription,
     LocalizeBadgeName,
     LocalizeText,
     localizeWithFallback,
     TALENT_TASK_AVATAR_LOOKS,
+    TALENT_TASK_EMAIL,
     TALENT_TASK_GUIDE_GROUP,
     TALENT_TASK_HABBO_WAY,
     TALENT_TASK_ROOM_ENTRY_1,
@@ -21,6 +23,7 @@ import {
 } from '../../api';
 import { Button, LayoutBadgeImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useHabboWay, useWelcomeTour } from '../../hooks';
+import { EMAIL_RESULT_OK, useTalentEmail } from '../../hooks/talent';
 
 interface TalentTaskProgressViewProps {
     trackName: string;
@@ -46,6 +49,16 @@ export const TalentTaskProgressView: FC<TalentTaskProgressViewProps> = (props) =
     const { trackName = '', task = null, onClose = null, onCloseTrack = null } = props;
     const { showHabboWay = null, startSafetyQuiz = null } = useHabboWay();
     const { acceptTour = null } = useWelcomeTour();
+    const { email = '', isVerified = false, result = null, requestEmailStatus = null, changeEmail = null, clearEmailResult = null } = useTalentEmail();
+    const [emailDraft, setEmailDraft] = useState<string>('');
+    const showEmailBlock = !!task && task.badgeCode === TALENT_TASK_EMAIL && isCitizenshipEnabled() && isTalentEmailChangeEnabled();
+
+    // createTaskProgressDialog asks the server for the status as soon as the e-mail task opens.
+    useEffect(() => {
+        if (showEmailBlock) requestEmailStatus?.();
+    }, [showEmailBlock, requestEmailStatus]);
+
+    useEffect(() => setEmailDraft(email ?? ''), [email]);
 
     if (!task || !task.badgeCode) return null;
 
@@ -152,6 +165,39 @@ export const TalentTaskProgressView: FC<TalentTaskProgressViewProps> = (props) =
                         </div>
                     )}
                 </div>
+                {showEmailBlock && (
+                    <div className="octane-talent-email-container octane-card-panel">
+                        {isVerified && result === null ? (
+                            <Text className="octane-talent-email-verified" wrap>
+                                {LocalizeText('talent.track.progress.emailverified')}
+                            </Text>
+                        ) : (
+                            <div className="octane-talent-email-unverified">
+                                <input
+                                    className={`octane-talent-email-input${result !== null && result !== EMAIL_RESULT_OK ? ' is-invalid' : ''}`}
+                                    type="email"
+                                    value={emailDraft}
+                                    onChange={(event) => setEmailDraft(event.target.value)}
+                                    onFocus={() => clearEmailResult?.()}
+                                />
+                                {result !== null && result !== EMAIL_RESULT_OK && (
+                                    <Text className="octane-talent-email-error" wrap>
+                                        {LocalizeText(`welcome.gift.email.error.${result}`)}
+                                    </Text>
+                                )}
+                                {result === EMAIL_RESULT_OK ? (
+                                    <Text className="octane-talent-email-changed" wrap>
+                                        {LocalizeText('talent.track.progress.emailchanged')}
+                                    </Text>
+                                ) : (
+                                    <Button variant="primary" onClick={() => changeEmail?.(emailDraft)}>
+                                        {LocalizeText('talent.track.progress.setemail')}
+                                    </Button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
                 {showProgress && (
                     <div className="octane-talent-task-progress-main">
                         <div className="octane-talent-progress-bar">

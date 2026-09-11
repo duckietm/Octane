@@ -12,6 +12,18 @@ vi.mock('../../../api', async () => {
     };
 });
 
+vi.mock('../../../hooks', async () => {
+    const actual = await vi.importActual<typeof import('../../../hooks')>('../../../hooks');
+
+    return {
+        ...actual,
+        // The raffle line is driven by the server events (933 / 2316); the dialog only needs
+        // to know whether a raffle is running, so the tests hold it at "not running".
+        useLtdRaffle: () => ({ raffleActive: false, raffleClassName: null })
+    };
+});
+
+
 afterEach(cleanup);
 
 const offer = {

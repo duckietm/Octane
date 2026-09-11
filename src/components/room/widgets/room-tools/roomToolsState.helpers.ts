@@ -13,8 +13,9 @@ export interface RoomToolsCollapseInput {
 }
 
 /**
- * The renderer has no composer for header 2313 (`UpdateUIFlags`), so a toggle cannot reach the
- * server: the browser choice wins once it exists and the server flag only seeds the first visit.
+ * The toggle is written back through `UpdateUIFlags` (header 2313), as the official
+ * `SessionDataManager.setRoomToolsState` does. The browser copy still wins locally so the rail
+ * keeps its state before the next user object arrives.
  */
 export const resolveRoomToolsCollapsed = ({ storedCollapsed, uiFlags, isNoob }: RoomToolsCollapseInput): boolean => {
     if (isNoob) return true;

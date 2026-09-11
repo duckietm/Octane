@@ -2,7 +2,9 @@ import {
     AccountSafetyLockStatusChangeMessageEvent,
     AchievementNotificationMessageEvent,
     ActivityPointNotificationMessageEvent,
+    ActivateNotificationsComposer,
     BadgeReceivedEvent,
+    BanInfoEvent,
     ChestNotificationEvent,
     ClubGiftNotificationEvent,
     ClubGiftSelectedEvent,
@@ -15,6 +17,7 @@ import {
     HotelClosedAndOpensEvent,
     HotelClosesAndWillOpenAtEvent,
     HotelWillCloseInMinutesEvent,
+    IncomeRewardNotificationEvent,
     InfoFeedEnableMessageEvent,
     MaintenanceStatusMessageEvent,
     MOTDNotificationEvent,
@@ -24,6 +27,7 @@ import {
     NotifyPlayedSongEvent,
     PetLevelNotificationEvent,
     PetReceivedMessageEvent,
+    PetRespectFailedEvent,
     RecyclerFinishedMessageEvent,
     RespectReceivedEvent,
     RoomEnterEffect,
@@ -31,6 +35,10 @@ import {
     RoomMessageNotificationMessageEvent,
     SimpleAlertMessageEvent,
     UserBannedMessageEvent,
+    UserInfoEvent,
+    TreasureHuntFailMessageEvent,
+    TreasureHuntFirstWinnerMessageEvent,
+    TreasureHuntUpdateMessageEvent,
     Vector3d,
     WiredRewardResultMessageEvent
 } from '@octane/renderer';
@@ -51,6 +59,7 @@ import {
     NotificationConfirmItem,
     PlaySound,
     ProductImageUtility,
+    SendMessageComposer,
     TradingNotificationType
 } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
@@ -409,6 +418,17 @@ const useNotificationStore = () => {
         showSingleBubble(text, NotificationBubbleType.ROOMMESSAGESPOSTED, null, parser.roomId > 0 ? `navigator/goto/${parser.roomId}` : null);
     });
 
+    // "You have new earnings" (`EarningsController.onIncomeRewardNotificationMessageEvent`):
+    // one bubble linking to the vault, whatever the credited reward category is.
+    useMessageEvent<IncomeRewardNotificationEvent>(IncomeRewardNotificationEvent, () => {
+        showSingleBubble(
+            localizeWithFallback('notification.earning.new', 'You have new earnings to collect!'),
+            NotificationBubbleType.EARNING,
+            null,
+            'habboUI/open/vault'
+        );
+    });
+
     // The recycler only announces a finished run (`onRecyclerFinished` ignores the failure code).
     useMessageEvent<RecyclerFinishedMessageEvent>(RecyclerFinishedMessageEvent, (event) => {
         const parser = event.getParser();
@@ -532,6 +552,49 @@ const useNotificationStore = () => {
 
         showModeratorMessage(parser.message);
     });
+
+    // Official HabboAlertDialogManager.handleBanInfoMessage (event 2524): the ban alert shows the
+    // expiry date and the reason, or the server's localized reason with {expiryDate} filled in.
+    useMessageEvent<BanInfoEvent>(BanInfoEvent, (event) => {
+        const parser = event.getParser();
+
+        const dateText =
+            parser.banExpirySeconds > -1 ? new Date(Date.now() + parser.banExpirySeconds * 1000).toLocaleString() : '';
+
+        const message = parser.localizedReason?.length
+            ? parser.localizedReason.replace('{expiryDate}', dateText)
+            : [
+                  localizeWithFallback('login.banned.until', 'Banned until'),
+                  dateText,
+                  localizeWithFallback('login.banned.reason', 'Reason'),
+                  parser.reason
+              ]
+                  .filter((line) => line && line.length)
+                  .join('\r');
+
+        simpleAlert(message, NotificationAlertType.DEFAULT, null, null, localizeWithFallback('generic.alert.title', 'Alert'));
+    });
+
+    // Official class_1873.onPetRespectFailed (event 2703): the account is too young to scratch.
+    useMessageEvent<PetRespectFailedEvent>(PetRespectFailedEvent, (event) => {
+        const parser = event.getParser();
+
+        simpleAlert(
+            LocalizeText(
+                'room.error.pets.respectfailed',
+                ['required_age', 'avatar_age'],
+                [parser.requiredDays.toString(), parser.avatarAgeInDays.toString()]
+            ),
+            NotificationAlertType.DEFAULT,
+            null,
+            null,
+            LocalizeText('error.title')
+        );
+    });
+
+    // Official HabboNotifications.activate() (composer 3235): the client tells the server its
+    // notification feed is up. The official does it when the notification events are registered.
+    useMessageEvent<UserInfoEvent>(UserInfoEvent, () => SendMessageComposer(new ActivateNotificationsComposer()));
 
     useMessageEvent<HotelClosesAndWillOpenAtEvent>(HotelClosesAndWillOpenAtEvent, (event) => {
         const parser = event.getParser();
@@ -749,6 +812,63 @@ const useNotificationStore = () => {
             null,
             null,
             LocalizeText(parser.titleMessage ? parser.titleMessage : 'notifications.broadcast.title')
+        );
+    });
+
+    // AIR 13 treasure hunt (`class_1873.onTreasureHuntUpdate` / `onTreasureHuntFail` /
+    // `onTreasureHuntFirstWinner`): three bubbles of the `treasure_hunt` style.
+    const getHuntName = (huntId: string) => localizeWithFallback(`treasure_hunt.${huntId}.name`, huntId);
+
+    useMessageEvent<TreasureHuntUpdateMessageEvent>(TreasureHuntUpdateMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        const message = parser.isCompleted
+            ? localizeWithFallback('treasure_hunt.won.desc', 'You finished %hunt_name%!', ['hunt_name'], [getHuntName(parser.huntId)])
+            : localizeWithFallback(
+                  'treasure_hunt.progress.desc',
+                  'You found %current% of %total% in %hunt_name%.',
+                  ['current', 'total', 'hunt_name'],
+                  [String(parser.stepsCompleted), String(parser.totalSteps), getHuntName(parser.huntId)]
+              );
+
+        showSingleBubble(message, NotificationBubbleType.TREASURE_HUNT);
+    });
+
+    useMessageEvent<TreasureHuntFailMessageEvent>(TreasureHuntFailMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        showSingleBubble(
+            localizeWithFallback(
+                'treasure_hunt.level_fail.desc',
+                'You need level %level%, or level %level_paying% with Habbo Club.',
+                ['level', 'level_paying'],
+                [String(parser.requiredLevel), String(parser.requiredLevelPaying)]
+            ),
+            NotificationBubbleType.TREASURE_HUNT
+        );
+    });
+
+    useMessageEvent<TreasureHuntFirstWinnerMessageEvent>(TreasureHuntFirstWinnerMessageEvent, (event) => {
+        const winner = event.getParser()?.winnerInfo;
+
+        if (!winner) return;
+
+        showSingleBubble(
+            localizeWithFallback(
+                'treasure_hunt.winner.desc',
+                '%user_name% is the first to finish %hunt_name%!',
+                ['user_name', 'hunt_name'],
+                [winner.userName, getHuntName(winner.huntId)]
+            ),
+            NotificationBubbleType.TREASURE_HUNT,
+            null,
+            null,
+            winner.userName,
+            { figure: winner.userFigure, gender: winner.userGender }
         );
     });
 
