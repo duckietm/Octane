@@ -3,12 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
     send: vi.fn(),
+    link: vi.fn(),
     roomSession: { roomId: 1 } as { roomId: number } | null,
     handlers: new Map<unknown, (event: unknown) => void>()
 }));
 
 vi.mock('../../../api', () => ({
-    SendMessageComposer: mocks.send
+    SendMessageComposer: mocks.send,
+    CreateLinkEvent: mocks.link
 }));
 
 vi.mock('../../events', () => ({
@@ -26,6 +28,12 @@ vi.mock('@octane/renderer', () => ({
     CompetitionVotingInfoMessageEvent: class {},
     NavigatorOpenRoomCreatorEvent: class {},
     ForwardToASubmittableRoomMessageComposer: class {},
+    CompetitionRoomsSearchMessageComposer: class CompetitionRoomsSearchMessageComposer {
+        constructor(
+            public goalId: number,
+            public pageIndex: number
+        ) {}
+    },
     RoomCompetitionInitMessageComposer: class RoomCompetitionInitMessageComposer {},
     SubmitRoomToCompetitionMessageComposer: class SubmitRoomToCompetitionMessageComposer {
         constructor(
@@ -38,7 +46,12 @@ vi.mock('@octane/renderer', () => ({
     }
 }));
 
-import { CompetitionEntrySubmitResultEvent, RoomCompetitionInitMessageComposer, SubmitRoomToCompetitionMessageComposer } from '@octane/renderer';
+import {
+    CompetitionEntrySubmitResultEvent,
+    CompetitionRoomsSearchMessageComposer,
+    RoomCompetitionInitMessageComposer,
+    SubmitRoomToCompetitionMessageComposer
+} from '@octane/renderer';
 import { COMPETITION_LEVEL_CONFIRM, useRoomCompetition } from './useRoomCompetition';
 
 let hook: ReturnType<typeof useRoomCompetition> = null;
@@ -116,5 +129,20 @@ describe('useRoomCompetition', () => {
         hook.vote();
 
         expect(mocks.send).not.toHaveBeenCalled();
+    });
+    it('asks for the participants of the competition the window is about, from the first page', () => {
+        render(<Harness />);
+        act(() => mocks.handlers.get(CompetitionEntrySubmitResultEvent)(submitResult(1)));
+        mocks.send.mockClear();
+        mocks.link.mockClear();
+
+        act(() => hook.showParticipants());
+
+        const composer = mocks.send.mock.calls[0][0] as { goalId: number; pageIndex: number };
+
+        expect(composer).toBeInstanceOf(CompetitionRoomsSearchMessageComposer);
+        expect(composer.goalId).toBe(7);
+        expect(composer.pageIndex).toBe(0);
+        expect(mocks.link).toHaveBeenCalledWith('navigator/show');
     });
 });

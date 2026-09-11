@@ -1,5 +1,6 @@
 import {
     CompetitionEntrySubmitResultEvent,
+    CompetitionRoomsSearchMessageComposer,
     CompetitionVotingInfoMessageEvent,
     ForwardToASubmittableRoomMessageComposer,
     NavigatorOpenRoomCreatorEvent,
@@ -7,16 +8,8 @@ import {
     SubmitRoomToCompetitionMessageComposer,
     VoteForRoomMessageComposer
 } from '@octane/renderer';
-<<<<<<< f797991d820fe1e839cc1b1c842d9cd8e44ec614
-import { useEffect, useState } from 'react';
-import { SendMessageComposer } from '../../../api';
-||||||| d7c782c6455d76df76cf64e5a780753d871f292d^
-import { useEffect, useState } from 'react';
-import { CreateLinkEvent, SendMessageComposer } from '../../../api';
-=======
 import { useEffect, useRef, useState } from 'react';
 import { CreateLinkEvent, SendMessageComposer } from '../../../api';
->>>>>>> d7c782c6455d76df76cf64e5a780753d871f292d
 import { useMessageEvent } from '../../events';
 import { useRoom } from '../useRoom';
 
@@ -86,6 +79,15 @@ const useRoomCompetitionState = () => {
 
     const findSubmittableRoom = () => SendMessageComposer(new ForwardToASubmittableRoomMessageComposer());
 
+    // The official window's "see all participants": the hotel answers with an ordinary navigator
+    // search result, so the list lands where every other room list does.
+    const showParticipants = () => {
+        if (!competition) return;
+
+        SendMessageComposer(new CompetitionRoomsSearchMessageComposer(competition.goalId, 0));
+        CreateLinkEvent('navigator/show');
+    };
+
     // The official client asks on every room entry, and stops asking for the day
     // once the visitor ticked "don't show me this again".
     useEffect(() => {
@@ -149,6 +151,7 @@ const useRoomCompetitionState = () => {
         refresh: () => send(COMPETITION_LEVEL_REFRESH),
         vote,
         findSubmittableRoom,
+        showParticipants,
         hideForToday,
         close
     };

@@ -7,6 +7,7 @@ import {
     GetConfigurationValue,
     LocalizeText,
     localizeWithFallback,
+    openHelpFaq,
     ReportState,
     ReportType,
     SendMessageComposer
@@ -70,7 +71,7 @@ export const HelpIndexView: FC<{}> = (props) => {
                 </button>
             </div>
             <div className="flex flex-col gap-1 pt-1">
-                <button type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
+                <button type="button" className="help-link" onClick={openHelpFaq}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.faq.link.text')}
                 </button>

@@ -12,8 +12,19 @@ import { COMPETITION_RESULT_MISSING_FURNI, competitionAction, competitionName, c
  * a room taking part.
  */
 export const RoomCompetitionWidgetView: FC<{}> = () => {
-    const { competition, noOwnedRooms, dismissNoOwnedRooms, acceptRules, submitRoom, confirmSubmit, vote, findSubmittableRoom, hideForToday, close } =
-        useRoomCompetition();
+    const {
+        competition,
+        noOwnedRooms,
+        dismissNoOwnedRooms,
+        acceptRules,
+        submitRoom,
+        confirmSubmit,
+        vote,
+        findSubmittableRoom,
+        showParticipants,
+        hideForToday,
+        close
+    } = useRoomCompetition();
 
     if (noOwnedRooms) {
         return (
@@ -67,11 +78,21 @@ export const RoomCompetitionWidgetView: FC<{}> = () => {
                         <Text
                             pointer={competition.result !== COMPETITION_RESULT_MISSING_FURNI}
                             variant="muted"
-                            onClick={() =>
-                                competition.result === COMPETITION_RESULT_MISSING_FURNI
-                                    ? CreateLinkEvent('catalog/open')
-                                    : CreateLinkEvent('navigator/goto/hotelview')
-                            }
+                            onClick={() => {
+                                // The info line is the official link: the catalogue when furniture is
+                                // missing, the participants while voting, the hotel view otherwise.
+                                if (competition.result === COMPETITION_RESULT_MISSING_FURNI) {
+                                    CreateLinkEvent('catalog/open');
+                                    return;
+                                }
+
+                                if (competition.mode === 'vote') {
+                                    showParticipants();
+                                    return;
+                                }
+
+                                CreateLinkEvent('navigator/goto/hotelview');
+                            }}
                         >
                             {info}
                         </Text>

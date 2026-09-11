@@ -24,6 +24,7 @@ import { FurnitureWidgetsView } from './furniture/FurnitureWidgetsView';
 import { PetPackageWidgetView } from './pet-package/PetPackageWidgetView';
 import { PollWidgetView } from './poll/PollWidgetView';
 import { RoomKeybindView } from './RoomKeybindView';
+import { AchievementResolutionWidgetView } from './achievement-resolution/AchievementResolutionWidgetView';
 import { RoomCompetitionWidgetView } from './room-competition/RoomCompetitionWidgetView';
 import { RoomFilterWordsWidgetView } from './room-filter-words/RoomFilterWordsWidgetView';
 import { RoomThumbnailWidgetView } from './room-thumbnail/RoomThumbnailWidgetView';
@@ -203,6 +204,9 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="RoomToolsWidget">
                 <RoomToolsWidgetView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="AchievementResolutionWidget">
+                <AchievementResolutionWidgetView />
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="RoomCompetitionWidget">
                 <RoomCompetitionWidgetView />

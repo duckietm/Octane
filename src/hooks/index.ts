@@ -13,6 +13,7 @@ export * from './friends';
 export * from './game-center';
 export * from './groups';
 export * from './help';
+export * from './hotel-view/useBadgeRequest';
 export * from './housekeeping';
 export * from './inventory';
 export * from './mentions';

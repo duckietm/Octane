@@ -354,6 +354,11 @@ export class TreasureHuntUpdateMessageEvent extends MessageEvent {}
 export class EmailStatusResultEvent extends MessageEvent {}
 export class ChangeEmailResultEvent extends MessageEvent {}
 // Room competition: the window listens for these three and sends the four composers below.
+// Risoluzioni achievement: le tre finestre del furni.
+export class IsBadgeRequestFulfilledEvent extends MessageEvent {}
+export class AchievementResolutionsMessageEvent extends MessageEvent {}
+export class AchievementResolutionProgressMessageEvent extends MessageEvent {}
+export class AchievementResolutionCompletedMessageEvent extends MessageEvent {}
 export class CompetitionEntrySubmitResultEvent extends MessageEvent {}
 export class CompetitionVotingInfoMessageEvent extends MessageEvent {}
 export class NoOwnedRoomsAlertMessageEvent extends MessageEvent {}
@@ -879,6 +884,11 @@ export class AcceptFriendMessageComposer extends StubClass {}
 export class AddFriendCategoryComposer extends StubClass {}
 export class DeclineFriendMessageComposer extends StubClass {}
 export class FriendListUpdateComposer extends StubClass {}
+export class GetIsBadgeRequestFulfilledComposer extends StubClass {}
+export class RequestABadgeComposer extends StubClass {}
+export class GetResolutionAchievementsMessageComposer extends StubClass {}
+export class ResetResolutionAchievementMessageComposer extends StubClass {}
+export class CompetitionRoomsSearchMessageComposer extends StubClass {}
 export class ForwardToASubmittableRoomMessageComposer extends StubClass {}
 export class RoomCompetitionInitMessageComposer extends StubClass {}
 export class SubmitRoomToCompetitionMessageComposer extends StubClass {}

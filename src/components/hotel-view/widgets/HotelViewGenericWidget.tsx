@@ -7,7 +7,7 @@ import {
 } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, localizeWithFallback, NotificationAlertType, SendMessageComposer } from '../../../api';
-import { useMessageEvent, useNotification } from '../../../hooks';
+import { useBadgeRequest, useMessageEvent, useNotification } from '../../../hooks';
 import {
     CONCURRENT_USERS_UPDATE_INTERVAL_MS,
     ConcurrentUsersState,
@@ -57,6 +57,7 @@ const readSlotConfigString = (configJson: string, key: string): string => {
 export const HotelViewGenericWidget: FC<HotelViewGenericWidgetProps> = (props) => {
     const { slot, slotNumber, resolveImageUrl, onLinkClick } = props;
     const { simpleAlert = null } = useNotification();
+    const { claimed: badgeClaimed, ask: askBadge, claim: claimBadge } = useBadgeRequest();
     const imageLibraryUrl = GetConfigurationValue<string>('image.library.url', '');
     const conf = readSlotConfigString(slot.configJson, 'conf') || GetConfigurationValue<string>(`landing.view.dynamic.slot.${slotNumber}.conf`, '');
     const layoutString = readSlotConfigString(slot.configJson, 'layout') || GetConfigurationValue<string>(`landing.view.dynamic.slot.${slotNumber}.layout`, '');
@@ -65,6 +66,17 @@ export const HotelViewGenericWidget: FC<HotelViewGenericWidgetProps> = (props) =
     const concurrentUsersElement = elements.find((element) => element.type === 'concurrentusersinfo') ?? null;
     const [concurrentUsers, setConcurrentUsers] = useState<ConcurrentUsersProgress | null>(null);
     const [redeeming, setRedeeming] = useState(false);
+    // The request codes this widget offers, joined so the effect only runs when they change.
+    const badgeRequestCodes = elements
+        .filter((element) => element.type === 'rewardbadge' && element.args[2])
+        .map((element) => element.args[2])
+        .join(',');
+
+    useEffect(() => {
+        if (!badgeRequestCodes) return;
+
+        for (const code of badgeRequestCodes.split(',')) askBadge(code);
+    }, [badgeRequestCodes, askBadge]);
 
     // ConcurrentUsersInfoElementHandler: request on initialize, then every 5 s
     // while the goal is still running (the timer stops once it is reached).
@@ -223,13 +235,35 @@ export const HotelViewGenericWidget: FC<HotelViewGenericWidgetProps> = (props) =
                         {LocalizeText(textKey)}
                     </button>
                 );
-            case 'rewardbadge':
+            case 'rewardbadge': {
+                // The official element is a button when it carries a request code: it asks whether
+                // the badge was already claimed when it appears, and claims it on click.
+                const image = <img src={getRewardBadgeUrl(imageLibraryUrl, textKey)} alt="" />;
+
+                if (!extra) {
+                    return (
+                        <div key={key} className="hotelview-generic__reward-badge">
+                            {image}
+                            <span />
+                        </div>
+                    );
+                }
+
+                const alreadyClaimed = !!badgeClaimed[extra];
+
                 return (
-                    <div key={key} className="hotelview-generic__reward-badge">
-                        <img src={getRewardBadgeUrl(imageLibraryUrl, textKey)} alt="" />
+                    <button
+                        key={key}
+                        type="button"
+                        className={`hotelview-generic__reward-badge ${alreadyClaimed ? 'is-claimed' : ''}`}
+                        disabled={alreadyClaimed}
+                        onClick={() => claimBadge(extra)}
+                    >
+                        {image}
                         <span />
-                    </div>
+                    </button>
                 );
+            }
             case 'image':
                 return (
                     <img
