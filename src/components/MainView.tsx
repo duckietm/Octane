@@ -1,3 +1,4 @@
+import { HabbiconHubView } from './room/widgets/chat-input/HabbiconHubView';
 import {
     AddLinkEventTracker,
     GetCommunication,
@@ -174,6 +175,7 @@ export const MainView: FC<{}> = (props) =>
             <EmuStatsView />
             <AvatarEffectsView />
             <AchievementsView />
+            <HabbiconHubView />
             <NavigatorView />
             <OctanebubbleHiddenView />
             <InventoryView />

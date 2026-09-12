@@ -12,7 +12,7 @@ import {
     useHabbiconCatalog
 } from '../../../../api';
 import { UseHabbiconIcon } from '../../../../assets/images/habbicons';
-import { HabbiconHubView } from './HabbiconHubView';
+import { LayoutHabbiconImageView, LayoutItemCountView } from '../../../../common';
 
 type SelectorSection = {
     id: string;
@@ -53,14 +53,13 @@ const measureSelectorHeight = (sections: SelectorSection[]) => {
 export const ChatInputHabbiconSelectorView: FC = () => {
     const catalog = useHabbiconCatalog();
     const [selectorVisible, setSelectorVisible] = useState(false);
-    const [bookVisible, setBookVisible] = useState(false);
     const [search, setSearch] = useState('');
 
     const sections = useMemo<SelectorSection[]>(() => {
         const query = search.trim().toLowerCase();
 
         if (query) {
-            const matches = catalog.entries.filter(
+            const matches = catalog.ownedEntries.filter(
                 (entry) =>
                     localizeHabbiconName(entry).toLowerCase().includes(query) ||
                     entry.nameKey.toLowerCase().includes(query) ||
@@ -71,32 +70,21 @@ export const ChatInputHabbiconSelectorView: FC = () => {
         }
 
         const next: SelectorSection[] = [];
-        const byId = new Map(catalog.entries.map((entry) => [entry.id, entry]));
+        const byId = new Map(catalog.ownedEntries.map((entry) => [entry.id, entry]));
         const favorites = catalog.favoriteIds.map((id) => byId.get(id)).filter(Boolean) as HabbiconEntry[];
         const recent = catalog.recentIds.map((id) => byId.get(id)).filter(Boolean) as HabbiconEntry[];
 
         if (favorites.length) next.push({ id: 'favorites', title: localizeWithFallback('habbicons.favourites.title', 'Favorites'), entries: favorites });
         if (recent.length) next.push({ id: 'recent', title: localizeWithFallback('habbicon.recently.used', 'Recently used'), entries: recent });
 
-        for (const set of catalog.sets) {
+        for (const set of catalog.ownedSets) {
             if (set.entries.length) next.push({ id: set.id, title: set.title, entries: set.entries });
         }
 
         return next;
-    }, [catalog.entries, catalog.favoriteIds, catalog.recentIds, catalog.sets, search]);
+    }, [catalog.ownedEntries, catalog.favoriteIds, catalog.recentIds, catalog.ownedSets, search]);
 
     const { listHeight, windowHeight } = useMemo(() => measureSelectorHeight(sections), [sections]);
-    const sheetSize = useMemo(() => {
-        let width = 0;
-        let height = 0;
-
-        for (const entry of catalog.entries) {
-            width = Math.max(width, entry.x + entry.width);
-            height = Math.max(height, entry.y + entry.height);
-        }
-
-        return { width, height };
-    }, [catalog.entries]);
 
     useEffect(() => {
         if (!catalog.enabled || !catalog.baseUrl) return;
@@ -108,8 +96,8 @@ export const ChatInputHabbiconSelectorView: FC = () => {
 
     const applyHabbicon = async (habbiconId: number, keepOpen = false) => {
         await HabbiconAssetManager.getInstance().preload();
+        catalog.clearUnseen(habbiconId);
         SendMessageComposer(new UseHabbiconComposer(habbiconId));
-        catalog.noteUsed(habbiconId);
 
         if (!keepOpen) setSelectorVisible(false);
     };
@@ -124,7 +112,12 @@ export const ChatInputHabbiconSelectorView: FC = () => {
         >
             <Popover.Trigger asChild>
                 <button className="habbicon-chat-trigger" title={localizeWithFallback('habbicons.hud.title', 'Habicons')} type="button">
-                    <img alt="" src={UseHabbiconIcon} />
+                    {catalog.lastUsedCollectionId ? (
+                        <LayoutHabbiconImageView collection outlined id={catalog.lastUsedCollectionId} size={22} />
+                    ) : (
+                        <img alt="" src={UseHabbiconIcon} />
+                    )}
+                    {!selectorVisible && catalog.unseenCount > 0 && <span className="habbicon-unseen-count">{catalog.unseenCount}</span>}
                 </button>
             </Popover.Trigger>
             <Popover.Portal>
@@ -140,7 +133,7 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                                 className="habbicon-selector-book-button"
                                 type="button"
                                 onClick={() => {
-                                    setBookVisible(true);
+                                    catalog.setBookVisible(true);
                                     setSelectorVisible(false);
                                 }}
                             >
@@ -162,13 +155,8 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                                                         type="button"
                                                         onClick={(event) => void applyHabbicon(entry.id, event.shiftKey)}
                                                     >
-                                                        <span
-                                                            style={{
-                                                                backgroundImage: `url(${catalog.baseUrl}habbicons_spritesheet.png)`,
-                                                                backgroundSize: `${(sheetSize.width * 30) / Math.max(entry.width, 1)}px ${(sheetSize.height * 30) / Math.max(entry.height, 1)}px`,
-                                                                backgroundPosition: `-${(entry.x * 30) / Math.max(entry.width, 1)}px -${(entry.y * 30) / Math.max(entry.height, 1)}px`
-                                                            }}
-                                                        />
+                                                        <LayoutHabbiconImageView id={entry.id} size={30} />
+                                                        {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -5, right: -5 }} />}
                                                     </button>
                                                 ) : (
                                                     <div className="habbicon-selector-item empty" key={`empty-${section.id}-${index}`} />
@@ -184,15 +172,6 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                     </div>
                 </Popover.Content>
             </Popover.Portal>
-            {bookVisible && (
-                <HabbiconHubView
-                    baseUrl={catalog.baseUrl}
-                    favoriteIds={catalog.favoriteIds}
-                    sets={catalog.sets}
-                    onClose={() => setBookVisible(false)}
-                    onToggleFavorite={catalog.toggleFavorite}
-                />
-            )}
         </Popover.Root>
     );
 };

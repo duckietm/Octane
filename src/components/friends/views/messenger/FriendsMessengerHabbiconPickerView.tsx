@@ -1,12 +1,6 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    HABBICON_GRID_COLUMNS,
-    HabbiconEntry,
-    localizeHabbiconName,
-    localizeWithFallback,
-    padHabbiconRow,
-    useHabbiconCatalog
-} from '../../../../api';
+import { HABBICON_GRID_COLUMNS, HabbiconEntry, localizeHabbiconName, localizeWithFallback, padHabbiconRow, useHabbiconCatalog } from '../../../../api';
+import { LayoutHabbiconImageView, LayoutItemCountView } from '../../../../common';
 
 type PickerSection = {
     id: string;
@@ -84,46 +78,33 @@ export const FriendsMessengerHabbiconPickerView: FC<{
         const query = search.trim().toLowerCase();
 
         if (query) {
-            const matches = catalog.entries.filter(
+            const matches = catalog.ownedEntries.filter(
                 (entry) =>
-                    localizeHabbiconName(entry).toLowerCase().includes(query) ||
-                    entry.nameKey.toLowerCase().includes(query) ||
-                    entry.id.toString() === query
+                    localizeHabbiconName(entry).toLowerCase().includes(query) || entry.nameKey.toLowerCase().includes(query) || entry.id.toString() === query
             );
 
             return matches.length ? [{ id: 'search', title: localizeWithFallback('habbicon.search.results', 'Search results'), entries: matches }] : [];
         }
 
         const next: PickerSection[] = [];
-        const byId = new Map(catalog.entries.map((entry) => [entry.id, entry]));
+        const byId = new Map(catalog.ownedEntries.map((entry) => [entry.id, entry]));
         const favorites = catalog.favoriteIds.map((id) => byId.get(id)).filter(Boolean) as HabbiconEntry[];
         const recent = catalog.recentIds.map((id) => byId.get(id)).filter(Boolean) as HabbiconEntry[];
 
         if (favorites.length) next.push({ id: 'favorites', title: localizeWithFallback('habbicons.favourites.title', 'Favorites'), entries: favorites });
         if (recent.length) next.push({ id: 'recent', title: localizeWithFallback('habbicon.recently.used', 'Recently used'), entries: recent });
 
-        for (const set of catalog.sets) {
+        for (const set of catalog.ownedSets) {
             if (set.entries.length) next.push({ id: set.id, title: set.title, entries: set.entries });
         }
 
         return next;
-    }, [catalog.entries, catalog.favoriteIds, catalog.recentIds, catalog.sets, search]);
+    }, [catalog.ownedEntries, catalog.favoriteIds, catalog.recentIds, catalog.ownedSets, search]);
 
     const { listHeight, windowHeight } = useMemo(() => measurePickerHeight(sections), [sections]);
-    const sheetSize = useMemo(() => {
-        let width = 1;
-        let height = 1;
-
-        for (const entry of catalog.entries) {
-            width = Math.max(width, entry.x + entry.width);
-            height = Math.max(height, entry.y + entry.height);
-        }
-
-        return { width, height };
-    }, [catalog.entries]);
 
     const choose = (id: number, keepOpen = false) => {
-        catalog.noteUsed(id);
+        catalog.clearUnseen(id);
         onSelect(id, keepOpen);
     };
 
@@ -153,13 +134,8 @@ export const FriendsMessengerHabbiconPickerView: FC<{
                                             title={localizeHabbiconName(entry)}
                                             onClick={(event) => choose(entry.id, event.shiftKey)}
                                         >
-                                            <span
-                                                style={{
-                                                    backgroundImage: `url(${catalog.baseUrl}habbicons_spritesheet.png)`,
-                                                    backgroundSize: `${(sheetSize.width * 40) / Math.max(entry.width, 1)}px ${(sheetSize.height * 40) / Math.max(entry.height, 1)}px`,
-                                                    backgroundPosition: `-${(entry.x * 40) / Math.max(entry.width, 1)}px -${(entry.y * 40) / Math.max(entry.height, 1)}px`
-                                                }}
-                                            />
+                                            <LayoutHabbiconImageView id={entry.id} size={40} />
+                                            {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -3, right: -3 }} />}
                                         </button>
                                     ) : (
                                         <div className="empty" key={`empty-${section.id}-${index}`} />
