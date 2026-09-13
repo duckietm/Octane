@@ -108,13 +108,17 @@ const ICON_ALIGNMENT_OPTION_IDS = [0, 1, 2];
 
 /**
  * The icon travels as the box's string param, and the empty string is the official "no icon" - the
- * corpus names that one `…variablefx.icon.none`. The ranch icons the official client also lists are
- * campaign content behind `wired.variablefx.campaign.icons.enabled`, so they stay out.
+ * corpus names that one `…variablefx.icon.none`.
+ *
+ * The official set is the twenty-two in its `icons_xml`, but only these ten ship as artwork we
+ * have; the rest live in the official client's external asset bundle. Offering a name the room
+ * cannot draw would promise an icon that never appears, so the list is the drawable set and grows
+ * when more artwork lands in `public/assets/images/wired/variablefx/`. The ranch icons the official
+ * client also lists are campaign content behind `wired.variablefx.campaign.icons.enabled` and are
+ * out for a separate reason.
  */
 const ICON_IDS = [
-    '', 'battery', 'burning', 'cash', 'cooldown', 'droplet', 'energy', 'eye', 'fish', 'food', 'freezing',
-    'gems', 'gold', 'health', 'honor', 'magic', 'mana', 'misc_heart', 'misc_skull', 'poison', 'repairing',
-    'reputation', 'shield', 'stamina', 'star_power', 'stealth', 'timeleft', 'upgrading', 'wooden_logs'
+    '', 'burning', 'cash', 'energy', 'fish', 'food', 'honor', 'mana', 'misc_heart', 'misc_skull', 'timeleft'
 ];
 
 const iconOptionLabel = (iconId: string): string => {
