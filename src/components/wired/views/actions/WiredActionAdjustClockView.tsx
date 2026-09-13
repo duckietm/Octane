@@ -93,12 +93,12 @@ export const WiredActionAdjustClockView: FC<{}> = () => {
                 })}
             </div>
             <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.clock_minutes', LocalizeText('wiredfurni.params.time.minute_selection'))}</Text>
+                <Text bold>{localizeWithFallback('wiredfurni.params.clock_minutes', LocalizeText('wiredfurni.params.time.minute_selection'), ['minutes'], [minutes.toString()])}</Text>
                 <Slider max={MINUTES_MAX} min={MINUTES_MIN} step={1} value={minutes} onChange={(event) => setMinutes(normalizeMinutes(event as number))} />
                 <Text small>{minutes}</Text>
             </div>
             <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.clock_seconds', LocalizeText('wiredfurni.params.time.second_selection'))}</Text>
+                <Text bold>{localizeWithFallback('wiredfurni.params.clock_seconds', LocalizeText('wiredfurni.params.time.second_selection'), ['seconds'], [secondsLabel])}</Text>
                 <Slider
                     max={HALF_SECONDS_MAX}
                     min={HALF_SECONDS_MIN}
