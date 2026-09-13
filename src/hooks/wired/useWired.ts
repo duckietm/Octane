@@ -288,18 +288,23 @@ const useWiredState = () => {
         const parser = event.getParser();
 
         setTrigger(parser.definition);
+        // Seeded in the same tick as setTrigger so the two land in one render: a box that was saved
+        // with an override variable must reopen with that variable already restored, not blank.
+        setVariableIds(parser.definition?.variableIds ?? []);
     });
 
     useMessageEvent<WiredFurniConditionEvent>(WiredFurniConditionEvent, (event) => {
         const parser = event.getParser();
 
         setTrigger(parser.definition);
+        setVariableIds(parser.definition?.variableIds ?? []);
     });
 
     useMessageEvent<WiredFurniTriggerEvent>(WiredFurniTriggerEvent, (event) => {
         const parser = event.getParser();
 
         setTrigger(parser.definition);
+        setVariableIds(parser.definition?.variableIds ?? []);
     });
 
     useEffect(() => {
@@ -329,6 +334,7 @@ const useWiredState = () => {
         setTrigger,
         intParams,
         setIntParams,
+        variableIds,
         setVariableIds,
         stringParam,
         setStringParam,
