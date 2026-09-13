@@ -830,6 +830,28 @@
         text-align: center;
     }
 
+    /* The official section puts a 40px number box beside the bold title, one
+       generic horizontal gap apart. */
+    .octane-wired__slider-header {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .octane-wired__slider-header .font-bold {
+        flex: 1;
+    }
+
+    .octane-wired__slider-number {
+        width: 40px;
+        min-width: 40px;
+        min-height: 18px !important;
+        height: 18px;
+        padding: 0 4px !important;
+        line-height: 18px;
+        text-align: center;
+    }
+
     .octane-wired__give-var-number--blurred {
         filter: blur(0.8px) !important;
         opacity: 0.78;
