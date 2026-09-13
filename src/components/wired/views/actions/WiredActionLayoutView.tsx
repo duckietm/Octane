@@ -32,6 +32,7 @@ import { WiredExtraTimeUtilitiesView } from '../extras/WiredExtraTimeUtilitiesVi
 import { WiredExtraUnseenView } from '../extras/WiredExtraUnseenView';
 import { WiredExtraUserVariableView } from '../extras/WiredExtraUserVariableView';
 import { WiredExtraVariableEchoView } from '../extras/WiredExtraVariableEchoView';
+import { WiredExtraVariableFxProgressBarView } from '../extras/WiredExtraVariableFxProgressBarView';
 import { WiredExtraVariableLevelUpSystemView } from '../extras/WiredExtraVariableLevelUpSystemView';
 import { WiredExtraVariableReferenceView } from '../extras/WiredExtraVariableReferenceView';
 import { WiredExtraVariableTextConnectorView } from '../extras/WiredExtraVariableTextConnectorView';
@@ -282,6 +283,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredExtraTextOutputVariableView />;
         case WiredActionLayoutCode.VARIABLE_WEB_API_EXTRA:
             return <WiredExtraVariableWebApiView />;
+        case WiredActionLayoutCode.VARIABLE_FX_PROGRESS_BAR_EXTRA:
+            return <WiredExtraVariableFxProgressBarView />;
         case WiredActionLayoutCode.USER_VARIABLE_EXTRA:
             return <WiredExtraUserVariableView />;
         case WiredActionLayoutCode.FURNI_VARIABLE_EXTRA:
