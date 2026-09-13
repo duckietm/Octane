@@ -18,8 +18,7 @@ export const copyWiredConfig = (trigger: Triggerable, seed: WiredConfigSeed): vo
     entries.set(key, {
         intParams: [...(seed.intParams ?? [])],
         stringParam: seed.stringParam ?? '',
-        furniIds: [...(seed.furniIds ?? [])],
-        variableIds: [...(seed.variableIds ?? [])]
+        furniIds: [...(seed.furniIds ?? [])]
     });
 };
 

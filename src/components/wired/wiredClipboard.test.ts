@@ -12,7 +12,7 @@ class WiredActionDefinition {
 
 const box = (instance: object) => instance as unknown as Triggerable;
 
-const seed = (value: number) => ({ intParams: [value], stringParam: `s${value}`, furniIds: [value], variableIds: [] });
+const seed = (value: number) => ({ intParams: [value], stringParam: `s${value}`, furniIds: [value] });
 
 describe('wired clipboard', () => {
     // The official client keys its clipboard by holder and code, which is why a configuration

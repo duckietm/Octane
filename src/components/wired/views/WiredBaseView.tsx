@@ -46,7 +46,6 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
         intParams = null,
         stringParam = null,
         furniIds = null,
-        variableIds = null,
         setIntParams = null,
         setStringParam = null,
         setFurniIds = null,
@@ -83,9 +82,9 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
     useEffect(() => {
         if (!pendingCopy) return;
 
-        copyWiredConfig(trigger, { intParams, stringParam, furniIds, variableIds });
+        copyWiredConfig(trigger, { intParams, stringParam, furniIds });
         setPendingCopy(false);
-    }, [pendingCopy, trigger, intParams, stringParam, furniIds, variableIds]);
+    }, [pendingCopy, trigger, intParams, stringParam, furniIds]);
 
     useEffect(() => {
         if (!needsSave) return;
