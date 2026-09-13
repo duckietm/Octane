@@ -26,6 +26,7 @@ export const WiredTriggeExecuteOnceView: FC<{}> = (props) => {
                     )}
                 </Text>
                 <Slider max={1200} min={1} value={time} onChange={(event) => setTime(event)} />
+                <Text small>{LocalizeText('wiredfurni.params.settime', ['seconds'], [GetWiredTimeLocale(time)])}</Text>
             </div>
         </WiredTriggerBaseView>
     );

@@ -19,6 +19,7 @@ export const WiredTriggeExecutePeriodicallyView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.settime3', LocalizeText('wiredfurni.params.settime', ['seconds'], [GetWiredTimeLocale(time)]))}</Text>
                 <Slider max={120} min={1} value={time} onChange={(event) => setTime(event)} />
+                <Text small>{LocalizeText('wiredfurni.params.settime', ['seconds'], [GetWiredTimeLocale(time)])}</Text>
             </div>
         </WiredTriggerBaseView>
     );
