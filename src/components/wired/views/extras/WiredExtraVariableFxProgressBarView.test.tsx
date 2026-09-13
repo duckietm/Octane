@@ -15,8 +15,9 @@ const setVariableIds = vi.fn((next: string[]) => {
 
 /**
  * Matches VariableFxSettingsCodec.write's field order exactly (see the codec, the authority for
- * this vector). Indices this window does not expose (1, 18, 19, 20) carry distinctive marker
- * values so the test fails if save() ever stops passing them through unchanged. Index 16/17 use a
+ * this vector). Indices this window does not expose (1, 18, 19) carry distinctive marker values so
+ * the test fails if save() ever stops passing them through unchanged. Index 20, the segment count,
+ * used to be one of them and is a real control now. Index 16/17 use a
  * value the view never emits (OVERRIDE_TARGET_GLOBAL is 2), so the test also fails if the "write
  * the global constant" behaviour regresses.
  *
@@ -95,6 +96,16 @@ vi.mock('./WiredExtraBaseView', () => ({
 
 import { WiredExtraVariableFxProgressBarView } from './WiredExtraVariableFxProgressBarView';
 
+/**
+ * Visibility and the advanced range are folded away by default, the way the official editor keeps
+ * them, so a test that drives a control inside one has to open it first.
+ */
+const expandVisibilitySettings = (container: HTMLElement) => {
+    const [visibilityToggle] = container.querySelectorAll<HTMLButtonElement>('button.octane-wired__advanced-toggle');
+
+    fireEvent.click(visibilityToggle);
+};
+
 describe('WiredExtraVariableFxProgressBarView', () => {
     afterEach(cleanup);
 
@@ -169,6 +180,8 @@ describe('WiredExtraVariableFxProgressBarView', () => {
      */
     it('keeps an edit after a save instead of re-seeding the controls from the stale trigger', () => {
         const { container, rerender } = render(<WiredExtraVariableFxProgressBarView />);
+
+        expandVisibilitySettings(container);
 
         const showModeRadios = container.querySelectorAll<HTMLInputElement>('input[name="wiredVariableFxShowMode"]');
 

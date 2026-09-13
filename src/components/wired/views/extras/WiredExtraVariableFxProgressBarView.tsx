@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
@@ -124,6 +124,25 @@ const iconOptionLabel = (iconId: string): string => {
     return text && text !== key ? text : iconId || 'none';
 };
 
+/**
+ * The official editor keeps visibility and the advanced range folded away behind a header you click,
+ * which is what keeps its window short. Ours rendered every section open at once, so the box grew
+ * past the useful height and the controls that matter were pushed below the fold.
+ */
+const CollapsibleSection: FC<PropsWithChildren<{ open: boolean; title: string; onToggle: () => void }>> = ({
+    open,
+    title,
+    onToggle,
+    children
+}) => (
+    <div className="flex flex-col gap-2">
+        <button className="octane-wired__advanced-toggle" type="button" onClick={onToggle}>
+            {title}
+        </button>
+        {open && <div className="octane-wired__advanced-body flex flex-col gap-2">{children}</div>}
+    </div>
+);
+
 const clampSegments = (value: number): number =>
     Number.isFinite(value) ? Math.max(SEGMENTS_NOT_SPECIFIED, Math.min(MAX_SEGMENTS, Math.floor(value))) : SEGMENTS_NOT_SPECIFIED;
 
@@ -215,6 +234,8 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
     const [colorId, setColorId] = useState(0);
     const [widthId, setWidthId] = useState(DEFAULT_WIDTH_ID);
     const [rendererId, setRendererId] = useState(0);
+    const [showVisibilitySettings, setShowVisibilitySettings] = useState(false);
+    const [showAdvancedRange, setShowAdvancedRange] = useState(false);
     const [segments, setSegments] = useState(SEGMENTS_NOT_SPECIFIED);
     const [iconId, setIconId] = useState('');
     const [iconAlignment, setIconAlignment] = useState(0);
@@ -483,8 +504,11 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
 
                 <div className="octane-wired__divider" />
 
-                <div className="flex flex-col gap-2">
-                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.visibility')}</Text>
+                <CollapsibleSection
+                    open={showVisibilitySettings}
+                    title={LocalizeText('wiredfurni.params.variablefx.visibility')}
+                    onToggle={() => setShowVisibilitySettings((value) => !value)}
+                >
                     <div className="flex flex-col gap-1">
                         <label className="flex items-center gap-1 cursor-pointer">
                             <input
@@ -568,7 +592,7 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
                             <Text>{LocalizeText('wiredfurni.params.variablefx.update_mask.4')}</Text>
                         </label>
                     </div>
-                </div>
+                </CollapsibleSection>
 
                 <div className="octane-wired__divider" />
 
@@ -593,7 +617,15 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
                             onChange={(event) => setDefaultMaxValue(parseInt(event.target.value, 10) || 0)}
                         />
                     </div>
+                </div>
 
+                <div className="octane-wired__divider" />
+
+                <CollapsibleSection
+                    open={showAdvancedRange}
+                    title={LocalizeText('wiredfurni.params.variablefx.advanced.range')}
+                    onToggle={() => setShowAdvancedRange((value) => !value)}
+                >
                     <div className="flex flex-col gap-1">
                         <label className="flex items-center gap-1 cursor-pointer">
                             <input
@@ -633,7 +665,7 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
                             />
                         )}
                     </div>
-                </div>
+                </CollapsibleSection>
             </div>
         </WiredExtraBaseView>
     );
