@@ -32,6 +32,7 @@ const useWiredState = () => {
     const [stringParam, setStringParam, stringParamRef] = useLiveState<string>('');
     const [furniIds, setFurniIds, furniIdsRef] = useLiveState<number[]>([]);
     const [actionDelay, setActionDelay, actionDelayRef] = useLiveState<number>(0);
+    const [variableIds, setVariableIds, variableIdsRef] = useLiveState<string[]>([]);
     const [allowsFurni, setAllowsFurni] = useState<number>(WiredFurniType.STUFF_SELECTION_OPTION_NONE);
     const selectByType = false;
     const [neighborhoodTiles, setNeighborhoodTiles] = useState<{ x: number; y: number }[] | null>(null);
@@ -49,9 +50,10 @@ const useWiredState = () => {
             const stringParam = stringParamRef.current;
             const furniIds = furniIdsRef.current;
             const actionDelay = actionDelayRef.current;
+            const variableIds = variableIdsRef.current;
 
             if (trigger instanceof WiredActionDefinition) {
-                SendMessageComposer(new UpdateActionMessageComposer(trigger.id, intParams, stringParam, furniIds, actionDelay, trigger.stuffTypeSelectionCode));
+                SendMessageComposer(new UpdateActionMessageComposer(trigger.id, intParams, stringParam, furniIds, actionDelay, trigger.stuffTypeSelectionCode, variableIds));
             } else if (trigger instanceof TriggerDefinition) {
                 SendMessageComposer(new UpdateTriggerMessageComposer(trigger.id, intParams, stringParam, furniIds, trigger.stuffTypeSelectionCode));
             } else if (trigger instanceof ConditionDefinition) {
@@ -308,6 +310,7 @@ const useWiredState = () => {
             setIntParams([]);
             setStringParam('');
             setActionDelay(0);
+            setVariableIds([]);
             setFurniIds((prevValue) => {
                 if (prevValue && prevValue.length) WiredSelectionVisualizer.clearSelectionShaderFromFurni(prevValue);
 
@@ -326,6 +329,7 @@ const useWiredState = () => {
         setTrigger,
         intParams,
         setIntParams,
+        setVariableIds,
         stringParam,
         setStringParam,
         furniIds,
