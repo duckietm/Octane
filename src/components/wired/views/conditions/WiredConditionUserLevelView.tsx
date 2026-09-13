@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { WiredComparisonOperator } from '../WiredComparisonOperator';
+import { normalizeWiredVariableComparison, WIRED_VAR_CMP_DEFAULT, WiredVariableComparisonOperator } from '../WiredVariableComparisonOperator';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries } from '../WiredVariablePickerData';
@@ -23,7 +23,7 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
     const { userVariableDefinitions = [] } = useWiredTools();
     const [variableToken, setVariableToken] = useState('');
     const [level, setLevel] = useState(MIN_LEVEL);
-    const [comparison, setComparison] = useState(1);
+    const [comparison, setComparison] = useState(WIRED_VAR_CMP_DEFAULT);
     const [userSource, setUserSource] = useState(0);
     const [quantifier, setQuantifier] = useState(QUANTIFIER_ALL);
 
@@ -34,7 +34,7 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
 
         setVariableToken(trigger.stringData ?? '');
         setLevel(trigger.intData?.length > 0 ? trigger.intData[0] : MIN_LEVEL);
-        setComparison(trigger.intData?.length > 1 ? trigger.intData[1] : 1);
+        setComparison(trigger.intData?.length > 1 ? normalizeWiredVariableComparison(trigger.intData[1]) : WIRED_VAR_CMP_DEFAULT);
         setUserSource(trigger.intData?.length > 2 ? trigger.intData[2] : 0);
         setQuantifier(trigger.intData?.length > 3 && trigger.intData[3] === QUANTIFIER_ANY ? QUANTIFIER_ANY : QUANTIFIER_ALL);
     }, [trigger]);
@@ -70,7 +70,7 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
                     <Slider max={MAX_LEVEL} min={MIN_LEVEL} value={level} onChange={(value) => setLevel(value)} />
                 </div>
 
-                <WiredComparisonOperator name="wiredUserLevelComparison" value={comparison} onChange={setComparison} />
+                <WiredVariableComparisonOperator name="wiredUserLevelComparison" value={comparison} onChange={setComparison} />
 
                 <label className="flex items-center gap-1 cursor-pointer">
                     <input
