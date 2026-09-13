@@ -19,6 +19,7 @@ export const WiredConditionTimeElapsedLessView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.allowbefore2', LocalizeText('wiredfurni.params.allowbefore', ['seconds'], [GetWiredTimeLocale(time)]))}</Text>
                 <Slider max={1200} min={1} value={time} onChange={(event) => setTime(event)} />
+                <Text small>{LocalizeText('wiredfurni.params.allowbefore', ['seconds'], [GetWiredTimeLocale(time)])}</Text>
             </div>
         </WiredConditionBaseView>
     );

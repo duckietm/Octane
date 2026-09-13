@@ -41,6 +41,7 @@ export const WiredExtraAnimationTimeView: FC<{}> = () => {
                     value={duration}
                     onChange={(value) => setDuration(normalizeDuration(Array.isArray(value) ? value[0] : Number(value)))}
                 />
+                <Text small>{`${duration} ms`}</Text>
             </div>
         </WiredExtraBaseView>
     );
