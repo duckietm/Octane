@@ -1,5 +1,9 @@
 {
     "wiredfurni.params.variablefx.section.visualization": "Aspetto",
+    "wiredfurni.params.variablefx.section.source": "Variabili da mostrare",
+    "wiredfurni.params.variablefx.source.user": "Le variabili utente di questa pila",
+    "wiredfurni.params.variablefx.source.furni": "Le variabili mobile di questa pila",
+    "wiredfurni.params.variablefx.source.global": "Le variabili stanza di questa pila",
     "wiredfurni.params.variablefx.section.visibility": "Visibilità",
     "wiredfurni.params.variablefx.section.range": "Intervallo",
     "wiredfurni.params.variablefx.style": "Stile",
