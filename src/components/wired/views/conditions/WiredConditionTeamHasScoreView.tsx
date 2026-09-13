@@ -9,7 +9,8 @@ import { WiredConditionBaseView } from './WiredConditionBaseView';
 const TEAM_OPTIONS = [1, 2, 3, 4];
 const COMPARISON_OPTIONS = [0, 1, 2];
 const MIN_SCORE = 0;
-const MAX_SCORE = 999;
+/** The official setscore2 slider stops at 1000; the server accepts far more (MAX_SCORE 1_000_000). */
+const MAX_SCORE = 1000;
 /** What the server's normalizeScore lets through. A credit threshold is useless capped at 999. */
 const MAX_AMOUNT = 1_000_000;
 const SCORE_PATTERN = /^\d*$/;

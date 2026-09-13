@@ -7,33 +7,43 @@ import { WiredConditionBaseView } from './WiredConditionBaseView';
 
 const COUNTER_INTERACTION_TYPES = ['game_upcounter'];
 const MIN_ALTITUDE = 0;
-const MAX_ALTITUDE = 80;
+
+/**
+ * The server clamps every furni to Room.MAXIMUM_FURNI_HEIGHT (40), so offering more here only lets a
+ * builder set a threshold no furni can ever reach. The official box expresses the same idea as a
+ * 0..8000 hundredths slider, against a hotel whose ceiling is 80.
+ */
+const MAX_FURNI_HEIGHT = 40;
+
+/** A radius is a distance across the room, not a height, so it keeps its own ceiling. */
+const MAX_RADIUS = 80;
+
 const ALTITUDE_STEP = 0.01;
 const ALTITUDE_PATTERN = /^\d*(\.\d{0,2})?$/;
 
-const clampAltitude = (value: number) => {
+const clampAltitude = (value: number, max: number) => {
     if (isNaN(value)) return MIN_ALTITUDE;
 
-    const clamped = Math.min(MAX_ALTITUDE, Math.max(MIN_ALTITUDE, value));
+    const clamped = Math.min(max, Math.max(MIN_ALTITUDE, value));
 
     return parseFloat(clamped.toFixed(2));
 };
 
-const formatAltitude = (value: number) => {
-    const normalized = clampAltitude(value);
+const formatAltitude = (value: number, max: number) => {
+    const normalized = clampAltitude(value, max);
     const text = normalized.toFixed(2);
 
     return text.replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
 };
 
-const parseAltitude = (value: string) => {
+const parseAltitude = (value: string, max: number) => {
     if (!value || !value.trim().length) return 0;
 
     const parsed = parseFloat(value);
 
     if (isNaN(parsed)) return 0;
 
-    return clampAltitude(parsed);
+    return clampAltitude(parsed, max);
 };
 
 /**
@@ -75,6 +85,7 @@ interface WiredConditionHasAltitudeViewProps {
 
 export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProps> = ({ variant = 'altitude' }) => {
     const spec = VARIANTS[variant];
+    const maxValue = spec.value === 'altitude' ? MAX_FURNI_HEIGHT : MAX_RADIUS;
 
     const { trigger = null, setIntParams = null, setStringParam = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
     const [comparison, setComparison] = useState(1);
@@ -115,16 +126,16 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
                 : false
         );
 
-        const nextAltitude = parseAltitude(trigger.stringData);
+        const nextAltitude = parseAltitude(trigger.stringData, maxValue);
         setAltitude(nextAltitude);
-        setAltitudeInput(formatAltitude(nextAltitude));
-    }, [spec.comparison, trigger]);
+        setAltitudeInput(formatAltitude(nextAltitude, maxValue));
+    }, [maxValue, spec.comparison, trigger]);
 
     const updateAltitude = (value: number) => {
-        const nextValue = clampAltitude(value);
+        const nextValue = clampAltitude(value, maxValue);
 
         setAltitude(nextValue);
-        setAltitudeInput(formatAltitude(nextValue));
+        setAltitudeInput(formatAltitude(nextValue, maxValue));
     };
 
     const updateAltitudeInput = (value: string) => {
@@ -141,18 +152,18 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
 
         if (isNaN(parsedValue)) return;
 
-        if (parsedValue > MAX_ALTITUDE) {
-            updateAltitude(MAX_ALTITUDE);
+        if (parsedValue > maxValue) {
+            updateAltitude(maxValue);
             return;
         }
 
-        setAltitude(clampAltitude(parsedValue));
+        setAltitude(clampAltitude(parsedValue, maxValue));
     };
 
     const save = () => {
         // furniProperty reads [source, quantifier]; the others keep the comparison in slot 0.
         setIntParams(spec.comparison ? [comparison, furniSource, quantifier] : [furniSource, quantifier]);
-        setStringParam(spec.value ? formatAltitude(altitude) : '');
+        setStringParam(spec.value ? formatAltitude(altitude, maxValue) : '');
     };
 
     return (
@@ -228,13 +239,13 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
                             inputMode="decimal"
                             type="text"
                             value={altitudeInput}
-                            onBlur={() => setAltitudeInput(formatAltitude(altitude))}
+                            onBlur={() => setAltitudeInput(formatAltitude(altitude, maxValue))}
                             onChange={(event) => updateAltitudeInput(event.target.value)}
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
-                        <Text small>{formatAltitude(altitude)}</Text>
+                        <Slider max={maxValue} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
+                        <Text small>{formatAltitude(altitude, maxValue)}</Text>
                     </div>
                 </>
             )}
