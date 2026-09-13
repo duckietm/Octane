@@ -65,7 +65,7 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
 
                 <div className="flex flex-col gap-1">
                     <Text bold>
-                        {localizeWithFallback('wiredfurni.params.level_selection', 'Level')}: {level}
+                        {localizeWithFallback('wiredfurni.params.level_selection', `Level: ${level}`, ['level'], [level.toString()])}
                     </Text>
                     <Slider max={MAX_LEVEL} min={MIN_LEVEL} value={level} onChange={(value) => setLevel(value)} />
                 </div>
