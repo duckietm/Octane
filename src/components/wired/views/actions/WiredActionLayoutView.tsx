@@ -283,8 +283,18 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredExtraTextOutputVariableView />;
         case WiredActionLayoutCode.VARIABLE_WEB_API_EXTRA:
             return <WiredExtraVariableWebApiView />;
+        case WiredActionLayoutCode.VARIABLE_FX_HP_EXTRA:
+            return <WiredExtraVariableFxProgressBarView categoryId={0} />;
         case WiredActionLayoutCode.VARIABLE_FX_PROGRESS_BAR_EXTRA:
-            return <WiredExtraVariableFxProgressBarView />;
+            return <WiredExtraVariableFxProgressBarView categoryId={1} />;
+        case WiredActionLayoutCode.VARIABLE_FX_LEVELLING_EXTRA:
+            return <WiredExtraVariableFxProgressBarView categoryId={2} />;
+        case WiredActionLayoutCode.VARIABLE_FX_STATUS_EXTRA:
+            return <WiredExtraVariableFxProgressBarView categoryId={3} />;
+        case WiredActionLayoutCode.VARIABLE_FX_BOSS_EXTRA:
+            return <WiredExtraVariableFxProgressBarView categoryId={4} />;
+        case WiredActionLayoutCode.VARIABLE_FX_NUMBER_EXTRA:
+            return <WiredExtraVariableFxProgressBarView categoryId={5} />;
         case WiredActionLayoutCode.USER_VARIABLE_EXTRA:
             return <WiredExtraUserVariableView />;
         case WiredActionLayoutCode.FURNI_VARIABLE_EXTRA:

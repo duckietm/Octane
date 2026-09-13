@@ -49,14 +49,44 @@ const TRIGGER_MASK_UNCHANGED = 8;
 const OVERRIDE_TARGET_GLOBAL = 2;
 
 /**
- * The renderer side implements exactly one renderer so far (a classic progress bar) and does not
- * yet consume style, color or width at all, so a small numeric range keeps every field
- * byte-correct and forward compatible. The official text corpus does enumerate names for most of
- * these values now (see the *_OPTION_LABEL_KEYS maps below) - style.progress_bar.0-4 fully covers
- * this range, as do width.0-4 and renderer.0-4, but the color palette has no entry for 0, so that
- * option is left showing its bare number rather than an invented name.
+ * These are the ids the room renderer actually resolves: `VariableFxRendererRegistry` implements all
+ * fifteen official renderers under the official ids, and the emulator passes style, color, width and
+ * renderer through untouched, so the dialog is the only thing that decides what a builder can reach.
+ * It used to offer 0-4 for every one of them, written when the renderer had a single progress bar;
+ * that left nine renderers, twenty-four colors and two widths unreachable.
+ *
+ * Every id below is one the text corpus names (`wiredfurni.params.variablefx.<family>.<id>`).
  */
-const VISUALIZATION_OPTION_VALUES = [0, 1, 2, 3, 4];
+const COLOR_OPTION_IDS = [-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 100, 101, 102, 103, 104, 1000, 1001, 1002];
+
+const WIDTH_OPTION_IDS = [-1, 0, 1, 2, 3, 4, 100];
+
+const RENDERER_OPTION_IDS = [0, 1, 2, 3, 4, 10, 11, 12, 13, 20, 21, 100, 101, 200, 201];
+
+/** The six official categories, each a wired furni of its own on the server (codes 1200-1205). */
+const CATEGORY_NAMES: Record<number, string> = {
+    0: 'health_points',
+    1: 'progress_bar',
+    2: 'levelling_progress',
+    3: 'status_bar',
+    4: 'boss_bar',
+    5: 'number_display'
+};
+
+/** How many styles each category names in the corpus; the ids run from 0 to count - 1. */
+const CATEGORY_STYLE_COUNT: Record<number, number> = {
+    0: 4,
+    1: 5,
+    2: 2,
+    3: 22,
+    4: 2,
+    5: 3
+};
+
+const DEFAULT_CATEGORY_ID = 1;
+
+const styleOptionIds = (categoryId: number): number[] =>
+    Array.from({ length: CATEGORY_STYLE_COUNT[categoryId] ?? CATEGORY_STYLE_COUNT[DEFAULT_CATEGORY_ID] }, (_unused, index) => index);
 
 /**
  * `widthId` 0 is "molto piccolo" in the official corpus (`wiredfurni.params.variablefx.width.0`),
@@ -69,44 +99,16 @@ const VISUALIZATION_OPTION_VALUES = [0, 1, 2, 3, 4];
  */
 const DEFAULT_WIDTH_ID = 2;
 
-/** This window's category is the progress bar, so its style options are `style.progress_bar.*`. */
-const STYLE_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
-    0: 'wiredfurni.params.variablefx.style.progress_bar.0',
-    1: 'wiredfurni.params.variablefx.style.progress_bar.1',
-    2: 'wiredfurni.params.variablefx.style.progress_bar.2',
-    3: 'wiredfurni.params.variablefx.style.progress_bar.3',
-    4: 'wiredfurni.params.variablefx.style.progress_bar.4'
-};
+/**
+ * Every option label follows `wiredfurni.params.variablefx.<family>.<id>`, and the style family is
+ * nested one deeper under the category name. Falls back to the bare number when the corpus does not
+ * name a given option, so an unnamed id is visible rather than blank.
+ */
+const visualizationOptionLabel = (family: string, value: number): string => {
+    const key = `wiredfurni.params.variablefx.${family}.${value}`;
+    const text = LocalizeText(key);
 
-/** The official color palette has no entry for 0 - that option keeps showing its bare number. */
-const COLOR_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
-    1: 'wiredfurni.params.variablefx.color.1',
-    2: 'wiredfurni.params.variablefx.color.2',
-    3: 'wiredfurni.params.variablefx.color.3',
-    4: 'wiredfurni.params.variablefx.color.4'
-};
-
-const WIDTH_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
-    0: 'wiredfurni.params.variablefx.width.0',
-    1: 'wiredfurni.params.variablefx.width.1',
-    2: 'wiredfurni.params.variablefx.width.2',
-    3: 'wiredfurni.params.variablefx.width.3',
-    4: 'wiredfurni.params.variablefx.width.4'
-};
-
-const RENDERER_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
-    0: 'wiredfurni.params.variablefx.renderer.0',
-    1: 'wiredfurni.params.variablefx.renderer.1',
-    2: 'wiredfurni.params.variablefx.renderer.2',
-    3: 'wiredfurni.params.variablefx.renderer.3',
-    4: 'wiredfurni.params.variablefx.renderer.4'
-};
-
-/** Falls back to the bare number when the corpus does not name a given option. */
-const visualizationOptionLabel = (optionLabelKeys: Partial<Record<number, string>>, value: number): string => {
-    const key = optionLabelKeys[value];
-
-    return key ? LocalizeText(key) : String(value);
+    return text && text !== key ? text : String(value);
 };
 
 /**
@@ -153,7 +155,15 @@ const combineWordsIntoLong = (highWord: number, lowWord: number): number => {
     return Number(combined);
 };
 
-export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
+interface WiredExtraVariableFxViewProps {
+    /** One of the six official categories; the server sends a distinct code per category. */
+    categoryId?: number;
+}
+
+export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewProps> = ({ categoryId = DEFAULT_CATEGORY_ID }) => {
+    const categoryName = CATEGORY_NAMES[categoryId] ?? CATEGORY_NAMES[DEFAULT_CATEGORY_ID];
+    const styleIds = styleOptionIds(categoryId);
+
     const { trigger = null, setIntParams = null, setStringParam = null, setVariableIds = null } = useWired();
     const { roomVariableDefinitions = [] } = useWiredTools();
 
@@ -305,9 +315,9 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         <Text>{LocalizeText('wiredfurni.params.variablefx.style')}</Text>
                         <select className="form-select form-select-sm" value={styleId} onChange={(event) => setStyleId(Number(event.target.value) || 0)}>
-                            {VISUALIZATION_OPTION_VALUES.map((value) => (
+                            {styleIds.map((value) => (
                                 <option key={value} value={value}>
-                                    {visualizationOptionLabel(STYLE_OPTION_LABEL_KEYS, value)}
+                                    {visualizationOptionLabel(`style.${categoryName}`, value)}
                                 </option>
                             ))}
                         </select>
@@ -315,19 +325,19 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         <Text>{LocalizeText('wiredfurni.params.variablefx.color')}</Text>
                         <select className="form-select form-select-sm" value={colorId} onChange={(event) => setColorId(Number(event.target.value) || 0)}>
-                            {VISUALIZATION_OPTION_VALUES.map((value) => (
+                            {COLOR_OPTION_IDS.map((value) => (
                                 <option key={value} value={value}>
-                                    {visualizationOptionLabel(COLOR_OPTION_LABEL_KEYS, value)}
+                                    {visualizationOptionLabel('color', value)}
                                 </option>
                             ))}
                         </select>
                     </div>
                     <div className="flex flex-col gap-1">
                         <Text>{LocalizeText('wiredfurni.params.variablefx.width')}</Text>
-                        <select className="form-select form-select-sm" value={widthId} onChange={(event) => setWidthId(Number(event.target.value) || 0)}>
-                            {VISUALIZATION_OPTION_VALUES.map((value) => (
+                        <select className="form-select form-select-sm" value={widthId} onChange={(event) => setWidthId(Number(event.target.value))}>
+                            {WIDTH_OPTION_IDS.map((value) => (
                                 <option key={value} value={value}>
-                                    {visualizationOptionLabel(WIDTH_OPTION_LABEL_KEYS, value)}
+                                    {visualizationOptionLabel('width', value)}
                                 </option>
                             ))}
                         </select>
@@ -335,9 +345,9 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         <Text>{LocalizeText('wiredfurni.params.variablefx.renderer')}</Text>
                         <select className="form-select form-select-sm" value={rendererId} onChange={(event) => setRendererId(Number(event.target.value) || 0)}>
-                            {VISUALIZATION_OPTION_VALUES.map((value) => (
+                            {RENDERER_OPTION_IDS.map((value) => (
                                 <option key={value} value={value}>
-                                    {visualizationOptionLabel(RENDERER_OPTION_LABEL_KEYS, value)}
+                                    {visualizationOptionLabel('renderer', value)}
                                 </option>
                             ))}
                         </select>
@@ -437,6 +447,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
 
                 <div className="flex flex-col gap-2">
                     <Text bold>{LocalizeText('wiredfurni.params.variablefx.value_range')}</Text>
+                    <Text small>{LocalizeText('wiredfurni.params.variablefx.value_range.info')}</Text>
                     <div className="flex items-center justify-between gap-2">
                         <Text>{LocalizeText('wiredfurni.params.variablefx.value_range.min')}</Text>
                         <OctaneInput
