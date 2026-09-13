@@ -216,9 +216,18 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
 
     const resolvedCardStyle: CSSProperties = { ...cardStyle };
 
-    resolvedCardStyle.width = WIRED_CARD_WIDTH;
-    resolvedCardStyle.minWidth = WIRED_CARD_WIDTH;
-    resolvedCardStyle.maxWidth = WIRED_CARD_WIDTH;
+    // 244 mirrors the official frame asset; a box that needs more asks for it through
+    // cardStyle, the way the official window scales its frame per element. Pinning every box
+    // to the default ignored what 57 views already declare - several of them ask for 400.
+    const requestedWidth = cardStyle?.width ?? WIRED_CARD_WIDTH;
+    const width = typeof requestedWidth === 'number' ? `${requestedWidth}px` : requestedWidth;
+    const clampedWidth = `min(${width}, calc(100vw - 16px))`;
+
+    resolvedCardStyle.width = clampedWidth;
+    // Left at 0 so the viewport clamp can actually shrink the card: pinning it to the
+    // requested width would overflow a narrow screen once a wide dialog is honoured.
+    resolvedCardStyle.minWidth = 0;
+    resolvedCardStyle.maxWidth = clampedWidth;
     resolvedCardStyle.resize = 'none';
 
     return (
