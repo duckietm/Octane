@@ -63,7 +63,7 @@ const combineWordsIntoLong = (highWord: number, lowWord: number): number => {
 };
 
 export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setStringParam = null, setVariableIds = null } = useWired();
+    const { trigger = null, setIntParams = null, setStringParam = null, variableIds = [], setVariableIds = null } = useWired();
     const { roomVariableDefinitions = [] } = useWiredTools();
 
     const [styleId, setStyleId] = useState(0);
@@ -107,11 +107,12 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
         setOverrideMinEnabled(raw[14] !== 0);
         setOverrideMaxEnabled(raw[15] !== 0);
 
-        // The save path (Task 1) only ever sends variable ids; the server never echoes them back
-        // when a box is opened, so a previously chosen override variable cannot be restored here.
-        setOverrideMinVariableToken('');
-        setOverrideMaxVariableToken('');
-    }, [trigger]);
+        // WiredExtraVariableFxBase.serializeWiredData now echoes the override/audience ids back in
+        // codec order [overrideMinVariableId, overrideMaxVariableId, audienceVariableId], seeded by
+        // useWired in the same tick it sets `trigger` - restore them instead of resetting to ''.
+        setOverrideMinVariableToken(variableIds[0] ?? '');
+        setOverrideMaxVariableToken(variableIds[1] ?? '');
+    }, [trigger, variableIds]);
 
     const toggleTriggerMaskBit = (bit: number) => setShowTriggerMask((current) => (current & bit ? current & ~bit : current | bit));
 
