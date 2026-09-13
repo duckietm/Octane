@@ -1,0 +1,21 @@
+{
+    "wiredfurni.params.variablefx.section.visualization": "Aspetto",
+    "wiredfurni.params.variablefx.section.visibility": "Visibilità",
+    "wiredfurni.params.variablefx.section.range": "Intervallo",
+    "wiredfurni.params.variablefx.style": "Stile",
+    "wiredfurni.params.variablefx.color": "Colore",
+    "wiredfurni.params.variablefx.width": "Larghezza",
+    "wiredfurni.params.variablefx.renderer": "Renderer",
+    "wiredfurni.params.variablefx.show_mode.never": "Non mostrare mai la barra",
+    "wiredfurni.params.variablefx.show_mode.when_variable_changes": "Mostra quando la variabile cambia",
+    "wiredfurni.params.variablefx.show_mode.always": "Mostra sempre la barra",
+    "wiredfurni.params.variablefx.show_duration": "Mostra per (secondi)",
+    "wiredfurni.params.variablefx.mouse_hover": "Mostra anche al passaggio del mouse",
+    "wiredfurni.params.variablefx.update_mask.increased": "Il valore è aumentato",
+    "wiredfurni.params.variablefx.update_mask.decreased": "Il valore è diminuito",
+    "wiredfurni.params.variablefx.update_mask.unchanged": "Il valore è rimasto invariato",
+    "wiredfurni.params.variablefx.range.min": "Minimo",
+    "wiredfurni.params.variablefx.range.max": "Massimo",
+    "wiredfurni.params.variablefx.range.override_min": "Sostituisci il minimo con una variabile",
+    "wiredfurni.params.variablefx.range.override_max": "Sostituisci il massimo con una variabile"
+}

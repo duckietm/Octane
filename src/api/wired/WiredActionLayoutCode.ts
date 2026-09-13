@@ -147,4 +147,7 @@ export class WiredActionLayoutCode {
      * seats empty rather than have the two collide on whichever merges second.
      */
     public static VARIABLE_WEB_API_EXTRA: number = 128;
+
+    /** Variable FX progress bar; the emulator registers it on wf_xtra_varfx_prog. */
+    public static VARIABLE_FX_PROGRESS_BAR_EXTRA: number = 1201;
 }
