@@ -1,10 +1,17 @@
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, fireEvent, render } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const setIntParams = vi.fn();
 const setStringParam = vi.fn();
-const setVariableIds = vi.fn();
+
+// useWired holds variableIds in useLiveState, which sets React state as well as the ref: saving
+// therefore hands the window a NEW array identity. Mirrored here so a test can re-render the way
+// the real hook makes the window re-render after a save.
+let liveVariableIds = ['minVar', '', ''];
+const setVariableIds = vi.fn((next: string[]) => {
+    liveVariableIds = [...next];
+});
 
 /**
  * Matches VariableFxSettingsCodec.write's field order exactly (see the codec, the authority for
@@ -42,13 +49,13 @@ const trigger = {
         /* 19 audienceVariableValue low (unexposed) */ 22,
         /* 20 segments (unexposed) */ 4
     ],
-    stringData: 'vfx-icon'
+    stringData: 'vfx-icon',
+    // The override-min checkbox comes back checked (raw[14] === 1) with a saved variable id - the
+    // exact reopen scenario the Critical fix restores. The override-max checkbox is unchecked, so
+    // its slot is '' regardless of what the server sends. WiredActionDefinition carries these
+    // alongside intData, which is what the window seeds from.
+    variableIds: ['minVar', '', '']
 };
-
-// The override-min checkbox comes back checked (raw[14] === 1) with a saved variable id - the
-// exact reopen scenario the Critical fix restores. The override-max checkbox is unchecked, so its
-// slot is '' regardless of what the server sends.
-const variableIds = ['minVar', '', ''];
 
 vi.mock('../../../../api', () => ({
     LocalizeText: (key: string) => key,
@@ -56,7 +63,7 @@ vi.mock('../../../../api', () => ({
 }));
 
 vi.mock('../../../../hooks', () => ({
-    useWired: () => ({ trigger, setIntParams, setStringParam, variableIds, setVariableIds }),
+    useWired: () => ({ trigger, setIntParams, setStringParam, variableIds: liveVariableIds, setVariableIds }),
     useWiredTools: () => ({ roomVariableDefinitions: [] })
 }));
 
@@ -93,8 +100,39 @@ describe('WiredExtraVariableFxProgressBarView', () => {
         setIntParams.mockClear();
         setStringParam.mockClear();
         setVariableIds.mockClear();
+        liveVariableIds = ['minVar', '', ''];
         capturedSave = null;
         capturedValidate = null;
+    });
+
+    /**
+     * Saving does not close the window, and the server never refreshes `trigger`. So a seeding
+     * effect that re-runs after a save re-reads the OLD intData over the builder's edit: the
+     * controls snap back, and the next save writes the stale configuration over the new one - the
+     * edit lost without a word. The re-run used to be caused by save() itself, through the
+     * variableIds identity useLiveState hands back.
+     */
+    it('keeps an edit after a save instead of re-seeding the controls from the stale trigger', () => {
+        const { container, rerender } = render(<WiredExtraVariableFxProgressBarView />);
+
+        const showModeRadios = container.querySelectorAll<HTMLInputElement>('input[name="wiredVariableFxShowMode"]');
+
+        // trigger.intData[2] is 1 ("when the variable changes"); the builder picks "always" (2).
+        fireEvent.click(showModeRadios[2]);
+        expect(showModeRadios[2].checked).toBe(true);
+
+        capturedSave?.();
+
+        // The save replaced variableIds, so the window re-renders. Nothing about the box changed.
+        rerender(<WiredExtraVariableFxProgressBarView />);
+
+        const radiosAfterSave = container.querySelectorAll<HTMLInputElement>('input[name="wiredVariableFxShowMode"]');
+        expect(radiosAfterSave[2].checked).toBe(true);
+
+        capturedSave?.();
+
+        const secondSave = setIntParams.mock.calls[1][0] as number[];
+        expect(secondSave[2]).toBe(2);
     });
 
     it('restores a previously saved override token instead of blanking it, so the box is savable again', () => {
