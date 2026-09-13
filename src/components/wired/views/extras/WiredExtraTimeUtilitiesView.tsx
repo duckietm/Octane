@@ -4,11 +4,11 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
-const UNIT_OPTIONS: { value: number; label: string }[] = [
-    { value: 0, label: 'Milliseconds' },
-    { value: 1, label: 'Seconds' },
-    { value: 2, label: 'Minutes' },
-    { value: 3, label: 'Hours' }
+const UNIT_OPTIONS: { value: number; key: string; fallback: string }[] = [
+    { value: 0, key: 'wiredfurni.params.time_util.unit.0', fallback: 'Milliseconds' },
+    { value: 1, key: 'wiredfurni.params.time_util.unit.1', fallback: 'Seconds' },
+    { value: 2, key: 'wiredfurni.params.time_util.unit.2', fallback: 'Minutes' },
+    { value: 3, key: 'wiredfurni.params.time_util.unit.3', fallback: 'Hours' }
 ];
 
 const normalizeUnit = (value: number) => {
@@ -45,7 +45,7 @@ export const WiredExtraTimeUtilitiesView: FC<{}> = () => {
                                 checked={timeUnit === option.value}
                                 onChange={() => setTimeUnit(option.value)}
                             />
-                            <Text small>{option.label}</Text>
+                            <Text small>{localizeWithFallback(option.key, option.fallback)}</Text>
                         </label>
                     ))}
                 </div>
