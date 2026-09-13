@@ -63,7 +63,7 @@ const combineWordsIntoLong = (highWord: number, lowWord: number): number => {
 };
 
 export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setStringParam = null, variableIds = [], setVariableIds = null } = useWired();
+    const { trigger = null, setIntParams = null, setStringParam = null, setVariableIds = null } = useWired();
     const { roomVariableDefinitions = [] } = useWiredTools();
 
     const [styleId, setStyleId] = useState(0);
@@ -107,12 +107,19 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
         setOverrideMinEnabled(raw[14] !== 0);
         setOverrideMaxEnabled(raw[15] !== 0);
 
-        // WiredExtraVariableFxBase.serializeWiredData now echoes the override/audience ids back in
-        // codec order [overrideMinVariableId, overrideMaxVariableId, audienceVariableId], seeded by
-        // useWired in the same tick it sets `trigger` - restore them instead of resetting to ''.
-        setOverrideMinVariableToken(variableIds[0] ?? '');
-        setOverrideMaxVariableToken(variableIds[1] ?? '');
-    }, [trigger, variableIds]);
+        // WiredExtraVariableFxBase.serializeWiredData echoes the override/audience ids back in
+        // codec order [overrideMinVariableId, overrideMaxVariableId, audienceVariableId] - restore
+        // them instead of resetting to ''. They are read off the definition, not off useWired's
+        // own variableIds state: save() replaces that state with a fresh array, and depending on
+        // its identity here re-ran this effect after every save, re-seeding every control from a
+        // `trigger` the server never refreshes. The builder's edit snapped back and the next save
+        // wrote the old configuration over the new one. Every sibling extra view seeds on
+        // [trigger] alone for the same reason.
+        const savedVariableIds = trigger.variableIds ?? [];
+
+        setOverrideMinVariableToken(savedVariableIds[0] ?? '');
+        setOverrideMaxVariableToken(savedVariableIds[1] ?? '');
+    }, [trigger]);
 
     const toggleTriggerMaskBit = (bit: number) => setShowTriggerMask((current) => (current & bit ? current & ~bit : current | bit));
 
