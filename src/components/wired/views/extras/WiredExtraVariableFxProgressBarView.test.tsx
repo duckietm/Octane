@@ -145,6 +145,22 @@ describe('WiredExtraVariableFxProgressBarView', () => {
     });
 
     /**
+     * `widthId` 0 is "molto piccolo", a real band, not an empty slot. When `trigger.intData` is
+     * missing or too short to be real saved data, `rawIntParams` falls back to a synthetic vector -
+     * this pins that the synthetic vector no longer defaults that slot to 0, so this defensive path
+     * cannot recreate the silent-shrink-to-smallest bug the emulator's own default was fixed for.
+     */
+    it('falls back to the neutral width band, not "molto piccolo", when intData is missing', () => {
+        trigger.intData = undefined as unknown as number[];
+
+        const { container } = render(<WiredExtraVariableFxProgressBarView />);
+
+        const widthSelect = container.querySelectorAll<HTMLSelectElement>('select')[2];
+
+        expect(widthSelect.value).toBe('2');
+    });
+
+    /**
      * Saving does not close the window, and the server never refreshes `trigger`. So a seeding
      * effect that re-runs after a save re-reads the OLD intData over the builder's edit: the
      * controls snap back, and the next save writes the stale configuration over the new one - the
