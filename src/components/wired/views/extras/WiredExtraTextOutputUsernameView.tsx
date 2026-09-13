@@ -105,7 +105,7 @@ export const WiredExtraTextOutputUsernameView: FC<{}> = () => {
                             type="radio"
                             onChange={() => setPlaceholderType(TYPE_SINGLE)}
                         />
-                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.1')}</Text>
+                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.user.1')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
                         <input
@@ -115,7 +115,7 @@ export const WiredExtraTextOutputUsernameView: FC<{}> = () => {
                             type="radio"
                             onChange={() => setPlaceholderType(TYPE_MULTIPLE)}
                         />
-                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.2')}</Text>
+                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.user.2')}</Text>
                     </label>
                 </div>
                 {placeholderType === TYPE_MULTIPLE && (
