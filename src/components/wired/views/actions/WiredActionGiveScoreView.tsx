@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -55,10 +56,16 @@ export const WiredActionGiveScoreView: FC<{}> = (props) => {
             save={save}
             footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
         >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.setpoints2', LocalizeText('wiredfurni.params.setpoints', ['points'], [points.toString()]), ['points'], [points.toString()])}</Text>
-                <Slider max={1000} min={1} value={points} onChange={(event) => setPoints(event)} />
-            </div>
+            <WiredSliderSection
+                max={1000}
+                min={1}
+                titleFallback={LocalizeText('wiredfurni.params.setpoints', ['points'], [points.toString()])}
+                titleKey="wiredfurni.params.setpoints2"
+                titleParameters={['points']}
+                titleReplacements={[points.toString()]}
+                value={points}
+                onChange={setPoints}
+            />
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.settimesingame', `Times per game: ${timesLabel}`, ['times'], [timesLabel])}</Text>
                 <Slider max={UNLIMITED_SLIDER_POSITION} min={1} value={timesInGame} onChange={(event) => setTimesInGame(event)} />

@@ -1,8 +1,9 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { normalizeWiredVariableComparison, WIRED_VAR_CMP_DEFAULT, WiredVariableComparisonOperator } from '../WiredVariableComparisonOperator';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries } from '../WiredVariablePickerData';
@@ -63,12 +64,16 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
                     onSelect={(entry) => setVariableToken(entry.token)}
                 />
 
-                <div className="flex flex-col gap-1">
-                    <Text bold>
-                        {localizeWithFallback('wiredfurni.params.level_selection', `Level: ${level}`, ['level'], [level.toString()])}
-                    </Text>
-                    <Slider max={MAX_LEVEL} min={MIN_LEVEL} value={level} onChange={(value) => setLevel(value)} />
-                </div>
+                <WiredSliderSection
+                    max={MAX_LEVEL}
+                    min={MIN_LEVEL}
+                    titleFallback={`Level: ${level}`}
+                    titleKey="wiredfurni.params.level_selection"
+                    titleParameters={['level']}
+                    titleReplacements={[level.toString()]}
+                    value={level}
+                    onChange={setLevel}
+                />
 
                 <WiredVariableComparisonOperator name="wiredUserLevelComparison" value={comparison} onChange={setComparison} />
 
