@@ -14,6 +14,17 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
  */
 const INT_PARAM_COUNT = 21;
 
+/**
+ * `VariableFxSettings.SOURCE_*` in the emulator. The source type decides which kind of variable on
+ * the box's tile the configuration covers, and it is the only field that decides it - the editor
+ * never names a variable. A box that never sets it stays on SOURCE_USER, whose statuses are drawn
+ * on the avatar holding the value, a side this slice leaves unbound; so leaving this unexposed
+ * meant no configuration the window could produce ever drew anything.
+ */
+const SOURCE_USER = 0;
+const SOURCE_FURNI = 1;
+const SOURCE_GLOBAL = 2;
+
 const SHOW_MODE_NEVER = 0;
 const SHOW_MODE_WHEN_VARIABLE_CHANGES = 1;
 const SHOW_MODE_ALWAYS = 2;
@@ -46,6 +57,12 @@ const rawIntParams = (intData: number[] | undefined | null): number[] =>
 const normalizeShowMode = (value: number) =>
     value === SHOW_MODE_WHEN_VARIABLE_CHANGES || value === SHOW_MODE_ALWAYS ? value : SHOW_MODE_NEVER;
 
+/**
+ * The emulator's binding covers nothing for a source type outside these three, so the window never
+ * shows or writes back a fourth value: a vector carrying one is repaired to the default on save.
+ */
+const normalizeSourceType = (value: number) => (value === SOURCE_FURNI || value === SOURCE_GLOBAL ? value : SOURCE_USER);
+
 /** High word first, exactly as `VariableFxSettingsCodec.writeLong` splits it: `(int)(value >> 32)` then `(int) value`. */
 const splitLongIntoWords = (value: number): [number, number] => {
     const bigValue = BigInt(Math.trunc(Number.isFinite(value) ? value : 0));
@@ -65,6 +82,8 @@ const combineWordsIntoLong = (highWord: number, lowWord: number): number => {
 export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null, setVariableIds = null } = useWired();
     const { roomVariableDefinitions = [] } = useWiredTools();
+
+    const [sourceType, setSourceType] = useState(SOURCE_USER);
 
     const [styleId, setStyleId] = useState(0);
     const [colorId, setColorId] = useState(0);
@@ -94,6 +113,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
 
         const raw = rawIntParams(trigger.intData);
 
+        setSourceType(normalizeSourceType(raw[0]));
         setShowMode(normalizeShowMode(raw[2]));
         setShowTriggerMask(raw[3]);
         setShowOnMouseHover(raw[4] !== 0);
@@ -126,10 +146,11 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
     const validate = () => (!overrideMinEnabled || !!overrideMinVariableToken) && (!overrideMaxEnabled || !!overrideMaxVariableToken);
 
     const save = () => {
-        // Everything this window does not expose (sourceType, visibility, the audience value pair,
-        // segments) rides through unchanged from whatever the box opened with.
+        // Everything this window does not expose (visibility, the audience value pair, segments)
+        // rides through unchanged from whatever the box opened with.
         const params = [...rawIntParams(trigger?.intData)];
 
+        params[0] = sourceType;
         params[2] = showMode;
         params[3] = showTriggerMask;
         params[4] = showOnMouseHover ? 1 : 0;
@@ -151,7 +172,8 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
         params[15] = overrideMaxEnabled ? 1 : 0;
         params[16] = OVERRIDE_TARGET_GLOBAL;
         params[17] = OVERRIDE_TARGET_GLOBAL;
-        // params[18..19] audienceVariableValue, params[20] segments: left as read from `raw` above.
+        // params[1] visibility, params[18..19] audienceVariableValue, params[20] segments: left as
+        // read from `raw` above.
 
         setIntParams(params);
         setStringParam(trigger?.stringData ?? '');
@@ -166,6 +188,44 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
     return (
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 400 }}>
             <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.section.source')}</Text>
+                    <div className="flex flex-col gap-1">
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <input
+                                checked={sourceType === SOURCE_USER}
+                                className="form-check-input"
+                                name="wiredVariableFxSourceType"
+                                type="radio"
+                                onChange={() => setSourceType(SOURCE_USER)}
+                            />
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.source.user')}</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <input
+                                checked={sourceType === SOURCE_FURNI}
+                                className="form-check-input"
+                                name="wiredVariableFxSourceType"
+                                type="radio"
+                                onChange={() => setSourceType(SOURCE_FURNI)}
+                            />
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.source.furni')}</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <input
+                                checked={sourceType === SOURCE_GLOBAL}
+                                className="form-check-input"
+                                name="wiredVariableFxSourceType"
+                                type="radio"
+                                onChange={() => setSourceType(SOURCE_GLOBAL)}
+                            />
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.source.global')}</Text>
+                        </label>
+                    </div>
+                </div>
+
+                <div className="octane-wired__divider" />
+
                 <div className="flex flex-col gap-2">
                     <Text bold>{LocalizeText('wiredfurni.params.variablefx.section.visualization')}</Text>
                     <div className="flex flex-col gap-1">

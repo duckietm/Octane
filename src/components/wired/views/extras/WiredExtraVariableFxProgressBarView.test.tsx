@@ -15,7 +15,7 @@ const setVariableIds = vi.fn((next: string[]) => {
 
 /**
  * Matches VariableFxSettingsCodec.write's field order exactly (see the codec, the authority for
- * this vector). Indices this window does not expose (0, 1, 18, 19, 20) carry distinctive marker
+ * this vector). Indices this window does not expose (1, 18, 19, 20) carry distinctive marker
  * values so the test fails if save() ever stops passing them through unchanged. Index 16/17 use a
  * value the view never emits (OVERRIDE_TARGET_GLOBAL is 2), so the test also fails if the "write
  * the global constant" behaviour regresses.
@@ -25,9 +25,9 @@ const setVariableIds = vi.fn((next: string[]) => {
  * trips correctly if the high word is actually consulted. Together they cover both 64-bit split
  * directions save() has to reproduce unchanged when nothing edits the range.
  */
-const trigger = {
+const makeTrigger = () => ({
     intData: [
-        /* 0  sourceType (unexposed) */ 7,
+        /* 0  sourceType (furni) */ 1,
         /* 1  visibility (unexposed) */ 9,
         /* 2  showMode */ 1,
         /* 3  showTriggerMask (rose|fell) */ 6,
@@ -55,7 +55,9 @@ const trigger = {
     // its slot is '' regardless of what the server sends. WiredActionDefinition carries these
     // alongside intData, which is what the window seeds from.
     variableIds: ['minVar', '', '']
-};
+});
+
+let trigger = makeTrigger();
 
 vi.mock('../../../../api', () => ({
     LocalizeText: (key: string) => key,
@@ -101,8 +103,45 @@ describe('WiredExtraVariableFxProgressBarView', () => {
         setStringParam.mockClear();
         setVariableIds.mockClear();
         liveVariableIds = ['minVar', '', ''];
+        trigger = makeTrigger();
         capturedSave = null;
         capturedValidate = null;
+    });
+
+    /**
+     * sourceType is what the emulator's binding filters the box's tile by, and it is the only
+     * thing that decides which variables the configuration covers. While it was unexposed a fresh
+     * box kept the zero it was serialised with - SOURCE_USER - whose statuses are drawn on the
+     * avatar, a side this slice leaves unbound, so no configuration this window could produce ever
+     * drew a bar.
+     */
+    it('seeds the source type from the saved vector and writes the builder choice back', () => {
+        const { container } = render(<WiredExtraVariableFxProgressBarView />);
+
+        const sourceRadios = container.querySelectorAll<HTMLInputElement>('input[name="wiredVariableFxSourceType"]');
+
+        expect(sourceRadios).toHaveLength(3);
+        expect(sourceRadios[1].checked).toBe(true); // intData[0] is 1, the furni source
+
+        fireEvent.click(sourceRadios[2]); // room / global
+        capturedSave?.();
+
+        expect((setIntParams.mock.calls[0][0] as number[])[0]).toBe(2);
+    });
+
+    /** The emulator covers nothing for a source outside the three, so the window repairs it. */
+    it('repairs a saved source type the editor cannot produce', () => {
+        trigger.intData[0] = 7;
+
+        const { container } = render(<WiredExtraVariableFxProgressBarView />);
+
+        const sourceRadios = container.querySelectorAll<HTMLInputElement>('input[name="wiredVariableFxSourceType"]');
+
+        expect(sourceRadios[0].checked).toBe(true);
+
+        capturedSave?.();
+
+        expect((setIntParams.mock.calls[0][0] as number[])[0]).toBe(0);
     });
 
     /**
@@ -151,7 +190,7 @@ describe('WiredExtraVariableFxProgressBarView', () => {
 
         expect(setIntParams).toHaveBeenCalledTimes(1);
         expect(setIntParams).toHaveBeenCalledWith([
-            7, 9, 1, 6, 1, 30, 2, 3, 1, 0, 0, 1234, 1, 0, 1, 0, 2, 2, 11, 22, 4
+            1, 9, 1, 6, 1, 30, 2, 3, 1, 0, 0, 1234, 1, 0, 1, 0, 2, 2, 11, 22, 4
         ]);
     });
 
