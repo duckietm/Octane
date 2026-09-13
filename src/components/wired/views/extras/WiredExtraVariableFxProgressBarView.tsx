@@ -29,6 +29,13 @@ const SHOW_MODE_NEVER = 0;
 const SHOW_MODE_WHEN_VARIABLE_CHANGES = 1;
 const SHOW_MODE_ALWAYS = 2;
 
+/**
+ * The official corpus enumerates four update_mask options (`update_mask.1`-`.4`), not three: `.1`
+ * is "variable created", which has no bit exposed by this window at all (there is no
+ * TRIGGER_MASK_CREATED here), then `.2`/`.3`/`.4` name increased/decreased/unchanged in the same
+ * order as these three bits - so the numbering lines up with this triple only once the missing
+ * first option is skipped, not as a direct 1:1 rename.
+ */
 const TRIGGER_MASK_INCREASED = 2;
 const TRIGGER_MASK_DECREASED = 4;
 const TRIGGER_MASK_UNCHANGED = 8;
@@ -42,12 +49,54 @@ const TRIGGER_MASK_UNCHANGED = 8;
 const OVERRIDE_TARGET_GLOBAL = 2;
 
 /**
- * There is no catalog of named styles/colors/widths/renderers anywhere in this codebase yet - the
- * renderer side implements exactly one renderer so far (a classic progress bar) and does not yet
- * consume style, color or width at all. Offering a small numeric range keeps the field byte-correct
- * and forward compatible without inventing option names nothing has defined.
+ * The renderer side implements exactly one renderer so far (a classic progress bar) and does not
+ * yet consume style, color or width at all, so a small numeric range keeps every field
+ * byte-correct and forward compatible. The official text corpus does enumerate names for most of
+ * these values now (see the *_OPTION_LABEL_KEYS maps below) - style.progress_bar.0-4 fully covers
+ * this range, as do width.0-4 and renderer.0-4, but the color palette has no entry for 0, so that
+ * option is left showing its bare number rather than an invented name.
  */
 const VISUALIZATION_OPTION_VALUES = [0, 1, 2, 3, 4];
+
+/** This window's category is the progress bar, so its style options are `style.progress_bar.*`. */
+const STYLE_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
+    0: 'wiredfurni.params.variablefx.style.progress_bar.0',
+    1: 'wiredfurni.params.variablefx.style.progress_bar.1',
+    2: 'wiredfurni.params.variablefx.style.progress_bar.2',
+    3: 'wiredfurni.params.variablefx.style.progress_bar.3',
+    4: 'wiredfurni.params.variablefx.style.progress_bar.4'
+};
+
+/** The official color palette has no entry for 0 - that option keeps showing its bare number. */
+const COLOR_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
+    1: 'wiredfurni.params.variablefx.color.1',
+    2: 'wiredfurni.params.variablefx.color.2',
+    3: 'wiredfurni.params.variablefx.color.3',
+    4: 'wiredfurni.params.variablefx.color.4'
+};
+
+const WIDTH_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
+    0: 'wiredfurni.params.variablefx.width.0',
+    1: 'wiredfurni.params.variablefx.width.1',
+    2: 'wiredfurni.params.variablefx.width.2',
+    3: 'wiredfurni.params.variablefx.width.3',
+    4: 'wiredfurni.params.variablefx.width.4'
+};
+
+const RENDERER_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
+    0: 'wiredfurni.params.variablefx.renderer.0',
+    1: 'wiredfurni.params.variablefx.renderer.1',
+    2: 'wiredfurni.params.variablefx.renderer.2',
+    3: 'wiredfurni.params.variablefx.renderer.3',
+    4: 'wiredfurni.params.variablefx.renderer.4'
+};
+
+/** Falls back to the bare number when the corpus does not name a given option. */
+const visualizationOptionLabel = (optionLabelKeys: Partial<Record<number, string>>, value: number): string => {
+    const key = optionLabelKeys[value];
+
+    return key ? LocalizeText(key) : String(value);
+};
 
 const defaultIntParams = (): number[] => new Array(INT_PARAM_COUNT).fill(0);
 
@@ -227,13 +276,13 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                 <div className="octane-wired__divider" />
 
                 <div className="flex flex-col gap-2">
-                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.section.visualization')}</Text>
+                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.visualization')}</Text>
                     <div className="flex flex-col gap-1">
                         <Text>{LocalizeText('wiredfurni.params.variablefx.style')}</Text>
                         <select className="form-select form-select-sm" value={styleId} onChange={(event) => setStyleId(Number(event.target.value) || 0)}>
                             {VISUALIZATION_OPTION_VALUES.map((value) => (
                                 <option key={value} value={value}>
-                                    {value}
+                                    {visualizationOptionLabel(STYLE_OPTION_LABEL_KEYS, value)}
                                 </option>
                             ))}
                         </select>
@@ -243,7 +292,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                         <select className="form-select form-select-sm" value={colorId} onChange={(event) => setColorId(Number(event.target.value) || 0)}>
                             {VISUALIZATION_OPTION_VALUES.map((value) => (
                                 <option key={value} value={value}>
-                                    {value}
+                                    {visualizationOptionLabel(COLOR_OPTION_LABEL_KEYS, value)}
                                 </option>
                             ))}
                         </select>
@@ -253,7 +302,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                         <select className="form-select form-select-sm" value={widthId} onChange={(event) => setWidthId(Number(event.target.value) || 0)}>
                             {VISUALIZATION_OPTION_VALUES.map((value) => (
                                 <option key={value} value={value}>
-                                    {value}
+                                    {visualizationOptionLabel(WIDTH_OPTION_LABEL_KEYS, value)}
                                 </option>
                             ))}
                         </select>
@@ -263,7 +312,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                         <select className="form-select form-select-sm" value={rendererId} onChange={(event) => setRendererId(Number(event.target.value) || 0)}>
                             {VISUALIZATION_OPTION_VALUES.map((value) => (
                                 <option key={value} value={value}>
-                                    {value}
+                                    {visualizationOptionLabel(RENDERER_OPTION_LABEL_KEYS, value)}
                                 </option>
                             ))}
                         </select>
@@ -273,7 +322,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                 <div className="octane-wired__divider" />
 
                 <div className="flex flex-col gap-2">
-                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.section.visibility')}</Text>
+                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.visibility')}</Text>
                     <div className="flex flex-col gap-1">
                         <label className="flex items-center gap-1 cursor-pointer">
                             <input
@@ -336,7 +385,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                                 type="checkbox"
                                 onChange={() => toggleTriggerMaskBit(TRIGGER_MASK_INCREASED)}
                             />
-                            <Text>{LocalizeText('wiredfurni.params.variablefx.update_mask.increased')}</Text>
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.update_mask.2')}</Text>
                         </label>
                         <label className="flex items-center gap-1 cursor-pointer">
                             <input
@@ -345,7 +394,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                                 type="checkbox"
                                 onChange={() => toggleTriggerMaskBit(TRIGGER_MASK_DECREASED)}
                             />
-                            <Text>{LocalizeText('wiredfurni.params.variablefx.update_mask.decreased')}</Text>
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.update_mask.3')}</Text>
                         </label>
                         <label className="flex items-center gap-1 cursor-pointer">
                             <input
@@ -354,7 +403,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                                 type="checkbox"
                                 onChange={() => toggleTriggerMaskBit(TRIGGER_MASK_UNCHANGED)}
                             />
-                            <Text>{LocalizeText('wiredfurni.params.variablefx.update_mask.unchanged')}</Text>
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.update_mask.4')}</Text>
                         </label>
                     </div>
                 </div>
@@ -362,9 +411,9 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                 <div className="octane-wired__divider" />
 
                 <div className="flex flex-col gap-2">
-                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.section.range')}</Text>
+                    <Text bold>{LocalizeText('wiredfurni.params.variablefx.value_range')}</Text>
                     <div className="flex items-center justify-between gap-2">
-                        <Text>{LocalizeText('wiredfurni.params.variablefx.range.min')}</Text>
+                        <Text>{LocalizeText('wiredfurni.params.variablefx.value_range.min')}</Text>
                         <OctaneInput
                             className="max-w-[100px]"
                             type="number"
@@ -373,7 +422,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                         />
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                        <Text>{LocalizeText('wiredfurni.params.variablefx.range.max')}</Text>
+                        <Text>{LocalizeText('wiredfurni.params.variablefx.value_range.max')}</Text>
                         <OctaneInput
                             className="max-w-[100px]"
                             type="number"
@@ -390,7 +439,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                                 type="checkbox"
                                 onChange={(event) => setOverrideMinEnabled(event.target.checked)}
                             />
-                            <Text>{LocalizeText('wiredfurni.params.variablefx.range.override_min')}</Text>
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.advanced.override_min')}</Text>
                         </label>
                         {overrideMinEnabled && (
                             <WiredVariablePicker
@@ -410,7 +459,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
                                 type="checkbox"
                                 onChange={(event) => setOverrideMaxEnabled(event.target.checked)}
                             />
-                            <Text>{LocalizeText('wiredfurni.params.variablefx.range.override_max')}</Text>
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.advanced.override_max')}</Text>
                         </label>
                         {overrideMaxEnabled && (
                             <WiredVariablePicker
