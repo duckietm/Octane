@@ -58,6 +58,17 @@ const OVERRIDE_TARGET_GLOBAL = 2;
  */
 const VISUALIZATION_OPTION_VALUES = [0, 1, 2, 3, 4];
 
+/**
+ * `widthId` 0 is "molto piccolo" in the official corpus (`wiredfurni.params.variablefx.width.0`),
+ * not an empty slot - a box that never opens this dropdown must not land there by accident. The
+ * emulator's `WiredExtraVariableFxBase.DEFAULT_SETTINGS` starts a never-saved box on this same
+ * index 2 ("medio"), so a box that is saved without ever touching this control keeps the neutral
+ * width instead of silently shrinking to the smallest band. A box reopened with a genuinely saved
+ * `widthId` of 0 is unaffected: the effect below overwrites this initial value with `raw[8]`
+ * unconditionally, so a real "molto piccolo" choice is never second-guessed.
+ */
+const DEFAULT_WIDTH_ID = 2;
+
 /** This window's category is the progress bar, so its style options are `style.progress_bar.*`. */
 const STYLE_OPTION_LABEL_KEYS: Partial<Record<number, string>> = {
     0: 'wiredfurni.params.variablefx.style.progress_bar.0',
@@ -98,7 +109,21 @@ const visualizationOptionLabel = (optionLabelKeys: Partial<Record<number, string
     return key ? LocalizeText(key) : String(value);
 };
 
-const defaultIntParams = (): number[] => new Array(INT_PARAM_COUNT).fill(0);
+/**
+ * The synthetic vector used when `trigger.intData` is missing or too short to be real saved data
+ * (a safety net that does not fire in practice - the emulator always serialises a full-length
+ * vector, even for a never-saved box). Every field defaults to 0 except `widthId` (index 8): 0 is
+ * the real "molto piccolo" band, not an empty slot, so defaulting to it here would recreate the
+ * same silent-shrink bug this window's real restore path (`raw[8]`, below) never has to guess
+ * around because the emulator's own default already resolves to the neutral band.
+ */
+const defaultIntParams = (): number[] => {
+    const params = new Array(INT_PARAM_COUNT).fill(0);
+
+    params[8] = DEFAULT_WIDTH_ID;
+
+    return params;
+};
 
 const rawIntParams = (intData: number[] | undefined | null): number[] =>
     intData && intData.length >= INT_PARAM_COUNT ? intData : defaultIntParams();
@@ -136,7 +161,7 @@ export const WiredExtraVariableFxProgressBarView: FC<{}> = () => {
 
     const [styleId, setStyleId] = useState(0);
     const [colorId, setColorId] = useState(0);
-    const [widthId, setWidthId] = useState(0);
+    const [widthId, setWidthId] = useState(DEFAULT_WIDTH_ID);
     const [rendererId, setRendererId] = useState(0);
 
     const [showMode, setShowMode] = useState(SHOW_MODE_NEVER);
