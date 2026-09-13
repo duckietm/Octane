@@ -1,9 +1,10 @@
-import { FC, MouseEvent } from 'react';
+import { FC, MouseEvent, ReactNode } from 'react';
 import { FaFlag } from 'react-icons/fa';
 import { Base, Column, ColumnProps, Flex } from '..';
 
 interface OctaneCardHeaderViewProps extends ColumnProps {
     headerText: string;
+    headerStart?: ReactNode;
     isGalleryPhoto?: boolean;
     noCloseButton?: boolean;
     isInfoToHabboPages?: boolean;
@@ -15,6 +16,7 @@ interface OctaneCardHeaderViewProps extends ColumnProps {
 export const OctaneCardHeaderView: FC<OctaneCardHeaderViewProps> = (props) => {
     const {
         headerText = null,
+        headerStart = null,
         isGalleryPhoto = false,
         noCloseButton = false,
         isInfoToHabboPages = false,
@@ -53,6 +55,7 @@ export const OctaneCardHeaderView: FC<OctaneCardHeaderViewProps> = (props) => {
             {...rest}
         >
             <Flex center fullWidth>
+                {headerStart}
                 <span className="octane-card-title text-white">{headerText}</span>
                 {isGalleryPhoto && (
                     <Base className="inset-e-4 octane-card-header-report-camera" position="absolute" onClick={onReportPhoto}>
