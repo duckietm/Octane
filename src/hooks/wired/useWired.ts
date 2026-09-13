@@ -30,7 +30,6 @@ export interface WiredConfigSeed {
     intParams: number[];
     stringParam: string;
     furniIds: number[];
-    variableIds: string[];
 }
 
 const useWiredState = () => {
@@ -356,7 +355,6 @@ const useWiredState = () => {
         setIntParams(seed.intParams);
         setStringParam(seed.stringParam);
         setFurniIds(seed.furniIds);
-        setVariableIds(seed.variableIds);
         setConfigSeed(seed);
     };
 
@@ -370,8 +368,7 @@ const useWiredState = () => {
         applyWiredConfig({
             intParams: new Array(current.intData ? current.intData.length : 0).fill(0),
             stringParam: '',
-            furniIds: [],
-            variableIds: []
+            furniIds: []
         });
     };
 
