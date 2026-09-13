@@ -86,4 +86,26 @@
     .octane-wired__usage-text--warn {
         color: #f53235;
     }
+
+    /* A source the box has switched off stays in place, dimmed, instead of vanishing: the
+       official window greys it so the builder can see the option exists and why it is not
+       available. Half opacity is its own blend. */
+    .octane-wired__source-row.is-disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    /* The expanded selection block is a shaded panel in the official window, not loose rows on
+       the window ground: it reads as one area you opened. It bleeds to the body's own padding
+       so the panel meets the window edges. */
+    .octane-wired__advanced-body {
+        margin: 0 -8px;
+        padding: 6px 8px;
+        background: #cccccc;
+    }
+
+    &.octane-wired--style-volter .octane-wired__advanced-body,
+    &.octane-wired--style-volter_blue .octane-wired__advanced-body {
+        background: #303030;
+    }
 }
