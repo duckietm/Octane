@@ -85,6 +85,48 @@ const CATEGORY_STYLE_COUNT: Record<number, number> = {
 
 const DEFAULT_CATEGORY_ID = 1;
 
+/** Levelling carries a sub-renderer in the 22nd int; number display carries an icon alignment. */
+const CATEGORY_LEVELLING = 2;
+const CATEGORY_NUMBER = 5;
+
+/** Index of that 22nd int. VariableFxSettingsCodec reads it per addon code, never blindly. */
+const TWENTY_SECOND_INDEX = INT_PARAM_COUNT;
+
+/**
+ * The official `rendererSupportsSegments`: block progress, arrow progress and the thermometer are
+ * the three drawn as discrete pieces, so they are the only ones the segments count means anything
+ * for.
+ */
+const SEGMENT_CAPABLE_RENDERER_IDS = [2, 4, 13];
+const MAX_SEGMENTS = 100;
+const SEGMENTS_NOT_SPECIFIED = 0;
+
+/** `getSubRendererOptions` for a level-with-progress style: block, striped, arrow. */
+const SUB_RENDERER_OPTION_IDS = [2, 3, 4];
+
+const ICON_ALIGNMENT_OPTION_IDS = [0, 1, 2];
+
+/**
+ * The icon travels as the box's string param, and the empty string is the official "no icon" - the
+ * corpus names that one `…variablefx.icon.none`. The ranch icons the official client also lists are
+ * campaign content behind `wired.variablefx.campaign.icons.enabled`, so they stay out.
+ */
+const ICON_IDS = [
+    '', 'battery', 'burning', 'cash', 'cooldown', 'droplet', 'energy', 'eye', 'fish', 'food', 'freezing',
+    'gems', 'gold', 'health', 'honor', 'magic', 'mana', 'misc_heart', 'misc_skull', 'poison', 'repairing',
+    'reputation', 'shield', 'stamina', 'star_power', 'stealth', 'timeleft', 'upgrading', 'wooden_logs'
+];
+
+const iconOptionLabel = (iconId: string): string => {
+    const key = `wiredfurni.params.variablefx.icon.${iconId === '' ? 'none' : iconId}`;
+    const text = LocalizeText(key);
+
+    return text && text !== key ? text : iconId || 'none';
+};
+
+const clampSegments = (value: number): number =>
+    Number.isFinite(value) ? Math.max(SEGMENTS_NOT_SPECIFIED, Math.min(MAX_SEGMENTS, Math.floor(value))) : SEGMENTS_NOT_SPECIFIED;
+
 const styleOptionIds = (categoryId: number): number[] =>
     Array.from({ length: CATEGORY_STYLE_COUNT[categoryId] ?? CATEGORY_STYLE_COUNT[DEFAULT_CATEGORY_ID] }, (_unused, index) => index);
 
@@ -173,6 +215,10 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
     const [colorId, setColorId] = useState(0);
     const [widthId, setWidthId] = useState(DEFAULT_WIDTH_ID);
     const [rendererId, setRendererId] = useState(0);
+    const [segments, setSegments] = useState(SEGMENTS_NOT_SPECIFIED);
+    const [iconId, setIconId] = useState('');
+    const [iconAlignment, setIconAlignment] = useState(0);
+    const [subRendererId, setSubRendererId] = useState(SUB_RENDERER_OPTION_IDS[0]);
 
     const [showMode, setShowMode] = useState(SHOW_MODE_NEVER);
     const [showTriggerMask, setShowTriggerMask] = useState(0);
@@ -223,11 +269,24 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
 
         setOverrideMinVariableToken(savedVariableIds[0] ?? '');
         setOverrideMaxVariableToken(savedVariableIds[1] ?? '');
+
+        setSegments(clampSegments(raw[20]));
+        setIconId(trigger.stringData ?? '');
+
+        // The 22nd int means different things per category, and is absent for the other four.
+        const twentySecond = raw.length > TWENTY_SECOND_INDEX ? raw[TWENTY_SECOND_INDEX] : 0;
+
+        setIconAlignment(ICON_ALIGNMENT_OPTION_IDS.includes(twentySecond) ? twentySecond : ICON_ALIGNMENT_OPTION_IDS[0]);
+        setSubRendererId(SUB_RENDERER_OPTION_IDS.includes(twentySecond) ? twentySecond : SUB_RENDERER_OPTION_IDS[0]);
     }, [trigger]);
 
     const toggleTriggerMaskBit = (bit: number) => setShowTriggerMask((current) => (current & bit ? current & ~bit : current | bit));
 
     const validate = () => (!overrideMinEnabled || !!overrideMinVariableToken) && (!overrideMaxEnabled || !!overrideMaxVariableToken);
+
+    const showsSegments = SEGMENT_CAPABLE_RENDERER_IDS.includes(rendererId);
+    const showsIcon = categoryId === CATEGORY_NUMBER;
+    const showsSubRenderer = categoryId === CATEGORY_LEVELLING;
 
     const save = () => {
         // Everything this window does not expose (visibility, the audience value pair, segments)
@@ -256,11 +315,16 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
         params[15] = overrideMaxEnabled ? 1 : 0;
         params[16] = OVERRIDE_TARGET_GLOBAL;
         params[17] = OVERRIDE_TARGET_GLOBAL;
-        // params[1] visibility, params[18..19] audienceVariableValue, params[20] segments: left as
-        // read from `raw` above.
+        params[20] = showsSegments ? clampSegments(segments) : SEGMENTS_NOT_SPECIFIED;
+        // params[1] visibility and params[18..19] audienceVariableValue are left as read above.
+
+        // Only these two categories own the 22nd slot; writing it on any other would be read back
+        // as a field that category does not have.
+        if (categoryId === CATEGORY_LEVELLING) params[TWENTY_SECOND_INDEX] = subRendererId;
+        else if (categoryId === CATEGORY_NUMBER) params[TWENTY_SECOND_INDEX] = iconAlignment;
 
         setIntParams(params);
-        setStringParam(trigger?.stringData ?? '');
+        setStringParam(showsIcon ? iconId : trigger?.stringData ?? '');
         setVariableIds([
             overrideMinEnabled ? overrideMinVariableToken : '',
             overrideMaxEnabled ? overrideMaxVariableToken : '',
@@ -352,6 +416,69 @@ export const WiredExtraVariableFxProgressBarView: FC<WiredExtraVariableFxViewPro
                             ))}
                         </select>
                     </div>
+                    {showsSubRenderer && (
+                        <div className="flex flex-col gap-1">
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.visualization.sub_renderer')}</Text>
+                            <select
+                                className="form-select form-select-sm"
+                                value={subRendererId}
+                                onChange={(event) => setSubRendererId(Number(event.target.value) || SUB_RENDERER_OPTION_IDS[0])}
+                            >
+                                {SUB_RENDERER_OPTION_IDS.map((value) => (
+                                    <option key={value} value={value}>
+                                        {visualizationOptionLabel('renderer', value)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    {showsSegments && (
+                        <div className="flex flex-col gap-1">
+                            <Text>{LocalizeText('wiredfurni.params.variablefx.visualization.segments')}</Text>
+                            <select
+                                className="form-select form-select-sm"
+                                value={segments}
+                                onChange={(event) => setSegments(clampSegments(Number(event.target.value)))}
+                            >
+                                <option value={SEGMENTS_NOT_SPECIFIED}>
+                                    {LocalizeText('wiredfurni.params.variablefx.visualization.segments.not_specified')}
+                                </option>
+                                {Array.from({ length: MAX_SEGMENTS }, (_unused, index) => index + 1).map((value) => (
+                                    <option key={value} value={value}>
+                                        {value}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    {showsIcon && (
+                        <>
+                            <div className="flex flex-col gap-1">
+                                <Text>{LocalizeText('wiredfurni.params.variablefx.visualization.icon')}</Text>
+                                <select className="form-select form-select-sm" value={iconId} onChange={(event) => setIconId(event.target.value)}>
+                                    {ICON_IDS.map((value) => (
+                                        <option key={value || 'none'} value={value}>
+                                            {iconOptionLabel(value)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <Text>{LocalizeText('wiredfurni.params.variablefx.visualization.icon_alignment')}</Text>
+                                <select
+                                    className="form-select form-select-sm"
+                                    value={iconAlignment}
+                                    onChange={(event) => setIconAlignment(Number(event.target.value) || 0)}
+                                >
+                                    {ICON_ALIGNMENT_OPTION_IDS.map((value) => (
+                                        <option key={value} value={value}>
+                                            {visualizationOptionLabel('icon_alignment', value)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 <div className="octane-wired__divider" />

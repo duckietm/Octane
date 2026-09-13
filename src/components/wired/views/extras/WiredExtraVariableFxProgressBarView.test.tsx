@@ -199,6 +199,10 @@ describe('WiredExtraVariableFxProgressBarView', () => {
         expect(capturedValidate?.()).toBe(true);
     });
 
+    // Slot 20 is the segment count, and the fixture's renderer (slot 9) is 0, the classic progress
+    // bar, which is not one of the three the official rendererSupportsSegments names. The official
+    // editor stores 0 for segments whenever the chosen renderer cannot draw them, so a stale count
+    // does not survive a renderer change; this pin follows it rather than passing the old value on.
     it("pins save()'s 21-element vector against a fixed intData input, unedited", () => {
         render(<WiredExtraVariableFxProgressBarView />);
 
@@ -206,7 +210,7 @@ describe('WiredExtraVariableFxProgressBarView', () => {
 
         expect(setIntParams).toHaveBeenCalledTimes(1);
         expect(setIntParams).toHaveBeenCalledWith([
-            1, 9, 1, 6, 1, 30, 2, 3, 1, 0, 0, 1234, 1, 0, 1, 0, 2, 2, 11, 22, 4
+            1, 9, 1, 6, 1, 30, 2, 3, 1, 0, 0, 1234, 1, 0, 1, 0, 2, 2, 11, 22, 0
         ]);
     });
 
