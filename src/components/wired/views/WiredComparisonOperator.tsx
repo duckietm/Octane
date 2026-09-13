@@ -9,9 +9,11 @@ import { Text } from '../../../common';
 // WiredConditionChestHasItems / WiredConditionChestHasItemType.java. The server
 // maps by VALUE, never by order — so these numbers are the wire contract:
 //   0 = <    1 = =    2 = >    3 = <=    4 = !=    5 = >=
-// (NOTE: a different, unrelated 0..5 encoding is inlined in
-// WiredConditionVariableValueMatchView — that one is its own piece's contract; do
-// not cross-reference the two.)
+// (NOTE: the wired VARIABLE family numbers the same six operators differently.
+// That encoding lives in WiredVariableComparisonOperator and is the one the
+// variable boxes and the user-level condition speak. The two are not
+// interchangeable: sending a value from here to a variable box selects a
+// different operator on the server.)
 export const WIRED_CMP_LESS = 0;
 export const WIRED_CMP_EQUAL = 1;
 export const WIRED_CMP_GREATER = 2;
