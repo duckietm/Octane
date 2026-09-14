@@ -30,6 +30,7 @@ import {
     WiredFurniRuntimeStateRequestComposer,
     WiredMonitorDataEvent,
     WiredMonitorRequestComposer,
+    WiredUserVariableUpdateComposer,
     WiredUserInspectMoveComposer
 } from '@octane/renderer';
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -60,12 +61,13 @@ import {
     OctaneCardView,
     Text
 } from '../../common';
-import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredTools } from '../../hooks';
+import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredArrayInspectionPage, useWiredTools } from '../../hooks';
 import { WiredChestsTabView } from './WiredChestsTabView';
 import {
     DIRECTION_NAMES,
     EDITABLE_FURNI_VARIABLES,
     EDITABLE_USER_VARIABLES,
+    EDITABLE_GLOBAL_VARIABLES,
     INSPECTION_ELEMENTS,
     MONITOR_ERROR_INFO,
     MONITOR_LOG_ORDER,
@@ -228,7 +230,11 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         roomVariableDefinitions,
         roomVariableAssignments,
         contextVariableDefinitions,
+        arrayInspection,
         requestUserVariables,
+        requestArrayInspection,
+        updateArrayInspectionField,
+        clearArrayInspection,
         assignUserVariable,
         removeUserVariable,
         updateUserVariableValue,
@@ -1250,12 +1256,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return new Map(selectedFurniAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedFurniAssignments]);
     const selectedFurniCustomVariableDefinitions = useMemo(() => {
-        if (!selectedFurniAssignments.length) return [];
+        if (!selectedFurni) return [];
 
         return furniVariableDefinitions
-            .filter((definition) => selectedFurniAssignmentMap.has(definition.itemId))
+            .filter((definition) => definition.valueShape === 'array' || selectedFurniAssignmentMap.has(definition.itemId))
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }) || left.itemId - right.itemId);
-    }, [selectedFurniAssignments, selectedFurniAssignmentMap, furniVariableDefinitions]);
+    }, [selectedFurni, selectedFurniAssignmentMap, furniVariableDefinitions]);
     const selectedFurniCustomVariableDefinitionMap = useMemo(() => {
         return new Map(selectedFurniCustomVariableDefinitions.map((definition) => [definition.name, definition]));
     }, [selectedFurniCustomVariableDefinitions]);
@@ -1265,7 +1271,9 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const classId = selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_TYPE_ID);
         const tileSizeZ = Number(selectedFurnitureData?.tileSizeZ ?? 0);
         const liveState = selectedFurniLiveState ?? getFurniLiveState(selectedFurni.objectId, selectedFurni.category);
-        const opacity = Math.round(Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER) ?? 1)) * 100);
+        const opacity = Math.round(
+            Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER) ?? 1)) * 100
+        );
         const gravity = Math.max(0, Math.min(1, selectedRoomObject.model.getValue<number>(WIRED_FURNI_GRAVITY_MODEL_KEY) ?? 0));
 
         const dynamicFlags: InspectionVariable[] = [];
@@ -1280,8 +1288,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return {
                 key: definition.name,
-                value: definition.hasValue ? String(assignment?.value ?? 0) : '',
-                editable: canEditInspection && definition.hasValue
+                value: definition.valueShape === 'array' ? '[Array]' : definition.hasValue ? String(assignment?.value ?? 0) : '',
+                editable: definition.valueShape !== 'array' && canEditInspection && definition.hasValue
             };
         });
 
@@ -1345,12 +1353,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         return new Map(selectedUserAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedUserAssignments]);
     const selectedUserCustomVariableDefinitions = useMemo(() => {
-        if (!selectedUserAssignments.length) return [];
+        if (!selectedUser) return [];
 
         return userVariableDefinitions
-            .filter((definition) => selectedUserAssignmentMap.has(definition.itemId))
+            .filter((definition) => definition.valueShape === 'array' || selectedUserAssignmentMap.has(definition.itemId))
             .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }) || left.itemId - right.itemId);
-    }, [selectedUserAssignments.length, selectedUserAssignmentMap, userVariableDefinitions]);
+    }, [selectedUser, selectedUserAssignmentMap, userVariableDefinitions]);
     const selectedUserCustomVariableDefinitionMap = useMemo(() => {
         return new Map(selectedUserCustomVariableDefinitions.map((definition) => [definition.name, definition]));
     }, [selectedUserCustomVariableDefinitions]);
@@ -1408,8 +1416,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return {
                 key: definition.name,
-                value: definition.hasValue ? String(assignment?.value ?? 0) : '',
-                editable: canEditSelectedUser && definition.hasValue
+                value: definition.valueShape === 'array' ? '[Array]' : definition.hasValue ? String(assignment?.value ?? 0) : '',
+                editable: definition.valueShape !== 'array' && canEditSelectedUser && definition.hasValue
             };
         });
 
@@ -1425,7 +1433,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@position_x', value: String(liveState?.positionX ?? 0), editable: canEditSelectedUser },
             { key: '@position_y', value: String(liveState?.positionY ?? 0), editable: canEditSelectedUser },
             { key: '@direction', value: String(liveState?.direction ?? 0), editable: canEditSelectedUser },
-            { key: '@altitude', value: String(liveState?.altitude ?? 0) },
+            { key: '@altitude', value: String(liveState?.altitude ?? 0), editable: canEditSelectedUser },
             ...(Number(selectedUser.favouriteGroupId ?? 0) > 0 ? [{ key: '@favourite_group_id', value: String(selectedUser.favouriteGroupId) }] : []),
             ...(selectedUser.roomEntryMethod && selectedUser.roomEntryMethod !== 'unknown'
                 ? [{ key: '@room_entry.method', value: `${getRoomEntryMethodNumericValue(selectedUser.roomEntryMethod)} (${selectedUser.roomEntryMethod})` }]
@@ -1499,8 +1507,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             return {
                 key: definition.name,
-                value: String(assignment?.value ?? 0),
-                editable: canEditInspection
+                value: definition.valueShape === 'array' ? '[Array]' : String(assignment?.value ?? 0),
+                editable: definition.valueShape !== 'array' && canEditInspection
             };
         });
 
@@ -1509,10 +1517,10 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@furni_count', value: String(floorObjects.length + wallObjects.length) },
             { key: '@user_count', value: String(userCount) },
             { key: '@wired_timer', value: String(Math.max(0, Math.floor((globalClock - roomEnteredAt) / 500))) },
-            { key: '@team_red_score', value: String(getRoomTeamScore(1)) },
-            { key: '@team_green_score', value: String(getRoomTeamScore(2)) },
-            { key: '@team_blue_score', value: String(getRoomTeamScore(3)) },
-            { key: '@team_yellow_score', value: String(getRoomTeamScore(4)) },
+            { key: '@team_red_score', value: String(getRoomTeamScore(1)), editable: canEditInspection },
+            { key: '@team_green_score', value: String(getRoomTeamScore(2)), editable: canEditInspection },
+            { key: '@team_blue_score', value: String(getRoomTeamScore(3)), editable: canEditInspection },
+            { key: '@team_yellow_score', value: String(getRoomTeamScore(4)), editable: canEditInspection },
             { key: '@team_red_size', value: String(teamSizes[1]) },
             { key: '@team_green_size', value: String(teamSizes[2]) },
             { key: '@team_blue_size', value: String(teamSizes[3]) },
@@ -1562,6 +1570,31 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         roomCustomVariableDefinitionMap,
         selectedFurniCustomVariableDefinitionMap
     ]);
+    const selectedArrayInspectionTarget = useMemo(() => {
+        if (selectedInspectionCustomDefinition?.valueShape !== 'array') return null;
+        if (inspectionType === 'furni') {
+            return selectedFurni
+                ? { variableType: 0, requestedOwnerId: selectedFurni.objectId, definitionItemId: selectedInspectionCustomDefinition.itemId }
+                : null;
+        }
+        if (inspectionType === 'global') {
+            return { variableType: 1, requestedOwnerId: 0, definitionItemId: selectedInspectionCustomDefinition.itemId };
+        }
+        return selectedUser ? { variableType: 2, requestedOwnerId: selectedUser.roomIndex, definitionItemId: selectedInspectionCustomDefinition.itemId } : null;
+    }, [inspectionType, selectedFurni, selectedInspectionCustomDefinition, selectedUser]);
+    const activeArrayInspection = useMemo(() => {
+        if (!selectedArrayInspectionTarget || !arrayInspection?.definition) return null;
+        if (arrayInspection.definition.itemId !== selectedArrayInspectionTarget.definitionItemId) return null;
+        if (arrayInspection.requestedOwnerId !== selectedArrayInspectionTarget.requestedOwnerId) return null;
+        return arrayInspection;
+    }, [arrayInspection, selectedArrayInspectionTarget]);
+
+    const changeArrayInspectionPage = useWiredArrayInspectionPage(
+        isVisible && activeTab === 'inspection',
+        selectedArrayInspectionTarget,
+        requestArrayInspection,
+        clearArrayInspection
+    );
     const availableInspectionDefinitions = useMemo(() => {
         if (inspectionType === 'global') return [];
         if (inspectionType === 'user' && !selectedUser) return [];
@@ -2579,7 +2612,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             const customDefinition = roomCustomVariableDefinitionMap.get(variable.key);
             const isEditableCustom = !!customDefinition && !customDefinition.isReadOnly;
 
-            if (!isEditableCustom) return;
+            if (!isEditableCustom && !EDITABLE_GLOBAL_VARIABLES.includes(variable.key)) return;
         }
 
         setEditingVariable(variable.key);
@@ -2587,6 +2620,27 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     };
 
     const commitVariableEdit = () => {
+        const builtInGlobal = inspectionType === 'global' && EDITABLE_GLOBAL_VARIABLES.includes(editingVariable);
+        const builtInAltitude = inspectionType === 'user' && selectedUser && editingVariable === '@altitude';
+
+        if (builtInGlobal || builtInAltitude) {
+            const parsed = Number(editingValue.trim());
+
+            if (roomSettings.canModify && editingValue.trim() && Number.isInteger(parsed) && parsed >= -2147483648 && parsed <= 2147483647) {
+                const token = builtInGlobal ? editingVariable.replace(/^@team_(red|green|blue|yellow)_score$/, '@teams.$1.score') : editingVariable;
+                SendMessageComposer(new WiredUserVariableUpdateComposer(
+                    builtInGlobal ? 3 : 0,
+                    builtInGlobal ? roomSession?.roomId ?? 0 : selectedUser.userId,
+                    0,
+                    parsed,
+                    `internal:${token}`
+                ));
+            }
+
+            cancelVariableEdit();
+            return;
+        }
+
         if (inspectionType === 'global') {
             const customDefinition = roomCustomVariableDefinitionMap.get(editingVariable);
 
@@ -3322,6 +3376,22 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             onGiveInspectionVariable={() => giveInspectionVariable()}
                             canRemoveInspectionVariable={canRemoveInspectionVariable}
                             onRemoveInspectionVariable={() => removeInspectionVariable()}
+                            arrayInspection={activeArrayInspection}
+                            canModifyArray={roomSettings.canModify}
+                            onArrayPageChange={changeArrayInspectionPage}
+                            onArrayFieldUpdate={(index, fieldId, value) => {
+                                if (!selectedArrayInspectionTarget || !activeArrayInspection) return;
+                                updateArrayInspectionField(
+                                    selectedArrayInspectionTarget.variableType,
+                                    selectedArrayInspectionTarget.requestedOwnerId,
+                                    selectedArrayInspectionTarget.definitionItemId,
+                                    index,
+                                    fieldId,
+                                    value,
+                                    activeArrayInspection.page,
+                                    activeArrayInspection.pageSize
+                                );
+                            }}
                         />
                     )}
                     {activeTab === 'variables' && (

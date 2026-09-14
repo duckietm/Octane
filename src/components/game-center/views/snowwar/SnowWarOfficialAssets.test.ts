@@ -65,8 +65,10 @@ describe('SnowWar official arena artwork', () => {
         expect(leaderboard).toContain("getAssetUrl('leaderboard_divider')");
         expect(leaderboard).toContain("'left_blue' : 'left_black'");
         expect(leaderboard).toContain("'right_blue' : 'right_black'");
-        expect(leaderboard).toContain('requestLeaderboard(true, leaderboard.friendsOnly');
-        expect(leaderboard).toContain('requestLeaderboard(false, leaderboard.friendsOnly');
+        expect(leaderboard).toContain('requestLeaderboard(true, leaderboard.scope');
+        expect(leaderboard).toContain('requestLeaderboard(false, leaderboard.scope');
+        // AIR snowwar_leaderboard also carries changeView / changeFriendsView / changeGroupView.
+        expect(leaderboard).toContain("'snowwar.leaderboard.groups'");
         expect(gameTile).toContain("GetConfigurationValue<boolean>('games.highscores.enabled', true)");
     });
 });

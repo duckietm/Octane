@@ -1,4 +1,5 @@
 import {
+    CreateLinkEvent,
     GetSessionDataManager,
     RelationshipStatusInfoEvent,
     RelationshipStatusInfoMessageParser,
@@ -8,15 +9,28 @@ import {
     UserRelationshipsComposer
 } from '@octane/renderer';
 import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { AvatarInfoUser, CloneObject, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
+import {
+    AvatarInfoUser,
+    CloneObject,
+    ensureBadgeLeaderboardLoaded,
+    GetConfigurationValue,
+    GetGroupInformation,
+    GetUserProfile,
+    LocalizeText,
+    localizeWithFallback,
+    OpenUrl,
+    rememberBadgeRarityFromPacket,
+    SendMessageComposer
+} from '../../../../../api';
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
-import { useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
+import { useMessageEvent, useOctaneEvent, useRoom, useUserDataSnapshot } from '../../../../../hooks';
 import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
+import { getBadgesRank, getRealNameLine, getUserHomePageUrl } from './infostandUser.helpers';
 
 interface InfoStandWidgetUserViewProps {
     avatarInfo: AvatarInfoUser;
@@ -35,7 +49,33 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const [cardBackgroundId, setCardBackgroundId] = useState<number>(null);
     const [borderId, setBorderId] = useState<number>(null);
     const [isVisible, setIsVisible] = useState(false);
+    const [badgesRank, setBadgesRank] = useState(-1);
     const { roomSession = null } = useRoom();
+    const { realName: ownRealName = '' } = useUserDataSnapshot();
+
+    const badgesRankEnabled = GetConfigurationValue<boolean>('infostand.badges_rank.enabled', true);
+
+    // The room user data carries no rank; the badge leaderboard the
+    // client caches does, for the viewer and the top entries.
+    useEffect(() => {
+        if (!badgesRankEnabled || !avatarInfo) return;
+
+        let cancelled = false;
+
+        setBadgesRank(-1);
+
+        ensureBadgeLeaderboardLoaded()
+            .then((leaderboard) => {
+                if (!cancelled) setBadgesRank(getBadgesRank(leaderboard, avatarInfo.webID));
+            })
+            .catch(() => {
+                if (!cancelled) setBadgesRank(-1);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [avatarInfo?.webID, badgesRankEnabled]);
 
     const infostandBackgroundClass = `background-${backgroundId ?? 'default'}`;
     const infostandStandClass = `stand-${standId ?? 'default'}`;
@@ -45,6 +85,21 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const handleProfileClick = useCallback(() => {
         GetUserProfile(avatarInfo.webID);
     }, [avatarInfo.webID]);
+
+    // Official home icon (RWUAM_OPEN_HOME_PAGE): the Habbo Home web page of
+    // the viewed user, built from `link.format.userpage`. Without the
+    // property there is no home page to open, so the profile stays the target.
+    const homePageUrl = getUserHomePageUrl(GetConfigurationValue<string>('link.format.userpage', ''), avatarInfo.webID, avatarInfo.name);
+    const homeLabel = homePageUrl ? localizeWithFallback('infostand.link.home.tooltip', 'Open Habbo Home') : LocalizeText('infostand.profile.link.tooltip');
+
+    const handleHomeClick = useCallback(() => {
+        if (homePageUrl) {
+            OpenUrl(homePageUrl);
+            return;
+        }
+
+        GetUserProfile(avatarInfo.webID);
+    }, [avatarInfo.webID, homePageUrl]);
 
     const handleEditClick = useCallback((event: React.MouseEvent) => {
         event.stopPropagation();
@@ -72,6 +127,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
 
     useOctaneEvent<RoomSessionUserBadgesEvent>(RoomSessionUserBadgesEvent.RSUBE_BADGES, (event) => {
         if (!avatarInfo || avatarInfo.webID !== event.userId) return;
+
+        rememberBadgeRarityFromPacket(event.badgeDetails);
 
         // Deduplicate badges from server
         const seen = new Set<string>();
@@ -164,6 +221,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const isOwnUser = avatarInfo.type === AvatarInfoUser.OWN_USER;
     const showAchievementScore = GetConfigurationValue<boolean>('activity.point.display.enabled', true);
     const hasRelationships = !!relationships?.relationshipStatusMap.length;
+    // The server only exposes the viewer's own real name (UserInfo packet);
+    // peers never carry one, so the row stays hidden for them.
+    const realNameLine = isOwnUser ? getRealNameLine(ownRealName) : '';
 
     return (
         <>
@@ -174,8 +234,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <button
                         type="button"
                         className="octane-infostand__home"
-                        aria-label={LocalizeText('infostand.profile.link.tooltip')}
-                        onClick={handleProfileClick}
+                        aria-label={homeLabel}
+                        title={homePageUrl ? homeLabel : undefined}
+                        onClick={handleHomeClick}
                     >
                         <img src={homeIcon} alt="" draggable={false} />
                     </button>
@@ -194,6 +255,11 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                         />
                     </button>
                 </div>
+                {realNameLine && (
+                    <Text small wrap className="octane-infostand__realname" variant="white">
+                        {localizeWithFallback('infostand.text.realname', '(%realname%)', ['realname'], [realNameLine])}
+                    </Text>
+                )}
                 <div className="octane-infostand__rule" />
                 <div className="octane-infostand__figure-row">
                     <div className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
@@ -286,6 +352,23 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             <span>{LocalizeText('infostand.text.achievement_score')}</span>
                             <span>{avatarInfo.achievementScore}</span>
                         </div>
+                    </>
+                )}
+                {badgesRank > 0 && (
+                    <>
+                        <div className="octane-infostand__rule" />
+                        <Text
+                            pointer
+                            small
+                            underline
+                            wrap
+                            className="octane-infostand__badges-rank"
+                            title={localizeWithFallback('badge_leaderboard.title.total_badges', 'Badge leaderboard')}
+                            variant="white"
+                            onClick={() => CreateLinkEvent('badge-leaderboard/show')}
+                        >
+                            {localizeWithFallback('infostand.text.badges_rank', 'Badges rank: %rank%', ['rank'], [`#${badgesRank}`])}
+                        </Text>
                     </>
                 )}
                 {avatarInfo.carryItem > 0 && (

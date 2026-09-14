@@ -253,12 +253,29 @@ export class RoomDoorbellAcceptedEvent extends MessageEvent {}
 export class FlatAccessDeniedMessageEvent extends MessageEvent {}
 export class GenericErrorEvent extends MessageEvent {}
 export class GetGuestRoomResultEvent extends MessageEvent {}
+export class AvailableCommandsEvent extends MessageEvent {}
+// Friend-list events and composers the useFriends hook subscribes to.
+export class FollowFriendFailedEvent extends MessageEvent {}
+export class FriendListFragmentEvent extends MessageEvent {}
+export class FriendListUpdateEvent extends MessageEvent {}
+export class FriendRequestsEvent extends MessageEvent {}
+export class MessageErrorEvent extends MessageEvent {}
+export class MessengerInitEvent extends MessageEvent {}
+export class NewFriendRequestEvent extends MessageEvent {}
 export class ThumbnailStatusMessageEvent extends MessageEvent {}
 
 // Mentions system — incoming events extend MessageEvent (they expose
 // getParser()); the request/mark composers are symbol-only constructors.
 export class MentionReceivedEvent extends MessageEvent {}
 export class MentionsListEvent extends MessageEvent {}
+
+// Per-user preferences (chat mode/width/speed, wired whisper, friend-online notification)
+// arrive with the UserSettings packet; the hooks subscribe to it directly.
+export class UserSettingsEvent extends MessageEvent {}
+
+// AIR LatencyTracker: the chat-input hook pings the server so `:ping` has a
+// round-trip measurement to print.
+export class LatencyPingResponseEvent extends MessageEvent {}
 
 // ---------------------------------------------------------------------------
 // Navigator event classes — MessageEvent subclasses needed by useNavigatorStore
@@ -300,6 +317,9 @@ export class UserPermissionsEvent extends MessageEvent {}
 export class AchievementNotificationMessageEvent extends MessageEvent {}
 export class ActivityPointNotificationMessageEvent extends MessageEvent {}
 export class BadgeReceivedEvent extends MessageEvent {}
+export class BanInfoEvent extends MessageEvent {}
+export class DiscordPreferencesEvent extends MessageEvent {}
+export class PetRespectFailedEvent extends MessageEvent {}
 export class ChestNotificationEvent extends MessageEvent {}
 export class ClubGiftNotificationEvent extends MessageEvent {}
 export class ClubGiftSelectedEvent extends MessageEvent {}
@@ -323,6 +343,34 @@ export class UserBannedMessageEvent extends MessageEvent {}
 export class WiredRewardResultMessageEvent extends MessageEvent {
     static readonly PRODUCT_DONATED_CODE = 7;
     static readonly BADGE_DONATED_CODE = 8;
+}
+export class AccountSafetyLockStatusChangeMessageEvent extends MessageEvent {}
+export class EpicPopupMessageEvent extends MessageEvent {}
+export class RoomMessageNotificationMessageEvent extends MessageEvent {}
+export class IncomeRewardNotificationEvent extends MessageEvent {}
+export class TreasureHuntFirstWinnerMessageEvent extends MessageEvent {}
+export class TreasureHuntFailMessageEvent extends MessageEvent {}
+export class TreasureHuntUpdateMessageEvent extends MessageEvent {}
+export class EmailStatusResultEvent extends MessageEvent {}
+export class ChangeEmailResultEvent extends MessageEvent {}
+// Room competition: the window listens for these three and sends the four composers below.
+// Risoluzioni achievement: le tre finestre del furni.
+export class IsBadgeRequestFulfilledEvent extends MessageEvent {}
+export class AchievementResolutionsMessageEvent extends MessageEvent {}
+export class AchievementResolutionProgressMessageEvent extends MessageEvent {}
+export class AchievementResolutionCompletedMessageEvent extends MessageEvent {}
+export class CompetitionEntrySubmitResultEvent extends MessageEvent {}
+export class CompetitionVotingInfoMessageEvent extends MessageEvent {}
+export class NoOwnedRoomsAlertMessageEvent extends MessageEvent {}
+export class RecyclerFinishedMessageEvent extends MessageEvent {
+    static readonly FINISHED_OK = 1;
+    static readonly FINISHED_FAIL = 2;
+}
+export class CanCreateRoomEvent extends MessageEvent {}
+export class CanCreateRoomMessageComposer extends StubClass {}
+// The sound manager's "song started" OctaneEvent; useNotification listens for its type string.
+export class NotifyPlayedSongEvent extends OctaneEvent {
+    static readonly NOTIFY_PLAYED_SONG = 'UIEW_NOTIFY_PLAYED_SONG';
 }
 
 // RoomEnterEffect — used by useNotificationStore to check if the room-enter
@@ -384,7 +432,14 @@ export class HabboWebTools extends StubClass {}
 
 // Composers — symbol-only constructors; only their identity matters in the
 // codebase ("did the SUT call SendMessageComposer(new FooComposer(args))").
+export class ActivateNotificationsComposer extends StubClass {}
+export class LatencyPingRequestMessageComposer extends StubClass {}
+export class GetDiscordPreferencesComposer extends StubClass {}
+export class UpdateDiscordPreferencesComposer extends StubClass {}
 export class AddFavouriteRoomMessageComposer extends StubClass {}
+export class ChatReviewSessionCreateMessageComposer extends StubClass {}
+export class GetEmailStatusComposer extends StubClass {}
+export class ChangeEmailComposer extends StubClass {}
 export class AvatarEffectActivatedComposer extends StubClass {}
 export class DeleteFavouriteRoomMessageComposer extends StubClass {}
 export class FollowFriendMessageComposer extends StubClass {}
@@ -396,13 +451,20 @@ export class MarkMentionsReadComposer extends StubClass {}
 export class DeleteMentionComposer extends StubClass {}
 export class DesktopViewComposer extends StubClass {}
 export class FurniturePlacePaintComposer extends StubClass {}
+export class GetHotLooksComposer extends StubClass {}
+export class HotLooksEvent extends StubClass {}
+export class UnblockGroupMemberMessageComposer extends StubClass {}
 export class GetGuestRoomMessageComposer extends StubClass {}
 export class GetProductOfferComposer extends StubClass {}
 export class GroupFavoriteComposer extends StubClass {}
 export class GroupInformationComposer extends StubClass {}
+export class GroupInformationEvent extends StubClass {}
 export class GroupJoinComposer extends StubClass {}
 export class GroupUnfavoriteComposer extends StubClass {}
 export class UserProfileComposer extends StubClass {}
+export class UserSettingsChatPreferencesComposer extends StubClass {}
+export class UserSettingsOnlineIndicatorComposer extends StubClass {}
+export class WiredMenuSettingsComposer extends StubClass {}
 
 // Catalog Studio — keep request arguments observable so provider tests can
 // verify the renderer/emulator field order without loading Pixi.
@@ -751,3 +813,271 @@ export class SnowWarPlayAgainComposer extends StubClass {}
 export class SnowWarGameChatComposer extends StubClass {}
 export class SnowWarJoinQueueComposer extends StubClass {}
 export class SnowWarLeaveQueueComposer extends StubClass {}
+
+// Game center directory / account status — consumed by useGameCenter.
+export class Game2AccountGameStatusMessageEvent extends MessageEvent {}
+export class Game2GameDirectoryStatusMessageEvent extends MessageEvent {}
+export class Game2GetAccountGameStatusMessageComposer extends StubClass {}
+export class Game2CheckGameDirectoryStatusMessageComposer extends StubClass {}
+
+// ---------------------------------------------------------------------------
+// Composers whose payload a test asserts on, plus the avatar expression
+// table the chat-command handler reads. `PayloadComposer` mirrors the real
+// `getMessageArray()` so a test can check what would go on the wire.
+// ---------------------------------------------------------------------------
+
+class PayloadComposer {
+    private readonly _data: unknown[];
+
+    constructor(...args: unknown[]) {
+        this._data = args;
+    }
+
+    public getMessageArray(): unknown[] {
+        return this._data;
+    }
+
+    public dispose(): void {}
+}
+
+export class VisitUserComposer extends PayloadComposer {}
+export class RequestFriendComposer extends PayloadComposer {}
+export class IgnoreUserIdComposer extends PayloadComposer {}
+export class RemoveFriendComposer extends PayloadComposer {
+    constructor(...userIds: number[]) {
+        super(userIds.length, ...userIds);
+    }
+}
+export class RoomSettingsComposer extends StubClass {}
+export class UseHabbiconComposer extends StubClass {}
+export class RoomZoomEvent extends StubClass {}
+export const RoomShakingEffect = { init: vi.fn(), turnVisualizationOn: vi.fn() };
+export const RoomRotatingEffect = { init: vi.fn(), turnVisualizationOn: vi.fn() };
+export const AvatarExpressionEnum = {
+    NONE: { ordinal: 0 },
+    WAVE: { ordinal: 1 },
+    BLOW: { ordinal: 2 },
+    LAUGH: { ordinal: 3 },
+    CRY: { ordinal: 4 },
+    IDLE: { ordinal: 5 },
+    JUMP: { ordinal: 6 },
+    RESPECT: { ordinal: 7 }
+};
+
+// Chat settings constants the user preferences hook compares against (values from the renderer).
+export class RoomChatSettings {
+    public static CHAT_MODE_FREE_FLOW = 0;
+    public static CHAT_MODE_LINE_BY_LINE = 1;
+    public static CHAT_BUBBLE_WIDTH_WIDE = 0;
+    public static CHAT_BUBBLE_WIDTH_NORMAL = 1;
+    public static CHAT_BUBBLE_WIDTH_THIN = 2;
+    public static CHAT_SCROLL_SPEED_FAST = 0;
+    public static CHAT_SCROLL_SPEED_NORMAL = 1;
+    public static CHAT_SCROLL_SPEED_SLOW = 2;
+    public static FLOOD_FILTER_STRICT = 0;
+    public static FLOOD_FILTER_NORMAL = 1;
+    public static FLOOD_FILTER_LOOSE = 2;
+}
+
+// Friend-list composers the useFriends hook sends; nothing asserts on their payload.
+export class AcceptFriendMessageComposer extends StubClass {}
+export class AddFriendCategoryComposer extends StubClass {}
+export class DeclineFriendMessageComposer extends StubClass {}
+export class FriendListUpdateComposer extends StubClass {}
+export class GetIsBadgeRequestFulfilledComposer extends StubClass {}
+export class RequestABadgeComposer extends StubClass {}
+export class GetResolutionAchievementsMessageComposer extends StubClass {}
+export class ResetResolutionAchievementMessageComposer extends StubClass {}
+export class CompetitionRoomsSearchMessageComposer extends StubClass {}
+export class ForwardToASubmittableRoomMessageComposer extends StubClass {}
+export class RoomCompetitionInitMessageComposer extends StubClass {}
+export class SubmitRoomToCompetitionMessageComposer extends StubClass {}
+export class VoteForRoomMessageComposer extends StubClass {}
+export class GetFriendRequestsComposer extends StubClass {}
+export class MessengerInitComposer extends StubClass {}
+export class MoveFriendToCategoryComposer extends StubClass {}
+export class RemoveFriendCategoryComposer extends StubClass {}
+export class RenameFriendCategoryComposer extends StubClass {}
+export class RequestOfflineMessagesComposer extends StubClass {}
+export class SetRelationshipStatusComposer extends StubClass {}
+
+// Help centre: the Habbo Way quiz packets and the tour request composer
+// (hooks/help/useHabboWay, useWelcomeTour).
+export class QuizDataMessageEvent extends MessageEvent {}
+export class QuizResultsMessageEvent extends MessageEvent {}
+export class GetQuizQuestionsComposer extends StubClass {}
+export class PostQuizAnswersComposer extends StubClass {}
+export class GuideSessionCreateMessageComposer extends StubClass {}
+// Guardian chat review jury + reporter feedback (GuideToolView, ChatReviewReporterFeedbackView).
+export class ChatReviewSessionOfferedToGuideMessageEvent extends MessageEvent {}
+export class ChatReviewSessionStartedMessageEvent extends MessageEvent {}
+export class ChatReviewSessionVotingStatusMessageEvent extends MessageEvent {}
+export class ChatReviewSessionResultsMessageEvent extends MessageEvent {}
+export class ChatReviewSessionDetachedMessageEvent extends MessageEvent {}
+export class GuideTicketCreationResultMessageEvent extends MessageEvent {}
+export class GuideTicketResolutionMessageEvent extends MessageEvent {}
+export class ChatReviewGuideDecidesOnOfferMessageComposer extends PayloadComposer {}
+export class ChatReviewGuideVoteMessageComposer extends PayloadComposer {}
+export class ChatReviewGuideDetachedMessageComposer extends PayloadComposer {}
+// Talent track / citizenship (useTalentTrack, TalentTrackView).
+export class TalentTrackMessageEvent extends MessageEvent {}
+export class TalentLevelUpEvent extends MessageEvent {}
+export class TalentTrackLevelMessageEvent extends MessageEvent {}
+export class TalentTrackComposer extends PayloadComposer {}
+export class GetTalentTrackLevelMessageComposer extends PayloadComposer {}
+
+// ---------------------------------------------------------------------------
+// AIR 13 parity (infostand / navigator enforce category / friend bar tokens)
+// ---------------------------------------------------------------------------
+
+export class RoomSettingsSavedEvent extends MessageEvent {}
+export class ShowEnforceRoomCategoryDialogEvent extends MessageEvent {}
+export class FriendNotificationEvent extends MessageEvent {}
+export class UpdateRoomCategoryAndTradeSettingsComposer extends StubClass {}
+
+// ---------------------------------------------------------------------------
+// AIR 13 personal word filter (components/user-settings/wordfilter)
+// ---------------------------------------------------------------------------
+
+class WordFilterComposerStub {
+    private readonly data: unknown[];
+    constructor(...args: unknown[]) { this.data = args; }
+    public getMessageArray() { return this.data; }
+}
+
+export class CustomFilterResultEvent extends MessageEvent {}
+export class ModifyCustomFilterResultEvent extends MessageEvent {
+    public static FAILED = 0;
+    public static ADDED = 1;
+    public static REMOVED = 3;
+}
+export class GetCustomFilterMessageComposer extends WordFilterComposerStub {}
+export class AddCustomFilterWordMessageComposer extends WordFilterComposerStub {}
+export class RemoveCustomFilterWordMessageComposer extends WordFilterComposerStub {}
+
+// ---------------------------------------------------------------------------
+// Quest engine (AIR 13 quests, daily tasks, reward track) — the hooks under
+// src/hooks/quests register these events and send these composers.
+// ---------------------------------------------------------------------------
+
+export class QuestsMessageEvent extends MessageEvent {}
+export class QuestMessageEvent extends MessageEvent {}
+export class QuestCompletedMessageEvent extends MessageEvent {}
+export class QuestCancelledMessageEvent extends MessageEvent {}
+export class QuestDailyMessageEvent extends MessageEvent {}
+export class ActiveDailyTasksMessageEvent extends MessageEvent {}
+export class DailyTasksAddedMessageEvent extends MessageEvent {}
+export class DailyTaskUpdatedMessageEvent extends MessageEvent {}
+export class RewardTracksMessageEvent extends MessageEvent {}
+export class RewardTrackClaimResultMessageEvent extends MessageEvent {}
+export class RewardTrackProgressMessageEvent extends MessageEvent {}
+export class RewardTrackPremiumPurchaseResultMessageEvent extends MessageEvent {}
+export class QuestMessageData extends StubClass {}
+export class DailyTaskData extends StubClass {
+    public static STATUS_IN_PROGRESS = 0;
+    public static STATUS_COMPLETED = 1;
+    public static STATUS_CLAIMED = 2;
+}
+export class DailyTaskRewardData extends StubClass {}
+export class RewardTrackData extends StubClass {}
+export class RewardTrackTaskData extends StubClass {}
+export class RewardTrackTaskLevelData extends StubClass {}
+export class RewardTrackPrizeData extends StubClass {}
+export class AcceptQuestMessageComposer extends PayloadComposer {}
+export class ActivateQuestMessageComposer extends PayloadComposer {}
+export class CancelQuestMessageComposer extends PayloadComposer {}
+export class GetDailyQuestMessageComposer extends PayloadComposer {}
+export class GetQuestsMessageComposer extends PayloadComposer {}
+export class GetSeasonalQuestsOnlyMessageComposer extends PayloadComposer {}
+export class OpenQuestTrackerMessageComposer extends PayloadComposer {}
+export class RejectQuestMessageComposer extends PayloadComposer {}
+export class StartCampaignMessageComposer extends PayloadComposer {}
+export class GetDailyTasksMessageComposer extends PayloadComposer {}
+export class ClaimDailyTaskMessageComposer extends PayloadComposer {}
+export class GetRewardTracksMessageComposer extends PayloadComposer {}
+export class ClaimRewardTrackPrizeMessageComposer extends PayloadComposer {}
+export class PurchaseRewardTrackPremiumMessageComposer extends PayloadComposer {}
+
+// ---------------------------------------------------------------------------
+// Chat commands / perks / stack height (useChatInputActions, usePerkAllowances,
+// useFurnitureStackHeightWidget) register these events and send these composers.
+// ---------------------------------------------------------------------------
+
+export class PerkEnum {
+    public static USE_GUIDE_TOOL = 'USE_GUIDE_TOOL';
+    public static GIVE_GUIDE_TOUR = 'GIVE_GUIDE_TOUR';
+    public static JUDGE_CHAT_REVIEWS = 'JUDGE_CHAT_REVIEWS';
+    public static VOTE_IN_COMPETITIONS = 'VOTE_IN_COMPETITIONS';
+    public static CALL_ON_HELPERS = 'CALL_ON_HELPERS';
+    public static CITIZEN = 'CITIZEN';
+    public static TRADE = 'TRADE';
+    public static HEIGHTMAP_EDITOR_BETA = 'HEIGHTMAP_EDITOR_BETA';
+    public static BUILDER_AT_WORK = 'BUILDER_AT_WORK';
+    public static NAVIGATOR_ROOM_THUMBNAIL_CAMERA = 'NAVIGATOR_ROOM_THUMBNAIL_CAMERA';
+    public static CAMERA = 'CAMERA';
+    public static MOUSE_ZOOM = 'MOUSE_ZOOM';
+}
+export class PerkAllowancesMessageEvent extends MessageEvent {}
+export class RoomSessionChatEvent {
+    public static CHAT_EVENT = 'RSCE_CHAT_EVENT';
+    public static CHAT_TYPE_SPEAK = 0;
+    public static CHAT_TYPE_WHISPER = 1;
+    public static CHAT_TYPE_SHOUT = 2;
+    public static CHAT_TYPE_RESPECT = 3;
+    public static CHAT_TYPE_PETRESPECT = 4;
+    public static CHAT_TYPE_HAND_ITEM_RECEIVED = 5;
+    public static CHAT_TYPE_PETTREAT = 6;
+    public static CHAT_TYPE_PETREVIVE = 7;
+    public static CHAT_TYPE_PET_REBREED_FERTILIZE = 8;
+    public static CHAT_TYPE_PET_SPEED_FERTILIZE = 9;
+    public static CHAT_TYPE_MUTE_REMAINING = 10;
+    public static CHAT_TYPE_SPECIAL_SYSTEM = 12;
+
+    constructor(
+        public type: string,
+        public session: unknown,
+        public objectId: number,
+        public message: string,
+        public chatType: number,
+        public style: number = 0,
+        public chatColours: string = '',
+        public links: string[] = null,
+        public extraParam: number = -1
+    ) {}
+}
+export class RoomUnitDropHandItemComposer extends PayloadComposer {}
+export class FurnitureStackHeightComposer extends PayloadComposer {}
+export class ObjectTileCursorUpdateMessage extends StubClass {}
+
+// AIR 13 room queue, room flags, batched removals and the room hopper network.
+export class RoomQueueStatusEvent extends MessageEvent {}
+export class ConfigurationItemStatesEvent extends MessageEvent {}
+export class SpecialRoomEventEvent extends MessageEvent {}
+export class SpecialSystemChatEvent extends MessageEvent {}
+export class YouAreNotSpectatorMessageEvent extends MessageEvent {}
+export class ObjectRemoveMultipleEvent extends MessageEvent {}
+export class ItemRemoveMultipleEvent extends MessageEvent {}
+export class ItemsStateUpdateEvent extends MessageEvent {}
+export class ObjectRemoveConfirmEvent extends MessageEvent {}
+export class FurnitureListRemoveMultipleEvent extends MessageEvent {}
+export class OfficialRoomsEvent extends MessageEvent {}
+export class ChangeQueueMessageComposer extends PayloadComposer {}
+export class RoomNetworkOpenConnectionMessageComposer extends PayloadComposer {}
+export class GetOfficialRoomsMessageComposer extends PayloadComposer {}
+
+// AIR 13 marketplace batch actions, LTD raffle, purchasable chat styles, club extend
+// confirmation and the my-reports window.
+export class MarketplaceCancelAllOffersResultEvent extends MessageEvent {}
+export class MarketplaceClearOwnHistoryResultEvent extends MessageEvent {}
+export class LtdRaffleEnteredMessageEvent extends MessageEvent {}
+export class LtdRaffleResultMessageEvent extends MessageEvent {}
+export class PurchasableChatStylesMessageEvent extends MessageEvent {}
+export class ChatStyleNotificationMessageEvent extends MessageEvent {}
+export class MyReportsStatusMessageEvent extends MessageEvent {}
+export class HabboClubExtendOfferMessageEvent extends MessageEvent {}
+export class CancelAllMarketplaceOffersMessageComposer extends PayloadComposer {}
+export class ClearOwnMarketplaceHistoryMessageComposer extends PayloadComposer {}
+export class MakeMultipleOffersMessageComposer extends PayloadComposer {}
+export class HabboClubExtendConfirmMessageComposer extends PayloadComposer {}
+export class GetMyReportsStatusMessageComposer extends PayloadComposer {}
+export class AppealReportMessageComposer extends PayloadComposer {}

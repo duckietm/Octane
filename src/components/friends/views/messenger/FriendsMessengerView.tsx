@@ -5,7 +5,6 @@ import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer, useHabbi
 import { HabbiconsDmIcon } from '../../../../assets/images/habbicons';
 import { DraggableWindow, DraggableWindowPosition, LayoutAvatarImageView } from '../../../../common';
 import { useFriends, useHelp, useMessenger, useTranslation } from '../../../../hooks';
-import { HabbiconHubView } from '../../../room/widgets/chat-input/HabbiconHubView';
 import { isStaffChatIdentity } from '../../staffChatIdentity';
 import { StaffChatFrankIconView } from '../../StaffChatFrankIconView';
 import { resolveAvatarFigure } from '../friends-list/resolveAvatarFigure';
@@ -20,7 +19,6 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     const [lastThreadId, setLastThreadId] = useState(-1);
     const [messageText, setMessageText] = useState('');
     const [isHabbiconPickerVisible, setIsHabbiconPickerVisible] = useState(false);
-    const [isHabbiconHubVisible, setIsHabbiconHubVisible] = useState(false);
     const habbiconCatalog = useHabbiconCatalog();
     const [avatarStartIndex, setAvatarStartIndex] = useState(0);
     const {
@@ -28,6 +26,7 @@ export const FriendsMessengerView: FC<{}> = (props) => {
         activeThread = null,
         getMessageThread = null,
         sendMessage = null,
+        sendHabbiconMessage,
         setActiveThreadId = null,
         closeThread = null,
         typingUserIds = [],
@@ -113,7 +112,7 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     const sendHabbicon = (habbiconId: number, keepOpen = false) => {
         if (!activeThread || habbiconId <= 0) return;
 
-        sendMessage(activeThread, GetSessionDataManager().userId, `\uE000${habbiconId}`);
+        sendHabbiconMessage(activeThread, habbiconId);
         if (!keepOpen) setIsHabbiconPickerVisible(false);
     };
 
@@ -338,7 +337,7 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                                 onClose={() => setIsHabbiconPickerVisible(false)}
                                 onOpenHub={() => {
                                     setIsHabbiconPickerVisible(false);
-                                    setIsHabbiconHubVisible(true);
+                                    habbiconCatalog.setBookVisible(true);
                                 }}
                                 onSelect={sendHabbicon}
                             />
@@ -347,15 +346,6 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                 )}
             </div>
         </DraggableWindow>
-        {isHabbiconHubVisible && habbiconCatalog.baseUrl && (
-            <HabbiconHubView
-                baseUrl={habbiconCatalog.baseUrl}
-                favoriteIds={habbiconCatalog.favoriteIds}
-                sets={habbiconCatalog.sets}
-                onClose={() => setIsHabbiconHubVisible(false)}
-                onToggleFavorite={habbiconCatalog.toggleFavorite}
-            />
-        )}
         </>
     );
 };

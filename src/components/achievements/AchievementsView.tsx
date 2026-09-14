@@ -41,11 +41,29 @@ export const AchievementsView: FC<{}> = (props) => {
             },
             eventUrlPrefix: 'achievements/'
         };
+        // The level-up bubble links `questengine/achievements/<category>` (`class_1873.onLevelUp`):
+        // the window opens on that category.
+        const questEngineTracker: ILinkEventTracker = {
+            linkReceived: (url: string) => {
+                const parts = url.split('/');
+
+                if (parts.length < 2 || parts[1] !== 'achievements') return;
+
+                setIsVisible(true);
+
+                if (parts.length > 2 && parts[2]) setSelectedCategoryCode?.(parts[2]);
+            },
+            eventUrlPrefix: 'questengine/'
+        };
 
         AddLinkEventTracker(linkTracker);
+        AddLinkEventTracker(questEngineTracker);
 
-        return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
+        return () => {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(questEngineTracker);
+        };
+    }, [setSelectedCategoryCode]);
 
     if (!isVisible) return null;
 

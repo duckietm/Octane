@@ -6,6 +6,7 @@ import { WiredContractRewardView } from '../extras/WiredContractRewardView';
 import { WiredContractTradeView } from '../extras/WiredContractTradeView';
 import { WiredCustomContractView } from '../extras/WiredCustomContractView';
 import { WiredExtraAnimationTimeView } from '../extras/WiredExtraAnimationTimeView';
+import { WiredExtraArrayCaptureVariableView } from '../extras/WiredExtraArrayCaptureVariableView';
 import { WiredExtraContextVariableView } from '../extras/WiredExtraContextVariableView';
 import { WiredExtraExecuteInOrderView } from '../extras/WiredExtraExecuteInOrderView';
 import { WiredExtraExecutionLimitView } from '../extras/WiredExtraExecutionLimitView';
@@ -87,6 +88,7 @@ import { WiredActionInitTransactionView } from './WiredActionInitTransactionView
 import { WiredActionJoinTeamView } from './WiredActionJoinTeamView';
 import { WiredActionKickFromRoomView } from './WiredActionKickFromRoomView';
 import { WiredActionLeaveTeamView } from './WiredActionLeaveTeamView';
+import { WiredActionModifyArrayView } from './WiredActionModifyArrayView';
 import { WiredActionMoveAndRotateFurniView } from './WiredActionMoveAndRotateFurniView';
 import { WiredActionMoveFurniAsGroupView } from './WiredActionMoveFurniAsGroupView';
 import { WiredActionMoveFurniToView } from './WiredActionMoveFurniToView';
@@ -358,6 +360,10 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredCustomContractView />;
         case WiredActionLayoutCode.CHANGE_OPACITY:
             return <WiredActionChangeOpacityView />;
+        case WiredActionLayoutCode.MODIFY_ARRAY:
+            return <WiredActionModifyArrayView />;
+        case WiredActionLayoutCode.ARRAY_CAPTURE_VARIABLE_EXTRA:
+            return <WiredExtraArrayCaptureVariableView />;
     }
 
     return null;

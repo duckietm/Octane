@@ -1,6 +1,15 @@
 import { ClubOfferData, CreateLinkEvent, PurchaseFromCatalogComposer } from '@octane/renderer';
 import { FC, useCallback, useMemo, useRef, useState } from 'react';
-import { CatalogPurchaseState, DispatchUiEvent, GetConfigurationValue, LocalizeText, OpenUrl, SanitizeHtml, SendMessageComposer } from '../../../../../api';
+import {
+    CatalogPurchaseState,
+    DispatchUiEvent,
+    GetConfigurationValue,
+    localizeWithFallback,
+    LocalizeText,
+    OpenUrl,
+    SanitizeHtml,
+    SendMessageComposer
+} from '../../../../../api';
 import vipIconMedium from '../../../../../assets/images/catalog/air/vip-icon-medium.png';
 import { Button, LayoutCurrencyIcon, LayoutLoadingSpinnerView } from '../../../../../common';
 import { CatalogEvent, CatalogInitGiftEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
@@ -9,6 +18,7 @@ import {
     useCatalogData,
     useCatalogSkipPurchaseConfirmation,
     useCatalogUiState,
+    useClubExtendOffer,
     useClubOffers,
     useGiftConfiguration,
     useNotification,
@@ -33,6 +43,7 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
     const { purse = null, getCurrencyAmount = null } = usePurse();
     const { showConfirm = null, simpleAlert = null } = useNotification();
     const { data: offers = null } = useClubOffers(CLUB_WINDOW_ID);
+    const { clubExtendOffer = null, requestClubExtendOffer = null, clearClubExtendOffer = null } = useClubExtendOffer();
     const isPurchasingRef = useRef(false);
     const pageData = currentPage ?? page;
     const layoutCode = pageData?.layoutCode ?? 'club_buy';
@@ -248,6 +259,19 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
         submitPurchase(pendingOffer);
     }, [giftReceiver, pageData, pendingOffer, purchaseWillBeGift, submitPurchase]);
 
+    /**
+     * `ClubExtendController`: the extension is bought like any other club offer, only the
+     * offer itself came from the server's extend answer instead of the club window list.
+     */
+    const confirmClubExtension = useCallback(() => {
+        if (!clubExtendOffer) return;
+
+        const offer = clubExtendOffer;
+
+        clearClubExtendOffer?.();
+        submitPurchase(offer);
+    }, [clearClubExtendOffer, clubExtendOffer, submitPurchase]);
+
     const renderPrice = (offer: ClubOfferData) => {
         if (!isVipPage) {
             return (
@@ -384,11 +408,40 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
                         </section>
                         <section className="octane-club-vip-column">{offerGroups.vip.map(renderOffer)}</section>
                     </div>
-                    {membership.active && <div className="octane-club-remaining">{LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}</div>}
+                    {membership.active && (
+                        <div className="octane-club-remaining">
+                            {LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}
+                            <Button
+                                classNames={['octane-club-extend-action']}
+                                disabled={isPurchasingRef.current}
+                                onClick={() => requestClubExtendOffer?.()}
+                            >
+                                {LocalizeText('catalog.club.extend.buy.button')}
+                            </Button>
+                        </div>
+                    )}
                     <button className="octane-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
                         {LocalizeText('catalog.club.buy.link')}
                     </button>
                 </>
+            )}
+
+            {clubExtendOffer && (
+                <CatalogClubPurchaseConfirmView
+                    discountText={
+                        clubExtendOffer.discountCreditAmount > 0
+                            ? `${LocalizeText('catalog.club.extend.normal.label')}: ${clubExtendOffer.originalPrice} - ${LocalizeText(
+                                  'catalog.club.extend.save.label'
+                              )}: ${clubExtendOffer.discountCreditAmount}`
+                            : null
+                    }
+                    offer={clubExtendOffer}
+                    productText={LocalizeText('catalog.club.extend.confirm.caption')}
+                    title={LocalizeText('catalog.club.extend.confirm.title')}
+                    validUntilText={getPurchaseValidUntil(clubExtendOffer)}
+                    onCancel={() => clearClubExtendOffer?.()}
+                    onConfirm={confirmClubExtension}
+                />
             )}
 
             {pendingOffer && purchaseState !== CatalogPurchaseState.NONE && purchaseState !== CatalogPurchaseState.PURCHASE && (

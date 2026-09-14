@@ -1,7 +1,7 @@
 import { GetAvatarRenderManager, GetSessionDataManager, Vector3d } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { FurniCategory, GetProductIconUrl, Offer, ProductTypeEnum } from '../../../../../api';
-import { AutoGrid, Column, LayoutGridItem, LayoutRoomPreviewerView } from '../../../../../common';
+import { AutoGrid, Column, LayoutGridItem, LayoutHabbiconImageView, LayoutRoomPreviewerView } from '../../../../../common';
 import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
 
 const PREVIEW_LIFT = 21;
@@ -145,7 +145,11 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
 
                             return (
                                 <LayoutGridItem key={index} itemCount={product.productCount}>
-                                    {iconUrl && <img alt="" className="octane-catalog-grid-offer-icon" draggable={false} src={iconUrl} />}
+                                    {product.productType === ProductTypeEnum.HABBICON ? (
+                                        <LayoutHabbiconImageView id={product.productClassId} />
+                                    ) : (
+                                        iconUrl && <img alt="" className="octane-catalog-grid-offer-icon" draggable={false} src={iconUrl} />
+                                    )}
                                 </LayoutGridItem>
                             );
                         })}
@@ -153,6 +157,13 @@ export const CatalogViewProductWidgetView: FC<{ height?: number }> = (props) => 
             </Column>
         );
     }
+
+    if (currentOffer.product?.productType === ProductTypeEnum.HABBICON)
+        return (
+            <Column center style={{ height }}>
+                <LayoutHabbiconImageView id={currentOffer.product.productClassId} size={80} />
+            </Column>
+        );
 
     return <LayoutRoomPreviewerView height={height} roomPreviewer={roomPreviewer} />;
 };

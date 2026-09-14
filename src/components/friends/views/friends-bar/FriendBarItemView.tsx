@@ -1,23 +1,64 @@
 import { FindNewFriendsMessageComposer, MouseEventType } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { GetUserProfile, LocalizeText, MessengerFriend, OpenMessengerChat, SendMessageComposer } from '../../../../api';
+import messengerTokenIcon from '../../../../assets/images/friends/messenger_notification_icon.png';
 import staffChatFrankIcon from '../../../../assets/images/friends/staff-chat-frank.svg';
 import addFriendsIcon from '../../../../assets/images/friends/swf/add_friends_icon.png';
 import chatIcon from '../../../../assets/images/friends/swf/friendlist_chat.png';
 import profileIcon from '../../../../assets/images/friends/swf/friendlist_eye.png';
 import visitIcon from '../../../../assets/images/friends/swf/friendlist_go_room.png';
+import notifyTokenIcon from '../../../../assets/images/friends/swf/friendlist_notify_1.png';
 import searchFriendsIcon from '../../../../assets/images/friends/swf/search_friends_icon.png';
 import { LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
-import { useFriends } from '../../../../hooks';
+import { useFriends, useMessenger } from '../../../../hooks';
+import { FriendBarToken, resolveFriendBarTokens } from '../../../../hooks/friends/friendBarTokens';
+import { selectFriendNotifications, useFriendNotificationsStore } from '../../../../hooks/friends/friendNotificationsStore';
 import { isStaffChatIdentity } from '../../staffChatIdentity';
 import { StaffChatFrankIconView } from '../../StaffChatFrankIconView';
+
+const tokenIconSrc = (token: FriendBarToken): string => (token.tag === 'message' ? messengerTokenIcon : notifyTokenIcon);
 
 export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
     const { friend = null } = props;
     const [isVisible, setVisible] = useState(false);
     const { followFriend = null } = useFriends();
+    const { messageThreads = [] } = useMessenger();
+    const friendId = friend ? friend.id : 0;
+    const notifications = useFriendNotificationsStore(selectFriendNotifications(friendId));
     const elementRef = useRef<HTMLDivElement>(null);
+    const wasVisibleRef = useRef(false);
+
+    // Official friend tab tokens: an unread console thread raises the
+    // messenger token, the FriendNotification packet the event / achievement /
+    // quest / game ones (FriendEntityTab.addNotificationToken).
+    const unreadMessageCount = useMemo(() => {
+        if (friendId === 0) return 0;
+
+        const thread = messageThreads.find((entry) => entry && entry.participant && entry.participant.id === friendId);
+
+        return thread ? thread.unreadCount : 0;
+    }, [friendId, messageThreads]);
+    const tokens = useMemo(
+        () => (friendId === 0 ? [] : resolveFriendBarTokens(notifications, unreadMessageCount)),
+        [friendId, notifications, unreadMessageCount]
+    );
+
+    // FriendEntityTab.deselect: view-once tokens leave once the tab was opened and closed again.
+    useEffect(() => {
+        if (wasVisibleRef.current && !isVisible && friendId !== 0) useFriendNotificationsStore.getState().markViewed(friendId);
+
+        wasVisibleRef.current = isVisible;
+    }, [friendId, isVisible]);
+
+    // HabboFriendBarView.setCollapsedState -> deSelect(true): collapsing the bar (or
+    // paging the tab away) closes the open tab and drops its view-once tokens too.
+    useEffect(
+        () => () => {
+            if (wasVisibleRef.current && friendId !== 0) useFriendNotificationsStore.getState().markViewed(friendId);
+        },
+        [friendId]
+    );
 
     useEffect(() => {
         const onClick = (event: MouseEvent) => {
@@ -100,10 +141,37 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
             )}
             <motion.button
                 type="button"
-                className={`friend-bar-item friend-bar-tab find-friends-active ${friend.id <= 0 ? 'group' : ''}`}
+                className={`friend-bar-item friend-bar-tab find-friends-active ${friend.id <= 0 ? 'group' : ''}${tokens.length ? ' has-tokens' : ''}`}
                 onClick={() => setVisible((prev) => !prev)}
             >
                 <div className="friend-bar-text">{friend.name}</div>
+                {tokens.length > 0 && (
+                    <div className="friend-bar-tokens">
+                        {tokens.map((token) => {
+                            const title = `${friend.name} ${LocalizeText(token.titleKey)}${token.message ? `: ${token.message}` : ''}`;
+
+                            return (
+                                <span
+                                    key={token.typeCode}
+                                    role={token.tag === 'message' ? 'button' : undefined}
+                                    className={`friend-bar-token friend-bar-token--${token.tag}`}
+                                    data-token-type={token.typeCode}
+                                    title={title}
+                                    aria-label={title}
+                                    onClick={(event) => {
+                                        if (token.tag !== 'message') return;
+
+                                        event.stopPropagation();
+                                        OpenMessengerChat(friend.id);
+                                        setVisible(false);
+                                    }}
+                                >
+                                    <img src={tokenIconSrc(token)} alt="" draggable={false} />
+                                </span>
+                            );
+                        })}
+                    </div>
+                )}
             </motion.button>
 
             <AnimatePresence>

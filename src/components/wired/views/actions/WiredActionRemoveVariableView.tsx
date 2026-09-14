@@ -13,6 +13,7 @@ import {
     createFallbackVariableEntry,
     flattenWiredVariablePickerEntries,
     getCustomVariableItemId,
+    isInternalVariableToken,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredActionBaseView } from './WiredActionBaseView';
@@ -124,13 +125,10 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
     useEffect(() => {
         if (!trigger) return;
 
-        const parsedVariableItemId = parseInt((trigger.stringData || '').trim(), 10);
         const nextTargetType = normalizeTargetType(trigger.intData.length > 0 ? trigger.intData[0] : TARGET_USER);
 
         setSelectedTargetType(nextTargetType);
-        setSelectedVariableToken(
-            normalizeVariableTokenFromWire(!Number.isNaN(parsedVariableItemId) && parsedVariableItemId > 0 ? String(parsedVariableItemId) : '')
-        );
+        setSelectedVariableToken(normalizeVariableTokenFromWire(trigger.stringData || ''));
         setUserSource(trigger.intData.length > 1 ? trigger.intData[1] : 0);
         setFurniSource(trigger.intData.length > 2 ? trigger.intData[2] : (trigger.selectedItems?.length ?? 0) > 0 ? SOURCE_SELECTED : 0);
     }, [trigger]);
@@ -139,12 +137,14 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
         const targetValue = getTargetValue(selectedTargetType);
         const variableItemId = getCustomVariableItemId(selectedVariableToken);
 
-        setStringParam(variableItemId ? String(variableItemId) : '');
+        setStringParam(isInternalVariableToken(selectedVariableToken) ? selectedVariableToken : variableItemId ? String(variableItemId) : '');
         setIntParams([targetValue, userSource, furniSource]);
         setFurniIds(selectedTargetType === 'furni' && furniSource === SOURCE_SELECTED ? [...furniIds] : []);
     };
 
-    const validate = () => getCustomVariableItemId(selectedVariableToken) > 0;
+    const validate = () => flattenWiredVariablePickerEntries(resolvedVariableEntries).some(
+        (entry) => entry.token === selectedVariableToken && entry.selectable
+    );
 
     const requiresFurni =
         selectedTargetType === 'furni' ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT : WiredFurniType.STUFF_SELECTION_OPTION_NONE;

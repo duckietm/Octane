@@ -4,6 +4,7 @@ import { useNotification } from '../../hooks';
 import { GetAlertLayout } from './views/alert-layouts/GetAlertLayout';
 import { GetBubbleLayout } from './views/bubble-layouts/GetBubbleLayout';
 import { GetConfirmLayout } from './views/confirm-layouts/GetConfirmLayout';
+import { NotificationFeedView } from './views/feed/NotificationFeedView';
 import { HotelAlertToastView } from './views/HotelAlertToastView';
 
 export const NotificationCenterView: FC<{}> = (props) => {
@@ -61,6 +62,7 @@ export const NotificationCenterView: FC<{}> = (props) => {
         <>
             <div className="octane-rightside-notifications flex flex-col gap-1">{getBubbleAlerts}</div>
             <HotelAlertToastView />
+            <NotificationFeedView />
             {getConfirms}
             {getAlerts}
         </>

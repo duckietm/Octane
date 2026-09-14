@@ -1,6 +1,6 @@
 import { GetTargetedOfferComposer, PurchaseTargetedOfferComposer, TargetedOfferData } from '@octane/renderer';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import { FriendlyTime, GetConfigurationValue, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../../../api';
+import { CreateLinkEvent, FriendlyTime, GetConfigurationValue, LocalizeText, localizeWithFallback, SanitizeHtml, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { usePurse } from '../../../../hooks';
 
@@ -13,20 +13,28 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; setOpen: Disp
 
     const [amount, setAmount] = useState<number>(1);
 
+    // TargetedOffer.checkPurseBalance: the whole quantity has to be affordable in every currency.
+    const canAfford = useMemo(() => {
+        if (!offer) return false;
+
+        const quantity = Math.max(1, amount || 1);
+
+        if (offer.priceInCredits > 0 && getCurrencyAmount(-1) < offer.priceInCredits * quantity) return false;
+        if (offer.priceInActivityPoints > 0 && getCurrencyAmount(offer.activityPointType) < offer.priceInActivityPoints * quantity) return false;
+
+        return true;
+    }, [offer, amount, getCurrencyAmount]);
+
     const canPurchase = useMemo(() => {
-        let credits = false;
-        let points = false;
-        let limit = false;
+        if (!offer || !canAfford) return false;
 
-        if (offer.priceInCredits > 0) credits = getCurrencyAmount(-1) >= offer.priceInCredits;
+        const quantity = amount || 0;
 
-        if (offer.priceInActivityPoints > 0) points = getCurrencyAmount(offer.activityPointType) >= offer.priceInActivityPoints;
-        else points = true;
+        return offer.purchaseLimit > 0 && quantity >= 1 && quantity <= offer.purchaseLimit;
+    }, [offer, amount, canAfford]);
 
-        if (offer.purchaseLimit > 0) limit = true;
-
-        return credits && points && limit;
-    }, [offer, getCurrencyAmount]);
+    // TargetedOfferDialogView.btn_get_credits sends the player to the credits catalog page.
+    const goGetCredits = () => CreateLinkEvent('catalog/open/credits');
 
     const expirationTime = () => {
         let expirationTime = Math.max(0, (offer.expirationTime - Date.now()) / 1000);
@@ -76,7 +84,17 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; setOpen: Disp
                             <Button disabled={!canPurchase} variant="primary" onClick={() => buyOffer()}>
                                 {LocalizeText('targeted.offer.button.buy')}
                             </Button>
+                            {!canAfford && (
+                                <Button variant="secondary" onClick={goGetCredits}>
+                                    {localizeWithFallback('targeted.offer.button.credits', 'Go get credits')}
+                                </Button>
+                            )}
                         </Flex>
+                        {!canAfford && (
+                            <Text center bold className="text-danger" data-testid="targeted-offer-status" role="status">
+                                {localizeWithFallback('targeted.offer.not_enough.credits', "You don't have enough credits or diamonds yet!")}
+                            </Text>
+                        )}
                     </Flex>
                     <div
                         className="w-50 h-full"

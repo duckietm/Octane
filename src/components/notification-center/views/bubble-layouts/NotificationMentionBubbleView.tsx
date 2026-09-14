@@ -24,9 +24,9 @@ export const NotificationMentionBubbleView: FC<NotificationMentionBubbleViewProp
         SendMessageComposer(new MarkMentionsReadComposer(1, mention.mentionId));
     };
 
-    // Whole-bubble click opens the mentions panel (and dismisses the bubble).
+    // Whole-bubble click opens the notification feed on its mentions section (and dismisses the bubble).
     const open = () => {
-        CreateLinkEvent('mentions/toggle');
+        CreateLinkEvent('mentions/show');
         onClose();
     };
 
