@@ -2627,13 +2627,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             const parsed = Number(editingValue.trim());
 
             if (roomSettings.canModify && editingValue.trim() && Number.isInteger(parsed) && parsed >= -2147483648 && parsed <= 2147483647) {
-                const token = builtInGlobal ? editingVariable.replace(/^@team_(red|green|blue|yellow)_score$/, '@teams.$1.score') : editingVariable;
+                // The packet carries four ints and nothing else: the handler reads target type, target
+                // id, definition item id and value, so it has no field in which to name a built-in.
+                // Naming one from here needs that field on the renderer, the contract and the server.
                 SendMessageComposer(new WiredUserVariableUpdateComposer(
                     builtInGlobal ? 3 : 0,
                     builtInGlobal ? roomSession?.roomId ?? 0 : selectedUser.userId,
                     0,
-                    parsed,
-                    `internal:${token}`
+                    parsed
                 ));
             }
 
