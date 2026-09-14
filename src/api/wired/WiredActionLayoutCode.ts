@@ -147,4 +147,15 @@ export class WiredActionLayoutCode {
      * seats empty rather than have the two collide on whichever merges second.
      */
     public static VARIABLE_WEB_API_EXTRA: number = 128;
+
+    /** Variable FX progress bar; the emulator registers it on wf_xtra_varfx_prog. */
+    // The emulator ships one wired furni per official Variable FX category, codes 1200-1205
+    // (WiredExtraVariableFxHp, ...ProgressBar, ...Levelling, ...Status, ...Boss, ...Number). Only
+    // the progress bar was declared here, so the other five opened no dialog at all.
+    public static VARIABLE_FX_HP_EXTRA: number = 1200;
+    public static VARIABLE_FX_PROGRESS_BAR_EXTRA: number = 1201;
+    public static VARIABLE_FX_LEVELLING_EXTRA: number = 1202;
+    public static VARIABLE_FX_STATUS_EXTRA: number = 1203;
+    public static VARIABLE_FX_BOSS_EXTRA: number = 1204;
+    public static VARIABLE_FX_NUMBER_EXTRA: number = 1205;
 }

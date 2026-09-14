@@ -1,0 +1,6 @@
+{
+    "wiredfurni.params.variablefx.section.source": "Variabili da mostrare",
+    "wiredfurni.params.variablefx.source.user": "Le variabili utente di questa pila",
+    "wiredfurni.params.variablefx.source.furni": "Le variabili mobile di questa pila",
+    "wiredfurni.params.variablefx.source.global": "Le variabili stanza di questa pila"
+}
