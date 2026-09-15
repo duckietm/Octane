@@ -17,14 +17,11 @@ import { ChatInputEmojiSelectorView } from './ChatInputEmojiSelectorView';
 import { ChatInputHabbiconSelectorView } from './ChatInputHabbiconSelectorView';
 import { ChatInputHelpButtonView } from './ChatInputHelpButtonView';
 import { ChatInputMentionSelectorView } from './ChatInputMentionSelectorView';
-import { ChatInputReminderHintView } from './ChatInputReminderHintView';
 import { ChatInputStyleSelectorView } from './ChatInputStyleSelectorView';
-import { markChatReminderDismissed, shouldShowChatReminder } from './chatInputReminder';
 
 export const ChatInputView: FC<{}> = (props) => {
     const [chatValue, setChatValue] = useState<string>('');
     const [portalTarget, setPortalTarget] = useState<HTMLElement>(null);
-    const [showReminder, setShowReminder] = useState<boolean>(() => shouldShowChatReminder(window.localStorage));
     const { chatStyleId = 0, updateChatStyleId = null } = useSessionInfo();
     const { purchasableChatStyleIds = [] } = usePurchasableChatStyles();
     const {
@@ -126,17 +123,12 @@ export const ChatInputView: FC<{}> = (props) => {
                     setChatValue('');
                     sendChat(text, chatType, recipientName, chatStyleId);
 
-                    // The first line sent ends the new-user reminder for good.
-                    if (showReminder) {
-                        markChatReminderDismissed(window.localStorage);
-                        setShowReminder(false);
-                    }
                 }
             }
 
             setChatValue(append);
         },
-        [chatModeIdWhisper, chatModeIdShout, chatModeIdSpeak, maxChatLength, chatStyleId, setIsTyping, setIsIdle, sendChat, showReminder]
+        [chatModeIdWhisper, chatModeIdShout, chatModeIdSpeak, maxChatLength, chatStyleId, setIsTyping, setIsIdle, sendChat]
     );
 
     const updateChatInput = useCallback(
@@ -372,7 +364,6 @@ export const ChatInputView: FC<{}> = (props) => {
         // trailing button (habbicons disabled) redistributes the slack between the
         // trigger and the bubble, exposing the cap and opening a gap.
         <div className="octane-chat-input-container swf-chat-input group relative flex w-full items-center justify-start overflow-visible" data-help-bubble="chat_input">
-            <ChatInputReminderHintView visible={showReminder} />
             {commandSelectorVisible && (
                 <ChatInputCommandSelectorView
                     commands={filteredCommands}
