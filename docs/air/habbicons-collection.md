@@ -79,3 +79,7 @@ Independent Standards review: zero findings. Independent Spec review initially i
 - Screenshots and runtime logs live alongside the isolated worktree. No live server mutation, deployment or publication performed. Exact pixel equality to the supplied scaled screenshot is not established; source-derived native geometry/skins and browser output were inspected.
 
 Final tray check: heading position unchanged while group list scrollTop=160; Close removed the collection window. The fixture is outside the repository at ../preview; run from octane with `node_modules/.bin/vite --config ../preview/vite.config.mjs` for an isolated localhost preview (port5193). It is not shipped in the production bundle.
+
+## PR preparation update
+
+Merged Dev 4062d74b during PR preparation. Its Habbicons stylesheet conflict was limited to an interim 572px frame height/background; retained the source-derived 570px frame and bitmap background from this port. Other upstream changes remain intact. With matching Renderer Dev 41ee2a00, full TypeScript and the production build now pass; the duplicate-mock errors recorded above applied to the earlier baseline. Focused Biome/hooks lint and the task diff whitespace check also pass.

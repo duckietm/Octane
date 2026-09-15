@@ -1,6 +1,7 @@
 import {
     AdvancedMap,
     GetSessionDataManager,
+    RoomObjectType,
     TradingAcceptComposer,
     TradingAcceptEvent,
     TradingCancelComposer,
@@ -23,8 +24,10 @@ import { useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     CloneObject,
+    detectTradingNameScam,
     GetRoomSession,
     GroupItem,
+    ITradingNameScamWarning,
     LocalizeText,
     parseTradeItems,
     SendMessageComposer,
@@ -33,6 +36,7 @@ import {
     TradingNotificationType
 } from '../../api';
 import { useMessageEvent } from '../events';
+import { useFriends } from '../friends';
 import { useNotification } from '../notification';
 import { useInventoryFurni } from './useInventoryFurni';
 
@@ -40,9 +44,40 @@ const useInventoryTradeState = () => {
     const [ownUser, setOwnUser] = useState<TradeUserData>(null);
     const [otherUser, setOtherUser] = useState<TradeUserData>(null);
     const [tradeState, setTradeState] = useState(TradeState.TRADING_STATE_READY);
+    const [nameScamWarning, setNameScamWarning] = useState<ITradingNameScamWarning>(null);
     const { groupItems = [], setGroupItems = null, activate = null, deactivate = null } = useInventoryFurni();
     const { simpleAlert = null, showTradeAlert = null } = useNotification();
+    const { friends = [] } = useFriends();
     const isTrading = tradeState >= TradeState.TRADING_STATE_RUNNING;
+
+    const dismissNameScamWarning = () => setNameScamWarning(null);
+
+    // TradingModel.startTrading: compare the partner's name with every other user in the room
+    // (both traders excluded) and with the friend list; a look-alike opens the warning window.
+    const detectNameScam = (ownUserId: number, otherUserId: number, otherUserName: string, otherUserFigure: string) => {
+        const roomUserNames: string[] = [];
+
+        for (const userData of GetRoomSession()?.userDataManager?.getRoomUserListSnapshot() ?? []) {
+            if (!userData || userData.type !== RoomObjectType.USER) continue;
+
+            if (userData.webID === ownUserId || userData.webID === otherUserId || !userData.name) continue;
+
+            roomUserNames.push(userData.name);
+        }
+
+        const friendNames = friends.map((friend) => friend.name).filter(Boolean);
+        const result = detectTradingNameScam(otherUserName, roomUserNames, friendNames);
+
+        if (!result.nameScamDetected) return null;
+
+        return {
+            tradedUserId: otherUserId,
+            tradedUserName: otherUserName,
+            tradedUserFigure: otherUserFigure ?? '',
+            similarInRoom: result.similarInRoom,
+            similarInFriends: result.similarInFriends
+        } as ITradingNameScamWarning;
+    };
 
     const progressTrade = () => {
         switch (tradeState) {
@@ -123,6 +158,7 @@ const useInventoryTradeState = () => {
 
         setOwnUser(null);
         setOtherUser(null);
+        setNameScamWarning(null);
         setTradeState(TradeState.TRADING_STATE_READY);
     });
 
@@ -131,6 +167,7 @@ const useInventoryTradeState = () => {
 
         setOwnUser(null);
         setOtherUser(null);
+        setNameScamWarning(null);
         setTradeState(TradeState.TRADING_STATE_READY);
     });
 
@@ -238,6 +275,10 @@ const useInventoryTradeState = () => {
         setOwnUser(firstUser);
         setOtherUser(secondUser);
         setTradeState(TradeState.TRADING_STATE_RUNNING);
+
+        const otherUserData = firstUser.userId === firstUserData?.webID ? secondUserData : firstUserData;
+
+        setNameScamWarning(detectNameScam(firstUser.userId, secondUser.userId, secondUser.userName, otherUserData?.figure));
     });
 
     useMessageEvent<TradingOpenFailedEvent>(TradingOpenFailedEvent, (event) => {
@@ -266,7 +307,19 @@ const useInventoryTradeState = () => {
         return () => deactivate(id);
     }, [tradeState, activate, deactivate]);
 
-    return { ownUser, otherUser, tradeState, setTradeState, isTrading, groupItems, progressTrade, removeItem, stopTrading };
+    return {
+        ownUser,
+        otherUser,
+        tradeState,
+        setTradeState,
+        isTrading,
+        groupItems,
+        progressTrade,
+        removeItem,
+        stopTrading,
+        nameScamWarning,
+        dismissNameScamWarning
+    };
 };
 
 export const useInventoryTrade = () => useSharedHook(useInventoryTradeState);

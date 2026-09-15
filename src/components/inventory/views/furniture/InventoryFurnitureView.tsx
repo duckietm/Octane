@@ -1,14 +1,52 @@
 import { InfiniteGrid } from '@layout/InfiniteGrid';
-import { GetSessionDataManager, IRoomSession, RoomPreviewer, Vector3d } from '@octane/renderer';
+import { CreateLinkEvent, GetSessionDataManager, IFurnitureData, IRoomSession, RoomPreviewer, Vector3d } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { FaPowerOff, FaSyncAlt, FaTrashAlt } from 'react-icons/fa';
-import { attemptItemPlacement, DispatchUiEvent, FurniCategory, getGroupItemKey, GroupItem, LocalizeText, UnseenItemCategory } from '../../../../api';
+import { FaExchangeAlt, FaPowerOff, FaRecycle, FaSyncAlt, FaTrashAlt } from 'react-icons/fa';
+import {
+    attemptItemPlacement,
+    DispatchUiEvent,
+    FriendlyTime,
+    FurniCategory,
+    getGroupItemKey,
+    GroupItem,
+    LocalizeText,
+    localizeWithFallback,
+    UnseenItemCategory
+} from '../../../../api';
 import { LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, LayoutRoomPreviewerView } from '../../../../common';
 import { CatalogPostMarketplaceOfferEvent, DeleteItemConfirmEvent } from '../../../../events';
-import { useInventoryFurni, useInventoryUnseenTracker } from '../../../../hooks';
+import { useInventoryFurni, useInventoryUnseenTracker, useRentConfirmation } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
+import { getInventoryPreviewButtons, getInventoryRentTextKey } from './inventoryFurniPreview';
+
+const getFurnitureData = (groupItem: GroupItem): IFurnitureData => {
+    if (!groupItem) return null;
+
+    const manager = GetSessionDataManager();
+
+    if (!manager) return null;
+
+    return groupItem.isWallItem ? manager.getWallItemData(groupItem.type) : manager.getFloorItemData(groupItem.type);
+};
+
+// FurniView.as:298-339: the preview pane counts what is still tradeable / recyclable and swaps
+// the icon for its greyed "no" variant when nothing is; the number gets a white glow.
+const PreviewCounter: FC<{ count: number; icon: 'trade' | 'recycle' }> = (props) => {
+    const { count = 0, icon = 'trade' } = props;
+    const isTrade = icon === 'trade';
+    const title = isTrade
+        ? LocalizeText(count > 0 ? 'inventory.furni.preview.tradeable_amount' : 'inventory.furni.preview.not_tradeable')
+        : LocalizeText(count > 0 ? 'inventory.furni.preview.recyclable_amount' : 'inventory.furni.preview.not_recyclable');
+
+    return (
+        <div className={`octane-inventory-preview-counter ${count > 0 ? 'is-available' : 'is-unavailable'}`} data-testid={`inventory-preview-${icon}`} title={title}>
+            {isTrade ? <FaExchangeAlt className="fa-icon" /> : <FaRecycle className="fa-icon" />}
+            {count > 0 && <span className="octane-inventory-preview-counter__number">{count}</span>}
+        </div>
+    );
+};
 
 const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
     const item = groupItem.getLastItem();
@@ -17,7 +55,9 @@ const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
 
     if (!item.sellable) return false;
 
-    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item));
+    // The official make-offer window sells the whole selection of identical copies at one
+    // price (`MarketplaceModel.makeOffer`), so it gets the group and not only this copy.
+    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item, (groupItem.items || []).filter((groupedItem) => groupedItem?.sellable)));
 };
 
 const attemptDeleteItem = (groupItem: GroupItem) => {
@@ -37,6 +77,10 @@ export const InventoryFurnitureView: FC<{
     const [isVisible, setIsVisible] = useState(false);
     const { groupItems = [], selectedItem = null, setSelectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
     const { resetItems = null } = useInventoryUnseenTracker();
+    const { openRentConfirmation = null } = useRentConfirmation();
+    // Rent countdown, refreshed locally once a second like FurniModel.onImageUpdateTimerEvent
+    // calls FurniView.updateRentedItem between two server updates.
+    const [rentTick, setRentTick] = useState(0);
 
     useEffect(() => {
         if (!selectedItem || !roomPreviewer) return;
@@ -86,13 +130,22 @@ export const InventoryFurnitureView: FC<{
     useEffect(() => {
         if (!selectedItem || !selectedItem.hasUnseenItems) return;
 
+        // Rented furni are merged into this tab but tracked under their own unseen category.
         resetItems(
-            UnseenItemCategory.FURNI,
+            selectedItem.isRented ? UnseenItemCategory.RENTABLE : UnseenItemCategory.FURNI,
             selectedItem.items.map((item) => item.id)
         );
 
         selectedItem.hasUnseenItems = false;
     }, [selectedItem, resetItems]);
+
+    useEffect(() => {
+        if (!selectedItem || !selectedItem.isRented) return;
+
+        const handle = window.setInterval(() => setRentTick((previous) => previous + 1), 1000);
+
+        return () => window.clearInterval(handle);
+    }, [selectedItem]);
 
     useEffect(() => {
         if (!isVisible) return;
@@ -110,6 +163,42 @@ export const InventoryFurnitureView: FC<{
 
     if (!groupItems || !groupItems.length)
         return <InventoryCategoryEmptyView desc={LocalizeText('inventory.empty.desc')} title={LocalizeText('inventory.empty.title')} />;
+
+    const selectedFurniture = selectedItem ? selectedItem.getLastItem() : null;
+    const selectedFurniData = selectedItem ? getFurnitureData(selectedItem) : null;
+    const previewButtons = selectedFurniture
+        ? getInventoryPreviewButtons({
+              isRented: selectedFurniture.isRented,
+              flatId: selectedFurniture.flatId,
+              category: selectedFurniture.category,
+              sellable: selectedItem.isSellable,
+              isTrading: false,
+              inPrivateRoom: !!roomSession,
+              rentCouldBeUsedForBuyout: !!selectedFurniData?.rentCouldBeUsedForBuyout,
+              purchaseCouldBeUsedForBuyout: !!selectedFurniData?.purchaseCouldBeUsedForBuyout
+          })
+        : null;
+    // FurniView.updateActionView fills `furni_extra` with the rarity level or the chest name and
+    // FurniView.updateRentedItem overrides it with the rent countdown for rented furni.
+    const rentTextKey = getInventoryRentTextKey(selectedFurniture);
+    const rentTime = rentTextKey ? FriendlyTime.format(Math.max(0, Math.floor(selectedFurniture.secondsToExpiration))) : '';
+    const furniExtraText = rentTextKey
+        ? LocalizeText(rentTextKey, ['time', 'TIME'], [rentTime, rentTime])
+        : selectedFurniture && selectedFurniture.stuffData && selectedFurniture.stuffData.rarityLevel >= 0
+          ? LocalizeText('inventory.rarity', ['rarity'], [String(selectedFurniture.stuffData.rarityLevel)])
+          : '';
+
+    const openRent = (buyout: boolean) => {
+        if (!selectedFurniture || !selectedFurniData) return;
+
+        openRentConfirmation?.(selectedFurniData, buyout, -1, selectedFurniture.id);
+    };
+
+    const gotoRoom = () => {
+        if (!selectedFurniture || selectedFurniture.flatId <= -1) return;
+
+        CreateLinkEvent(`navigator/goto/${selectedFurniture.flatId}`);
+    };
 
     return (
         <div className="grid h-full grid-cols-12 gap-2">
@@ -159,17 +248,45 @@ export const InventoryFurnitureView: FC<{
                 </div>
                 {selectedItem && (
                     <div className="flex flex-col justify-between gap-2 grow">
-                        <span className="text-sm truncate grow">{selectedItem.name}</span>
-                        {selectedItem.description && <span className="text-xs truncate">{selectedItem.description}</span>}
+                        <div className="flex items-start gap-2">
+                            <div className="flex flex-col min-w-0 grow">
+                                <span className="text-sm truncate">{selectedItem.name}</span>
+                                {selectedItem.description && <span className="text-xs truncate">{selectedItem.description}</span>}
+                                {furniExtraText && (
+                                    <span className="octane-inventory-preview-extra text-xs" data-rent-tick={rentTick} data-testid="inventory-preview-extra">
+                                        {furniExtraText}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="octane-inventory-preview-counters flex flex-col gap-[2px] shrink-0">
+                                <PreviewCounter count={selectedItem.getTradeableCount()} icon="trade" />
+                                <PreviewCounter count={selectedItem.getRecyclableCount()} icon="recycle" />
+                            </div>
+                        </div>
                         <div className="flex flex-col gap-1">
-                            {!!roomSession && (
+                            {!!roomSession && previewButtons?.place && (
                                 <OctaneButton className="octane-inventory-btn-place" onClick={(event) => attemptItemPlacement(selectedItem)}>
                                     {LocalizeText('inventory.furni.placetoroom')}
                                 </OctaneButton>
                             )}
-                            {selectedItem.isSellable && (
+                            {previewButtons?.gotoRoom && (
+                                <OctaneButton className="octane-inventory-btn-goto" data-testid="inventory-goto-room" onClick={gotoRoom}>
+                                    {localizeWithFallback('inventory.furni.gotoroom', 'Go to room')}
+                                </OctaneButton>
+                            )}
+                            {previewButtons?.sell && (
                                 <OctaneButton className="octane-inventory-btn-sell" onClick={(event) => attemptPlaceMarketplaceOffer(selectedItem)}>
                                     {LocalizeText('inventory.marketplace.sell')}
+                                </OctaneButton>
+                            )}
+                            {previewButtons?.extend && (
+                                <OctaneButton className="octane-inventory-btn-rent" data-testid="inventory-extend-rent" onClick={() => openRent(false)}>
+                                    {localizeWithFallback('inventory.furni.extendrent', 'Extend rent')}
+                                </OctaneButton>
+                            )}
+                            {previewButtons?.buyout && (
+                                <OctaneButton className="octane-inventory-btn-rent" data-testid="inventory-buy-rented" onClick={() => openRent(true)}>
+                                    {localizeWithFallback('inventory.furni.buyrenteditem', 'Buy permanently')}
                                 </OctaneButton>
                             )}
                         </div>

@@ -82,6 +82,11 @@ export const loadEmojiShortcodes = (): Promise<void> => {
     return loading;
 };
 
+/**
+ * Replace `:shortcode:` and standalone smileys such as `:)` with their emoji.
+ * Smileys only convert as whole words, so `http://` and `:/` inside a path stay
+ * as typed.
+ */
 export const convertEmojiShortcodes = (text: string): string => {
     if (!shortcodes || !text) return text;
 

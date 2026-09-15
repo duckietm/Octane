@@ -372,9 +372,17 @@ const useMessengerState = () => {
 
     useMessageEvent<RoomInviteErrorEvent>(RoomInviteErrorEvent, (event) => {
         const parser = event.getParser();
+        const missed = parser.failedRecipients ?? [];
+
+        if (!missed.length) return;
+
+        // The names read better than the ids, and we have them in the friend list already.
+        const names = missed.map((id) => getFriend?.(id)?.name).filter(Boolean);
 
         simpleAlert(
-            `Received room invite error: ${parser.errorCode},recipients: ${parser.failedRecipients.join(',')}`,
+            names.length
+                ? localizeWithFallback('friendlist.invite.failed', 'Some friends did not get your invitation: %names%').replace('%names%', names.join(', '))
+                : localizeWithFallback('friendlist.invite.failed.count', 'Some friends did not get your invitation.'),
             NotificationAlertType.DEFAULT,
             null,
             null,

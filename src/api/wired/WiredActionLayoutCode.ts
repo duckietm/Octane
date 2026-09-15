@@ -147,4 +147,6 @@ export class WiredActionLayoutCode {
      * seats empty rather than have the two collide on whichever merges second.
      */
     public static VARIABLE_WEB_API_EXTRA: number = 128;
+    public static MODIFY_ARRAY: number = 126;
+    public static ARRAY_CAPTURE_VARIABLE_EXTRA: number = 127;
 }

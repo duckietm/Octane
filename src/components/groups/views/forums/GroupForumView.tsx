@@ -10,7 +10,7 @@ import {
 import { FC, useCallback, useEffect, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
-import { useMessageEvent } from '../../../../hooks';
+import { useGroupForumUnread, useMessageEvent } from '../../../../hooks';
 import { GroupForumListView } from './GroupForumListView';
 import { GroupForumNewThreadView } from './GroupForumNewThreadView';
 import { GroupForumSettingsView } from './GroupForumSettingsView';
@@ -30,6 +30,9 @@ export const GroupForumView: FC<{}> = (props) => {
     const [threadId, setThreadId] = useState<number>(0);
     const [currentThread, setCurrentThread] = useState<GuildForumThread>(null);
     const [forumData, setForumData] = useState<ExtendedForumData>(null);
+    // Official GroupForumController.goToMessageIndex: the message the thread opens on.
+    const [threadMessageIndex, setThreadMessageIndex] = useState<number>(0);
+    const { clearThreadMarkers = null } = useGroupForumUnread();
 
     useMessageEvent<ForumDataMessageEvent>(ForumDataMessageEvent, (event) => {
         const parser = event.getParser();
@@ -37,17 +40,22 @@ export const GroupForumView: FC<{}> = (props) => {
         setForumData(parser.extendedForumData);
     });
 
-    const openForum = useCallback((id: number) => {
-        setGroupId(id);
-        setCurrentView(VIEW_THREAD_LIST);
-        setIsVisible(true);
-        SendMessageComposer(new GetForumStatsMessageComposer(id));
-    }, []);
+    const openForum = useCallback(
+        (id: number) => {
+            clearThreadMarkers?.();
+            setGroupId(id);
+            setCurrentView(VIEW_THREAD_LIST);
+            setIsVisible(true);
+            SendMessageComposer(new GetForumStatsMessageComposer(id));
+        },
+        [clearThreadMarkers]
+    );
 
-    const openThread = useCallback((gId: number, tId: number, thread: GuildForumThread = null) => {
+    const openThread = useCallback((gId: number, tId: number, thread: GuildForumThread = null, messageIndex: number = 0) => {
         setGroupId(gId);
         setThreadId(tId);
         setCurrentThread(thread);
+        setThreadMessageIndex(Math.max(0, messageIndex));
         setCurrentView(VIEW_THREAD);
     }, []);
 
@@ -141,7 +149,14 @@ export const GroupForumView: FC<{}> = (props) => {
                     />
                 )}
                 {currentView === VIEW_THREAD && (
-                    <GroupForumThreadView groupId={groupId} threadId={threadId} initialThread={currentThread} forumData={forumData} onBack={backToThreadList} />
+                    <GroupForumThreadView
+                        groupId={groupId}
+                        threadId={threadId}
+                        initialThread={currentThread}
+                        initialMessageIndex={threadMessageIndex}
+                        forumData={forumData}
+                        onBack={backToThreadList}
+                    />
                 )}
                 {currentView === VIEW_NEW_THREAD && (
                     <GroupForumNewThreadView

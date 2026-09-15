@@ -20,7 +20,8 @@ interface ContextMenuViewProps extends BaseProps<HTMLDivElement> {
 
 const LOCATION_STACK_SIZE = 25;
 const BUBBLE_DROP_SPEED = 3;
-const FADE_DELAY = 5000;
+// The official context bubbles fade after three seconds (ContextInfoView.as, CONTEXT_INFO_DELAY).
+const FADE_DELAY = 3000;
 const FADE_LENGTH = 75;
 const SPACE_AROUND_EDGES = 10;
 

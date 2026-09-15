@@ -178,4 +178,57 @@ describe('useNavigatorUiStore', () => {
             expect(useNavigatorUiStore.getState().currentFilter).toBe('');
         });
     });
+
+    describe('search back-stack (SearchContextHistoryManager)', () => {
+        beforeEach(() => {
+            useNavigatorUiStore.setState({ searchHistory: { contexts: [], offset: -1 }, skipNextHistoryPush: false });
+        });
+
+        it('records every received search context once', () => {
+            const store = useNavigatorUiStore.getState();
+            store.recordSearchContext('official_view', '');
+            store.recordSearchContext('official_view', '');
+            store.recordSearchContext('hotel_view', 'tag:party');
+            expect(useNavigatorUiStore.getState().searchHistory).toEqual({
+                contexts: [
+                    { code: 'official_view', filter: '' },
+                    { code: 'hotel_view', filter: 'tag:party' }
+                ],
+                offset: 1
+            });
+        });
+
+        it('goBackSearch re-performs the previous context and does not push it again', () => {
+            const store = useNavigatorUiStore.getState();
+            store.recordSearchContext('official_view', '');
+            store.recordSearchContext('hotel_view', 'tag:party');
+            expect(useNavigatorUiStore.getState().goBackSearch()).toBe(true);
+
+            const afterBack = useNavigatorUiStore.getState();
+            expect(afterBack.currentTabCode).toBe('official_view');
+            expect(afterBack.currentFilter).toBe('');
+            expect(afterBack.searchHistory.offset).toBe(0);
+            expect(afterBack.skipNextHistoryPush).toBe(true);
+
+            afterBack.recordSearchContext('official_view', '');
+            expect(useNavigatorUiStore.getState().searchHistory.contexts).toHaveLength(2);
+            expect(useNavigatorUiStore.getState().skipNextHistoryPush).toBe(false);
+        });
+
+        it('goBackSearch returns false with nothing to go back to', () => {
+            useNavigatorUiStore.getState().recordSearchContext('official_view', '');
+            expect(useNavigatorUiStore.getState().goBackSearch()).toBe(false);
+        });
+
+        it('a new search after going back drops the forward entries', () => {
+            const store = useNavigatorUiStore.getState();
+            store.recordSearchContext('a', '');
+            store.recordSearchContext('b', '');
+            store.recordSearchContext('c', '');
+            useNavigatorUiStore.getState().goBackSearch();
+            useNavigatorUiStore.getState().recordSearchContext('b', '');
+            useNavigatorUiStore.getState().recordSearchContext('d', '');
+            expect(useNavigatorUiStore.getState().searchHistory.contexts.map((context) => context.code)).toEqual(['a', 'b', 'd']);
+        });
+    });
 });

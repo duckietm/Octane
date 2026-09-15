@@ -1,6 +1,8 @@
+import type { IWiredArrayInspectionData } from '@octane/renderer';
 import { KeyboardEvent } from 'react';
 import wiredGlobalPlaceholderImage from '../../assets/images/wiredtools/wired_global_placeholder.png';
 import { Button, LayoutAvatarImageView, LayoutPetImageView, LayoutRoomObjectImageView, Text } from '../../common';
+import { WiredArrayInspectionView } from './WiredArrayInspectionView';
 import { INSPECTION_ELEMENTS } from './WiredCreatorTools.constants';
 import { InspectionFurniSelection, InspectionUserSelection, InspectionVariable } from './WiredCreatorTools.types';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
@@ -52,6 +54,11 @@ export interface WiredInspectionTabViewProps {
     // remove variable
     canRemoveInspectionVariable: boolean;
     onRemoveInspectionVariable: () => void;
+
+    arrayInspection: IWiredArrayInspectionData | null;
+    canModifyArray: boolean;
+    onArrayPageChange: (page: number) => void;
+    onArrayFieldUpdate: (index: number, fieldId: number, value: string) => void;
 }
 
 /**
@@ -81,7 +88,11 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
         canGiveInspectionVariable,
         onGiveInspectionVariable,
         canRemoveInspectionVariable,
-        onRemoveInspectionVariable
+        onRemoveInspectionVariable,
+        arrayInspection,
+        canModifyArray,
+        onArrayPageChange,
+        onArrayFieldUpdate
     } = props;
 
     const inspectionType = useWiredCreatorToolsUiStore((s) => s.inspectionType);
@@ -214,6 +225,14 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                         )}
                     </div>
                 </div>
+                {arrayInspection && (
+                    <WiredArrayInspectionView
+                        canModify={canModifyArray}
+                        data={arrayInspection}
+                        onPageChange={onArrayPageChange}
+                        onUpdateField={onArrayFieldUpdate}
+                    />
+                )}
                 <div className="relative flex justify-between gap-2">
                     {isInspectionGiveOpen && (
                         <div className="absolute right-0 bottom-full mb-2 w-[210px] rounded border border-[#8d887a] bg-[#efede5] p-3 shadow-[0_2px_8px_rgba(0,0,0,.25)] z-10 flex flex-col gap-2">

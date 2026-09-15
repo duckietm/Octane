@@ -83,8 +83,10 @@
         text-overflow: ellipsis;
         text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.65);
         white-space: nowrap;
-        font-family: UbuntuCondensed, Ubuntu, sans-serif;
-        font-size: 13px;
+        /* u_frame_title in 1788_styles_css is Ubuntu bold 12; the condensed cut is
+           reserved for ubuntu_condensed_regular, which no window title uses. */
+        font-family: Ubuntu, sans-serif;
+        font-size: 12px;
         font-weight: 700;
         line-height: 31px;
         min-height: 31px;
@@ -183,6 +185,16 @@
     z-index: 1;
 }
 
+/* habbo_window_layout_frame_3 puts content_area at x=3/y=36 in a 64px frame:
+   3px in on every side except the 36px title strip. The shell box sits 1px
+   inside the AIR outer rect (the ::before is inset -1px), hence 35/2/2. Zero
+   specificity on purpose: windows that lay their content out absolutely
+   (avatar editor, purchase confirm, gift wrap) keep their own offsets, and
+   the header is absolute so it never takes the padding. */
+:where(.octane-card-shell.octane-card-frame-3) {
+    padding: 35px 2px 2px;
+}
+
 .octane-card-shell.octane-card-frame-3 > .octane-card-header-shell {
     position: absolute !important;
     top: 5px !important;
@@ -216,7 +228,7 @@
     min-height: 15px !important;
     margin: 0 !important;
     color: #ffffff !important;
-    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif !important;
+    font-family: Ubuntu, HabboAirUbuntu, sans-serif !important;
     font-size: 12px !important;
     font-weight: 700 !important;
     line-height: 15px !important;
@@ -485,7 +497,7 @@
 
             .octane-card-header-text,
             .octane-card-title {
-                font-size: 13px;
+                font-size: 12px;
             }
         }
 

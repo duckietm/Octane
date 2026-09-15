@@ -1,7 +1,8 @@
 import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { GetConfigurationValue, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../api';
+import { GetConfigurationValue, IPurchasableOffer, LocalizeText, localizeWithFallback, ProductTypeEnum } from '../../../api';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
 import { LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
+import { useLtdRaffle } from '../../../hooks';
 
 interface CatalogPurchaseConfirmViewProps {
     offer: IPurchasableOffer;
@@ -13,11 +14,33 @@ interface CatalogPurchaseConfirmViewProps {
     onCancel: () => void;
 }
 
+// PurchaseConfirmationDialog.onRaffleTimerTick appends one dot every 150ms and restarts after 14.
+export const RAFFLE_DOT_INTERVAL_MS = 150;
+export const RAFFLE_MAX_DOTS = 14;
+
+export const getRaffleDots = (tick: number): string => '.'.repeat((Math.max(0, tick) % RAFFLE_MAX_DOTS) + 1);
+
 export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (props) => {
     const { offer = null, quantity = 1, bundleDiscountRuleset = null, isGift = false, isSubmitting = false, onConfirm = null, onCancel = null } = props;
     const dialogRef = useRef<HTMLDivElement>(null);
     const spendingDisclaimerEnabled = GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false) === true;
     const [spendingDisclaimerAccepted, setSpendingDisclaimerAccepted] = useState(!spendingDisclaimerEnabled);
+    const [raffleTick, setRaffleTick] = useState(0);
+    const { raffleActive = false } = useLtdRaffle();
+    // The server says the purchase joined a raffle (event 933) and says when it is over
+    // (event 2316). A hotel that runs no raffle never sends either, so the line still runs
+    // for as long as an LTD purchase is pending, exactly as it did before.
+    const isRaffling = raffleActive || (isSubmitting && !!offer?.product?.isUniqueLimitedItem);
+
+    useEffect(() => {
+        if (!isRaffling) return;
+
+        setRaffleTick(0);
+
+        const interval = setInterval(() => setRaffleTick((tick) => tick + 1), RAFFLE_DOT_INTERVAL_MS);
+
+        return () => clearInterval(interval);
+    }, [isRaffling]);
 
     useEffect(() => {
         const previousActiveElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -156,6 +179,12 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                                 {offer.product.uniqueLimitedItemsLeft} / {offer.product.uniqueLimitedItemSeriesSize}
                             </strong>
                         </span>
+                    </div>
+                )}
+                {isRaffling && (
+                    <div aria-live="polite" className="octane-catalog-purchase-confirm-raffle" data-testid="purchase-confirm-raffle" role="status">
+                        {localizeWithFallback('catalog.purchase.confirmation.dialog.raffling', "Hold on while we're processing your LTD purchase")}
+                        {getRaffleDots(raffleTick)}
                     </div>
                 )}
                 <div className="octane-catalog-purchase-confirm-actions">

@@ -20,6 +20,7 @@ const TABS: string[] = [
 export const NavigatorRoomSettingsView: FC<{}> = (props) => {
     const [roomData, setRoomData] = useState<IRoomData>(null);
     const [currentTab, setCurrentTab] = useState(TABS[0]);
+    const tabs = TABS;
 
     useMessageEvent<RoomSettingsDataEvent>(RoomSettingsDataEvent, (event) => {
         const parser = event.getParser();
@@ -230,7 +231,7 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
                 onCloseClick={onClose}
             />
             <OctaneCardTabsView>
-                {TABS.map((tab) => {
+                {tabs.map((tab) => {
                     return (
                         <OctaneCardTabsItemView key={tab} isActive={currentTab === tab} onClick={(event) => setCurrentTab(tab)}>
                             {LocalizeText(tab)}
