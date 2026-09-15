@@ -35,7 +35,6 @@ import './css/mentions/MentionsPanel.css';
 
 import './css/common/Buttons.css';
 import './css/habbo/HabboSkin.css';
-import './css/common/AirScrollbar.css';
 import './css/common/PrefixEffects.css';
 
 import './css/forms/form_select.css';
