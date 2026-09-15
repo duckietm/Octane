@@ -6,7 +6,7 @@ import { MessengerFriend } from '../../../../api';
 import { useFriends } from '../../../../hooks';
 import { FriendBarView } from './FriendsBarView';
 
-vi.mock('../../../../hooks', () => ({ useFriends: vi.fn() }));
+vi.mock('../../../../hooks', () => ({ useFriends: vi.fn(), useMessenger: vi.fn(() => ({ messageThreads: [] })) }));
 vi.mock('../../../../common/layout/LayoutAvatarImageView', () => ({ LayoutAvatarImageView: () => null }));
 vi.mock('../../../../common/layout/LayoutBadgeImageView', () => ({ LayoutBadgeImageView: () => null }));
 vi.mock('../../StaffChatFrankIconView', () => ({

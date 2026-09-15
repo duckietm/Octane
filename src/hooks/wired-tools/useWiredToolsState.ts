@@ -14,6 +14,7 @@ export const useWiredToolsState = () => {
     const {
         accountPreferences,
         roomSettings,
+        wiredEnvironment,
         showInspectButton,
         showToolbarButton,
         userVariableDefinitions,
@@ -23,12 +24,14 @@ export const useWiredToolsState = () => {
         roomVariableDefinitions,
         roomVariableAssignments,
         contextVariableDefinitions,
-        areUserVariablesLoaded
+        areUserVariablesLoaded,
+        arrayInspection
     } = useSharedHook(useWiredToolsStore);
 
     return {
         accountPreferences,
         roomSettings,
+        wiredEnvironment,
         showInspectButton,
         showToolbarButton,
         userVariableDefinitions,
@@ -38,6 +41,7 @@ export const useWiredToolsState = () => {
         roomVariableDefinitions,
         roomVariableAssignments,
         contextVariableDefinitions,
-        areUserVariablesLoaded
+        areUserVariablesLoaded,
+        arrayInspection
     };
 };

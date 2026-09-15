@@ -1,5 +1,5 @@
-import { FC, useCallback, useEffect, useState } from 'react';
-import { IMarketplaceSearchOptions, LocalizeText, MarketplaceSearchType } from '../../../../../../api';
+import { FC, useCallback, useEffect, useId, useRef, useState } from 'react';
+import { IMarketplaceSearchOptions, LocalizeText, localizeWithFallback, MarketplaceSearchType } from '../../../../../../api';
 import { Button, Text } from '../../../../../../common';
 import { OctaneInput } from '../../../../../../layout';
 
@@ -15,23 +15,40 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [min, setMin] = useState(0);
     const [max, setMax] = useState(0);
+    // marketplace_search_simple.xml `combine_uniques_checkbox`: MarketPlaceCatalogWidget starts with
+    // _combineUniques = true and re-runs the search whenever it is toggled.
+    const [combineUniques, setCombineUniques] = useState(true);
+    const combineUniquesRef = useRef(combineUniques);
+    const combineUniquesId = useId();
+    const isSimpleSearch = searchType === MarketplaceSearchType.BY_ACTIVITY || searchType === MarketplaceSearchType.BY_VALUE;
 
     const onSortTypeChange = useCallback(
         (sortType: number) => {
             setSortType(sortType);
 
             if (searchType === MarketplaceSearchType.BY_ACTIVITY || searchType === MarketplaceSearchType.BY_VALUE)
-                onSearch({ minPrice: -1, maxPrice: -1, query: '', type: sortType });
+                onSearch({ minPrice: -1, maxPrice: -1, query: '', type: sortType, combineUniques });
         },
-        [onSearch, searchType]
+        [combineUniques, onSearch, searchType]
+    );
+
+    const onCombineUniquesChange = useCallback(
+        (checked: boolean) => {
+            combineUniquesRef.current = checked;
+            setCombineUniques(checked);
+
+            if (searchType === MarketplaceSearchType.BY_ACTIVITY || searchType === MarketplaceSearchType.BY_VALUE)
+                onSearch({ minPrice: -1, maxPrice: -1, query: '', type: sortType, combineUniques: checked });
+        },
+        [onSearch, searchType, sortType]
     );
 
     const onClickSearch = useCallback(() => {
         const minPrice = min > 0 ? min : -1;
         const maxPrice = max > 0 ? max : -1;
 
-        onSearch({ minPrice: minPrice, maxPrice: maxPrice, type: sortType, query: searchQuery });
-    }, [max, min, onSearch, searchQuery, sortType]);
+        onSearch({ minPrice: minPrice, maxPrice: maxPrice, type: sortType, query: searchQuery, combineUniques });
+    }, [combineUniques, max, min, onSearch, searchQuery, sortType]);
 
     useEffect(() => {
         if (!sortTypes || !sortTypes.length) return;
@@ -41,7 +58,7 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
         setSortType(sortType);
 
         if (searchType === MarketplaceSearchType.BY_ACTIVITY || MarketplaceSearchType.BY_VALUE === searchType)
-            onSearch({ minPrice: -1, maxPrice: -1, query: '', type: sortType });
+            onSearch({ minPrice: -1, maxPrice: -1, query: '', type: sortType, combineUniques: combineUniquesRef.current });
     }, [onSearch, searchType, sortTypes]);
 
     return (
@@ -56,6 +73,20 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
                     ))}
                 </select>
             </div>
+            {isSimpleSearch && (
+                <label className="octane-marketplace-combine-uniques flex items-center gap-1" htmlFor={combineUniquesId}>
+                    <input
+                        checked={combineUniques}
+                        data-testid="marketplace-combine-uniques"
+                        id={combineUniquesId}
+                        type="checkbox"
+                        onChange={(event) => onCombineUniquesChange(event.target.checked)}
+                    />
+                    <Text small className="text-muted">
+                        {localizeWithFallback('catalog.marketplace.combine_uniques', 'Combine identical LTD items into one offer')}
+                    </Text>
+                </label>
+            )}
             {searchType === MarketplaceSearchType.ADVANCED && (
                 <>
                     <div className="flex items-center gap-1">

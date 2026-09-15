@@ -130,6 +130,367 @@
     display: none;
 }
 
+/* inventory_thumb overlays: rarity plaque (rarity_item_overlay_grid, 36x9 at the bottom) and the
+   rent_state dot (10x10 at 4,4; not started / started / ending). */
+.octane-inventory-window .octane-inventory-thumb-rarity {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 9px;
+    line-height: 9px;
+    border-radius: 2px;
+    background: #f5d35b;
+    border: 1px solid #8a6d13;
+    color: #3a2c00;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* chest_overlay_(brown|gold)_background + ChestItemGridOverlayWidget: the contents count sits on a
+   small plate at the bottom of the tile, in the chest's own colour. */
+.octane-inventory-window .octane-inventory-thumb-chest {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 11px;
+    line-height: 11px;
+    border-radius: 2px;
+    color: #ffffff;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-brown {
+    background: #7a4a1e;
+    border: 1px solid #4a2a0c;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-gold {
+    background: #d9a521;
+    border: 1px solid #8a6d13;
+    color: #3a2c00;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-not_started {
+    background: #9a9a9a;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-started {
+    background: #5ca843;
+}
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-ending {
+    background: #d13e31;
+}
+
+/* Preview pane: tradeable / recyclable counters (FurniView.as:298-339) with the white glow on
+   the number, the extra line (rarity / rent countdown) and the rent buttons. */
+.octane-inventory-window .octane-inventory-preview-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    min-width: 40px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 3px;
+    border: 1px solid var(--inv-line);
+    background: #fff;
+    color: var(--inv-accent);
+    font-size: 11px;
+}
+
+.octane-inventory-window .octane-inventory-preview-counter.is-unavailable {
+    color: #9a9a9a;
+    opacity: 0.7;
+}
+
+.octane-inventory-window .octane-inventory-preview-counter__number {
+    font-weight: 700;
+    color: #2f6982;
+    text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+}
+
+.octane-inventory-window .octane-inventory-preview-extra {
+    color: #55544e;
+}
+
+.octane-inventory-window .octane-inventory-btn-goto,
+.octane-inventory-window .octane-inventory-btn-rent {
+    border: 2px solid var(--inv-border) !important;
+    border-radius: 4px;
+    color: #fff !important;
+    font-weight: 700;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    background: var(--inv-blue) !important;
+    box-shadow: inset -2px -2px 0 #2b6a88, inset 2px 2px 0 #7fbcd8;
+}
+
+.octane-inventory-window .octane-inventory-btn-goto:hover,
+.octane-inventory-window .octane-inventory-btn-rent:hover {
+    background: #4f9dc2 !important;
+}
+
+/* badge_details card: bold name, description, coloured rarity tag, owner count. */
+.octane-inventory-window .octane-inventory-badge-details__rarity {
+    letter-spacing: 0.04em;
+    text-shadow: none;
+}
+
+.octane-inventory-window .octane-inventory-badge-details__owners {
+    color: #555555;
+}
+
+/* item_popup: 203px white card to the right (or left) of the hovered trade thumb. */
+.octane-inventory-item-popup {
+    position: fixed;
+    z-index: 9999;
+    box-sizing: border-box;
+    padding: 5px 5px 10px;
+    border: 2px solid #6b6f73;
+    border-radius: 6px;
+    background: #fff;
+    color: #111;
+    font-family: Ubuntu, sans-serif;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.octane-inventory-item-popup__name {
+    min-height: 19px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 19px;
+}
+
+.octane-inventory-item-popup__ltd {
+    position: absolute;
+    top: 23px;
+    right: 4px;
+}
+
+.octane-inventory-item-popup__image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 55px;
+    margin-top: 3px;
+}
+
+.octane-inventory-item-popup__image img {
+    max-width: 180px;
+    max-height: 200px;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-item-popup__arrow {
+    position: absolute;
+    top: 50%;
+    width: 0;
+    height: 0;
+    margin-top: -8px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.octane-inventory-item-popup.is-right .octane-inventory-item-popup__arrow {
+    left: -10px;
+    border-right: 10px solid #6b6f73;
+}
+
+.octane-inventory-item-popup.is-left .octane-inventory-item-popup__arrow {
+    right: -10px;
+    border-left: 10px solid #6b6f73;
+}
+
+/* inventory_trading.xml: help_text line, info_text_0/1 replacing a disabled side's grid,
+   info_border_highlighted credits strip (0xfc9228) and the 3 x 3 grids. */
+.octane-inventory-window .octane-inventory-trade-help {
+    min-height: 15px;
+    color: #4a4a4a;
+    opacity: 0.85;
+}
+
+.octane-inventory-window .octane-inventory-trade-notification {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 132px;
+    padding: 6px;
+    border: 2px solid var(--inv-border, #27556a);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.55);
+    color: #333;
+    font-size: 11px;
+    line-height: 14px;
+    text-align: center;
+}
+
+.octane-inventory-window .octane-inventory-trade-highlight {
+    box-sizing: border-box;
+    padding: 5px 6px;
+    border: 2px solid #fc9228;
+    border-radius: 4px;
+    background: #fff4e5;
+    color: #222;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+}
+
+/* inventory_trading_minimized.xml (478x68): panic icon, "Trade in progress", Continue / Cancel. */
+.octane-inventory-window .octane-inventory-trade-minimized {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 4px;
+    row-gap: 4px;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 6px 7px 4px 11px;
+    border: 2px solid var(--inv-border, #27556a);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 45%, #ffe27a 0 40%, #f5a623 41% 100%);
+    box-shadow: inset 0 0 0 2px #7a4a00;
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-icon::after {
+    content: "!";
+    display: block;
+    color: #7a4a00;
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 30px;
+    text-align: center;
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-title {
+    color: #222;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 24px;
+}
+
+.octane-inventory-window .octane-inventory-trade-minimized-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+/* inventory_trading_name_scam_warning.xml (356x333, red 0xd43d59 title). */
+.octane-inventory-namescam-window {
+    width: min(356px, calc(100vw - 16px));
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+}
+
+.octane-inventory-namescam-window > .octane-card-header-shell {
+    background: #d43d59 !important;
+}
+
+.octane-inventory-namescam-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-inventory-namescam-warning {
+    margin: 0;
+}
+
+.octane-inventory-namescam-trader {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    min-height: 58px;
+    padding: 4px 8px 4px 0;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    background: #f1f1f1;
+}
+
+.octane-inventory-namescam-avatar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 56px;
+    overflow: hidden;
+}
+
+.octane-inventory-namescam-trader-name {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.octane-inventory-namescam-trader-label {
+    color: #555555;
+}
+
+.octane-inventory-namescam-trader-name strong {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.octane-inventory-namescam-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.octane-inventory-namescam-matches span {
+    white-space: pre-line;
+}
+
+.octane-inventory-namescam-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding-top: 4px;
+}
+
+.octane-inventory-namescam-countdown {
+    color: #555555;
+}
+
 @media (max-width: 1024px) and (min-width: 641px) {
     .octane-inventory-window {
         width: min(calc(100vw - 24px), 640px) !important;

@@ -68,4 +68,27 @@ describe('FloorplanCanvasSVG', () => {
         fireEvent.click(container.querySelector('[data-testid="zoom-in"]') as Element);
         expect(svg.getAttribute('viewBox')).not.toBe(initialVB);
     });
+
+    it('pans sideways on shift+wheel without zooming', () => {
+        const { container } = render(<FloorplanCanvasSVG state={initialState} dispatch={() => {}} />);
+        const svg = container.querySelector('svg') as SVGSVGElement;
+        const readViewBox = () => (svg.getAttribute('viewBox') as string).split(' ').map(Number);
+        const [x0, y0, w0, h0] = readViewBox();
+
+        fireEvent.wheel(svg, { shiftKey: true, deltaY: 100 });
+
+        const [x1, y1, w1, h1] = readViewBox();
+        expect(x1).toBeGreaterThan(x0);
+        expect([y1, w1, h1]).toEqual([y0, w0, h0]);
+
+        // Browsers that already map the gesture to the horizontal axis behave the same.
+        fireEvent.wheel(svg, { shiftKey: true, deltaX: -100, deltaY: 0 });
+
+        expect(readViewBox()[0]).toBe(x0);
+
+        // A plain wheel keeps scrolling the page instead of moving the canvas.
+        fireEvent.wheel(svg, { deltaY: 100 });
+
+        expect(readViewBox()[0]).toBe(x0);
+    });
 });

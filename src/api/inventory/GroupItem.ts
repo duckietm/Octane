@@ -217,6 +217,28 @@ export class GroupItem {
         return count;
     }
 
+    // FurniView.as:298-339 prints how many of the stack can still be traded / recycled: locked
+    // items (already offered in a trade) do not count, exactly like GroupItem.getTradeableCount.
+    public getTradeableCount(): number {
+        let count = 0;
+
+        for (const item of this._items) {
+            if (item.isTradable && !item.locked) count++;
+        }
+
+        return count;
+    }
+
+    public getRecyclableCount(): number {
+        let count = 0;
+
+        for (const item of this._items) {
+            if (item.recyclable && !item.locked) count++;
+        }
+
+        return count;
+    }
+
     public getLastItem(): FurnitureItem {
         if (!this._items.length) return null;
 
@@ -386,6 +408,12 @@ export class GroupItem {
         const item = this.getItemByIndex(0);
 
         return item ? item.isGroupable : false;
+    }
+
+    public get isRented(): boolean {
+        const item = this.getItemByIndex(0);
+
+        return item ? item.isRented : false;
     }
 
     public get isSellable(): boolean {

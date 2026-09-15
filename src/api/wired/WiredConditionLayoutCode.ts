@@ -98,4 +98,5 @@ export class WiredConditionlayout {
     public static USER_ONCE: number = 65;
     public static USER_DAILY: number = 66;
     public static USER_HIGHSCORE_POINTS: number = 67;
+    public static CHECK_ARRAY: number = 60;
 }

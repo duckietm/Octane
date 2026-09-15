@@ -19,16 +19,19 @@ import { FurniChooserWidgetView } from './choosers/FurniChooserWidgetView';
 import { UserChooserWidgetView } from './choosers/UserChooserWidgetView';
 import { DoorbellWidgetView } from './doorbell/DoorbellWidgetView';
 import { FriendRequestWidgetView } from './friend-request/FriendRequestWidgetView';
+import { FpsCounterView } from './fps-counter/FpsCounterView';
 import { FurnitureWidgetsView } from './furniture/FurnitureWidgetsView';
 import { PetPackageWidgetView } from './pet-package/PetPackageWidgetView';
+import { PollWidgetView } from './poll/PollWidgetView';
 import { RoomKeybindView } from './RoomKeybindView';
+import { AchievementResolutionWidgetView } from './achievement-resolution/AchievementResolutionWidgetView';
+import { RoomCompetitionWidgetView } from './room-competition/RoomCompetitionWidgetView';
 import { RoomFilterWordsWidgetView } from './room-filter-words/RoomFilterWordsWidgetView';
 import { RoomThumbnailWidgetView } from './room-thumbnail/RoomThumbnailWidgetView';
 import { RoomToolsWidgetView } from './room-tools/RoomToolsWidgetView';
-import { applyRoomZoom } from './room-tools/roomZoom.helpers';
+import { UiHelpBubblesView } from './ui-help-bubbles/UiHelpBubblesView';
+import { animateRoomZoom, applyRoomZoom, roomZoomLevelToScale } from './room-tools/roomZoom.helpers';
 import { WordQuizWidgetView } from './word-quiz/WordQuizWidgetView';
-
-const MAX_ZOOM_SHIFT = 3;
 
 export const RoomWidgetsView: FC<{}> = (props) => {
     const { roomSession = null } = useRoom();
@@ -36,10 +39,13 @@ export const RoomWidgetsView: FC<{}> = (props) => {
 
     usePollSubscriptions();
 
+    // Official RoomUI: `:flip` toggles the flip immediately, `:zoom N` tweens
+    // to the level's scale.
     useOctaneEvent<RoomZoomEvent>(RoomZoomEvent.ROOM_ZOOM, (event) => {
-        const level = Number.isFinite(event.level) ? Math.floor(event.level) : 1;
-        const logicalScale = level < 1 ? 0.5 : (1 << Math.min(level - 1, MAX_ZOOM_SHIFT));
-        applyRoomZoom(event.roomId, logicalScale, event.isFlipForced);
+        const logicalScale = roomZoomLevelToScale(event.level);
+
+        if (event.isFlipForced) applyRoomZoom(event.roomId, logicalScale, true);
+        else animateRoomZoom(event.roomId, logicalScale);
     });
 
     useOctaneEvent<RoomEngineObjectEvent>(
@@ -199,6 +205,12 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             <WidgetErrorBoundary name="RoomToolsWidget">
                 <RoomToolsWidgetView />
             </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="AchievementResolutionWidget">
+                <AchievementResolutionWidgetView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="RoomCompetitionWidget">
+                <RoomCompetitionWidgetView />
+            </WidgetErrorBoundary>
             <WidgetErrorBoundary name="RoomFilterWordsWidget">
                 <RoomFilterWordsWidgetView />
             </WidgetErrorBoundary>
@@ -211,6 +223,9 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             <WidgetErrorBoundary name="PetPackageWidget">
                 <PetPackageWidgetView />
             </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="PollWidget">
+                <PollWidgetView />
+            </WidgetErrorBoundary>
             <WidgetErrorBoundary name="UserChooserWidget">
                 <UserChooserWidgetView />
             </WidgetErrorBoundary>
@@ -219,6 +234,12 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="FriendRequestWidget">
                 <FriendRequestWidgetView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="UiHelpBubbles">
+                <UiHelpBubblesView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="FpsCounter">
+                <FpsCounterView />
             </WidgetErrorBoundary>
         </WidgetErrorBoundary>
     );

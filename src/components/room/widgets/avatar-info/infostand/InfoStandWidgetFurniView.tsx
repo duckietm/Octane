@@ -22,7 +22,19 @@ import {
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCrosshairs, FaEraser, FaTimes } from 'react-icons/fa';
 import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
-import { AvatarInfoFurni, GetConfigurationValue, GetGroupInformation, IPhotoData, isSafeExternalUrl, LocalizeText, SendMessageComposer } from '../../../../../api';
+import {
+    AvatarInfoFurni,
+    FriendlyTime,
+    GetConfigurationValue,
+    GetFurnitureDataForRoomObject,
+    GetGroupInformation,
+    GetUserProfile,
+    IPhotoData,
+    isSafeExternalUrl,
+    LocalizeText,
+    localizeWithFallback,
+    SendMessageComposer
+} from '../../../../../api';
 import {
     Button,
     Column,
@@ -35,9 +47,10 @@ import {
     Text,
     UserProfileIconView
 } from '../../../../../common';
-import { useHasPermission, useMessageEvent, useOctaneEvent, useRareValues, useRoom, useWiredTools } from '../../../../../hooks';
+import { useHasPermission, useMessageEvent, useOctaneEvent, useRareValues, useRentConfirmation, useRoom, useWiredTools } from '../../../../../hooks';
 import { OctaneInput } from '../../../../../layout';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
+import { getFurniOfferButtons, isWiredFurniType } from './infostandFurniOffers.helpers';
 
 interface InfoStandWidgetFurniViewProps {
     avatarInfo: AvatarInfoFurni;
@@ -109,6 +122,7 @@ function getValidRoomObjectDirection(roomObject: any, isPositive: boolean) {
 export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (props) => {
     const { avatarInfo = null, onClose = null } = props;
     const { roomSession = null } = useRoom();
+    const { openRentConfirmation = null } = useRentConfirmation();
     const { openInspectionForFurni, showInspectButton } = useWiredTools();
     const isModerator = useHasPermission('acc_anyroomowner');
     const { getValue: getRareValue } = useRareValues();
@@ -168,6 +182,35 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
 
         return !!avatarInfo && avatarInfo.ownerId > 0 && ownerName !== 'builders club';
     }, [avatarInfo]);
+    const placeMoreEnabled = GetConfigurationValue<boolean>('infostand.place_more.enabled', true);
+    const offerButtons = useMemo(
+        () =>
+            avatarInfo
+                ? getFurniOfferButtons(avatarInfo, placeMoreEnabled)
+                : { buy: false, rent: false, extend: false, buyout: false, placeMore: false, showExpiration: false },
+        [avatarInfo, placeMoreEnabled]
+    );
+    const isWiredFurni = useMemo(() => {
+        if (!avatarInfo || !roomSession) return false;
+
+        return isWiredFurniType(GetRoomEngine().getRoomObject(roomSession.roomId, avatarInfo.id, avatarInfo.category)?.type);
+    }, [avatarInfo, roomSession]);
+    // Rental time left, counted down locally between two server updates
+    // the way the official infostand refreshes its expiration text.
+    const [rentalSecondsLeft, setRentalSecondsLeft] = useState(-1);
+
+    useEffect(() => {
+        if (!offerButtons.showExpiration || !avatarInfo) {
+            setRentalSecondsLeft(-1);
+            return;
+        }
+
+        setRentalSecondsLeft(Math.max(0, Math.floor(avatarInfo.expiration)));
+
+        const handle = window.setInterval(() => setRentalSecondsLeft((previous) => (previous <= 0 ? 0 : previous - 1)), 1000);
+
+        return () => window.clearInterval(handle);
+    }, [avatarInfo, offerButtons.showExpiration]);
 
     const sendUpdate = useCallback(
         (deltaX: number, deltaY: number, newZ: number = 0, deltaDirection: number = 0) => {
@@ -565,6 +608,21 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                 case 'buy_one':
                     CreateLinkEvent(`catalog/open/offerId/${avatarInfo.purchaseOfferId}`);
                     return;
+                case 'rent':
+                    CreateLinkEvent(`catalog/open/offerId/${avatarInfo.rentOfferId}`);
+                    return;
+                // Like the official InfoStandFurniView, extend and buy-out open the
+                // catalog's rent confirmation for this room item.
+                case 'extend':
+                case 'buyout':
+                    openRentConfirmation?.(GetFurnitureDataForRoomObject(roomSession?.roomId, avatarInfo.id, avatarInfo.category), action === 'buyout', avatarInfo.id);
+                    return;
+                case 'place_more':
+                    CreateLinkEvent(`catalog/open/offerId/${avatarInfo.purchaseOfferId}`);
+                    return;
+                case 'open_owner_profile':
+                    if (avatarInfo.ownerId > 0) GetUserProfile(avatarInfo.ownerId);
+                    return;
                 case 'move':
                     GetRoomEngine().processRoomObjectOperation(avatarInfo.id, avatarInfo.category, RoomObjectOperationType.OBJECT_MOVE);
                     break;
@@ -696,15 +754,50 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1">
                             {showOwnerProfileIcon && <UserProfileIconView userId={avatarInfo.ownerId} />}
-                            <Text small wrap variant="white">
+                            <Text
+                                pointer={showOwnerProfileIcon}
+                                small
+                                wrap
+                                className="octane-infostand__owner-link"
+                                title={showOwnerProfileIcon ? LocalizeText('infostand.profile.link.tooltip') : undefined}
+                                variant="white"
+                                onClick={() => showOwnerProfileIcon && processButtonAction('open_owner_profile')}
+                            >
                                 {LocalizeText('furni.owner', ['name'], [avatarInfo.ownerName])}
                             </Text>
                         </div>
-                        {avatarInfo.purchaseOfferId > 0 && (
-                            <Flex>
-                                <Text pointer small underline variant="white" onClick={(event) => processButtonAction('buy_one')}>
-                                    {LocalizeText('infostand.button.buy')}
-                                </Text>
+                        {offerButtons.showExpiration && rentalSecondsLeft >= 0 && (
+                            <Text small wrap className="octane-infostand__rent-expiration" variant="white">
+                                {LocalizeText('infostand.rent.expiration', ['TIME', 'time'], [FriendlyTime.format(rentalSecondsLeft), FriendlyTime.format(rentalSecondsLeft)])}
+                            </Text>
+                        )}
+                        {(offerButtons.buy || offerButtons.rent || offerButtons.extend || offerButtons.buyout || offerButtons.placeMore) && (
+                            <Flex gap={2} className="flex-wrap octane-infostand__purchase-buttons">
+                                {offerButtons.buy && (
+                                    <Text pointer small underline variant="white" onClick={() => processButtonAction('buy_one')}>
+                                        {LocalizeText('infostand.button.buy')}
+                                    </Text>
+                                )}
+                                {offerButtons.rent && (
+                                    <Text pointer small underline variant="white" onClick={() => processButtonAction('rent')}>
+                                        {localizeWithFallback('infostand.button.rent', 'Rent one')}
+                                    </Text>
+                                )}
+                                {offerButtons.extend && (
+                                    <Text pointer small underline variant="white" onClick={() => processButtonAction('extend')}>
+                                        {localizeWithFallback('infostand.button.extend', 'Extend')}
+                                    </Text>
+                                )}
+                                {offerButtons.buyout && (
+                                    <Text pointer small underline variant="white" onClick={() => processButtonAction('buyout')}>
+                                        {localizeWithFallback('infostand.button.buyout', 'Buy-out')}
+                                    </Text>
+                                )}
+                                {offerButtons.placeMore && (
+                                    <Text pointer small underline variant="white" onClick={() => processButtonAction('place_more')}>
+                                        {localizeWithFallback('infostand.button.place_more', 'Place More')}
+                                    </Text>
+                                )}
                             </Flex>
                         )}
                     </div>
@@ -1060,9 +1153,9 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                 </Column>
             </Column>
             <Flex gap={1} justifyContent="end">
-                {showInspectButton && (
+                {showInspectButton && isWiredFurni && (
                     <Button variant="dark" onClick={() => openInspectionForFurni(avatarInfo.id, avatarInfo.category)}>
-                        Inspect
+                        {localizeWithFallback('infostand.button.wired_inspect', 'Inspect')}
                     </Button>
                 )}
                 {canMove && (

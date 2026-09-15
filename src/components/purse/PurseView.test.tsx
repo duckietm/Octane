@@ -71,7 +71,8 @@ describe('PurseView', () => {
 
         fireEvent.click(settingsButton!);
 
-        const settingsMenu = container.querySelector('.octane-purse-menu');
+        // The menu portals to the body so nothing on the right side can cover it.
+        const settingsMenu = document.body.querySelector('.octane-purse-menu');
         expect(settingsMenu).toBeTruthy();
         expect(within(settingsMenu as HTMLElement).getByRole('button', { name: 'Translate' })).toBeInTheDocument();
     });

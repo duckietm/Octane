@@ -19,6 +19,7 @@ export * from './layout/limited-edition';
 export * from './Slider';
 export * from './scroll-area/ClassicScrollAreaView';
 export * from './Text';
+export * from './Tooltip';
 export * from './types';
 export * from './UserIdentityView';
 export * from './utils';

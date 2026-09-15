@@ -563,3 +563,48 @@
     width: 100%;
   }
 }
+
+/* Official new_extended_profile block_button (24x24, top right) and the
+   blocked_container overlay that greys the card out while the user is ignored. */
+.octane-extended-profile {
+  position: relative;
+}
+
+.octane-extended-profile__block-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #9b9b9b;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #e2e2e2 100%);
+  color: #444;
+  cursor: pointer;
+}
+
+.octane-extended-profile__block-button:hover,
+.octane-extended-profile__block-button.is-active {
+  color: #c8382b;
+}
+
+.octane-extended-profile__blocked-overlay {
+  position: absolute;
+  inset: -3px -2px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(137, 137, 133, 0.8);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}

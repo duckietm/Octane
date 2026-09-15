@@ -23,12 +23,28 @@ import {
     SendMessageComposer
 } from '../../api';
 import { useMessageEvent } from '../events';
+import { useFriends } from '../friends';
 import { useNotification } from '../notification';
+import { buildReportFollowUpComposers, shouldIgnoreAndUnfriendReportedUser } from './reportFollowUp';
 
 const useHelpState = () => {
     const [activeReport, setActiveReport] = useState<IHelpReport>(null);
     const [sanctionInfo, setSanctionInfo] = useState<SanctionStatusMessageParser>(null);
     const { simpleAlert = null, showConfirm = null } = useNotification();
+    const { getFriend = null } = useFriends();
+
+    /**
+     * Right after a report goes out the official client ignores the reported
+     * user and drops them from the friend list, except for the topics that
+     * need the two to stay in contact.
+     */
+    const ignoreAndUnfriendReportedUser = (reportedUserId: number, cfhTopic: number) => {
+        if (!shouldIgnoreAndUnfriendReportedUser(reportedUserId, cfhTopic)) return;
+
+        const isFriend = !!getFriend?.(reportedUserId);
+
+        for (const composer of buildReportFollowUpComposers(reportedUserId, isFriend)) SendMessageComposer(composer);
+    };
 
     const report = (type: number, options: Partial<IHelpReport>) => {
         const newReport: IHelpReport = {
@@ -162,7 +178,7 @@ const useHelpState = () => {
         setSanctionInfo(parser);
     });
 
-    return { activeReport, setActiveReport, sanctionInfo, setSanctionInfo, report };
+    return { activeReport, setActiveReport, sanctionInfo, setSanctionInfo, report, ignoreAndUnfriendReportedUser };
 };
 
 export const useHelp = () => useSharedHook(useHelpState);

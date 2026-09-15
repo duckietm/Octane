@@ -112,3 +112,111 @@ export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]):
         pointerX: Math.max(POINTER_LEFT_MARGIN, Math.min(bubble.width - POINTER_RIGHT_MARGIN, bubble.anchorX - bubble.left))
     }));
 };
+
+// ---------------------------------------------------------------------------
+// Bubble rules mirrored from the official PooledChatBubble.
+// ---------------------------------------------------------------------------
+
+// On desktop a bubble never sits under the left toolbar column nor under the
+// right-hand panels, whatever its speaker's position.
+export const DESKTOP_MARGIN_LEFT = 85;
+export const DESKTOP_MARGIN_RIGHT = 190;
+
+// Below this viewport width the client shows the phone layout, where the
+// official client skips the desktop margins altogether.
+export const DESKTOP_STAGE_MIN_WIDTH = 640;
+
+// A bubble taller than this (scaled by the chat font size) still shows in
+// full, but only this much of it takes part in the collisions.
+export const BUBBLE_MAX_HEIGHT = 108;
+
+// A bubble glides to a new position in 150 ms and stays hidden for its first
+// 150 ms so the reader never sees it jump into place.
+export const BUBBLE_GLIDE_DURATION_MS = 150;
+export const BUBBLE_REVEAL_DELAY_MS = 150;
+
+const HIGHLIGHT_LINK_PREFIX = 'highlight/';
+const BASE_CHAT_TEXT_SIZE_PIXELS = 14;
+
+export const isDesktopChatStage = (stageWidth: number): boolean => stageWidth >= DESKTOP_STAGE_MIN_WIDTH;
+
+export const clampBubbleLeftToDesktopMargins = (left: number, width: number, stageWidth: number): number => {
+    if (!isDesktopChatStage(stageWidth)) return left;
+
+    let clamped = left;
+
+    const maxLeft = stageWidth - DESKTOP_MARGIN_RIGHT - width;
+
+    if (clamped > maxLeft) clamped = maxLeft;
+
+    // The left margin wins when the stage is too narrow for both.
+    if (clamped < DESKTOP_MARGIN_LEFT) clamped = DESKTOP_MARGIN_LEFT;
+
+    return clamped;
+};
+
+/**
+ * The official chat font scale is 1 for the default size and grows with the
+ * larger sizes; a size smaller than the default keeps the base collision box.
+ */
+export const getChatFontSizeScale = (textSizePixels: number): number =>
+    Number.isFinite(textSizePixels) && textSizePixels > BASE_CHAT_TEXT_SIZE_PIXELS ? textSizePixels / BASE_CHAT_TEXT_SIZE_PIXELS : 1;
+
+export const getBubbleMaxHeight = (fontSizeScale: number): number => Math.floor(BUBBLE_MAX_HEIGHT * fontSizeScale);
+
+export const getBubbleCollisionHeight = (height: number, fontSizeScale: number): number => Math.min(height, getBubbleMaxHeight(fontSizeScale));
+
+/**
+ * A "highlight/<text>" link in a bubble is not a destination: the official
+ * client shows the text as a hint next to the pointer and never navigates.
+ * Returns the hint text, or null for any other link.
+ */
+export const getHighlightHint = (href: string): string | null => {
+    const index = (href || '').indexOf(HIGHLIGHT_LINK_PREFIX);
+
+    if (index < 0) return null;
+
+    const raw = href.slice(index + HIGHLIGHT_LINK_PREFIX.length);
+
+    let text = raw;
+
+    try {
+        text = decodeURIComponent(raw);
+    } catch {
+        // A malformed escape shows as typed rather than crashing the click.
+    }
+
+    return text.toLocaleUpperCase();
+};
+
+/**
+ * Line-by-line mode: every bubble collides with every other one across the
+ * whole width, so each line gets its own row. The newest stays where it was
+ * born, older lines are pushed up; each keeps its speaker's horizontal spot.
+ */
+export const resolveLineByLineLayout = (bubbles: readonly FreeFlowLayoutBubble[]): FreeFlowLayoutPosition[] => {
+    const ordered = [...bubbles].sort((a, b) => a.id - b.id);
+    const tops = new Map<number, number>();
+
+    for (let index = ordered.length - 1; index >= 0; index--) {
+        const bubble = ordered[index];
+        const newer = ordered[index + 1];
+
+        if (!newer) {
+            tops.set(bubble.id, bubble.top);
+            continue;
+        }
+
+        const newerTop = tops.get(newer.id) - (newer.overflowTop || 0);
+        const clearance = newerTop - bubble.height - (bubble.overflowBottom || 0) - VERTICAL_GAP;
+
+        tops.set(bubble.id, Math.min(bubble.top, clearance));
+    }
+
+    return bubbles.map((bubble) => ({
+        id: bubble.id,
+        left: bubble.left,
+        top: tops.get(bubble.id),
+        pointerX: Math.max(POINTER_LEFT_MARGIN, Math.min(bubble.width - POINTER_RIGHT_MARGIN, bubble.anchorX - bubble.left))
+    }));
+};

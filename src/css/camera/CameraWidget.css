@@ -328,6 +328,9 @@
     }
 }
 
+/* Frame 3 keeps a 35px title strip plus 2px of padding inside the card, so the
+   fixed-size windows below are 6px taller (and 4px wider) than their SWF frame
+   to leave their pixel layouts untouched. */
 /* WIN63 camera_editor_xml: fixed 586x517 frame with a 230x410 effect rail
    and the 320x320 processed photograph at x=249, y=10. */
 .octane-camera-editor {
@@ -335,9 +338,9 @@
     width: 586px;
     min-width: 586px;
     max-width: 586px;
-    height: 517px;
-    min-height: 517px;
-    max-height: 517px;
+    height: 523px;
+    min-height: 523px;
+    max-height: 523px;
     resize: none !important;
     image-rendering: pixelated;
 }
@@ -766,7 +769,7 @@
     box-sizing: border-box;
     width: 338px;
     height: auto !important;
-    max-height: calc(min(686px, 94vh) - 31px) !important;
+    max-height: calc(min(686px, 94vh) - 39px) !important;
     padding: 8px 5px 8px 10px !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;

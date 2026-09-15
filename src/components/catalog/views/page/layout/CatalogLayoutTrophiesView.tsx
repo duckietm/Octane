@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
-import { FaPen, FaTrophy } from 'react-icons/fa';
-import { LocalizeText, ProductTypeEnum, SanitizeHtml } from '../../../../../api';
+import { FaChevronLeft, FaChevronRight, FaPen, FaTrophy } from 'react-icons/fa';
+import { LocalizeText, localizeWithFallback, ProductTypeEnum, SanitizeHtml } from '../../../../../api';
 import { Text } from '../../../../../common';
 import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
@@ -9,12 +9,20 @@ import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView'
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { getAdjacentTrophyOffer, groupTrophyOffers } from './catalogTrophies.helpers';
 
 export const CatalogLayoutTrophiesView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
     const [trophyText, setTrophyText] = useState<string>('');
     const { currentOffer = null } = useCatalogData();
-    const { setPurchaseOptions = null } = useCatalogUiState();
+    const { setPurchaseOptions = null, setCurrentOffer = null } = useCatalogUiState();
+    // The official trophyWidget arrows step through models, not through gold/silver/bronze.
+    const hasSeveralModels = groupTrophyOffers(page?.offers ?? []).length > 1;
+    const selectAdjacentModel = (direction: 1 | -1) => {
+        const offer = getAdjacentTrophyOffer(page?.offers ?? [], currentOffer, direction);
+
+        if (offer) setCurrentOffer?.(offer);
+    };
 
     useEffect(() => {
         if (!currentOffer) return;
@@ -46,6 +54,28 @@ export const CatalogLayoutTrophiesView: FC<CatalogLayoutProps> = (props) => {
                             </>
                         ) : (
                             <CatalogAddOnBadgeWidgetView className="scale-200" />
+                        )}
+                        {hasSeveralModels && (
+                            <>
+                                <button
+                                    aria-label={localizeWithFallback('catalog.trophies.prev_model', 'Previous model')}
+                                    className="octane-catalog-trophy-model-button absolute left-1 top-1/2 -translate-y-1/2 rounded bg-white/80 p-1 text-[10px]"
+                                    data-testid="trophy-prev-model"
+                                    type="button"
+                                    onClick={() => selectAdjacentModel(-1)}
+                                >
+                                    <FaChevronLeft />
+                                </button>
+                                <button
+                                    aria-label={localizeWithFallback('catalog.trophies.next_model', 'Next model')}
+                                    className="octane-catalog-trophy-model-button absolute right-1 top-1/2 -translate-y-1/2 rounded bg-white/80 p-1 text-[10px]"
+                                    data-testid="trophy-next-model"
+                                    type="button"
+                                    onClick={() => selectAdjacentModel(1)}
+                                >
+                                    <FaChevronRight />
+                                </button>
+                            </>
                         )}
                     </div>
                     {/* Info */}

@@ -16,6 +16,7 @@ import {
 import { LayoutBadgeImageView } from '../../../../common';
 import { useInventoryBadges, useInventoryUnseenTracker, useNotification } from '../../../../hooks';
 import { InfiniteGrid, OctaneButton } from '../../../../layout';
+import { InventoryBadgeDetailsView } from './InventoryBadgeDetailsView';
 import { InventoryBadgeItemView } from './InventoryBadgeItemView';
 
 const ActiveBadgeSlot: FC<{
@@ -116,7 +117,6 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
     const maxSlots = useMemo(() => GetConfigurationValue<number>('user.badges.max.slots', 5), []);
 
     const [ownCustomBadgeIds, setOwnCustomBadgeIds] = useState<Set<string>>(() => new Set());
-    const [filter, setFilter] = useState<'all' | 'custom'>('all');
 
     const refreshOwnCustomBadges = useCallback(async () => {
         try {
@@ -134,9 +134,9 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
         ensureCustomBadgeTexts();
     }, []);
 
-    const baseCodes = filteredBadgeCodes !== null ? filteredBadgeCodes : badgeCodes;
-    const customCount = useMemo(() => baseCodes.filter((c) => isCustomBadgeCode(c)).length, [baseCodes]);
-    const displayCodes = useMemo(() => (filter === 'custom' ? baseCodes.filter((c) => isCustomBadgeCode(c)) : baseCodes), [baseCodes, filter]);
+    // The type / rarity filters (official `filter.options` / `filter.rarity`) live in the
+    // inventory filter bar; what arrives here is already filtered.
+    const displayCodes = filteredBadgeCodes !== null ? filteredBadgeCodes : badgeCodes;
 
     const isOwnCustomBadge = (code: string | null) => !!code && isCustomBadgeCode(code) && ownCustomBadgeIds.has(code);
 
@@ -278,22 +278,6 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
                 <div className="flex items-center gap-1 text-xs">
                     <button
                         type="button"
-                        className={`px-2 py-0.5 rounded ${filter === 'all' ? 'bg-card-grid-item-active text-black font-bold' : 'bg-card-grid-item'}`}
-                        onClick={() => setFilter('all')}
-                    >
-                        {LocalizeText('inventory.badges.tab.all') !== 'inventory.badges.tab.all' ? LocalizeText('inventory.badges.tab.all') : 'All'} (
-                        {baseCodes.length})
-                    </button>
-                    <button
-                        type="button"
-                        className={`px-2 py-0.5 rounded ${filter === 'custom' ? 'bg-card-grid-item-active text-black font-bold' : 'bg-card-grid-item'}`}
-                        onClick={() => setFilter('custom')}
-                    >
-                        {LocalizeText('inventory.badges.tab.custom') !== 'inventory.badges.tab.custom' ? LocalizeText('inventory.badges.tab.custom') : 'Custom'}{' '}
-                        ({customCount})
-                    </button>
-                    <button
-                        type="button"
                         className="ml-auto px-2 py-0.5 rounded bg-card-grid-item flex items-center gap-1"
                         onClick={() => CreateLinkEvent('badge-creator/show')}
                         title={
@@ -335,10 +319,7 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
                 </div>
                 {!!selectedBadgeCode && (
                     <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                            <LayoutBadgeImageView shrink badgeCode={selectedBadgeCode} />
-                            <span className="text-sm truncate grow">{LocalizeBadgeName(selectedBadgeCode)}</span>
-                        </div>
+                        <InventoryBadgeDetailsView badgeCode={selectedBadgeCode} />
                         <div className="flex items-center gap-2">
                             <OctaneButton
                                 className="grow"
