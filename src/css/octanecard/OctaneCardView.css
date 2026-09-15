@@ -47,6 +47,7 @@
     overflow: hidden;
 }
 
+
 .octane-card-header,
 .octane-card-header-shell {
     position: relative;
@@ -150,7 +151,12 @@
 
 /* WIN63 habbo_window_layout_frame_3 / Ubuntu skin. Feature windows opt in
    through OctaneCardView frameStyle={3}; the shared frame coordinate plane is
-   x=6/y=6 for the 27px titlebar and x=3/y=36 for generic content. */
+   x=6/y=6 for the 27px titlebar and x=3/y=36 for generic content.
+
+   Pixelated corner rounding comes from transparent staircase pixels in
+   frame-ubuntu-3.png — never CSS border-radius. Opaque child backgrounds
+   must be clipped by the same 9-slice alpha (mask-box-image) or they will
+   square the corners. */
 .octane-card-shell.octane-card-frame-3 {
     --octane-card-frame-3: url("../../assets/images/habbo-skin/slices/frame-ubuntu-3.png");
     --octane-card-close-3: url("../../assets/images/habbo-skin/slices/close-3-default.png");
@@ -158,12 +164,35 @@
     --octane-card-close-3-pressed: url("../../assets/images/habbo-skin/slices/close-3-pressed.png");
 
     isolation: isolate;
+    padding: 36px 3px 3px;
+    resize: none !important;
     overflow: visible !important;
+    border: 0 !important;
     border-color: transparent !important;
     border-radius: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
-    filter: drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349)) !important;
+    filter: none !important;
+    image-rendering: pixelated;
+
+    /* Match the source bitmap alpha: each corner is a staircase of whole pixels. */
+    clip-path: polygon(
+        6px 0, calc(100% - 6px) 0, calc(100% - 6px) 1px,
+        calc(100% - 4px) 1px, calc(100% - 4px) 2px,
+        calc(100% - 3px) 2px, calc(100% - 3px) 3px,
+        calc(100% - 2px) 3px, calc(100% - 2px) 4px,
+        calc(100% - 1px) 4px, calc(100% - 1px) 6px, 100% 6px,
+        100% calc(100% - 5px), calc(100% - 1px) calc(100% - 5px),
+        calc(100% - 1px) calc(100% - 3px), calc(100% - 2px) calc(100% - 3px),
+        calc(100% - 2px) calc(100% - 2px), calc(100% - 3px) calc(100% - 2px),
+        calc(100% - 3px) calc(100% - 1px), calc(100% - 5px) calc(100% - 1px),
+        calc(100% - 5px) 100%, 5px 100%, 5px calc(100% - 1px),
+        3px calc(100% - 1px), 3px calc(100% - 2px),
+        2px calc(100% - 2px), 2px calc(100% - 3px),
+        1px calc(100% - 3px), 1px calc(100% - 5px), 0 calc(100% - 5px),
+        0 6px, 1px 6px, 1px 4px, 2px 4px, 2px 3px,
+        3px 3px, 3px 2px, 4px 2px, 4px 1px, 6px 1px
+    );
 }
 
 .octane-card-shell.octane-card-frame-3.octane-card-frame-teal {
@@ -173,13 +202,13 @@
 .octane-card-shell.octane-card-frame-3::before {
     content: "";
     position: absolute;
-    inset: -1px;
+    inset: 0;
     z-index: 0;
     border: solid transparent;
-    border-width: 33px 10px 10px;
+    border-width: 33px 10px 10px 10px;
     border-image-source: var(--octane-card-frame-3);
     border-image-slice: 33 10 10 10 fill;
-    border-image-width: 33px 10px 10px;
+    border-image-width: 33px 10px 10px 10px;
     border-image-repeat: stretch;
     image-rendering: pixelated;
     pointer-events: none;
@@ -201,10 +230,10 @@
 
 .octane-card-shell.octane-card-frame-3 > .octane-card-header-shell {
     position: absolute !important;
-    top: 5px !important;
-    left: 5px !important;
+    top: 6px !important;
+    left: 6px !important;
     z-index: 2;
-    width: calc(100% - 10px) !important;
+    width: calc(100% - 12px) !important;
     min-width: 0 !important;
     max-width: none !important;
     height: 27px !important;
@@ -291,32 +320,58 @@
 
     .nav-item,
     .octane-card-tab-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        --octane-card-tab-3: url("../../assets/images/habbo-skin/slices/tab-3-default.png");
+        --octane-card-tab-3-hover: url("../../assets/images/habbo-skin/slices/tab-3-hover.png");
+        --octane-card-tab-3-selected: url("../../assets/images/habbo-skin/slices/tab-3-selected.png");
+
+        display: flex !important;
+        /* AIR tab label margins are top-heavy (7/10 on a 34px tab) so the
+           caption sits above geometric center — match that, don't flex-center. */
+        align-items: flex-start !important;
+        justify-content: center !important;
+        box-sizing: border-box;
         min-height: 29px !important;
         max-height: 29px !important;
+        height: 29px !important;
         min-width: 67px;
-        padding: 0 12px !important;
+        padding: 5px 4px 0 !important;
         margin-bottom: 0;
         color: var(--octane-card-text);
-        background: #cbc9c2;
-        border: 1px solid #55554f;
-        border-bottom: 0;
-        border-radius: 6px 6px 0 0;
-        box-shadow: inset 1px 1px #ffffff, inset -1px 0 rgba(0, 0, 0, 0.08);
+        background: transparent;
+        border: solid transparent;
+        border-width: 0 9px;
+        border-image-source: var(--octane-card-tab-3);
+        border-image-slice: 0 9 0 9 fill;
+        border-image-width: 0 9px 0 9px;
+        border-image-repeat: stretch;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        font-family: HabboAirUbuntu, Ubuntu, sans-serif;
         font-size: 12px;
         font-weight: 400;
-        line-height: 29px;
+        line-height: 17px !important;
         text-align: center;
         white-space: nowrap;
+        image-rendering: pixelated;
 
         &:before {
             display: none;
         }
 
+        .octane-card-tab-item-label {
+            display: block;
+            flex: 1 1 auto;
+            width: 100%;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            line-height: 17px;
+        }
+
         &:hover {
-            background: #d8d6cf;
+            border-image-source: var(--octane-card-tab-3-hover);
+            background: transparent;
         }
 
         &:focus-visible {
@@ -326,9 +381,10 @@
 
         &.active,
         &.octane-card-tab-item-active {
-            background: var(--octane-card-surface);
+            border-image-source: var(--octane-card-tab-3-selected);
+            background: transparent;
             border-bottom: 0;
-            box-shadow: inset 1px 1px #ffffff;
+            box-shadow: none !important;
         }
     }
 }
@@ -512,8 +568,9 @@
 
             .nav-item,
             .octane-card-tab-item {
-                padding: 0 12px;
+                padding: 5px 12px 0;
                 font-size: 12px;
+                line-height: 17px;
             }
         }
 
@@ -557,3 +614,20 @@
         transform: translate(-50%, -50%) !important;
     }
 }
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-resize-handle {
+    position: absolute;
+    right: 3px;
+    bottom: 4px;
+    z-index: 5;
+    width: 20px;
+    height: 20px;
+    background: url('../../assets/images/habbo-skin/slices/window-resize-grip.png') no-repeat;
+    image-rendering: pixelated;
+    cursor: nwse-resize;
+    touch-action: none;
+    user-select: none;
+}
+
+.octane-card-shell.octane-card-frame-3 > .octane-card-resize-handle.is-vertical { cursor: ns-resize; }
+.octane-card-shell.octane-card-frame-3 > .octane-card-resize-handle.is-horizontal { cursor: ew-resize; }

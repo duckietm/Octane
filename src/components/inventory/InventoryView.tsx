@@ -12,44 +12,61 @@ import {
     RoomSessionEvent
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { ensureBadgeLeaderboardLoaded, GetConfigurationValue, isObjectMoverRequested, LocalizeText, setObjectMoverRequested, UnseenItemCategory } from '../../api';
+import {
+    ensureBadgeLeaderboardLoaded,
+    filterFurnitureGroupItems,
+    FURNI_MAIN_FILTER,
+    FurniMainFilter,
+    getCachedBadgeRarityStat,
+    isObjectMoverRequested,
+    LocalizeBadgeName,
+    LocalizeText,
+    setObjectMoverRequested,
+    UnseenItemCategory
+} from '../../api';
 import { OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import {
     useInventoryBadges,
     useInventoryFurni,
-    useInventoryPrefixes,
     useInventoryTrade,
     useInventoryUnseenTracker,
     useMessageEvent,
     useOctaneEvent,
     useWiredTrading
 } from '../../hooks';
-import {
-    BADGE_FILTER_ALL,
-    BADGE_RARITY_FILTER_ALL,
-    getInventoryBadgeRarityFilterIds,
-    isAchievementBadgeCode,
-    passInventoryBadgeFilter
-} from './views/badge/inventoryBadgeFilters';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitureDeleteView';
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
-import { InventoryTradeMinimizedView } from './views/furniture/InventoryTradeMinimizedView';
 import { InventoryTradeNameScamWarningView } from './views/furniture/InventoryTradeNameScamWarningView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
-import { filterInventoryGroupItems, MAIN_FILTER_ALL, TYPE_FILTER_ANY } from './views/furniture/inventoryFurniFilters';
-import { InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
+import { BADGE_MAIN_ACHIEVEMENTS, BADGE_MAIN_ALL, BADGE_MAIN_NORMAL, BADGE_RARITY_ALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
 import { InventoryPrefixView } from './views/prefix/InventoryPrefixView';
 
-const TAB_FURNITURE: string = 'inventory.furni';
-const TAB_BOTS: string = 'inventory.bots';
-const TAB_PETS: string = 'inventory.furni.tab.pets';
-const TAB_BADGES: string = 'inventory.badges';
-const TAB_PREFIXES: string = 'inventory.prefixes';
-const TABS = [TAB_FURNITURE, TAB_PETS, TAB_BADGES, TAB_PREFIXES, TAB_BOTS];
+const TAB_FURNITURE = 'inventory.furni';
+const TAB_BOTS = 'inventory.bots';
+const TAB_PETS = 'inventory.furni.tab.pets';
+const TAB_BADGES = 'inventory.badges';
+const TAB_PREFIXES = 'inventory.prefixes';
+const TABS = [TAB_FURNITURE, TAB_PETS, TAB_BADGES, TAB_BOTS, TAB_PREFIXES];
+
+const TAB_LABEL_FALLBACK: Record<string, string> = {
+    [TAB_FURNITURE]: 'Furniture',
+    [TAB_PETS]: 'Pets',
+    [TAB_BADGES]: 'Badges',
+    [TAB_BOTS]: 'Bots',
+    [TAB_PREFIXES]: 'Prefixes'
+};
+
+const tabLabel = (name: string) => {
+    const value = LocalizeText(name);
+
+    if (name === TAB_BADGES && value === 'Achieved badges') return 'Badges';
+
+    return value && value !== name ? value : TAB_LABEL_FALLBACK[name] || name;
+};
 
 const TAB_BY_CODE: Record<string, string> = {
     furni: TAB_FURNITURE,
@@ -59,29 +76,42 @@ const TAB_BY_CODE: Record<string, string> = {
     prefixes: TAB_PREFIXES,
     bots: TAB_BOTS
 };
-const UNSEEN_CATEGORIES = [UnseenItemCategory.FURNI, UnseenItemCategory.PET, UnseenItemCategory.BADGE, UnseenItemCategory.PREFIX, UnseenItemCategory.BOT];
 
-// AIR 13 keeps rented furni in the furni tab (HabboInventory.mergeRentFurni is always true), so
-// their unseen counter (category 2) lands on the same tab as the owned furni.
-const getTabUnseenCount = (index: number, getCount: (category: number) => number) => {
-    const count = getCount(UNSEEN_CATEGORIES[index]);
-
-    return UNSEEN_CATEGORIES[index] === UnseenItemCategory.FURNI ? count + getCount(UnseenItemCategory.RENTABLE) : count;
+const UNSEEN_BY_TAB: Record<string, number> = {
+    [TAB_FURNITURE]: UnseenItemCategory.FURNI,
+    [TAB_PETS]: UnseenItemCategory.PET,
+    [TAB_BADGES]: UnseenItemCategory.BADGE,
+    [TAB_BOTS]: UnseenItemCategory.BOT,
+    [TAB_PREFIXES]: UnseenItemCategory.PREFIX
 };
 
-export const InventoryView: FC<{}> = (props) => {
+// AIR 13 keeps rented furni in the furni tab, so their unseen counter lands with owned furni.
+const getTabUnseenCount = (name: string, getCount: (category: number) => number) => {
+    const category = UNSEEN_BY_TAB[name];
+    const count = getCount(category);
+    return category === UnseenItemCategory.FURNI ? count + getCount(UnseenItemCategory.RENTABLE) : count;
+};
+
+const RARITY_TO_ID: Record<string, number> = {
+    common: 0,
+    uncommon: 1,
+    rare: 2,
+    epic: 3,
+    mythical: 4,
+    legendary: 5,
+    unique: 6
+};
+
+export const InventoryView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [currentTab, setCurrentTab] = useState<string>(TABS[0]);
     const [roomSession, setRoomSession] = useState<IRoomSession>(null);
     const [roomPreviewer, setRoomPreviewer] = useState<RoomPreviewer>(null);
     const [searchValue, setSearchValue] = useState('');
-    const [mainFilter, setMainFilter] = useState<string>(MAIN_FILTER_ALL);
-    const [typeFilter, setTypeFilter] = useState<string>(TYPE_FILTER_ANY);
-    const [badgeTypeFilter, setBadgeTypeFilter] = useState<string>(BADGE_FILTER_ALL);
-    const [badgeRarityFilter, setBadgeRarityFilter] = useState<number>(BADGE_RARITY_FILTER_ALL);
-    // The rarity tiers come from caches that fill asynchronously; bumping this recomputes the
-    // badge filters once the leaderboard classification has arrived.
-    const [badgeRarityRevision, setBadgeRarityRevision] = useState(0);
+    const [appliedSearch, setAppliedSearch] = useState('');
+    const [badgeMetadata, setBadgeMetadata] = useState<Awaited<ReturnType<typeof ensureBadgeLeaderboardLoaded>>>(null);
+    const [mainFilter, setMainFilter] = useState<string>(FURNI_MAIN_FILTER.ALL);
+    const [typeFilter, setTypeFilter] = useState<string>('any');
     const { isTrading = false, stopTrading = null, nameScamWarning = null, dismissNameScamWarning = null } = useInventoryTrade();
     const { isOpen: isWiredTrading = false } = useWiredTrading();
     const { getCount = null } = useInventoryUnseenTracker();
@@ -90,45 +120,35 @@ export const InventoryView: FC<{}> = (props) => {
 
     useEffect(() => {
         setSearchValue('');
-        setMainFilter(MAIN_FILTER_ALL);
-        setTypeFilter(TYPE_FILTER_ANY);
-        setBadgeTypeFilter(BADGE_FILTER_ALL);
-        setBadgeRarityFilter(BADGE_RARITY_FILTER_ALL);
+        setAppliedSearch('');
+        if (currentTab === TAB_BADGES) {
+            setMainFilter(BADGE_MAIN_ALL);
+            setTypeFilter(String(BADGE_RARITY_ALL));
+            ensureBadgeLeaderboardLoaded()
+                .then(setBadgeMetadata)
+                .catch(() => setBadgeMetadata(null));
+        } else {
+            setMainFilter(FURNI_MAIN_FILTER.ALL);
+            setTypeFilter('any');
+        }
     }, [currentTab]);
 
     useEffect(() => {
-        if (currentTab !== TAB_BADGES) return;
+        if (currentTab !== TAB_FURNITURE) return;
+        setTypeFilter('any');
+    }, [mainFilter, currentTab]);
 
-        let cancelled = false;
+    const filteredGroupItems = useMemo(() => {
+        if (currentTab !== TAB_FURNITURE) return groupItems;
 
-        ensureBadgeLeaderboardLoaded()
-            .then(() => {
-                if (!cancelled) setBadgeRarityRevision((previous) => previous + 1);
-            })
-            .catch(() => undefined);
+        return filterFurnitureGroupItems(groupItems, appliedSearch, mainFilter as FurniMainFilter, typeFilter);
+    }, [groupItems, appliedSearch, mainFilter, typeFilter, currentTab]);
 
-        return () => {
-            cancelled = true;
-        };
-    }, [currentTab]);
+    const filteredBadgeCodes = useMemo(() => {
+        const comparison = appliedSearch.toLocaleLowerCase().trim();
+        const rarityFilter = Number(typeFilter);
 
-    // Changing the main filter swaps the type list underneath it; keeping the old type id would
-    // silently filter with an option the dropdown no longer shows.
-    const onMainFilterChange = (value: string) => {
-        setMainFilter(value);
-        setTypeFilter(TYPE_FILTER_ANY);
-    };
-
-    const filteredGroupItems = useMemo(
-        () => filterInventoryGroupItems(groupItems, mainFilter, typeFilter, searchValue),
-        [groupItems, searchValue, mainFilter, typeFilter]
-    );
-
-    const uncommonRarityEnabled = GetConfigurationValue<boolean>('badge_rarity.uncommon', false) === true;
-
-    // Achievement badges are collapsed to the highest level owned before any filter runs.
-    const dedupedBadgeCodes = useMemo(() => {
-        const achievementBadges = badgeCodes.filter((badge) => isAchievementBadgeCode(badge));
+        const achievementBadges = badgeCodes.filter((badge) => badge.startsWith('ACH_'));
         const numberMap: { [key: string]: number } = {};
 
         achievementBadges.forEach((badge) => {
@@ -138,34 +158,32 @@ export const InventoryView: FC<{}> = (props) => {
             if (numberMap[name] === undefined || number > numberMap[name]) numberMap[name] = number;
         });
 
-        return Object.keys(numberMap)
+        let deduped = Object.keys(numberMap)
             .map((name) => `${name}${numberMap[name]}`)
-            .concat(badgeCodes.filter((badge) => !isAchievementBadgeCode(badge)));
-    }, [badgeCodes]);
+            .concat(badgeCodes.filter((badge) => !badge.startsWith('ACH_')));
 
-    // `badgeRarityRevision` is a dependency on purpose: the tier caches the helpers read are not
-    // React state, so the memos have to be told when they filled.
-    const badgeRarityFilterIds = useMemo(
-        () => getInventoryBadgeRarityFilterIds(dedupedBadgeCodes, uncommonRarityEnabled),
-        [dedupedBadgeCodes, uncommonRarityEnabled, badgeRarityRevision]
-    );
+        if (mainFilter === BADGE_MAIN_NORMAL) deduped = deduped.filter((code) => !code.startsWith('ACH_'));
+        if (mainFilter === BADGE_MAIN_ACHIEVEMENTS) deduped = deduped.filter((code) => code.startsWith('ACH_'));
 
-    const filteredBadgeCodes = useMemo(
-        () => dedupedBadgeCodes.filter((badgeCode) => passInventoryBadgeFilter(badgeCode, badgeTypeFilter, badgeRarityFilter, searchValue, uncommonRarityEnabled)),
-        [dedupedBadgeCodes, badgeTypeFilter, badgeRarityFilter, searchValue, uncommonRarityEnabled, badgeRarityRevision]
-    );
+        return deduped.filter((badgeCode) => {
+            if (!LocalizeBadgeName(badgeCode).toLocaleLowerCase().includes(comparison)) return false;
+            if (rarityFilter === BADGE_RARITY_ALL) return true;
+
+            const stat = badgeMetadata ? getCachedBadgeRarityStat(badgeCode) : null;
+            if (!stat) return rarityFilter === 0;
+
+            return (RARITY_TO_ID[stat.rarity] ?? -99) === rarityFilter;
+        });
+    }, [badgeCodes, appliedSearch, mainFilter, typeFilter, badgeMetadata]);
 
     const onClose = () => {
         if (isTrading) stopTrading();
-
         setIsVisible(false);
     };
 
     useOctaneEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectEvent.PLACED, (event) => {
         if (!isObjectMoverRequested()) return;
-
         setObjectMoverRequested(false);
-
         if (!event.placedInRoom) setIsVisible(true);
     });
 
@@ -183,7 +201,6 @@ export const InventoryView: FC<{}> = (props) => {
 
     useMessageEvent<BadgePointLimitsEvent>(BadgePointLimitsEvent, (event) => {
         const parser = event.getParser();
-
         for (const data of parser.data) GetLocalizationManager().setBadgePointLimit(data.badgeId, data.limit);
     });
 
@@ -191,7 +208,6 @@ export const InventoryView: FC<{}> = (props) => {
         const linkTracker: ILinkEventTracker = {
             linkReceived: (url: string) => {
                 const parts = url.split('/');
-
                 if (parts.length < 2) return;
 
                 switch (parts[1]) {
@@ -212,103 +228,96 @@ export const InventoryView: FC<{}> = (props) => {
         };
 
         AddLinkEventTracker(linkTracker);
-
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
     useEffect(() => {
-        setRoomPreviewer(new RoomPreviewer(GetRoomEngine(), ++RoomPreviewer.PREVIEW_COUNTER));
-
+        const previewer = new RoomPreviewer(GetRoomEngine(), ++RoomPreviewer.PREVIEW_COUNTER);
+        previewer.backgroundColor = null;
+        setRoomPreviewer(previewer);
         return () => {
             setRoomPreviewer((prevValue) => {
                 prevValue.dispose();
-
                 return null;
             });
         };
     }, []);
 
     useEffect(() => {
-        // A wired contract opens its negotiation without anyone asking for the inventory, so the
-        // window has to show itself the same way a trade does.
         if (!isVisible && (isTrading || isWiredTrading)) setIsVisible(true);
     }, [isVisible, isTrading, isWiredTrading]);
 
-    useEffect(() => {
-        // TradingModel.startTrading ends with toggleInventoryPage("furni"): the trade lives in the
-        // furni tab, every other tab only shows the minimised strip.
-        if (isTrading) setCurrentTab(TAB_FURNITURE);
-    }, [isTrading]);
-
     if (!isVisible) return null;
 
-    const showTradeView = isTrading && currentTab === TAB_FURNITURE;
-    const showTradeMinimized = isTrading && currentTab !== TAB_FURNITURE;
-    const showFilter = !showTradeView && (currentTab === TAB_FURNITURE || currentTab === TAB_BADGES);
+    const showFilter = !isTrading && !isWiredTrading && ((currentTab === TAB_FURNITURE && groupItems.length > 0) || currentTab === TAB_BADGES);
 
     return (
         <>
             <OctaneCardView
-                className="octane-inventory-window min-w-0 w-[min(528px,calc(100vw-16px))] h-[min(420px,calc(100vh-16px))] min-h-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                className={`octane-inventory-window max-w-[calc(100vw-16px)] ${currentTab === TAB_BADGES ? 'has-badge-controls' : currentTab === TAB_PETS ? 'has-pet-controls' : ''}`}
+                frameStyle={3}
+                resizeAxis="vertical"
                 uniqueKey="inventory"
             >
                 <OctaneCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
-                {!isWiredTrading && (
+                {!isTrading && !isWiredTrading && (
                     <>
                         <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
-                            {TABS.map((name, index) => {
-                                return (
-                                    <OctaneCardTabsItemView
-                                        key={index}
-                                        count={getTabUnseenCount(index, getCount)}
-                                        isActive={currentTab === name}
-                                        onClick={(event) => setCurrentTab(name)}
-                                    >
-                                        <span className="octane-inventory-tab-label">{LocalizeText(name)}</span>
-                                    </OctaneCardTabsItemView>
-                                );
-                            })}
+                            {TABS.map((name) => (
+                                <OctaneCardTabsItemView
+                                    key={name}
+                                    count={getTabUnseenCount(name, getCount)}
+                                    isActive={currentTab === name}
+                                    onClick={() => setCurrentTab(name)}
+                                >
+                                    <span className="octane-inventory-tab-label">{tabLabel(name)}</span>
+                                </OctaneCardTabsItemView>
+                            ))}
                         </OctaneCardTabsView>
-                        <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full gap-2">
+                        <div className="octane-inventory-body">
                             {showFilter && (
                                 <InventoryCategoryFilterView
-                                    badgeRarityFilter={badgeRarityFilter}
-                                    badgeRarityFilterIds={badgeRarityFilterIds}
-                                    badgeTypeFilter={badgeTypeFilter}
                                     currentTab={currentTab}
                                     mainFilter={mainFilter}
-                                    searchValue={searchValue}
                                     typeFilter={typeFilter}
-                                    uncommonRarityEnabled={uncommonRarityEnabled}
-                                    onBadgeRarityFilterChange={setBadgeRarityFilter}
-                                    onBadgeTypeFilterChange={setBadgeTypeFilter}
-                                    onMainFilterChange={onMainFilterChange}
+                                    searchValue={searchValue}
+                                    onMainFilterChange={(value) => {
+                                        setMainFilter(value);
+                                        setAppliedSearch(searchValue);
+                                    }}
+                                    onTypeFilterChange={(value) => {
+                                        setTypeFilter(value);
+                                        setAppliedSearch(searchValue);
+                                    }}
                                     onSearchChange={setSearchValue}
-                                    onTypeFilterChange={setTypeFilter}
+                                    onSearchApply={setAppliedSearch}
                                 />
                             )}
-                            <div className="flex-1 overflow-hidden">
-                                {showTradeView && <InventoryTradeView cancelTrade={onClose} />}
-                                {currentTab === TAB_FURNITURE && !showTradeView && (
+                            <div className={`octane-inventory-content ${currentTab === TAB_FURNITURE ? 'is-furniture' : ''}`}>
+                                {currentTab === TAB_FURNITURE && (
                                     <InventoryFurnitureView filteredGroupItems={filteredGroupItems} roomPreviewer={roomPreviewer} roomSession={roomSession} />
                                 )}
                                 {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
                                 {currentTab === TAB_BADGES && <InventoryBadgeView filteredBadgeCodes={filteredBadgeCodes} />}
-                                {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
                                 {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
+                                {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
                             </div>
-                            {showTradeMinimized && <InventoryTradeMinimizedView onCancel={stopTrading} onContinue={() => setCurrentTab(TAB_FURNITURE)} />}
                         </div>
                     </>
                 )}
+                {isTrading && (
+                    <div className="octane-inventory-body is-trade">
+                        <InventoryTradeView cancelTrade={onClose} />
+                    </div>
+                )}
                 {!isTrading && isWiredTrading && (
-                    <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full">
+                    <div className="octane-inventory-body is-trade">
                         <InventoryWiredTradeView />
                     </div>
                 )}
+                            {nameScamWarning && <InventoryTradeNameScamWarningView warning={nameScamWarning} onClose={dismissNameScamWarning} />}
             </OctaneCardView>
             <InventoryFurnitureDeleteView />
-            {nameScamWarning && <InventoryTradeNameScamWarningView warning={nameScamWarning} onClose={dismissNameScamWarning} />}
         </>
     );
 };

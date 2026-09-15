@@ -1,53 +1,34 @@
 .octane-inventory-window {
-    --inv-blue: #418db0;
+    --inv-surface: #e9e9e1;
     --inv-beige: #dfdfdf;
-    --inv-tab: #b6bec5;
-    --inv-line: #b6bec5;
+    --inv-line: #6b6f73;
     --inv-accent: #418db0;
-    --inv-place: #5ca843;
-    --inv-place-dark: #397025;
-    --inv-place-light: #8ee374;
+    --inv-empty-title: #dd0000;
+    --inv-place: #ececec;
     --inv-sell: #d13e31;
-    --inv-sell-dark: #881e15;
-    --inv-sell-light: #f07e74;
-    --inv-border: #6b6f73;
+    --inv-border: #0f1b22;
 
-    background: var(--inv-beige) !important;
+    position: relative;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 490px !important;
+    min-width: 490px !important;
+    max-width: 490px !important;
+    height: 342px !important;
+    min-height: 300px !important;
+    max-height: min(90vh, 720px) !important;
+    /* Frame-3 titlebar is absolutely positioned; keep content below it. */
+    padding: 35px 6px 6px !important;
+    resize: none !important;
+    /* Surface + pixel corners come from frame-ubuntu-3 9-slice. Never paint
+       an opaque shell background or rectangular overflow clip here. */
+    background: transparent !important;
 }
 
-.octane-inventory-window .octane-inventory-tabs-shell {
-    gap: 4px;
-}
-
-.octane-inventory-window .octane-inventory-tab-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 5px;
-    font-size: 14px;
-    line-height: 1;
-}
-
-.octane-inventory-window .octane-inventory-body {
-    background: var(--inv-beige);
-}
-
-.octane-inventory-window .octane-inventory-filter-bar {
-    width: 100%;
-    background: #fff;
-    border: 2px solid var(--inv-border);
-    border-radius: 4px;
-}
-
+/* Dev chrome-ownership scopes kept alongside AIR inventory skins */
 .octane-inventory-window .octane-inventory-filter-bar.is-badges {
     width: min(320px, 100%);
-}
-
-.octane-inventory-window .octane-inventory-filter-bar select {
-    background: var(--inv-beige);
-    border: 2px solid var(--inv-border) !important;
-    border-radius: 4px;
-    font-weight: 700;
 }
 
 .octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
@@ -68,10 +49,6 @@
     box-shadow: 0 0 0 2px var(--inv-accent);
 }
 
-.octane-inventory-window :where(.text-muted, .text-dark) {
-    color: #55544e !important;
-}
-
 .octane-inventory-window :where(input, select, textarea) {
     min-height: 22px;
     border: 1px solid var(--inv-border) !important;
@@ -88,47 +65,603 @@
     outline: none !important;
 }
 
-.octane-inventory-window .bg-red-700 {
-    background-color: #fff !important;
-    color: var(--inv-accent) !important;
+
+.octane-inventory-window .octane-inventory-tabs-shell {
+    flex: 0 0 35px !important;
+    gap: 0 !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--inv-surface) !important;
+    position: relative;
+    border-bottom: 0 !important;
+}
+
+.octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item {
+    min-width: 0 !important;
+    flex: 0 0 auto;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 7px 3px 10px !important;
+    font-size: 12px !important;
+    line-height: 17px !important;
+    overflow: hidden;
+    border-radius: 0 !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+}
+
+.octane-inventory-window .octane-inventory-tab-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    width: 100%;
+    line-height: 17px;
+}
+
+.octane-inventory-window .octane-inventory-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0;
+    min-height: 0;
+    height: auto !important;
+    padding: 0 5px 5px;
+    overflow: hidden;
+    background: transparent;
+}
+
+.octane-inventory-window .octane-inventory-body.is-trade {
+    padding: 8px;
+}
+
+.octane-inventory-window .octane-inventory-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
+    background-color: #ececec !important;
+    color: #111 !important;
+}
+
+.octane-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
     border-color: #75746e !important;
 }
 
-.octane-inventory-window .shadow-room-previewer {
-    background-color: #fff;
-    border: 2px solid var(--inv-line);
+.octane-inventory-window .bg-card-grid-item-active {
+    background-color: #c6e2f7 !important;
+}
+
+.octane-inventory-window .border-card-grid-item-active {
+    border-color: #2e6f8a !important;
+    box-shadow: none !important;
+}
+
+.octane-inventory-window .rounded-md.border-2 {
+    border-radius: 3px !important;
+    border-width: 1px !important;
+}
+
+.octane-inventory-empty {
+    position: relative;
+    height: 100%;
+    min-height: 278px;
+    margin-left: -5px;
+    margin-top: -15px;
+    width: 478px;
+    background: transparent;
+}
+
+.octane-inventory-empty-image {
+    position: absolute;
+    left: 46px;
+    top: 42px;
+    width: 180px;
+    height: 180px;
+    background: url('@/assets/images/inventory/air/inventory-empty-state.png') center no-repeat;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-empty-copy {
+    position: absolute;
+    left: 287px;
+    top: 64px;
+    width: 176px;
+}
+
+.octane-inventory-empty-title {
+    color: var(--inv-empty-title);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 17px;
+    margin-bottom: 8px;
+}
+
+.octane-inventory-empty-desc {
+    color: #111;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-inventory-empty-shop {
+    position: absolute !important;
+    left: 241px;
+    top: 225px;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 149px !important;
+    height: 51px !important;
+    min-height: 51px !important;
+    /* Ubuntu metrics sit low in the em-box; bias caption up inside shiny chrome. */
+    padding: 0 8px 3px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny-large) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    line-height: 14px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-furni {
+    display: grid;
+    grid-template-columns: 284px 180px;
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.octane-inventory-furni-grid {
+    width: 284px;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-grid > * {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.octane-inventory-furni-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-preview-stage {
+    position: absolute;
+    top: 0;
+    left: 5px;
+    width: 170px;
+    height: calc(100% - 107px);
+    min-height: 50px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-status {
+    position: absolute;
+    top: 0;
+    left: -5px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    z-index: 2;
+}
+
+.octane-inventory-furni-status-icon {
+    position: relative;
+    width: 52px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-size: auto;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-furni-status-icon.is-trade {
+    background-image: url('@/assets/images/inventory/air/furniture-trade-available.png');
+}
+
+.octane-inventory-furni-status-icon.is-no-trade {
+    background-image: url('@/assets/images/inventory/air/furniture-trade-unavailable.png');
+}
+
+.octane-inventory-furni-status-icon.is-recycle {
+    background-image: url('@/assets/images/inventory/air/furniture-recycle-available.png');
+}
+
+.octane-inventory-furni-status-icon.is-no-recycle {
+    background-image: url('@/assets/images/inventory/air/furniture-recycle-unavailable.png');
+}
+
+.octane-inventory-furni-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: auto;
+    padding-top: 6px;
+    min-height: 0;
+}
+
+.octane-inventory-furni-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111;
+    word-break: break-word;
+}
+
+.octane-inventory-furni-desc {
+    font-size: 11px;
+    color: #333;
+    word-break: break-word;
+}
+
+.octane-inventory-furni-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    margin-top: 12px;
+    width: 180px;
+}
+
+.octane-inventory-window .octane-inventory-btn-place {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 180px !important;
+    max-width: 100% !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    /* 1px bottom bias — Ubuntu glyph box sits low inside 12px content. */
+    padding: 0 8px 1px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 11px !important;
+    text-align: center !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-window .octane-inventory-btn-place:hover {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+    background: transparent !important;
+    filter: none !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-place:active {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-sell {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 180px !important;
+    max-width: 100% !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 0 8px 1px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    line-height: 11px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-window .octane-inventory-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 180px !important;
+    max-width: 100% !important;
+    min-height: 22px !important;
+    padding: 0 8px !important;
+    border: 3px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-button) !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #881e15 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-furni-grid .grid {
+    grid-template-columns: repeat(6, 42px);
+    gap: 2px !important;
+}
+
+.octane-inventory-window .octane-inventory-thumb {
+    position: relative;
+    flex: 0 0 42px;
+    width: 42px !important;
+    height: 42px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-size: auto !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: none !important;
+    isolation: isolate;
+    animation: none;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    background: url('../../assets/images/inventory/air/inventory-item-background.png') no-repeat;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb.is-unseen::before {
+    background-image: url('../../assets/images/inventory/air/inventory-item-unseen-background.png');
+}
+
+.octane-inventory-thumb.is-selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../../assets/images/inventory/air/inventory-item-selected-outline.png') no-repeat;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb > .bg-red-700 {
+    background: white;
+    border: 1px solid #2f6982;
+    color: #2f6982;
+    border-radius: 0;
+}
+
+.octane-inventory-window {
+    font-family: HabboAirUbuntu, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.octane-inventory-window .octane-inventory-tabs-shell {
+    align-items: flex-start;
+}
+
+
+
+.octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item-label {
+    width: auto;
+}
+
+.octane-inventory-furni-preview {
+    padding-bottom: 2px;
+}
+
+.octane-inventory-furni-details {
+    flex-shrink: 0;
+}
+
+.octane-inventory-window .octane-inventory-btn-place,
+.octane-inventory-window .octane-inventory-btn-sell,
+.octane-inventory-window .octane-inventory-btn-delete {
+    width: fit-content !important;
+    font-family: HabboAirUbuntu, sans-serif;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    padding: 0 5px !important;
+}
+
+.octane-inventory-furni-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.octane-inventory-furni-grid > :first-child {
+    flex: 1;
+    min-height: 0;
+}
+
+.octane-inventory-furni-grid > .octane-inventory-pages {
+    flex: 0 0 14px;
+    height: 14px !important;
+    display: flex;
+    gap: 2px;
+    font-size: 9px;
+}
+
+.octane-inventory-pages button {
+    padding: 0 2px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-inventory-pages button[aria-current='page'] { font-weight: bold; }
+
+.octane-inventory-window.has-badge-controls { height: 364px !important; min-height: 322px !important; }
+
+.octane-inventory-thumb-image {
+    position: absolute;
+    inset: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb-image img {
+    max-width: none;
+    flex: none;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-thumb.is-selected::after { z-index: 3; }
+
+.octane-inventory-window .octane-inventory-tabs-shell { justify-content: flex-start !important; padding-left: 8px !important; }
+.octane-inventory-furni-preview-stage { overflow: visible; }
+.octane-inventory-furni-preview-stage > div:first-child { border-radius: 0 !important; }
+
+.octane-inventory-preview-controls { display: none; }
+@media (max-width: 640px) {
+    .octane-inventory-preview-controls { display: flex; gap: 8px; }
+}
+
+@media (max-width: 489px) {
+    .octane-inventory-window {
+        width: calc(100vw - 16px) !important;
+        min-width: 0 !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 64px) !important;
+    }
+
+    .octane-inventory-window .octane-inventory-tabs-shell {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .octane-inventory-window .octane-inventory-body {
+        overflow: auto;
+    }
+
+    .octane-inventory-window .octane-inventory-content { min-width: 468px; overflow: visible; }
+    .octane-inventory-window .octane-inventory-filter-bar { flex-shrink: 0; }
+}
+
+.octane-inventory-furni-preview-stage .shadow-room-previewer {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
 .octane-inventory-window .octane-inventory-btn-place,
 .octane-inventory-window .octane-inventory-btn-sell {
-    border: 2px solid var(--inv-border) !important;
-    border-radius: 4px;
-    color: #fff !important;
-    font-weight: 700;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    padding: 0 5px 1px !important;
+    line-height: 17px !important;
 }
 
-.octane-inventory-window .octane-inventory-btn-place {
-    background: var(--inv-place) !important;
-    box-shadow: inset -2px -2px 0 var(--inv-place-dark), inset 2px 2px 0 var(--inv-place-light);
+.octane-inventory-window .octane-inventory-btn-place:disabled {
+    border-image-source: url('@/assets/images/habbo-skin/slices/button-shiny-disabled.png') !important;
+    opacity: 1;
 }
 
-.octane-inventory-window .octane-inventory-btn-place:hover {
-    background: #67b94e !important;
+.octane-inventory-preview-delete {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    isolation: isolate;
 }
 
-.octane-inventory-window .octane-inventory-btn-sell {
-    background: var(--inv-sell) !important;
-    box-shadow: inset -2px -2px 0 var(--inv-sell-dark), inset 2px 2px 0 var(--inv-sell-light);
+.octane-inventory-preview-delete::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-red) 5 fill / 5px stretch;
+    /* Requested darker upper half and lighter lower half. */
+    transform: scaleY(-1);
+    image-rendering: pixelated;
 }
 
-.octane-inventory-window .octane-inventory-btn-sell:hover {
-    background: #db4d40 !important;
+.octane-inventory-preview-delete:hover::before { border-image-source: var(--habbo-skin-shiny-red-hover); }
+.octane-inventory-preview-delete:active::before { border-image-source: var(--habbo-skin-shiny-red-pressed); }
+.octane-inventory-preview-delete:focus-visible { outline: 1px dotted #fff; outline-offset: -4px; }
+.octane-inventory-preview-delete svg { width: 8px; height: 9px; }
+
+.octane-inventory-tabs-shell::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 31px;
+    height: 1px;
+    background: #000;
+    pointer-events: none;
 }
+
+.octane-inventory-content.is-furniture { overflow: visible; }
+.octane-inventory-furni-grid { margin-top: 2px; height: calc(100% - 5px); }
+.octane-inventory-furni-preview { margin-top: 2px; height: calc(100% + 1px); }
+
+.octane-inventory-furni-status-count {
+    position: absolute;
+    top: 1px;
+    font-size: 12px;
+    line-height: 14px;
+    font-weight: normal;
+    color: #000;
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+}
+.octane-inventory-furni-status-count.is-trade-count { left: 33px; }
+.octane-inventory-furni-status-count.is-recycle-count { left: 18px; }
+
+/* Dev overlay / rent / chest / rarity styles retained for AIR inventory */
 
 .octane-inventory-preview-btn {
     display: none;
 }
+
 
 /* inventory_thumb overlays: rarity plaque (rarity_item_overlay_grid, 36x9 at the bottom) and the
    rent_state dot (10x10 at 4,4; not started / started / ending). */
@@ -150,6 +683,7 @@
     pointer-events: none;
 }
 
+
 /* chest_overlay_(brown|gold)_background + ChestItemGridOverlayWidget: the contents count sits on a
    small plate at the bottom of the tile, in the chest's own colour. */
 .octane-inventory-window .octane-inventory-thumb-chest {
@@ -168,16 +702,19 @@
     pointer-events: none;
 }
 
+
 .octane-inventory-window .octane-inventory-thumb-chest.is-brown {
     background: #7a4a1e;
     border: 1px solid #4a2a0c;
 }
+
 
 .octane-inventory-window .octane-inventory-thumb-chest.is-gold {
     background: #d9a521;
     border: 1px solid #8a6d13;
     color: #3a2c00;
 }
+
 
 .octane-inventory-window .octane-inventory-thumb-rent {
     position: absolute;
@@ -192,48 +729,26 @@
     pointer-events: none;
 }
 
+
 .octane-inventory-window .octane-inventory-thumb-rent.is-not_started {
     background: #9a9a9a;
 }
+
 
 .octane-inventory-window .octane-inventory-thumb-rent.is-started {
     background: #5ca843;
 }
 
+
 .octane-inventory-window .octane-inventory-thumb-rent.is-ending {
     background: #d13e31;
 }
 
-/* Preview pane: tradeable / recyclable counters (FurniView.as:298-339) with the white glow on
-   the number, the extra line (rarity / rent countdown) and the rent buttons. */
-.octane-inventory-window .octane-inventory-preview-counter {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    min-width: 40px;
-    height: 16px;
-    padding: 0 4px;
-    border-radius: 3px;
-    border: 1px solid var(--inv-line);
-    background: #fff;
-    color: var(--inv-accent);
-    font-size: 11px;
-}
-
-.octane-inventory-window .octane-inventory-preview-counter.is-unavailable {
-    color: #9a9a9a;
-    opacity: 0.7;
-}
-
-.octane-inventory-window .octane-inventory-preview-counter__number {
-    font-weight: 700;
-    color: #2f6982;
-    text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
-}
 
 .octane-inventory-window .octane-inventory-preview-extra {
     color: #55544e;
 }
+
 
 .octane-inventory-window .octane-inventory-btn-goto,
 .octane-inventory-window .octane-inventory-btn-rent {
@@ -246,320 +761,12 @@
     box-shadow: inset -2px -2px 0 #2b6a88, inset 2px 2px 0 #7fbcd8;
 }
 
+
 .octane-inventory-window .octane-inventory-btn-goto:hover,
 .octane-inventory-window .octane-inventory-btn-rent:hover {
     background: #4f9dc2 !important;
 }
 
-/* badge_details card: bold name, description, coloured rarity tag, owner count. */
-.octane-inventory-window .octane-inventory-badge-details__rarity {
-    letter-spacing: 0.04em;
-    text-shadow: none;
-}
-
-.octane-inventory-window .octane-inventory-badge-details__owners {
-    color: #555555;
-}
-
-/* item_popup: 203px white card to the right (or left) of the hovered trade thumb. */
-.octane-inventory-item-popup {
-    position: fixed;
-    z-index: 9999;
-    box-sizing: border-box;
-    padding: 5px 5px 10px;
-    border: 2px solid #6b6f73;
-    border-radius: 6px;
-    background: #fff;
-    color: #111;
-    font-family: Ubuntu, sans-serif;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    pointer-events: none;
-}
-
-.octane-inventory-item-popup__name {
-    min-height: 19px;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 19px;
-}
-
-.octane-inventory-item-popup__ltd {
-    position: absolute;
-    top: 23px;
-    right: 4px;
-}
-
-.octane-inventory-item-popup__image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 55px;
-    margin-top: 3px;
-}
-
-.octane-inventory-item-popup__image img {
-    max-width: 180px;
-    max-height: 200px;
-    image-rendering: pixelated;
-}
-
-.octane-inventory-item-popup__arrow {
-    position: absolute;
-    top: 50%;
-    width: 0;
-    height: 0;
-    margin-top: -8px;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-}
-
-.octane-inventory-item-popup.is-right .octane-inventory-item-popup__arrow {
-    left: -10px;
-    border-right: 10px solid #6b6f73;
-}
-
-.octane-inventory-item-popup.is-left .octane-inventory-item-popup__arrow {
-    right: -10px;
-    border-left: 10px solid #6b6f73;
-}
-
-/* inventory_trading.xml: help_text line, info_text_0/1 replacing a disabled side's grid,
-   info_border_highlighted credits strip (0xfc9228) and the 3 x 3 grids. */
-.octane-inventory-window .octane-inventory-trade-help {
-    min-height: 15px;
-    color: #4a4a4a;
-    opacity: 0.85;
-}
-
-.octane-inventory-window .octane-inventory-trade-notification {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    min-height: 132px;
-    padding: 6px;
-    border: 2px solid var(--inv-border, #27556a);
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.55);
-    color: #333;
-    font-size: 11px;
-    line-height: 14px;
-    text-align: center;
-}
-
-.octane-inventory-window .octane-inventory-trade-highlight {
-    box-sizing: border-box;
-    padding: 5px 6px;
-    border: 2px solid #fc9228;
-    border-radius: 4px;
-    background: #fff4e5;
-    color: #222;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 14px;
-}
-
-/* inventory_trading_minimized.xml (478x68): panic icon, "Trade in progress", Continue / Cancel. */
-.octane-inventory-window .octane-inventory-trade-minimized {
-    display: grid;
-    grid-template-columns: 30px minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    column-gap: 4px;
-    row-gap: 4px;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 6px 7px 4px 11px;
-    border: 2px solid var(--inv-border, #27556a);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.55);
-}
-
-.octane-inventory-window .octane-inventory-trade-minimized-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 45%, #ffe27a 0 40%, #f5a623 41% 100%);
-    box-shadow: inset 0 0 0 2px #7a4a00;
-}
-
-.octane-inventory-window .octane-inventory-trade-minimized-icon::after {
-    content: "!";
-    display: block;
-    color: #7a4a00;
-    font-size: 20px;
-    font-weight: 900;
-    line-height: 30px;
-    text-align: center;
-}
-
-.octane-inventory-window .octane-inventory-trade-minimized-title {
-    color: #222;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 24px;
-}
-
-.octane-inventory-window .octane-inventory-trade-minimized-actions {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: space-between;
-    gap: 6px;
-}
-
-/* inventory_trading_name_scam_warning.xml (356x333, red 0xd43d59 title). */
-.octane-inventory-namescam-window {
-    width: min(356px, calc(100vw - 16px));
-    min-width: 0;
-    max-width: calc(100vw - 16px);
-    max-height: calc(100vh - 16px);
-}
-
-.octane-inventory-namescam-window > .octane-card-header-shell {
-    background: #d43d59 !important;
-}
-
-.octane-inventory-namescam-content {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 12px;
-    line-height: 15px;
-}
-
-.octane-inventory-namescam-warning {
-    margin: 0;
-}
-
-.octane-inventory-namescam-trader {
-    display: grid;
-    grid-template-columns: 56px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 6px;
-    box-sizing: border-box;
-    min-height: 58px;
-    padding: 4px 8px 4px 0;
-    border: 1px solid #cfcfcf;
-    border-radius: 4px;
-    background: #f1f1f1;
-}
-
-.octane-inventory-namescam-avatar {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    height: 56px;
-    overflow: hidden;
-}
-
-.octane-inventory-namescam-trader-name {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.octane-inventory-namescam-trader-label {
-    color: #555555;
-}
-
-.octane-inventory-namescam-trader-name strong {
-    font-size: 13px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.octane-inventory-namescam-matches {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.octane-inventory-namescam-matches span {
-    white-space: pre-line;
-}
-
-.octane-inventory-namescam-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    padding-top: 4px;
-}
-
-.octane-inventory-namescam-countdown {
-    color: #555555;
-}
-
-@media (max-width: 1024px) and (min-width: 641px) {
-    .octane-inventory-window {
-        width: min(calc(100vw - 24px), 640px) !important;
-        min-width: 0 !important;
-        max-width: calc(100vw - 24px) !important;
-        height: min(calc(100vh - 24px), 560px) !important;
-        min-height: 0 !important;
-        max-height: calc(100vh - 24px) !important;
-    }
-}
-
-@media (max-width: 640px) {
-    .draggable-window:has(> .octane-inventory-window) {
-        inset: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        top: 0 !important;
-        bottom: 0 !important;
-        width: auto !important;
-        height: auto !important;
-        transform: none !important;
-    }
-
-    .octane-card-shell.octane-inventory-window {
-        width: calc(100% - 40px) !important;
-        min-width: 0 !important;
-        max-width: calc(100% - 40px) !important;
-        height: calc(100% - 76px) !important;
-        min-height: 0 !important;
-        max-height: calc(100% - 76px) !important;
-        margin: 8px auto 0 auto !important;
-    }
-
-    .octane-inventory-window .octane-inventory-tabs-shell {
-        flex-wrap: nowrap;
-        overflow: hidden;
-    }
-
-    .octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item {
-        flex: 1 1 0;
-        min-width: 0;
-        padding: 8px 0;
-        justify-content: center;
-    }
-
-    .octane-inventory-window .octane-inventory-tab-label {
-        display: none;
-    }
-
-    .octane-inventory-window .octane-inventory-tab-icon {
-        margin-right: 0;
-        font-size: 17px;
-    }
-
-    .octane-inventory-window .grid.grid-cols-12 {
-        grid-template-columns: minmax(0, 1fr) !important;
-        grid-template-rows: minmax(0, 1fr) auto !important;
-    }
-
-    .octane-inventory-window .grid.grid-cols-12 > .col-span-7,
-    .octane-inventory-window .grid.grid-cols-12 > .col-span-5 {
-        grid-column: 1 / -1 !important;
-    }
-
-    .octane-inventory-window .octane-inventory-btn-place,
-    .octane-inventory-window .octane-inventory-btn-sell {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-    }
 
     .octane-inventory-window .octane-inventory-preview-btn {
         position: absolute;
@@ -578,15 +785,17 @@
         cursor: pointer;
     }
 
+
     .octane-inventory-window .octane-inventory-preview-btn:active {
         background: rgba(0, 0, 0, 0.85);
     }
+
 
     .octane-inventory-window .octane-inventory-preview-rotate {
         left: 6px;
     }
 
+
     .octane-inventory-window .octane-inventory-preview-state {
         right: 6px;
     }
-}

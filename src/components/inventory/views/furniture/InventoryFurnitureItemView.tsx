@@ -56,10 +56,10 @@ export const InventoryFurnitureItemView: FC<{
 
     return (
         <InfiniteGrid.Item
-            className={classNames(!count && 'opacity-50')}
+            className={classNames('octane-inventory-thumb', isActive && 'is-selected', groupItem.hasUnseenItems && 'is-unseen', !count && 'opacity-50')}
             itemActive={isActive}
             itemCount={count}
-            itemImage={groupItem.iconUrl}
+            itemImage={groupItem.stuffData.uniqueNumber > 0 ? groupItem.iconUrl : undefined}
             itemUniqueNumber={groupItem.stuffData.uniqueNumber}
             itemUnseen={groupItem.hasUnseenItems}
             onDoubleClick={onMouseEvent}
@@ -67,6 +67,11 @@ export const InventoryFurnitureItemView: FC<{
             onMouseOut={onMouseEvent}
             onMouseUp={onMouseEvent}
         >
+            {groupItem.stuffData.uniqueNumber <= 0 && (
+                <div className="octane-inventory-thumb-image">
+                    <img src={groupItem.iconUrl} alt="" draggable={false} />
+                </div>
+            )}
             {rarityLevel >= 0 && (
                 <div className="octane-inventory-thumb-rarity" data-testid="inventory-thumb-rarity">
                     {rarityLevel}

@@ -1,4 +1,5 @@
 export * from './FurniCategory';
+export * from './FurnitureFilter';
 export * from './FurnitureItem';
 export * from './FurnitureUtilities';
 export * from './GroupItem';

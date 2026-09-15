@@ -11,12 +11,7 @@ export const OctaneCardTabsItemView: FC<OctaneCardTabsItemViewProps> = (props) =
     const { isActive = false, count = 0, overflow = 'hidden', position = 'relative', pointer = true, classNames = [], children = null, ...rest } = props;
 
     const getClassNames = useMemo(() => {
-        const newClassNames: string[] = [
-            'octane-card-tab-item overflow-hidden relative cursor-pointer rounded-t-[8px] flex px-3 py-[6px] z-1',
-            isActive && 'octane-card-tab-item-active -mb-px'
-        ];
-
-        //if (isActive) newClassNames.push('bg-[#dfdfdf] border-b-[1px_solid_black]');
+        const newClassNames: string[] = ['octane-card-tab-item overflow-hidden relative cursor-pointer z-1', isActive && 'octane-card-tab-item-active -mb-px'];
 
         if (classNames.length) newClassNames.push(...classNames);
 
@@ -24,10 +19,8 @@ export const OctaneCardTabsItemView: FC<OctaneCardTabsItemViewProps> = (props) =
     }, [isActive, classNames]);
 
     return (
-        <Flex classNames={getClassNames} overflow={overflow} pointer={pointer} position={position} {...rest}>
-            <Flex center shrink>
-                {children}
-            </Flex>
+        <Flex center classNames={getClassNames} overflow={overflow} pointer={pointer} position={position} {...rest}>
+            <span className="octane-card-tab-item-label">{children}</span>
             {count > 0 && <LayoutItemCountView count={count} />}
         </Flex>
     );
