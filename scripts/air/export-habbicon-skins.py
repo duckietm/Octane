@@ -3,7 +3,6 @@
 Usage: python3 scripts/air/export-habbicon-skins.py /path/to/qualified/air/bundle
 Requires Pillow. Source bundle is intentionally not distributed.
 """
-import csv
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -23,7 +22,6 @@ styles = [
     (7, '2956_habbo_skin_border_7_xml*.bin', ubuntu, ['41aad3']),
     (10, '2250_class_847.bin', blue, ['f8ebd6', 'fff2c6', 'f0cf86', 'e0cba6', 'f6ebd7', 'efe1c4']),
 ]
-rows = []
 for style, pattern, atlas_path, colors in styles:
     xml = next((bundle / 'decompiled/binaryData').glob(pattern))
     root = ET.parse(xml).getroot()
@@ -44,8 +42,3 @@ for style, pattern, atlas_path, colors in styles:
         tinted.putdata([(*(v * m // 255 for v, m in zip(p[:3], rgb)), p[3]) for p in packed.getdata()])
         name = f'border-{style}-{color}.png'
         tinted.save(out / name)
-        rows.append([name, 'WIN63-202609091217-117204808', xml.name, atlas_path.name, str(rects), color, f'{heights[0]} {widths[2]} {heights[2]} {widths[0]}'])
-with (repo / 'docs/air/habbicon-skins.csv').open('w') as f:
-    writer = csv.writer(f, lineterminator="\n")
-    writer.writerow(['destination', 'build', 'skin_xml', 'atlas_symbol', 'atlas_rectangles', 'rgb_multiply', 'slice_top_right_bottom_left'])
-    writer.writerows(rows)
