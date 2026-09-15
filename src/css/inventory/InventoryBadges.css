@@ -1,5 +1,3 @@
-/* WIN63 inventory_xml: coordinates below start after the 27px filter row.
-   Polaris custom controls follow the official description area. */
 .octane-inventory-badges {
     display: flex;
     flex-direction: column;

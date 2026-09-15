@@ -49,7 +49,6 @@ const TAB_BOTS = 'inventory.bots';
 const TAB_PETS = 'inventory.furni.tab.pets';
 const TAB_BADGES = 'inventory.badges';
 const TAB_PREFIXES = 'inventory.prefixes';
-/** Official AIR order, then Polaris Prefixes. Collectibles/Rentables deferred. */
 const TABS = [TAB_FURNITURE, TAB_PETS, TAB_BADGES, TAB_BOTS, TAB_PREFIXES];
 
 const TAB_LABEL_FALLBACK: Record<string, string> = {

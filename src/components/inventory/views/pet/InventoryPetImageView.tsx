@@ -1,8 +1,6 @@
 import { GetRoomEngine, PetData, PetFigureData, Vector3d } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 
-// PetsGridItem and PetsView choose renderer scale, direction and body/head per species.
-// These are native renderer pixels, never a CSS enlargement of a thumbnail.
 export const InventoryPetImageView: FC<{ pet: PetData; preview?: boolean }> = ({ pet, preview = false }) => {
     const [image, setImage] = useState<HTMLImageElement>(null);
 

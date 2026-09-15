@@ -39,8 +39,6 @@
 .octane-card-shell:not(.octane-wired) {
     resize: both;
     border: 1px solid #0f1b22 !important;
-    /* Soft radius is only a fallback when a window opts out of Ubuntu frame 3.
-       Habbo AIR windows use frameStyle={3} / .octane-card-frame-3 instead. */
     border-radius: 6px;
     background: var(--octane-card-surface);
     box-shadow: none;
@@ -49,7 +47,6 @@
     overflow: hidden;
 }
 
-/* Frame-3 overrides the soft fallback radius/border/fill above. */
 
 .octane-card-header,
 .octane-card-header-shell {
@@ -324,8 +321,6 @@
         padding: 5px 4px 0 !important;
         margin-bottom: 0;
         color: var(--octane-card-text);
-        /* AIR tab_button style 3: 9-slice caps 9px / mid 4px. Corners are
-           transparent stair-steps in the bitmap — no CSS border-radius. */
         background: transparent;
         border: solid transparent;
         border-width: 0 9px;

@@ -43,8 +43,6 @@ const OctaneCardRoot = ({
                 ref={elementRef}
                 className={classNames(
                     'octane-card octane-card-shell flex flex-col min-w-full min-h-full max-w-full max-h-full',
-                    // Ubuntu frame 3 unless the caller already opted into a frame class
-                    // or Illumina wired chrome. Pixel corners come from the bitmap mask.
                     !className?.includes('octane-card-frame-') && !className?.includes('octane-wired') && 'octane-card-frame-3',
                     className
                 )}

@@ -48,7 +48,6 @@
     font-size: 12px !important;
     line-height: 17px !important;
     overflow: hidden;
-    /* Keep shared tab-3 9-slice chrome; only tighten fit for five labels. */
     border-radius: 0 !important;
     align-items: flex-start !important;
     justify-content: center !important;
@@ -288,7 +287,6 @@
     width: 180px;
 }
 
-/* AIR placeinroom_btn: button style 3 / shiny, 180×22 — pixel caps from bitmap. */
 .octane-inventory-window .octane-inventory-btn-place {
     box-sizing: border-box !important;
     display: inline-flex !important;
@@ -379,7 +377,6 @@
     image-rendering: pixelated;
 }
 
-/* inventory_thumb_xml: 42px logical slot, 40px plate, native bitmap. */
 .octane-inventory-furni-grid .grid {
     grid-template-columns: repeat(6, 42px);
     gap: 2px !important;
@@ -514,7 +511,6 @@
 .octane-inventory-furni-preview-stage { overflow: visible; }
 .octane-inventory-furni-preview-stage > div:first-child { border-radius: 0 !important; }
 
-/* Retain Polaris's compact-screen preview controls after the AIR Place action. */
 .octane-inventory-preview-controls { display: none; }
 @media (max-width: 640px) {
     .octane-inventory-preview-controls { display: flex; gap: 8px; }
@@ -558,7 +554,6 @@
     opacity: 1;
 }
 
-/* Polaris delete: compact overlay, using the red AIR shiny skin. */
 .octane-inventory-preview-delete {
     position: absolute;
     right: 4px;
@@ -594,7 +589,6 @@
 .octane-inventory-preview-delete:focus-visible { outline: 1px dotted #fff; outline-offset: -4px; }
 .octane-inventory-preview-delete svg { width: 8px; height: 9px; }
 
-/* TabContext's selector is32px high; contentArea remains at y35. */
 .octane-inventory-tabs-shell::after {
     content: '';
     position: absolute;
@@ -606,13 +600,10 @@
     pointer-events: none;
 }
 
-/* XML grid/preview start2px after the25px options container. The preview
-   extends3px below contentArea, while the grid leaves3px beneath it. */
 .octane-inventory-content.is-furniture { overflow: visible; }
 .octane-inventory-furni-grid { margin-top: 2px; height: calc(100% - 5px); }
 .octane-inventory-furni-preview { margin-top: 2px; height: calc(100% + 1px); }
 
-/* AIR's52px status regions contain native40px trade/28px recycle bitmaps. */
 .octane-inventory-furni-status-count {
     position: absolute;
     top: 1px;

@@ -1,5 +1,3 @@
-/* inventory_xml pets/bots: 274px grid, 6px gutter, preview starts at x280.
-   PetsGridItem/BotGridItem use the shared 42px inventory_thumb asset. */
 .octane-inventory-animals {
     position: relative;
     width: 100%;
@@ -140,5 +138,4 @@
     .octane-inventory-animal-preview { width: 170px; right: 0; }
 }
 
-/* Reserve room for the Polaris Delete action below AIR’s y229 Place control. */
 .octane-inventory-window.has-pet-controls { height: 372px !important; }

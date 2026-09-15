@@ -1,5 +1,3 @@
-/* inventory_xml options_container and dropmenu/style0. Closed control and
-   portalled expanded list share the official AIR frame and type styling. */
 .octane-inventory-window .octane-inventory-filter-bar {
     position: relative;
     display: block;
@@ -118,8 +116,6 @@
     font-weight: normal;
 }
 
-/* DropMenuController: list x6/y2, 3px end padding; labels use regular Volter9
-   and margins L4/T1/R4/B2. Skin atlas samples: white, d9d9d9, f2f2f2. */
 .octane-inventory-filter-menu {
     position: fixed;
     z-index: 100000;

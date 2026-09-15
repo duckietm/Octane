@@ -9,8 +9,6 @@ interface InventoryFilterSelectProps {
     children: ReactNode;
 }
 
-// AIR dropmenu/style0: expanded menu replaces the closed rectangle at the same
-// origin, widens for captions and fits to desktop. Keep the menu above card clips.
 export const InventoryFilterSelect: FC<InventoryFilterSelectProps> = ({ value, disabled, onChange, children, 'aria-label': label }) => {
     const options = Children.toArray(children)
         .filter(isValidElement<{ value?: string | number; children: ReactNode }>)

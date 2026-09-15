@@ -3,7 +3,6 @@ import { LocalizeText } from '../utils';
 import { FurniCategory } from './FurniCategory';
 import { GroupItem } from './GroupItem';
 
-/** WIN63 FurniView MAIN_FILTER_IDS; predicates from furni/class_3936.as. */
 export const FURNI_MAIN_FILTER = {
     ALL: 'all',
     FLOOR: 'floor_items',
@@ -13,7 +12,6 @@ export const FURNI_MAIN_FILTER = {
 
 export type FurniMainFilter = (typeof FURNI_MAIN_FILTER)[keyof typeof FURNI_MAIN_FILTER];
 
-/** AIR type ids by main filter (FurniView.as). */
 export const FURNI_TYPE_OPTIONS: Record<FurniMainFilter, string[]> = {
     all: ['any', 'sittable', 'layable', 'tiles_or_rugs', 'ltd', 'wired', 'credit_furni', 'clothes', 'pet_food', 'tradable', 'non_tradable', 'recyclable'],
     floor_items: [
@@ -91,7 +89,6 @@ const matchesTypeFilter = (item: GroupItem, typeId: string): boolean => {
         case 'pet_food':
             return className.startsWith('petfood') || furniLine === 'pet_food';
         case 'tradable':
-            // Preserve item authority for custom furniture with no furnidata flag.
             return data?.tradeable ?? !!last?.isTradable;
         case 'non_tradable':
             return data?.tradeable !== undefined ? !data.tradeable : !!last && !last.isTradable;
@@ -116,8 +113,6 @@ const matchesTypeFilter = (item: GroupItem, typeId: string): boolean => {
     }
 };
 
-// GroupItem currently leaves description blank. Resolve the same localization
-// keys as AIR GroupItem.getFurniItemDesc, preserving any Polaris-provided text.
 const getDescription = (item: GroupItem): string => {
     if (item.description) return item.description;
 
