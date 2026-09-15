@@ -887,7 +887,7 @@
 
 .octane-avatar-action-menu--own::before {
     position: absolute;
-    inset: 0;
+    inset: 6px;
     z-index: -2;
     box-sizing: border-box;
     content: '';
@@ -899,6 +899,17 @@
     border-image-repeat: stretch;
     pointer-events: none;
     image-rendering: pixelated;
+}
+
+.octane-avatar-action-menu--own::after {
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 6px);
+    width: 13px;
+    height: 9px;
+    content: '';
+    background: url('../../assets/images/avatar-menu/air/bubble-pointer-down.png') no-repeat;
+    pointer-events: none;
 }
 
 .octane-avatar-action-menu--own .octane-context-menu-header {
@@ -920,10 +931,10 @@
     font-size: 11px;
     font-weight: 700;
     line-height: 16px;
-    text-align: left;
+    text-align: center;
     text-shadow: none;
     white-space: nowrap;
-    justify-content: flex-start !important;
+    justify-content: center !important;
 }
 
 .octane-avatar-action-menu--own .octane-context-menu-header::after {
@@ -1035,58 +1046,6 @@
 
 .air-avatar-menu-buttons > .octane-context-menu-item.air-avatar-menu-item--link:hover {
     color: #91c2ff;
-}
-
-.air-avatar-menu-label {
-    position: relative;
-    display: inline-block;
-    height: 16px;
-    line-height: 16px;
-    white-space: nowrap;
-}
-
-.air-avatar-menu-arrow {
-    position: absolute;
-    top: 3px;
-    display: block;
-    width: 5px;
-    height: 10px;
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: 5px 10px;
-    image-rendering: pixelated;
-}
-
-.air-avatar-menu-arrow--left {
-    right: calc(100% + 8px);
-    background-image: url('../../assets/images/avatar-menu/air/arrow-left.png');
-}
-
-.air-avatar-menu-arrow--right {
-    left: calc(100% + 8px);
-    background-image: url('../../assets/images/avatar-menu/air/arrow-right.png');
-}
-
-.octane-context-menu-item.disabled .air-avatar-menu-arrow {
-    background-color: #585553;
-    background-image: none;
-    filter: none;
-    mask-position: 0 0;
-    mask-repeat: no-repeat;
-    mask-size: 5px 10px;
-    -webkit-mask-position: 0 0;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-size: 5px 10px;
-}
-
-.octane-context-menu-item.disabled .air-avatar-menu-arrow--left {
-    mask-image: url('../../assets/images/avatar-menu/air/arrow-left.png');
-    -webkit-mask-image: url('../../assets/images/avatar-menu/air/arrow-left.png');
-}
-
-.octane-context-menu-item.disabled .air-avatar-menu-arrow--right {
-    mask-image: url('../../assets/images/avatar-menu/air/arrow-right.png');
-    -webkit-mask-image: url('../../assets/images/avatar-menu/air/arrow-right.png');
 }
 
 .air-avatar-menu-extra-label {
