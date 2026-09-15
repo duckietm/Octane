@@ -209,3 +209,86 @@
     scrollbar-width: thin !important;
     scrollbar-color: #8d8d8d transparent !important;
 }
+
+/* AIR opt-in scrollbar skin (navigator results etc.) */
+.has-air-scrollbar {
+    scrollbar-color: auto;
+    scrollbar-width: auto;
+}
+
+.has-air-scrollbar::-webkit-scrollbar {
+    width: 17px;
+    height: 17px;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-track:vertical {
+    background: url("../../assets/images/habbo-skin/slices/scroll-track-3.png") repeat-y;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-thumb:vertical {
+    min-height: 26px;
+    border: 0 solid transparent;
+    border-image: url("../../assets/images/habbo-skin/slices/scroll-thumb-3-default.png") 5 0 / 5px 0 stretch;
+    background: url("../../assets/images/habbo-skin/slices/scroll-grip-3-default.png") center no-repeat,
+        url("../../assets/images/habbo-skin/slices/scroll-mid-3-default.png") repeat-y;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-thumb:vertical:active {
+    border-image-source: url("../../assets/images/habbo-skin/slices/scroll-thumb-3-pressed.png");
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-grip-3-pressed.png"), url("../../assets/images/habbo-skin/slices/scroll-mid-3-pressed.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical {
+    display: block;
+    height: 16px;
+    background: center / 17px 16px no-repeat;
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-default.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-default.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:active {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-pressed.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:active {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-pressed.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:disabled {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-disabled.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:disabled {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-disabled.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-thumb:vertical:hover:not(:active) {
+    border-image-source: url("../../assets/images/habbo-skin/slices/scroll-thumb-3-hover.png");
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-grip-3-hover.png"), url("../../assets/images/habbo-skin/slices/scroll-mid-3-hover.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:decrement:hover:not(:active) {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-hover.png");
+}
+
+.has-air-scrollbar::-webkit-scrollbar-button:single-button:vertical:increment:hover:not(:active) {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-hover.png");
+}
+
+.has-air-scrollbar[data-scrollable="false"]::-webkit-scrollbar-track:vertical {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-track-v-disabled.png");
+}
+
+.has-air-scrollbar[data-scrollable="false"]::-webkit-scrollbar-button:single-button:vertical:decrement {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-up-3-disabled.png");
+}
+
+.has-air-scrollbar[data-scrollable="false"]::-webkit-scrollbar-button:single-button:vertical:increment {
+    background-image: url("../../assets/images/habbo-skin/slices/scroll-down-3-disabled.png");
+}

@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { LocalizeText, SearchFilterOptions } from '../../../../api';
-import dropmenuArrow from '../../../../assets/images/habbo-skin/slices/dropmenu-arrow.png';
+import dropmenuArrow from '../../../../assets/images/habbo-skin/slices/dropmenu-default-arrow.png';
 
 interface NavigatorFilterChipsViewProps {
     value: number;
@@ -43,7 +43,7 @@ export const NavigatorFilterChipsView: FC<NavigatorFilterChipsViewProps> = (prop
                 onClick={() => setOpen((currentOpen) => !currentOpen)}
             >
                 <span>{LocalizeText('navigator.filter.' + current.name)}</span>
-                <img src={dropmenuArrow} alt="" width={22} height={20} />
+                <img src={dropmenuArrow} alt="" width={16} height={16} />
             </button>
             {open && (
                 <ul className="octane-navigator-air__filter-list" role="listbox">

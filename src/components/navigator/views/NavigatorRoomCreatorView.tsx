@@ -1,7 +1,7 @@
 import { CreateFlatMessageComposer } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { CreateLinkEvent, GetConfigurationValue, IRoomModel, LocalizeText, SendMessageComposer } from '../../../api';
-import dropmenuArrow from '../../../assets/images/habbo-skin/slices/dropmenu-arrow.png';
+import dropmenuArrow from '../../../assets/images/habbo-skin/slices/dropmenu-default-arrow.png';
 import vipIconBig from '../../../assets/images/navigator/air/icon-vip-big.png';
 import vipIconSmall from '../../../assets/images/navigator/air/icon-vip-small.png';
 import popupArrowDown from '../../../assets/images/navigator/air/popup-arrow-down.png';
@@ -11,11 +11,7 @@ import { DraggableWindow } from '../../../common';
 import { useNavigatorData, useNavigatorUiStore, useUserDataSnapshot } from '../../../hooks';
 import { useRoomCreatorStore } from './navigatorRoomCreatorStore';
 
-const AIR_TRADE_KEYS = [
-    'navigator.roomsettings.trade_not_allowed',
-    'navigator.roomsettings.trade_not_with_Controller',
-    'navigator.roomsettings.trade_allowed'
-];
+const AIR_TRADE_KEYS = ['navigator.roomsettings.trade_not_allowed', 'navigator.roomsettings.trade_not_with_Controller', 'navigator.roomsettings.trade_allowed'];
 
 const ROOM_LIMIT_HC = 75;
 const ROOM_LIMIT_NON_SUBSCRIBER = 50;
@@ -71,7 +67,7 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
                 onClick={() => setOpen((currentOpen) => !currentOpen)}
             >
                 <span>{options[value] ?? ''}</span>
-                <img src={dropmenuArrow} alt="" width={22} height={20} />
+                <img src={dropmenuArrow} alt="" width={16} height={16} />
             </button>
             {open && (
                 <ul className="octane-room-creator-air__dropmenu-list" role="listbox">
@@ -127,10 +123,7 @@ export const NavigatorRoomCreatorView: FC = () => {
         [categories, securityLevel]
     );
 
-    const visitorOptions = useMemo(
-        () => buildVisitorOptions(effectiveClubLevel >= 2 ? ROOM_LIMIT_HC : ROOM_LIMIT_NON_SUBSCRIBER),
-        [effectiveClubLevel]
-    );
+    const visitorOptions = useMemo(() => buildVisitorOptions(effectiveClubLevel >= 2 ? ROOM_LIMIT_HC : ROOM_LIMIT_NON_SUBSCRIBER), [effectiveClubLevel]);
 
     const safeCategoryIndex = categoryIndex < selectableCategories.length ? categoryIndex : 0;
     const safeVisitorsIndex = visitorsIndex < visitorOptions.length ? visitorsIndex : 0;
@@ -192,12 +185,7 @@ export const NavigatorRoomCreatorView: FC = () => {
                 <div className="octane-room-creator-air__skin" aria-hidden="true" />
                 <div className="octane-room-creator-air__caption">
                     <span className="octane-room-creator-air__title">{LocalizeText('navigator.createroom.title')}</span>
-                    <button
-                        type="button"
-                        className="octane-room-creator-air__close"
-                        aria-label={LocalizeText('generic.close')}
-                        onClick={closeCreator}
-                    />
+                    <button type="button" className="octane-room-creator-air__close" aria-label={LocalizeText('generic.close')} onClick={closeCreator} />
                 </div>
 
                 <span className="octane-room-creator-air__label octane-room-creator-air__label--name">{LocalizeText('navigator.roomname')}</span>
@@ -272,7 +260,7 @@ export const NavigatorRoomCreatorView: FC = () => {
                 <span className="octane-room-creator-air__label octane-room-creator-air__label--layout">
                     {LocalizeText('navigator.createroom.chooselayoutcaption')}
                 </span>
-                <div className="octane-room-creator-air__layouts">
+                <div className="octane-room-creator-air__layouts has-classic-scrollbar">
                     <div className="octane-room-creator-air__layout-rows">
                         {visibleModels.map((model) => {
                             const isSelected = selectedModelName === model.name;

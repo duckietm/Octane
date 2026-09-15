@@ -69,7 +69,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
 
     return (
-        <section className="octane-navigator-air__category" data-result-code={searchResult.code}>
+        <section className={`octane-navigator-air__category${isExtended ? '' : ' is-collapsed'}`} data-result-code={searchResult.code}>
             <header className="octane-navigator-air__category-header">
                 <button
                     type="button"
@@ -82,7 +82,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                     <span>{resultTitle}</span>
                 </button>
                 <div className="octane-navigator-air__category-controls">
-                    {displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
+                    {isExtended && displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
                         <button
                             type="button"
                             className="octane-navigator-air__icon-button"
@@ -93,7 +93,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                             <img src={navViewThumbs} alt="" />
                         </button>
                     )}
-                    {isTileMode && (
+                    {isExtended && isTileMode && (
                         <button
                             type="button"
                             className="octane-navigator-air__icon-button"
