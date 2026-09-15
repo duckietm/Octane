@@ -166,6 +166,10 @@
     filter: drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349)) !important;
 }
 
+.octane-card-shell.octane-card-frame-3.octane-card-frame-teal {
+    --octane-card-frame-3: url("../../assets/images/habbo-skin/slices/frame-ubuntu-3-teal.png");
+}
+
 .octane-card-shell.octane-card-frame-3::before {
     content: "";
     position: absolute;
