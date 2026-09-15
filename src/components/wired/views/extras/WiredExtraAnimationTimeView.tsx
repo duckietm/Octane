@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
-import { localizeWithFallback, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { WiredFurniType } from '../../../../api';
 import { useWired } from '../../../../hooks';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
 const MIN_DURATION = 50;
@@ -32,16 +32,16 @@ export const WiredExtraAnimationTimeView: FC<{}> = () => {
 
     return (
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>{localizeWithFallback('wiredfurni.params.setanimationtime2', `${duration} ms`)}</Text>
-                <Slider
-                    min={MIN_DURATION}
-                    max={MAX_DURATION}
-                    step={STEP_DURATION}
-                    value={duration}
-                    onChange={(value) => setDuration(normalizeDuration(Array.isArray(value) ? value[0] : Number(value)))}
-                />
-            </div>
+            <WiredSliderSection
+                max={MAX_DURATION}
+                min={MIN_DURATION}
+                normalize={normalizeDuration}
+                step={STEP_DURATION}
+                titleFallback={`${duration} ms`}
+                titleKey="wiredfurni.params.setanimationtime2"
+                value={duration}
+                onChange={setDuration}
+            />
         </WiredExtraBaseView>
     );
 };

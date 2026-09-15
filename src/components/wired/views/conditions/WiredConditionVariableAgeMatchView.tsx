@@ -48,7 +48,7 @@ const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string; disabled?: 
 ];
 
 const GLOBAL_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.global' }];
-const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'Current execution' }];
+const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.context' }];
 const COMPARE_VALUE_OPTIONS = [COMPARE_VALUE_CREATED, COMPARE_VALUE_UPDATED];
 const COMPARISON_OPTIONS = [COMPARISON_LOWER_THAN, COMPARISON_HIGHER_THAN];
 const DURATION_UNITS = [0, 1, 2, 3, 4, 5, 6, 7];

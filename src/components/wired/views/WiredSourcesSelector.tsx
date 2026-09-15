@@ -13,6 +13,9 @@ import { GetRoomSession, LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';
 import { useMessageEvent, useOctaneEvent, useWired } from '../../../hooks';
 
+/** The furni sources that actually pick items, and so carry the picked counter. */
+export const SELECTING_FURNI_SOURCES = [100, 101];
+
 export const FURNI_SOURCES = [
     { value: 100, label: 'wiredfurni.params.sources.furni.100' },
     { value: 200, label: 'wiredfurni.params.sources.furni.200' },
@@ -218,7 +221,11 @@ export const WiredSourcesSelector: FC<WiredSourcesSelectorProps> = (props) => {
         onChangeFurni = null,
         onChangeUsers = null
     } = props;
-    const { trigger = null } = useWired();
+    const { trigger = null, furniIds = null } = useWired();
+    // The official window prints how many items are picked, and the ceiling, on the source
+    // label itself - the picked count belongs to the source, not to a separate block.
+    const selectionCount = furniIds?.length ?? 0;
+    const selectionLimit = trigger?.maximumItemSelectionCount ?? 0;
     const availableUserSources = useAvailableUserSources(trigger, userSources, usersTitle, allowClickedUserSource);
     const orderedFurniSources = useMemo(() => sortWiredSourceOptions(furniSources, 'furni'), [furniSources]);
     const orderedUserSources = useMemo(() => {
@@ -278,6 +285,8 @@ export const WiredSourcesSelector: FC<WiredSourcesSelectorProps> = (props) => {
                         <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
                             <Text small className="text-center">
                                 {LocalizeText(orderedFurniSources[furniIndex].label)}
+                                {SELECTING_FURNI_SOURCES.includes(orderedFurniSources[furniIndex].value) &&
+                                    ` [${selectionCount}${selectionLimit ? `/${selectionLimit}` : ''}]`}
                             </Text>
                         </div>
                         <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={nextFurni}>

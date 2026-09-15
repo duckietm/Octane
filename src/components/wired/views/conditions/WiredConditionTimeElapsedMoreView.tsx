@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
-import { GetWiredTimeLocale, LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { GetWiredTimeLocale, LocalizeText, WiredFurniType } from '../../../../api';
 import { useWired } from '../../../../hooks';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
 export const WiredConditionTimeElapsedMoreView: FC<{}> = (props) => {
@@ -16,10 +16,17 @@ export const WiredConditionTimeElapsedMoreView: FC<{}> = (props) => {
 
     return (
         <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.allowafter2', LocalizeText('wiredfurni.params.allowafter', ['seconds'], [GetWiredTimeLocale(time)]))}</Text>
-                <Slider max={1200} min={1} value={time} onChange={(event) => setTime(event)} />
-            </div>
+            <WiredSliderSection
+                boxStep={0.5}
+                fromDisplay={(text) => Math.round(Number(text) * 2)}
+                max={1200}
+                min={1}
+                titleFallback={LocalizeText('wiredfurni.params.allowafter')}
+                titleKey="wiredfurni.params.allowafter2"
+                toDisplay={GetWiredTimeLocale}
+                value={time}
+                onChange={(value) => setTime(value)}
+            />
         </WiredConditionBaseView>
     );
 };

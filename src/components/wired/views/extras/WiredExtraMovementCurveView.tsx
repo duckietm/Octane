@@ -1,17 +1,22 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
+import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
-const CURVE_OPTIONS: { value: number; label: string }[] = [
-    { value: 0, label: 'Linear' },
-    { value: 1, label: 'Ease in' },
-    { value: 2, label: 'Ease out' },
-    { value: 3, label: 'Ease in / out' },
-    { value: 4, label: 'Bounce' },
-    { value: 5, label: 'Elastic' },
-    { value: 6, label: 'Drop' }
+/**
+ * The first four curves are the ones the official corpus already names under
+ * `wiredfurni.params.easing.*`; bounce, elastic and drop are this fork's own, so they carry a key in
+ * the same namespace and fall back to English until it is translated.
+ */
+const CURVE_OPTIONS: { value: number; key: string; fallback: string }[] = [
+    { value: 0, key: 'wiredfurni.params.easing.linear', fallback: 'Linear' },
+    { value: 1, key: 'wiredfurni.params.easing.ease_in', fallback: 'Ease in' },
+    { value: 2, key: 'wiredfurni.params.easing.ease_out', fallback: 'Ease out' },
+    { value: 3, key: 'wiredfurni.params.easing.ease_in_out', fallback: 'Ease in / out' },
+    { value: 4, key: 'wiredfurni.params.easing.bounce', fallback: 'Bounce' },
+    { value: 5, key: 'wiredfurni.params.easing.elastic', fallback: 'Elastic' },
+    { value: 6, key: 'wiredfurni.params.easing.drop', fallback: 'Drop' }
 ];
 
 const CURVE_MAX = 6;
@@ -49,7 +54,7 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
     return (
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
             <div className="flex flex-col gap-2">
-                <Text bold>Movement curve</Text>
+                <Text bold>{localizeWithFallback('wiredfurni.params.easing_function', 'Movement curve')}</Text>
                 <div className="flex flex-col gap-1">
                     {CURVE_OPTIONS.map((option) => (
                         <label key={option.value} className="flex items-center gap-2">
@@ -60,13 +65,20 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
                                 checked={curveType === option.value}
                                 onChange={() => setCurveType(option.value)}
                             />
-                            <Text small>{option.label}</Text>
+                            <Text small>{localizeWithFallback(option.key, option.fallback)}</Text>
                         </label>
                     ))}
                 </div>
                 {curveType > 0 && (
                     <div className="flex flex-col gap-1">
-                        <Text bold>Intensity ({intensity}%)</Text>
+                        <Text bold>
+                            {localizeWithFallback(
+                                'wiredfurni.params.easing.intensity',
+                                `Intensity (${intensity}%)`,
+                                ['intensity'],
+                                [intensity.toString()]
+                            )}
+                        </Text>
                         <Slider
                             max={INTENSITY_MAX}
                             min={INTENSITY_MIN}
