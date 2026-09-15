@@ -26,7 +26,8 @@ describe('AIR navigator visual contract', () => {
         expect(view).not.toContain('FindNewFriendsMessageComposer');
         expect(css).toContain('width: 425px');
         expect(css).toContain('width: 578px');
-        expect(css).toContain('width: 88px');
+        expect(css).toContain('88px');
+        expect(css).toMatch(/--navigator-tab-width|width:\s*88px/);
         expect(css).toContain('width: 383px');
         expect(css).toContain('height: 20px');
         expect(css).toContain('width: 122px');
