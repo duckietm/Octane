@@ -67,7 +67,7 @@ export const AchievementsView: FC = () => {
 
     return (
         <OctaneCard
-            className="octane-achievements-air octane-card-frame-3"
+            className="octane-achievements-air octane-card-frame-3 octane-card-frame-teal"
             uniqueKey="achievements"
             windowPosition={DraggableWindowPosition.TOP_CENTER}
             offsetTop={-30}

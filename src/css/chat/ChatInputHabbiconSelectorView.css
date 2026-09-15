@@ -1,3 +1,5 @@
+@import "../habbo/AirBitmapSurface.css";
+
 .habbicon-chat-trigger {
     width: 24px;
     height: 24px;
@@ -39,7 +41,7 @@
     image-rendering: pixelated;
     background: transparent;
     border: 6px solid transparent;
-    border-image-source: url('../../assets/images/habbicons/slices/selector-panel.png');
+    border-image-source: url("../../assets/images/habbicons/slices/selector-panel.png");
     border-image-slice: 6 fill;
     border-image-width: 6px;
     border-image-repeat: stretch;
@@ -62,7 +64,7 @@
     height: 28px;
     background: transparent;
     border: 6px solid transparent;
-    border-image-source: url('../../assets/images/habbicons/slices/selector-input.png');
+    border-image-source: url("../../assets/images/habbicons/slices/selector-input.png");
     border-image-slice: 6 fill;
     border-image-width: 6px;
     border-image-repeat: stretch;
@@ -109,7 +111,7 @@
     height: 17px;
     padding: 0;
     border: 0;
-    background: transparent url('../../assets/images/habbicons/slices/promo-arrow-close.png') center no-repeat;
+    background: transparent url("../../assets/images/habbicons/slices/promo-arrow-close.png") center no-repeat;
     image-rendering: pixelated;
     cursor: pointer;
 }
@@ -130,7 +132,7 @@
     text-shadow: none;
     background: transparent;
     border: 5px solid transparent;
-    border-image-source: url('../../assets/images/habbicons/slices/button-shiny-black-default.png');
+    border-image-source: url("../../assets/images/habbicons/slices/button-shiny-black-default.png");
     border-image-slice: 5 fill;
     border-image-width: 5px;
     border-image-repeat: stretch;
@@ -140,11 +142,11 @@
 }
 
 .habbicon-selector-book-button:hover {
-    border-image-source: url('../../assets/images/habbicons/slices/button-shiny-black-hover.png');
+    border-image-source: url("../../assets/images/habbicons/slices/button-shiny-black-hover.png");
 }
 
 .habbicon-selector-book-button:active {
-    border-image-source: url('../../assets/images/habbicons/slices/button-shiny-black-pressed.png');
+    border-image-source: url("../../assets/images/habbicons/slices/button-shiny-black-pressed.png");
 }
 
 .habbicon-selector-sections {
@@ -195,15 +197,15 @@
 }
 
 .habbicon-selector-item.filled {
-    border-image-source: url('../../assets/images/habbicons/slices/selector-tile.png');
+    border-image-source: url("../../assets/images/habbicons/slices/selector-tile.png");
 }
 
 .habbicon-selector-item.empty {
-    border-image-source: url('../../assets/images/habbicons/slices/selector-tile-empty.png');
+    border-image-source: url("../../assets/images/habbicons/slices/selector-tile-empty.png");
 }
 
 .habbicon-selector-item.filled:hover {
-    border-image-source: url('../../assets/images/habbicons/slices/selector-tile-hover.png');
+    border-image-source: url("../../assets/images/habbicons/slices/selector-tile-hover.png");
 }
 
 .habbicon-selector-item > img {
@@ -235,42 +237,57 @@
     text-align: center;
 }
 
+/* Coordinates and skins: WIN63 habbicon_view_xml. */
 .habbicon-hub-window {
     width: 560px !important;
     min-width: 560px !important;
     max-width: 560px !important;
-    height: 572px !important;
-    min-height: 572px !important;
-    max-height: 572px !important;
-    background: #d7d1be !important;
+    height: 570px !important;
+    min-height: 570px !important;
+    max-height: 570px !important;
     color: #2b2b2b;
-    overflow: hidden;
+    font:
+        12px HabboAirUbuntu,
+        sans-serif;
 }
 
 .habbicon-hub-body {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-album-background.png");
+    --air-surface-slice: 3;
+    --air-surface-width: 3px;
     position: absolute;
     left: 2px;
     top: 35px;
     width: 554px;
     height: 530px;
-    background: #d7d1be;
 }
 
 .habbicon-hub-header {
-    position: relative;
+    position: absolute;
+    left: -2px;
+    top: -3px;
+    width: 558px;
     height: 110px;
-    margin: -3px -2px 0;
-    padding: 14px 16px 12px;
     overflow: hidden;
     color: #fff;
-    background: #1f5d78;
+    background: #2b7aa0;
+}
+
+.habbicon-hub-header-surface {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-album-header.png");
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 554px;
+    height: 106px;
 }
 
 .habbicon-hub-header-pattern {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    left: -1px;
+    top: 2px;
+    width: 554px;
+    height: 110px;
     opacity: 0.16;
     pointer-events: none;
     image-rendering: pixelated;
@@ -280,7 +297,6 @@
     position: absolute;
     left: 18px;
     top: 20px;
-    z-index: 1;
     width: 66px;
     height: 70px;
     object-fit: contain;
@@ -291,39 +307,40 @@
     position: absolute;
     left: 100px;
     top: 14px;
-    z-index: 1;
 }
 
 .habbicon-hub-header-copy strong {
     display: block;
+    padding: 2px;
     font-size: 18px;
-    line-height: 24px;
+    line-height: 22px;
 }
 
 .habbicon-hub-header-copy span {
     display: block;
     width: 220px;
+    margin-top: 1px;
+    padding: 2px;
     color: #d7efe5;
     font-size: 11px;
-    line-height: 14px;
+    line-height: 13px;
 }
 
 .habbicon-hub-stat {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-album-stat.png");
+    --air-surface-slice: 6 6 7;
+    --air-surface-width: 6px 6px 7px;
     position: absolute;
     top: 12px;
-    z-index: 1;
     width: 102px;
     height: 42px;
     padding: 5px 6px 0;
     text-align: center;
-    background: transparent;
-    border-radius: 4px;
 }
 
 .habbicon-hub-stat.owned {
     left: 331px;
 }
-
 .habbicon-hub-stat.completed {
     left: 443px;
 }
@@ -343,148 +360,249 @@
 .habbicon-hub-progress {
     position: absolute;
     left: 102px;
-    bottom: 10px;
-    z-index: 1;
+    top: 79px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
 }
 
-.habbicon-hub-progress-bar,
-.habbicon-hub-set-progress-bar,
-.habbicon-hub-rail-progress {
-    overflow: hidden;
-    background: #17394d;
+.habbicon-progress-bar {
+    position: relative;
+    background: #4d5d66;
+    border: 1px solid #000;
     border-radius: 6px;
+    height: 16px;
+    width: 154px;
+    --habbicon-progress-highlight-height: 5px;
+    --habbicon-progress-highlight-alpha: 0.09;
 }
 
-.habbicon-hub-progress-bar {
+.habbicon-progress-bar-album {
     width: 304px;
     height: 18px;
+    background: #17394d;
+    --habbicon-progress-highlight-height: 6px;
+    --habbicon-progress-highlight-alpha: 0.1;
 }
 
-.habbicon-hub-progress-fill,
-.habbicon-hub-set-progress-bar > div,
-.habbicon-hub-rail-progress > div {
+.habbicon-progress-clip {
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    height: calc(100% + 2px);
+    overflow: hidden;
+}
+
+.habbicon-progress-fill {
+    position: relative;
     height: 100%;
-    background: #54a8e8;
+    border: 1px solid #000;
     border-radius: 6px;
+    background: #54a8e8;
+    transition: background-color 250ms linear;
+}
+
+.habbicon-progress-fill::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: var(--habbicon-progress-highlight-height);
+    opacity: var(--habbicon-progress-highlight-alpha);
+    background: linear-gradient(#fff, transparent);
+    mix-blend-mode: plus-lighter;
+}
+
+.habbicon-progress-bar[data-complete="true"] .habbicon-progress-fill {
+    background-color: #78c95c;
 }
 
 .habbicon-hub-progress strong,
 .habbicon-hub-set-progress strong {
+    padding: 1px 2px;
     font-size: 12px;
+    line-height: 17px;
+    white-space: nowrap;
 }
 
 .habbicon-hub-tabs {
+    position: absolute;
+    left: 7px;
+    top: 113px;
     display: flex;
+    align-items: flex-start;
+    width: 540px;
     height: 33px;
-    margin: 3px 7px 0;
+    padding-left: 8px;
     border-bottom: 1px solid #fff;
+    background: linear-gradient(#000, #000) left bottom 1px / 100% 1px no-repeat;
 }
 
 .habbicon-hub-tabs button {
     height: 32px;
     min-width: 64px;
-    padding: 0 12px;
-    color: #222;
-    border: 7px solid transparent;
-    border-image: url("../../assets/images/habbo-skin/slices/tab-3-default.png") 7 fill / 7px stretch;
+    padding: 0 10px;
+    color: #000;
+    border: 0;
+    border-image: url("../../assets/images/habbo-skin/slices/tab-3-default.png") 9 9 1 fill / 9px 9px 1px stretch;
     background: transparent;
+    font: inherit;
+    white-space: nowrap;
 }
 
+.habbicon-hub-tabs button:last-child {
+    min-width: 82px;
+}
+.habbicon-hub-tabs button:hover {
+    border-image-source: url("../../assets/images/habbo-skin/slices/tab-3-hover.png");
+}
 .habbicon-hub-tabs button.active {
     border-image-source: url("../../assets/images/habbo-skin/slices/tab-3-selected.png");
 }
 
 .habbicon-hub-all-sets {
+    position: absolute;
+    left: 7px;
+    top: 146px;
     display: grid;
     grid-template-columns: 154px 380px;
     gap: 6px;
+    width: 540px;
     height: 380px;
-    margin: 3px 7px 7px;
 }
 
 .habbicon-hub-rail {
-    overflow-y: auto;
-    padding: 4px;
-    background: #f8ebd6;
-    border: 1px solid #b9ad92;
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-sidebar.png");
+    --air-surface-slice: 8;
+    --air-surface-width: 8px;
+}
+
+.habbicon-hub-rail-list {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 145px;
+    height: 372px;
+    overflow: hidden auto;
 }
 
 .habbicon-hub-rail button {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-row-default.png");
+    --air-surface-slice: 6 6 8;
+    --air-surface-width: 6px 6px 8px;
+    display: block;
     width: 145px;
-    min-height: 50px;
-    display: flex;
-    gap: 6px;
-    align-items: center;
+    height: 50px;
     margin-bottom: 1px;
-    padding: 4px 6px;
+    padding: 0;
+    overflow: hidden;
     color: #2b2b2b;
     text-align: left;
-    background: #f2ecd5;
+    background: transparent;
     border: 0;
 }
 
+.habbicon-hub-rail button::before {
+    inset: 1px -1px 0 1px;
+}
+.habbicon-hub-rail button:hover {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-row-hover.png");
+}
 .habbicon-hub-rail button.active {
-    background: #e0cba6;
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-row-selected.png");
 }
 
-.habbicon-hub-rail button span {
-    flex: 0 0 40px;
+.habbicon-hub-rail button > img {
+    position: absolute;
+    left: 7px;
+    top: 4px;
     width: 40px;
     height: 40px;
-    background-repeat: no-repeat;
-    image-rendering: pixelated;
 }
 
 .habbicon-hub-rail strong {
-    display: block;
+    position: absolute;
+    left: 50px;
+    top: 7px;
+    padding: 2px;
     font-size: 12px;
+    line-height: 13px;
+    white-space: nowrap;
 }
 
-.habbicon-hub-rail-progress {
+.habbicon-progress-bar-rail {
+    position: absolute;
+    left: 53px;
+    top: 28px;
     width: 69px;
     height: 12px;
-    margin-top: 4px;
+    border-radius: 4px;
+    --habbicon-progress-highlight-height: 4px;
+    --habbicon-progress-highlight-alpha: 0.08;
+}
+
+.habbicon-progress-bar-rail .habbicon-progress-fill {
     border-radius: 4px;
 }
 
 .habbicon-hub-page {
     position: relative;
-    background: #f6ebd7;
-    border: 1px solid #c8be8d;
+}
+
+.habbicon-hub-page-background,
+.habbicon-hub-page-header {
+    --air-surface-slice: 6 6 8;
+    --air-surface-width: 6px 6px 8px;
+    position: absolute;
+    left: 0;
+    width: 380px;
+}
+
+.habbicon-hub-page-background {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-panel.png");
+    top: 98px;
+    height: 282px;
 }
 
 .habbicon-hub-page-header {
-    height: 92px;
-    padding: 8px 12px 0;
-    background: #e0cba6;
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-header.png");
+    top: 2px;
+    height: 91px;
 }
 
 .habbicon-hub-page-header h3 {
+    position: absolute;
+    left: 12px;
+    top: 8px;
     margin: 0;
+    padding: 2px;
     font-size: 17px;
-    line-height: 22px;
+    font-weight: 700;
+    line-height: 20px;
 }
 
 .habbicon-hub-page-header p {
-    margin: 1px 0 0;
+    position: absolute;
+    left: 13px;
+    top: 31px;
+    width: 359px;
+    height: 30px;
+    overflow: hidden;
+    margin: 0;
+    padding: 2px;
     color: #3b3b3b;
     font-size: 11px;
-    line-height: 15px;
+    line-height: 13px;
 }
 
 .habbicon-hub-set-progress {
+    position: absolute;
+    left: 14px;
+    top: 65px;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 8px;
-}
-
-.habbicon-hub-set-progress-bar {
-    width: 154px;
-    height: 16px;
 }
 
 .habbicon-hub-grid,
@@ -494,62 +612,60 @@
     grid-auto-rows: 50px;
     align-content: start;
     gap: 4px;
-    padding: 8px;
 }
 
 .habbicon-hub-grid {
     position: absolute;
     left: 8px;
     top: 106px;
-    padding: 0;
     width: 234px;
     height: 266px;
-    overflow-y: auto;
+    overflow: hidden auto;
 }
 
-.habbicon-tile, .habbicon-empty-tile {
-    position: relative;
-    box-sizing: border-box;
+.habbicon-hub-window :is(.habbicon-tile, .habbicon-empty-tile) {
+    --air-surface-slice: 6;
+    --air-surface-width: 6px;
     width: 50px;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 1px solid #99c176;
-    background: #c3d3a7;
+    border: 0;
+    background: transparent;
 }
 
-.habbicon-tile.unowned {
-    background: #e0d6c2;
-    border-color: #d4c2ad;
+.habbicon-hub-window .habbicon-tile {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-owned-default.png");
+    background: linear-gradient(#c3d3a7, #c3d3a7) center / 48px 48px no-repeat;
 }
 
-.habbicon-tile.owned:hover {
-    background: #cddfb2;
-    border-color: #bcd99f;
+.habbicon-hub-window .habbicon-tile.unowned {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-unowned-default.png");
+    background-image: linear-gradient(#e0d6c2, #e0d6c2);
+}
+.habbicon-hub-window .habbicon-tile.owned:hover {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-owned-hover.png");
+    background-image: linear-gradient(#cddfb2, #cddfb2);
+}
+.habbicon-hub-window .habbicon-tile.owned.active {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-owned-selected.png");
+    background-image: linear-gradient(#d4e6b9, #d4e6b9);
+}
+.habbicon-hub-window .habbicon-tile.unowned:hover {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-unowned-hover.png");
+    background-image: linear-gradient(#e8dec9, #e8dec9);
+}
+.habbicon-hub-window .habbicon-tile.unowned.active {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-unowned-selected.png");
+    background-image: linear-gradient(#ebdfcb, #ebdfcb);
 }
 
-.habbicon-tile.owned.active {
-    background: #d4e6b9;
-    border-color: #d3e9bd;
-}
-
-.habbicon-tile.unowned:hover {
-    background: #e8dec9;
-    border-color: #e6ddc8;
-}
-
-.habbicon-tile.unowned.active {
-    background: #ebdfcb;
-    border-color: #eaddcd;
-}
-
-.habbicon-tile.unowned:not(.claimable) .habbicon-tile-image {
+.habbicon-hub-window .habbicon-tile.unowned:not(.claimable) .habbicon-tile-image {
     filter: url(#habbicon-unowned-filter);
 }
-
-.habbicon-tile.unowned:not(.claimable)::after {
+.habbicon-hub-window .habbicon-tile.unowned:not(.claimable)::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -557,10 +673,9 @@
     pointer-events: none;
 }
 
-.habbicon-empty-tile {
-    opacity: .2;
-    background: transparent;
-    border-color: #c8be8d;
+.habbicon-hub-window .habbicon-empty-tile {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-empty.png");
+    opacity: 0.2;
 }
 
 .habbicon-claimable-marker {
@@ -572,7 +687,6 @@
     background: url("../../assets/images/habbicons/claimable.png") no-repeat;
 }
 
-
 .habbicon-hub-fav {
     position: absolute;
     top: 2px;
@@ -582,45 +696,74 @@
 }
 
 .habbicon-hub-tray {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tray-background.png");
+    position: absolute;
+    left: 7px;
+    top: 146px;
+    width: 540px;
     height: 380px;
-    margin: 3px 7px 7px;
     padding: 10px 12px;
-    overflow-y: auto;
-    background: #f6ebd7;
+}
+
+.habbicon-hub-tray-groups {
+    position: absolute;
+    left: 10px;
+    top: 59px;
+    width: 526px;
+    height: 310px;
+    overflow: hidden auto;
 }
 
 .habbicon-hub-tray h3 {
+    font-weight: 700;
     margin: 0;
     font-size: 17px;
+    line-height: 22px;
 }
-
 .habbicon-hub-tray p {
-    margin: 4px 0 12px;
+    margin: 2px 0 12px;
     color: #3b3b3b;
     font-size: 11px;
 }
-
 .habbicon-hub-tray section {
-    margin-bottom: 12px;
-}
-
-.habbicon-hub-tray section strong {
-    display: block;
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tray-group.png");
+    --air-surface-slice: 6 6 8;
+    --air-surface-width: 6px 6px 8px;
+    width: 506px;
+    padding: 7px 10px 9px;
     margin-bottom: 6px;
 }
 
+.habbicon-hub-tray section > strong {
+    display: block;
+    height: 23px;
+}
+.habbicon-hub-tray-grid {
+    grid-template-columns: repeat(9, 50px);
+}
+
 .habbicon-hub-popup {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-popup.png");
+    --air-surface-slice: 6;
+    --air-surface-width: 6px;
     position: absolute;
-    left: 190px;
-    top: 210px;
     z-index: 4;
     width: 180px;
     padding: 6px 0 8px;
     text-align: center;
+}
+
+.habbicon-hub-popup::after {
+    content: "";
+    position: absolute;
+    left: 84px;
+    bottom: -6px;
+    width: 11px;
+    height: 11px;
     background: #efefef;
-    border: 1px solid #cfcfcf;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    transform: rotate(45deg);
 }
 
 .habbicon-hub-popup strong {
@@ -628,74 +771,82 @@
     margin-bottom: 5px;
     font-size: 12px;
 }
-
-
-.habbicon-hub-tray-grid {
-    grid-template-columns: repeat(9, 50px);
+.habbicon-hub-popup p {
+    margin: 6px 12px;
+}
+.habbicon-hub-popup .habbicon-action {
+    width: 156px;
+}
+.habbicon-popup-purchase {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 12px;
+}
+.habbicon-popup-purchase .habbicon-action {
+    width: 57px;
 }
 
-.habbicon-hub-tray section {
-    background: #efe1c4;
-    padding: 7px 10px 9px;
-}
-
-.habbicon-hub-tray section > strong {
-    margin: 0 0 6px;
-}
-
-.habbicon-hub-tray-grid {
-    padding: 0;
-}
-
-.habbicon-hub-reward {
+.habbicon-hub-reward,
+.habbicon-hub-buy-set {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-reward-panel.png");
+    --air-surface-slice: 3;
+    --air-surface-width: 3px;
     position: absolute;
-    right: 12px;
-    top: 106px;
     width: 116px;
-    height: 152px;
-    padding: 0 8px 8px;
-    background: #e7d5b2;
+    padding: 9px 8px 8px;
     text-align: center;
     font-size: 11px;
 }
 
+.habbicon-hub-reward {
+    left: 252px;
+    top: 106px;
+    height: 152px;
+}
 .habbicon-hub-reward > strong {
     display: block;
     height: 23px;
+    font-size: 12px;
+    line-height: 17px;
 }
-
-.habbicon-hub-reward > img {
-    display: block;
+.habbicon-hub-reward-image {
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-reward-image-frame.png");
+    width: 46px;
+    height: 46px;
     margin: 0 auto;
-    box-sizing: content-box;
     padding: 3px;
-    background: #f8ebd6;
 }
 
 .habbicon-hub-reward > p {
-    min-height: 26px;
+    height: 26px;
     margin: 6px 0;
+    font-size: 10px;
+    line-height: 11px;
 }
-
 .habbicon-hub-buy-set {
-    position: absolute;
     top: 161px;
     left: 0;
-    width: 116px;
-    min-height: 71px;
-    padding: 4px 8px 8px;
-    background: #e7d5b2;
+    height: 71px;
 }
-
 .habbicon-hub-buy-set > strong {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
 }
-
-.habbicon-hub-buy-set > button {
-    margin-top: 5px;
+.habbicon-hub-buy-row {
+    position: absolute;
+    right: 8px;
+    top: 34px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+    height: 28px;
 }
-
+.habbicon-hub-buy-row > .habbicon-action {
+    flex: 0 0 88px;
+}
 .habbicon-price {
     display: inline-flex;
     align-items: center;
@@ -706,59 +857,56 @@
 }
 
 .habbicon-action {
-    min-height: 28px;
+    height: 28px;
     padding: 0 8px;
-    border: 5px solid transparent;
+    border: 0;
     border-image: var(--habbo-skin-shiny-green) 5 fill / 5px stretch;
     background: transparent;
     border-radius: 0;
-    color: white;
-    font: bold 12px Ubuntu, sans-serif;
-    text-shadow: 0 1px #000;
+    color: #000;
+    font:
+        12px HabboAirUbuntu,
+        sans-serif;
 }
 
 .habbicon-action:hover {
     border-image-source: var(--habbo-skin-shiny-green-hover);
 }
-
 .habbicon-action:active {
     border-image-source: var(--habbo-skin-shiny-green-pressed);
 }
-
 .habbicon-action:disabled {
     border-image-source: var(--habbo-skin-shiny-green-disabled);
+    color: #ffffff80;
     cursor: default;
 }
-
 .habbicon-action.remove {
     border-image-source: var(--habbo-skin-shiny-red);
 }
-
 .habbicon-action.remove:hover {
     border-image-source: var(--habbo-skin-shiny-red-hover);
 }
-
 .habbicon-action.remove:disabled {
     border-image-source: var(--habbo-skin-shiny-red-disabled);
 }
-
-.habbicon-hub-popup .habbicon-action {
-    max-width: 156px;
-}
-
-.habbicon-hub-popup p {
-    margin: 6px 8px;
-}
-
-.habbicon-popup-purchase {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    align-items: center;
-}
-
-.habbicon-hub-reward > .habbicon-action, .habbicon-hub-buy-set > .habbicon-action {
+.habbicon-hub-reward > .habbicon-action {
     width: 100%;
+}
+
+@media (max-width: 575px), (max-height: 585px) {
+    .habbicon-hub-window {
+        width: min(560px, calc(100vw - 16px)) !important;
+        min-width: min(560px, calc(100vw - 16px)) !important;
+        height: min(570px, calc(100dvh - 16px)) !important;
+        min-height: min(570px, calc(100dvh - 16px)) !important;
+    }
+
+    .habbicon-hub-body {
+        width: calc(100% - 4px);
+        height: calc(100% - 38px);
+        overflow: auto;
+        background: #d7d1be;
+    }
 }
 
 .habbicon-chat-trigger {
@@ -791,7 +939,16 @@
 }
 
 .habbicon-hub-empty {
+    position: absolute;
+    left: 7px;
+    top: 146px;
     padding: 12px;
+}
+
+.habbicon-hub-retry {
+    position: absolute;
+    left: 19px;
+    top: 190px;
 }
 
 .habbicon-purchase-window {
@@ -804,7 +961,9 @@
     margin: 35px 3px 3px;
     padding: 8px 10px;
     background: #e9e9e1;
-    font: 12px Ubuntu, sans-serif;
+    font:
+        12px Ubuntu,
+        sans-serif;
 }
 
 .habbicon-purchase-top {
@@ -864,8 +1023,4 @@
     text-decoration: underline;
     background: none;
     border: 0;
-}
-
-.habbicon-hub-progress-fill, .habbicon-hub-set-progress-bar > div, .habbicon-hub-rail-progress > div {
-    transition: width 300ms ease;
 }

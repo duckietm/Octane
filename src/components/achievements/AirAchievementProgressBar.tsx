@@ -4,7 +4,7 @@ import { AchievementUtilities, LocalizeText } from '../../api';
 interface AirAchievementProgressBarProps {
     progress: number;
     maxProgress: number;
-    localizationKey: string;
+    localizationKey?: string;
     width: number;
     scoreAtStartOfLevel?: number;
     className?: string;
@@ -69,11 +69,13 @@ export const AirAchievementProgressBar: FC<AirAchievementProgressBarProps> = ({
             <span className="air-achievement-progress__fill" style={{ width: animation.width, opacity: animation.opacity }} aria-hidden="true" />
             <span className="air-achievement-progress__fill-cap" style={{ left: animation.width + 4 }} aria-hidden="true" />
             <span className="air-achievement-progress__text" style={{ width }}>
-                {LocalizeText(
-                    localizationKey,
-                    ['progress', 'limit'],
-                    [String(animation.progress + scoreAtStartOfLevel), String(maxProgress + scoreAtStartOfLevel)]
-                )}
+                {localizationKey
+                    ? LocalizeText(
+                          localizationKey,
+                          ['progress', 'limit'],
+                          [String(animation.progress + scoreAtStartOfLevel), String(maxProgress + scoreAtStartOfLevel)]
+                      )
+                    : `${animation.progress + scoreAtStartOfLevel}/${maxProgress + scoreAtStartOfLevel}`}
             </span>
         </div>
     );
