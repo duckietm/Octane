@@ -178,8 +178,6 @@ export const NavigatorView: FC<{}> = () => {
 
         const sizeTabs = () => {
             for (const label of labels) {
-                // AIR centers the title in its 88px template, then fits the tab to its right edge.
-                // TextField contributes a 4px gutter; the title adds two 10px margins.
                 const titleWidth = label.offsetWidth + 4 + 20;
                 label.parentElement.style.setProperty('--navigator-tab-width', `${44 + Math.ceil(titleWidth / 2)}px`);
             }
