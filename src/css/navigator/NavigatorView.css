@@ -1470,7 +1470,7 @@
     min-height: 367px;
     max-height: 367px;
     overflow: visible;
-    zoom: min(1, calc((100vw - 16px) / 585), calc((100dvh - 70px - env(safe-area-inset-bottom, 0px)) / 367));
+    zoom: min(1, calc((100vw - 16px) / 585px), calc((100dvh - 70px - env(safe-area-inset-bottom, 0px)) / 367px));
     border: 0 !important;
     border-radius: 0 !important;
     background: transparent !important;
@@ -1737,15 +1737,15 @@
     height: 21px;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px 0 6px;
+    padding: 0 24px 0 10px;
     overflow: hidden;
     border-style: solid !important;
     border-color: transparent !important;
     border-width: 0 !important;
     border-radius: 0 !important;
-    border-image-source: url("@/assets/images/habbo-skin/slices/border-4.png") !important;
-    border-image-slice: 6 fill !important;
-    border-image-width: 6px !important;
+    border-image-source: url("@/assets/images/habbo-skin/slices/dropmenu-default.png") !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
     border-image-repeat: stretch !important;
     background: transparent !important;
     box-shadow: none !important;
@@ -1769,18 +1769,14 @@
 
 .octane-room-creator-air__dropmenu-button img {
     position: absolute;
-    top: 0;
-    right: 2px;
+    top: 2px;
+    right: 5px;
     flex: none;
-    width: 22px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     margin: 0;
     image-rendering: pixelated;
     pointer-events: none;
-}
-
-.octane-room-creator-air__dropmenu-button:hover img {
-    content: url('@/assets/images/habbo-skin/slices/dropmenu-arrow-hover.png');
 }
 
 .octane-room-creator-air__dropmenu-list {
@@ -1831,6 +1827,9 @@
 
 .octane-room-creator-air__button {
     position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     top: 330px;
     z-index: 2;
     box-sizing: border-box;
@@ -1847,7 +1846,7 @@
     font-family: Volter, monospace;
     font-size: 9px;
     font-weight: 700;
-    line-height: 20px;
+    line-height: 13px;
     text-align: center;
     text-shadow: none !important;
     cursor: pointer;
@@ -1892,10 +1891,10 @@
     left: 276px;
     z-index: 2;
     box-sizing: border-box;
-    width: 290px;
+    width: 295px;
     height: 295px;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
     border-style: solid;
     border-color: transparent;
     border-width: 0;
@@ -2192,3 +2191,4 @@
 .octane-navigator-enforce-category__ok:disabled {
     opacity: 0.5;
     cursor: default;
+}
