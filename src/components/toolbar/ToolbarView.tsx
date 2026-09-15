@@ -1,7 +1,7 @@
 import { CreateLinkEvent, Dispose, DropBounce, EaseOut, FindNewFriendsMessageComposer, JumpBy, Motions, OctaneToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { CSSProperties, FC, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { GetConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, TryVisitRoom, VisitDesktop } from '../../api';
+import { CSSProperties, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { GetConfigurationValue, isHousekeepingEnabled, localizeWithFallback, MessengerIconState, OpenMessengerChat, SendMessageComposer, setYoutubeRoomEnabled, VisitDesktop } from '../../api';
 import collapseLeftImg from '../../assets/images/toolbar/air/collapse-left.png';
 import collapseRightImg from '../../assets/images/toolbar/air/collapse-right.png';
 import dividerImg from '../../assets/images/toolbar/air/divider.png';
@@ -10,7 +10,7 @@ import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
 import { SafetyLockedNotificationView } from '../notification-center/views/SafetyLockedNotificationView';
-import { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NAVIGATOR_HOVER_LINKS, NavigatorHoverItemId, useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useNavigatorData, useOctaneEvent, usePerkAllowances, useRewardTracks, useRoomVisitHistory, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useOctaneEvent, usePerkAllowances, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -49,167 +49,6 @@ const readCollapsedPreference = (key: string): boolean =>
     {
         return false;
     }
-};
-
-/**
- * The official navigator icon unfolds a small menu while hovered
- * (ToolbarHoverCtrl.as, 3075_toolbar_hover_xml): navigator, home,
- * favourites, create, and the visited / frequent room lists that reuse
- * the room visit history. The bubble opens flush with the slot (the icon
- * sits by the screen edge) with a tail pointing at it, like the toolbar hints. The wrapper fills the slot so
- * the icon's absolute offsets keep measuring from the slot. Pointer-only, so
- * the touch layout never mounts it.
- */
-const NavigatorHoverPanel: FC<{ children: ReactNode }> = ({ children }) =>
-{
-    const [ isOpen, setIsOpen ] = useState(false);
-    const [ expandedList, setExpandedList ] = useState<NavigatorHoverItemId | null>(null);
-    const hideTimerRef = useRef<number | null>(null);
-    const rootRef = useRef<HTMLDivElement>(null);
-    const { navigatorData } = useNavigatorData();
-    const { historyView = [], frequentView = [] } = useRoomVisitHistory();
-
-    const homeRoomId = navigatorData?.homeRoomId ?? -1;
-    const items = buildNavigatorHoverItems({ homeRoomId, historyCount: historyView.length });
-
-    const clearHideTimer = () =>
-    {
-        if(hideTimerRef.current === null) return;
-
-        window.clearTimeout(hideTimerRef.current);
-        hideTimerRef.current = null;
-    };
-
-    const open = () =>
-    {
-        clearHideTimer();
-        setIsOpen(true);
-    };
-
-    const scheduleHide = () =>
-    {
-        clearHideTimer();
-        hideTimerRef.current = window.setTimeout(() =>
-        {
-            hideTimerRef.current = null;
-            setIsOpen(false);
-            setExpandedList(null);
-        }, expandedList ? NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS : NAVIGATOR_HOVER_HIDE_DELAY_MS);
-    };
-
-    const hideNow = () =>
-    {
-        clearHideTimer();
-        setIsOpen(false);
-        setExpandedList(null);
-    };
-
-    useEffect(() => clearHideTimer, []);
-
-    // A click anywhere outside the menu closes it at once, as the official
-    // toolbar does when another window takes the mouse.
-    useEffect(() =>
-    {
-        if(!isOpen) return;
-
-        const onPointerDown = (event: PointerEvent) =>
-        {
-            if(rootRef.current?.contains(event.target as Node)) return;
-
-            clearHideTimer();
-            setIsOpen(false);
-            setExpandedList(null);
-        };
-
-        document.addEventListener('pointerdown', onPointerDown, true);
-
-        return () => document.removeEventListener('pointerdown', onPointerDown, true);
-    }, [ isOpen ]);
-
-    // Every row opens the navigator like its official counterpart
-    // (ToolbarHoverCtrl.as): the history rows land on the visited rooms block
-    // of the "me" tab, the chevron next to them unfolds the inline list instead.
-    const activate = (id: NavigatorHoverItemId) =>
-    {
-        if((id === 'home') && (homeRoomId <= 0)) return;
-
-        CreateLinkEvent(NAVIGATOR_HOVER_LINKS[id]);
-        hideNow();
-    };
-
-    const toggleList = (id: NavigatorHoverItemId) => setExpandedList(previous => (previous === id ? null : id));
-
-    const visitRoom = (roomId: number) =>
-    {
-        TryVisitRoom(roomId);
-        hideNow();
-    };
-
-    const expandedRooms = expandedList === 'history' ? historyView : expandedList === 'frequent' ? frequentView : [];
-
-    return (
-        <div
-            ref={ rootRef }
-            className="absolute inset-0"
-            data-testid="navigator-hover"
-            onMouseEnter={ open }
-            onMouseLeave={ scheduleHide }>
-            { children }
-            { isOpen &&
-                <div
-                    className="tb-navigator-hover absolute bottom-full left-0 z-[90] w-[238px] text-[12px] font-bold text-white"
-                    data-testid="navigator-hover-panel"
-                    onMouseEnter={ open }
-                    onMouseLeave={ scheduleHide }>
-                    <div className="tb-navigator-hover-body flex flex-col gap-[1px]">
-                        { items.map(item => (
-                            <div key={ item.id }>
-                                { item.expandable
-                                    ? <div className={ `tb-navigator-hover-row flex w-full items-center justify-between ${ item.disabled ? 'cursor-default text-white/40' : '' } ${ expandedList === item.id ? 'is-open' : '' }` }>
-                                        <button
-                                            type="button"
-                                            disabled={ item.disabled }
-                                            className="tb-navigator-hover-row-label min-w-0 flex-1 truncate text-left"
-                                            onClick={ () => activate(item.id) }>
-                                            { localizeWithFallback(item.key, item.fallback) }
-                                        </button>
-                                        <button
-                                            type="button"
-                                            disabled={ item.disabled }
-                                            aria-expanded={ expandedList === item.id }
-                                            aria-label={ localizeWithFallback(item.key, item.fallback) }
-                                            className="tb-navigator-hover-row-toggle"
-                                            data-testid={ `navigator-hover-toggle-${ item.id }` }
-                                            onClick={ () => toggleList(item.id) }>
-                                            { expandedList === item.id ? '▾' : '▸' }
-                                        </button>
-                                    </div>
-                                    : <button
-                                        type="button"
-                                        disabled={ item.disabled }
-                                        className={ `tb-navigator-hover-row flex w-full items-center text-left ${ item.disabled ? 'cursor-default text-white/40' : 'cursor-pointer' }` }
-                                        onClick={ () => activate(item.id) }>
-                                        <span className="truncate">{ localizeWithFallback(item.key, item.fallback) }</span>
-                                    </button> }
-                                { item.expandable && expandedList === item.id && expandedRooms.length > 0 &&
-                                    <div className="tb-navigator-hover-list flex max-h-[220px] flex-col overflow-y-auto">
-                                        { expandedRooms.map(room => (
-                                            <button
-                                                key={ room.roomId }
-                                                type="button"
-                                                className={ `tb-navigator-hover-row truncate text-left ${ room.roomId === navigatorData?.currentRoomId ? 'is-current' : '' }` }
-                                                onClick={ () => visitRoom(room.roomId) }>
-                                                { room.roomName }
-                                            </button>
-                                        )) }
-                                    </div> }
-                            </div>
-                        )) }
-                    </div>
-                    <div className="tb-navigator-hover-tail" aria-hidden="true" />
-                </div> }
-        </div>
-    );
 };
 
 export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
@@ -546,9 +385,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             : <ToolbarItemView icon="house" data-help-bubble="HTIE_ICON_HOME" onClick={ () => CreateLinkEvent('navigator/goto/home') } className="tb-icon" /> }
                     </motion.div>
                     <motion.div variants={ itemVariants } className="tb-slot">
-                        <NavigatorHoverPanel>
-                            <ToolbarItemView icon="rooms" data-help-bubble="HTIE_ICON_NAVIGATOR" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
-                        </NavigatorHoverPanel>
+                        <ToolbarItemView icon="rooms" data-help-bubble="HTIE_ICON_NAVIGATOR" onClick={ () => CreateLinkEvent('navigator/toggle') } className="tb-icon" />
                     </motion.div>
                     { isInRoom &&
                         <motion.div variants={ itemVariants } className="tb-slot">

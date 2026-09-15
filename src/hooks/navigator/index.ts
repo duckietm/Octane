@@ -10,7 +10,6 @@ export {
 } from './navigatorEnforceCategory';
 export type { NavigatorEnforceCategoryState } from './navigatorEnforceCategoryStore';
 export { useNavigatorEnforceCategoryStore } from './navigatorEnforceCategoryStore';
-export type { NavigatorHoverItem, NavigatorHoverItemId } from './navigatorHoverMenu';
 export type { NavigatorSearchContext } from './navigatorLegacySearch';
 export {
     EMULATOR_CATEGORY_CODES,
@@ -30,7 +29,6 @@ export {
     hasPreviousSearchContext,
     isSameSearchContext
 } from './navigatorSearchHistory';
-export { buildNavigatorHoverItems, NAVIGATOR_HOVER_HIDE_DELAY_EXPANDED_MS, NAVIGATOR_HOVER_HIDE_DELAY_MS, NAVIGATOR_HOVER_LINKS } from './navigatorHoverMenu';
 export type { NavigatorRoomInfoAnchorKind, NavigatorRoomInfoPopupActions, NavigatorRoomInfoPopupState } from './navigatorRoomInfoPopupStore';
 export { useNavigatorRoomInfoPopupStore } from './navigatorRoomInfoPopupStore';
 export type { NavigatorUiActions, NavigatorUiState } from './navigatorUiStore';
