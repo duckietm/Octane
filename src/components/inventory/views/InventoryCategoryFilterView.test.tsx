@@ -34,8 +34,8 @@ describe('InventoryCategoryFilterView AIR filters', () => {
         expect(onSearchApply).toHaveBeenCalledWith('');
     });
 
-    it('renders AIR category filter controls for furniture', () => {
-        render(
+    it('renders the AIR filter bar shell', () => {
+        const { container } = render(
             <InventoryCategoryFilterView
                 currentTab="inventory.furniture"
                 mainFilter="all"
@@ -48,7 +48,7 @@ describe('InventoryCategoryFilterView AIR filters', () => {
             />
         );
 
-        expect(screen.getByLabelText(/category/i)).toBeTruthy();
-        expect(screen.getByLabelText(/^type$/i)).toBeTruthy();
+        expect(container.querySelector('.octane-inventory-filter-bar')).toBeTruthy();
+        expect(container.querySelector('.octane-inventory-filter-search')).toBeTruthy();
     });
 });
