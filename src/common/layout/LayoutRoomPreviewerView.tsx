@@ -4,8 +4,10 @@ import { FC, useEffect, useRef } from 'react';
 export const LayoutRoomPreviewerView: FC<{
     roomPreviewer: RoomPreviewer;
     height?: number;
+    fitParent?: boolean;
+    onPreviewClick?: () => void;
 }> = (props) => {
-    const { roomPreviewer = null, height = 0 } = props;
+    const { roomPreviewer = null, height = 0, fitParent = false, onPreviewClick } = props;
     const elementRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     // Counter that disables further renders once Pixi throws in this
@@ -20,6 +22,10 @@ export const LayoutRoomPreviewerView: FC<{
     const MAX_RENDER_FAILURES = 6;
 
     const onClick = () => {
+        if (onPreviewClick) {
+            onPreviewClick();
+            return;
+        }
         if (!roomPreviewer) return;
 
         roomPreviewer.changeRoomObjectState();
@@ -30,7 +36,7 @@ export const LayoutRoomPreviewerView: FC<{
         const canvas = canvasRef.current;
         const parent = element?.parentElement;
 
-        if (!roomPreviewer || !element || !canvas || !parent || height <= 0) return;
+        if (!roomPreviewer || !element || !canvas || !parent || (!fitParent && height <= 0)) return;
 
         const context = canvas.getContext('2d');
 
@@ -39,6 +45,7 @@ export const LayoutRoomPreviewerView: FC<{
         renderFailuresRef.current = 0;
 
         let textureWidth = 0;
+        let textureHeight = 0;
         let texture: ReturnType<typeof TextureUtils.createRenderTexture> = null;
         let roomCanvasInitialized = false;
         let frameImageData: ImageData = null;
@@ -112,10 +119,11 @@ export const LayoutRoomPreviewerView: FC<{
 
         const resizeToParent = () => {
             const width = Math.round(parent.clientWidth);
+            const targetHeight = fitParent ? Math.round(parent.clientHeight) : height;
 
-            if (width <= 0 || width === textureWidth) return;
+            if (width <= 0 || targetHeight <= 0 || (width === textureWidth && targetHeight === textureHeight)) return;
 
-            const nextTexture = TextureUtils.createRenderTexture(width, height);
+            const nextTexture = TextureUtils.createRenderTexture(width, targetHeight);
 
             if (!nextTexture) return;
 
@@ -123,11 +131,12 @@ export const LayoutRoomPreviewerView: FC<{
 
             texture = nextTexture;
             textureWidth = width;
+            textureHeight = targetHeight;
             frameImageData = null;
 
-            if (roomCanvasInitialized) roomPreviewer.modifyRoomCanvas(width, height);
+            if (roomCanvasInitialized) roomPreviewer.modifyRoomCanvas(width, targetHeight);
             else {
-                roomPreviewer.getRoomCanvas(width, height);
+                roomPreviewer.getRoomCanvas(width, targetHeight);
                 roomCanvasInitialized = true;
             }
 
@@ -141,7 +150,7 @@ export const LayoutRoomPreviewerView: FC<{
         resizeToParent();
         GetTicker().add(update);
 
-        resizeObserver.observe(element);
+        resizeObserver.observe(fitParent ? parent : element);
 
         return () => {
             GetTicker().remove(update);
@@ -150,16 +159,16 @@ export const LayoutRoomPreviewerView: FC<{
 
             texture?.destroy(true);
         };
-    }, [roomPreviewer, height]);
+    }, [roomPreviewer, height, fitParent]);
 
     return (
         <div
             ref={elementRef}
             className="relative w-full overflow-hidden rounded-md shadow-room-previewer"
             style={{
-                height,
-                minHeight: height,
-                maxHeight: height
+                height: fitParent ? '100%' : height,
+                minHeight: fitParent ? 0 : height,
+                maxHeight: fitParent ? undefined : height
             }}
             onClick={onClick}
         >

@@ -1,0 +1,9 @@
+dest,source_symbol,source_path,notes
+inventory-empty.png,inventory_empty_png,reference/habbo-air-WIN63-202609091217-117204808/decompiled/images/1861_inventory_empty_png$1d8cbfcab4939e56731b4914c26d5e51893062458.png,AIR empty-state scene
+furni-no-trade.png,inventory_furni_no_trade_icon / class_1283,decompiled/images/2395_class_1283.png,preview status
+furni-trade.png,inventory_furni_trade_icon / class_1638,decompiled/images/2846_class_1638.png,preview status
+furni-no-recycle.png,inventory_furni_no_recycle_icon,decompiled/images/2225_no_recycle_icon_png$8ed31d02d627ca1b6e306344e9253f021886728925.png,preview status
+furni-recycle.png,inventory_furni_recycle_icon / class_1385,decompiled/images/2048_class_1385.png,preview status
+thumb-selected-outline.png,inventory_thumb_selected_outline,decompiled/images/2196_thumb_selected_outline_png,Native 42x42 selection overlay
+thumb-normal.png,habbo_blue_skin_png,class_840 / 2378_class_840.png,Border5 atlas (30 29 11 11) 5px slices rendered40x40 multiplied#cccccc; GroupItem.updateBackgroundVisual
+thumb-unseen.png,habbo_blue_skin_png,class_840 / 2378_class_840.png,Border5 atlas (30 29 11 11) 5px slices rendered40x40 multiplied#9ccc65; GroupItem.updateBackgroundVisual

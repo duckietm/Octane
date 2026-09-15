@@ -12,17 +12,27 @@ import {
     RoomSessionEvent
 } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { isObjectMoverRequested, LocalizeBadgeName, LocalizeText, setObjectMoverRequested, UnseenItemCategory } from '../../api';
+import {
+    ensureBadgeLeaderboardLoaded,
+    filterFurnitureGroupItems,
+    FURNI_MAIN_FILTER,
+    FurniMainFilter,
+    getCachedBadgeRarityStat,
+    isObjectMoverRequested,
+    LocalizeBadgeName,
+    LocalizeText,
+    setObjectMoverRequested,
+    UnseenItemCategory
+} from '../../api';
 import { OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
 import {
     useInventoryBadges,
     useInventoryFurni,
-    useInventoryPrefixes,
     useInventoryTrade,
-    useWiredTrading,
     useInventoryUnseenTracker,
     useMessageEvent,
-    useOctaneEvent
+    useOctaneEvent,
+    useWiredTrading
 } from '../../hooks';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
@@ -30,16 +40,33 @@ import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitu
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
-import { FILTER_EVERYTHING, FILTER_FLOOR, FILTER_WALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
+import { BADGE_MAIN_ACHIEVEMENTS, BADGE_MAIN_ALL, BADGE_MAIN_NORMAL, BADGE_RARITY_ALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
 import { InventoryPrefixView } from './views/prefix/InventoryPrefixView';
 
-const TAB_FURNITURE: string = 'inventory.furni';
-const TAB_BOTS: string = 'inventory.bots';
-const TAB_PETS: string = 'inventory.furni.tab.pets';
-const TAB_BADGES: string = 'inventory.badges';
-const TAB_PREFIXES: string = 'inventory.prefixes';
-const TABS = [TAB_FURNITURE, TAB_PETS, TAB_BADGES, TAB_PREFIXES, TAB_BOTS];
+const TAB_FURNITURE = 'inventory.furni';
+const TAB_BOTS = 'inventory.bots';
+const TAB_PETS = 'inventory.furni.tab.pets';
+const TAB_BADGES = 'inventory.badges';
+const TAB_PREFIXES = 'inventory.prefixes';
+/** Official AIR order, then Polaris Prefixes. Collectibles/Rentables deferred. */
+const TABS = [TAB_FURNITURE, TAB_PETS, TAB_BADGES, TAB_BOTS, TAB_PREFIXES];
+
+const TAB_LABEL_FALLBACK: Record<string, string> = {
+    [TAB_FURNITURE]: 'Furniture',
+    [TAB_PETS]: 'Pets',
+    [TAB_BADGES]: 'Badges',
+    [TAB_BOTS]: 'Bots',
+    [TAB_PREFIXES]: 'Prefixes'
+};
+
+const tabLabel = (name: string) => {
+    const value = LocalizeText(name);
+
+    if (name === TAB_BADGES && value === 'Achieved badges') return 'Badges';
+
+    return value && value !== name ? value : TAB_LABEL_FALLBACK[name] || name;
+};
 
 const TAB_BY_CODE: Record<string, string> = {
     furni: TAB_FURNITURE,
@@ -49,15 +76,35 @@ const TAB_BY_CODE: Record<string, string> = {
     prefixes: TAB_PREFIXES,
     bots: TAB_BOTS
 };
-const UNSEEN_CATEGORIES = [UnseenItemCategory.FURNI, UnseenItemCategory.PET, UnseenItemCategory.BADGE, UnseenItemCategory.PREFIX, UnseenItemCategory.BOT];
 
-export const InventoryView: FC<{}> = (props) => {
+const UNSEEN_BY_TAB: Record<string, number> = {
+    [TAB_FURNITURE]: UnseenItemCategory.FURNI,
+    [TAB_PETS]: UnseenItemCategory.PET,
+    [TAB_BADGES]: UnseenItemCategory.BADGE,
+    [TAB_BOTS]: UnseenItemCategory.BOT,
+    [TAB_PREFIXES]: UnseenItemCategory.PREFIX
+};
+
+const RARITY_TO_ID: Record<string, number> = {
+    common: 0,
+    uncommon: 1,
+    rare: 2,
+    epic: 3,
+    mythical: 4,
+    legendary: 5,
+    unique: 6
+};
+
+export const InventoryView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [currentTab, setCurrentTab] = useState<string>(TABS[0]);
     const [roomSession, setRoomSession] = useState<IRoomSession>(null);
     const [roomPreviewer, setRoomPreviewer] = useState<RoomPreviewer>(null);
     const [searchValue, setSearchValue] = useState('');
-    const [filterType, setFilterType] = useState<string>(FILTER_EVERYTHING);
+    const [appliedSearch, setAppliedSearch] = useState('');
+    const [badgeMetadata, setBadgeMetadata] = useState<Awaited<ReturnType<typeof ensureBadgeLeaderboardLoaded>>>(null);
+    const [mainFilter, setMainFilter] = useState<string>(FURNI_MAIN_FILTER.ALL);
+    const [typeFilter, setTypeFilter] = useState<string>('any');
     const { isTrading = false, stopTrading = null } = useInventoryTrade();
     const { isOpen: isWiredTrading = false } = useWiredTrading();
     const { getCount = null } = useInventoryUnseenTracker();
@@ -66,27 +113,33 @@ export const InventoryView: FC<{}> = (props) => {
 
     useEffect(() => {
         setSearchValue('');
-        setFilterType(FILTER_EVERYTHING);
+        setAppliedSearch('');
+        if (currentTab === TAB_BADGES) {
+            setMainFilter(BADGE_MAIN_ALL);
+            setTypeFilter(String(BADGE_RARITY_ALL));
+            ensureBadgeLeaderboardLoaded()
+                .then(setBadgeMetadata)
+                .catch(() => setBadgeMetadata(null));
+        } else {
+            setMainFilter(FURNI_MAIN_FILTER.ALL);
+            setTypeFilter('any');
+        }
     }, [currentTab]);
 
+    useEffect(() => {
+        if (currentTab !== TAB_FURNITURE) return;
+        setTypeFilter('any');
+    }, [mainFilter, currentTab]);
+
     const filteredGroupItems = useMemo(() => {
-        const comparison = searchValue.toLocaleLowerCase();
+        if (currentTab !== TAB_FURNITURE) return groupItems;
 
-        if (filterType === FILTER_EVERYTHING) {
-            return groupItems.filter((item) => item.name.toLocaleLowerCase().includes(comparison));
-        }
-
-        return groupItems.filter((item) => {
-            const isWall = filterType === FILTER_WALL ? item.isWallItem : false;
-            const isFloor = filterType === FILTER_FLOOR ? !item.isWallItem : false;
-            const matchesSearch = item.name.toLocaleLowerCase().includes(comparison);
-
-            return comparison.length ? matchesSearch && (isWall || isFloor) : isWall || isFloor;
-        });
-    }, [groupItems, searchValue, filterType]);
+        return filterFurnitureGroupItems(groupItems, appliedSearch, mainFilter as FurniMainFilter, typeFilter);
+    }, [groupItems, appliedSearch, mainFilter, typeFilter, currentTab]);
 
     const filteredBadgeCodes = useMemo(() => {
-        const comparison = searchValue.toLocaleLowerCase().replace(' ', '');
+        const comparison = appliedSearch.toLocaleLowerCase().trim();
+        const rarityFilter = Number(typeFilter);
 
         const achievementBadges = badgeCodes.filter((badge) => badge.startsWith('ACH_'));
         const numberMap: { [key: string]: number } = {};
@@ -98,24 +151,32 @@ export const InventoryView: FC<{}> = (props) => {
             if (numberMap[name] === undefined || number > numberMap[name]) numberMap[name] = number;
         });
 
-        const deduped = Object.keys(numberMap)
+        let deduped = Object.keys(numberMap)
             .map((name) => `${name}${numberMap[name]}`)
             .concat(badgeCodes.filter((badge) => !badge.startsWith('ACH_')));
 
-        return deduped.filter((badgeCode) => LocalizeBadgeName(badgeCode).toLocaleLowerCase().includes(comparison));
-    }, [badgeCodes, searchValue]);
+        if (mainFilter === BADGE_MAIN_NORMAL) deduped = deduped.filter((code) => !code.startsWith('ACH_'));
+        if (mainFilter === BADGE_MAIN_ACHIEVEMENTS) deduped = deduped.filter((code) => code.startsWith('ACH_'));
+
+        return deduped.filter((badgeCode) => {
+            if (!LocalizeBadgeName(badgeCode).toLocaleLowerCase().includes(comparison)) return false;
+            if (rarityFilter === BADGE_RARITY_ALL) return true;
+
+            const stat = badgeMetadata ? getCachedBadgeRarityStat(badgeCode) : null;
+            if (!stat) return rarityFilter === 0;
+
+            return (RARITY_TO_ID[stat.rarity] ?? -99) === rarityFilter;
+        });
+    }, [badgeCodes, appliedSearch, mainFilter, typeFilter, badgeMetadata]);
 
     const onClose = () => {
         if (isTrading) stopTrading();
-
         setIsVisible(false);
     };
 
     useOctaneEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectEvent.PLACED, (event) => {
         if (!isObjectMoverRequested()) return;
-
         setObjectMoverRequested(false);
-
         if (!event.placedInRoom) setIsVisible(true);
     });
 
@@ -133,7 +194,6 @@ export const InventoryView: FC<{}> = (props) => {
 
     useMessageEvent<BadgePointLimitsEvent>(BadgePointLimitsEvent, (event) => {
         const parser = event.getParser();
-
         for (const data of parser.data) GetLocalizationManager().setBadgePointLimit(data.badgeId, data.limit);
     });
 
@@ -141,7 +201,6 @@ export const InventoryView: FC<{}> = (props) => {
         const linkTracker: ILinkEventTracker = {
             linkReceived: (url: string) => {
                 const parts = url.split('/');
-
                 if (parts.length < 2) return;
 
                 switch (parts[1]) {
@@ -162,84 +221,90 @@ export const InventoryView: FC<{}> = (props) => {
         };
 
         AddLinkEventTracker(linkTracker);
-
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
     useEffect(() => {
-        setRoomPreviewer(new RoomPreviewer(GetRoomEngine(), ++RoomPreviewer.PREVIEW_COUNTER));
-
+        const previewer = new RoomPreviewer(GetRoomEngine(), ++RoomPreviewer.PREVIEW_COUNTER);
+        previewer.backgroundColor = null;
+        setRoomPreviewer(previewer);
         return () => {
             setRoomPreviewer((prevValue) => {
                 prevValue.dispose();
-
                 return null;
             });
         };
     }, []);
 
     useEffect(() => {
-        // A wired contract opens its negotiation without anyone asking for the inventory, so the
-        // window has to show itself the same way a trade does.
         if (!isVisible && (isTrading || isWiredTrading)) setIsVisible(true);
     }, [isVisible, isTrading, isWiredTrading]);
 
     if (!isVisible) return null;
 
-    const showFilter = !isTrading && (currentTab === TAB_FURNITURE || currentTab === TAB_BADGES);
+    const showFilter = !isTrading && !isWiredTrading && ((currentTab === TAB_FURNITURE && groupItems.length > 0) || currentTab === TAB_BADGES);
 
     return (
         <>
             <OctaneCardView
-                className="octane-inventory-window min-w-0 w-[min(528px,calc(100vw-16px))] h-[min(420px,calc(100vh-16px))] min-h-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                className={`octane-inventory-window max-w-[calc(100vw-16px)] ${currentTab === TAB_BADGES ? 'has-badge-controls' : currentTab === TAB_PETS ? 'has-pet-controls' : ''}`}
+                frameStyle={3}
+                resizeAxis="vertical"
                 uniqueKey="inventory"
             >
                 <OctaneCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
                 {!isTrading && !isWiredTrading && (
                     <>
                         <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
-                            {TABS.map((name, index) => {
-                                return (
-                                    <OctaneCardTabsItemView
-                                        key={index}
-                                        count={getCount(UNSEEN_CATEGORIES[index])}
-                                        isActive={currentTab === name}
-                                        onClick={(event) => setCurrentTab(name)}
-                                    >
-                                        <span className="octane-inventory-tab-label">{LocalizeText(name)}</span>
-                                    </OctaneCardTabsItemView>
-                                );
-                            })}
+                            {TABS.map((name) => (
+                                <OctaneCardTabsItemView
+                                    key={name}
+                                    count={getCount(UNSEEN_BY_TAB[name])}
+                                    isActive={currentTab === name}
+                                    onClick={() => setCurrentTab(name)}
+                                >
+                                    <span className="octane-inventory-tab-label">{tabLabel(name)}</span>
+                                </OctaneCardTabsItemView>
+                            ))}
                         </OctaneCardTabsView>
-                        <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full gap-2">
+                        <div className="octane-inventory-body">
                             {showFilter && (
                                 <InventoryCategoryFilterView
                                     currentTab={currentTab}
-                                    filterType={filterType}
+                                    mainFilter={mainFilter}
+                                    typeFilter={typeFilter}
                                     searchValue={searchValue}
-                                    onFilterTypeChange={setFilterType}
+                                    onMainFilterChange={(value) => {
+                                        setMainFilter(value);
+                                        setAppliedSearch(searchValue);
+                                    }}
+                                    onTypeFilterChange={(value) => {
+                                        setTypeFilter(value);
+                                        setAppliedSearch(searchValue);
+                                    }}
                                     onSearchChange={setSearchValue}
+                                    onSearchApply={setAppliedSearch}
                                 />
                             )}
-                            <div className="flex-1 overflow-hidden">
+                            <div className={`octane-inventory-content ${currentTab === TAB_FURNITURE ? 'is-furniture' : ''}`}>
                                 {currentTab === TAB_FURNITURE && (
                                     <InventoryFurnitureView filteredGroupItems={filteredGroupItems} roomPreviewer={roomPreviewer} roomSession={roomSession} />
                                 )}
                                 {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
                                 {currentTab === TAB_BADGES && <InventoryBadgeView filteredBadgeCodes={filteredBadgeCodes} />}
-                                {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
                                 {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
+                                {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
                             </div>
                         </div>
                     </>
                 )}
                 {isTrading && (
-                    <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full">
+                    <div className="octane-inventory-body is-trade">
                         <InventoryTradeView cancelTrade={onClose} />
                     </div>
                 )}
                 {!isTrading && isWiredTrading && (
-                    <div className="octane-inventory-body flex flex-col overflow-hidden p-2 h-full">
+                    <div className="octane-inventory-body is-trade">
                         <InventoryWiredTradeView />
                     </div>
                 )}

@@ -1,231 +1,626 @@
 .octane-inventory-window {
-    --inv-blue: #418db0;
+    --inv-surface: #e9e9e1;
     --inv-beige: #dfdfdf;
-    --inv-tab: #b6bec5;
-    --inv-line: #b6bec5;
+    --inv-line: #6b6f73;
     --inv-accent: #418db0;
-    --inv-place: #5ca843;
-    --inv-place-dark: #397025;
-    --inv-place-light: #8ee374;
+    --inv-empty-title: #dd0000;
+    --inv-place: #ececec;
     --inv-sell: #d13e31;
-    --inv-sell-dark: #881e15;
-    --inv-sell-light: #f07e74;
-    --inv-border: #6b6f73;
+    --inv-border: #0f1b22;
 
-    background: var(--inv-beige) !important;
+    position: relative;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 490px !important;
+    min-width: 490px !important;
+    max-width: 490px !important;
+    height: 342px !important;
+    min-height: 300px !important;
+    max-height: min(90vh, 720px) !important;
+    /* Frame-3 titlebar is absolutely positioned; keep content below it. */
+    padding: 35px 6px 6px !important;
+    resize: none !important;
+    /* Surface + pixel corners come from frame-ubuntu-3 9-slice. Never paint
+       an opaque shell background or rectangular overflow clip here. */
+    background: transparent !important;
 }
 
 .octane-inventory-window .octane-inventory-tabs-shell {
-    gap: 4px;
+    flex: 0 0 35px !important;
+    gap: 0 !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--inv-surface) !important;
+    position: relative;
+    border-bottom: 0 !important;
 }
 
-.octane-inventory-window .octane-inventory-tab-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 5px;
-    font-size: 14px;
-    line-height: 1;
+.octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item {
+    min-width: 0 !important;
+    flex: 0 0 auto;
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 7px 3px 10px !important;
+    font-size: 12px !important;
+    line-height: 17px !important;
+    overflow: hidden;
+    /* Keep shared tab-3 9-slice chrome; only tighten fit for five labels. */
+    border-radius: 0 !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+}
+
+.octane-inventory-window .octane-inventory-tab-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    width: 100%;
+    line-height: 17px;
 }
 
 .octane-inventory-window .octane-inventory-body {
-    background: var(--inv-beige);
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0;
+    min-height: 0;
+    height: auto !important;
+    padding: 0 5px 5px;
+    overflow: hidden;
+    background: transparent;
 }
 
-.octane-inventory-window .octane-inventory-filter-bar {
-    width: 100%;
-    background: #fff;
-    border: 2px solid var(--inv-border);
-    border-radius: 4px;
+.octane-inventory-window .octane-inventory-body.is-trade {
+    padding: 8px;
 }
 
-.octane-inventory-window .octane-inventory-filter-bar.is-badges {
-    width: min(320px, 100%);
-}
-
-.octane-inventory-window .octane-inventory-filter-bar select {
-    background: var(--inv-beige);
-    border: 2px solid var(--inv-border) !important;
-    border-radius: 4px;
-    font-weight: 700;
+.octane-inventory-window .octane-inventory-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
-    background-color: var(--inv-beige) !important;
+    background-color: #ececec !important;
     color: #111 !important;
 }
 
 .octane-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
-    border-color: var(--inv-line) !important;
-}
-
-.octane-inventory-window .bg-card-grid-item-active {
-    background-color: #fff !important;
-}
-
-.octane-inventory-window .border-card-grid-item-active {
-    border-color: var(--inv-border) !important;
-    box-shadow: 0 0 0 2px var(--inv-accent);
-}
-
-.octane-inventory-window :where(.text-muted, .text-dark) {
-    color: #55544e !important;
-}
-
-.octane-inventory-window :where(input, select, textarea) {
-    min-height: 22px;
-    border: 1px solid var(--inv-border) !important;
-    border-radius: 3px !important;
-    background: #fffdf4 !important;
-    color: #111111 !important;
-    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.65) !important;
-    font-size: 11px !important;
-}
-
-.octane-inventory-window :where(input:focus, select:focus, textarea:focus) {
-    border-color: var(--inv-accent) !important;
-    box-shadow: 0 0 0 2px rgba(74, 125, 140, 0.28), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
-    outline: none !important;
-}
-
-.octane-inventory-window .bg-red-700 {
-    background-color: #fff !important;
-    color: var(--inv-accent) !important;
     border-color: #75746e !important;
 }
 
-.octane-inventory-window .shadow-room-previewer {
-    background-color: #fff;
-    border: 2px solid var(--inv-line);
+.octane-inventory-window .bg-card-grid-item-active {
+    background-color: #c6e2f7 !important;
+}
+
+.octane-inventory-window .border-card-grid-item-active {
+    border-color: #2e6f8a !important;
+    box-shadow: none !important;
+}
+
+.octane-inventory-window .rounded-md.border-2 {
+    border-radius: 3px !important;
+    border-width: 1px !important;
+}
+
+.octane-inventory-empty {
+    position: relative;
+    height: 100%;
+    min-height: 278px;
+    margin-left: -5px;
+    margin-top: -15px;
+    width: 478px;
+    background: transparent;
+}
+
+.octane-inventory-empty-image {
+    position: absolute;
+    left: 46px;
+    top: 42px;
+    width: 180px;
+    height: 180px;
+    background: url('@/assets/images/inventory/air/inventory-empty.png') center no-repeat;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-empty-copy {
+    position: absolute;
+    left: 287px;
+    top: 64px;
+    width: 176px;
+}
+
+.octane-inventory-empty-title {
+    color: var(--inv-empty-title);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 17px;
+    margin-bottom: 8px;
+}
+
+.octane-inventory-empty-desc {
+    color: #111;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.octane-inventory-empty-shop {
+    position: absolute !important;
+    left: 241px;
+    top: 225px;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 149px !important;
+    height: 51px !important;
+    min-height: 51px !important;
+    /* Ubuntu metrics sit low in the em-box; bias caption up inside shiny chrome. */
+    padding: 0 8px 3px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny-large) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    line-height: 14px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-furni {
+    display: grid;
+    grid-template-columns: 284px 180px;
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.octane-inventory-furni-grid {
+    width: 284px;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-grid > * {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.octane-inventory-furni-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-preview-stage {
+    position: absolute;
+    top: 0;
+    left: 5px;
+    width: 170px;
+    height: calc(100% - 107px);
+    min-height: 50px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.octane-inventory-furni-status {
+    position: absolute;
+    top: 0;
+    left: -5px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    z-index: 2;
+}
+
+.octane-inventory-furni-status-icon {
+    position: relative;
+    width: 52px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-size: auto;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-furni-status-icon.is-trade {
+    background-image: url('@/assets/images/inventory/air/furni-trade.png');
+}
+
+.octane-inventory-furni-status-icon.is-no-trade {
+    background-image: url('@/assets/images/inventory/air/furni-no-trade.png');
+}
+
+.octane-inventory-furni-status-icon.is-recycle {
+    background-image: url('@/assets/images/inventory/air/furni-recycle.png');
+}
+
+.octane-inventory-furni-status-icon.is-no-recycle {
+    background-image: url('@/assets/images/inventory/air/furni-no-recycle.png');
+}
+
+.octane-inventory-furni-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: auto;
+    padding-top: 6px;
+    min-height: 0;
+}
+
+.octane-inventory-furni-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111;
+    word-break: break-word;
+}
+
+.octane-inventory-furni-desc {
+    font-size: 11px;
+    color: #333;
+    word-break: break-word;
+}
+
+.octane-inventory-furni-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    margin-top: 12px;
+    width: 180px;
+}
+
+/* AIR placeinroom_btn: button style 3 / shiny, 180×22 — pixel caps from bitmap. */
+.octane-inventory-window .octane-inventory-btn-place {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 180px !important;
+    max-width: 100% !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    /* 1px bottom bias — Ubuntu glyph box sits low inside 12px content. */
+    padding: 0 8px 1px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-family: HabboAirUbuntu, Ubuntu, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 11px !important;
+    text-align: center !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-window .octane-inventory-btn-place:hover {
+    border-image-source: var(--habbo-skin-shiny-hover) !important;
+    background: transparent !important;
+    filter: none !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-place:active {
+    border-image-source: var(--habbo-skin-shiny-pressed) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.octane-inventory-window .octane-inventory-btn-sell {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 180px !important;
+    max-width: 100% !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 0 8px 1px !important;
+    border: 5px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-shiny) !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    line-height: 11px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-window .octane-inventory-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 180px !important;
+    max-width: 100% !important;
+    min-height: 22px !important;
+    padding: 0 8px !important;
+    border: 3px solid transparent !important;
+    border-radius: 0 !important;
+    border-image-source: var(--habbo-skin-button) !important;
+    border-image-slice: 3 fill !important;
+    border-image-width: 3px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #881e15 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+    image-rendering: pixelated;
+}
+
+/* inventory_thumb_xml: 42px logical slot, 40px plate, native bitmap. */
+.octane-inventory-furni-grid .grid {
+    grid-template-columns: repeat(6, 42px);
+    gap: 2px !important;
+}
+
+.octane-inventory-window .octane-inventory-thumb {
+    position: relative;
+    flex: 0 0 42px;
+    width: 42px !important;
+    height: 42px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-size: auto !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: none !important;
+    isolation: isolate;
+    animation: none;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    background: url('../../assets/images/inventory/air/thumb-normal.png') no-repeat;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb.is-unseen::before {
+    background-image: url('../../assets/images/inventory/air/thumb-unseen.png');
+}
+
+.octane-inventory-thumb.is-selected::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../../assets/images/inventory/air/thumb-selected-outline.png') no-repeat;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb > .bg-red-700 {
+    background: white;
+    border: 1px solid #2f6982;
+    color: #2f6982;
+    border-radius: 0;
+}
+
+.octane-inventory-window {
+    font-family: HabboAirUbuntu, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.octane-inventory-window .octane-inventory-tabs-shell {
+    align-items: flex-start;
+}
+
+
+
+.octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item-label {
+    width: auto;
+}
+
+.octane-inventory-furni-preview {
+    padding-bottom: 2px;
+}
+
+.octane-inventory-furni-details {
+    flex-shrink: 0;
+}
+
+.octane-inventory-window .octane-inventory-btn-place,
+.octane-inventory-window .octane-inventory-btn-sell,
+.octane-inventory-window .octane-inventory-btn-delete {
+    width: fit-content !important;
+    font-family: HabboAirUbuntu, sans-serif;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    padding: 0 5px !important;
+}
+
+.octane-inventory-furni-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.octane-inventory-furni-grid > :first-child {
+    flex: 1;
+    min-height: 0;
+}
+
+.octane-inventory-furni-grid > .octane-inventory-pages {
+    flex: 0 0 14px;
+    height: 14px !important;
+    display: flex;
+    gap: 2px;
+    font-size: 9px;
+}
+
+.octane-inventory-pages button {
+    padding: 0 2px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-inventory-pages button[aria-current='page'] { font-weight: bold; }
+
+.octane-inventory-window.has-badge-controls { height: 364px !important; min-height: 322px !important; }
+
+.octane-inventory-thumb-image {
+    position: absolute;
+    inset: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.octane-inventory-thumb-image img {
+    max-width: none;
+    flex: none;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-thumb.is-selected::after { z-index: 3; }
+
+.octane-inventory-window .octane-inventory-tabs-shell { justify-content: flex-start !important; padding-left: 8px !important; }
+.octane-inventory-furni-preview-stage { overflow: visible; }
+.octane-inventory-furni-preview-stage > div:first-child { border-radius: 0 !important; }
+
+/* Retain Polaris's compact-screen preview controls after the AIR Place action. */
+.octane-inventory-preview-controls { display: none; }
+@media (max-width: 640px) {
+    .octane-inventory-preview-controls { display: flex; gap: 8px; }
+}
+
+@media (max-width: 489px) {
+    .octane-inventory-window {
+        width: calc(100vw - 16px) !important;
+        min-width: 0 !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 64px) !important;
+    }
+
+    .octane-inventory-window .octane-inventory-tabs-shell {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .octane-inventory-window .octane-inventory-body {
+        overflow: auto;
+    }
+
+    .octane-inventory-window .octane-inventory-content { min-width: 468px; overflow: visible; }
+    .octane-inventory-window .octane-inventory-filter-bar { flex-shrink: 0; }
+}
+
+.octane-inventory-furni-preview-stage .shadow-room-previewer {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
 
 .octane-inventory-window .octane-inventory-btn-place,
 .octane-inventory-window .octane-inventory-btn-sell {
-    border: 2px solid var(--inv-border) !important;
-    border-radius: 4px;
-    color: #fff !important;
-    font-weight: 700;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    padding: 0 5px 1px !important;
+    line-height: 17px !important;
 }
 
-.octane-inventory-window .octane-inventory-btn-place {
-    background: var(--inv-place) !important;
-    box-shadow: inset -2px -2px 0 var(--inv-place-dark), inset 2px 2px 0 var(--inv-place-light);
+.octane-inventory-window .octane-inventory-btn-place:disabled {
+    border-image-source: url('@/assets/images/habbo-skin/slices/button-shiny-disabled.png') !important;
+    opacity: 1;
 }
 
-.octane-inventory-window .octane-inventory-btn-place:hover {
-    background: #67b94e !important;
+/* Polaris delete: compact overlay, using the red AIR shiny skin. */
+.octane-inventory-preview-delete {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    isolation: isolate;
 }
 
-.octane-inventory-window .octane-inventory-btn-sell {
-    background: var(--inv-sell) !important;
-    box-shadow: inset -2px -2px 0 var(--inv-sell-dark), inset 2px 2px 0 var(--inv-sell-light);
+.octane-inventory-preview-delete::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-red) 5 fill / 5px stretch;
+    /* Requested darker upper half and lighter lower half. */
+    transform: scaleY(-1);
+    image-rendering: pixelated;
 }
 
-.octane-inventory-window .octane-inventory-btn-sell:hover {
-    background: #db4d40 !important;
+.octane-inventory-preview-delete:hover::before { border-image-source: var(--habbo-skin-shiny-red-hover); }
+.octane-inventory-preview-delete:active::before { border-image-source: var(--habbo-skin-shiny-red-pressed); }
+.octane-inventory-preview-delete:focus-visible { outline: 1px dotted #fff; outline-offset: -4px; }
+.octane-inventory-preview-delete svg { width: 8px; height: 9px; }
+
+/* TabContext's selector is32px high; contentArea remains at y35. */
+.octane-inventory-tabs-shell::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 31px;
+    height: 1px;
+    background: #000;
+    pointer-events: none;
 }
 
-.octane-inventory-preview-btn {
-    display: none;
+/* XML grid/preview start2px after the25px options container. The preview
+   extends3px below contentArea, while the grid leaves3px beneath it. */
+.octane-inventory-content.is-furniture { overflow: visible; }
+.octane-inventory-furni-grid { margin-top: 2px; height: calc(100% - 5px); }
+.octane-inventory-furni-preview { margin-top: 2px; height: calc(100% + 1px); }
+
+/* AIR's52px status regions contain native40px trade/28px recycle bitmaps. */
+.octane-inventory-furni-status-count {
+    position: absolute;
+    top: 1px;
+    font-size: 12px;
+    line-height: 14px;
+    font-weight: normal;
+    color: #000;
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
 }
-
-@media (max-width: 1024px) and (min-width: 641px) {
-    .octane-inventory-window {
-        width: min(calc(100vw - 24px), 640px) !important;
-        min-width: 0 !important;
-        max-width: calc(100vw - 24px) !important;
-        height: min(calc(100vh - 24px), 560px) !important;
-        min-height: 0 !important;
-        max-height: calc(100vh - 24px) !important;
-    }
-}
-
-@media (max-width: 640px) {
-    .draggable-window:has(> .octane-inventory-window) {
-        inset: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        top: 0 !important;
-        bottom: 0 !important;
-        width: auto !important;
-        height: auto !important;
-        transform: none !important;
-    }
-
-    .octane-card-shell.octane-inventory-window {
-        width: calc(100% - 40px) !important;
-        min-width: 0 !important;
-        max-width: calc(100% - 40px) !important;
-        height: calc(100% - 76px) !important;
-        min-height: 0 !important;
-        max-height: calc(100% - 76px) !important;
-        margin: 8px auto 0 auto !important;
-    }
-
-    .octane-inventory-window .octane-inventory-tabs-shell {
-        flex-wrap: nowrap;
-        overflow: hidden;
-    }
-
-    .octane-inventory-window .octane-inventory-tabs-shell .octane-card-tab-item {
-        flex: 1 1 0;
-        min-width: 0;
-        padding: 8px 0;
-        justify-content: center;
-    }
-
-    .octane-inventory-window .octane-inventory-tab-label {
-        display: none;
-    }
-
-    .octane-inventory-window .octane-inventory-tab-icon {
-        margin-right: 0;
-        font-size: 17px;
-    }
-
-    .octane-inventory-window .grid.grid-cols-12 {
-        grid-template-columns: minmax(0, 1fr) !important;
-        grid-template-rows: minmax(0, 1fr) auto !important;
-    }
-
-    .octane-inventory-window .grid.grid-cols-12 > .col-span-7,
-    .octane-inventory-window .grid.grid-cols-12 > .col-span-5 {
-        grid-column: 1 / -1 !important;
-    }
-
-    .octane-inventory-window .octane-inventory-btn-place,
-    .octane-inventory-window .octane-inventory-btn-sell {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-    }
-
-    .octane-inventory-window .octane-inventory-preview-btn {
-        position: absolute;
-        top: 6px;
-        z-index: 4;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 8px;
-        border: 1px solid #555;
-        border-radius: 5px;
-        background: rgba(0, 0, 0, 0.7);
-        color: #fff;
-        font-size: 10px;
-        font-weight: 700;
-        cursor: pointer;
-    }
-
-    .octane-inventory-window .octane-inventory-preview-btn:active {
-        background: rgba(0, 0, 0, 0.85);
-    }
-
-    .octane-inventory-window .octane-inventory-preview-rotate {
-        left: 6px;
-    }
-
-    .octane-inventory-window .octane-inventory-preview-state {
-        right: 6px;
-    }
-}
+.octane-inventory-furni-status-count.is-trade-count { left: 33px; }
+.octane-inventory-furni-status-count.is-recycle-count { left: 18px; }

@@ -1,7 +1,7 @@
 import { DeleteItemMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
-import { FurnitureItem, LocalizeText, ProductTypeEnum, SendMessageComposer } from '../../../../api';
+import { FurnitureItem, LocalizeText, localizeWithFallback, ProductTypeEnum, SendMessageComposer } from '../../../../api';
 import { LayoutFurniImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { DeleteItemConfirmEvent } from '../../../../events';
 import { useNotification, useUiEvent } from '../../../../hooks';
@@ -36,7 +36,12 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
         const furniTitle = LocalizeText(item.isWallItem ? 'wallItem.name.' + item.type : 'roomItem.name.' + item.type);
 
         showConfirm(
-            LocalizeText('inventory.delete.confirm_delete.info', ['furniname', 'amount'], [furniTitle, amount.toString()]),
+            localizeWithFallback(
+                'inventory.delete.confirm_delete.info',
+                `Delete ${amount} × ${furniTitle}?`,
+                ['furniname', 'amount'],
+                [furniTitle, amount.toString()]
+            ),
             () => {
                 SendMessageComposer(new DeleteItemMessageComposer(item.id, amount));
                 onClose();
@@ -44,7 +49,7 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
             () => onClose(),
             null,
             null,
-            LocalizeText('inventory.delete.confirm_delete.title')
+            localizeWithFallback('inventory.delete.confirm_delete.title', 'Delete furniture')
         );
     };
 
@@ -60,7 +65,7 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
 
     return (
         <OctaneCardView className="min-w-0 w-[min(340px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" uniqueKey="inventory-delete">
-            <OctaneCardHeaderView headerText={LocalizeText('inventory.delete.confirm_delete.title')} onCloseClick={onClose} />
+            <OctaneCardHeaderView headerText={localizeWithFallback('inventory.delete.confirm_delete.title', 'Delete furniture')} onCloseClick={onClose} />
             <div className="bg-[#DFDFDF] p-2">
                 <div className="flex items-center gap-2">
                     <div className="shrink-0 w-[64px] h-[64px] bg-white rounded flex items-center justify-center">
@@ -84,11 +89,11 @@ export const InventoryFurnitureDeleteView: FC<{}> = (props) => {
                             />
                             <FaCaretRight className="cursor-pointer text-black fa-icon shrink-0" onClick={() => updateAmount((amount + 1).toString())} />
                             <OctaneButton className="text-xs py-0.5 px-1 shrink-0" onClick={() => updateAmount(maxAmount.toString())}>
-                                {LocalizeText('inventory.delete.max_amount.button')}
+                                {localizeWithFallback('inventory.delete.max_amount.button', 'Maximum')}
                             </OctaneButton>
                         </div>
                         <OctaneButton className="bg-danger! hover:bg-danger/80! w-full" disabled={amount > maxAmount} onClick={deleteItem}>
-                            {LocalizeText('inventory.delete.confirm_delete.button')}
+                            {localizeWithFallback('inventory.delete.confirm_delete.button', 'Delete')}
                         </OctaneButton>
                     </div>
                 </div>

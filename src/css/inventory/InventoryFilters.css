@@ -1,0 +1,179 @@
+/* inventory_xml options_container and dropmenu/style0. Closed control and
+   portalled expanded list share the official AIR frame and type styling. */
+.octane-inventory-window .octane-inventory-filter-bar {
+    position: relative;
+    display: block;
+    flex: 0 0 25px;
+    width: 468px;
+    height: 25px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.octane-inventory-window .octane-inventory-filter-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 3px solid transparent;
+    border-image: url('@/assets/images/habbo-skin/slices/border-slot-cacaca.png') 3 fill / 3px stretch;
+}
+
+.octane-inventory-window .octane-inventory-filter-search {
+    position: absolute;
+    left: 4px;
+    top: 3px;
+    width: 139px;
+    height: 20px;
+    border: 0;
+    background: transparent;
+}
+
+.octane-inventory-window .octane-inventory-filter-search::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 6px solid transparent;
+    border-image: var(--habbo-skin-border-white) 6 fill / 6px stretch;
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-filter-input {
+    position: absolute;
+    left: 3px;
+    top: 2px;
+    width: 122px !important;
+    height: 15px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    -webkit-appearance: none;
+    appearance: none;
+    font-family: HabboAirUbuntu, sans-serif;
+    font-size: 12px !important;
+    outline: none !important;
+    box-shadow: none !important;
+    min-height: 15px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    line-height: 15px;
+}
+
+.octane-inventory-window .octane-inventory-filter-clear {
+    left: 120px;
+    right: auto;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: url('@/assets/images/habbo-skin/slices/icons-close.png') center no-repeat;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-window .octane-inventory-filter-choice {
+    position: absolute;
+    left: 150px;
+    top: 2px;
+    width: 119px;
+    height: 21px;
+}
+
+.octane-inventory-window .octane-inventory-filter-choice + .octane-inventory-filter-choice {
+    left: 274px;
+}
+
+.octane-inventory-window .octane-inventory-filter-choice::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 3px solid transparent;
+    border-image: url('@/assets/images/habbo-skin/slices/dropmenu-0.png') 3 fill / 3px stretch;
+    pointer-events: none;
+}
+
+.octane-inventory-window .octane-inventory-filter-select {
+    position: relative;
+    appearance: none;
+    width: 119px;
+    height: 21px;
+    border: 0 !important;
+    padding: 4px 21px 3px 10px;
+    background: url('@/assets/images/habbo-skin/slices/dropmenu-0-arrow.png') right 5px top 2px / 16px 16px no-repeat transparent !important;
+    line-height: 14px;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-window .octane-inventory-filter-select:focus-visible {
+    outline: 1px dotted #000;
+    outline-offset: -3px;
+}
+
+.octane-inventory-window .octane-inventory-filter-select {
+    display: block;
+    overflow: hidden;
+    text-align: left;
+    white-space: nowrap;
+    font-family: Volter, sans-serif;
+    font-size: 9px !important;
+    font-weight: normal;
+}
+
+/* DropMenuController: list x6/y2, 3px end padding; labels use regular Volter9
+   and margins L4/T1/R4/B2. Skin atlas samples: white, d9d9d9, f2f2f2. */
+.octane-inventory-filter-menu {
+    position: fixed;
+    z-index: 100000;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 119px;
+    max-width: 100vw;
+    padding: 2px 6px 5px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    transform-origin: top left;
+    isolation: isolate;
+    overflow: auto;
+    font-family: Volter, sans-serif;
+    font-size: 9px;
+    line-height: 12px;
+    color: #000;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-filter-menu::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: 3px solid transparent;
+    border-image: url('@/assets/images/habbo-skin/slices/dropmenu-0.png') 3 fill / 3px stretch;
+    pointer-events: none;
+}
+
+.octane-inventory-filter-option {
+    min-height: 15px;
+    padding: 1px 4px 2px;
+    white-space: nowrap;
+    background: #fff;
+    cursor: pointer;
+}
+
+.octane-inventory-filter-option[aria-selected='true'] {
+    background: #f2f2f2;
+}
+
+.octane-inventory-filter-option.is-active,
+.octane-inventory-filter-option:hover {
+    background: #d9d9d9;
+}
+
+/* Keep mobile text autosizing from inflating the native AIR captions. */
+.octane-inventory-window .octane-inventory-filter-select,
+.octane-inventory-filter-menu,
+.octane-inventory-filter-option {
+    -webkit-text-size-adjust: none !important;
+    text-size-adjust: none !important;
+    font-size: 9px !important;
+    line-height: 12px;
+}

@@ -1,9 +1,8 @@
 import { MouseEventType } from '@octane/renderer';
 import { FC, MouseEvent, PropsWithChildren, useState } from 'react';
 import { attemptPetPlacement, IPetItem, UnseenItemCategory } from '../../../../api';
-import { LayoutPetImageView } from '../../../../common';
 import { useInventoryPets, useInventoryUnseenTracker } from '../../../../hooks';
-import { InfiniteGrid } from '../../../../layout';
+import { InventoryPetImageView } from './InventoryPetImageView';
 
 export const InventoryPetItemView: FC<PropsWithChildren<{ petItem: IPetItem }>> = (props) => {
     const { petItem = null, children = null, ...rest } = props;
@@ -21,9 +20,10 @@ export const InventoryPetItemView: FC<PropsWithChildren<{ petItem: IPetItem }>> 
             case MouseEventType.MOUSE_UP:
                 setMouseDown(false);
                 return;
-            case MouseEventType.ROLL_OUT:
+            case 'mouseleave':
                 if (!isMouseDown || !(petItem === selectedPet)) return;
 
+                setMouseDown(false);
                 attemptPetPlacement(petItem);
                 return;
             case 'dblclick':
@@ -33,17 +33,18 @@ export const InventoryPetItemView: FC<PropsWithChildren<{ petItem: IPetItem }>> 
     };
 
     return (
-        <InfiniteGrid.Item
-            itemActive={petItem === selectedPet}
-            itemUnseen={unseen}
+        <div
+            className={`octane-inventory-thumb${petItem === selectedPet ? ' is-selected' : ''}${unseen ? ' is-unseen' : ''}`}
             onDoubleClick={onMouseEvent}
             onMouseDown={onMouseEvent}
-            onMouseOut={onMouseEvent}
+            onMouseLeave={onMouseEvent}
             onMouseUp={onMouseEvent}
             {...rest}
         >
-            <LayoutPetImageView direction={3} figure={petItem.petData.figureData.figuredata} headOnly={true} />
+            <span className="octane-inventory-animal-thumb-image">
+                <InventoryPetImageView pet={petItem.petData} />
+            </span>
             {children}
-        </InfiniteGrid.Item>
+        </div>
     );
 };

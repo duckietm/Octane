@@ -1,12 +1,14 @@
 import { FC, useMemo, useRef } from 'react';
 import { Column, ColumnProps } from '..';
 import { DraggableWindow, DraggableWindowPosition, DraggableWindowProps } from '../draggable-window';
+import { CardResizeHandle } from './CardResizeHandle';
 import { OctaneCardContextProvider } from './OctaneCardContext';
 
 export interface OctaneCardViewProps extends DraggableWindowProps, ColumnProps {
     theme?: string;
     isResizable?: boolean;
-    frameStyle?: number;
+    frameStyle?: number | null;
+    resizeAxis?: 'both' | 'vertical' | 'horizontal';
 }
 
 export const OctaneCardView: FC<OctaneCardViewProps> = (props) => {
@@ -16,12 +18,14 @@ export const OctaneCardView: FC<OctaneCardViewProps> = (props) => {
         handleSelector = '.drag-handler',
         windowPosition = DraggableWindowPosition.CENTER,
         disableDrag = false,
-        overflow = 'hidden',
+        overflow,
         position = 'relative',
         gap = 0,
         classNames = [],
         isResizable = true,
-        frameStyle = null,
+        frameStyle = 3,
+        resizeAxis = 'both',
+        children,
         dragStyle,
         offsetLeft,
         offsetTop,
@@ -29,27 +33,36 @@ export const OctaneCardView: FC<OctaneCardViewProps> = (props) => {
     } = props;
     const elementRef = useRef<HTMLDivElement>(null);
 
+    const isWired =
+        classNames.some((name) => name === 'octane-wired' || name.startsWith('octane-wired ')) ||
+        (typeof rest.className === 'string' && rest.className.split(/\s+/).includes('octane-wired'));
+    const resolvedFrameStyle = isWired ? null : frameStyle;
+    const resolvedOverflow = overflow ?? (resolvedFrameStyle === 3 ? 'visible' : 'hidden');
+
     const getClassNames = useMemo(() => {
         const newClassNames: string[] = [isResizable ? 'resize' : 'resize-none', 'octane-card', 'octane-card-shell', `theme-${theme}`];
 
-        if (frameStyle !== null) newClassNames.push(`octane-card-frame-${frameStyle}`);
+        if (resolvedFrameStyle !== null) newClassNames.push(`octane-card-frame-${resolvedFrameStyle}`);
         if (classNames.length) newClassNames.push(...classNames);
 
         return newClassNames;
-    }, [classNames, frameStyle, isResizable]);
+    }, [classNames, isResizable, resolvedFrameStyle, theme]);
 
     return (
         <OctaneCardContextProvider value={{ theme }}>
             <DraggableWindow
                 disableDrag={disableDrag}
-                dragStyle={dragStyle}
+                dragStyle={resolvedFrameStyle === 3 ? { filter: 'drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349))', ...dragStyle } : dragStyle}
                 handleSelector={handleSelector}
                 offsetLeft={offsetLeft}
                 offsetTop={offsetTop}
                 uniqueKey={uniqueKey}
                 windowPosition={windowPosition}
             >
-                <Column classNames={getClassNames} gap={gap} innerRef={elementRef} overflow={overflow} position={position} {...rest} />
+                <Column classNames={getClassNames} gap={gap} innerRef={elementRef} overflow={resolvedOverflow} position={position} {...rest}>
+                    {children}
+                    {isResizable && resolvedFrameStyle === 3 && <CardResizeHandle uniqueKey={uniqueKey} elementRef={elementRef} resizeAxis={resizeAxis} />}
+                </Column>
             </DraggableWindow>
         </OctaneCardContextProvider>
     );

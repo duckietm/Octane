@@ -1,0 +1,144 @@
+/* inventory_xml pets/bots: 274px grid, 6px gutter, preview starts at x280.
+   PetsGridItem/BotGridItem use the shared 42px inventory_thumb asset. */
+.octane-inventory-animals {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.octane-inventory-animal-grid {
+    position: absolute;
+    top: 0;
+    bottom: 5px;
+    left: 0;
+    width: calc(100% - 194px);
+    min-height: 0;
+}
+
+.octane-inventory-animals.is-pets .octane-inventory-animal-grid {
+    top: 27px;
+    bottom: 3px;
+}
+
+.octane-inventory-animal-cells {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 42px);
+    gap: 2px;
+    align-content: start;
+}
+
+.octane-inventory-animal-thumb-image {
+    position: absolute;
+    inset: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.octane-inventory-animal-thumb-image img,
+.octane-inventory-animal-image img {
+    flex: none;
+    max-width: none;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-animal-preview {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    width: 190px;
+    height: 100%;
+}
+
+.octane-inventory-animal-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 190px;
+    height: 19px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 19px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.octane-inventory-animal-image {
+    position: absolute;
+    top: 24px;
+    left: 43px;
+    width: 100px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.octane-inventory-animal-description {
+    position: absolute;
+    top: 174px;
+    left: 0;
+    width: 190px;
+    height: 45px;
+    font-size: 12px;
+    line-height: 17px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.octane-inventory-animal-actions {
+    position: absolute;
+    top: 225px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 158px;
+}
+
+.octane-inventory-animals.is-pets .octane-inventory-animal-name { top: 32px; }
+.octane-inventory-animals.is-pets .octane-inventory-animal-image { top: 53px; left: 5px; width: 150px; height: 152px; }
+.octane-inventory-animals.is-pets .octane-inventory-animal-description { top: 205px; left: 4px; width: 180px; height: 17px; }
+.octane-inventory-animals.is-pets .octane-inventory-animal-actions { top: 229px; left: 0; }
+
+/* Polaris delete follows the official Place button. Allow scrolling when the
+   minimum-height AIR frame cannot contain this additional action. */
+.octane-inventory-animals.is-pets .octane-inventory-animal-preview {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.octane-inventory-window .octane-inventory-animal-place {
+    width: 158px;
+    height: 28px;
+    min-height: 28px;
+    flex: none;
+    padding: 0 4px;
+    border: 5px solid transparent !important;
+    border-image: var(--habbo-skin-shiny) 5 fill / 5px !important;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 17px;
+    box-shadow: none;
+    image-rendering: pixelated;
+}
+
+.octane-inventory-window .octane-inventory-animal-place:hover { border-image-source: var(--habbo-skin-shiny-hover) !important; }
+.octane-inventory-window .octane-inventory-animal-place:active { border-image-source: var(--habbo-skin-shiny-pressed) !important; }
+.octane-inventory-window .octane-inventory-animal-place:disabled {
+    border-image-source: url('@/assets/images/habbo-skin/slices/button-shiny-disabled.png') !important;
+    opacity: 1;
+}
+
+@media (max-width: 489px) {
+    .octane-inventory-animal-grid { width: max(42px, calc(100% - 174px)); }
+    .octane-inventory-animal-preview { width: 170px; right: 0; }
+}
+
+/* Reserve room for the Polaris Delete action below AIR’s y229 Place control. */
+.octane-inventory-window.has-pet-controls { height: 372px !important; }

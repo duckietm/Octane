@@ -1,0 +1,6 @@
+destination,source_symbol,source,operation
+dropmenu-0.png,habbo_blue_skin_png/class_840,2086_class_872.bin,3/1/3 atlas x164/167/185 y0/3/19
+dropmenu-0-arrow.png,habbo_blue_skin_png/class_840,2086_class_872.bin,"atlas168,1,16,16; no hover state"
+border-slot-cacaca.png,habbo_blue_skin_png/class_840,2856_habbo_skin_border_slot_xml,shared border-slot multiplied #cacaca
+icons-close.png,icons_close/class_387,2349_class_387.png,unmodified
+border-white.png,habbo_blue_skin_png/class_840,2573_habbo_skin_border_white_xml,"existing18px shared crop verified equal atlas0,29,18,18"

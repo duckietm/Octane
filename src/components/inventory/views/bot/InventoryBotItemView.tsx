@@ -1,9 +1,8 @@
 import { MouseEventType } from '@octane/renderer';
 import { FC, MouseEvent, PropsWithChildren, useState } from 'react';
 import { attemptBotPlacement, IBotItem, UnseenItemCategory } from '../../../../api';
-import { LayoutAvatarImageView } from '../../../../common';
 import { useInventoryBots, useInventoryUnseenTracker } from '../../../../hooks';
-import { InfiniteGrid } from '../../../../layout';
+import { InventoryBotImageView } from './InventoryBotImageView';
 
 export const InventoryBotItemView: FC<
     PropsWithChildren<{
@@ -25,9 +24,10 @@ export const InventoryBotItemView: FC<
             case MouseEventType.MOUSE_UP:
                 setMouseDown(false);
                 return;
-            case MouseEventType.ROLL_OUT:
+            case 'mouseleave':
                 if (!isMouseDown || selectedBot !== botItem) return;
 
+                setMouseDown(false);
                 attemptBotPlacement(botItem);
                 return;
             case 'dblclick':
@@ -37,18 +37,18 @@ export const InventoryBotItemView: FC<
     };
 
     return (
-        <InfiniteGrid.Item
-            itemActive={selectedBot === botItem}
-            itemUnseen={unseen}
+        <div
             onDoubleClick={onMouseEvent}
             onMouseDown={onMouseEvent}
-            onMouseOut={onMouseEvent}
+            onMouseLeave={onMouseEvent}
             onMouseUp={onMouseEvent}
             {...rest}
-            className="aspect-[2/3]"
+            className={`octane-inventory-thumb${botItem === selectedBot ? ' is-selected' : ''}${unseen ? ' is-unseen' : ''}`}
         >
-            <LayoutAvatarImageView direction={2} figure={botItem.botData.figure} fit />
+            <span className="octane-inventory-animal-thumb-image">
+                <InventoryBotImageView figure={botItem.botData.figure} gender={botItem.botData.gender} />
+            </span>
             {children}
-        </InfiniteGrid.Item>
+        </div>
     );
 };

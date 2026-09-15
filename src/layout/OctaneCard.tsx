@@ -1,5 +1,6 @@
-import { DetailedHTMLProps, HTMLAttributes, MouseEvent, PropsWithChildren, Ref } from 'react';
+import { DetailedHTMLProps, HTMLAttributes, MouseEvent, PropsWithChildren, Ref, useRef, useImperativeHandle } from 'react';
 import { DraggableWindow, DraggableWindowPosition, DraggableWindowProps } from '../common';
+import { CardResizeHandle } from '../common/card/CardResizeHandle';
 import { classNames } from './classNames';
 import { OctaneItemCountBadge } from './OctaneItemCountBadge';
 
@@ -20,12 +21,18 @@ const OctaneCardRoot = ({
     offsetLeft = 0,
     offsetTop = 0,
     className = null,
+    children,
     ...rest
 }: OctaneCardRootProps) => {
+    const elementRef = useRef<HTMLDivElement>(null);
+    useImperativeHandle(ref, () => elementRef.current);
+    const isWired = className?.split(/\s+/).includes('octane-wired');
+    const isResizable = !className?.split(/\s+/).includes('resize-none') && rest.style?.resize !== 'none';
+
     return (
         <DraggableWindow
             disableDrag={disableDrag}
-            dragStyle={dragStyle}
+            dragStyle={isWired ? dragStyle : { filter: 'drop-shadow(2.828px 2.828px 4px rgba(0, 0, 0, 0.349))', ...dragStyle }}
             handleSelector={handleSelector}
             offsetLeft={offsetLeft}
             offsetTop={offsetTop}
@@ -33,10 +40,19 @@ const OctaneCardRoot = ({
             windowPosition={windowPosition}
         >
             <div
-                ref={ref}
-                className={classNames('octane-card-shell flex flex-col overflow-hidden min-w-full min-h-full max-w-full max-h-full', className)}
+                ref={elementRef}
+                className={classNames(
+                    'octane-card octane-card-shell flex flex-col min-w-full min-h-full max-w-full max-h-full',
+                    // Ubuntu frame 3 unless the caller already opted into a frame class
+                    // or Illumina wired chrome. Pixel corners come from the bitmap mask.
+                    !className?.includes('octane-card-frame-') && !className?.includes('octane-wired') && 'octane-card-frame-3',
+                    className
+                )}
                 {...rest}
-            />
+            >
+                {children}
+                {!isWired && isResizable && <CardResizeHandle uniqueKey={uniqueKey} elementRef={elementRef} />}
+            </div>
         </DraggableWindow>
     );
 };
