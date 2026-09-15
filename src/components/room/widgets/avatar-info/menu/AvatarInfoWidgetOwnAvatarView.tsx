@@ -29,6 +29,17 @@ import { useRoom, useWiredTools } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
+import {
+    getInitialOwnAvatarMenuMode,
+    OWN_AVATAR_MENU_MODE_CLUB_DANCES,
+    OWN_AVATAR_MENU_MODE_EXPRESSIONS,
+    OWN_AVATAR_MENU_MODE_MINIMIZED_LOOKS,
+    OWN_AVATAR_MENU_MODE_MINIMIZED_NAME,
+    OWN_AVATAR_MENU_MODE_NORMAL,
+    OWN_AVATAR_MENU_MODE_SIGNS,
+    readUseMinimizedOwnAvatarMenu,
+    writeUseMinimizedOwnAvatarMenu
+} from './ownAvatarMenuPreference';
 
 interface AvatarInfoWidgetOwnAvatarViewProps {
     avatarInfo: AvatarInfoUser;
@@ -48,10 +59,12 @@ interface AirSign {
     icon?: string;
 }
 
-const MODE_NORMAL = 0;
-const MODE_CLUB_DANCES = 1;
-const MODE_EXPRESSIONS = 3;
-const MODE_SIGNS = 4;
+const MODE_NORMAL = OWN_AVATAR_MENU_MODE_NORMAL;
+const MODE_CLUB_DANCES = OWN_AVATAR_MENU_MODE_CLUB_DANCES;
+const MODE_MINIMIZED_NAME = OWN_AVATAR_MENU_MODE_MINIMIZED_NAME;
+const MODE_EXPRESSIONS = OWN_AVATAR_MENU_MODE_EXPRESSIONS;
+const MODE_SIGNS = OWN_AVATAR_MENU_MODE_SIGNS;
+const MODE_MINIMIZED_LOOKS = OWN_AVATAR_MENU_MODE_MINIMIZED_LOOKS;
 
 const AIR_SIGNS: AirSign[] = [
     { id: 1, label: '1' },
@@ -93,7 +106,15 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
     const hasActiveEffect = activeEffectId > 0;
     const isRidingHorse = IsRidingHorse();
     const isSwimming = ownPosture === AvatarAction.POSTURE_SWIM;
-    const [mode, setMode] = useState(isDancing && hasClub && !hasActiveEffect ? MODE_CLUB_DANCES : MODE_NORMAL);
+    const [mode, setMode] = useState(() =>
+        getInitialOwnAvatarMenuMode({
+            useMinimized: readUseMinimizedOwnAvatarMenu(),
+            allowNameChange: !!avatarInfo?.allowNameChange,
+            isDancing,
+            hasClub,
+            hasActiveEffect
+        })
+    );
     const { roomSession = null } = useRoom();
     const { openInspectionForUser, showInspectButton } = useWiredTools();
 
@@ -110,7 +131,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
 
         if (name)
         {
-            if (!hasVip && ['blow', 'expression_67', 'laugh'].includes(name))
+            if (!hasVip && ['blow', 'expression_67', 'laugh', 'jump'].includes(name))
             {
                 CreateLinkEvent('habboUI/open/hccenter');
                 hideMenu = false;
@@ -164,6 +185,16 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                         break;
                     case 'laugh':
                         roomSession.sendExpressionMessage(AvatarExpressionEnum.LAUGH.ordinal);
+                        break;
+                    case 'jump':
+                        roomSession.sendExpressionMessage(AvatarExpressionEnum.JUMP.ordinal);
+                        break;
+                    // "More" leaves the minimized menu for good: the official
+                    // client clears use_minimized_own_avatar_menu here.
+                    case 'more':
+                        hideMenu = false;
+                        writeUseMinimizedOwnAvatarMenu(false);
+                        setMode(MODE_NORMAL);
                         break;
                     case 'idle':
                         roomSession.sendExpressionMessage(AvatarExpressionEnum.IDLE.ordinal);
@@ -234,6 +265,26 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                 {avatarInfo.name}
             </ContextMenuHeaderView>
             <div className="air-avatar-menu-buttons">
+                {mode === MODE_MINIMIZED_NAME && (
+                    <>
+                        <ContextMenuListItemView classNames={['air-avatar-menu-item--link']} onClick={() => processAction('change_name')}>
+                            {LocalizeText('widget.avatar.change_name')}
+                        </ContextMenuListItemView>
+                        <ContextMenuListItemView onClick={() => processAction('more')}>
+                            <AirMenuLabel direction="right">{localizeWithFallback('widget.memenu.more', 'More...')}</AirMenuLabel>
+                        </ContextMenuListItemView>
+                    </>
+                )}
+                {mode === MODE_MINIMIZED_LOOKS && (
+                    <>
+                        <ContextMenuListItemView classNames={['air-avatar-menu-item--link']} onClick={() => processAction('change_looks')}>
+                            {LocalizeText('widget.memenu.myclothes')}
+                        </ContextMenuListItemView>
+                        <ContextMenuListItemView onClick={() => processAction('more')}>
+                            <AirMenuLabel direction="right">{localizeWithFallback('widget.memenu.more', 'More...')}</AirMenuLabel>
+                        </ContextMenuListItemView>
+                    </>
+                )}
                 {mode === MODE_NORMAL && (
                     <>
                         {avatarInfo.allowNameChange && (
@@ -357,6 +408,16 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                             {LocalizeText('widget.memenu.laugh')}
                         </ContextMenuListItemView>
                         <ContextMenuListItemView onClick={() => processAction('idle')}>{LocalizeText('widget.memenu.idle')}</ContextMenuListItemView>
+                        {isRidingHorse && (
+                            <ContextMenuListItemView
+                                classNames={premiumExpressionClassNames}
+                                disabled={hasVip && hasActiveEffect}
+                                onClick={() => processAction('jump')}
+                            >
+                                {!hasVip && <i className="air-avatar-menu-vip" aria-hidden="true" />}
+                                {localizeWithFallback('widget.memenu.jump', 'Jump')}
+                            </ContextMenuListItemView>
+                        )}
                         <ContextMenuListItemView onClick={() => processAction('back')}>
                             <AirMenuLabel direction="left">{LocalizeText('generic.back')}</AirMenuLabel>
                         </ContextMenuListItemView>

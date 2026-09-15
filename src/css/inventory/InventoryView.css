@@ -615,3 +615,147 @@
 }
 .octane-inventory-furni-status-count.is-trade-count { left: 33px; }
 .octane-inventory-furni-status-count.is-recycle-count { left: 18px; }
+
+/* Dev overlay / rent / chest / rarity styles retained for AIR inventory */
+
+.octane-inventory-preview-btn {
+    display: none;
+}
+
+
+/* inventory_thumb overlays: rarity plaque (rarity_item_overlay_grid, 36x9 at the bottom) and the
+   rent_state dot (10x10 at 4,4; not started / started / ending). */
+.octane-inventory-window .octane-inventory-thumb-rarity {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 9px;
+    line-height: 9px;
+    border-radius: 2px;
+    background: #f5d35b;
+    border: 1px solid #8a6d13;
+    color: #3a2c00;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+
+/* chest_overlay_(brown|gold)_background + ChestItemGridOverlayWidget: the contents count sits on a
+   small plate at the bottom of the tile, in the chest's own colour. */
+.octane-inventory-window .octane-inventory-thumb-chest {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    height: 11px;
+    line-height: 11px;
+    border-radius: 2px;
+    color: #ffffff;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-brown {
+    background: #7a4a1e;
+    border: 1px solid #4a2a0c;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-gold {
+    background: #d9a521;
+    border: 1px solid #8a6d13;
+    color: #3a2c00;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    z-index: 1;
+    pointer-events: none;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-not_started {
+    background: #9a9a9a;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-started {
+    background: #5ca843;
+}
+
+
+.octane-inventory-window .octane-inventory-thumb-rent.is-ending {
+    background: #d13e31;
+}
+
+
+.octane-inventory-window .octane-inventory-preview-extra {
+    color: #55544e;
+}
+
+
+.octane-inventory-window .octane-inventory-btn-goto,
+.octane-inventory-window .octane-inventory-btn-rent {
+    border: 2px solid var(--inv-border) !important;
+    border-radius: 4px;
+    color: #fff !important;
+    font-weight: 700;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    background: var(--inv-blue) !important;
+    box-shadow: inset -2px -2px 0 #2b6a88, inset 2px 2px 0 #7fbcd8;
+}
+
+
+.octane-inventory-window .octane-inventory-btn-goto:hover,
+.octane-inventory-window .octane-inventory-btn-rent:hover {
+    background: #4f9dc2 !important;
+}
+
+
+    .octane-inventory-window .octane-inventory-preview-btn {
+        position: absolute;
+        top: 6px;
+        z-index: 4;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 8px;
+        border: 1px solid #555;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+
+    .octane-inventory-window .octane-inventory-preview-btn:active {
+        background: rgba(0, 0, 0, 0.85);
+    }
+
+
+    .octane-inventory-window .octane-inventory-preview-rotate {
+        left: 6px;
+    }
+
+
+    .octane-inventory-window .octane-inventory-preview-state {
+        right: 6px;
+    }

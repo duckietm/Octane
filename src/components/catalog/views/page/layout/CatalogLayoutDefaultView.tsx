@@ -4,6 +4,7 @@ import { Text } from '../../../../../common';
 import { getCatalogGridMetrics, useCatalogData, useCatalogDisplayPreferences, useCatalogUiState } from '../../../../../hooks';
 import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
+import { CatalogBundleExtraInfoWidgetView } from '../widgets/CatalogBundleExtraInfoWidgetView';
 import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
 import { CatalogLimitedItemWidgetView } from '../widgets/CatalogLimitedItemWidgetView';
 import { CatalogPreviewControls } from '../widgets/CatalogPreviewControls';
@@ -49,6 +50,7 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
                                     <CatalogPreviewControls productType={currentOffer.product.productType} roomPreviewer={roomPreviewer} />
                                     <CatalogViewProductWidgetView height={348} />
                                     <CatalogAddOnBadgeWidgetView className="bg-muted rounded bottom-1 right-1 absolute" />
+                                    {showBundlePurchase && <CatalogBundleExtraInfoWidgetView />}
                                 </>
                             )}
                             {currentOffer.product.productType === ProductTypeEnum.BADGE && <CatalogAddOnBadgeWidgetView className="scale-200" />}

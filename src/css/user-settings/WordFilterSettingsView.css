@@ -1,0 +1,106 @@
+/*
+ * AIR 13 custom_word_filter_settings_xml (1253_class_437): 242x248 frame,
+ * border style 6 tinted #79756e, title centred at y=5, divider y=24,
+ * then a 222px column at x=10 y=35 with 7px spacing:
+ *   [input border 152x24 | Add 66x24]  ->  word list border 222x100
+ *   -> Remove 210x30 -> Back 60x28.
+ * List rows: custom_word_filter_item_xml, 18px tall, white / #e3e9e1
+ * alternating, #b6d9ff hovered, #9ab8d9 selected.
+ */
+
+.user-settings-window.air-settings-window--wordfilter {
+    --air-settings-width: 242px;
+    --air-settings-height: 248px;
+    --air-settings-back-top: 210px;
+}
+
+.air-settings-window--wordfilter .air-settings-window__title {
+    text-align: center;
+}
+
+.air-settings-window--wordfilter .air-settings-window__divider {
+    top: 24px;
+    left: 40px;
+    width: 162px;
+}
+
+.air-wordfilter__add-row {
+    top: 35px;
+    left: 10px;
+    display: flex;
+    width: 222px;
+    height: 24px;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.air-wordfilter__input-border {
+    box-sizing: border-box;
+    width: 152px;
+    height: 24px;
+    padding: 3px 3px 3px 3px;
+    border: 1px solid #7a7a7a;
+    background: #ffffff;
+}
+
+.air-wordfilter__input {
+    box-sizing: border-box;
+    width: 144px;
+    height: 16px;
+    padding: 0 1px;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    background: transparent;
+    color: #000000;
+    font: 400 12px/16px UbuntuRegular, Ubuntu, sans-serif;
+}
+
+.air-wordfilter__add {
+    width: 66px;
+    height: 24px;
+    min-height: 24px;
+}
+
+.air-wordfilter__list-border {
+    top: 66px;
+    left: 10px;
+    box-sizing: border-box;
+    width: 222px;
+    height: 100px;
+    padding: 3px;
+    border: 1px solid #7a7a7a;
+    background: #ffffff;
+}
+
+.air-wordfilter__list {
+    box-sizing: border-box;
+    width: 214px;
+    height: 92px;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.air-wordfilter__row {
+    box-sizing: border-box;
+    height: 18px;
+    padding: 0 2px;
+    overflow: hidden;
+    color: #000000;
+    cursor: pointer;
+    font: 400 12px/18px UbuntuRegular, Ubuntu, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.air-wordfilter__remove {
+    top: 173px;
+    left: 10px;
+    width: 210px;
+    height: 30px;
+    min-height: 30px;
+}

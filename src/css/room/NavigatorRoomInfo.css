@@ -49,6 +49,31 @@
     line-height: 13px;
 }
 
+/* iro_tag: 14px chips (bg_l / bg_m / bg_r pieces), reactive on hover, laid out in rows. */
+.octane-room-info__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin: 1px 0;
+}
+
+.octane-room-info__tag {
+    box-sizing: border-box;
+    height: 14px;
+    padding: 0 4px;
+    border: 0;
+    border-radius: 4px;
+    background: #cfcfc6;
+    color: #111;
+    font-size: 10px;
+    line-height: 14px;
+    cursor: pointer;
+}
+
+.octane-room-info__tag:hover {
+    background: #a9a99f;
+}
+
 .octane-room-info__thumbnail {
     width: 112px !important;
     height: 112px !important;

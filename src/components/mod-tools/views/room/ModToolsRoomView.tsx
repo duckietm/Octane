@@ -5,11 +5,14 @@ import {
     ModeratorActionMessageComposer,
     ModeratorRoomInfoEvent
 } from '@octane/renderer';
-import { FC, useEffect, useState } from 'react';
-import { FaBullhorn, FaCommentDots, FaDoorOpen, FaExclamationTriangle, FaSignInAlt, FaSync, FaUserShield, FaUsers } from 'react-icons/fa';
-import { LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { FaBullhorn, FaCommentDots, FaDoorOpen, FaExclamationTriangle, FaExternalLinkAlt, FaSignInAlt, FaSync, FaTags, FaUserShield, FaUsers } from 'react-icons/fa';
+import { LocalizeText, localizeWithFallback, SendMessageComposer, TryVisitRoom } from '../../../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
-import { useMessageEvent } from '../../../../hooks';
+import { useMessageEvent, useModTools } from '../../../../hooks';
+import { HK_ROOM_ADMIN_URL, hasHousekeepingUrl, openHousekeepingPage } from '../../common/ModToolsHousekeepingLinks';
+import { CONFIG_ROOM_MESSAGE_TEMPLATES, resolveMessageTemplates } from '../../common/ModToolsMessageTemplates';
+import { ModToolsTemplateSelect } from '../../common/ModToolsTemplateSelect';
 
 interface ModToolsRoomViewProps {
     roomId: number;
@@ -21,6 +24,8 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
     const [infoRequested, setInfoRequested] = useState(false);
     const [loadedRoomId, setLoadedRoomId] = useState(null);
     const [name, setName] = useState(null);
+    const [description, setDescription] = useState('');
+    const [tags, setTags] = useState<string[]>([]);
     const [ownerId, setOwnerId] = useState(null);
     const [ownerName, setOwnerName] = useState(null);
     const [ownerInRoom, setOwnerInRoom] = useState(false);
@@ -29,6 +34,10 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
     const [lockRoom, setLockRoom] = useState(false);
     const [changeRoomName, setChangeRoomName] = useState(false);
     const [message, setMessage] = useState('');
+    const { settings = null } = useModTools();
+    // The official room tool fills its drop-down from the init message's `roomMessageTemplates`.
+    const templates = useMemo(() => resolveMessageTemplates(settings?.roomMessageTemplates, CONFIG_ROOM_MESSAGE_TEMPLATES), [settings]);
+    const hasRoomAdmin = hasHousekeepingUrl(HK_ROOM_ADMIN_URL);
 
     const refresh = () => SendMessageComposer(new GetModeratorRoomInfoMessageComposer(roomId));
 
@@ -58,6 +67,8 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
 
         setLoadedRoomId(parser.data.flatId);
         setName(parser.data.room.name);
+        setDescription(parser.data.room.desc || '');
+        setTags(parser.data.room.tags ? parser.data.room.tags.filter((tag) => tag && tag.trim().length > 0) : []);
         setOwnerId(parser.data.ownerId);
         setOwnerName(parser.data.ownerName);
         setOwnerInRoom(parser.data.ownerInRoom);
@@ -73,6 +84,13 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
 
     const isLoaded = loadedRoomId !== null;
     const hasMessage = message.trim().length > 0;
+    // Rights come from the init message, as `RoomToolCtrl.populate` reads them: room alerts
+    // and cautions need the room-alert right, the kick box the room-kick right, the chat
+    // log the chatlog right. Nothing is enabled until the init message has arrived.
+    const canAlert = !!settings?.roomAlertPermission;
+    const canKick = !!settings?.roomKickPermission;
+    const canReadChatlog = !!settings?.chatlogsPermission;
+    const noPermissionHint = localizeWithFallback('modtools.roominfo.no_permission', 'You do not have the right to use this tool');
     const ownerPillClass = ownerInRoom ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-zinc-100 text-zinc-600 border-zinc-200';
     const ownerDotClass = ownerInRoom ? 'bg-emerald-500' : 'bg-zinc-400';
 
@@ -109,6 +127,23 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                     </button>
                 </div>
 
+                {/* Description and tags, as the official room tool lists them under the name */}
+                {(description.length > 0 || tags.length > 0) && (
+                    <div className="flex flex-col gap-1 text-[.8rem] px-1">
+                        {description.length > 0 && <div className="break-words opacity-80">{description}</div>}
+                        {tags.length > 0 && (
+                            <div className="flex items-center gap-1.5 flex-wrap" data-testid="room-tags">
+                                <FaTags className="opacity-50 shrink-0" size={10} title={localizeWithFallback('modtools.roominfo.tags', 'Tags')} />
+                                {tags.map((tag) => (
+                                    <span key={tag} className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs border bg-zinc-50 border-zinc-200">
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* Stat strip */}
                 <div className="flex gap-1.5">
                     <div className="flex flex-col items-center justify-center px-2 py-1.5 rounded border bg-sky-50 border-sky-200 text-sky-700 grow min-w-0">
@@ -134,13 +169,30 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                 </div>
 
                 {/* Quick actions */}
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className={`grid gap-1.5 ${hasRoomAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
                     <Button gap={1} variant="secondary" onClick={() => TryVisitRoom(roomId)}>
                         <FaSignInAlt size={12} /> {LocalizeText('modtools.roominfo.button.visit')}
                     </Button>
-                    <Button gap={1} variant="secondary" onClick={() => CreateLinkEvent(`mod-tools/open-room-chatlog/${roomId}`)}>
+                    <Button
+                        disabled={!canReadChatlog}
+                        gap={1}
+                        title={!canReadChatlog ? noPermissionHint : undefined}
+                        variant="secondary"
+                        onClick={() => CreateLinkEvent(`mod-tools/open-room-chatlog/${roomId}`)}
+                    >
                         <FaCommentDots size={12} /> {LocalizeText('modtools.roominfo.button.chatlog')}
                     </Button>
+                    {hasRoomAdmin && (
+                        <Button
+                            disabled={!isLoaded}
+                            gap={1}
+                            title={localizeWithFallback('modtools.roominfo.button.edit_in_hk.title', 'Open this room in housekeeping')}
+                            variant="secondary"
+                            onClick={() => openHousekeepingPage(HK_ROOM_ADMIN_URL, roomId)}
+                        >
+                            <FaExternalLinkAlt size={11} /> {localizeWithFallback('modtools.roominfo.button.edit_in_hk', 'Edit in HK')}
+                        </Button>
+                    )}
                 </div>
 
                 {/* Moderate panel */}
@@ -148,8 +200,17 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                     <div className="flex items-center gap-1.5 text-[.7rem] uppercase tracking-wide font-semibold text-amber-800">
                         <FaExclamationTriangle size={10} /> {LocalizeText('modtools.roominfo.moderate.title')}
                     </div>
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input checked={kickUsers} className="form-check-input" type="checkbox" onChange={(event) => setKickUsers(event.target.checked)} />
+                    <label
+                        className={`flex items-center gap-2 text-sm ${canKick ? 'cursor-pointer' : 'opacity-50'}`}
+                        title={!canKick ? noPermissionHint : undefined}
+                    >
+                        <input
+                            checked={kickUsers}
+                            className="form-check-input"
+                            disabled={!canKick}
+                            type="checkbox"
+                            onChange={(event) => setKickUsers(event.target.checked)}
+                        />
                         <span>{LocalizeText('modtools.roominfo.moderate.kick')}</span>
                     </label>
                     <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -165,6 +226,7 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                         />
                         <span>{LocalizeText('modtools.roominfo.moderate.rename')}</span>
                     </label>
+                    <ModToolsTemplateSelect templates={templates} onSelect={(template) => setMessage(template)} />
                     <textarea
                         className="min-h-[60px] px-2 py-1.5 rounded text-sm border border-amber-300 bg-white/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
                         placeholder={LocalizeText('modtools.roominfo.moderate.message.placeholder')}
@@ -172,10 +234,24 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                         onChange={(event) => setMessage(event.target.value)}
                     />
                     <div className="flex gap-1.5">
-                        <Button className="grow" disabled={!hasMessage || !isLoaded} gap={1} variant="danger" onClick={() => handleClick('send_message')}>
+                        <Button
+                            className="grow"
+                            disabled={!hasMessage || !isLoaded || !canAlert}
+                            gap={1}
+                            title={!canAlert ? noPermissionHint : undefined}
+                            variant="danger"
+                            onClick={() => handleClick('send_message')}
+                        >
                             <FaBullhorn size={12} /> {LocalizeText('modtools.roominfo.moderate.send.caution')}
                         </Button>
-                        <Button className="grow" disabled={!hasMessage || !isLoaded} gap={1} variant="warning" onClick={() => handleClick('alert_only')}>
+                        <Button
+                            className="grow"
+                            disabled={!hasMessage || !isLoaded || !canAlert}
+                            gap={1}
+                            title={!canAlert ? noPermissionHint : undefined}
+                            variant="warning"
+                            onClick={() => handleClick('alert_only')}
+                        >
                             <FaExclamationTriangle size={12} /> {LocalizeText('modtools.roominfo.moderate.send.alert')}
                         </Button>
                     </div>

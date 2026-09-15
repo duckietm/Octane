@@ -1,14 +1,17 @@
 import {
     CreateLinkEvent,
     GetSessionDataManager,
+    IWiredArrayInspectionData,
+    WiredArrayInspectionDataEvent,
+    WiredArrayInspectionRequestComposer,
+    WiredArrayInspectionUpdateComposer,
     WiredRoomSettingsDataEvent,
     WiredRoomSettingsRequestComposer,
     WiredRoomSettingsSaveComposer,
     WiredUserVariableManageComposer,
     WiredUserVariablesDataEvent,
     WiredUserVariablesRequestComposer,
-    WiredUserVariableUpdateComposer
-} from '@octane/renderer';
+    WiredUserVariableUpdateComposer, WiredEnvironmentEvent} from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook } from '@/state/useSharedHook';
 import {
@@ -23,6 +26,12 @@ import {
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 import { useRoom } from '../rooms';
+
+/** What the room's wired can do to the client, from the official WiredEnvironment packet. */
+export interface IWiredEnvironment {
+    enabledAchievements: string[];
+    hasClickUserWired: boolean;
+}
 
 export interface IWiredAccountPreferences {
     showInspectButton: boolean;
@@ -42,7 +51,16 @@ export interface IWiredRoomSettings {
     roomId: number;
 }
 
-export interface IWiredUserVariableDefinition {
+export interface IWiredArrayVariableMetadata {
+    arrayFormat?: 'simple' | 'record';
+    arrayMode?: 'list' | 'slots';
+    fields?: { id: number; name: string; order: number; textConnected?: boolean }[];
+    maxEntries?: number;
+    permanent?: boolean;
+    valueShape?: 'single' | 'array';
+}
+
+export interface IWiredUserVariableDefinition extends IWiredArrayVariableMetadata {
     availability: number;
     hasValue: boolean;
     isReadOnly?: boolean;
@@ -59,7 +77,7 @@ export interface IWiredUserVariableAssignment {
     variableItemId: number;
 }
 
-export interface IWiredFurniVariableDefinition {
+export interface IWiredFurniVariableDefinition extends IWiredArrayVariableMetadata {
     availability: number;
     hasValue: boolean;
     isReadOnly?: boolean;
@@ -76,7 +94,7 @@ export interface IWiredFurniVariableAssignment {
     variableItemId: number;
 }
 
-export interface IWiredRoomVariableDefinition {
+export interface IWiredRoomVariableDefinition extends IWiredArrayVariableMetadata {
     availability: number;
     hasValue: boolean;
     isReadOnly?: boolean;
@@ -93,7 +111,7 @@ export interface IWiredRoomVariableAssignment {
     variableItemId: number;
 }
 
-export interface IWiredContextVariableDefinition {
+export interface IWiredContextVariableDefinition extends IWiredArrayVariableMetadata {
     availability: number;
     hasValue: boolean;
     isReadOnly?: boolean;
@@ -111,6 +129,11 @@ const WIRED_VARIABLE_MANAGE_ACTION_CLEAR_ALL = 2;
 
 const WIRED_TOOLS_STORAGE_PREFIX = 'nitro.wired.tools.preferences';
 const getCurrentUnixTime = () => Math.floor(Date.now() / 1000);
+const DEFAULT_ENVIRONMENT: IWiredEnvironment = {
+    hasClickUserWired: false,
+    enabledAchievements: []
+};
+
 const DEFAULT_ACCOUNT_PREFERENCES: IWiredAccountPreferences = {
     showToolbarButton: false,
     showInspectButton: false,
@@ -144,6 +167,7 @@ export const useWiredToolsStore = () => {
     const { simpleAlert = null } = useNotification();
     const [accountPreferences, setAccountPreferences] = useState<IWiredAccountPreferences>(DEFAULT_ACCOUNT_PREFERENCES);
     const [roomSettings, setRoomSettings] = useState<IWiredRoomSettings>(DEFAULT_ROOM_SETTINGS);
+    const [wiredEnvironment, setWiredEnvironment] = useState<IWiredEnvironment>(DEFAULT_ENVIRONMENT);
     const [userVariableDefinitions, setUserVariableDefinitions] = useState<IWiredUserVariableDefinition[]>([]);
     const [userVariableAssignments, setUserVariableAssignments] = useState<Record<number, IWiredUserVariableAssignment[]>>({});
     const [furniVariableDefinitions, setFurniVariableDefinitions] = useState<IWiredFurniVariableDefinition[]>([]);
@@ -165,6 +189,7 @@ export const useWiredToolsStore = () => {
             SendMessageComposer(new WiredUserVariablesRequestComposer());
         });
     }, [roomSettings.canInspect]);
+    const [arrayInspection, setArrayInspection] = useState<IWiredArrayInspectionData | null>(null);
 
     const storageKey = useMemo(() => {
         const userId = GetSessionDataManager().userId;
@@ -210,6 +235,7 @@ export const useWiredToolsStore = () => {
             setRoomVariableAssignments([]);
             setContextVariableDefinitions([]);
             setAreUserVariablesLoaded(false);
+            setArrayInspection(null);
             return;
         }
 
@@ -239,6 +265,15 @@ export const useWiredToolsStore = () => {
 
         requestUserVariables();
     }, [roomSession?.roomId, roomSettings.canInspect, requestUserVariables]);
+
+    useMessageEvent<WiredEnvironmentEvent>(WiredEnvironmentEvent, (event) => {
+        const parser = event.getParser();
+
+        setWiredEnvironment({
+            hasClickUserWired: parser.hasClickUserWired,
+            enabledAchievements: [...(parser.enabledAchievements || [])]
+        });
+    });
 
     useMessageEvent<WiredRoomSettingsDataEvent>(WiredRoomSettingsDataEvent, (event) => {
         const parser = event.getParser();
@@ -282,6 +317,12 @@ export const useWiredToolsStore = () => {
         setAreUserVariablesLoaded(true);
     });
 
+    useMessageEvent<WiredArrayInspectionDataEvent>(WiredArrayInspectionDataEvent, (event) => {
+        const data = event.getParser().data;
+
+        if (data) setArrayInspection(data);
+    });
+
     const updateAccountPreferences = useCallback((partialPreferences: Partial<IWiredAccountPreferences>) => {
         setAccountPreferences((prevValue) => ({
             ...prevValue,
@@ -303,6 +344,37 @@ export const useWiredToolsStore = () => {
         },
         [roomSettings.canManageSettings]
     );
+
+    const requestArrayInspection = useCallback(
+        (variableType: number, requestedOwnerId: number, definitionItemId: number, page = 0, pageSize = 25) => {
+            if (!roomSettings.canInspect) return;
+
+            SendMessageComposer(new WiredArrayInspectionRequestComposer(variableType, requestedOwnerId, definitionItemId, page, pageSize));
+        },
+        [roomSettings.canInspect]
+    );
+
+    const updateArrayInspectionField = useCallback(
+        (
+            variableType: number,
+            requestedOwnerId: number,
+            definitionItemId: number,
+            index: number,
+            fieldId: number,
+            value: string,
+            page: number,
+            pageSize: number
+        ) => {
+            if (!roomSettings.canModify) return;
+
+            SendMessageComposer(
+                new WiredArrayInspectionUpdateComposer(variableType, requestedOwnerId, definitionItemId, index, fieldId, value, page, pageSize)
+            );
+        },
+        [roomSettings.canModify]
+    );
+
+    const clearArrayInspection = useCallback(() => setArrayInspection(null), []);
 
     const updateUserVariableValue = useCallback(
         (userId: number, variableItemId: number, value: number) => {
@@ -659,6 +731,7 @@ export const useWiredToolsStore = () => {
     return {
         accountPreferences,
         roomSettings,
+        wiredEnvironment,
         showInspectButton,
         showToolbarButton,
         userVariableDefinitions,
@@ -669,9 +742,13 @@ export const useWiredToolsStore = () => {
         roomVariableAssignments,
         contextVariableDefinitions,
         areUserVariablesLoaded,
+        arrayInspection,
         updateAccountPreferences,
         saveRoomSettings,
         requestUserVariables,
+        requestArrayInspection,
+        updateArrayInspectionField,
+        clearArrayInspection,
         assignUserVariable,
         removeUserVariable,
         updateUserVariableValue,

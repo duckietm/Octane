@@ -1,38 +1,74 @@
 import { AvailableCommandsEvent, GetCommunication } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CommandDefinition, LocalizeText } from '../../../api';
+import { CommandDefinition, localizeWithFallback } from '../../../api';
 import { createOctaneStore } from '../../../state/createOctaneStore';
 import { useMessageEvent } from '../../events';
 
 // Client-only commands are static; safe to keep at module scope. The
-// `descriptionKey` is a LocalizeText slot resolved at merge time so
-// hotels in different locales see the right language.
-const CLIENT_COMMANDS: { key: string; descriptionKey: string }[] = [
+// `descriptionKey` is a localization slot resolved at merge time so
+// hotels in different locales see the right language; `fallback` is the
+// English shown until the hotel translates the key.
+export const CLIENT_COMMANDS: { key: string; descriptionKey: string; fallback: string }[] = [
     // Room effects
-    { key: 'shake', descriptionKey: 'chatcmd.client.shake' },
-    { key: 'rotate', descriptionKey: 'chatcmd.client.rotate' },
-    { key: 'zoom', descriptionKey: 'chatcmd.client.zoom' },
-    { key: 'flip', descriptionKey: 'chatcmd.client.flip' },
-    { key: 'iddqd', descriptionKey: 'chatcmd.client.iddqd' },
-    { key: 'screenshot', descriptionKey: 'chatcmd.client.screenshot' },
-    { key: 'togglefps', descriptionKey: 'chatcmd.client.togglefps' },
+    { key: 'shake', descriptionKey: 'chatcmd.client.shake', fallback: 'Shake the room' },
+    { key: 'rotate', descriptionKey: 'chatcmd.client.rotate', fallback: 'Rotate the room' },
+    { key: 'zoom', descriptionKey: 'chatcmd.client.zoom', fallback: 'Zoom in/out' },
+    { key: 'flip', descriptionKey: 'chatcmd.client.flip', fallback: 'Reset zoom' },
+    { key: 'iddqd', descriptionKey: 'chatcmd.client.iddqd', fallback: 'Flip the room' },
+    { key: 'screenshot', descriptionKey: 'chatcmd.client.screenshot', fallback: 'Room screenshot' },
+    { key: 'togglefps', descriptionKey: 'chatcmd.client.togglefps', fallback: 'Toggle FPS cap' },
+    { key: 'fs', descriptionKey: 'chatcmd.client.fullscreen', fallback: 'Toggle fullscreen' },
+    { key: 'hidemouse', descriptionKey: 'chatcmd.client.hidemouse', fallback: 'Hide/show the mouse cursor' },
+    { key: 'cam', descriptionKey: 'chatcmd.client.camera', fallback: 'Open the camera' },
+    { key: 'fps', descriptionKey: 'chatcmd.client.fps', fallback: 'Set the frame rate: :fps <5-10000>' },
+    { key: 'showstats', descriptionKey: 'chatcmd.client.showstats', fallback: 'Show the FPS counter' },
+    { key: 'ping', descriptionKey: 'chatcmd.client.ping', fallback: 'Show your latency' },
+    { key: 'lang', descriptionKey: 'chatcmd.client.lang', fallback: 'Switch the client language: :lang <code>' },
     // Expressions
-    { key: 'd', descriptionKey: 'chatcmd.client.laugh' },
-    { key: 'kiss', descriptionKey: 'chatcmd.client.kiss' },
-    { key: 'jump', descriptionKey: 'chatcmd.client.jump' },
-    { key: 'idle', descriptionKey: 'chatcmd.client.idle' },
-    { key: 'sign', descriptionKey: 'chatcmd.client.sign' },
+    { key: 'd', descriptionKey: 'chatcmd.client.laugh', fallback: 'Laugh (VIP)' },
+    { key: 'kiss', descriptionKey: 'chatcmd.client.kiss', fallback: 'Blow a kiss (VIP)' },
+    { key: 'jump', descriptionKey: 'chatcmd.client.jump', fallback: 'Jump (VIP)' },
+    { key: 'idle', descriptionKey: 'chatcmd.client.idle', fallback: 'Go idle' },
+    { key: 'sign', descriptionKey: 'chatcmd.client.sign', fallback: 'Show a sign' },
+    { key: 'link', descriptionKey: 'chatcmd.client.wave', fallback: 'Wave' },
+    { key: 'moonwalk', descriptionKey: 'chatcmd.client.moonwalk', fallback: 'Moonwalk' },
+    { key: 'habnam', descriptionKey: 'chatcmd.client.habnam', fallback: 'Habnam' },
+    // Navigation
+    { key: 'visit', descriptionKey: 'chatcmd.client.visit', fallback: 'Visit a user: :visit <name>' },
+    { key: 'roomid', descriptionKey: 'chatcmd.client.roomid', fallback: 'Go to a room by id: :roomid <id>' },
+    // People
+    { key: 'ignore', descriptionKey: 'chatcmd.client.ignore', fallback: 'Ignore a user in this room: :ignore <name>' },
+    { key: 'unignore', descriptionKey: 'chatcmd.client.unignore', fallback: 'Stop ignoring a user: :unignore <name>' },
+    { key: 'mutepets', descriptionKey: 'chatcmd.client.mutepets', fallback: 'Mute the pets in this room' },
+    { key: 'kick', descriptionKey: 'chatcmd.client.kick', fallback: 'Kick a user from your room: :kick <name>' },
+    { key: 'mute', descriptionKey: 'chatcmd.client.mute', fallback: 'Mute a user in your room for 2 minutes: :mute <name>' },
+    { key: 'shutup', descriptionKey: 'chatcmd.client.mute', fallback: 'Mute a user in your room for 2 minutes: :mute <name>' },
+    { key: 'drop', descriptionKey: 'chatcmd.client.drop', fallback: 'Drop the item you are carrying' },
+    { key: 'news', descriptionKey: 'chatcmd.client.news', fallback: 'Open the news' },
+    { key: 'mail', descriptionKey: 'chatcmd.client.mail', fallback: 'Open your mail' },
+    // Ambassadors and staff
+    { key: 'aalert', descriptionKey: 'chatcmd.client.aalert', fallback: 'Ambassador alert: :aalert <name>' },
+    { key: 'anew', descriptionKey: 'chatcmd.client.anew', fallback: 'Classify the users of this room as new' },
+    { key: 'avisit', descriptionKey: 'chatcmd.client.avisit', fallback: 'Go to the newbie lobby (:avisit group for the group lobby)' },
+    { key: 'uc', descriptionKey: 'chatcmd.client.uc', fallback: 'Classify users: :uc <type> or :uc hotel <type>' },
     // Room management
-    { key: 'furni', descriptionKey: 'chatcmd.client.furni' },
-    { key: 'chooser', descriptionKey: 'chatcmd.client.chooser' },
-    { key: 'floor', descriptionKey: 'chatcmd.client.floor' },
-    { key: 'bcfloor', descriptionKey: 'chatcmd.client.floor' },
-    { key: 'pickall', descriptionKey: 'chatcmd.client.pickall' },
-    { key: 'ejectall', descriptionKey: 'chatcmd.client.ejectall' },
-    { key: 'settings', descriptionKey: 'chatcmd.client.settings' },
+    { key: 'furni', descriptionKey: 'chatcmd.client.furni', fallback: 'Furni chooser' },
+    { key: 'chooser', descriptionKey: 'chatcmd.client.chooser', fallback: 'User chooser' },
+    { key: 'floor', descriptionKey: 'chatcmd.client.floor', fallback: 'Floor plan editor' },
+    { key: 'bcfloor', descriptionKey: 'chatcmd.client.floor', fallback: 'Floor plan editor' },
+    { key: 'pickall', descriptionKey: 'chatcmd.client.pickall', fallback: 'Pick up all furni' },
+    { key: 'ejectall', descriptionKey: 'chatcmd.client.ejectall', fallback: 'Eject all furni' },
+    { key: 'settings', descriptionKey: 'chatcmd.client.settings', fallback: 'Room settings' },
+    // Wired creator tools
+    { key: 'wired', descriptionKey: 'chatcmd.client.wired', fallback: 'Open the wired creator tools' },
+    { key: 'wf', descriptionKey: 'chatcmd.client.wired', fallback: 'Open the wired creator tools' },
+    { key: 'var', descriptionKey: 'chatcmd.client.variables', fallback: 'Wired tools: variables tab' },
+    { key: 'inspect', descriptionKey: 'chatcmd.client.inspection', fallback: 'Wired tools: inspection tab' },
+    { key: 'wiredreset', descriptionKey: 'chatcmd.client.wiredreset', fallback: 'Close the wired window and reset its cache' },
+    { key: 'playtest', descriptionKey: 'chatcmd.client.playtest', fallback: 'Toggle the wired play-test mode' },
     // Info
-    { key: 'client', descriptionKey: 'chatcmd.client.info' },
-    { key: 'octane', descriptionKey: 'chatcmd.client.info' }
+    { key: 'client', descriptionKey: 'chatcmd.client.info', fallback: 'Client info' },
+    { key: 'octane', descriptionKey: 'chatcmd.client.info', fallback: 'Client info' }
 ];
 
 /**
@@ -110,7 +146,7 @@ export const useChatCommandSelector = (chatValue: string) => {
 
         for (const clientCmd of CLIENT_COMMANDS) {
             if (byKey.has(clientCmd.key)) continue;
-            byKey.set(clientCmd.key, { key: clientCmd.key, description: LocalizeText(clientCmd.descriptionKey) });
+            byKey.set(clientCmd.key, { key: clientCmd.key, description: localizeWithFallback(clientCmd.descriptionKey, clientCmd.fallback) });
         }
 
         return [ ...byKey.values() ].sort((a, b) => a.key.localeCompare(b.key));

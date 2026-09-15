@@ -7,6 +7,11 @@ interface ChatInputEmojiSelectorViewProps {
     addChatEmoji: (emoji: string) => void;
 }
 
+/**
+ * The emoji-mart picker on the chat bar: pick one and its native glyph is appended to
+ * the message. `chat.emoji.enabled` (default on) hides the button for hotels that do
+ * not want it.
+ */
 export const ChatInputEmojiSelectorView: FC<ChatInputEmojiSelectorViewProps> = (props) => {
     const { addChatEmoji = null } = props;
     const [selectorVisible, setSelectorVisible] = useState(false);

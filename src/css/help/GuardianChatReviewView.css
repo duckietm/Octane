@@ -1,0 +1,464 @@
+/* Guardian chat review jury (guardian_chat_review_accept / vote / wait_for_voters /
+   wait_for_results / results) and the reporter feedback (chat_review_reporter_feedback).
+   The official frames are 282x276, 279x499, 248x280 and 369x304; the widths are kept
+   and the heights follow the content inside the frame 3 chrome. */
+
+.octane-guide-tool.octane-guardian-chat-review-accept {
+    width: 282px;
+}
+
+.octane-guide-tool.octane-guardian-chat-review-vote {
+    width: 279px;
+}
+
+.octane-guide-tool.octane-guardian-chat-review-results {
+    width: 248px;
+}
+
+.octane-guardian-countdown {
+    min-width: 48px;
+    height: 30px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1c1c1c;
+    color: #f0f0f0;
+    border-radius: 4px;
+    font-family: Ubuntu, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    box-shadow: inset 0 0 0 1px #4a4a4a;
+}
+
+.octane-guardian-link {
+    cursor: pointer;
+    color: #222;
+}
+
+.octane-guardian-link:hover {
+    color: #000;
+}
+
+/* ---- accept (282x276) ---- */
+
+.octane-guardian-accept {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 70px;
+    min-height: 221px;
+}
+
+.octane-guardian-accept-illustration {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 63px;
+    height: 80px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 6px;
+}
+
+.octane-guardian-accept-request {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 120px;
+}
+
+.octane-guardian-accept-description {
+    padding-top: 10px;
+}
+
+.octane-guardian-accept-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: auto;
+}
+
+/* ---- vote / wait for voters (279x499) ---- */
+
+.octane-guardian-vote {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.octane-guardian-vote-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+    min-height: 34px;
+}
+
+.octane-guardian-vote-subtitle {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding-top: 8px;
+}
+
+.octane-guardian-chatlog {
+    height: 265px;
+    overflow-y: auto;
+    padding: 4px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.octane-guardian-chatlog-entry {
+    display: flex;
+    gap: 7px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.octane-guardian-chatlog-entry:last-child {
+    border-bottom: 0;
+}
+
+.octane-guardian-chatlog-avatar {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 17px;
+    margin-top: 2px;
+    border-radius: 3px;
+    background: #8a8a8a;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.octane-guardian-chatlog-entry.is-suspect .octane-guardian-chatlog-avatar {
+    background: #a9322b;
+}
+
+.octane-guardian-chatlog-message {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 12px;
+    line-height: 16px;
+    word-break: break-word;
+}
+
+.octane-guardian-chatlog-entry.is-suspect .octane-guardian-chatlog-message {
+    color: #a9322b;
+}
+
+.octane-guardian-waiting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 30px 0;
+}
+
+.octane-guardian-waiting-animation,
+.octane-guardian-decision.is-animated {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 4px solid rgba(0, 0, 0, 0.15);
+    border-top-color: #555;
+    animation: octane-guardian-spin 1s linear infinite;
+}
+
+@keyframes octane-guardian-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.octane-guardian-vote-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 10px;
+}
+
+.octane-guardian-vote-options {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 0 24px;
+}
+
+.octane-guardian-vote-option {
+    width: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* help_chat_review_vote_ok / _bad / _very_bad (76x77): the three faces, drawn. */
+.octane-guardian-vote-button {
+    width: 60px;
+    height: 60px;
+    margin: 4px 0;
+    border-radius: 50%;
+    border: 3px solid #333;
+    cursor: pointer;
+    position: relative;
+    box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15);
+    transition: transform 0.1s ease;
+}
+
+.octane-guardian-vote-button::before,
+.octane-guardian-vote-button::after {
+    content: '';
+    position: absolute;
+    background: #333;
+    border-radius: 50%;
+}
+
+.octane-guardian-vote-button::before {
+    width: 8px;
+    height: 8px;
+    left: 16px;
+    top: 18px;
+    box-shadow: 20px 0 0 #333;
+}
+
+.octane-guardian-vote-button::after {
+    width: 28px;
+    height: 12px;
+    left: 13px;
+    top: 34px;
+    border-radius: 0 0 14px 14px;
+}
+
+.octane-guardian-vote-button.vote-ok {
+    background: #7cc75b;
+}
+
+.octane-guardian-vote-button.vote-bad {
+    background: #f0b13a;
+}
+
+.octane-guardian-vote-button.vote-bad::after {
+    height: 4px;
+    top: 38px;
+    border-radius: 2px;
+}
+
+.octane-guardian-vote-button.vote-very_bad {
+    background: #d94a3c;
+}
+
+.octane-guardian-vote-button.vote-very_bad::after {
+    top: 36px;
+    border-radius: 14px 14px 0 0;
+}
+
+.octane-guardian-vote-button:hover:not(:disabled) {
+    transform: scale(1.06);
+}
+
+.octane-guardian-vote-button:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+.octane-guardian-vote-button:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+
+/* ---- wait for results / results (248x280) ---- */
+
+.octane-guardian-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.octane-guardian-results-verdict {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 55px;
+    padding: 0 4px;
+}
+
+.octane-guardian-results-waiting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-height: 55px;
+    padding: 4px 20px 0;
+}
+
+.octane-guardian-results-waiting-title {
+    color: #888;
+    font-size: 14px;
+}
+
+.octane-guardian-results-label {
+    color: #444;
+    padding: 4px 4px 0;
+}
+
+.octane-guardian-results-list {
+    display: flex;
+    flex-direction: column;
+    padding: 0 6px;
+}
+
+.octane-guardian-results-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    min-height: 46px;
+    padding: 0 6px 0 14px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.octane-guardian-results-row:last-child {
+    border-bottom: 0;
+}
+
+.octane-guardian-results-balloon {
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translate(100%, -50%);
+    padding: 5px 10px;
+    background: #a3201d;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+    white-space: nowrap;
+    display: none;
+}
+
+.octane-guardian-results-row.is-own {
+    box-shadow: inset 3px 0 0 #a3201d;
+}
+
+/* help_chat_review_decision_* (52x47): the coloured decision badges, drawn. */
+.octane-guardian-decision {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid #333;
+    background: #bdbdbd;
+    box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.15);
+}
+
+.octane-guardian-decision.decision-ok {
+    background: #7cc75b;
+}
+
+.octane-guardian-decision.decision-bad {
+    background: #f0b13a;
+}
+
+.octane-guardian-decision.decision-very_bad {
+    background: #d94a3c;
+}
+
+.octane-guardian-decision.decision-refused {
+    background: #8a8a8a;
+}
+
+.octane-guardian-decision.is-animated {
+    border-color: rgba(0, 0, 0, 0.15);
+    border-top-color: #555;
+    background: transparent;
+    box-shadow: none;
+}
+
+.octane-guardian-results-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px 4px;
+}
+
+.octane-guardian-results-footer .btn,
+.octane-guardian-results-footer button {
+    min-width: 140px;
+}
+
+/* ---- reporter feedback (369x304) ---- */
+
+.octane-chat-review-reporter-feedback {
+    width: 369px;
+}
+
+.octane-chat-review-reporter-feedback-content {
+    display: flex;
+    gap: 10px;
+    min-height: 150px;
+    padding: 6px 4px 0;
+}
+
+.octane-chat-review-reporter-feedback-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.octane-chat-review-reporter-feedback-caption {
+    font-size: 16px;
+    color: #333;
+}
+
+.octane-chat-review-reporter-feedback-body {
+    font-size: 12px;
+    line-height: 16px;
+    color: #000;
+}
+
+/* help_illustrations_bully (35x120): the bully icon strip on the right. */
+.octane-chat-review-reporter-feedback-illustration {
+    flex: 0 0 35px;
+    width: 35px;
+    height: 120px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #d94a3c 0 33%, #f0b13a 33% 66%, #7cc75b 66%);
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.35);
+}
+
+.octane-chat-review-reporter-feedback-note {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 50px;
+    padding: 8px 12px;
+    margin: 6px 4px 0;
+}
+
+/* help_notification (16x17) */
+.octane-chat-review-reporter-feedback-note-icon {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 17px;
+    border-radius: 50%;
+    background: #418db0;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.6);
+}
+
+.octane-chat-review-reporter-feedback-actions {
+    display: flex;
+    justify-content: center;
+    padding: 14px 0 6px;
+}
+
+.octane-chat-review-reporter-feedback-actions button {
+    min-width: 140px;
+}

@@ -6,6 +6,7 @@ import { WiredConditionActorIsOnFurniView } from './WiredConditionActorIsOnFurni
 import { WiredConditionActorIsTeamMemberView } from './WiredConditionActorIsTeamMemberView';
 import { WiredConditionActorIsWearingBadgeView } from './WiredConditionActorIsWearingBadgeView';
 import { WiredConditionActorIsWearingEffectView } from './WiredConditionActorIsWearingEffectView';
+import { WiredConditionCheckArrayView } from './WiredConditionCheckArrayView';
 import { WiredConditionChestHasItemsView } from './WiredConditionChestHasItemsView';
 import { WiredConditionChestHasItemTypeView } from './WiredConditionChestHasItemTypeView';
 import { WiredConditionCounterTimeMatchesView } from './WiredConditionCounterTimeMatchesView';
@@ -171,6 +172,8 @@ export const WiredConditionLayoutView = (code: number) => {
             return <WiredConditionUserOnceView daily={true} />;
         case WiredConditionlayout.USER_HIGHSCORE_POINTS:
             return <WiredConditionUserHighscorePointsView />;
+        case WiredConditionlayout.CHECK_ARRAY:
+            return <WiredConditionCheckArrayView />;
     }
 
     return null;

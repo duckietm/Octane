@@ -45,7 +45,6 @@ export const AchievementsView: FC = () => {
             },
             eventUrlPrefix: 'achievements/'
         };
-
         const questTracker: ILinkEventTracker = {
             eventUrlPrefix: 'questengine/achievements',
             linkReceived: (url) => {

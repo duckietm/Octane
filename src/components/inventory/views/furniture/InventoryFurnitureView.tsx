@@ -21,8 +21,9 @@ import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 
 const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
     const item = groupItem.getLastItem();
-    if (!item || !item.sellable) return false;
-    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item));
+    if (!item) return false;
+    if (!item.sellable) return false;
+    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item, (groupItem.items || []).filter((groupedItem) => groupedItem?.sellable)));
 };
 
 const attemptDeleteItem = (groupItem: GroupItem) => {

@@ -1,7 +1,9 @@
 import { NotificationAlertItem, NotificationAlertType } from '../../../../api';
 import { OctaneInfoAlertView } from './OctaneInfoAlertView';
 import { OctaneSystemAlertView } from './OctaneSystemAlertView';
+import { NotificationClubPromoAlertView } from './NotificationClubPromoAlertView';
 import { NotificationDefaultAlertView } from './NotificationDefaultAlertView';
+import { NotificationEpicPopupAlertView } from './NotificationEpicPopupAlertView';
 import { EVENT_ALERT_TYPES, NotificationEventAlertView } from './NotificationEventAlertView';
 import { isFurniDataAlert, NotificationFurniDataAlertView } from './NotificationFurniDataAlertView';
 import { NotificationSeachAlertView } from './NotificationSearchAlertView';
@@ -21,6 +23,10 @@ export const GetAlertLayout = (item: NotificationAlertItem, onClose: () => void)
             return <OctaneInfoAlertView key={key} {...props} />;
         case NotificationAlertType.SEARCH:
             return <NotificationSeachAlertView key={key} {...props} />;
+        case NotificationAlertType.EPIC:
+            return <NotificationEpicPopupAlertView key={key} {...props} />;
+        case NotificationAlertType.CLUB_PROMO:
+            return <NotificationClubPromoAlertView key={key} {...props} />;
         default:
             if (isFurniDataAlert(item)) return <NotificationFurniDataAlertView key={key} {...props} />;
 

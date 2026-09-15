@@ -1,5 +1,6 @@
 import {
     AddLinkEventTracker,
+    ApproveAllMembershipRequestsMessageComposer,
     GetSessionDataManager,
     GroupAdminGiveComposer,
     GroupAdminTakeComposer,
@@ -11,14 +12,17 @@ import {
     GroupMembershipAcceptComposer,
     GroupMembershipDeclineComposer,
     GroupMembersParser,
+    GroupMembersRefreshEvent,
+    GroupMemberUpdateEvent,
     GroupRank,
     GroupRemoveMemberComposer,
     ILinkEventTracker,
-    RemoveLinkEventTracker
+    RemoveLinkEventTracker,
+    UnblockGroupMemberMessageComposer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../api';
+import { GetConfigurationValue, GetUserProfile, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../api';
 import {
     Button,
     Column,
@@ -33,6 +37,17 @@ import {
 } from '../../../common';
 import { useMessageEvent, useNotification } from '../../../hooks';
 import { classNames } from '../../../layout';
+import { GROUP_MEMBER_LEVEL, GROUP_MEMBER_RANK, resolveGroupMemberActions, resolveGroupMemberLevels, resolveRemoveConfirmKeys } from './groupMemberActions';
+
+const LEVEL_TEXT_KEYS: Record<number, string> = {
+    [GROUP_MEMBER_LEVEL.ALL]: 'group.members.search.all',
+    [GROUP_MEMBER_LEVEL.ADMINS]: 'group.members.search.admins',
+    [GROUP_MEMBER_LEVEL.PENDING]: 'group.members.search.pending',
+    [GROUP_MEMBER_LEVEL.BLOCKED]: 'group.members.search.blocked'
+};
+
+const localizeLevel = (level: number) =>
+    level === GROUP_MEMBER_LEVEL.BLOCKED ? localizeWithFallback(LEVEL_TEXT_KEYS[level], 'Show blocked members') : LocalizeText(LEVEL_TEXT_KEYS[level]);
 
 export const GroupMembersView: FC<{}> = (props) => {
     const [groupId, setGroupId] = useState<number>(-1);
@@ -41,9 +56,11 @@ export const GroupMembersView: FC<{}> = (props) => {
     const [pageId, setPageId] = useState<number>(-1);
     const [totalPages, setTotalPages] = useState<number>(0);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [removingMemberName, setRemovingMemberName] = useState<string>(null);
+    // AIR 13: the kick confirmation is reused for "block" (KickMember with the block flag set).
+    const [pendingRemoval, setPendingRemoval] = useState<{ name: string; block: boolean }>(null);
     const { showConfirm = null } = useNotification();
     const pendingActionsRef = useRef<Set<string>>(new Set());
+    const blockingEnabled = GetConfigurationValue<boolean>('group.blocking.enabled', true) !== false;
 
     const getRankDescription = (member: GroupMemberParser) => {
         if (member.rank === GroupRank.OWNER) return 'group.members.owner';
@@ -73,8 +90,6 @@ export const GroupMembersView: FC<{}> = (props) => {
 
         if (member.rank !== GroupRank.ADMIN) SendMessageComposer(new GroupAdminGiveComposer(membersData.groupId, member.id));
         else SendMessageComposer(new GroupAdminTakeComposer(membersData.groupId, member.id));
-
-        refreshMembers();
     };
 
     const acceptMembership = (member: GroupMemberParser) => {
@@ -86,11 +101,9 @@ export const GroupMembersView: FC<{}> = (props) => {
         setTimeout(() => pendingActionsRef.current.delete(key), 2000);
 
         SendMessageComposer(new GroupMembershipAcceptComposer(membersData.groupId, member.id));
-
-        refreshMembers();
     };
 
-    const removeMemberOrDeclineMembership = (member: GroupMemberParser) => {
+    const removeMemberOrDeclineMembership = (member: GroupMemberParser, block = false) => {
         if (!membersData.admin) return;
 
         const key = `remove_${member.id}`;
@@ -99,43 +112,86 @@ export const GroupMembersView: FC<{}> = (props) => {
         setTimeout(() => pendingActionsRef.current.delete(key), 2000);
 
         if (member.rank === GroupRank.REQUESTED) {
-            SendMessageComposer(new GroupMembershipDeclineComposer(membersData.groupId, member.id));
+            if (block) return;
 
-            refreshMembers();
+            SendMessageComposer(new GroupMembershipDeclineComposer(membersData.groupId, member.id));
 
             return;
         }
 
-        setRemovingMemberName(member.name);
+        setPendingRemoval({ name: member.name, block });
         SendMessageComposer(new GroupConfirmRemoveMemberComposer(membersData.groupId, member.id));
+    };
+
+    const unblockMember = (member: GroupMemberParser) => {
+        if (!membersData.admin || member.rank !== GROUP_MEMBER_RANK.BLOCKED) return;
+
+        const key = `unblock_${member.id}`;
+        if (pendingActionsRef.current.has(key)) return;
+        pendingActionsRef.current.add(key);
+        setTimeout(() => pendingActionsRef.current.delete(key), 2000);
+
+        SendMessageComposer(new UnblockGroupMemberMessageComposer(membersData.groupId, member.id));
+
+        refreshMembers();
     };
 
     useMessageEvent<GroupMembersEvent>(GroupMembersEvent, (event) => {
         const parser = event.getParser();
+        const normalizedLevel = !parser.admin && levelId >= 2 && parser.level === 0;
+
+        if (parser.groupId !== groupId || parser.query !== searchQuery || parser.pageIndex !== pageId) return;
+        if (parser.level !== levelId && !normalizedLevel) return;
 
         setMembersData(parser);
         setLevelId(parser.level);
         setTotalPages(Math.ceil(parser.totalMembersCount / parser.pageSize));
     });
 
+    useMessageEvent<GroupMemberUpdateEvent>(GroupMemberUpdateEvent, (event) => {
+        if (event.getParser().groupId !== groupId) return;
+
+        refreshMembers();
+    });
+
+    useMessageEvent<GroupMembersRefreshEvent>(GroupMembersRefreshEvent, (event) => {
+        if (event.getParser().groupId !== groupId) return;
+
+        refreshMembers();
+    });
+
     useMessageEvent<GroupConfirmMemberRemoveEvent>(GroupConfirmMemberRemoveEvent, (event) => {
         const parser = event.getParser();
+        const block = pendingRemoval?.block ?? false;
+        const keys = resolveRemoveConfirmKeys(block, parser.furnitureCount);
+        const parameters = ['user', 'amount'];
+        const replacements = [pendingRemoval?.name ?? '', parser.furnitureCount.toString()];
+        const message = block
+            ? localizeWithFallback(
+                  keys.desc,
+                  parser.furnitureCount > 0
+                      ? '%user% has %amount% Furnis in the Group homeroom. Are you sure you want to block this Habbo from the Group?'
+                      : 'Are you sure you want to block %user% from this Group?',
+                  parameters,
+                  replacements
+              )
+            : LocalizeText(keys.desc, parameters, replacements);
+        const title = block ? localizeWithFallback(keys.title, 'Confirm block from Group') : LocalizeText(keys.title);
 
         showConfirm(
-            LocalizeText(
-                parser.furnitureCount > 0 ? 'group.kickconfirm.desc' : 'group.kickconfirm_nofurni.desc',
-                ['user', 'amount'],
-                [removingMemberName, parser.furnitureCount.toString()]
-            ),
+            message,
             () => {
-                SendMessageComposer(new GroupRemoveMemberComposer(membersData.groupId, parser.userId));
+                SendMessageComposer(new GroupRemoveMemberComposer(membersData.groupId, parser.userId, block));
 
                 refreshMembers();
             },
-            null
+            null,
+            null,
+            null,
+            title
         );
 
-        setRemovingMemberName(null);
+        setPendingRemoval(null);
     });
 
     useEffect(() => {
@@ -176,7 +232,7 @@ export const GroupMembersView: FC<{}> = (props) => {
         setMembersData(null);
         setTotalPages(0);
         setSearchQuery('');
-        setRemovingMemberName(null);
+        setPendingRemoval(null);
     }, [groupId]);
 
     if (groupId === -1 || !membersData) return null;
@@ -201,14 +257,33 @@ export const GroupMembersView: FC<{}> = (props) => {
                             onChange={(event) => setSearchQuery(event.target.value)}
                         />
                         <select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
-                            <option value="0">{LocalizeText('group.members.search.all')}</option>
-                            <option value="1">{LocalizeText('group.members.search.admins')}</option>
-                            <option value="2">{LocalizeText('group.members.search.pending')}</option>
+                            {resolveGroupMemberLevels(membersData.admin, blockingEnabled).map((level) => (
+                                <option key={level} value={level}>
+                                    {localizeLevel(level)}
+                                </option>
+                            ))}
                         </select>
+                        {membersData.admin && levelId === GROUP_MEMBER_LEVEL.PENDING && membersData.result.length > 0 && (
+                            <Button
+                                variant="success"
+                                className="btn-sm octane-group-members-accept-all"
+                                onClick={() => SendMessageComposer(new ApproveAllMembershipRequestsMessageComposer(membersData.groupId))}
+                            >
+                                {LocalizeText('group.members.acceptall')}
+                            </Button>
+                        )}
                     </Column>
                 </div>
                 <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
                     {membersData.result.map((member, index) => {
+                        const actions = resolveGroupMemberActions({
+                            rank: member.rank,
+                            isSelf: member.id === GetSessionDataManager().userId,
+                            allowedToManage: membersData.admin,
+                            blockingEnabled
+                        });
+                        const blocked = member.rank === GROUP_MEMBER_RANK.BLOCKED;
+
                         return (
                             <Flex key={index} alignItems="center" className="octane-group-member-row" gap={0} overflow="hidden">
                                 <div className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
@@ -226,14 +301,24 @@ export const GroupMembersView: FC<{}> = (props) => {
                                     <Text bold pointer small className="octane-group-member-row__name" onClick={(event) => GetUserProfile(member.id)}>
                                         {member.name}
                                     </Text>
-                                    {member.rank !== GroupRank.REQUESTED && (
+                                    {blocked && (
+                                        <Text
+                                            small
+                                            pointer
+                                            className="octane-group-member-row__since octane-group-member-row__unblock"
+                                            onClick={() => unblockMember(member)}
+                                        >
+                                            {localizeWithFallback('group.members.unblock', 'Unblock')}
+                                        </Text>
+                                    )}
+                                    {!blocked && member.rank !== GroupRank.REQUESTED && (
                                         <Text italics small variant="muted" className="octane-group-member-row__since">
                                             {LocalizeText('group.members.since', ['date'], [member.joinedAt])}
                                         </Text>
                                     )}
                                 </Column>
                                 <div className="octane-group-member-row__actions">
-                                    {member.rank !== GroupRank.REQUESTED && (
+                                    {!blocked && member.rank !== GroupRank.REQUESTED && (
                                         <div className="flex items-center justify-center">
                                             <div
                                                 className={classNames(
@@ -254,7 +339,16 @@ export const GroupMembersView: FC<{}> = (props) => {
                                             />
                                         </Flex>
                                     )}
-                                    {membersData.admin && member.rank !== GroupRank.OWNER && member.id !== GetSessionDataManager().userId && (
+                                    {actions.canBlock && (
+                                        <Flex alignItems="center">
+                                            <div
+                                                className="cursor-pointer octane-friends-spritesheet icon-deny octane-group-member-row__block"
+                                                title={localizeWithFallback('group.members.block', 'Block from Group')}
+                                                onClick={(event) => removeMemberOrDeclineMembership(member, true)}
+                                            />
+                                        </Flex>
+                                    )}
+                                    {actions.canRemove && (
                                         <Flex alignItems="center">
                                             <div
                                                 className="cursor-pointer octane-friends-spritesheet icon-deny"

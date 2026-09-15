@@ -38,6 +38,7 @@ import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitureDeleteView';
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
+import { InventoryTradeNameScamWarningView } from './views/furniture/InventoryTradeNameScamWarningView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
 import { BADGE_MAIN_ACHIEVEMENTS, BADGE_MAIN_ALL, BADGE_MAIN_NORMAL, BADGE_RARITY_ALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
@@ -84,6 +85,13 @@ const UNSEEN_BY_TAB: Record<string, number> = {
     [TAB_PREFIXES]: UnseenItemCategory.PREFIX
 };
 
+// AIR 13 keeps rented furni in the furni tab, so their unseen counter lands with owned furni.
+const getTabUnseenCount = (name: string, getCount: (category: number) => number) => {
+    const category = UNSEEN_BY_TAB[name];
+    const count = getCount(category);
+    return category === UnseenItemCategory.FURNI ? count + getCount(UnseenItemCategory.RENTABLE) : count;
+};
+
 const RARITY_TO_ID: Record<string, number> = {
     common: 0,
     uncommon: 1,
@@ -104,7 +112,7 @@ export const InventoryView: FC<{}> = () => {
     const [badgeMetadata, setBadgeMetadata] = useState<Awaited<ReturnType<typeof ensureBadgeLeaderboardLoaded>>>(null);
     const [mainFilter, setMainFilter] = useState<string>(FURNI_MAIN_FILTER.ALL);
     const [typeFilter, setTypeFilter] = useState<string>('any');
-    const { isTrading = false, stopTrading = null } = useInventoryTrade();
+    const { isTrading = false, stopTrading = null, nameScamWarning = null, dismissNameScamWarning = null } = useInventoryTrade();
     const { isOpen: isWiredTrading = false } = useWiredTrading();
     const { getCount = null } = useInventoryUnseenTracker();
     const { groupItems = [] } = useInventoryFurni();
@@ -258,7 +266,7 @@ export const InventoryView: FC<{}> = () => {
                             {TABS.map((name) => (
                                 <OctaneCardTabsItemView
                                     key={name}
-                                    count={getCount(UNSEEN_BY_TAB[name])}
+                                    count={getTabUnseenCount(name, getCount)}
                                     isActive={currentTab === name}
                                     onClick={() => setCurrentTab(name)}
                                 >
@@ -307,6 +315,7 @@ export const InventoryView: FC<{}> = () => {
                         <InventoryWiredTradeView />
                     </div>
                 )}
+                            {nameScamWarning && <InventoryTradeNameScamWarningView warning={nameScamWarning} onClose={dismissNameScamWarning} />}
             </OctaneCardView>
             <InventoryFurnitureDeleteView />
         </>

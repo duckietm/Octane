@@ -43,10 +43,11 @@ export const OctaneCardView: FC<OctaneCardViewProps> = (props) => {
         const newClassNames: string[] = [isResizable ? 'resize' : 'resize-none', 'octane-card', 'octane-card-shell', `theme-${theme}`];
 
         if (resolvedFrameStyle !== null) newClassNames.push(`octane-card-frame-${resolvedFrameStyle}`);
+        newClassNames.push(classicScrollbar ? 'has-classic-scrollbar' : 'octane-scrollbar-native');
         if (classNames.length) newClassNames.push(...classNames);
 
         return newClassNames;
-    }, [classNames, isResizable, resolvedFrameStyle, theme]);
+    }, [classNames, classicScrollbar, isResizable, resolvedFrameStyle, theme]);
 
     return (
         <OctaneCardContextProvider value={{ theme }}>

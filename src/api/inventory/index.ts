@@ -13,6 +13,7 @@ export * from './IUnseenItemTracker';
 export * from './PetUtilities';
 export * from './TradeState';
 export * from './TradeUserData';
+export * from './TradingNameScamDetector';
 export * from './TradingNotificationType';
 export * from './TradingUtilities';
 export * from './UnseenItemCategory';
