@@ -7,19 +7,23 @@ interface CatalogClubPurchaseConfirmViewProps {
     offer: ClubOfferData;
     productText: string;
     validUntilText: string;
+    /** The extend confirmation adds a line saying what the club deal saves; a plain purchase has none. */
+    discountText?: string;
+    /** The extend confirmation carries its own title (`catalog.club.extend.confirm.title`). */
+    title?: string;
     onCancel: () => void;
     onConfirm: () => void;
 }
 
 export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewProps> = (props) => {
-    const { offer, productText, validUntilText, onCancel, onConfirm } = props;
+    const { offer, productText, validUntilText, discountText = null, title: titleOverride = null, onCancel, onConfirm } = props;
     const disclaimerEnabled = useMemo(() => GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false), []);
     const [disclaimerAccepted, setDisclaimerAccepted] = useState(!disclaimerEnabled);
     const showCredits = offer.priceCredits > 0 || offer.priceActivityPoints <= 0;
 
     useEffect(() => setDisclaimerAccepted(!disclaimerEnabled), [disclaimerEnabled, offer.offerId]);
 
-    const title = LocalizeText('catalog.club.buy.confirm');
+    const title = titleOverride ?? LocalizeText('catalog.club.buy.confirm');
 
     return (
         <OctaneCardView
@@ -58,6 +62,11 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
                                 )}
                             </span>
                         </div>
+                        {discountText && (
+                            <span className="octane-club-purchase-confirm-discount" data-testid="club-purchase-confirm-discount">
+                                {discountText}
+                            </span>
+                        )}
                     </div>
                 </div>
 

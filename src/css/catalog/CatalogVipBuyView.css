@@ -795,3 +795,90 @@
     border-image-source: var(--habbo-skin-shiny-thick-green-disabled);
     cursor: default;
 }
+
+/* vip_benefits.xml (457x450, VipBenefitsWindow.as): header strip 455x42 at y=0, title at y=55,
+   teaser 237x253 at 24/91, description html 163x269 at 275/98, details 403x50 at 27/351. */
+.octane-vip-benefits-window {
+    width: min(457px, calc(100vw - 16px));
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    height: min(450px, calc(100vh - 16px));
+    min-height: 0;
+    max-height: calc(100vh - 16px);
+}
+
+.octane-vip-benefits-content {
+    position: relative;
+    padding: 0 !important;
+    color: #222;
+    font-family: Ubuntu, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-vip-benefits-header {
+    position: absolute;
+    top: 0;
+    left: 1px;
+    width: 455px;
+    max-width: calc(100% - 2px);
+    height: 42px;
+    object-fit: cover;
+}
+
+.octane-vip-benefits-title {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 30px;
+    text-align: center;
+}
+
+.octane-vip-benefits-teaser {
+    position: absolute;
+    top: 91px;
+    left: 24px;
+    width: 237px;
+    height: 253px;
+    object-fit: contain;
+}
+
+.octane-vip-benefits-description {
+    position: absolute;
+    top: 98px;
+    left: 275px;
+    width: 163px;
+    height: 269px;
+    overflow: hidden;
+    line-height: 18px;
+}
+
+.octane-vip-benefits-details {
+    position: absolute;
+    top: 351px;
+    left: 27px;
+    width: 403px;
+    max-width: calc(100% - 54px);
+    height: 50px;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 13px;
+}
+
+@media (max-width: 480px) {
+    .octane-vip-benefits-teaser {
+        left: 8px;
+        width: 45%;
+        height: auto;
+        max-height: 253px;
+    }
+
+    .octane-vip-benefits-description {
+        left: 52%;
+        width: 44%;
+    }
+}

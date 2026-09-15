@@ -1,5 +1,6 @@
 import {
     AddLinkEventTracker,
+    CanCreateRoomMessageComposer,
     ConvertGlobalRoomIdMessageComposer,
     ForwardToSomeRoomMessageComposer,
     GetCategoriesWithUserCountMessageComposer,
@@ -19,6 +20,8 @@ import quicklinkAdd from '../../assets/images/navigator/air/quicklink-add.png';
 import randomRoomImg from '../../assets/images/navigator/air/random-room.png';
 import { DraggableWindow, WidgetErrorBoundary } from '../../common';
 import {
+    resolveNavigatorSearchLink,
+    resolveNavigatorTabCode,
     useMessageEvent,
     useNavigatorData,
     useNavigatorRoomInfoPopupStore,
@@ -28,12 +31,14 @@ import {
     useOctaneEvent
 } from '../../hooks';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
+import { NavigatorEnforceCategoryView } from './views/NavigatorEnforceCategoryView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
 import { NavigatorRoomLinkView } from './views/NavigatorRoomLinkView';
 import { NavigatorRoomSettingsView } from './views/room-settings/NavigatorRoomSettingsView';
 import { NavigatorEmptyStateView } from './views/search/NavigatorEmptyStateView';
 import { NavigatorRoomInfoPopupView } from './views/search/NavigatorRoomInfoPopupView';
+import { NavigatorOfficialRoomsView } from './views/NavigatorOfficialRoomsView';
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
 import { NavigatorSearchSavesResultView } from './views/search/NavigatorSearchSavesResultView';
 import { NavigatorSearchView } from './views/search/NavigatorSearchView';
@@ -58,6 +63,9 @@ export const NavigatorView: FC<{}> = () => {
     const frameRef = useRef<HTMLDivElement>(null);
     const tabsRef = useRef<HTMLDivElement>(null);
     const resizeRef = useRef<{ y: number; height: number; scale: number } | null>(null);
+    // A search block of the "me" tab to unfold and scroll to once it renders
+    // (navigator/me/<code>, the toolbar hover rows; HabboNavigator.as showMeTab).
+    const [focusResultCode, setFocusResultCode] = useState<string | null>(null);
 
     useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, () => {
         useNavigatorUiStore.getState().hide();
@@ -106,8 +114,10 @@ export const NavigatorView: FC<{}> = () => {
                             TryVisitRoom(navigatorData.homeRoomId);
                             return;
                         }
-                        if (target === 'random_friending_room') {
-                            SendMessageComposer(new ForwardToSomeRoomMessageComposer('random_friending_room'));
+                        // Official `HabboNavigator.as:790-803`: named targets are forwarded to the
+                        // server (`:avisit` uses the predefined lobbies).
+                        if (target === 'random_friending_room' || target === 'predefined_noob_lobby' || target === 'predefined_group_lobby') {
+                            SendMessageComposer(new ForwardToSomeRoomMessageComposer(target));
                             return;
                         }
                         const roomId = Number.parseInt(target, 10);
@@ -119,23 +129,32 @@ export const NavigatorView: FC<{}> = () => {
                         return;
                     }
                     case 'create':
-                        store.openCreator();
+                        // The creator opens on the server's answer (`CanCreateRoom`), which
+                        // is where the room-limit alert comes from.
+                        SendMessageComposer(new CanCreateRoomMessageComposer());
                         return;
-                    case 'search':
-                        store.setSearch('hotel_view', parts.slice(2).join('/'));
+                    case 'search': {
+                        // Legacy search-code bridge (FakeMainViewCtrl.getSearchCodeByLegacySearchType):
+                        // numeric types, legacy codes and tab codes all resolve to a search.
+                        const context = resolveNavigatorSearchLink(parts, topLevelContexts?.map((item) => item.code) ?? []);
+                        if (!context) return;
+                        store.setSearch(context.code, context.filter);
                         store.show();
                         return;
+                    }
                     case 'tag':
                         store.setSearch('hotel_view', `tag:${parts.slice(2).join('/')}`);
                         store.show();
                         return;
                     case 'tab':
-                        if (parts[2]) store.setTab(parts[2]);
+                        // HabboNewNavigator.getSearchCodeForTabLink: "me" is the myworld view.
+                        if (parts[2]) store.setTab(resolveNavigatorTabCode(parts[2]));
                         store.show();
                         return;
                     case 'me':
                         store.setTab('myworld_view');
                         store.show();
+                        setFocusResultCode(parts[2] || null);
                         return;
                 }
             },
@@ -143,13 +162,25 @@ export const NavigatorView: FC<{}> = () => {
         };
         AddLinkEventTracker(linkTracker);
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [navigatorData]);
+    }, [navigatorData, topLevelContexts]);
 
     useEffect(() => {
         if (!searchResult) return;
         if (elementRef.current) elementRef.current.scrollTop = 0;
         useNavigatorRoomInfoPopupStore.getState().hide();
     }, [searchResult]);
+
+    useEffect(() => {
+        if (!focusResultCode || !isVisible || !searchResult || searchResult.code !== 'myworld_view') return;
+
+        const block = elementRef.current?.querySelector<HTMLElement>(`[data-result-code="${focusResultCode}"]`);
+        if (!block) return;
+
+        const store = useNavigatorUiStore.getState();
+        if (!store.expandedResultCodes.includes(focusResultCode)) store.setResultCollapsed(focusResultCode, false);
+        block.scrollIntoView({ block: 'start' });
+        setFocusResultCode(null);
+    }, [focusResultCode, isVisible, searchResult]);
 
     useEffect(() => {
         if (!isVisible || !needsInit) return;
@@ -221,7 +252,9 @@ export const NavigatorView: FC<{}> = () => {
 
     const onCreateRoom = () => {
         useNavigatorRoomInfoPopupStore.getState().hide();
-        useNavigatorUiStore.getState().openCreator();
+        // Ask first, as the official navigator does: the answer opens the creator or
+        // shows the room-limit alert (useNavigatorStore).
+        SendMessageComposer(new CanCreateRoomMessageComposer());
     };
 
     const onRandomRoom = () => {
@@ -333,6 +366,8 @@ export const NavigatorView: FC<{}> = () => {
                                         <NavigatorSearchView searchResult={searchResult} />
                                         <div ref={elementRef} className="octane-navigator-air__results has-air-scrollbar" data-scrollable={resultsScrollable}>
                                             {isFetching && <div className="octane-navigator-air__busy-mask" aria-hidden="true" />}
+                                            {/* AIR 13 official rooms list (OfficialRooms, 438) sits above the search results of the official tab. */}
+                                            {(searchResult?.code === 'official_view' || currentTabCode === 'official_view') && <NavigatorOfficialRoomsView />}
                                             {searchResult &&
                                                 searchResult.results.map((result, index) => (
                                                     <NavigatorSearchResultView
@@ -421,6 +456,9 @@ export const NavigatorView: FC<{}> = () => {
             <NavigatorRoomInfoPopupView />
             <WidgetErrorBoundary name="NavigatorDoorState">
                 <NavigatorDoorStateView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="NavigatorEnforceCategory">
+                <NavigatorEnforceCategoryView />
             </WidgetErrorBoundary>
             {isRoomInfoOpen && (
                 <WidgetErrorBoundary name="NavigatorRoomInfo">

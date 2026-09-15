@@ -25,6 +25,11 @@ allowedColours.set('brown', 'brown');
 allowedColours.set('purple', 'purple');
 allowedColours.set('pink', 'pink');
 
+/**
+ * Numeric entities for markup characters and the Latin/CJK range. Existing
+ * `&#123;` entities are kept. The `u` flag walks code points, so an emoji after
+ * an accented letter is never split into a lone surrogate.
+ */
 const encodeHTML = (str: string) => {
     return str.replace(/&#\d+;|[\u00A0-\u9999<>&]/gu, (match) => (match.length > 1 ? match : `&#${match.codePointAt(0)};`));
 };

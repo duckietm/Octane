@@ -94,6 +94,9 @@ vi.mock('../../../../../hooks', () => ({
     useCatalogData: vi.fn(),
     useCatalogSkipPurchaseConfirmation: vi.fn(),
     useCatalogUiState: vi.fn(),
+    // The extend confirmation only appears once the server answers composer 352; these tests
+    // never ask for it, so the hook stays empty.
+    useClubExtendOffer: () => ({ clubExtendOffer: null, requestClubExtendOffer: vi.fn(), clearClubExtendOffer: vi.fn() }),
     useClubOffers: vi.fn(),
     useGiftConfiguration: vi.fn(),
     useMessageEvent: vi.fn(),

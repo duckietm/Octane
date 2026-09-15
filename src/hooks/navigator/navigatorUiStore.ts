@@ -6,6 +6,14 @@ import {
 } from '@octane/renderer';
 import { SendMessageComposer } from '../../api';
 import { createOctaneStore } from '../../state/createOctaneStore';
+import {
+    addSearchContextAtCurrentOffset,
+    EMPTY_SEARCH_HISTORY,
+    getCurrentSearchContext,
+    goBackInSearchHistory,
+    isSameSearchContext,
+    NavigatorSearchHistoryState
+} from './navigatorSearchHistory';
 
 const QUICK_LINKS_STORAGE_KEY = 'nitro.navigator.air.quickLinksOpen';
 const COLLAPSED_RESULTS_STORAGE_KEY = 'nitro.navigator.air.collapsedResults';
@@ -80,6 +88,11 @@ export type NavigatorUiState = {
     collapsedResultCodes: string[];
     expandedResultCodes: string[];
     resultViewModes: Record<string, number>;
+    // SearchContextHistoryManager.as: the back-stack of performed searches.
+    searchHistory: NavigatorSearchHistoryState;
+    // HabboNewNavigator._noPushToHistoryDueToNavigation: the result of a
+    // "back" navigation must not be pushed again.
+    skipNextHistoryPush: boolean;
 };
 
 export type NavigatorUiActions = {
@@ -107,6 +120,8 @@ export type NavigatorUiActions = {
     toggleResultCollapsed(code: string): void;
     setResultCollapsed(code: string, collapsed: boolean): void;
     setResultViewMode(code: string, mode: number): void;
+    recordSearchContext(code: string, filter: string): void;
+    goBackSearch(): boolean;
 };
 
 export const useNavigatorUiStore = createOctaneStore<NavigatorUiState & NavigatorUiActions>()((set) => ({
@@ -127,6 +142,8 @@ export const useNavigatorUiStore = createOctaneStore<NavigatorUiState & Navigato
     collapsedResultCodes: [],
     expandedResultCodes: [],
     resultViewModes: {},
+    searchHistory: EMPTY_SEARCH_HISTORY,
+    skipNextHistoryPush: false,
 
     show: () => set({ isVisible: true, needsSearch: true }),
     hide: () => set({ isVisible: false }),
@@ -211,5 +228,37 @@ export const useNavigatorUiStore = createOctaneStore<NavigatorUiState & Navigato
             SendMessageComposer(new NavigatorCategoryListModeComposer(code, resultViewModes[code]));
 
             return { resultViewModes };
-        })
+        }),
+    // HabboNewNavigator.onSearchResult: every received result set becomes the
+    // current history entry unless it is the target of a "back" navigation.
+    // The periodic user-count refresh re-receives the same context, which the
+    // official client served from its cache: identical consecutive contexts
+    // are not pushed twice.
+    recordSearchContext: (code, filter) =>
+        set((state) => {
+            const context = { code, filter };
+            const current = getCurrentSearchContext(state.searchHistory);
+
+            if (isSameSearchContext(current, context)) return { skipNextHistoryPush: false };
+            if (state.skipNextHistoryPush) return { skipNextHistoryPush: false };
+
+            return { searchHistory: addSearchContextAtCurrentOffset(state.searchHistory, context) };
+        }),
+    // HabboNewNavigator.goBack: re-perform the previous context without pushing it.
+    goBackSearch: () => {
+        const state = useNavigatorUiStore.getState();
+        const previous = goBackInSearchHistory(state.searchHistory);
+
+        if (!previous) return false;
+
+        set({
+            searchHistory: previous.state,
+            skipNextHistoryPush: true,
+            currentTabCode: previous.context.code,
+            currentFilter: previous.context.filter,
+            isCreatorOpen: false
+        });
+
+        return true;
+    }
 }));

@@ -2901,6 +2901,291 @@
     white-space: nowrap;
 }
 
+/* marketplace_search_simple.xml: combine_uniques_checkbox at 10/92 under the sort dropmenu. */
+.octane-marketplace-combine-uniques {
+    padding-left: 2px;
+    cursor: pointer;
+}
+
+.octane-marketplace-combine-uniques input {
+    width: 16px;
+    height: 15px;
+    margin: 0;
+}
+
+/* marketplace_purchase_confirmation.xml (279x255): 48px item box, name, header line, then the
+   price / average price / offer count lines, the disclaimer row and the two 120px buttons. */
+.octane-marketplace-purchase-confirm {
+    width: min(279px, calc(100vw - 16px));
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+}
+
+.octane-marketplace-purchase-confirm-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 9px 9px !important;
+    color: #222;
+    font-size: 12px;
+    line-height: 15px;
+}
+
+.octane-marketplace-purchase-confirm-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.octane-marketplace-purchase-confirm-image {
+    display: flex;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    background: #f1f1f1;
+}
+
+.octane-marketplace-purchase-confirm-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.octane-marketplace-purchase-confirm-header {
+    min-height: 30px;
+    margin: 0;
+}
+
+.octane-marketplace-purchase-confirm-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.octane-marketplace-purchase-confirm-disclaimer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.octane-marketplace-purchase-confirm-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    padding-top: 4px;
+}
+
+.octane-marketplace-purchase-confirm-actions > * {
+    flex: 1 1 0;
+}
+
+/* bundlePurchaseExtraInfoWidget (360x155 over the product view): discountPromoItem 180x20
+   top-left, discountValueItem 180x37 bottom-left, bundlesInfoItem 182x142 centred. */
+.octane-catalog-bundle-extra-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 6;
+    width: 100%;
+    height: 155px;
+    pointer-events: none;
+}
+
+.octane-catalog-bundle-extra-info > * {
+    pointer-events: auto;
+}
+
+.octane-catalog-bundle-thumb {
+    position: relative;
+    flex: 0 0 15px;
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    background: #ffd44d;
+    box-shadow: inset 0 0 0 2px #7a4a00;
+}
+
+.octane-catalog-bundle-thumb.has-splash::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    background: url("../../assets/images/catalog/air/bundle-star.png") center / 29px 29px no-repeat;
+    image-rendering: pixelated;
+    animation: octane-catalog-bundle-splash 1.2s steps(8) infinite;
+}
+
+@keyframes octane-catalog-bundle-splash {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.octane-catalog-bundle-promo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-sizing: border-box;
+    width: 180px;
+    height: 20px;
+    padding: 0 4px;
+    border: 0;
+    background: rgba(255, 145, 0, 0.7);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 17px;
+    text-align: left;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    animation: octane-catalog-bundle-drop 0.5s ease-out;
+}
+
+@keyframes octane-catalog-bundle-drop {
+    from {
+        transform: translateY(-20px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.octane-catalog-bundle-promo-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.octane-catalog-bundle-value {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    box-sizing: border-box;
+    width: 180px;
+    height: 37px;
+    padding: 1px 0 1px 8px;
+}
+
+.octane-catalog-bundle-value-rows {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.octane-catalog-bundle-value-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    height: 15px;
+    padding: 0 3px 0 6px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 15px;
+}
+
+.octane-catalog-bundle-value-row.is-total {
+    background: rgba(115, 115, 115, 0.7);
+}
+
+.octane-catalog-bundle-value-row.is-save {
+    background: rgba(0, 145, 0, 0.7);
+}
+
+.octane-catalog-bundle-value-label {
+    flex: 1 1 auto;
+}
+
+.octane-catalog-bundle-value-amount {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.octane-catalog-bundle-value-amount.is-struck {
+    opacity: 0.85;
+}
+
+.octane-catalog-bundle-value-amount.is-struck::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -4px;
+    left: -4px;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.octane-catalog-bundle-info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 182px;
+    height: 142px;
+    padding: 11px 4px;
+    border: 4px solid #8b5a2b;
+    border-radius: 6px;
+    background: #2f4f3a;
+    color: #fff;
+    font-size: 11px;
+    line-height: 15px;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+.octane-catalog-bundle-info-header,
+.octane-catalog-bundle-info-footer {
+    font-weight: 700;
+}
+
+.octane-catalog-bundle-info-formula {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+}
+
+.octane-catalog-bundle-info-free {
+    font-size: 11px;
+    line-height: 15px;
+}
+
+.octane-catalog-bundle-info-equals {
+    padding: 0 6px 2px;
+    border-bottom: 1px solid #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
 .octane-catalog-standard-spinner-discount-star {
     position: absolute;
     top: -2px;

@@ -5,11 +5,17 @@ import { RoomThumbnailWidgetView } from './RoomThumbnailWidgetView';
 
 const mocks = vi.hoisted(() => ({
     messageHandler: null as null | ((event: any) => void),
+    photoReady: vi.fn(() => true),
     refreshRoomThumbnail: vi.fn(),
     saveTextureAsScreenshot: vi.fn(() => Promise.resolve()),
     sendMessageComposer: vi.fn(),
     simpleAlert: vi.fn(),
-    uiHandler: null as null | ((event: { type: string }) => void)
+    uiHandler: null as null | ((event: { type: string }) => void),
+    zoomHandler: null as null | ((event: { roomId: number }) => void)
+}));
+
+vi.mock('../room-tools/roomZoom.helpers', () => ({
+    isRoomZoomPhotoReady: mocks.photoReady
 }));
 
 vi.mock('@octane/renderer', async () => {
@@ -44,6 +50,9 @@ vi.mock('../../../../hooks', () => ({
     useMessageEvent: (_eventType: unknown, handler: (event: any) => void) => {
         mocks.messageHandler = handler;
     },
+    useOctaneEvent: (_type: string, handler: (event: { roomId: number }) => void) => {
+        mocks.zoomHandler = handler;
+    },
     useNotification: () => ({ simpleAlert: mocks.simpleAlert }),
     useRoom: () => ({ roomSession: { roomId: 42 } }),
     useUiEvent: (_types: string[], handler: (event: { type: string }) => void) => {
@@ -59,7 +68,10 @@ afterEach(() => {
     mocks.saveTextureAsScreenshot.mockClear();
     mocks.sendMessageComposer.mockClear();
     mocks.simpleAlert.mockClear();
+    mocks.photoReady.mockReset();
+    mocks.photoReady.mockReturnValue(true);
     mocks.uiHandler = null;
+    mocks.zoomHandler = null;
 });
 
 const openCamera = () => {
@@ -99,6 +111,44 @@ describe('AIR room thumbnail server handshake', () => {
         expect(screen.getByRole('dialog', { name: 'room-thumbnail-camera' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'navigator.thumbeditor.save' })).toBeEnabled();
         expect(mocks.simpleAlert).toHaveBeenCalledWith('camera.render.count.info');
+    });
+
+    it('refuses to open while zoomed out or flipped, with the official alert', () => {
+        mocks.photoReady.mockReturnValue(false);
+
+        render(<RoomThumbnailWidgetView />);
+        act(() => mocks.uiHandler?.({ type: RoomWidgetThumbnailEvent.SHOW_THUMBNAIL }));
+
+        expect(screen.queryByRole('dialog', { name: 'room-thumbnail-camera' })).not.toBeInTheDocument();
+        expect(mocks.photoReady).toHaveBeenCalledWith(42);
+        expect(mocks.simpleAlert).toHaveBeenCalledWith('camera.zoom.missing.body', null, null, null, 'camera.zoom.missing.header');
+
+        act(() => mocks.uiHandler?.({ type: RoomWidgetThumbnailEvent.TOGGLE_THUMBNAIL }));
+
+        expect(screen.queryByRole('dialog', { name: 'room-thumbnail-camera' })).not.toBeInTheDocument();
+    });
+
+    it('closes when the room zooms out of the allowed range, unless an upload is in flight', async () => {
+        openCamera();
+
+        act(() => mocks.zoomHandler?.({ roomId: 42 }));
+
+        expect(screen.getByRole('dialog', { name: 'room-thumbnail-camera' })).toBeInTheDocument();
+
+        mocks.photoReady.mockReturnValue(false);
+        act(() => mocks.zoomHandler?.({ roomId: 42 }));
+
+        expect(screen.queryByRole('dialog', { name: 'room-thumbnail-camera' })).not.toBeInTheDocument();
+
+        mocks.photoReady.mockReturnValue(true);
+        openCamera();
+        fireEvent.click(screen.getByRole('button', { name: 'navigator.thumbeditor.save' }));
+        await waitFor(() => expect(mocks.saveTextureAsScreenshot).toHaveBeenCalledTimes(1));
+
+        mocks.photoReady.mockReturnValue(false);
+        act(() => mocks.zoomHandler?.({ roomId: 42 }));
+
+        expect(screen.getByRole('dialog', { name: 'room-thumbnail-camera' })).toBeInTheDocument();
     });
 
     it('unlocks the camera if the server never sends a thumbnail status', async () => {

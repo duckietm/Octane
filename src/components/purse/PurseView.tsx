@@ -1,5 +1,6 @@
 import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication } from '@octane/renderer';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ClearRememberLogin, FriendlyTime, GetConfigurationValue, GetRememberLogin, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
 import earningsIcon from '../../assets/images/purse-swf/icons/1747_icon_earnings_png$5e39e03f65fbbb9a85bedd0d577dc12d307477063.png';
 import hcIcon from '../../assets/images/purse-swf/icons/1801_hc_icon_png$2f8b554609e9c5cbbdc46bcbe5764be5-210881771.png';
@@ -13,6 +14,41 @@ import { SeasonalView } from './views/SeasonalView';
 export const PurseView: FC<{}> = (props) => {
     const { purse = null, hcDisabled = false } = usePurse();
     const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+    // Official toolbar logout_confirmation: "Are you sure you want to log out?" before the reboot.
+    const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+    // The menu portals to the body, so no widget stacked on the right side can cover it;
+    // it hangs under the purse, aligned to its right edge.
+    const purseRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const [menuAnchor, setMenuAnchor] = useState<{ top: number; right: number } | null>(null);
+
+    useEffect(() => {
+        if (!settingsMenuOpen) return;
+
+        const place = () => {
+            const rect = purseRef.current?.getBoundingClientRect();
+
+            if (!rect) return;
+
+            setMenuAnchor({ top: Math.round(rect.bottom + 1), right: Math.max(0, Math.round(window.innerWidth - rect.right)) });
+        };
+        const onPointerDown = (event: PointerEvent) => {
+            const target = event.target as Node;
+
+            if (menuRef.current?.contains(target) || purseRef.current?.contains(target)) return;
+
+            setSettingsMenuOpen(false);
+        };
+
+        place();
+        window.addEventListener('resize', place);
+        document.addEventListener('pointerdown', onPointerDown, true);
+
+        return () => {
+            window.removeEventListener('resize', place);
+            document.removeEventListener('pointerdown', onPointerDown, true);
+        };
+    }, [settingsMenuOpen]);
 
     const openSettingsSection = useCallback((section: string) => {
         CreateLinkEvent('user-settings/show/' + section);
@@ -21,6 +57,8 @@ export const PurseView: FC<{}> = (props) => {
 
     const displayedCurrencies = useMemo(() => GetConfigurationValue<number[]>('system.currency.types', []), []);
     const currencyDisplayNumberShort = useMemo(() => GetConfigurationValue<boolean>('currency.display.number.short', false), []);
+    // AIR 13 SettingsExtension shows the "Word filter" row only when user.custom.filter.enabled is on.
+    const wordFilterEnabled = useMemo(() => GetConfigurationValue<boolean>('user.custom.filter.enabled', true), []);
 
     const currencyTypes = useMemo(() => {
         if (!purse || !purse.activityPoints || !purse.activityPoints.size) return [];
@@ -67,8 +105,9 @@ export const PurseView: FC<{}> = (props) => {
         CreateLinkEvent('habboUI/open/vault');
     }, []);
 
-    const handleLogout = useCallback(async (event: React.MouseEvent) => {
-        event.stopPropagation();
+    const handleLogout = useCallback(async (event?: React.MouseEvent) => {
+        event?.stopPropagation();
+        setLogoutConfirmOpen(false);
 
         const logoutUrl = GetConfigurationValue<string>('login.logout.endpoint', '/api/auth/logout');
         const ssoTicket = (window.OctaneConfig?.['sso.ticket'] as string) ?? '';
@@ -128,7 +167,7 @@ export const PurseView: FC<{}> = (props) => {
 
     return (
         <Column alignItems="end" className="octane-purse-container" gap={0}>
-            <div className="octane-purse">
+            <div ref={purseRef} className="octane-purse">
                 <div className="octane-purse__chrome" aria-hidden="true" />
                 <div className="octane-purse__body">
                     <div className="octane-purse__currencies">
@@ -174,11 +213,28 @@ export const PurseView: FC<{}> = (props) => {
                         <button
                             type="button"
                             className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--logout octane-purse-right-button disconnect"
-                            onClick={handleLogout}
-                            title="Log out"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                setSettingsMenuOpen(false);
+                                setLogoutConfirmOpen((value) => !value);
+                            }}
+                            title={localizeWithFallback('toolbar.logout', 'Log out')}
                         >
                             <img src={logoutIcon} alt="" className="octane-purse__btn-img" />
                         </button>
+                        {logoutConfirmOpen && (
+                            <div className="octane-purse-logout-confirm" role="dialog" onClick={(event) => event.stopPropagation()}>
+                                <p className="octane-purse-logout-confirm__text">{localizeWithFallback('toolbar.logout.confirmation', 'Are you sure you want to log out?')}</p>
+                                <div className="octane-purse-logout-confirm__buttons">
+                                    <button type="button" className="octane-purse-logout-confirm__button" onClick={() => handleLogout()}>
+                                        {localizeWithFallback('toolbar.logout.ok', 'Log out')}
+                                    </button>
+                                    <button type="button" className="octane-purse-logout-confirm__button" onClick={() => setLogoutConfirmOpen(false)}>
+                                        {localizeWithFallback('toolbar.logout.cancel', 'Cancel')}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                         <button
                             type="button"
                             className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--settings octane-purse-right-button settings"
@@ -193,39 +249,60 @@ export const PurseView: FC<{}> = (props) => {
                     </div>
                 </div>
             </div>
-            {settingsMenuOpen && (
-                <div className="octane-purse-menu">
-                    <button type="button" className="octane-purse-menu__item" onClick={() => openSettingsSection('')}>
-                        {localizeWithFallback('widget.memenu.settings.title', 'Settings')}
-                    </button>
-                    <button type="button" className="octane-purse-menu__item" onClick={() => openSettingsSection('privacy')}>
-                        {localizeWithFallback('purse.settings.game_privacy', 'Game Privacy')}
-                    </button>
-                    <button
-                        type="button"
-                        className="octane-purse-menu__item"
-                        onClick={() => {
-                            CreateLinkEvent('translation-settings/toggle');
-                            setSettingsMenuOpen(false);
+            {settingsMenuOpen &&
+                createPortal(
+                    <div
+                        ref={menuRef}
+                        className="octane-purse-menu octane-purse-menu--floating"
+                        style={{
+                            position: 'fixed',
+                            top: menuAnchor?.top ?? 78,
+                            right: menuAnchor?.right ?? 4,
+                            visibility: menuAnchor ? 'visible' : 'hidden',
+                            zIndex: 1000
                         }}
                     >
-                        {translateLabel}
-                    </button>
-                    <button
-                        type="button"
-                        className="octane-purse-menu__item"
-                        onClick={() => {
-                            CreateLinkEvent('user-account-settings/show');
-                            setSettingsMenuOpen(false);
-                        }}
-                    >
-                        {localizeWithFallback('purse.settings.account', 'Account Management')}
-                    </button>
-                    <button type="button" className="octane-purse-menu__item octane-purse-menu__item--disabled" disabled>
-                        {localizeWithFallback('purse.settings.wordfilter', 'Word Filter')}
-                    </button>
-                </div>
-            )}
+                        <button type="button" className="octane-purse-menu__item" onClick={() => openSettingsSection('')}>
+                            {localizeWithFallback('widget.memenu.settings.title', 'Settings')}
+                        </button>
+                        <button type="button" className="octane-purse-menu__item" onClick={() => openSettingsSection('privacy')}>
+                            {localizeWithFallback('purse.settings.game_privacy', 'Game Privacy')}
+                        </button>
+                        <button
+                            type="button"
+                            className="octane-purse-menu__item"
+                            onClick={() => {
+                                CreateLinkEvent('translation-settings/toggle');
+                                setSettingsMenuOpen(false);
+                            }}
+                        >
+                            {translateLabel}
+                        </button>
+                        <button
+                            type="button"
+                            className="octane-purse-menu__item"
+                            onClick={() => {
+                                CreateLinkEvent('user-account-settings/show');
+                                setSettingsMenuOpen(false);
+                            }}
+                        >
+                            {localizeWithFallback('purse.settings.account', 'Account Management')}
+                        </button>
+                        {wordFilterEnabled && (
+                            <button
+                                type="button"
+                                className="octane-purse-menu__item"
+                                onClick={() => {
+                                    CreateLinkEvent('word-filter/show');
+                                    setSettingsMenuOpen(false);
+                                }}
+                            >
+                                {localizeWithFallback('word_filter.settings.title', localizeWithFallback('purse.settings.wordfilter', 'Word Filter'))}
+                            </button>
+                        )}
+                    </div>,
+                    document.body
+                )}
             {otherCurrencies.length > 0 && (
                 <div className="octane-purse__other">
                     {otherCurrencies.map((type) => (

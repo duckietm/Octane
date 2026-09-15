@@ -9,6 +9,17 @@ const DEFAULT_CONNECTOR_PLACEHOLDER = '0=text 1\n1=text 2\n2 = text 3';
 const MAX_CONNECTOR_LINES = 30;
 const MAX_CONNECTOR_CHARACTERS = 1000;
 
+interface IConnectorFieldOption {
+    id: number;
+    name: string;
+}
+
+interface IConnectorEditorData {
+    fieldId?: number;
+    fields?: IConnectorFieldOption[];
+    mappingsText?: string;
+}
+
 const truncateMappingsText = (value: string) => {
     const normalizedValue = (value ?? '').replace(/\r/g, '');
     const lines = normalizedValue.split('\n');
@@ -26,16 +37,35 @@ const getLineCount = (value: string) => {
 export const WiredExtraVariableTextConnectorView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
     const [mappingsText, setMappingsText] = useState('');
+    const [fieldId, setFieldId] = useState(0);
+    const [fields, setFields] = useState<IConnectorFieldOption[]>([]);
 
     useEffect(() => {
         if (!trigger) return;
 
-        setMappingsText(truncateMappingsText(trigger.stringData || ''));
+        const rawValue = trigger.stringData || '';
+
+        if (rawValue.trim().startsWith('{')) {
+            try {
+                const data = JSON.parse(rawValue) as IConnectorEditorData;
+
+                setMappingsText(truncateMappingsText(data.mappingsText || ''));
+                setFieldId(Math.max(0, data.fieldId || 0));
+                setFields([...(data.fields || [])].filter((field) => field.id > 0 && !!field.name));
+                return;
+            } catch {
+                // Fall through to the legacy raw text format.
+            }
+        }
+
+        setMappingsText(truncateMappingsText(rawValue));
+        setFieldId(0);
+        setFields([]);
     }, [trigger]);
 
     const save = () => {
         setIntParams([]);
-        setStringParam(mappingsText ?? '');
+        setStringParam(JSON.stringify({ mappingsText: mappingsText ?? '', fieldId }));
     };
 
     const handleTextChange = (value: string) => setMappingsText(truncateMappingsText(value));
@@ -56,6 +86,19 @@ export const WiredExtraVariableTextConnectorView: FC<{}> = () => {
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 400 }}>
             <div className="flex flex-col gap-2">
                 <Text bold>{LocalizeText('wiredfurni.params.variables.connect_text.title')}</Text>
+                {!!fields.length && (
+                    <label className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.array.field')}</Text>
+                        <select className="form-select form-select-sm" value={fieldId} onChange={(event) => setFieldId(parseInt(event.target.value, 10) || 0)}>
+                            <option value={0}>{LocalizeText('wiredfurni.params.variables.single_value')}</option>
+                            {fields.map((field) => (
+                                <option key={field.id} value={field.id}>
+                                    {field.name}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                )}
                 <textarea
                     className="form-control form-control-sm octane-wired__resizable-textarea"
                     maxLength={MAX_CONNECTOR_CHARACTERS}
