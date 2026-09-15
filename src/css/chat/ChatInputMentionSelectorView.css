@@ -176,7 +176,6 @@
     color: #4a2b00;
 }
 
-/* Polaris command autocomplete uses the shared AIR style-3 frame. */
 .chat-input-command-popover.octane-card-shell.octane-card-frame-3 {
     position: absolute;
     bottom: 100%;
