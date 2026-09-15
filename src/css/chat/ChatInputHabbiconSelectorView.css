@@ -252,7 +252,7 @@
 }
 
 .habbicon-hub-body {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-3-d7d1be.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-album-background.png");
     --air-surface-slice: 3;
     --air-surface-width: 3px;
     position: absolute;
@@ -274,7 +274,7 @@
 }
 
 .habbicon-hub-header-surface {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-3-1f5d78.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-album-header.png");
     position: absolute;
     left: 2px;
     top: 2px;
@@ -327,7 +327,7 @@
 }
 
 .habbicon-hub-stat {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-7-41aad3.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-album-stat.png");
     --air-surface-slice: 6 6 7;
     --air-surface-width: 6px 6px 7px;
     position: absolute;
@@ -473,7 +473,7 @@
 }
 
 .habbicon-hub-rail {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-6-ffffff.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-sidebar.png");
     --air-surface-slice: 8;
     --air-surface-width: 8px;
 }
@@ -488,7 +488,7 @@
 }
 
 .habbicon-hub-rail button {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-10-f8ebd6.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-row-default.png");
     --air-surface-slice: 6 6 8;
     --air-surface-width: 6px 6px 8px;
     display: block;
@@ -507,10 +507,10 @@
     inset: 1px -1px 0 1px;
 }
 .habbicon-hub-rail button:hover {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-10-fff2c6.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-row-hover.png");
 }
 .habbicon-hub-rail button.active {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-10-f0cf86.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-row-selected.png");
 }
 
 .habbicon-hub-rail button > img {
@@ -560,13 +560,13 @@
 }
 
 .habbicon-hub-page-background {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-10-f6ebd7.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-panel.png");
     top: 98px;
     height: 282px;
 }
 
 .habbicon-hub-page-header {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-10-e0cba6.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-set-header.png");
     top: 2px;
     height: 91px;
 }
@@ -637,28 +637,28 @@
 }
 
 .habbicon-hub-window .habbicon-tile {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-2-99c176.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-owned-default.png");
     background: linear-gradient(#c3d3a7, #c3d3a7) center / 48px 48px no-repeat;
 }
 
 .habbicon-hub-window .habbicon-tile.unowned {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-2-d4c2ad.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-unowned-default.png");
     background-image: linear-gradient(#e0d6c2, #e0d6c2);
 }
 .habbicon-hub-window .habbicon-tile.owned:hover {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-2-bcd99f.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-owned-hover.png");
     background-image: linear-gradient(#cddfb2, #cddfb2);
 }
 .habbicon-hub-window .habbicon-tile.owned.active {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-2-d3e9bd.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-owned-selected.png");
     background-image: linear-gradient(#d4e6b9, #d4e6b9);
 }
 .habbicon-hub-window .habbicon-tile.unowned:hover {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-2-e6ddc8.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-unowned-hover.png");
     background-image: linear-gradient(#e8dec9, #e8dec9);
 }
 .habbicon-hub-window .habbicon-tile.unowned.active {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-2-eaddcd.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-unowned-selected.png");
     background-image: linear-gradient(#ebdfcb, #ebdfcb);
 }
 
@@ -674,7 +674,7 @@
 }
 
 .habbicon-hub-window .habbicon-empty-tile {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-2-c8be8d.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tile-empty.png");
     opacity: 0.2;
 }
 
@@ -696,7 +696,7 @@
 }
 
 .habbicon-hub-tray {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-3-f6ebd7.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tray-background.png");
     position: absolute;
     left: 7px;
     top: 146px;
@@ -726,7 +726,7 @@
     font-size: 11px;
 }
 .habbicon-hub-tray section {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-10-efe1c4.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-tray-group.png");
     --air-surface-slice: 6 6 8;
     --air-surface-width: 6px 6px 8px;
     width: 506px;
@@ -743,7 +743,7 @@
 }
 
 .habbicon-hub-popup {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-4-efefef.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-popup.png");
     --air-surface-slice: 6;
     --air-surface-width: 6px;
     position: absolute;
@@ -790,7 +790,7 @@
 
 .habbicon-hub-reward,
 .habbicon-hub-buy-set {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-3-e7d5b2.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-reward-panel.png");
     --air-surface-slice: 3;
     --air-surface-width: 3px;
     position: absolute;
@@ -812,7 +812,7 @@
     line-height: 17px;
 }
 .habbicon-hub-reward-image {
-    --air-surface-image: url("../../assets/images/habbo-skin/slices/border-3-f8ebd6.png");
+    --air-surface-image: url("../../assets/images/habbo-skin/slices/habbicon-reward-image-frame.png");
     width: 46px;
     height: 46px;
     margin: 0 auto;
