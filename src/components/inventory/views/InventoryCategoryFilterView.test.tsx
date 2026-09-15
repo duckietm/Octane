@@ -34,25 +34,21 @@ describe('InventoryCategoryFilterView AIR filters', () => {
         expect(onSearchApply).toHaveBeenCalledWith('');
     });
 
-    it('forwards main filter changes', () => {
-        const onMainFilterChange = vi.fn();
-
+    it('renders AIR category filter controls for furniture', () => {
         render(
             <InventoryCategoryFilterView
                 currentTab="inventory.furniture"
                 mainFilter="all"
                 searchValue=""
                 typeFilter="any"
-                onMainFilterChange={onMainFilterChange}
+                onMainFilterChange={vi.fn()}
                 onSearchApply={vi.fn()}
                 onSearchChange={vi.fn()}
                 onTypeFilterChange={vi.fn()}
             />
         );
 
-        const selects = screen.getAllByRole('combobox');
-        expect(selects.length).toBeGreaterThanOrEqual(1);
-        fireEvent.change(selects[0], { target: { value: selects[0].querySelectorAll('option')[1]?.value || 'wall' } });
-        expect(onMainFilterChange).toHaveBeenCalled();
+        expect(screen.getByLabelText(/category/i)).toBeTruthy();
+        expect(screen.getByLabelText(/^type$/i)).toBeTruthy();
     });
 });

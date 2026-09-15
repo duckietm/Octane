@@ -26,6 +26,46 @@
     background: transparent !important;
 }
 
+/* Dev chrome-ownership scopes kept alongside AIR inventory skins */
+.octane-inventory-window .octane-inventory-filter-bar.is-badges {
+    width: min(320px, 100%);
+}
+
+.octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted) {
+    background-color: var(--inv-beige) !important;
+    color: #111 !important;
+}
+
+.octane-inventory-window :where(.border-card-grid-item-border, .border-muted, .border-gray-400) {
+    border-color: var(--inv-line) !important;
+}
+
+.octane-inventory-window .bg-card-grid-item-active {
+    background-color: #fff !important;
+}
+
+.octane-inventory-window .border-card-grid-item-active {
+    border-color: var(--inv-border) !important;
+    box-shadow: 0 0 0 2px var(--inv-accent);
+}
+
+.octane-inventory-window :where(input, select, textarea) {
+    min-height: 22px;
+    border: 1px solid var(--inv-border) !important;
+    border-radius: 3px !important;
+    background: #fffdf4 !important;
+    color: #111111 !important;
+    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.65) !important;
+    font-size: 11px !important;
+}
+
+.octane-inventory-window :where(input:focus, select:focus, textarea:focus) {
+    border-color: var(--inv-accent) !important;
+    box-shadow: 0 0 0 2px rgba(74, 125, 140, 0.28), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
+    outline: none !important;
+}
+
+
 .octane-inventory-window .octane-inventory-tabs-shell {
     flex: 0 0 35px !important;
     gap: 0 !important;
