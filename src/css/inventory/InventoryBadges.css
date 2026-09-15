@@ -121,7 +121,7 @@
     height: 78px;
     box-sizing: border-box;
     border: 3px solid transparent;
-    border-image: url("@/assets/images/habbo-skin/slices/border-slot.png") 3 fill / 3px stretch;
+    border-image: url("@/assets/images/habbo-skin/slices/inventory-badge-details-background.png") 3 fill / 3px stretch;
 }
 
 .octane-inventory-badges-footer-image {
@@ -175,7 +175,7 @@
     min-height: 17px;
     padding: 0 3px;
     border: 2px solid transparent;
-    border-image: url("@/assets/images/habbo-skin/slices/border-colorless-777777.png") 6 fill / 6px stretch;
+    border-image: url("@/assets/images/habbo-skin/slices/badge-rarity-default.png") 6 fill / 6px stretch;
     font-family: Volter, sans-serif;
     font-size: 9px;
     line-height: 13px;
@@ -183,11 +183,11 @@
     text-shadow: 1px 1px #000;
 }
 
-.octane-inventory-badge-rarity.rarity-rare { border-image-source: url("@/assets/images/habbo-skin/slices/border-colorless-56a152.png"); }
-.octane-inventory-badge-rarity.rarity-epic { border-image-source: url("@/assets/images/habbo-skin/slices/border-colorless-5194cc.png"); }
-.octane-inventory-badge-rarity.rarity-mythical { border-image-source: url("@/assets/images/habbo-skin/slices/border-colorless-a564b5.png"); }
-.octane-inventory-badge-rarity.rarity-legendary { border-image-source: url("@/assets/images/habbo-skin/slices/border-colorless-c02a20.png"); }
-.octane-inventory-badge-rarity.rarity-unique { border-image-source: url("@/assets/images/habbo-skin/slices/border-colorless-cc9200.png"); }
+.octane-inventory-badge-rarity.rarity-rare { border-image-source: url("@/assets/images/habbo-skin/slices/badge-rarity-rare.png"); }
+.octane-inventory-badge-rarity.rarity-epic { border-image-source: url("@/assets/images/habbo-skin/slices/badge-rarity-epic.png"); }
+.octane-inventory-badge-rarity.rarity-mythical { border-image-source: url("@/assets/images/habbo-skin/slices/badge-rarity-mythical.png"); }
+.octane-inventory-badge-rarity.rarity-legendary { border-image-source: url("@/assets/images/habbo-skin/slices/badge-rarity-legendary.png"); }
+.octane-inventory-badge-rarity.rarity-unique { border-image-source: url("@/assets/images/habbo-skin/slices/badge-rarity-unique.png"); }
 
 .octane-inventory-badge-owners {
     color: #555;

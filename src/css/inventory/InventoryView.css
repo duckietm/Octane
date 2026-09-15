@@ -124,7 +124,7 @@
     top: 42px;
     width: 180px;
     height: 180px;
-    background: url('@/assets/images/inventory/air/inventory-empty.png') center no-repeat;
+    background: url('@/assets/images/inventory/air/inventory-empty-state.png') center no-repeat;
     image-rendering: pixelated;
 }
 
@@ -241,19 +241,19 @@
 }
 
 .octane-inventory-furni-status-icon.is-trade {
-    background-image: url('@/assets/images/inventory/air/furni-trade.png');
+    background-image: url('@/assets/images/inventory/air/furniture-trade-available.png');
 }
 
 .octane-inventory-furni-status-icon.is-no-trade {
-    background-image: url('@/assets/images/inventory/air/furni-no-trade.png');
+    background-image: url('@/assets/images/inventory/air/furniture-trade-unavailable.png');
 }
 
 .octane-inventory-furni-status-icon.is-recycle {
-    background-image: url('@/assets/images/inventory/air/furni-recycle.png');
+    background-image: url('@/assets/images/inventory/air/furniture-recycle-available.png');
 }
 
 .octane-inventory-furni-status-icon.is-no-recycle {
-    background-image: url('@/assets/images/inventory/air/furni-no-recycle.png');
+    background-image: url('@/assets/images/inventory/air/furniture-recycle-unavailable.png');
 }
 
 .octane-inventory-furni-details {
@@ -404,19 +404,19 @@
     position: absolute;
     inset: 1px;
     z-index: -1;
-    background: url('../../assets/images/inventory/air/thumb-normal.png') no-repeat;
+    background: url('../../assets/images/inventory/air/inventory-item-background.png') no-repeat;
     pointer-events: none;
 }
 
 .octane-inventory-thumb.is-unseen::before {
-    background-image: url('../../assets/images/inventory/air/thumb-unseen.png');
+    background-image: url('../../assets/images/inventory/air/inventory-item-unseen-background.png');
 }
 
 .octane-inventory-thumb.is-selected::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: url('../../assets/images/inventory/air/thumb-selected-outline.png') no-repeat;
+    background: url('../../assets/images/inventory/air/inventory-item-selected-outline.png') no-repeat;
     pointer-events: none;
 }
 

@@ -15,7 +15,7 @@
     inset: 0;
     pointer-events: none;
     border: 3px solid transparent;
-    border-image: url('@/assets/images/habbo-skin/slices/border-slot-cacaca.png') 3 fill / 3px stretch;
+    border-image: url('@/assets/images/habbo-skin/slices/inventory-filter-bar-background.png') 3 fill / 3px stretch;
 }
 
 .octane-inventory-window .octane-inventory-filter-search {
@@ -64,7 +64,7 @@
     width: 20px;
     height: 20px;
     padding: 0;
-    background: url('@/assets/images/habbo-skin/slices/icons-close.png') center no-repeat;
+    background: url('@/assets/images/habbo-skin/slices/inventory-search-clear.png') center no-repeat;
     image-rendering: pixelated;
 }
 
@@ -85,7 +85,7 @@
     position: absolute;
     inset: 0;
     border: 3px solid transparent;
-    border-image: url('@/assets/images/habbo-skin/slices/dropmenu-0.png') 3 fill / 3px stretch;
+    border-image: url('@/assets/images/habbo-skin/slices/inventory-filter-dropdown-frame.png') 3 fill / 3px stretch;
     pointer-events: none;
 }
 
@@ -96,7 +96,7 @@
     height: 21px;
     border: 0 !important;
     padding: 4px 21px 3px 10px;
-    background: url('@/assets/images/habbo-skin/slices/dropmenu-0-arrow.png') right 5px top 2px / 16px 16px no-repeat transparent !important;
+    background: url('@/assets/images/habbo-skin/slices/inventory-filter-dropdown-arrow.png') right 5px top 2px / 16px 16px no-repeat transparent !important;
     line-height: 14px;
     image-rendering: pixelated;
 }
@@ -143,7 +143,7 @@
     inset: 0;
     z-index: -1;
     border: 3px solid transparent;
-    border-image: url('@/assets/images/habbo-skin/slices/dropmenu-0.png') 3 fill / 3px stretch;
+    border-image: url('@/assets/images/habbo-skin/slices/inventory-filter-dropdown-frame.png') 3 fill / 3px stretch;
     pointer-events: none;
 }
 

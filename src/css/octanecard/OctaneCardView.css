@@ -606,7 +606,7 @@
     z-index: 5;
     width: 20px;
     height: 20px;
-    background: url('../../assets/images/habbo-skin/slices/scaler-ubuntu-3.png') no-repeat;
+    background: url('../../assets/images/habbo-skin/slices/window-resize-grip.png') no-repeat;
     image-rendering: pixelated;
     cursor: nwse-resize;
     touch-action: none;
