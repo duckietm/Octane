@@ -48,7 +48,6 @@ export const AchievementDetailsView: FC<AchievementDetailsViewProps> = (props) =
                     maxProgress={achievement.scoreLimit}
                     key={`${achievement.achievementId}:${achievement.level}:${achievement.scoreLimit}`}
                     scoreAtStartOfLevel={achievement.scoreAtStartOfLevel}
-                    localizationKey="achievements.details.progress"
                 />
             )}
         </div>
