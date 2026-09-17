@@ -828,3 +828,27 @@ export enum HabbiconAction {
     Favorite = 3,
     Unfavorite = 4
 }
+
+// Quest engine (AIR 13 quests, daily tasks, reward track) — the hooks under
+// src/hooks/quests register these events and send these composers.
+// ---------------------------------------------------------------------------
+
+export class QuestsMessageEvent extends MessageEvent {}
+export class QuestMessageEvent extends MessageEvent {}
+export class QuestCompletedMessageEvent extends MessageEvent {}
+export class QuestCancelledMessageEvent extends MessageEvent {}
+export class QuestDailyMessageEvent extends MessageEvent {}
+export class ActiveDailyTasksMessageEvent extends MessageEvent {}
+export class DailyTasksAddedMessageEvent extends MessageEvent {}
+export class DailyTaskUpdatedMessageEvent extends MessageEvent {}
+export class RewardTracksMessageEvent extends MessageEvent {}
+export class RewardTrackClaimResultMessageEvent extends MessageEvent {}
+export class RewardTrackProgressMessageEvent extends MessageEvent {}
+export class RewardTrackPremiumPurchaseResultMessageEvent extends MessageEvent {}
+export class QuestMessageData extends StubClass {}
+export class DailyTaskData extends StubClass {
+    public static STATUS_IN_PROGRESS = 0;
+    public static STATUS_COMPLETED = 1;
+    public static STATUS_CLAIMED = 2;
+}
+export class DailyTaskRewardData extends StubClass {}
