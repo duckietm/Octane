@@ -18,13 +18,19 @@ import {
     WiredSaveSuccessEvent,
     WiredValidationErrorEvent
 } from '@octane/renderer';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetRoomSession, IsOwnerOfFloorFurniture, LocalizeText, SendMessageComposer, WiredFurniType, WiredSelectionVisualizer } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 import { useLiveState } from '../useLiveState';
 import { useWiredTools } from '../wired-tools/useWiredTools';
+
+export interface WiredConfigSeed {
+    intParams: number[];
+    stringParam: string;
+    furniIds: number[];
+}
 
 const useWiredState = () => {
     const [trigger, setTrigger, triggerRef] = useLiveState<Triggerable>(null);
@@ -38,8 +44,11 @@ const useWiredState = () => {
     const [neighborhoodInvert, setNeighborhoodInvert] = useState<boolean>(false);
     const [allowedInteractionTypes, setAllowedInteractionTypes] = useState<string[] | null>(null);
     const [allowedInteractionErrorKey, setAllowedInteractionErrorKey] = useState<string | null>(null);
+    const [configSeed, setConfigSeed] = useState<WiredConfigSeed>(null);
     const { showConfirm = null, simpleAlert = null } = useNotification();
     const { requestUserVariables = null, roomSettings = null } = useWiredTools();
+
+    useEffect(() => setConfigSeed(null), [trigger]);
 
     const saveWired = () => {
         const save = (trigger: Triggerable) => {
@@ -321,8 +330,50 @@ const useWiredState = () => {
         };
     }, [trigger]);
 
+    // Pasting or resetting a configuration has to reach the dialog that is already open, and every
+    // dialog seeds its own state from `trigger`. Rather than teach 185 dialogs about a second
+    // source, hand them a trigger whose three data getters answer with the seed: the identity
+    // changes, so their seeding effect re-runs, and `instanceof` still resolves through the
+    // target's prototype. `saveWired` keeps using the untouched ref.
+    const seededTrigger = useMemo(() => {
+        if (!trigger || !configSeed) return trigger;
+
+        return new Proxy(trigger, {
+            get: (target, property) => {
+                if (property === 'intData') return configSeed.intParams;
+                if (property === 'stringData') return configSeed.stringParam;
+                if (property === 'selectedItems') return configSeed.furniIds;
+
+                return Reflect.get(target, property, target);
+            }
+        });
+    }, [trigger, configSeed]);
+
+    const applyWiredConfig = (seed: WiredConfigSeed) => {
+        if (!seed) return;
+
+        setIntParams(seed.intParams);
+        setStringParam(seed.stringParam);
+        setFurniIds(seed.furniIds);
+        setConfigSeed(seed);
+    };
+
+    // The server never sends us the official defaults, so "restore defaults" means an empty
+    // configuration of the right shape. Nothing is sent until the user saves.
+    const resetWiredConfig = () => {
+        const current = triggerRef.current;
+
+        if (!current) return;
+
+        applyWiredConfig({
+            intParams: new Array(current.intData ? current.intData.length : 0).fill(0),
+            stringParam: '',
+            furniIds: []
+        });
+    };
+
     return {
-        trigger,
+        trigger: seededTrigger,
         setTrigger,
         intParams,
         setIntParams,
@@ -334,6 +385,8 @@ const useWiredState = () => {
         setActionDelay,
         setAllowsFurni,
         saveWired,
+        applyWiredConfig,
+        resetWiredConfig,
         selectObjectForWired,
         setNeighborhoodTiles,
         setNeighborhoodInvert,

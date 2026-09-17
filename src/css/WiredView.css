@@ -74,6 +74,88 @@
         .octane-card-close-button::after {
             transform: translate(-50%, -50%) rotate(-45deg);
         }
+
+        /* The official frame pins its menu button at the left edge and lets the close button
+           travel with the right one, so the caption sits centred between the two. */
+        .octane-wired__menu-anchor {
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+        }
+
+        .octane-wired__menu-button {
+            position: relative;
+            display: block;
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            border: 1px solid #777;
+            border-radius: 5px;
+            background: linear-gradient(180deg, #f9f9f9 0%, #cacaca 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+        }
+
+        /* Three dots, because we ship no equivalent of the official button asset. */
+        .octane-wired__menu-button::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            background: #6a6a6a;
+            transform: translate(-50%, -50%);
+            box-shadow:
+                0 -4px 0 #6a6a6a,
+                0 4px 0 #6a6a6a;
+        }
+
+        .octane-wired__menu {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 3px);
+            min-width: 188px;
+            padding: 2px 0;
+            border: 1px solid #777;
+            border-radius: 4px;
+            background: #f6f6f6;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.32);
+            text-align: left;
+            z-index: 40;
+        }
+
+        .octane-wired__menu-item {
+            display: block;
+            width: 100%;
+            padding: 4px 10px;
+            border: 0;
+            background: transparent;
+            color: #2b2b2b;
+            font-size: 12px;
+            line-height: 1.25;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .octane-wired__menu-item:hover:not(:disabled) {
+            background: #d8e3f0;
+        }
+
+        .octane-wired__menu-item:disabled {
+            color: #a5a5a5;
+            cursor: default;
+        }
+
+        .octane-wired__menu-separator {
+            height: 1px;
+            margin: 2px 0;
+            background: #cfcfcf;
+            box-shadow: 0 1px 0 #fff;
+        }
     }
 
     .octane-wired__content {
@@ -748,6 +830,28 @@
         text-align: center;
     }
 
+    /* The official section puts a 40px number box beside the bold title, one
+       generic horizontal gap apart. */
+    .octane-wired__slider-header {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .octane-wired__slider-header .font-bold {
+        flex: 1;
+    }
+
+    .octane-wired__slider-number {
+        width: 40px;
+        min-width: 40px;
+        min-height: 18px !important;
+        height: 18px;
+        padding: 0 4px !important;
+        line-height: 18px;
+        text-align: center;
+    }
+
     .octane-wired__give-var-number--blurred {
         filter: blur(0.8px) !important;
         opacity: 0.78;
@@ -1048,6 +1152,41 @@
     .octane-wired__header .nitro-card-close-button::before,
     .octane-wired__header .nitro-card-close-button::after {
         background: #e8e8e8;
+    }
+
+    .octane-wired__header .octane-wired__menu-button {
+        border-color: #181818;
+        background: linear-gradient(180deg, #626262 0%, #333333 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .octane-wired__header .octane-wired__menu-button::before {
+        background: #e8e8e8;
+        box-shadow:
+            0 -4px 0 #e8e8e8,
+            0 4px 0 #e8e8e8;
+    }
+
+    .octane-wired__menu {
+        border-color: #181818;
+        background: #3d3d3d;
+    }
+
+    .octane-wired__menu-item {
+        color: #f0f0f0;
+    }
+
+    .octane-wired__menu-item:hover:not(:disabled) {
+        background: #545454;
+    }
+
+    .octane-wired__menu-item:disabled {
+        color: #8a8a8a;
+    }
+
+    .octane-wired__menu-separator {
+        background: #2a2a2a;
+        box-shadow: 0 1px 0 #4c4c4c;
     }
 
     .octane-wired__content {

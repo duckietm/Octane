@@ -15,6 +15,8 @@ interface WiredFurniSelectionSourceRowProps {
     selectionLimit: number;
     selectionEnabledValues: number[];
     showSelectionToggle?: boolean;
+    arrowsDisabled?: boolean;
+    disabled?: boolean;
     headerContent?: ReactNode;
     onChange: (value: number) => void;
     onSelectionActivate?: () => void;
@@ -32,6 +34,8 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
         selectionLimit = 0,
         selectionEnabledValues = [],
         showSelectionToggle = true,
+        arrowsDisabled = undefined,
+        disabled = false,
         headerContent = null,
         onChange = null,
         onSelectionActivate = null
@@ -47,9 +51,12 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
     const labelText = currentOption ? LocalizeText(currentOption.label) : '';
     const displayText = shouldShowCount ? `${labelText} ${countText}` : labelText;
     const resolvedTitle = titleIsLiteral ? title : LocalizeText(title);
+    // A single-entry source has nothing to cycle through, so the official window greys its
+    // arrows there instead of leaving them lit and inert.
+    const arrowsAreDisabled = disabled || (arrowsDisabled ?? options.length < 2);
 
     const cycleValue = (direction: -1 | 1) => {
-        if (!options.length || !onChange) return;
+        if (arrowsAreDisabled || !options.length || !onChange) return;
 
         const nextIndex = (currentIndex + direction + options.length) % options.length;
 
@@ -57,15 +64,15 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
     };
 
     return (
-        <div className="octane-wired__source-row">
+        <div className={`octane-wired__source-row${disabled ? ' is-disabled' : ''}`}>
             <div className="flex items-center justify-between gap-2">
                 <Text>{resolvedTitle}</Text>
                 {headerContent}
-                {showSelectionToggle && (
+                {showSelectionToggle && canActivateSelection && !disabled && (
                     <button
                         type="button"
                         className={`octane-wired__selection-toggle octane-wired__selection-toggle--${selectionKind} ${selectionActive ? 'is-active' : ''}`}
-                        disabled={!canActivateSelection}
+                        title={LocalizeText('wiredfurni.params.furni_picking.tooltip')}
                         onClick={() => onSelectionActivate && onSelectionActivate()}
                     >
                         <FaMousePointer />
@@ -73,7 +80,12 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
                 )}
             </div>
             <div className="flex items-center gap-1">
-                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(-1)}>
+                <Button
+                    variant="primary"
+                    classNames={['octane-wired__picker-button']}
+                    className={`px-2 py-1${arrowsAreDisabled ? ' opacity-50' : ''}`}
+                    onClick={() => cycleValue(-1)}
+                >
                     <FaChevronLeft />
                 </Button>
                 <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
@@ -81,7 +93,12 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
                         {displayText}
                     </Text>
                 </div>
-                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(1)}>
+                <Button
+                    variant="primary"
+                    classNames={['octane-wired__picker-button']}
+                    className={`px-2 py-1${arrowsAreDisabled ? ' opacity-50' : ''}`}
+                    onClick={() => cycleValue(1)}
+                >
                     <FaChevronRight />
                 </Button>
             </div>

@@ -1,0 +1,111 @@
+/* Reusable wired dialog components.
+ *
+ * Kept out of WiredView.css deliberately. That stylesheet became a place where several
+ * separate pieces of work add rules next to one another, which ties them together for no
+ * reason: a rule added there carries the surrounding rules with it wherever it goes, so a
+ * component could not be published without the unrelated work above and below it.
+ *
+ * A component's own rules live here instead. Per-skin overrides stay in WiredView.css beside
+ * the other skin blocks; they carry !important and win regardless of import order.
+ */
+
+.octane-wired {
+    /* The official group preset takes a column count and divides the width evenly; 5px is its
+       generic horizontal spacing, 6px the radio spacing, 20px the minimum option height. */
+    .octane-wired__option-grid {
+        display: grid;
+        column-gap: 5px;
+        row-gap: 4px;
+    }
+
+    .octane-wired__option {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 20px;
+        cursor: pointer;
+    }
+
+    .octane-wired__option--span {
+        grid-column: 1 / -1;
+    }
+
+    /* One block of a box. The official section insets its body from both edges and stretches its
+       rule wider by exactly that inset, which is the relationship reproduced here. */
+    .octane-wired__sec {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .octane-wired__sec-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+    .octane-wired__sec-header-left,
+    .octane-wired__sec-header-right {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .octane-wired__sec-body {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding-inline: 5px;
+    }
+
+    .octane-wired__rule {
+        margin-inline: -5px;
+    }
+
+    /* The explanatory paragraph a box carries, as usage information or as a red warning. */
+    .octane-wired__usage-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 !important;
+        border: 0;
+        background: transparent;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .octane-wired__usage-text {
+        color: #333333;
+    }
+
+    .octane-wired__usage-text--warn {
+        color: #f53235;
+    }
+
+    /* A source the box has switched off stays in place, dimmed, instead of vanishing: the
+       official window greys it so the builder can see the option exists and why it is not
+       available. Half opacity is its own blend. */
+    .octane-wired__source-row.is-disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    /* The expanded selection block is a shaded panel in the official window, not loose rows on
+       the window ground: it reads as one area you opened. It bleeds to the body's own padding
+       so the panel meets the window edges. */
+    .octane-wired__advanced-body {
+        margin: 0 -8px;
+        padding: 6px 8px;
+        background: #cccccc;
+    }
+
+    &.octane-wired--style-volter .octane-wired__advanced-body,
+    &.octane-wired--style-volter_blue .octane-wired__advanced-body {
+        background: #303030;
+    }
+}

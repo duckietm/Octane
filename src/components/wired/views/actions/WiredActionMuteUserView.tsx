@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -33,10 +34,16 @@ export const WiredActionMuteUserView: FC<{}> = (props) => {
             save={save}
             footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
         >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.length.minutes', ['minutes'], [time.toString()])}</Text>
-                <Slider max={10} min={0} value={time} onChange={(event) => setTime(event)} />
-            </div>
+            <WiredSliderSection
+                max={10}
+                min={0}
+                titleFallback={`Mute for ${time} minutes`}
+                titleKey="wiredfurni.params.length.minutes"
+                titleParameters={['minutes']}
+                titleReplacements={[time.toString()]}
+                value={time}
+                onChange={setTime}
+            />
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
                 <OctaneInput

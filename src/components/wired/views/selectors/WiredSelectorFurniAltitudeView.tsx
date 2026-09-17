@@ -5,7 +5,12 @@ import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 
 const MIN_ALTITUDE = 0;
-const MAX_ALTITUDE = 80;
+
+/**
+ * The server clamps every furni to Room.MAXIMUM_FURNI_HEIGHT (40); a higher threshold here would
+ * select on a height no furni can reach.
+ */
+const MAX_ALTITUDE = 40;
 const ALTITUDE_STEP = 0.01;
 const ALTITUDE_PATTERN = /^\d*(\.\d{0,2})?$/;
 

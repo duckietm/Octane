@@ -6,10 +6,15 @@ import { normalizeWiredComparison, WIRED_CMP_GREATER_EQUAL, WiredComparisonOpera
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
-const TEAM_OPTIONS = [1, 2, 3, 4];
+// 0 is the official default: the team the user who triggered is on. It exists only on the team
+// score box - the currency and item-count conditions share this dialog with scoped={false} and
+// have no team at all, so their first slot must keep its old meaning.
+const TEAM_OPTIONS = [0, 1, 2, 3, 4];
+const AMOUNT_TEAM_OPTIONS = [1, 2, 3, 4];
 const COMPARISON_OPTIONS = [0, 1, 2];
 const MIN_SCORE = 0;
-const MAX_SCORE = 999;
+/** The official setscore2 slider stops at 1000; the server accepts far more (MAX_SCORE 1_000_000). */
+const MAX_SCORE = 1000;
 /** What the server's normalizeScore lets through. A credit threshold is useless capped at 999. */
 const MAX_AMOUNT = 1_000_000;
 const SCORE_PATTERN = /^\d*$/;
@@ -49,7 +54,7 @@ export const WiredConditionTeamHasScoreView: FC<WiredConditionTeamHasScoreViewPr
         const nextUserSource = trigger.intData.length > 3 ? trigger.intData[3] : 0;
         const nextQuantifier = trigger.intData.length > 4 ? trigger.intData[4] : 0;
 
-        setTeam(TEAM_OPTIONS.includes(nextTeam) ? nextTeam : 1);
+        setTeam((scoped ? TEAM_OPTIONS : AMOUNT_TEAM_OPTIONS).includes(nextTeam) ? nextTeam : 1);
         setComparison(scoped ? (COMPARISON_OPTIONS.includes(nextComparison) ? nextComparison : 1) : normalizeWiredComparison(nextComparison));
         setScore(nextScore);
         setScoreInput(nextScore.toString());
@@ -125,6 +130,8 @@ export const WiredConditionTeamHasScoreView: FC<WiredConditionTeamHasScoreViewPr
                     <div className="flex flex-col gap-1">
                         <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
                         {TEAM_OPTIONS.map((value) => {
+                            const labelKey = value === 0 ? 'wiredfurni.params.team.triggerer' : `wiredfurni.params.team.${value}`;
+
                             return (
                                 <div key={value} className="flex items-center gap-1">
                                     <input
@@ -135,7 +142,7 @@ export const WiredConditionTeamHasScoreView: FC<WiredConditionTeamHasScoreViewPr
                                         type="radio"
                                         onChange={() => setTeam(value)}
                                     />
-                                    <Text>{LocalizeText(`wiredfurni.params.team.${value}`)}</Text>
+                                    <Text>{LocalizeText(labelKey)}</Text>
                                 </div>
                             );
                         })}

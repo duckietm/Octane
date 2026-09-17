@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { LocalizeText, WiredFurniType } from '../../../../api';
+import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
+import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 
 const TEAM_TYPES = [0, 1, 2, 3, 4];
@@ -21,8 +22,14 @@ export const WiredTriggeScoreAchievedView: FC<{}> = (props) => {
     return (
         <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
             <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.setscore2', LocalizeText('wiredfurni.params.setscore', ['points'], [points.toString()]))}</Text>
-                <Slider max={1000} min={1} value={points} onChange={(event) => setPoints(event)} />
+                <WiredSliderSection
+                    max={1000}
+                    min={1}
+                    titleFallback={LocalizeText('wiredfurni.params.setscore', ['points'], [points.toString()])}
+                    titleKey="wiredfurni.params.setscore2"
+                    value={points}
+                    onChange={setPoints}
+                />
                 <hr className="m-0 bg-dark" />
                 <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
                 {TEAM_TYPES.map((value) => (

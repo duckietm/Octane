@@ -9,6 +9,7 @@ import { useWired, useWiredTools } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
+import { WIRED_VAR_CMP_OPTIONS } from '../WiredVariableComparisonOperator';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import {
     buildWiredVariablePickerEntries,
@@ -48,15 +49,6 @@ const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string; disabled?: 
     { key: 'context', icon: contextVariableIcon }
 ];
 
-const COMPARISON_OPTIONS = [
-    { value: 0, label: '>' },
-    { value: 1, label: '≥' },
-    { value: 2, label: '=' },
-    { value: 3, label: '≤' },
-    { value: 4, label: '<' },
-    { value: 5, label: '≠' }
-];
-
 const SECONDARY_FURNI_SOURCES: WiredSourceOption[] = sortWiredSourceOptions(
     [
         { value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.furni.0' },
@@ -68,7 +60,7 @@ const SECONDARY_FURNI_SOURCES: WiredSourceOption[] = sortWiredSourceOptions(
 );
 
 const GLOBAL_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.global' }];
-const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'Current execution' }];
+const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.context' }];
 
 const parseIds = (value: string): number[] => {
     if (!value?.length) return [];
@@ -476,7 +468,7 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                         {localizeWithFallback('wiredfurni.params.comparison_selection', LocalizeText('wiredfurni.params.choose_type'))}
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        {COMPARISON_OPTIONS.map((option) => (
+                        {WIRED_VAR_CMP_OPTIONS.map((option) => (
                             <label key={option.value} className="flex items-center gap-1">
                                 <input
                                     checked={comparison === option.value}
@@ -485,7 +477,7 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                                     type="radio"
                                     onChange={() => setComparison(option.value)}
                                 />
-                                <Text>{option.label}</Text>
+                                <Text>{option.symbol}</Text>
                             </label>
                         ))}
                     </div>

@@ -83,6 +83,7 @@ import './css/user-settings/UserSettingsView.css';
 import './css/vault/VaultView.css';
 import './css/widgets/FurnitureWidgets.css';
 import './css/WiredView.css';
+import './css/wired/WiredComponents.css';
 import './css/camera/CameraWidget.css';
 import './css/catalog/CatalogGiftView.css';
 import './css/navigator/NavigatorView.css';
