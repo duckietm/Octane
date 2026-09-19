@@ -5,6 +5,7 @@ import { useHasPermission } from '../../hooks';
 import { useFurniEditor } from '../../hooks/furni-editor';
 import { FurniEditorEditView } from './views/FurniEditorEditView';
 import { FurniEditorSearchView } from './views/FurniEditorSearchView';
+import { lineQueryFor } from './furniEditorSuggestions';
 
 const TAB_SEARCH = 0;
 const TAB_EDIT = 1;
@@ -22,9 +23,12 @@ export const FurniEditorView: FC<{}> = () => {
         clearError,
         selectedItem,
         setSelectedItem,
+        catalogItems,
         furniDataEntry,
         furniDataDiagnostic,
         interactions,
+        relatedItems,
+        probeRelated,
         searchItems,
         loadDetail,
         loadBySpriteId,
@@ -33,6 +37,7 @@ export const FurniEditorView: FC<{}> = () => {
         loadInteractions,
         updateFurnidata,
         revertFurnidata,
+        updateFurnidataStructure,
         syncPublicName,
         importText,
         importResult
@@ -106,6 +111,11 @@ export const FurniEditorView: FC<{}> = () => {
         return () => window.removeEventListener('furni-editor:open', handler);
     }, [isMod, loadBySpriteId]);
 
+    // Every open furni gets a probe for its line: siblings and duplicates come from it.
+    useEffect(() => {
+        probeRelated(selectedItem ? lineQueryFor(selectedItem.itemName) : '');
+    }, [selectedItem?.id, selectedItem?.itemName, probeRelated]);
+
     const handleSelect = useCallback(
         (id: number) => {
             loadDetail(id);
@@ -125,7 +135,7 @@ export const FurniEditorView: FC<{}> = () => {
     if (!isVisible || !isMod) return null;
 
     return (
-        <OctaneCardView uniqueKey="furni-editor" className="w-[620px] h-[520px]">
+        <OctaneCardView uniqueKey="furni-editor" className="w-[780px] h-[600px] min-w-[720px] min-h-[560px]">
             <OctaneCardHeaderView headerText="Furni Editor" onCloseClick={handleClose} />
             <OctaneCardTabsView>
                 <OctaneCardTabsItemView isActive={activeTab === TAB_SEARCH} onClick={() => setActiveTab(TAB_SEARCH)}>
@@ -146,21 +156,32 @@ export const FurniEditorView: FC<{}> = () => {
                 )}
 
                 {activeTab === TAB_SEARCH && (
-                    <FurniEditorSearchView items={items} total={total} page={page} loading={loading} onSearch={searchItems} onSelect={handleSelect} />
+                    <FurniEditorSearchView
+                        items={items}
+                        total={total}
+                        page={page}
+                        loading={loading}
+                        interactions={interactions}
+                        onSearch={searchItems}
+                        onSelect={handleSelect}
+                    />
                 )}
 
                 {activeTab === TAB_EDIT && selectedItem && (
                     <FurniEditorEditView
                         item={selectedItem}
+                        catalogItems={catalogItems}
                         furniDataEntry={furniDataEntry}
                         furniDataDiagnostic={furniDataDiagnostic}
                         interactions={interactions}
+                        relatedItems={relatedItems}
                         loading={loading}
                         onUpdate={updateItem}
                         onDelete={deleteItem}
                         onBack={handleBack}
                         onUpdateFurnidata={updateFurnidata}
                         onRevertFurnidata={revertFurnidata}
+                        onUpdateFurnidataStructure={updateFurnidataStructure}
                         onSyncPublicName={syncPublicName}
                         onImportText={importText}
                         importResult={importResult}

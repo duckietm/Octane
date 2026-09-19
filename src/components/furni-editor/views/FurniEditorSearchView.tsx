@@ -1,15 +1,27 @@
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Column, Flex, LayoutFurniIconImageView, Text } from '../../../common';
 import { FurniItem } from '../../../hooks/furni-editor';
+import { suggestInteractionType } from '../furniEditorSuggestions';
 
 interface FurniEditorSearchViewProps {
     items: FurniItem[];
     total: number;
     page: number;
     loading: boolean;
+    // Registered interaction types: a row whose stored type is not among them,
+    // or whose classname points at another one, is flagged as worth a look.
+    interactions: string[];
     onSearch: (query: string, type: string, page: number, sortField: string, sortDir: string) => void;
     onSelect: (id: number) => void;
 }
+
+const attention = (item: FurniItem, interactions: string[]): string | null => {
+    const stored = item.interactionType.trim().toLowerCase();
+    if (stored && !interactions.some((known) => known.toLowerCase() === stored)) return `type "${item.interactionType}" has no class, behaves as default`;
+    const hint = suggestInteractionType(item.itemName, interactions);
+    if (hint && hint.type.toLowerCase() !== stored) return `classname suggests "${hint.type}" (${hint.reason})`;
+    return null;
+};
 
 type SortField = 'id' | 'spriteId' | 'itemName' | 'publicName' | 'type' | 'interactionType';
 type SortDir = 'asc' | 'desc';
@@ -44,7 +56,11 @@ const PagBtn: FC<{ disabled?: boolean; onClick: () => void; children: ReactNode;
 );
 
 export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => {
-    const { items, total, page, loading, onSearch, onSelect } = props;
+    const { items, total, page, loading, interactions, onSearch, onSelect } = props;
+    const [onlyFlagged, setOnlyFlagged] = useState(false);
+    const flagged = items.map((item) => attention(item, interactions));
+    const flaggedCount = flagged.filter(Boolean).length;
+    const rows = items.map((item, index) => ({ item, note: flagged[index] })).filter((row) => !onlyFlagged || row.note);
     const [query, setQuery] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
     const [sortField, setSortField] = useState<SortField>('id');
@@ -178,6 +194,18 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                     {total > 0 ? `Showing ${from}–${to} of ${total.toLocaleString()}` : loading ? 'Searching…' : 'No results'}
                 </Text>
                 {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
+                {flaggedCount > 0 && (
+                    <button
+                        type="button"
+                        onClick={() => setOnlyFlagged((prev) => !prev)}
+                        aria-pressed={onlyFlagged}
+                        title="Rows whose interaction type has no class or does not match the classname"
+                        className={`ml-auto inline-flex items-center gap-1.5 text-[10px] font-medium rounded-full border px-2 py-0.5 transition ${onlyFlagged ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-[#ffffff] border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                    >
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                        {flaggedCount} to check on this page
+                    </button>
+                )}
             </Flex>
 
             {/* Table */}
@@ -199,10 +227,11 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                         </tr>
                     </thead>
                     <tbody>
-                        {items.map((item) => (
+                        {rows.map(({ item, note }) => (
                             <tr
                                 key={item.id}
                                 onClick={() => onSelect(item.id)}
+                                title={note ?? undefined}
                                 className="group cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors"
                             >
                                 <td className="px-2 py-1.5">
@@ -212,7 +241,8 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                                 </td>
                                 <td className="px-2 py-1.5 font-mono text-slate-500">{item.id}</td>
                                 <td className="px-2 py-1.5 font-mono text-slate-500">{item.spriteId}</td>
-                                <td className="px-2 py-1.5 text-slate-700 font-medium truncate max-w-[160px]" title={item.itemName}>
+                                <td className="px-2 py-1.5 text-slate-700 font-medium truncate max-w-[160px]" title={note ?? item.itemName}>
+                                    {note && <span aria-label={note} className="inline-block w-1.5 h-1.5 rounded-full bg-[#f59e0b] mr-1.5 align-middle" />}
                                     {item.itemName}
                                 </td>
                                 <td className="px-2 py-1.5 text-slate-500 truncate max-w-[150px]" title={item.publicName}>

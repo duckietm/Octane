@@ -677,6 +677,8 @@ export const GetLocalizationManager = vi.fn(stubManager);
 export const GetRoomEngine = vi.fn(stubManager);
 export const GetRoomMessageHandler = vi.fn(stubManager);
 export const GetRoomSessionManager = vi.fn(stubManager);
+export const GetRoomContentLoader = vi.fn(stubManager);
+export const GetRoomObjectVisualizationFactory = vi.fn(stubManager);
 
 // RoomGeometry — only the discrete zoom scale constants the room-zoom helper
 // reads (SCALE_ZOOMED_IN = 64, SCALE_ZOOMED_OUT = 32).
