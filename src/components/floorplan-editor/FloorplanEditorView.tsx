@@ -24,6 +24,7 @@ import { MAX_WALL_HEIGHT, MIN_WALL_HEIGHT } from './state/constants';
 import { serializeTilemap } from './state/encoding';
 import { areaCount } from './state/selectors';
 import { EntryDir, ThicknessLevel } from './state/types';
+import { Floorplan3DView } from './views/Floorplan3DView';
 import { FloorplanCanvasSVG } from './views/FloorplanCanvasSVG';
 import { FloorplanHeightPicker } from './views/FloorplanHeightPicker';
 import { FloorplanImportExport } from './views/FloorplanImportExport';
@@ -53,6 +54,7 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
     const [importExportVisible, setImportExportVisible] = useState(false);
     const [liveSync, setLiveSync] = useState(true);
     const [panMode, setPanMode] = useState(false);
+    const [view3d, setView3d] = useState(false);
     const [autoPickup, setAutoPickup] = useState(false);
     const { state, dispatch, loadFromServer, undo, redo, canUndo, canRedo } = useFloorplanReducer();
     const isExternal = !!externalSession;
@@ -276,11 +278,13 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                             panMode={panMode}
                             setPanMode={setPanMode}
                             includeDoor={!isExternal}
+                            view3d={view3d}
+                            setView3d={setView3d}
                         />
                         {!isExternal && <FloorplanOptionsPanel state={state} dispatch={dispatch} />}
                         <Flex gap={2} className="flex-1 min-h-0">
                             <FloorplanHeightPicker selectedH={state.brush.h} onSelect={(h) => dispatch({ type: 'BRUSH_SET', h })} />
-                            <FloorplanCanvasSVG state={state} dispatch={dispatch} panMode={panMode} />
+                            {view3d ? <Floorplan3DView state={state} dispatch={dispatch} panMode={panMode} /> : <FloorplanCanvasSVG state={state} dispatch={dispatch} panMode={panMode} />}
                         </Flex>
                         <Flex gap={3} alignItems="center" className="px-1">
                             {!isExternal && <Flex gap={1} alignItems="center">

@@ -488,3 +488,30 @@ describe('reducer — APPLY_REMOTE_SNAPSHOT', () => {
         expect(next.selection.size).toBe(0);
     });
 });
+
+describe('reducer — occupied flags survive tilemap swaps', () => {
+    const occupiedState = (): FloorplanState => {
+        const base = stateWith(defaultEmptyTilemap(2, 2));
+        const painted = reducer(base, { type: 'PAINT_TILE', row: 0, col: 1, h: 0, source: 'local' });
+        return reducer(painted, { type: 'SET_OCCUPIED_TILES', map: [[false, true], [false, false]] });
+    };
+
+    it('APPLY_REMOTE_SNAPSHOT keeps them by position', () => {
+        const start = occupiedState();
+        expect(start.tiles[0][1].occupied).toBe(true);
+        const next = reducer(start, { type: 'APPLY_REMOTE_SNAPSHOT', raw: '00\r0x', door: start.door, thickness: start.thickness, wallHeight: 0, seq: 2 });
+        expect(next.tiles[0][1].occupied).toBe(true);
+        expect(next.tiles[0][0].occupied).toBeUndefined();
+    });
+
+    it('IMPORT_STRING keeps them by position', () => {
+        const next = reducer(occupiedState(), { type: 'IMPORT_STRING', raw: '11\r11', source: 'local' });
+        expect(next.tiles[0][1].occupied).toBe(true);
+        expect(next.tiles[0][1].h).toBe(1);
+    });
+
+    it('APPLY_REMOTE_DIFF keeps the flag on a tile it rewrites', () => {
+        const next = reducer(occupiedState(), { type: 'APPLY_REMOTE_DIFF', diff: { tiles: [{ row: 0, col: 1, h: 3, blocked: false }] }, seq: 3, editorUserId: 1 });
+        expect(next.tiles[0][1]).toEqual({ h: 3, blocked: false, occupied: true });
+    });
+});

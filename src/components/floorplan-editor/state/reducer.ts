@@ -40,6 +40,15 @@ const setTile = (tiles: Tile[][], row: number, col: number, tile: Tile): Tile[][
     return next;
 };
 
+/**
+ * Occupied flags mark tiles that hold furniture. They come from the server,
+ * not from the tilemap string, so whenever a whole tilemap is swapped in
+ * (import, undo/redo snapshots, live-sync snapshots) the flags are carried
+ * over by position or they would silently disappear.
+ */
+const carryOccupied = (previous: Tile[][], next: Tile[][]): Tile[][] =>
+    next.map((row, r) => row.map((tile, c) => (previous[r]?.[c]?.occupied ? { ...tile, occupied: true } : tile)));
+
 export const reducer = (state: FloorplanState, action: FloorplanAction): FloorplanState => {
     switch (action.type) {
         case 'PAINT_TILE': {
@@ -194,7 +203,7 @@ export const reducer = (state: FloorplanState, action: FloorplanAction): Floorpl
         case 'SQUARE_SELECT_TOGGLE':
             return { ...state, squareSelect: !state.squareSelect };
         case 'IMPORT_STRING': {
-            const tiles = parseTilemap(action.raw);
+            const tiles = carryOccupied(state.tiles, parseTilemap(action.raw));
             const next: FloorplanState = { ...state, tiles };
             if (action.door) next.door = action.door;
             if (action.thickness) next.thickness = action.thickness;
@@ -207,7 +216,8 @@ export const reducer = (state: FloorplanState, action: FloorplanAction): Floorpl
                 let tiles = next.tiles;
                 for (const e of action.diff.tiles) {
                     tiles = ensureRect(tiles, e.row + 1, e.col + 1);
-                    tiles = setTile(tiles, e.row, e.col, { h: clampHeight(e.h), blocked: e.blocked });
+                    const occupied = tiles[e.row]?.[e.col]?.occupied;
+                    tiles = setTile(tiles, e.row, e.col, occupied ? { h: clampHeight(e.h), blocked: e.blocked, occupied: true } : { h: clampHeight(e.h), blocked: e.blocked });
                 }
                 next.tiles = tiles;
             }
@@ -219,7 +229,7 @@ export const reducer = (state: FloorplanState, action: FloorplanAction): Floorpl
         case 'APPLY_REMOTE_SNAPSHOT': {
             return {
                 ...state,
-                tiles: parseTilemap(action.raw),
+                tiles: carryOccupied(state.tiles, parseTilemap(action.raw)),
                 door: action.door,
                 thickness: action.thickness,
                 wallHeight: Math.max(MIN_WALL_HEIGHT, Math.min(MAX_WALL_HEIGHT, action.wallHeight | 0)),

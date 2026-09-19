@@ -760,27 +760,33 @@
 }
 
 .octane-icon.icon-set-select {
-	background-image: url('@/assets/images/floorplaneditor/icon-select.png');
-	width: 40px;
-	height: 40px;
+    background-image: url("@/assets/images/floorplaneditor/icon-select-all.png");
+    width: 40px;
+    height: 40px;
 }
-	
+
 .octane-icon.icon-set-deselect {
-	background-image: url('@/assets/images/floorplaneditor/icon-deselect.png');
-	width: 40px;
-	height: 40px;
+    background-image: url("@/assets/images/floorplaneditor/icon-deselect-all.png");
+    width: 40px;
+    height: 40px;
 }
-	
+
 .octane-icon.icon-set-squaresselect {
-	background-image: url('@/assets/images/floorplaneditor/icon-squaresselect.png');
-	width: 40px;
-	height: 40px;
+    background-image: url("@/assets/images/floorplaneditor/icon-area-select.png");
+    width: 40px;
+    height: 40px;
 }
-	
-.octane-icon.icon-set-active-squaresselect {
-	background-image: url('@/assets/images/floorplaneditor/icon-squaresselect.png');
-	width: 40px;
-	height: 40px;
+
+.octane-icon.icon-view-3d {
+    background-image: url("@/assets/images/floorplaneditor/icon-3d.png");
+    width: 40px;
+    height: 40px;
+}
+
+.octane-icon.icon-hand-mode {
+    background-image: url("@/assets/images/floorplaneditor/icon-hand.png");
+    width: 40px;
+    height: 40px;
 }
 
 .octane-icon.icon-tickets {

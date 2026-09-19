@@ -430,6 +430,11 @@ See `docs/ARCHITECTURE.md` "Recently fixed" for fix shapes.
   `useNavigatorSearch.ts` (filters), `navigatorUiStore.ts` (Zustand UI
   flags + `setTab`/`setFilter`). Door lifecycle: `src/hooks/rooms/widgets/useDoorState.ts`.
   Specs/plans: `docs/superpowers/specs/2026-05-2*-navigator-*.md`
+- Floorplan editor 3D preview (PixiJS 8, own WebGL context): `src/components/floorplan-editor/views/Floorplan3DView.tsx`
+  (React panel + orbit controls) over `src/components/floorplan-editor/scene3d/`
+  (`FloorplanScene.ts` instanced heightmap mesh + GLSL, `heightmap.ts` tile columns
+  and camera, `mat4.ts`). PixiJS is `await import`ed so the editor bundle and jsdom
+  never load it unless the panel is open; Vitest aliases `pixi.js` to `src/pixi.mock.ts`.
 - Renderer-SDK mock for Vitest: `src/octane-renderer.mock.ts`
   (aliased over `@octane/renderer` via `vitest.config.mts`).
   Hosts the explicit `OctaneLogger` mock, the `mockEventDispatcher` /

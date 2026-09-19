@@ -1,5 +1,5 @@
 import { Dispatch, FC } from 'react';
-import { FaHandPaper, FaRedo, FaUndo } from 'react-icons/fa';
+import { FaRedo, FaUndo } from 'react-icons/fa';
 import { LocalizeText } from '../../../api';
 import { Base, Flex, Text } from '../../../common';
 import { FloorActionMode, FloorplanAction, FloorplanState } from '../state/types';
@@ -14,6 +14,8 @@ type Props = {
     panMode?: boolean;
     setPanMode?: (next: boolean) => void;
     includeDoor?: boolean;
+    view3d?: boolean;
+    setView3d?: (next: boolean) => void;
 };
 
 const BRUSH_BUTTONS: { id: string; mode: FloorActionMode; iconClass: string }[] = [
@@ -24,7 +26,7 @@ const BRUSH_BUTTONS: { id: string; mode: FloorActionMode; iconClass: string }[] 
     { id: 'tool-door', mode: 'DOOR', iconClass: 'icon-set-door' }
 ];
 
-export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo, onUndo, onRedo, panMode, setPanMode, includeDoor = true }) => {
+export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo, onUndo, onRedo, panMode, setPanMode, includeDoor = true, view3d = false, setView3d }) => {
     const exitPan = () => {
         if (panMode && setPanMode) setPanMode(false);
     };
@@ -40,11 +42,19 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                     data-testid="tool-pan"
                     data-active={panMode ? 'true' : 'false'}
                     title={panMode ? 'Hand mode active — drag to pan the view' : 'Hand mode — drag to pan the view'}
-                    className={`w-7 h-7 flex items-center justify-center rounded border ${panMode ? 'bg-emerald-500 border-emerald-700 text-white shadow-inner' : 'border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700'}`}
+                    className={`octane-icon icon-hand-mode ${panMode ? 'border border-primary' : ''}`}
                     onClick={() => setPanMode(!panMode)}
-                >
-                    <FaHandPaper size={12} />
-                </Base>
+                />
+            )}
+            {setView3d && (
+                <Base
+                    pointer
+                    data-testid="tool-3d"
+                    data-active={view3d ? 'true' : 'false'}
+                    title={view3d ? '3D preview on — click for the flat editor' : '3D preview — rotate and zoom the room'}
+                    className={`octane-icon icon-view-3d ${view3d ? 'border border-primary' : ''}`}
+                    onClick={() => setView3d(!view3d)}
+                />
             )}
             {BRUSH_BUTTONS.filter((button) => includeDoor || button.mode !== 'DOOR').map((b) => {
                 const active = state.brush.action === b.mode && !panMode;
