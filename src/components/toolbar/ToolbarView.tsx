@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { useAchievements, useBuildHeight, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useOctaneEvent, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useOctaneEvent, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -68,6 +68,10 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { userFigure = null } = useSessionInfo();
     const { getFullCount = 0 } = useInventoryUnseenTracker();
     const { getTotalUnseen = 0 } = useAchievements();
+    const { unseenCount: unseenDailyTaskCount = 0 } = useDailyTasks();
+    const { unseenCount: unseenRewardTrackCount = 0 } = useRewardTracks();
+    // HabboToolbar.setUnseenItemCount("HTIE_ICON_PROGRESSION", unseenProgMenuCount): achievements + daily tasks + reward track rewards.
+    const unseenProgMenuCount = getTotalUnseen + unseenDailyTaskCount + unseenRewardTrackCount;
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
     const { unreadCount: mentionsUnread = 0 } = useMentionsSnapshot();
@@ -431,8 +435,8 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <LayoutAvatarImageView airMeMenu={ true } direction={ 3 } figure={ userFigure } />
                         </motion.div>
                         <img src={ memenuCircleImg } alt="" className="tb-memenu-circle" />
-                        { (getTotalUnseen > 0) &&
-                            <LayoutItemCountView count={ getTotalUnseen } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
+                        { (unseenProgMenuCount > 0) &&
+                            <LayoutItemCountView count={ unseenProgMenuCount } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
                     </motion.div> }
                     { (!leftCollapsed && isInRoom && showToolbarButton) &&
                         <motion.div variants={ itemVariants } className="tb-slot tb-slot-tall">
@@ -560,8 +564,8 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <LayoutAvatarImageView airMeMenu={ true } direction={ 3 } figure={ userFigure } />
                         </motion.div>
                         <img src={ memenuCircleImg } alt="" className="tb-memenu-circle" />
-                        { (getTotalUnseen > 0) &&
-                            <LayoutItemCountView count={ getTotalUnseen } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
+                        { (unseenProgMenuCount > 0) &&
+                            <LayoutItemCountView count={ unseenProgMenuCount } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
                     </motion.div>
                     { isInRoom &&
                         <motion.div variants={ itemVariants } className="relative">

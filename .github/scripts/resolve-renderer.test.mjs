@@ -46,6 +46,29 @@ describe('renderer resolution', () => {
         });
     });
 
+    it('pairs a pushed feature branch with the same-named renderer branch', async () => {
+        const hasRef = refLookup(
+            new Set(['duckietm/Octane-Renderer@feat/reward-track-editor', 'duckietm/Octane-Renderer@Dev'])
+        );
+
+        assert.deepEqual(
+            await resolveRenderer(
+                { ...baseInput, eventName: 'push', baseRef: '', refName: 'feat/reward-track-editor', headOwner: '', headRef: '' },
+                hasRef
+            ),
+            { repository: 'duckietm/Octane-Renderer', ref: 'feat/reward-track-editor' }
+        );
+    });
+
+    it('keeps a push of Dev on the renderer Dev', async () => {
+        const hasRef = refLookup(new Set(['duckietm/Octane-Renderer@Dev']));
+
+        assert.deepEqual(
+            await resolveRenderer({ ...baseInput, eventName: 'push', baseRef: '', refName: 'Dev', headOwner: '', headRef: '' }, hasRef),
+            { repository: 'duckietm/Octane-Renderer', ref: 'Dev' }
+        );
+    });
+
     it('preserves explicit workflow dispatch pairing', async () => {
         const hasRef = refLookup(new Set(['custom/renderer@release-candidate']));
 

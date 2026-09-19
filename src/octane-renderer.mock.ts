@@ -828,3 +828,79 @@ export enum HabbiconAction {
     Favorite = 3,
     Unfavorite = 4
 }
+
+// Quest engine (AIR 13 quests, daily tasks, reward track) — the hooks under
+// src/hooks/quests register these events and send these composers.
+// ---------------------------------------------------------------------------
+
+export class QuestsMessageEvent extends MessageEvent {}
+export class QuestMessageEvent extends MessageEvent {}
+export class QuestCompletedMessageEvent extends MessageEvent {}
+export class QuestCancelledMessageEvent extends MessageEvent {}
+export class QuestDailyMessageEvent extends MessageEvent {}
+export class ActiveDailyTasksMessageEvent extends MessageEvent {}
+export class DailyTasksAddedMessageEvent extends MessageEvent {}
+export class DailyTaskUpdatedMessageEvent extends MessageEvent {}
+export class RewardTracksMessageEvent extends MessageEvent {}
+export class RewardTrackClaimResultMessageEvent extends MessageEvent {}
+export class RewardTrackProgressMessageEvent extends MessageEvent {}
+export class RewardTrackPremiumPurchaseResultMessageEvent extends MessageEvent {}
+export class QuestMessageData extends StubClass {}
+export class DailyTaskData extends StubClass {
+    public static STATUS_IN_PROGRESS = 0;
+    public static STATUS_COMPLETED = 1;
+    public static STATUS_CLAIMED = 2;
+}
+export class DailyTaskRewardData extends StubClass {}
+
+// Reward track staff editor (hooks/quests/useRewardTrackAdmin). The composers keep their
+// payload so a test can read what would go on the wire.
+class RewardTrackEditorComposer {
+    private readonly _data: unknown[];
+
+    constructor(...args: unknown[]) {
+        this._data = args;
+    }
+
+    public getMessageArray(): unknown[] {
+        return this._data;
+    }
+
+    public dispose(): void {}
+}
+export class RewardTrackAdminDataMessageEvent extends MessageEvent {}
+export class RewardTrackAdminResultMessageEvent extends MessageEvent {}
+export class RewardTrackFurniSearchResultMessageEvent extends MessageEvent {}
+export class RewardTrackTextsMessageEvent extends MessageEvent {}
+export class GetRewardTrackAdminDataMessageComposer extends RewardTrackEditorComposer {}
+export class SaveRewardTrackMessageComposer extends RewardTrackEditorComposer {}
+export class SaveRewardTrackTaskMessageComposer extends RewardTrackEditorComposer {
+    constructor(
+        trackId: string,
+        id: string,
+        actionType: string,
+        parameter: string,
+        premium: boolean,
+        sortOrder: number,
+        levels: { requiredCount: number; pointsReward: number; premium: boolean }[]
+    ) {
+        super(
+            trackId,
+            id,
+            actionType,
+            parameter,
+            premium,
+            sortOrder,
+            levels.length,
+            ...levels.flatMap((level) => [level.requiredCount, level.pointsReward, level.premium])
+        );
+    }
+}
+export class SaveRewardTrackPrizeMessageComposer extends RewardTrackEditorComposer {}
+export class DeleteRewardTrackEntityMessageComposer extends RewardTrackEditorComposer {}
+export class SearchRewardTrackFurniMessageComposer extends RewardTrackEditorComposer {}
+export class SaveRewardTrackTextsMessageComposer extends RewardTrackEditorComposer {
+    constructor(trackId: string, texts: { key: string; value: string }[]) {
+        super(trackId, texts.length, ...texts.flatMap((text) => [text.key, text.value]));
+    }
+}
