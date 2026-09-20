@@ -1,7 +1,7 @@
 import { GroupInformationComposer, GroupInformationEvent, GroupInformationParser, HabboGroupEntryData } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, SanitizeHtml, SendMessageComposer, ToggleFavoriteGroup } from '../../api';
-import { Column, GridProps, LayoutBadgeImageView, LayoutGridItem } from '../../common';
+import { CreateLinkEvent, LocalizeText, SanitizeHtml, SendMessageComposer, ToggleFavoriteGroup } from '../../api';
+import { Button, GridProps, LayoutBadgeImageView, LayoutGridItem } from '../../common';
 import { useMessageEvent } from '../../hooks';
 import { GroupInformationView } from '../groups/views/GroupInformationView';
 
@@ -45,14 +45,17 @@ export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
     }, [groups]);
 
     if (!groups || !groups.length) {
+        // Official ExtendedProfileWindowCtrl "no_groups" panel: the caption depends on whose
+        // profile it is and a button runs the guild search. The previous placeholder used a
+        // `no-group-spritesheet` class that no stylesheet defines, so the panel rendered blank.
         return (
-            <Column center fullHeight className="octane-extended-profile-groups">
-                <div className="flex justify-center gap-2">
-                    <div className="no-group-spritesheet image-1" />
-                    <div className="no-group-spritesheet image-2" />
-                    <div className="no-group-spritesheet image-3" />
-                </div>
-            </Column>
+            <div className="octane-extended-profile-groups octane-extended-profile-groups--empty">
+                <p className="octane-extended-profile-groups__empty-caption">{LocalizeText(itsMe ? 'extendedprofile.nogroups.me' : 'extendedprofile.nogroups.user')}</p>
+                <p className="octane-extended-profile-groups__empty-info">{LocalizeText('extendedprofile.nogroups.info')}</p>
+                <Button variant="success" onClick={() => CreateLinkEvent('navigator/search/groups')}>
+                    {LocalizeText('extendedprofile.nogroups.viewgroups')}
+                </Button>
+            </div>
         );
     }
 

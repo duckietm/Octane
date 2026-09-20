@@ -255,6 +255,71 @@
   line-height: 14px;
 }
 
+.octane-extended-profile__relationship-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.octane-extended-profile__relationship-footer .octane-extended-profile__relationship-subcopy {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.octane-extended-profile__relationship-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+  margin-right: 3px;
+}
+
+.octane-extended-profile__relationship-action {
+  width: 16px;
+  height: 15px;
+  padding: 0;
+  border: 0;
+  background: transparent center / contain no-repeat;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.octane-extended-profile__relationship-action:hover {
+  opacity: 1;
+}
+
+.octane-extended-profile__relationship-action.whisper {
+  background-image: url("@/assets/images/friends/swf/friendlist_chat.png");
+}
+
+.octane-extended-profile__relationship-action.follow {
+  background-image: url("@/assets/images/friends/swf/follow_friend.png");
+}
+
+.octane-extended-profile__relationship-action.invite {
+  width: 19px;
+  height: 13px;
+  background-image: url("@/assets/images/friends/swf/room_invite.png");
+}
+
+.octane-extended-profile__relationship-action.ignore,
+.octane-extended-profile__relationship-action.unignore {
+  background-image: url("@/assets/images/friends/swf/friendlist_eye.png");
+}
+
+.octane-extended-profile__relationship-action.ignore {
+  opacity: 0.45;
+}
+
+.octane-extended-profile__relationship-action.ignore:hover {
+  opacity: 0.8;
+}
+
 .octane-extended-profile__summary-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -337,6 +402,29 @@
   gap: 7px;
   min-height: 236px;
   height: 100%;
+}
+
+.octane-extended-profile-groups--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 16px;
+}
+
+.octane-extended-profile-groups__empty-caption {
+  margin: 0;
+  color: #111;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.octane-extended-profile-groups__empty-info {
+  margin: 0 0 6px;
+  color: #555;
+  font-size: 11px;
 }
 
 .octane-extended-profile-groups__sidebar {
