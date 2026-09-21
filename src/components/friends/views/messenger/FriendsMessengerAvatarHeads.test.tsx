@@ -22,7 +22,8 @@ vi.mock('../../../../hooks/habbicons/useHabbiconCatalog', () => ({
     useHabbiconCatalog: vi.fn()
 }));
 
-vi.mock('../../../../common/layout/avatarImageCrop', () => ({
+vi.mock('../../../../common/layout/avatarImageCrop', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('../../../../common/layout/avatarImageCrop')>()),
     cropTransparentImageUrl: vi.fn(async () => 'data:image/png;base64,cropped')
 }));
 

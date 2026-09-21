@@ -117,6 +117,37 @@ export const cropTransparentImageUrl = (imageUrl: string, targetSize: number = 2
     image.src = imageUrl;
 });
 
+/**
+ * Decodes a `data:` url into a Blob so the bytes can be cached once and
+ * shown through object urls instead of a base64 string per consumer.
+ * Returns null for anything that is not a data url.
+ */
+export const dataUrlToBlob = (dataUrl: string): Blob | null =>
+{
+    const separator = dataUrl.indexOf(',');
+
+    if(!dataUrl.startsWith('data:') || (separator < 0)) return null;
+
+    const header = dataUrl.slice('data:'.length, separator);
+    const isBase64 = header.endsWith(';base64');
+    const type = (isBase64 ? header.slice(0, -';base64'.length) : header) || 'text/plain';
+    const payload = dataUrl.slice(separator + 1);
+
+    try
+    {
+        const binary = isBase64 ? atob(payload) : decodeURIComponent(payload);
+        const bytes = new Uint8Array(binary.length);
+
+        for(let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+        return new Blob([ bytes ], { type });
+    }
+    catch
+    {
+        return null;
+    }
+};
+
 export const AIR_ME_MENU_FACE = {
     canvasWidth: 90,
     canvasHeight: 130,
