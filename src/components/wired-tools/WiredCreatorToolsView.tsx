@@ -11,7 +11,6 @@ import {
     GetRoomEngine,
     GetSessionDataManager,
     GetStage,
-    GetTicker,
     ILinkEventTracker,
     RemoveLinkEventTracker,
     RoomControllerLevel,
@@ -34,6 +33,7 @@ import {
 } from '@octane/renderer';
 import { FC, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+    AddAnimationTickerCallback,
     AvatarInfoUtilities,
     createPacketCooldownGate,
     GetRoomObjectBounds,
@@ -2053,13 +2053,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         updateOverlays();
 
-        const ticker = GetTicker();
-
-        ticker.add(updateOverlays);
-
-        return () => {
-            ticker.remove(updateOverlays);
-        };
+        return AddAnimationTickerCallback(updateOverlays);
     }, [isVariableHighlightActive, roomSession?.roomId, variableHighlightTargets]);
     const userVariableDefinitionsById = useMemo(
         () => new Map(userVariableDefinitions.map((definition) => [definition.itemId, definition])),

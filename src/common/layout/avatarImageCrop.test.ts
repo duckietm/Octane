@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findOpaqueBounds, fitBoundsIntoSquare, scaledAirMeMenuFaceCrop } from './avatarImageCrop';
+import { dataUrlToBlob, findOpaqueBounds, fitBoundsIntoSquare, scaledAirMeMenuFaceCrop } from './avatarImageCrop';
 
 describe('findOpaqueBounds', () =>
 {
@@ -38,5 +38,22 @@ describe('AIR me-menu face crop', () =>
     it('scales the same window when the raster is doubled', () =>
     {
         expect(scaledAirMeMenuFaceCrop(180, 260)).toEqual({ sx: 42, sy: 60, sw: 100, sh: 100 });
+    });
+});
+
+describe('dataUrlToBlob', () =>
+{
+    it('decodes a base64 data url into a typed blob', async () =>
+    {
+        const blob = dataUrlToBlob('data:image/png;base64,' + btoa('\x89PNG'));
+
+        expect(blob.type).toBe('image/png');
+        expect(new Uint8Array(await blob.arrayBuffer())).toEqual(new Uint8Array([ 0x89, 0x50, 0x4e, 0x47 ]));
+    });
+
+    it('returns null for urls that are not data urls', () =>
+    {
+        expect(dataUrlToBlob('blob:http://localhost/abc')).toBeNull();
+        expect(dataUrlToBlob('data:image/png;base64')).toBeNull();
     });
 });

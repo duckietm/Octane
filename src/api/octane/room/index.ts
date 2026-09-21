@@ -1,3 +1,4 @@
+export * from './AddAnimationTickerCallback';
 export * from './DispatchMouseEvent';
 export * from './DispatchTouchEvent';
 export * from './GetOwnRoomObject';

@@ -53,3 +53,15 @@ for (const key of [ 'localStorage', 'sessionStorage' ] as const) {
 
     Object.defineProperty(globalThis, key, { configurable: true, value: storage, writable: true });
 }
+
+// Vitest's jsdom shim for `URL.createObjectURL` unwraps a jsdom-internal
+// Blob symbol that the bundled jsdom no longer exposes, so every call throws
+// "Cannot read properties of undefined (reading '_buffer')". Components that
+// show cached image Blobs (LayoutAvatarImageView) only need a stable,
+// revocable url, so hand out synthetic ones.
+{
+    let nextObjectUrlId = 0;
+
+    URL.createObjectURL = () => `blob:test/${++nextObjectUrlId}`;
+    URL.revokeObjectURL = () => undefined;
+}

@@ -1,11 +1,13 @@
 import { AvatarScaleType, AvatarSetType, GetAvatarRenderManager } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Base, BaseProps } from '../Base';
-import { cropAirMeMenuFaceImageUrl, cropOpaqueBoundsImageUrl, cropTransparentImageUrl } from './avatarImageCrop';
+import { cropAirMeMenuFaceImageUrl, cropOpaqueBoundsImageUrl, cropTransparentImageUrl, dataUrlToBlob } from './avatarImageCrop';
 import { PIXEL_ART_RENDERING } from './PixelArtRendering';
 
 const AVATAR_CACHE_MAX_SIZE = 200;
-const AVATAR_IMAGE_CACHE: Map<string, string> = new Map();
+// Holds the encoded PNG bytes; every mounted view makes (and revokes) its own
+// object url, so evicting an entry never breaks an image still on screen.
+const AVATAR_IMAGE_CACHE: Map<string, Blob> = new Map();
 
 export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement> {
     figure: string;
@@ -42,6 +44,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
     const [isReady, setIsReady] = useState<boolean>(false);
     const isDisposed = useRef(false);
     const requestIdRef = useRef(0);
+    const objectUrlRef = useRef<string>(null);
 
     const getClassNames = useMemo(() => {
         let newClassNames: string[];
@@ -92,8 +95,16 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
         const requestId = ++requestIdRef.current;
         const figureKey = [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, airMeMenu, nativeCroppedHead].join('-');
 
+        const applyImage = (image: Blob | string) => {
+            if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+
+            objectUrlRef.current = typeof image === 'string' ? null : URL.createObjectURL(image);
+
+            setAvatarUrl(objectUrlRef.current ?? (image as string));
+        };
+
         if (AVATAR_IMAGE_CACHE.has(figureKey)) {
-            setAvatarUrl(AVATAR_IMAGE_CACHE.get(figureKey));
+            applyImage(AVATAR_IMAGE_CACHE.get(figureKey));
         } else {
             const resetFigure = async (_figure: string) => {
                 if (isDisposed.current || requestIdRef.current !== requestId) return;
@@ -125,16 +136,18 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
                 if (imageUrl && fit && !nativeCroppedHead) imageUrl = await cropOpaqueBoundsImageUrl(imageUrl);
 
                 if (imageUrl && !isDisposed.current && requestIdRef.current === requestId) {
-                    if (!avatarImage.isPlaceholder()) {
+                    const blob = dataUrlToBlob(imageUrl);
+
+                    if (blob && !avatarImage.isPlaceholder()) {
                         if (AVATAR_IMAGE_CACHE.size >= AVATAR_CACHE_MAX_SIZE) {
                             const firstKey = AVATAR_IMAGE_CACHE.keys().next().value;
                             AVATAR_IMAGE_CACHE.delete(firstKey);
                         }
 
-                        AVATAR_IMAGE_CACHE.set(figureKey, imageUrl);
+                        AVATAR_IMAGE_CACHE.set(figureKey, blob);
                     }
 
-                    setAvatarUrl(imageUrl);
+                    applyImage(blob ?? imageUrl);
                 }
 
                 avatarImage.dispose();
@@ -151,6 +164,10 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
 
         return () => {
             isDisposed.current = true;
+
+            if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+
+            objectUrlRef.current = null;
         };
     }, []);
 

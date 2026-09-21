@@ -15,6 +15,7 @@ const previewMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@octane/renderer', () => ({
+    GetConfiguration: () => ({ getValue: (_key: string, value: unknown) => value }),
     GetRenderer: () => ({
         render: previewMocks.render,
         texture: { getPixels: previewMocks.getPixels }
@@ -106,6 +107,23 @@ describe('LayoutRoomPreviewerView presentation canvas', () => {
         expect(roomPreviewer.modifyRoomCanvas).toHaveBeenCalledOnce();
         expect(roomPreviewer.modifyRoomCanvas).toHaveBeenCalledWith(680, 240);
         expect(firstTexture.destroy).toHaveBeenCalledWith(true);
+    });
+});
+
+describe('LayoutRoomPreviewerView ticker', () => {
+    it('repositions on the animation clock but paints every updated frame', () => {
+        const roomPreviewer = createRoomPreviewer();
+
+        renderPreview(roomPreviewer);
+
+        const update = previewMocks.add.mock.calls[0][0] as (ticker: { deltaMS: number }) => void;
+
+        vi.clearAllMocks();
+
+        for (let frame = 0; frame < 5; frame++) update({ deltaMS: 16 });
+
+        expect(roomPreviewer.updatePreviewRoomView).toHaveBeenCalledTimes(2);
+        expect(context.putImageData).toHaveBeenCalledTimes(5);
     });
 });
 
