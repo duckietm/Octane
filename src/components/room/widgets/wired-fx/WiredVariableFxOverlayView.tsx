@@ -1,6 +1,6 @@
-import { GetTicker, RoomObjectCategory } from '@octane/renderer';
+import { RoomObjectCategory } from '@octane/renderer';
 import { FC, PropsWithChildren, useEffect, useMemo, useRef } from 'react';
-import { GetRoomObjectBounds } from '../../../../api';
+import { AddAnimationTickerCallback, GetRoomObjectBounds } from '../../../../api';
 import { useRoom, useWiredVariableFxEvents, useWiredVariableFxStore } from '../../../../hooks';
 import { groupWiredVariableFxStatuses } from './WiredVariableFxOverlay.helpers';
 import { WiredVariableFxStatusView } from './WiredVariableFxStatusView';
@@ -37,11 +37,8 @@ const WiredVariableFxEntityView: FC<PropsWithChildren<WiredVariableFxEntityViewP
         };
 
         updatePosition();
-        GetTicker().add(updatePosition);
 
-        return () => {
-            GetTicker().remove(updatePosition);
-        };
+        return AddAnimationTickerCallback(updatePosition);
     }, [roomId, userEntity, entityId]);
 
     return (

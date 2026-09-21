@@ -1,6 +1,6 @@
-import { GetStage, GetTicker, OctaneRectangle, OctaneTicker, RoomObjectType } from '@octane/renderer';
+import { GetStage, OctaneRectangle, RoomObjectType } from '@octane/renderer';
 import { CSSProperties, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FixedSizeStack, GetRoomObjectBounds, GetRoomObjectScreenLocation, GetRoomSession } from '../../../../api';
+import { AddAnimationTickerCallback, FixedSizeStack, GetRoomObjectBounds, GetRoomObjectScreenLocation, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
 import { ContextMenuCaretView } from './ContextMenuCaretView';
 
@@ -146,13 +146,7 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
             updatePosition(bounds, location);
         };
 
-        const ticker = GetTicker();
-        ticker.add(update);
-
-        return () =>
-        {
-            ticker.remove(update);
-        };
+        return AddAnimationTickerCallback(update);
     }, [objectId, category, updatePosition, onClose]);
 
     useEffect(() =>

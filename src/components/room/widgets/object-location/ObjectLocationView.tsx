@@ -1,6 +1,5 @@
-import { GetTicker } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { GetRoomObjectBounds, GetRoomSession } from '../../../../api';
+import { AddAnimationTickerCallback, GetRoomObjectBounds, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
 
 interface ObjectLocationViewProps extends BaseProps<HTMLDivElement> {
@@ -15,7 +14,7 @@ export const ObjectLocationView: FC<ObjectLocationViewProps> = (props) => {
     const elementRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        let remove = false;
+        let remove: () => void = null;
 
         const getObjectLocation = () => {
             const roomSession = GetRoomSession();
@@ -38,13 +37,11 @@ export const ObjectLocationView: FC<ObjectLocationViewProps> = (props) => {
         if (noFollow) {
             updatePosition();
         } else {
-            remove = true;
-
-            GetTicker().add(updatePosition);
+            remove = AddAnimationTickerCallback(updatePosition);
         }
 
         return () => {
-            if (remove) GetTicker().remove(updatePosition);
+            if (remove) remove();
         };
     }, [objectId, category, noFollow]);
 
