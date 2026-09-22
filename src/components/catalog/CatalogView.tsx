@@ -3,7 +3,7 @@ import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBars, FaCog } from 'react-icons/fa';
 import { CatalogType, GetConfigurationValue, LocalizeShortNumber, LocalizeText, SanitizeHtml } from '../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
-import { useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
+import { CatalogEffectsHost, useCatalogActions, useCatalogData, useCatalogUiState, useHasPermission, usePurse } from '../../hooks';
 import { CatalogStudioProvider } from './admin/studio/CatalogStudioProvider';
 import { CatalogAdminProvider, useCatalogAdmin } from './CatalogAdminContext';
 import { getCatalogHeaderDescription } from './catalogLocalization.helpers';
@@ -310,6 +310,7 @@ export const CatalogView: FC<{}> = () => {
     // The session is only needed once the catalog is actually open.
     return (
         <CatalogStudioProvider active={isCatalogAdmin && isVisible}>
+            <CatalogEffectsHost />
             <CatalogAdminProvider>
                 <div className="hidden" data-catalog-localization-version={catalogLocalizationVersion} />
                 <CatalogViewInner />

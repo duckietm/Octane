@@ -1,88 +1,25 @@
 /* @vitest-environment jsdom */
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-
-// `useCatalogStore` mounts ~30 useState calls, opens a fresh
-// RoomPreviewer, subscribes to a dozen renderer message events, and
-// reaches into `useNotification()` for the alert helpers — too much
-// surface to render under jsdom and not what these tests are about.
-//
-// We just want to lock down the *contract* of the three filters
-// (`useCatalogData` / `useCatalogUiState` / `useCatalogActions`) and
-// the shim: each one must read its specific subset of keys from the
-// same Zustand-backed singleton.
-//
-// Stub the shared-hook bridge so all four hooks share one deterministic store
-// object. `vi.hoisted` lets us reference the fake from the mock
-// factory (which is itself hoisted).
-
-const { fakeStore } = vi.hoisted(() => {
-    const fakeStore = {
-        // Data slice
-        isBusy: false,
-        rootNode: null,
-        offersToNodes: null,
-        currentPage: null,
-        currentOffer: null,
-        frontPageItems: [],
-        searchResult: null,
-        roomPreviewer: null,
-        catalogLocalizationVersion: 0,
-        furniCount: 0,
-        furniLimit: 0,
-        maxFurniLimit: 0,
-        secondsLeft: 0,
-        secondsLeftWithGrace: 0,
-        updateTime: 0,
-        // UiState slice
-        isVisible: false,
-        setIsVisible: vi.fn(),
-        pageId: -1,
-        previousPageId: -1,
-        currentType: 'NORMAL',
-        activeNodes: [] as any[],
-        navigationHidden: false,
-        setNavigationHidden: vi.fn(),
-        purchaseOptions: { quantity: 1 },
-        setPurchaseOptions: vi.fn(),
-        giftReceiver: null,
-        setGiftReceiver: vi.fn(),
-        catalogPlaceMultipleObjects: false,
-        setCatalogPlaceMultipleObjects: vi.fn(),
-        setCurrentPage: vi.fn(),
-        setCurrentOffer: vi.fn(),
-        setSearchResult: vi.fn(),
-        // Actions slice
-        openCatalogByType: vi.fn(),
-        toggleCatalogByType: vi.fn(),
-        activateNode: vi.fn(),
-        openPageById: vi.fn(),
-        openPageByName: vi.fn(),
-        openPageByOfferId: vi.fn(),
-        requestOfferToMover: vi.fn(),
-        selectCatalogOffer: vi.fn(),
-        getNodeById: vi.fn(),
-        getNodeByName: vi.fn(),
-        getNodesByOfferId: vi.fn(),
-        getBuilderFurniPlaceableStatus: vi.fn()
-    };
-
-    return { fakeStore };
-});
-
-vi.mock('@/state/useSharedHook', () => ({
-    registerSharedHook: () => undefined,
-    useSharedHook: () => fakeStore
-}));
-
-// Import AFTER the mock is set up. The hooks resolve `useSharedHook` at
-// import time via the module graph, so the order matters.
+import { ReactNode } from 'react';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { INITIAL_CATALOG_UI_STATE, useCatalogStore } from './catalogStore';
 import { useCatalogActions, useCatalogData, useCatalogUiState } from './useCatalog';
+
+// The three filters are the public surface 45 components read. This test
+// pins their key sets and the identity of the values behind them.
+
+let client: QueryClient;
+const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+
+beforeEach(() => {
+    client = new QueryClient();
+    useCatalogStore.setState({ ...INITIAL_CATALOG_UI_STATE });
+});
 
 describe('useCatalog filter contract', () => {
     it('useCatalogData returns the read-only data slice', () => {
-        const { result } = renderHook(() => useCatalogData());
+        const { result } = renderHook(() => useCatalogData(), { wrapper });
 
         expect(Object.keys(result.current).sort()).toEqual([
             'catalogLoadError',
@@ -103,14 +40,14 @@ describe('useCatalog filter contract', () => {
             'updateTime'
         ]);
 
-        // Reads point at the same underlying values.
-        expect(result.current.rootNode).toBe(fakeStore.rootNode);
-        expect(result.current.furniCount).toBe(fakeStore.furniCount);
-        expect(result.current.frontPageItems).toBe(fakeStore.frontPageItems);
+        expect(result.current.rootNode).toBeNull();
+        expect(result.current.currentPage).toBeNull();
+        expect(result.current.isBusy).toBe(false);
+        expect(result.current.frontPageItems).toBe(useCatalogStore.getState().frontPageItems);
     });
 
     it('useCatalogUiState returns the UI fields plus their setters', () => {
-        const { result } = renderHook(() => useCatalogUiState());
+        const { result } = renderHook(() => useCatalogUiState(), { wrapper });
 
         expect(Object.keys(result.current).sort()).toEqual([
             'activeNodes',
@@ -132,12 +69,11 @@ describe('useCatalog filter contract', () => {
             'setSearchResult'
         ]);
 
-        expect(result.current.setIsVisible).toBe(fakeStore.setIsVisible);
-        expect(result.current.setCurrentPage).toBe(fakeStore.setCurrentPage);
+        expect(result.current.setIsVisible).toBe(useCatalogStore.getState().setIsVisible);
     });
 
-    it('useCatalogActions returns only imperative operations', () => {
-        const { result } = renderHook(() => useCatalogActions());
+    it('useCatalogActions returns the imperative actions', () => {
+        const { result } = renderHook(() => useCatalogActions(), { wrapper });
 
         expect(Object.keys(result.current).sort()).toEqual([
             'activateNode',
@@ -149,6 +85,8 @@ describe('useCatalog filter contract', () => {
             'openPageById',
             'openPageByName',
             'openPageByOfferId',
+            'refreshCurrentPage',
+            'refreshIndex',
             'requestOfferToMover',
             'resetPlacedOfferData',
             'retryCurrentPage',
@@ -156,30 +94,23 @@ describe('useCatalog filter contract', () => {
             'toggleCatalogByType'
         ]);
 
-        // No data fields leak through.
-        expect(result.current).not.toHaveProperty('rootNode');
-        expect(result.current).not.toHaveProperty('isVisible');
-        expect(result.current).not.toHaveProperty('currentPage');
-
-        expect(result.current.activateNode).toBe(fakeStore.activateNode);
-        expect(result.current.openCatalogByType).toBe(fakeStore.openCatalogByType);
+        expect(result.current.activateNode).toBe(useCatalogStore.getState().activateNode);
     });
 
-    it('all three filters observe the same singleton — refs are ===', () => {
-        const { result } = renderHook(() => ({
-            data: useCatalogData(),
-            ui: useCatalogUiState(),
-            actions: useCatalogActions()
-        }));
+    it('a consumer of one slice does not re-render when another slice changes', () => {
+        let renders = 0;
+        renderHook(
+            () => {
+                renders++;
 
-        // Each slice reaches the same fakeStore via the shared bridge. Any
-        // accidental copy would break these `===` checks.
-        expect(result.current.actions.activateNode).toBe(fakeStore.activateNode);
-        expect(result.current.actions.openCatalogByType).toBe(fakeStore.openCatalogByType);
-        expect(result.current.ui.setIsVisible).toBe(fakeStore.setIsVisible);
-        expect(result.current.ui.setCurrentPage).toBe(fakeStore.setCurrentPage);
-        expect(result.current.data.rootNode).toBe(fakeStore.rootNode);
-        expect(result.current.data.furniCount).toBe(fakeStore.furniCount);
-        expect(result.current.data.roomPreviewer).toBe(fakeStore.roomPreviewer);
+                return useCatalogActions();
+            },
+            { wrapper }
+        );
+
+        const before = renders;
+        useCatalogStore.getState().setBuildersClubFurniCount(42);
+
+        expect(renders).toBe(before);
     });
 });
