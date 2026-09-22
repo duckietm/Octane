@@ -21,7 +21,7 @@ import {
     PageLocalization,
     Product
 } from '../../api';
-import { buildCatalogNodeTree, normalizeCatalogType } from './useCatalog.helpers';
+import { buildCatalogNodeTree, normalizeCatalogType, replaceCatalogPageOffers } from './useCatalog.helpers';
 
 export const CATALOG_QUERY_ROOT = ['octane', 'catalog'] as const;
 export const CATALOG_PAGE_TIMEOUT_MS = 10_000;
@@ -243,4 +243,18 @@ export const cloneCachedCatalogPages = (): void => {
 
 export const dropCatalogCache = (): void => {
     boundClient?.removeQueries({ queryKey: CATALOG_QUERY_ROOT });
+};
+
+/** Optimistic write of a page's offer order into the cache; false when the page is not cached. */
+export const setCachedCatalogPageOffers = (type: string, pageId: number, offers: IPurchasableOffer[]): boolean => {
+    if (!boundClient) return false;
+
+    const key = catalogPageKey(type, pageId);
+    const data = boundClient.getQueryData<CatalogPageData>(key);
+
+    if (!data?.page) return false;
+
+    boundClient.setQueryData<CatalogPageData>(key, { ...data, page: replaceCatalogPageOffers(data.page, offers) as ICatalogPage });
+
+    return true;
 };

@@ -21,9 +21,10 @@ import { GetConfigurationValue, ICatalogNode, IPurchasableOffer, LocalizeText, P
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../hooks';
 import { replaceCatalogPageOffers } from '../../../../hooks/catalog/useCatalog.helpers';
+import { setCachedCatalogPageOffers } from '../../../../hooks/catalog/useCatalogQueries';
 import { getCatalogStudioCommandState, getCatalogStudioWorkspaceTabs } from '../../admin/studio/CatalogStudioCommandCenter';
 import { CatalogStudioProblemsHistoryPanel } from '../../admin/studio/CatalogStudioProblemsHistoryPanel';
-import { CatalogStudioValidationIssue } from '../../admin/studio/CatalogStudioTypes';
+import { CatalogStudioPageSnapshot, CatalogStudioValidationIssue } from '../../admin/studio/CatalogStudioTypes';
 import { CatalogStudioTransferPanel } from '../../admin/studio/CatalogStudioTransferPanel';
 import { useCatalogStudio } from '../../admin/studio/useCatalogStudio';
 import { useCatalogAdmin } from '../../CatalogAdminContext';
@@ -40,6 +41,8 @@ import { CatalogAdminOfferPriceView } from './CatalogAdminOfferPriceView';
 
 type CatalogAdminOffer = Parameters<NonNullable<ReturnType<typeof useCatalogAdmin>>['setEditingOffer']>[0];
 type ManagerTab = 'catalog' | 'sql' | 'history';
+
+const EMPTY_PAGES: CatalogStudioPageSnapshot[] = [];
 
 const stripSwfSuffix = (label: string) => (label || '').replace(/\s*\(\D[^)]*\)\s*$/g, '').trim();
 const nodeName = (node: ICatalogNode) => stripSwfSuffix(parseCatalogTabLabel(node.localization).name) || node.pageName;
@@ -102,15 +105,16 @@ export const CatalogAdminManagerView: FC<{}> = () => {
     const [selectedPageId, setSelectedPageId] = useState(currentPage?.pageId ?? -1);
 
     const query = search.trim().toLowerCase();
+    const sessionPages = studio.session?.pages ?? EMPTY_PAGES;
     const managerRootNode = useMemo(
-        () => buildCatalogAdminDraftTree(rootNode, studio.session?.pages ?? [], currentType),
-        [currentType, rootNode, studio.session?.pages]
+        () => buildCatalogAdminDraftTree(rootNode, sessionPages, currentType),
+        [currentType, rootNode, sessionPages]
     );
     const selectedNode = findNodeByPageId(managerRootNode, selectedPageId);
     const offers = currentPage?.pageId === selectedPageId ? (currentPage.offers ?? []) : [];
     const selectedPageLayout = useMemo(
-        () => (studio.session?.pages ?? []).find((page) => page.pageId === selectedPageId)?.pageLayout ?? null,
-        [studio.session?.pages, selectedPageId]
+        () => sessionPages.find((page) => page.pageId === selectedPageId)?.pageLayout ?? null,
+        [sessionPages, selectedPageId]
     );
     const isReadOnlyPage = isReadOnlyCatalogAdminLayout(selectedPageLayout);
     const categoryCount = managerRootNode?.children.length ?? 0;
@@ -230,7 +234,9 @@ export const CatalogAdminManagerView: FC<{}> = () => {
             const [moved] = reordered.splice(fromIndex, 1);
             reordered.splice(toIndex, 0, moved);
 
-            setCurrentPage(replaceCatalogPageOffers(currentPage, reordered));
+            if (!setCachedCatalogPageOffers(currentType, currentPage.pageId, reordered)) {
+                setCurrentPage(replaceCatalogPageOffers(currentPage, reordered));
+            }
 
             const pageLabel = selectedNode ? nodeName(selectedNode) : 'page';
             catalogAdmin.reorderOffers(
@@ -239,7 +245,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                 currentPage.pageId
             );
         },
-        [catalogAdmin, currentPage, isReadOnlyPage, offers, selectedNode, setCurrentPage]
+        [catalogAdmin, currentPage, currentType, isReadOnlyPage, offers, selectedNode, setCurrentPage]
     );
 
     const handleOfferDragStart = useCallback((event: React.DragEvent, index: number) => {
