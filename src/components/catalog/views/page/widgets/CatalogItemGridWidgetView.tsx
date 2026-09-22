@@ -4,6 +4,7 @@ import { CatalogType, IPurchasableOffer } from '../../../../../api';
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView } from '../../../../../common';
 import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../../hooks';
 import { replaceCatalogPageOffers } from '../../../../../hooks/catalog/useCatalog.helpers';
+import { setCachedCatalogPageOffers } from '../../../../../hooks/catalog/useCatalogQueries';
 import { useCatalogAdmin } from '../../../CatalogAdminContext';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
 import { getAirCatalogColumnCount, isAirBaseCatalogOffer, layoutAirCatalogOffers } from '../common/catalogAirGrid.helpers';
@@ -28,7 +29,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
     } = props;
     const { currentOffer = null, currentPage = null } = useCatalogData();
     const { selectCatalogOffer = null } = useCatalogActions();
-    const { currentType = CatalogType.NORMAL, setCurrentPage } = useCatalogUiState();
+    const { currentType = CatalogType.NORMAL, pageId = null, setCurrentPage } = useCatalogUiState();
     const catalogAdmin = useCatalogAdmin();
     const adminMode = catalogAdmin?.adminMode ?? false;
     const elementRef = useRef<HTMLDivElement>(null);
@@ -103,13 +104,15 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
 
     const handleDrop = useCallback(
         (index: number) => {
-            if (dragIndex !== null && dragIndex !== index && currentPage?.offers) {
+            if (dragIndex !== null && dragIndex !== index && currentPage?.offers && currentPage.pageId === pageId) {
                 const reordered = [...currentPage.offers];
                 const [moved] = reordered.splice(dragIndex, 1);
 
                 reordered.splice(index, 0, moved);
 
-                setCurrentPage(replaceCatalogPageOffers(currentPage, reordered));
+                if (!setCachedCatalogPageOffers(currentType, currentPage.pageId, reordered)) {
+                    setCurrentPage(replaceCatalogPageOffers(currentPage, reordered));
+                }
 
                 const orders = reordered.map((o, i) => ({ id: o.offerId, orderNumber: i }));
 
@@ -119,7 +122,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
             setDragIndex(null);
             setDropIndex(null);
         },
-        [dragIndex, currentPage, catalogAdmin, setCurrentPage]
+        [dragIndex, currentPage, currentType, pageId, catalogAdmin, setCurrentPage]
     );
 
     const handleDragEnd = useCallback(() => {
