@@ -8,7 +8,8 @@ describe('catalog grid performance policy', () => {
         expect(shouldVirtualizeCatalogOffers(90, false)).toBe(false);
     });
 
-    it('keeps the complete grid mounted while Catalog Studio reorder is active', () => {
-        expect(shouldVirtualizeCatalogOffers(240, true)).toBe(false);
+    it('virtualizes large pages in Catalog Studio too; reorder carries offer indices, not DOM positions', () => {
+        expect(shouldVirtualizeCatalogOffers(240, true)).toBe(true);
+        expect(shouldVirtualizeCatalogOffers(90, true)).toBe(false);
     });
 });

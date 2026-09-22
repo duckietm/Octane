@@ -3,7 +3,7 @@ import { FC, useMemo, useState } from 'react';
 import { FaFillDrip } from 'react-icons/fa';
 import { IPurchasableOffer, SanitizeHtml } from '../../../../../api';
 import { AutoGrid, Button, Column, LayoutGridItem, Text } from '../../../../../common';
-import { useCatalogData, useCatalogUiState } from '../../../../../hooks';
+import { useCatalogData, useCatalogUiState, useInventoryFurni } from '../../../../../hooks';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogLimitedItemWidgetView } from '../widgets/CatalogLimitedItemWidgetView';
@@ -21,6 +21,7 @@ export const CatalogLayoutColorGroupingView: FC<CatalogLayoutColorGroupViewProps
     const [colorableItems, setColorableItems] = useState<Map<string, number[]>>(new Map<string, number[]>());
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
     const { setCurrentOffer = null } = useCatalogUiState();
+    const { isVisible: inventoryVisible = false } = useInventoryFurni();
     const [colorsShowing, setColorsShowing] = useState<boolean>(false);
 
     const sortByColorIndex = (a: IPurchasableOffer, b: IPurchasableOffer) => {
@@ -126,6 +127,7 @@ export const CatalogLayoutColorGroupingView: FC<CatalogLayoutColorGroupViewProps
                                 }
                                 offer={offer}
                                 selectOffer={selectOffer}
+                                inventoryVisible={inventoryVisible}
                             />
                         ))}
                     </AutoGrid>

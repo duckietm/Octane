@@ -11,7 +11,8 @@ vi.mock('../../../../../hooks', () => ({
     useCatalogActions: () => ({ selectCatalogOffer: vi.fn() }),
     useCatalogData: () => ({ currentOffer: null, currentPage: catalogState.currentPage }),
     useCatalogUiState: () => ({ currentType: catalogState.currentType, setCurrentPage: vi.fn() }),
-    useInventoryFurni: () => ({ isVisible: false })
+    useInventoryFurni: () => ({ isVisible: false }),
+    useScrollWindow: () => ({ scrollTop: 0, viewportHeight: 0 })
 }));
 
 describe('CatalogItemGridWidgetView responsive grid ownership', () => {

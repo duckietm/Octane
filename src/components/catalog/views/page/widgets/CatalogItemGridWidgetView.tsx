@@ -1,12 +1,12 @@
 import { InfiniteGrid } from '@layout/InfiniteGrid';
-import { CSSProperties, FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, FC, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { CatalogType, IPurchasableOffer } from '../../../../../api';
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView } from '../../../../../common';
-import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../../hooks';
+import { useCatalogActions, useCatalogData, useCatalogUiState, useInventoryFurni, useScrollWindow } from '../../../../../hooks';
 import { replaceCatalogPageOffers } from '../../../../../hooks/catalog/useCatalog.helpers';
 import { useCatalogAdmin } from '../../../CatalogAdminContext';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
-import { getAirCatalogColumnCount, isAirBaseCatalogOffer, layoutAirCatalogOffers } from '../common/catalogAirGrid.helpers';
+import { getAirCatalogColumnCount, getVisibleAirGridEntries, isAirBaseCatalogOffer, layoutAirCatalogOffers } from '../common/catalogAirGrid.helpers';
 import { shouldVirtualizeCatalogOffers } from './catalogGridPerformance.helpers';
 
 interface CatalogItemGridWidgetViewProps extends AutoGridProps {
@@ -54,12 +54,27 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
     } as CSSProperties;
     const mixedLayout = useMemo(() => layoutAirCatalogOffers(offers, airColumnCount, currentType), [airColumnCount, currentType, offers]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (elementRef.current) {
             elementRef.current.scrollLeft = 0;
             elementRef.current.scrollTop = 0;
         }
     }, [currentPage]);
+
+    const scrollWindow = useScrollWindow(elementRef, usesAirMixedGridTemplate, currentPage);
+    const clampedScrollTop = Math.min(scrollWindow.scrollTop, Math.max(0, mixedLayout.height - scrollWindow.viewportHeight));
+    const visibleMixedEntries = useMemo(
+        () => getVisibleAirGridEntries(mixedLayout.entries, clampedScrollTop, scrollWindow.viewportHeight),
+        [mixedLayout, clampedScrollTop, scrollWindow.viewportHeight]
+    );
+    const renderedMixedEntries = useMemo(
+        () =>
+            dragIndex === null || visibleMixedEntries.some((entry) => entry.index === dragIndex)
+                ? visibleMixedEntries
+                : [...visibleMixedEntries, ...mixedLayout.entries.filter((entry) => entry.index === dragIndex)],
+        [visibleMixedEntries, mixedLayout, dragIndex]
+    );
+    const { isVisible: inventoryVisible = false } = useInventoryFurni();
 
     useLayoutEffect(() => {
         if (!isAirStandardDensity || !offers.length) {
@@ -160,6 +175,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
                     tintColor={tintColor}
                     showTechnicalDetails={adminMode}
                     showPrices={showPrices}
+                    inventoryVisible={inventoryVisible}
                 />
             </div>
         );
@@ -173,8 +189,9 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
                     className={`octane-catalog-air-mixed-grid ${gridClassName}`}
                     role="listbox"
                     style={{ ...airGridStyle, width: mixedLayout.width, minWidth: '100%', height: mixedLayout.height }}
+                    onDragEnd={adminMode ? handleDragEnd : undefined}
                 >
-                    {mixedLayout.entries.map(({ offer, index, ...position }) => renderOfferTile(offer, index, position))}
+                    {renderedMixedEntries.map(({ offer, index, ...position }) => renderOfferTile(offer, index, position))}
                     {children}
                 </div>
             </ClassicScrollAreaView>
@@ -187,6 +204,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
                 aria-label="Catalog items"
                 className={`octane-catalog-grid-virtual h-full min-h-0 ${gridClassName}`.trim()}
                 role="listbox"
+                onDragEnd={adminMode ? handleDragEnd : undefined}
                 style={
                     {
                         '--octane-grid-column-min-height': `${effectiveColumnMinHeight}px`,

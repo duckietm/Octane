@@ -1,6 +1,7 @@
 import { CatalogType, IPurchasableOffer } from '../../../../../api';
 
 export const AIR_CATALOG_GRID_HORIZONTAL_SPACING = 3;
+export const AIR_GRID_WINDOW_OVERSCAN = 120;
 
 export interface CatalogAirGridEntry {
     offer: IPurchasableOffer;
@@ -79,4 +80,19 @@ export const layoutAirCatalogOffers = (offers: IPurchasableOffer[], columnCount:
         width: columnWidths.reduce((width, columnWidth) => width + columnWidth, 0) + AIR_CATALOG_GRID_HORIZONTAL_SPACING * (safeColumnCount - 1),
         height: Math.max(...columnHeights)
     };
+};
+
+/** Entries whose vertical span intersects the scroll window; everything while the viewport is unmeasured. */
+export const getVisibleAirGridEntries = (
+    entries: CatalogAirGridEntry[],
+    scrollTop: number,
+    viewportHeight: number,
+    overscan = AIR_GRID_WINDOW_OVERSCAN
+): CatalogAirGridEntry[] => {
+    if (viewportHeight <= 0) return entries;
+
+    const top = scrollTop - overscan;
+    const bottom = scrollTop + viewportHeight + overscan;
+
+    return entries.filter((entry) => entry.y + entry.height >= top && entry.y <= bottom);
 };
