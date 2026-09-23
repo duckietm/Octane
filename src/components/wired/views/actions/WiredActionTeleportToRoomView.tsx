@@ -17,8 +17,8 @@ import { WiredActionBaseView } from './WiredActionBaseView';
 const PICKED_SOURCE = 100;
 
 /**
- * Habbo's "teleport to room": sends the users to the room a picked room link or teleporter leads
- * to, arriving on the teleporter's pair, or else to the typed room.
+ * Habbo's "teleport to room": sends the users to the room a picked room linker, room link or
+ * teleporter leads to, arriving on the linker's or teleporter's pair, or else to the typed room.
  */
 export const WiredActionTeleportToRoomView: FC<{}> = () => {
     const { trigger = null, furniIds = [], setIntParams = null, setStringParam = null, setAllowedFurniCheck = null, setAllowedInteractionErrorKey = null } = useWired();
@@ -42,7 +42,7 @@ export const WiredActionTeleportToRoomView: FC<{}> = () => {
         setAllowedFurniCheck((roomObject, furniData) =>
             isTeleportToRoomPickable(roomObject?.model?.getValue<Record<string, unknown>>(RoomObjectVariable.FURNITURE_DATA), [furniData?.className, furniData?.name])
         );
-        setAllowedInteractionErrorKey?.(localizeWithFallback('wiredfurni.error.require_teleport_or_room_link', 'Pick a teleporter or a room link.'));
+        setAllowedInteractionErrorKey?.(localizeWithFallback('wiredfurni.error.require_room_linker', 'Pick a room linker.'));
 
         return () => {
             setAllowedFurniCheck(null);
