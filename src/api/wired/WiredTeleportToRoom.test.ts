@@ -18,6 +18,11 @@ describe('teleport to room', () => {
         expect(isTeleportToRoomPickable({ state: '0' }, ['chair_plasto', null])).toBe(false);
     });
 
+    it('lets room linkers be picked by their classname', () => {
+        expect(isTeleportToRoomPickable(null, ['wf_room_linker'])).toBe(true);
+        expect(isTeleportToRoomPickable({}, ['WF_ROOM_LINKER', 'WIRED Collegatore Stanze'])).toBe(true);
+    });
+
     it('reads a box saved before the furni source as picked furni', () => {
         expect(readTeleportToRoomParams([11])).toEqual({ userSource: 11, furniSource: 100 });
         expect(readTeleportToRoomParams([0, 201])).toEqual({ userSource: 0, furniSource: 201 });
