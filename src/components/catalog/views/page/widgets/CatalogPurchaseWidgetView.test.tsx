@@ -33,7 +33,9 @@ vi.mock('../../../../../api', () => ({
 }));
 
 vi.mock('../../../../../api/catalog/CatalogBundleDiscount', () => ({ getCatalogBundlePrice: (price: number) => ({ price }) }));
-vi.mock('../../../../../api/habbicons', () => ({ useHabbiconCatalog: () => ({ entries: [] }) }));
+const habbiconCatalog = vi.hoisted(() => ({ entries: [] as { id: number; owned?: boolean; claimable?: boolean }[] }));
+
+vi.mock('../../../../../api/habbicons', () => ({ useHabbiconCatalog: () => habbiconCatalog }));
 vi.mock('../../../../../api/utils/localizeWithFallback', () => ({ localizeWithFallback: (_key: string, fallback: string) => fallback }));
 
 vi.mock('../../../../../common', () => ({
@@ -88,6 +90,7 @@ afterEach(cleanup);
 
 beforeEach(() => {
     vi.clearAllMocks();
+    habbiconCatalog.entries = [];
     vi.mocked(GetClubMemberLevel).mockReturnValue(0);
     vi.mocked(useCatalogActions).mockReturnValue({
         getBuilderFurniPlaceableStatus: () => 0,
@@ -136,6 +139,41 @@ describe('catalog purchase widget', () => {
 
         expect(screen.queryByText('catalog.buy.widget.get.vip.to.unlock.this.product')).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' })).toBeEnabled();
+    });
+
+    it('shows the owned state instead of the club invitation for an owned habbicon', () => {
+        habbiconCatalog.entries = [{ id: 10, owned: true }];
+        setOffer(makeOffer({ clubLevel: 1, product: { isUniqueLimitedItem: false, productClassId: 10, productType: 'h' } }));
+
+        render(<CatalogPurchaseWidgetView />);
+
+        expect(screen.queryByText('catalog.buy.widget.get.vip.to.unlock.this.product')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Owned' })).toBeDisabled();
+    });
+
+    it('keeps the buy label on the disabled button while the offer is unavailable', () => {
+        setOffer(makeOffer({ haveOffer: false }));
+
+        render(<CatalogPurchaseWidgetView />);
+
+        expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' })).toBeDisabled();
+        expect(screen.queryByText('catalog.alert.not_available')).not.toBeInTheDocument();
+    });
+
+    it('keeps the rent label on the disabled button while a rent offer is unavailable', () => {
+        setOffer(makeOffer({ haveOffer: false, isRentOffer: true }));
+
+        render(<CatalogPurchaseWidgetView />);
+
+        expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.rent' })).toBeDisabled();
+    });
+
+    it('shows the loading label while a lazy offer resolves', () => {
+        setOffer(makeOffer({ haveOffer: false, isLazy: true }));
+
+        render(<CatalogPurchaseWidgetView />);
+
+        expect(screen.getByRole('button', { name: 'generic.loading' })).toBeDisabled();
     });
 
     it('lets a layout block the purchase without hiding the buttons', () => {

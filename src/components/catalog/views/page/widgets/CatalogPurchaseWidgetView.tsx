@@ -398,7 +398,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
         if (isOfferUnavailable)
             return (
                 <button type="button" className={purchaseButtonClassNames.join(' ')} disabled>
-                    {currentOffer.isLazy ? LocalizeText('generic.loading') : LocalizeText('catalog.alert.not_available')}
+                    {currentOffer.isLazy ? LocalizeText('generic.loading') : LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
                 </button>
             );
 

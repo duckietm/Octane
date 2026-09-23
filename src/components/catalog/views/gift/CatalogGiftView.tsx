@@ -601,7 +601,7 @@ export const CatalogGiftView: FC = () => {
                         {!isDefaultBox && <img alt="" draggable={false} src={giftSmallCoinImage} />}
                     </div>
                     <button
-                        aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon.title')}
+                        aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
                         className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-prev${isRibbonEnabled ? '' : ' is-disabled'}`}
                         disabled={!isRibbonEnabled}
                         type="button"
@@ -610,7 +610,7 @@ export const CatalogGiftView: FC = () => {
                         <img alt="" draggable={false} src={giftArrowLeftImage} />
                     </button>
                     <button
-                        aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon.title')}
+                        aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
                         className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-next${isRibbonEnabled ? '' : ' is-disabled'}`}
                         disabled={!isRibbonEnabled}
                         type="button"

@@ -50,7 +50,8 @@ vi.mock('../../../../../../api', () => ({
     GetPetIndexFromLocalization: (localization: string) => Number(localization.split('_').at(-1)),
     LocalizeText: (key: string) => key,
     SanitizeHtml: (value: string) => value,
-    SendMessageComposer: vi.fn()
+    SendMessageComposer: vi.fn(),
+    localizeWithFallback: (_key: string, fallback: string) => fallback
 }));
 
 vi.mock('../../../../../../common', () => ({
