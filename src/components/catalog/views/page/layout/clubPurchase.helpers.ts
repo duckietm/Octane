@@ -9,9 +9,12 @@ export interface ClubMembershipLike {
     isVip: boolean;
 }
 
+// The loyalty page sells the same club offers as the vip page, priced in the loyalty currency.
+export const isVipPurchaseLayout = (layoutCode: string): boolean => layoutCode === 'vip_buy' || layoutCode === 'loyalty_vip_buy';
+
 export const groupClubOffers = <TOffer extends ClubOfferLike>(layoutCode: string, offers: readonly TOffer[]) => {
     const vip = offers.filter((offer) => offer.vip);
-    const hc = layoutCode === 'vip_buy' ? [] : offers.filter((offer) => !offer.vip);
+    const hc = isVipPurchaseLayout(layoutCode) ? [] : offers.filter((offer) => !offer.vip);
 
     return { hc, vip, visible: [...hc, ...vip] };
 };

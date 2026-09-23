@@ -17,7 +17,7 @@ import {
 } from '../../../../../hooks';
 import { CatalogClubPurchaseConfirmView } from './CatalogClubPurchaseConfirmView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
-import { getClubMembershipSummary, groupClubOffers } from './clubPurchase.helpers';
+import { getClubMembershipSummary, groupClubOffers, isVipPurchaseLayout } from './clubPurchase.helpers';
 
 const CLUB_WINDOW_ID = 1;
 
@@ -36,7 +36,7 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
     const isPurchasingRef = useRef(false);
     const pageData = currentPage ?? page;
     const layoutCode = pageData?.layoutCode ?? 'club_buy';
-    const isVipPage = layoutCode === 'vip_buy';
+    const isVipPage = isVipPurchaseLayout(layoutCode);
     const offerGroups = useMemo(() => groupClubOffers(layoutCode, offers ?? []), [layoutCode, offers]);
     const membership = useMemo(() => getClubMembershipSummary(purse), [purse]);
 
