@@ -22,14 +22,24 @@ export const isValidTeleportRoomId = (value: string): boolean => {
 
 const TELEPORTER_NAME = /^door|tele/;
 
+/** The furni sold in pairs, one per room, that this box is meant to lead through. */
+export const ROOM_LINKER_CLASSNAME = 'wf_room_linker';
+
 /**
- * Whether a furni may be picked: one carrying a room link, or one named like a teleporter. The
- * client cannot see the server's interaction, so the name is a guess the server checks on save.
+ * Whether a furni may be picked: a room linker, one carrying a room link, or one named like a
+ * teleporter. The client cannot see the server's interaction, so the name is a guess the server
+ * checks on save.
  */
 export const isTeleportToRoomPickable = (objectData: Record<string, unknown> | null | undefined, names: Array<string | null | undefined>): boolean => {
     if (objectData && typeof objectData === 'object' && TELEPORT_TO_ROOM_LINK_KEY in objectData) return true;
 
-    return names.some((name) => typeof name === 'string' && TELEPORTER_NAME.test(name.toLowerCase()));
+    return names.some((name) => {
+        if (typeof name !== 'string') return false;
+
+        const lowered = name.toLowerCase();
+
+        return lowered === ROOM_LINKER_CLASSNAME || TELEPORTER_NAME.test(lowered);
+    });
 };
 
 export const readTeleportToRoomParams = (intData: number[] | null | undefined): { userSource: number; furniSource: number } => ({
