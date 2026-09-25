@@ -19,10 +19,20 @@ import {
     StringDataType,
     UpdateFurniturePositionComposer
 } from '@octane/renderer';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCrosshairs, FaEraser, FaTimes } from 'react-icons/fa';
 import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
-import { AvatarInfoFurni, GetConfigurationValue, GetGroupInformation, IPhotoData, isSafeExternalUrl, LocalizeText, SendMessageComposer } from '../../../../../api';
+import {
+    AvatarInfoFurni,
+    CopyToClipboard,
+    GetConfigurationValue,
+    GetGroupInformation,
+    IPhotoData,
+    isSafeExternalUrl,
+    LocalizeText,
+    localizeWithFallback,
+    SendMessageComposer
+} from '../../../../../api';
 import {
     Button,
     Column,
@@ -53,6 +63,33 @@ const removeLandscapeLabel = () => {
     const localized = LocalizeText('infostand.button.remove_landscape');
 
     return !localized || localized === 'infostand.button.remove_landscape' ? 'Remove Landscape' : localized;
+};
+
+// An infostand id line (icon + "Label: value") that copies its value on click
+// and shows a check in place of the value for a moment.
+const InfoStandCopyValue: FC<{ icon: ReactNode; label: string; value: string | number }> = ({ icon, label, value }) => {
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!copied) return;
+
+        const timeout = setTimeout(() => setCopied(false), 1200);
+
+        return () => clearTimeout(timeout);
+    }, [copied]);
+
+    return (
+        <div
+            className="flex items-center gap-1 cursor-pointer"
+            title={localizeWithFallback('infostand.copy.tooltip', 'Click to copy')}
+            onClick={() => void CopyToClipboard(String(value)).then((ok) => setCopied(ok))}
+        >
+            {icon}
+            <Text small wrap variant="white" className={copied ? '!text-[#7ec8e3]' : undefined}>
+                {label}: {copied ? '✓' : value}
+            </Text>
+        </div>
+    );
 };
 
 function formatPlantDuration(totalSeconds: number): string {
@@ -629,6 +666,16 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
 
     if (!avatarInfo) return null;
 
+    const furniTypeId = roomSession
+        ? (GetRoomEngine()
+              .getRoomObject(roomSession.roomId, avatarInfo.id, avatarInfo.isWallItem ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR)
+              ?.model?.getValue<number>(RoomObjectVariable.FURNITURE_TYPE_ID) ?? '?')
+        : '?';
+    const showLocation = itemLocation.x > -1 && itemLocationEnabled && (!itemLocationRequireAccess || canMove);
+    const showIds = godMode && canSeeFurniId;
+    const showEditFurni = godMode && isModerator;
+    const showBuildtools = godMode && !avatarInfo.isWallItem && canMove;
+
     return (
         <Column alignItems="end" gap={1}>
             <Column className="relative min-w-[190px] max-w-[190px] z-30 pointer-events-auto bg-[rgba(28,28,32,.95)] [box-shadow:inset_0_5px_#22222799,inset_0_-4px_#12121599] rounded">
@@ -793,15 +840,43 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                 </Flex>
                             </>
                         )}
-                        {itemLocation.x > -1 && itemLocationEnabled && (!itemLocationRequireAccess || canMove) && (
+                        {(showLocation || showIds) && (
                             <>
                                 <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                <div className="flex items-center gap-1 min-w-0">
-                                    <FaCrosshairs className="fa-icon shrink-0" />
-                                    <Text small textBreak variant="white">
-                                        X: {itemLocation.x} · Y: {itemLocation.y} · H: {itemLocation.z < 0.01 ? 0 : itemLocation.z}
-                                    </Text>
-                                </div>
+                                {showLocation && (
+                                    <div className="flex items-center gap-1 min-w-0">
+                                        <FaCrosshairs className="fa-icon shrink-0" />
+                                        <Text small textBreak variant="white">
+                                            X: {itemLocation.x} · Y: {itemLocation.y} · H: {itemLocation.z < 0.01 ? 0 : itemLocation.z}
+                                        </Text>
+                                    </div>
+                                )}
+                                {showIds && (
+                                    <div className="flex items-center gap-3">
+                                        <InfoStandCopyValue
+                                            icon={
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#7ec8e3]">
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M4.93 1.31a41.401 41.401 0 0 1 10.14 0C16.194 1.45 17 2.414 17 3.517V18.25a.75.75 0 0 1-1.075.676l-2.8-1.344-2.8 1.344a.75.75 0 0 1-.65 0l-2.8-1.344-2.8 1.344A.75.75 0 0 1 3 18.25V3.517c0-1.103.806-2.068 1.93-2.207Z"
+                                                        clipRule="evenodd"
+                                                    />
+                                                </svg>
+                                            }
+                                            label="ID"
+                                            value={avatarInfo.id}
+                                        />
+                                        <InfoStandCopyValue
+                                            icon={
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#7ec8e3]">
+                                                    <path d="M5.127 3.502 5.25 3.5h9.5c.041 0 .082 0 .123.002A2.251 2.251 0 0 0 12.75 2h-5.5a2.25 2.25 0 0 0-2.123 1.502ZM1 10.25A2.25 2.25 0 0 1 3.25 8h13.5A2.25 2.25 0 0 1 19 10.25v5.5A2.25 2.25 0 0 1 16.75 18H3.25A2.25 2.25 0 0 1 1 15.75v-5.5ZM3.25 6.5c-.04 0-.082 0-.123.002A2.25 2.25 0 0 1 5.25 5h9.5c.98 0 1.814.627 2.123 1.502a3.819 3.819 0 0 0-.123-.002H3.25Z" />
+                                                </svg>
+                                            }
+                                            label="Sprite"
+                                            value={furniTypeId}
+                                        />
+                                    </div>
+                                )}
                             </>
                         )}
                         {rareValue && rareValue.points > 0 && (
@@ -820,69 +895,37 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                 </Flex>
                             </>
                         )}
-                        {godMode && (
+                        {(showEditFurni || showBuildtools) && (
                             <>
                                 <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                {canSeeFurniId && (
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex items-center gap-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#7ec8e3]">
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M4.93 1.31a41.401 41.401 0 0 1 10.14 0C16.194 1.45 17 2.414 17 3.517V18.25a.75.75 0 0 1-1.075.676l-2.8-1.344-2.8 1.344a.75.75 0 0 1-.65 0l-2.8-1.344-2.8 1.344A.75.75 0 0 1 3 18.25V3.517c0-1.103.806-2.068 1.93-2.207Z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg>
-                                            <Text small wrap variant="white">
-                                                ID: {avatarInfo.id}
-                                            </Text>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#7ec8e3]">
-                                                <path d="M5.127 3.502 5.25 3.5h9.5c.041 0 .082 0 .123.002A2.251 2.251 0 0 0 12.75 2h-5.5a2.25 2.25 0 0 0-2.123 1.502ZM1 10.25A2.25 2.25 0 0 1 3.25 8h13.5A2.25 2.25 0 0 1 19 10.25v5.5A2.25 2.25 0 0 1 16.75 18H3.25A2.25 2.25 0 0 1 1 15.75v-5.5ZM3.25 6.5c-.04 0-.082 0-.123.002A2.25 2.25 0 0 1 5.25 5h9.5c.98 0 1.814.627 2.123 1.502a3.819 3.819 0 0 0-.123-.002H3.25Z" />
-                                            </svg>
-                                            <Text small wrap variant="white">
-                                                Sprite: {(() => {
-                                                    const ro = GetRoomEngine().getRoomObject(
-                                                        roomSession.roomId,
-                                                        avatarInfo.id,
-                                                        avatarInfo.isWallItem ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR
-                                                    );
-                                                    return ro?.model?.getValue(RoomObjectVariable.FURNITURE_TYPE_ID) ?? '?';
-                                                })()}
-                                            </Text>
-                                        </div>
+                                {(showEditFurni || showBuildtools) && (
+                                    <div className="flex gap-1 w-full">
+                                        {showEditFurni && (
+                                            <button
+                                                className="flex-1 min-w-0 text-white text-xs bg-[#418db0] hover:bg-[#3789a8] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
+                                                onClick={() => {
+                                                    CreateLinkEvent('furni-editor/show');
+
+                                                    if (furniTypeId !== '?') window.dispatchEvent(new CustomEvent('furni-editor:open', { detail: { spriteId: furniTypeId } }));
+                                                }}
+                                            >
+                                                {localizeWithFallback('infostand.button.edit_furni', 'Edit furni')}
+                                            </button>
+                                        )}
+                                        {showBuildtools && (
+                                            <button
+                                                className="flex-1 min-w-0 text-white text-xs bg-[#2a2a3a] hover:bg-[#3a3a4a] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
+                                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                            >
+                                                {dropdownOpen
+                                                    ? localizeWithFallback('infostand.button.buildtools.close', 'Close Buildtools')
+                                                    : localizeWithFallback('infostand.button.buildtools.open', 'Open Buildtools')}
+                                            </button>
+                                        )}
                                     </div>
                                 )}
-                                {isModerator && (
-                                    <button
-                                        className="w-full text-white text-xs bg-[#418db0] hover:bg-[#3789a8] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
-                                        onClick={() => {
-                                            const roomObject = GetRoomEngine().getRoomObject(
-                                                roomSession.roomId,
-                                                avatarInfo.id,
-                                                avatarInfo.isWallItem ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR
-                                            );
-                                            const typeId = roomObject?.model?.getValue(RoomObjectVariable.FURNITURE_TYPE_ID);
-
-                                            CreateLinkEvent('furni-editor/show');
-
-                                            if (typeId) window.dispatchEvent(new CustomEvent('furni-editor:open', { detail: { spriteId: typeId } }));
-                                        }}
-                                    >
-                                        Edit Furni
-                                    </button>
-                                )}
-                                {!avatarInfo.isWallItem && canMove && (
+                                {showBuildtools && (
                                     <>
-                                        <button
-                                            className="w-full text-white text-xs bg-[#2a2a3a] hover:bg-[#3a3a4a] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
-                                            onClick={() => setDropdownOpen(!dropdownOpen)}
-                                        >
-                                            {dropdownOpen
-                                                ? `${LocalizeText('widget.furni.present.close')} Buildtools`
-                                                : `${LocalizeText('navigator.roomsettings.doormode.open')} Buildtools`}
-                                        </button>
                                         {dropdownOpen && (
                                             <div className="flex gap-[4px] w-full">
                                                 <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
