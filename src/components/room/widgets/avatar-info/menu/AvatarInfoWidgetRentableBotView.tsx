@@ -14,6 +14,7 @@ import {
     DispatchUiEvent,
     GetConfigurationValue,
     LocalizeText,
+    localizeWithFallback,
     RoomWidgetUpdateRentableBotChatEvent,
     SendMessageComposer
 } from '../../../../../api';
@@ -148,100 +149,105 @@ export const AvatarInfoWidgetRentableBotView: FC<AvatarInfoWidgetRentableBotView
     return (
         <ContextMenuView
             category={RoomObjectCategory.UNIT}
+            classNames={['octane-avatar-action-menu', 'octane-avatar-action-menu--own']}
             collapsable={true}
+            freezePositionOnHover={true}
             objectId={avatarInfo.roomIndex}
+            showCaretIcon={false}
             userType={RoomObjectType.RENTABLE_BOT}
             onClose={onClose}
         >
             <ContextMenuHeaderView>{avatarInfo.name}</ContextMenuHeaderView>
-            {mode === MODE_NORMAL && canControl && (
-                <>
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_ALL) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('donate_to_all')}>
-                            {LocalizeText('avatar.widget.donate_to_all')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_USER) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('donate_to_user')}>
-                            {LocalizeText('avatar.widget.donate_to_user')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_NAME) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('change_bot_name')}>
-                            {LocalizeText('avatar.widget.change_bot_name')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_MOTTO) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('change_bot_motto')}>
-                            {LocalizeText('avatar.widget.change_bot_motto')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.DRESS_UP) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('dress_up')}>
-                            {LocalizeText('avatar.widget.dress_up')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.RANDOM_WALK) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('random_walk')}>
-                            {LocalizeText('avatar.widget.random_walk')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.SETUP_CHAT) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('setup_chat')}>
-                            {LocalizeText('avatar.widget.setup_chat')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.DANCE) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('dance')}>{LocalizeText('avatar.widget.dance')}</ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.ROTATE) >= 0 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('rotate')}>
-                            {LocalizeText('tooltip.roombuilding.rotate')}
-                        </ContextMenuListItemView>
-                    )}
-                    {avatarInfo.botSkills.indexOf(BotSkillsEnum.NO_PICK_UP) === -1 && (
-                        <ContextMenuListItemView onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
-                    )}
-                </>
-            )}
-            {mode === MODE_CHANGE_NAME && (
-                <Column className="menu-item" gap={1} onClick={null}>
-                    <Text variant="white">{LocalizeText('bot.skill.name.configuration.new.name')}</Text>
-                    <OctaneInput
-                        maxLength={GetConfigurationValue<number>('bot.name.max.length', 15)}
-                        type="text"
-                        value={newName}
-                        onChange={(event) => setNewName(event.target.value)}
-                    />
-                    <div className="flex items-center justify-between gap-1">
-                        <Button fullWidth variant="secondary" onClick={(event) => processAction(null)}>
-                            {LocalizeText('cancel')}
-                        </Button>
-                        <Button fullWidth variant="success" onClick={(event) => processAction('save_bot_name')}>
-                            {LocalizeText('save')}
-                        </Button>
-                    </div>
-                </Column>
-            )}
-            {mode === MODE_CHANGE_MOTTO && (
-                <Column className="menu-item" gap={1} onClick={null}>
-                    <Text variant="white">{LocalizeText('bot.skill.name.configuration.new.motto')}</Text>
-                    <OctaneInput
-                        maxLength={GetConfigurationValue<number>('motto.max.length', 38)}
-                        type="text"
-                        value={newMotto}
-                        onChange={(event) => setNewMotto(event.target.value)}
-                    />
-                    <div className="flex items-center justify-between gap-1">
-                        <Button fullWidth variant="secondary" onClick={(event) => processAction(null)}>
-                            {LocalizeText('cancel')}
-                        </Button>
-                        <Button fullWidth variant="success" onClick={(event) => processAction('save_bot_motto')}>
-                            {LocalizeText('save')}
-                        </Button>
-                    </div>
-                </Column>
-            )}
+            <div className="air-avatar-menu-buttons">
+                {mode === MODE_NORMAL && canControl && (
+                    <>
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_ALL) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('donate_to_all')}>
+                                {localizeWithFallback('avatar.widget.donate_to_all', 'Serve everyone')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DONATE_TO_USER) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('donate_to_user')}>
+                                {localizeWithFallback('avatar.widget.donate_to_user', 'Serve me')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_NAME) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('change_bot_name')}>
+                                {LocalizeText('avatar.widget.change_bot_name')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.CHANGE_BOT_MOTTO) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('change_bot_motto')}>
+                                {localizeWithFallback('avatar.widget.change_bot_motto', 'Change motto')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DRESS_UP) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('dress_up')}>
+                                {LocalizeText('avatar.widget.dress_up')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.RANDOM_WALK) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('random_walk')}>
+                                {LocalizeText('avatar.widget.random_walk')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.SETUP_CHAT) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('setup_chat')}>
+                                {LocalizeText('avatar.widget.setup_chat')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.DANCE) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('dance')}>{LocalizeText('avatar.widget.dance')}</ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.ROTATE) >= 0 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('rotate')}>
+                                {LocalizeText('tooltip.roombuilding.rotate')}
+                            </ContextMenuListItemView>
+                        )}
+                        {avatarInfo.botSkills.indexOf(BotSkillsEnum.NO_PICK_UP) === -1 && (
+                            <ContextMenuListItemView onClick={(event) => processAction('pick')}>{LocalizeText('avatar.widget.pick_up')}</ContextMenuListItemView>
+                        )}
+                    </>
+                )}
+                {mode === MODE_CHANGE_NAME && (
+                    <Column className="menu-item" gap={1} onClick={null}>
+                        <Text variant="white">{LocalizeText('bot.skill.name.configuration.new.name')}</Text>
+                        <OctaneInput
+                            maxLength={GetConfigurationValue<number>('bot.name.max.length', 15)}
+                            type="text"
+                            value={newName}
+                            onChange={(event) => setNewName(event.target.value)}
+                        />
+                        <div className="flex items-center justify-between gap-1">
+                            <Button fullWidth variant="secondary" onClick={(event) => processAction(null)}>
+                                {LocalizeText('cancel')}
+                            </Button>
+                            <Button fullWidth variant="success" onClick={(event) => processAction('save_bot_name')}>
+                                {LocalizeText('save')}
+                            </Button>
+                        </div>
+                    </Column>
+                )}
+                {mode === MODE_CHANGE_MOTTO && (
+                    <Column className="menu-item" gap={1} onClick={null}>
+                        <Text variant="white">{localizeWithFallback('bot.skill.name.configuration.new.motto', 'Choose a motto:')}</Text>
+                        <OctaneInput
+                            maxLength={GetConfigurationValue<number>('motto.max.length', 38)}
+                            type="text"
+                            value={newMotto}
+                            onChange={(event) => setNewMotto(event.target.value)}
+                        />
+                        <div className="flex items-center justify-between gap-1">
+                            <Button fullWidth variant="secondary" onClick={(event) => processAction(null)}>
+                                {LocalizeText('cancel')}
+                            </Button>
+                            <Button fullWidth variant="success" onClick={(event) => processAction('save_bot_motto')}>
+                                {LocalizeText('save')}
+                            </Button>
+                        </div>
+                    </Column>
+                )}
+            </div>
         </ContextMenuView>
     );
 };
