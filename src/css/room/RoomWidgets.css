@@ -1221,7 +1221,9 @@
     width: 13px;
     height: 10px;
     content: '';
-    background: url('../../assets/images/avatar-menu/air/arrow-down.png') center / 10px 5px no-repeat;
+    /* The icon-set arrows are 10x5 bitmaps drawn from the top-left of their icon box
+       (habbo_skin_icon_set_xml icon_6 / icon_7), not centred in it. */
+    background: url('../../assets/images/avatar-menu/air/arrow-down.png') left top / 10px 5px no-repeat;
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
