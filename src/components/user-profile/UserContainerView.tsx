@@ -1,6 +1,6 @@
 import { CreateLinkEvent, GetSessionDataManager, RelationshipStatusInfoMessageParser, RequestFriendComposer, UserProfileParser } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { FriendlyTime, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
+import { ensureBadgeLeaderboardLoaded, FriendlyTime, getBadgesRank, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
 import { badgeEmblemDefault } from '../../assets/images/leaderboard_badge';
 import { level as profileLevelIcon, rooms as profileRoomsIcon } from '../../assets/images/user-profile';
 import { LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../common';
@@ -24,6 +24,27 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
     const infostandOverlayClass = `overlay-${userProfile.overlayId ?? 'default'}`;
     const selectedBadges = useMemo(() => [...userBadges].slice(0, 5), [userBadges]);
     const totalBadges = (userProfile as any).totalBadges ?? userBadges.length ?? 0;
+
+    // Official badgeRank "(#N)" next to the badge count, read from the badge leaderboard.
+    const [badgesRank, setBadgesRank] = useState(-1);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        setBadgesRank(-1);
+
+        ensureBadgeLeaderboardLoaded()
+            .then((leaderboard) => {
+                if (!cancelled) setBadgesRank(getBadgesRank(leaderboard, userProfile.id));
+            })
+            .catch(() => {
+                if (!cancelled) setBadgesRank(-1);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [userProfile.id]);
 
     const addFriend = () => {
         setRequestSent(true);
@@ -149,6 +170,7 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                     <img className="octane-extended-profile__summary-icon octane-extended-profile__summary-icon--badge" src={badgeEmblemDefault} alt="" />
                     <span className="octane-extended-profile__summary-label">{LocalizeText('inventory.badges')}</span>
                     <span className="octane-extended-profile__summary-value">{totalBadges}</span>
+                    {badgesRank > 0 && <span className="octane-extended-profile__summary-rank">(#{badgesRank})</span>}
                 </button>
                 <button
                     className="octane-extended-profile__summary-button octane-extended-profile__summary-button--center"

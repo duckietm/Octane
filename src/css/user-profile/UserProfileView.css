@@ -313,6 +313,12 @@
   line-height: 1;
 }
 
+/* Official badgeRank "(#N)" after the badge count. */
+.octane-extended-profile__summary-rank {
+  margin-left: 3px;
+  line-height: 1;
+}
+
 .octane-extended-profile-window__body {
   background: #ece8dc;
 }
