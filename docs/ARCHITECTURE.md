@@ -474,16 +474,83 @@ The current branch (**`feat/react19-modernization`**, PR #2) has applied:
   dropped.
 - Main view: **4493 → 3544 lines** (−21%).
 
-### `useCatalog` decomposition (in progress)
+### `useCatalog` decomposition (done)
 
-The 1100-line god-hook owns the catalog page tree, current page,
-offer selection, and a long tail of secondary fetches. Decomposition
-strategy from ARCHITECTURE.md proposal #4 step 1: lift the
-session-stable read-only fetches to TanStack queries first, then
-split the remaining state ownership into `useCatalogData` /
-`useCatalogUiState` / `useCatalogActions`.
+The 1100-line god-hook owning the catalog page tree, current page,
+offer selection, and a long tail of secondary fetches has been
+decomposed along the lines proposed in ARCHITECTURE.md proposal #4:
+the index and the pages moved to TanStack queries, the remaining UI
+state moved to a Zustand store, side effects moved to a dedicated
+headless hook, and the two internal request coordinators that used
+to paper over the lack of a selector were deleted outright.
 
-Status after this round of work:
+- **Store** — `src/hooks/catalog/catalogStore.ts` holds the UI-owned
+  slice: `isVisible`, `pageId`, `previousPageId`, `currentType`,
+  `activeNodes`, `navigationHidden`, `purchaseOptions`,
+  `catalogPlaceMultipleObjects`, `pendingOfferId`, `pageOverride`
+  (search/admin override of the page shown independent of `pageId`)
+  and their actions, including `consumePendingOffer` and
+  `setSearchResult`.
+- **Queries** — `src/hooks/catalog/useCatalogQueries.ts` owns the
+  index and the pages as TanStack queries:
+    - `useCatalogIndexQuery(type, enabled)` — key
+      `['octane', 'catalog', 'index', type]` (`type` is the catalog
+      type, `NORMAL` or `BUILDERS_CLUB`), `staleTime: Infinity` (the
+      tree is only ever invalidated explicitly), prefetchable idle via
+      `prefetchCatalogIndex`. A publish or an admin edit *invalidates*
+      the index and the pages (`invalidateCatalogIndex` /
+      `invalidateCatalogPages` / `invalidateCatalogPage`) so they
+      refetch on next use; only the authenticated → unauthenticated
+      transition *drops* the cache outright, via `dropCatalogCache`.
+    - `useCatalogPageQuery(type, pageId, enabled)` — key
+      `['octane', 'catalog', 'page', type, pageId]`, `staleTime: 30_000`,
+      `keepPreviousData` so switching pages renders the cached page
+      immediately instead of a loading state, a 10 s request timeout
+      surfaced as `catalogLoadError` with `retryCurrentPage`, and
+      invalidation on purchase / sold-out / admin reorder.
+    - Cache helpers (`cloneCachedCatalogPages`, `readCatalogIndex`,
+      `selectCatalogIndex`, `selectCatalogPage`,
+      `invalidateCatalogIndex`, `invalidateCatalogPage(s)`,
+      `refetchCatalogPage`) are exported for the effects hook and for
+      tests.
+- **Effects** — `src/hooks/catalog/useCatalogEffects.ts` is the single
+  headless hook mounted once via `CatalogEffectsHost` in
+  `src/components/catalog/CatalogView.tsx`. It owns every
+  subscription that used to live inside the god-hook: server message
+  listeners (page/index updates, purchase, sold-out), the
+  `catalog/open/<pageId>` deep-link consumption
+  (`pendingOfferId`/`consumePendingOffer`), the mover/previewer flow,
+  and the localization-refresh listener (`bumpLocalizationVersion`,
+  re-clones the cached pages without a network round trip). It does
+  **not** own an admin listener: `CatalogAdminContext` calls
+  `refreshIndex()` / `refreshCurrentPage()` from `useCatalogActions`
+  directly on a successful admin edit, rather than dispatching a
+  `window` event for the effects hook to pick up.
+- **Filters** — `src/hooks/catalog/useCatalog.ts` is now a short file
+  exposing three filters, each reading its slice of the store with
+  `useShallow` so a consumer of one slice does not re-render on a
+  change to another:
+    - `useCatalogData()` — server-driven read-only slice, sourced from
+      the queries (`rootNode`, `offersToNodes`, `currentPage`,
+      `currentOffer`, `frontPageItems`, `searchResult`,
+      `roomPreviewer`, `isBusy`, `catalogLoadError`,
+      `catalogLocalizationVersion`, Builders Club counters + timers).
+    - `useCatalogUiState()` — the store's UI slice + writers.
+    - `useCatalogActions()` — imperative operations
+      (`openCatalogByType`, `toggleCatalogByType`, `activateNode`,
+      `openPageBy{Id,Name,OfferId}`, `requestOfferToMover`,
+      `selectCatalogOffer`, `getNodeBy{Id,Name}`,
+      `getBuilderFurniPlaceableStatus`, `retryCurrentPage`).
+- **`useSharedHook` is no longer used by the catalog** — the shared
+  Zustand-vanilla-store + registry pattern used for the coordinator
+  era has been replaced end to end by `catalogStore.ts` +
+  `useCatalogQueries.ts` + `useCatalogEffects.ts`.
+- **The two request coordinators were deleted**:
+  `createCatalogIndexRequestCoordinator`,
+  `createCatalogIndexPrewarmController` and
+  `createCatalogPageRequestCorrelation` (and their three `describe`
+  blocks) no longer exist; the queries' own cache/staleness rules and
+  the effects hook's listeners replace what they worked around.
 
 | Fetch | Migrated to |
 |---|---|
@@ -493,43 +560,14 @@ Status after this round of work:
 | SellablePetPalettes (per breed) | `useSellablePetPalette(breed)` |
 | MarketplaceConfiguration | `useMarketplaceConfiguration()` |
 | ClubGiftInfo | `useClubGifts()` (with `useOctaneEventInvalidator`) |
-| CatalogPagesList / CatalogPage | **deferred** — core state slice (rootNode / offersToNodes / currentPage), needs its own split-out store |
-| BuildersClubFurniCount / SubscriptionStatus | **deferred** — read by the internal `getBuilderFurniPlaceableStatus` logic, moves with the data/actions split |
+| CatalogPagesList / CatalogPage | `useCatalogIndexQuery` / `useCatalogPageQuery` |
+| BuildersClubFurniCount / SubscriptionStatus | store, written by `useCatalogEffects` |
 
-**Helper extraction + filter split both landed.** The 1100-line hook
-now has its dependency-free logic in
-`src/hooks/catalog/useCatalog.helpers.ts` and exposes three public
-filters built on top of the same Zustand-backed shared source:
-
-- `useCatalogData()` — server-driven read-only slice (`rootNode`,
-  `offersToNodes`, `currentPage`, `currentOffer`, `frontPageItems`,
-  `searchResult`, `roomPreviewer`, `isBusy`,
-  `catalogLocalizationVersion`, Builders Club counters + timers).
-- `useCatalogUiState()` — UI ephemeral state + writers
-  (`isVisible`, `pageId`, `previousPageId`, `currentType`,
-  `activeNodes`, `navigationHidden`, `purchaseOptions`,
-  `catalogPlaceMultipleObjects`, plus all the `set*` writers,
-  including the ones that mutate the data slice on page / offer /
-  search-result selection).
-- `useCatalogActions()` — imperative operations
-  (`openCatalogByType`, `toggleCatalogByType`, `activateNode`,
-  `openPageBy{Id,Name,OfferId}`, `requestOfferToMover`,
-  `selectCatalogOffer`, `getNodeBy{Id,Name}`,
-  `getBuilderFurniPlaceableStatus`).
-
-The internal store is named `useCatalogStore` and is **not exported**;
-the three public entry points (`useCatalogData` / `useCatalogUiState`
-/ `useCatalogActions`) all funnel into the same `useSharedHook`
-store, so listeners + state register once. All 48 historical
-consumers have been migrated to the targeted filters; the deprecated
-`useCatalog` shim has been removed.
-
-Pure helpers in `useCatalog.helpers.ts`:
+Pure helpers in `useCatalog.helpers.ts` (unchanged by this round —
+still dependency-free and coordinator-free):
 
 - `normalizeCatalogType(type?)` — coerce the optional catalog type
   back to `NORMAL` / `BUILDER`.
-- `getOfferProductKeys(offer)` — canonical lookup keys for the
-  resolved-offer cache.
 - `findNodeById` / `findNodeByName` — DFS over the catalog tree,
   root excluded.
 - `getNodesByOfferIdFromMap(offerId, map, onlyVisible)` — used to be
@@ -545,7 +583,7 @@ Pure helpers in `useCatalog.helpers.ts`:
 
 `useCatalog.ts` now imports these instead of defining them inline
 (net **−75 LOC**). Co-located test file `src/hooks/catalog/useCatalog.helpers.test.ts` covers
-all six helpers with 34 cases (tree depth + offerId mapping,
+all five helpers with 30 cases (tree depth + offerId mapping,
 node lookups including root exclusion, the limit-reached / guild-admin
 fallback / visitors-in-room paths of the placement helper, and the
 empty-map / partial-bucket branches of the offer lookup).
@@ -554,7 +592,7 @@ empty-map / partial-bucket branches of the offer lookup).
 - Vitest 3 + jsdom + `@testing-library/react` + `@testing-library/jest-dom`
   configured. Separate `vitest.config.mts` so the runner doesn't drag in
   the renderer SDK aliases from `vite.config.mjs`.
-- **178 cases passing** across 13 test files, **co-located under `src/`** next to each subject (no separate `tests/` tree). Pure-module suites:
+- **1909 of 1910 cases passing** across 351 of 353 test files (full `src/` suite; the two remaining failures — a pixi.js resolution error in `FloorplanEditorView.test.tsx` and a static-text assertion in `NavigatorAirParity.test.ts` — are pre-existing and unrelated to the catalog work below). The catalog-scoped slice (`src/hooks/catalog src/components/catalog`) is 69 test files / 294 cases, up from the 66 files / 270 cases baseline: the three coordinator `describe` blocks (`createCatalogIndexRequestCoordinator`, `createCatalogIndexPrewarmController`, `createCatalogPageRequestCorrelation`) were removed and replaced by the query/store/effects test files added in this decomposition. Tests are **co-located under `src/`** next to each subject (no separate `tests/` tree). Pure-module suites:
     - `WiredCreatorTools.helpers.test.ts` (18) — formatters + snapshot
       factory.
     - `navigatorRoomCreatorStore.test.ts` (4) — Zustand store invariants
@@ -574,9 +612,9 @@ empty-map / partial-bucket branches of the offer lookup).
       bail-out branches (state-not-AvatarInfoUser, mismatched
       user/roomIndex, equal-after-dedup) + the figure / favorite-group
       apply paths.
-    - `useCatalog.helpers.test.ts` (34) — catalog pure helpers
+    - `useCatalog.helpers.test.ts` (30) — catalog pure helpers
       extracted out of the god-hook: `normalizeCatalogType`,
-      `getOfferProductKeys`, `findNodeById` / `findNodeByName` (with
+      `findNodeById` / `findNodeByName` (with
       the root-exclusion guard), `getNodesByOfferIdFromMap` (with
       the partial-visible fallback), `buildCatalogNodeTree` (tree
       depth + offerId index), and the full decision tree of

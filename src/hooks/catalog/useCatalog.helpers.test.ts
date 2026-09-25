@@ -1,212 +1,30 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { BuilderFurniPlaceableStatus } from '../../api/catalog/BuilderFurniPlaceableStatus';
 import { CatalogType } from '../../api/catalog/CatalogType';
-import * as catalogHelpers from './useCatalog.helpers';
 import {
     buildCatalogNodeTree,
-    createCatalogPageRequestCorrelation,
     findNodeById,
     findNodeByName,
     getNodesByOfferIdFromMap,
-    getOfferProductKeys,
-    isCurrentCatalogPageResponse,
     normalizeCatalogType,
-    resolveBuilderFurniPlaceableStatus
+    resolveBuilderFurniPlaceableStatus,
+    restoreCatalogActivePath
 } from './useCatalog.helpers';
-
-describe('catalog index request coordinator', () => {
-    it('sends the first request and suppresses a duplicate while it is in flight', () => {
-        const sentTypes: string[] = [];
-        const coordinator = (catalogHelpers.createCatalogIndexRequestCoordinator as any)((type: string) => sentTypes.push(type), 10_000, () => 1_000);
-
-        expect(coordinator).toBeDefined();
-        if (!coordinator) return;
-
-        expect(coordinator.request(CatalogType.NORMAL)).toBe(true);
-        expect(coordinator.request(CatalogType.NORMAL)).toBe(false);
-        expect(sentTypes).toEqual([CatalogType.NORMAL]);
-    });
-
-    it('allows another request after the matching response completes', () => {
-        const sentTypes: string[] = [];
-        const coordinator = (catalogHelpers.createCatalogIndexRequestCoordinator as any)((type: string) => sentTypes.push(type), 10_000, () => 1_000);
-
-        expect(coordinator).toBeDefined();
-        if (!coordinator) return;
-
-        coordinator.request(CatalogType.NORMAL);
-        coordinator.complete(CatalogType.NORMAL);
-
-        expect(coordinator.request(CatalogType.NORMAL)).toBe(true);
-        expect(sentTypes).toEqual([CatalogType.NORMAL, CatalogType.NORMAL]);
-    });
-
-    it('retries an index request after the in-flight timeout', () => {
-        let now = 1_000;
-        const sentTypes: string[] = [];
-        const coordinator = (catalogHelpers.createCatalogIndexRequestCoordinator as any)((type: string) => sentTypes.push(type), 10_000, () => now);
-
-        expect(coordinator).toBeDefined();
-        if (!coordinator) return;
-
-        coordinator.request(CatalogType.NORMAL);
-        now = 11_000;
-
-        expect(coordinator.request(CatalogType.NORMAL)).toBe(true);
-        expect(sentTypes).toEqual([CatalogType.NORMAL, CatalogType.NORMAL]);
-    });
-});
-
-describe('catalog index prewarm controller', () => {
-    // The login prewarm is deferred to an idle slot so it cannot land in the
-    // middle of authentication and room entry; run those callbacks on demand.
-    let idleCallbacks: Array<() => void> = [];
-
-    beforeEach(() => {
-        idleCallbacks = [];
-        (globalThis as any).requestIdleCallback = (cb: () => void) => {
-            idleCallbacks.push(cb);
-
-            return idleCallbacks.length;
-        };
-    });
-
-    afterEach(() => {
-        delete (globalThis as any).requestIdleCallback;
-    });
-
-    const runIdle = () => {
-        const pending = idleCallbacks;
-
-        idleCallbacks = [];
-        pending.forEach(cb => cb());
-    };
-
-    it('prewarms the current catalog once the thread is idle after authenticating', () => {
-        const requestedTypes: string[] = [];
-        const controller = (catalogHelpers as any).createCatalogIndexPrewarmController((type: string) => requestedTypes.push(type));
-
-        expect(controller).toBeDefined();
-        if (!controller) return;
-
-        controller.update({ authenticated: false, visible: false, hasIndex: false, catalogType: CatalogType.NORMAL });
-        controller.update({ authenticated: true, visible: false, hasIndex: false, catalogType: CatalogType.NORMAL });
-        controller.update({ authenticated: true, visible: false, hasIndex: true, catalogType: CatalogType.NORMAL });
-
-        // nothing on the critical path: authentication and room entry come first
-        expect(requestedTypes).toEqual([]);
-
-        runIdle();
-
-        expect(requestedTypes).toEqual([CatalogType.NORMAL]);
-    });
-
-    it('refreshes once on each opening even when the prewarmed index is available', () => {
-        const requestedTypes: string[] = [];
-        const controller = (catalogHelpers as any).createCatalogIndexPrewarmController((type: string) => requestedTypes.push(type));
-
-        expect(controller).toBeDefined();
-        if (!controller) return;
-
-        controller.update({ authenticated: true, visible: false, hasIndex: false, catalogType: CatalogType.NORMAL });
-        runIdle();
-        requestedTypes.length = 0;
-        // opening is a request the user is waiting on, so it stays synchronous
-        controller.update({ authenticated: true, visible: true, hasIndex: true, catalogType: CatalogType.NORMAL });
-        controller.update({ authenticated: true, visible: true, hasIndex: true, catalogType: CatalogType.NORMAL });
-        controller.update({ authenticated: true, visible: false, hasIndex: true, catalogType: CatalogType.NORMAL });
-        controller.update({ authenticated: true, visible: true, hasIndex: true, catalogType: CatalogType.NORMAL });
-
-        expect(requestedTypes).toEqual([CatalogType.NORMAL, CatalogType.NORMAL]);
-    });
-
-    it('prewarms again after reconnecting', () => {
-        const requestedTypes: string[] = [];
-        const controller = (catalogHelpers as any).createCatalogIndexPrewarmController((type: string) => requestedTypes.push(type));
-
-        expect(controller).toBeDefined();
-        if (!controller) return;
-
-        controller.update({ authenticated: true, visible: false, hasIndex: false, catalogType: CatalogType.NORMAL });
-        controller.update({ authenticated: false, visible: false, hasIndex: false, catalogType: CatalogType.NORMAL });
-        controller.update({ authenticated: true, visible: false, hasIndex: false, catalogType: CatalogType.NORMAL });
-
-        runIdle();
-
-        expect(requestedTypes).toEqual([CatalogType.NORMAL, CatalogType.NORMAL]);
-    });
-});
 
 describe('restoreCatalogActivePath', () => {
     it('rebinds the active path to nodes from a refreshed catalog tree', () => {
-        const restore = (catalogHelpers as any).restoreCatalogActivePath;
-        expect(restore).toBeTypeOf('function');
-        if (!restore) return;
-
         const root: any = { pageId: -1, pageName: 'root', children: [] };
         const parent: any = { pageId: 10, pageName: 'parent', parent: root, children: [], activate: vi.fn(), open: vi.fn() };
         const child: any = { pageId: 11, pageName: 'child', parent, children: [], activate: vi.fn(), open: vi.fn() };
         root.children = [parent];
         parent.children = [child];
 
-        const restored = restore(root, 11);
+        const restored = restoreCatalogActivePath(root, 11);
 
         expect(restored).toEqual([parent, child]);
         expect(parent.activate).toHaveBeenCalledOnce();
         expect(child.activate).toHaveBeenCalledOnce();
         expect(parent.open).toHaveBeenCalledOnce();
-    });
-});
-
-describe('catalog page request correlation', () => {
-    afterEach(() => vi.useRealTimers());
-
-    it('accepts only the response for the page that is still requested', () => {
-        expect(isCurrentCatalogPageResponse(12, 12)).toBe(true);
-        expect(isCurrentCatalogPageResponse(12, 9)).toBe(false);
-    });
-
-    it('matches an immediate response before React can render the requested page id', () => {
-        const correlation = createCatalogPageRequestCorrelation();
-
-        correlation.request(12);
-
-        expect(correlation.matches(12)).toBe(true);
-        expect(correlation.matches(9)).toBe(false);
-    });
-
-    it('reports the timeout but still accepts a late response for the same page', () => {
-        vi.useFakeTimers();
-        const correlation = createCatalogPageRequestCorrelation();
-        let timedOutPageId = -1;
-
-        correlation.request(
-            12,
-            (pageId) => {
-                timedOutPageId = pageId;
-            },
-            5000
-        );
-        vi.advanceTimersByTime(5000);
-
-        expect(timedOutPageId).toBe(12);
-        expect(correlation.matches(12)).toBe(true);
-        expect(correlation.matches(9)).toBe(false);
-        expect(correlation.complete(12)).toBe(true);
-        expect(correlation.complete(12)).toBe(false);
-    });
-
-    it('completes only the current request and cancels its timeout', () => {
-        vi.useFakeTimers();
-        const correlation = createCatalogPageRequestCorrelation();
-        let timeoutCount = 0;
-
-        correlation.request(12, () => timeoutCount++, 5000);
-
-        expect(correlation.complete(9)).toBe(false);
-        expect(correlation.complete(12)).toBe(true);
-        vi.advanceTimersByTime(5000);
-        expect(timeoutCount).toBe(0);
     });
 });
 
@@ -230,50 +48,6 @@ describe('normalizeCatalogType', () => {
     it('returns NORMAL for any unknown string', () => {
         expect(normalizeCatalogType('something_else')).toBe(CatalogType.NORMAL);
         expect(normalizeCatalogType('')).toBe(CatalogType.NORMAL);
-    });
-});
-
-// ---------------------------------------------------------------------------
-// getOfferProductKeys
-// ---------------------------------------------------------------------------
-
-describe('getOfferProductKeys', () => {
-    const makeOffer = (overrides: any = {}) =>
-        ({
-            product: {
-                productType: 'floor',
-                productClassId: 42,
-                furnitureData: { className: 'chair_basic' },
-                ...overrides
-            }
-        }) as any;
-
-    it('returns both id and className keys when the product has both', () => {
-        expect(getOfferProductKeys(makeOffer())).toEqual(['floor:id:42', 'floor:class:chair_basic']);
-    });
-
-    it('omits the id key when productClassId is negative', () => {
-        const offer = makeOffer({ productClassId: -1 });
-
-        expect(getOfferProductKeys(offer)).toEqual(['floor:class:chair_basic']);
-    });
-
-    it('omits the className key when furnitureData has no className', () => {
-        const offer = makeOffer({ furnitureData: { className: '' } });
-
-        expect(getOfferProductKeys(offer)).toEqual(['floor:id:42']);
-    });
-
-    it('returns an empty array when the offer has no product', () => {
-        expect(getOfferProductKeys(null)).toEqual([]);
-        expect(getOfferProductKeys(undefined)).toEqual([]);
-        expect(getOfferProductKeys({} as any)).toEqual([]);
-    });
-
-    it('returns an empty array when productType is missing', () => {
-        const offer = makeOffer({ productType: '' });
-
-        expect(getOfferProductKeys(offer)).toEqual([]);
     });
 });
 

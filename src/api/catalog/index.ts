@@ -25,5 +25,4 @@ export * from './PageLocalization';
 export * from './PlacedObjectPurchaseData';
 export * from './Product';
 export * from './ProductTypeEnum';
-export * from './RequestedPage';
 export * from './SearchResult';

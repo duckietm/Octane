@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
     handlers: new Map<string, (event: any) => void>(),
     loadHistory: vi.fn(),
     refresh: vi.fn(),
+    refreshCurrentPage: vi.fn(),
+    refreshIndex: vi.fn(),
     sendMessage: vi.fn(),
     useCatalogStudio: vi.fn()
 }));
@@ -19,6 +21,7 @@ vi.mock('../../api', () => ({
 }));
 
 vi.mock('../../hooks', () => ({
+    useCatalogActions: () => ({ refreshIndex: mocks.refreshIndex, refreshCurrentPage: mocks.refreshCurrentPage }),
     useCatalogUiState: () => ({ currentType: 'NORMAL' }),
     useMessageEvent: (eventType: any, handler: (event: any) => void) =>
         mocks.handlers.set(`${eventType?.name ?? 'anonymous'}-${mocks.handlers.size}`, handler),
@@ -106,6 +109,8 @@ describe('CatalogAdminProvider page mutations', () => {
         mocks.handlers.clear();
         mocks.loadHistory.mockReset();
         mocks.refresh.mockReset();
+        mocks.refreshCurrentPage.mockReset();
+        mocks.refreshIndex.mockReset();
         mocks.sendMessage.mockReset();
         studio = {
             session,
@@ -296,7 +301,6 @@ describe('CatalogAdminProvider page mutations', () => {
     });
 
     it('keeps public catalog refreshes for a legacy delete result', () => {
-        const dispatchEvent = vi.spyOn(window, 'dispatchEvent');
         studio = {
             ...studio,
             locks: {
@@ -308,7 +312,7 @@ describe('CatalogAdminProvider page mutations', () => {
         act(() => screen.getByText('delete').click());
         emitAdminResult({ success: true, message: 'Deleted', smartSaveResult: null });
 
-        expect(dispatchEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'catalog-admin-refresh-index' }));
-        dispatchEvent.mockRestore();
+        expect(mocks.refreshIndex).toHaveBeenCalledTimes(1);
+        expect(mocks.refreshCurrentPage).not.toHaveBeenCalled();
     });
 });

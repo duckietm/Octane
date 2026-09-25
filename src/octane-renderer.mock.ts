@@ -208,7 +208,16 @@ export class OctaneSprite extends StubClass {}
 export class OctaneRenderTexture extends StubClass {}
 export class OctaneTexture extends StubClass {}
 export class OctaneSoundEvent extends StubClass {}
-export class OctaneEvent extends StubClass {}
+// OctaneEvent — stores the `type` string passed to `super(type)` by every
+// concrete subclass so EventDispatcher below can route it to listeners
+// registered under that same type.
+export class OctaneEvent {
+    public readonly type: string;
+
+    constructor(type: string) {
+        this.type = type;
+    }
+}
 
 // MessageEvent — stores the handler so GetCommunication (below) can
 // route dispatches through mockEventDispatcher. Each concrete subclass
@@ -372,7 +381,35 @@ export const RoomEnterEffect = {
 
 export class RoomEngineObjectEvent extends StubClass {}
 export const CreateLinkEvent = vi.fn();
-export class EventDispatcher extends StubClass {}
+// EventDispatcher — real listener storage. UI_EVENT_DISPATCHER (`../../api`)
+// is a module-level `new EventDispatcher()` singleton, so hooks that dispatch
+// OctaneEvent subclasses through it (DispatchUiEvent / useUiEvent) need a
+// working addEventListener/removeEventListener/dispatchEvent, not a no-op
+// stub.
+export class EventDispatcher {
+    private listeners = new Map<string, Set<Function>>();
+
+    addEventListener(type: string, handler: Function): void {
+        let bucket = this.listeners.get(type);
+
+        if (!bucket) {
+            bucket = new Set();
+            this.listeners.set(type, bucket);
+        }
+
+        bucket.add(handler);
+    }
+
+    removeEventListener(type: string, handler: Function): void {
+        this.listeners.get(type)?.delete(handler);
+    }
+
+    dispatchEvent(event: { type: string }): void {
+        const bucket = this.listeners.get(event.type);
+
+        if (bucket) for (const handler of bucket) handler(event);
+    }
+}
 export class AdvancedMap extends StubClass {}
 export class AvatarFigureContainer extends StubClass {}
 export class Vector3d extends StubClass {}
@@ -1026,4 +1063,27 @@ export class ConditionDefinition extends Triggerable {
     get type() {
         return this._type;
     }
+}
+
+// Catalog store, queries and effects hook: the events they subscribe to and
+// the composers they send.
+export class BuildersClubFurniCountMessageEvent extends MessageEvent {}
+export class BuildersClubPlaceRoomItemMessageComposer extends StubClass {}
+export class BuildersClubPlaceWallItemMessageComposer extends StubClass {}
+export class BuildersClubQueryFurniCountMessageComposer extends StubClass {}
+export class BuildersClubSubscriptionStatusMessageEvent extends MessageEvent {}
+export class CatalogPageMessageEvent extends MessageEvent {}
+export class CatalogPagesListEvent extends MessageEvent {}
+export class CatalogPublishedMessageEvent extends MessageEvent {}
+export class FrontPageItem extends StubClass {}
+export class FurniturePlaceComposer extends StubClass {}
+export class GetCatalogIndexComposer extends StubClass {}
+export class GetCatalogPageComposer extends StubClass {}
+export class LegacyDataType extends StubClass {}
+export class LimitedEditionSoldOutEvent extends MessageEvent {}
+export class MarketplaceMakeOfferResult extends MessageEvent {}
+export class ProductOfferEvent extends MessageEvent {}
+export class PurchaseFromCatalogComposer extends StubClass {}
+export class RoomEngineObjectPlacedEvent extends StubClass {
+    static PLACED = 'REOPE_PLACED';
 }

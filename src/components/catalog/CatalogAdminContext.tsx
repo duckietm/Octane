@@ -17,7 +17,7 @@ import {
 } from '@octane/renderer';
 import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ICatalogNode, IPurchasableOffer, NotificationAlertType, SendMessageComposer } from '../../api';
-import { useCatalogUiState, useMessageEvent, useNotification } from '../../hooks';
+import { useCatalogActions, useCatalogUiState, useMessageEvent, useNotification } from '../../hooks';
 import { nextCatalogStudioOperationId } from './admin/studio/CatalogStudioOperationId';
 import { CatalogStudioHistoryGroup, CatalogStudioOfferSnapshot, CatalogStudioPageSnapshot } from './admin/studio/CatalogStudioTypes';
 import { useCatalogStudio } from './admin/studio/useCatalogStudio';
@@ -189,6 +189,7 @@ interface PendingCatalogAdminMutation {
 
 export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const { currentType } = useCatalogUiState();
+    const { refreshIndex, refreshCurrentPage } = useCatalogActions();
     const studio = useCatalogStudio();
     const [adminMode, setAdminMode] = useState(false);
     const [editingOffer, setEditingOfferState] = useState<IPurchasableOffer | null>(null);
@@ -458,7 +459,7 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
             setLastError(null);
 
             if (smartSaveResult.entityType === 'OFFER') {
-                window.dispatchEvent(new Event('catalog-admin-refresh-current-page'));
+                refreshCurrentPage();
             }
 
             return;
@@ -494,11 +495,11 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
             studio.loadHistory();
 
             if (action && PAGE_INDEX_REFRESH_ACTIONS.has(action)) {
-                window.dispatchEvent(new Event('catalog-admin-refresh-index'));
+                refreshIndex();
             }
 
             if (action && OFFER_REFRESH_ACTIONS.has(action)) {
-                window.dispatchEvent(new Event('catalog-admin-refresh-current-page'));
+                refreshCurrentPage();
             }
         }
     });

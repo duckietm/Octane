@@ -40,6 +40,16 @@ export interface OctaneQueryConfig<TParser extends IMessageEvent, TData> {
     enabled?: boolean;
     staleTime?: number;
     refetchOnMount?: boolean | 'always';
+    /**
+     * Forwarded to TanStack Query. `keepPreviousData` keeps the last page
+     * on screen while the next one loads.
+     */
+    placeholderData?: UseQueryOptions<TData, Error, TData>['placeholderData'];
+    /**
+     * Forwarded to TanStack Query. Overrides the app's default `retry: 1`
+     * when a query's own timeout already accounts for one round trip.
+     */
+    retry?: UseQueryOptions<TData, Error, TData>['retry'];
 }
 
 /**
@@ -56,14 +66,16 @@ export interface OctaneQueryConfig<TParser extends IMessageEvent, TData> {
  * - Identical concurrent calls (same `key`) are deduped.
  */
 export const useOctaneQuery = <TParser extends IMessageEvent, TData = TParser>(config: OctaneQueryConfig<TParser, TData>): UseQueryResult<TData> => {
-    const { key, request, parser, select, accept, timeoutMs = 15_000, enabled, staleTime, refetchOnMount } = config;
+    const { key, request, parser, select, accept, timeoutMs = 15_000, enabled, staleTime, refetchOnMount, placeholderData, retry } = config;
 
     const options: UseQueryOptions<TData, Error, TData> = {
         queryKey: key,
         queryFn: () => awaitOctaneResponse<TParser, TData>({ request, parser, select, accept, timeoutMs }),
         enabled,
         staleTime,
-        refetchOnMount
+        refetchOnMount,
+        placeholderData,
+        retry
     };
 
     return useQuery(options);
