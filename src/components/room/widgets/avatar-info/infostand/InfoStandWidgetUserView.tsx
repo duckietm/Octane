@@ -283,8 +283,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <>
                         <div className="octane-infostand__rule" />
                         <div className="octane-infostand__score">
-                            <span>{LocalizeText('infostand.text.achievement_score')}</span>
-                            <span>{avatarInfo.achievementScore}</span>
+                            {LocalizeText('infostand.text.achievement_score')} {avatarInfo.achievementScore}
                         </div>
                     </>
                 )}

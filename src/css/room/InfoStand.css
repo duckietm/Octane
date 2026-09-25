@@ -269,17 +269,23 @@
     image-rendering: var(--octane-pixel-art, pixelated);
   }
 
+  /* Achievement score: one Volter line, label and value. */
   .octane-infostand__score {
-    display: grid;
-    grid-template-rows: 15px 15px;
-    gap: 3px;
+    display: block;
     min-width: 170px;
+    height: 15px;
     color: #ffffff;
     font-family: Volter, monospace;
     font-size: 9px;
     font-weight: bold;
     line-height: 15px;
     -webkit-font-smoothing: none;
+  }
+
+  /* A user-picked prefix colour can be as dark as the card; the pixel outline
+     keeps it readable. A prefix effect sets its own shadow inline and wins. */
+  .octane-infostand__identity .prefix {
+    text-shadow: 1px 1px 0 #000000;
   }
 
   .body-image {
@@ -386,4 +392,25 @@
         color: #000;
         font-weight: bold;
     }
+}
+
+/* A chosen card background replaces the flat #3d3d3d the infostand is drawn
+   for: the name loses its grey patch, text gets the one-pixel black shadow the
+   client uses for text over images, and the rules stay visible. The default
+   card is untouched. */
+.octane-infostand.profile-card-background[class*="card-background-"] {
+  .octane-infostand__identity {
+    background: transparent;
+  }
+
+  .octane-infostand__identity,
+  .octane-infostand__motto-text,
+  .octane-infostand__score,
+  .text-white {
+    text-shadow: 1px 1px 0 #000000;
+  }
+
+  .octane-infostand__rule {
+    background: rgba(0, 0, 0, 0.45);
+  }
 }
