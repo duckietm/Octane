@@ -94,7 +94,9 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
     const capabilities = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
     const isAvatarPreview = capabilities.mode === 'avatar';
     const showRotationControls = isAvatarPreview || capabilities.mode === 'floor' || (capabilities.mode === 'wall' && capabilities.canRotate);
-    const canToggleZoom = isAvatarPreview && (capabilities.canZoomIn || capabilities.canZoomOut);
+    // A habbicon preview is shown at room scale only: the doubled avatar zoom would
+    // push the habbicon above the head out of the view.
+    const canToggleZoom = isAvatarPreview && productType !== ProductTypeEnum.HABBICON && (capabilities.canZoomIn || capabilities.canZoomOut);
     const canChangeAvatarAction = isAvatarPreview && capabilities.canUseAvatarActions && !!directionalPreviewer.cycleAvatarAction;
 
     useEffect(() => setAvatarZoomed(true), [directionalPreviewer, productType]);
