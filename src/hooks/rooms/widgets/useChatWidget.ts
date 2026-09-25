@@ -27,6 +27,7 @@ import {
     PlaySound,
     RoomChatFormatter
 } from '../../../api';
+import { getStoredChatTextSize } from '../../../components/room/widgets/chat-input/chatTextSize';
 import { SoundboardRoomMessageEvent } from '../../../events';
 import { useChatHistory } from './../../chat-history';
 import { useMessageEvent, useOctaneEvent, useUiEvent } from '../../events';
@@ -231,6 +232,7 @@ const useChatWidgetState = () => {
         );
         // The renderer adds bubbleWidthOverride to the chat event in Octane-Renderer#212; until that
         // lands the published event has no such field, so it is read as optional.
+        chatMessage.textSize = getStoredChatTextSize();
         chatMessage.bubbleWidthOverride = (event as RoomSessionChatEvent & { bubbleWidthOverride?: number }).bubbleWidthOverride ?? -1;
 
         if (outgoingTranslation) {
@@ -328,6 +330,7 @@ const useChatWidgetState = () => {
             null,
             null
         );
+        bubble.textSize = getStoredChatTextSize();
 
         setChatMessages((previous) => {
             const next = [...previous, bubble];
