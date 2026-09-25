@@ -66,8 +66,11 @@ describe('catalog purchase confirmation', () => {
 
         render(<CatalogPurchaseConfirmView offer={limitedOffer} quantity={1} onCancel={() => undefined} onConfirm={() => undefined} />);
 
-        expect(screen.getByText('7 / 100')).toBeInTheDocument();
         expect(screen.getByRole('status')).toHaveClass('octane-catalog-purchase-confirm-limited');
+        // The positioned span is the hook the dialog styles rely on to paint the line above the frame.
+        expect(screen.getByRole('status').firstElementChild?.tagName).toBe('SPAN');
+        expect(screen.getByRole('status')).toHaveTextContent(/^unique\.items\.left 7 \/ unique\.items\.number\.sold 100$/);
+        expect(screen.queryByText(/catalog\.limited\.items\.left/)).not.toBeInTheDocument();
     });
 
     it('traps keyboard focus and restores it to the opener when closed', () => {

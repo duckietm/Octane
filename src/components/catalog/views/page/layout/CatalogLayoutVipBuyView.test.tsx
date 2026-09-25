@@ -167,6 +167,16 @@ describe('club purchase layout', () => {
         expect(document.querySelector('.is-vip-page .octane-club-compact-mark')).not.toBeInTheDocument();
     });
 
+    it('renders the loyalty vip page as the VIP purchase page', () => {
+        setCurrentPage('loyalty_vip_buy');
+        renderLayout('loyalty_vip_buy');
+
+        expect(screen.queryByText('catalog.vip.item.header.months:1')).not.toBeInTheDocument();
+        expect(screen.getByText('catalog.vip.item.header.months:2')).toBeInTheDocument();
+        expect(document.querySelector('.is-vip-page .octane-club-vip-offers')).toBeInTheDocument();
+        expect(document.querySelector('.octane-club-columns')).not.toBeInTheDocument();
+    });
+
     it('renders separate HC and VIP offer groups on the club page', () => {
         setCurrentPage('club_buy');
         renderLayout('club_buy');

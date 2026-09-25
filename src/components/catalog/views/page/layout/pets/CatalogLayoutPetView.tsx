@@ -10,7 +10,7 @@ import {
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaCheck, FaLock, FaTimes } from 'react-icons/fa';
-import { DispatchUiEvent, GetPetAvailableColors, GetPetIndexFromLocalization, LocalizeText, SendMessageComposer } from '../../../../../../api';
+import { DispatchUiEvent, GetPetAvailableColors, GetPetIndexFromLocalization, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../../api';
 import { LayoutPetImageView } from '../../../../../../common';
 import { CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../../events';
 import { useCatalogData, useCatalogUiState, useMessageEvent, useOctaneEvent, useSellablePetPalette, useUiEvent, useUserDataSnapshot } from '../../../../../../hooks';
@@ -54,9 +54,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
     const isHc = clubLevel > 0;
     // A club_only breed is shown to everyone but only selectable/buyable by HC members.
     const isBreedLocked = (palette: { clubOnly?: boolean } | null | undefined) => !!palette?.clubOnly && !isHc;
-    // Prefer a hotel-provided text; fall back to a readable default when the key is unset.
-    const hcOnlyText = LocalizeText('catalog.pets.breed.hc_only');
-    const hcOnlyLabel = hcOnlyText === 'catalog.pets.breed.hc_only' ? 'Habbo Club only' : hcOnlyText;
+    const hcOnlyLabel = localizeWithFallback('catalog.pets.breed.hc_only', 'Habbo Club only');
     const [petAssetRefreshKey, setPetAssetRefreshKey] = useState(0);
     const petTypeName = petIndex >= 0 ? (GetRoomContentLoader().getPetNameForType(petIndex) ?? null) : null;
 

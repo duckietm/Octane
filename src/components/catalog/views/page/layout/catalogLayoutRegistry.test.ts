@@ -74,4 +74,8 @@ describe('catalog layout registry', () => {
         expect(isReadOnlyCatalogAdminLayout(null)).toBe(false);
         expect(isReadOnlyCatalogAdminLayout(undefined)).toBe(false);
     });
+    it('sells club days on the loyalty vip page instead of showing an information page', () => {
+        expect(getCatalogLayoutDefinition('loyalty_vip_buy')?.renderer).toBe('vipBuy');
+        expect(getCatalogLayoutDefinition('vip_buy')?.renderer).toBe('vipBuy');
+    });
 });

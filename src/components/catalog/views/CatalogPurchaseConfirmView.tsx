@@ -151,10 +151,9 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                 {isLimited && (
                     <div className="octane-catalog-purchase-confirm-limited" role="status">
                         <span>
-                            {LocalizeText('catalog.limited.items.left')}{' '}
-                            <strong>
-                                {offer.product.uniqueLimitedItemsLeft} / {offer.product.uniqueLimitedItemSeriesSize}
-                            </strong>
+                            {LocalizeText('unique.items.left')} <strong>{offer.product.uniqueLimitedItemsLeft}</strong>
+                            {' / '}
+                            {LocalizeText('unique.items.number.sold')} <strong>{offer.product.uniqueLimitedItemSeriesSize}</strong>
                         </span>
                     </div>
                 )}

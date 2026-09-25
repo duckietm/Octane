@@ -1027,3 +1027,6 @@ export class ConditionDefinition extends Triggerable {
         return this._type;
     }
 }
+
+// Club gifts: the selection composer carries the chosen gift's localization id.
+export class SelectClubGiftComposer extends RecordingComposer {}

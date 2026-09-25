@@ -41,12 +41,13 @@ import { CatalogClubUpgradeButton } from './CatalogClubUpgradeButton';
 import { canPurchaseCatalogOffer } from './catalogPurchase.helpers';
 
 interface CatalogPurchaseWidgetViewProps {
+    disabled?: boolean;
     noGiftOption?: boolean;
     purchaseCallback?: () => void;
 }
 
 export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (props) => {
-    const { noGiftOption = false, purchaseCallback = null } = props;
+    const { disabled = false, noGiftOption = false, purchaseCallback = null } = props;
     const [builderPlaceableRefreshTick, setBuilderPlaceableRefreshTick] = useState(0);
     const habbicons = useHabbiconCatalog();
     const [purchaseWillBeGift, setPurchaseWillBeGift] = useState(false);
@@ -327,6 +328,9 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
     const isLimitedEditionOffer = !!(currentOffer.product && currentOffer.product.isUniqueLimitedItem);
     const isOfferUnavailable = !canPurchaseCatalogOffer(currentOffer);
+    // A club-locked offer replaces the purchase buttons with the club invitation; either
+    // button would only open the club centre for a player below the offer's club level.
+    const isClubLocked = !isBuildersClubOffer && !isOfferUnavailable && !habbiconOwned && GetClubMemberLevel() < currentOffer.clubLevel;
 
     const PurchaseButton = () => {
         const standardButtonClassNames = ['octane-catalog-standard-button'];
@@ -394,11 +398,9 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
         if (isOfferUnavailable)
             return (
                 <button type="button" className={purchaseButtonClassNames.join(' ')} disabled>
-                    {currentOffer.isLazy ? LocalizeText('generic.loading') : LocalizeText('catalog.alert.not_available')}
+                    {currentOffer.isLazy ? LocalizeText('generic.loading') : LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
                 </button>
             );
-
-        if (GetClubMemberLevel() < currentOffer.clubLevel) return <CatalogClubUpgradeButton />;
 
         if (isLimitedSoldOut)
             return (
@@ -438,7 +440,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                     <button
                         type="button"
                         className={purchaseButtonClassNames.join(' ')}
-                        disabled={purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length)}
+                        disabled={disabled || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))}
                         onClick={() => {
                             if (catalogSkipPurchaseConfirmation && !isLimitedEditionOffer) {
                                 confirmationOpenRef.current = false;
@@ -463,11 +465,13 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
     return (
         <>
-            {!isBuildersClubOffer && !noGiftOption && !currentOffer.isRentOffer && (
+            {isClubLocked && <CatalogClubUpgradeButton />}
+            {!isClubLocked && !isBuildersClubOffer && !noGiftOption && !currentOffer.isRentOffer && (
                 <button
                     type="button"
                     className="octane-catalog-standard-button octane-catalog-standard-gift-button"
                     disabled={
+                        disabled ||
                         purchaseOptions.quantity > 1 ||
                         isOfferUnavailable ||
                         !currentOffer.giftable ||
@@ -486,7 +490,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                     {LocalizeText('catalog.purchase_confirmation.gift')}
                 </button>
             )}
-            <PurchaseButton />
+            {!isClubLocked && <PurchaseButton />}
             {confirmationOpenRef.current && (purchaseState === CatalogPurchaseState.CONFIRM || purchaseState === CatalogPurchaseState.PURCHASE) && (
                 <CatalogPurchaseConfirmView
                     isGift={purchaseWillBeGift}

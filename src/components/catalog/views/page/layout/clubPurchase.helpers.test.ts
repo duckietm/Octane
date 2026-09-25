@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getClubMembershipSummary, groupClubOffers } from './clubPurchase.helpers';
+import { getClubMembershipSummary, groupClubOffers, isVipPurchaseLayout } from './clubPurchase.helpers';
 
 const offer = (offerId: number, vip: boolean) => ({ offerId, vip });
 
@@ -10,6 +10,16 @@ describe('club purchase rules', () => {
         expect(groups.hc).toEqual([]);
         expect(groups.vip.map((entry) => entry.offerId)).toEqual([2, 3]);
         expect(groups.visible.map((entry) => entry.offerId)).toEqual([2, 3]);
+    });
+
+    it('treats the loyalty vip page like the VIP purchase page', () => {
+        const groups = groupClubOffers('loyalty_vip_buy', [offer(1, false), offer(2, true)]);
+
+        expect(groups.hc).toEqual([]);
+        expect(groups.visible.map((entry) => entry.offerId)).toEqual([2]);
+        expect(isVipPurchaseLayout('loyalty_vip_buy')).toBe(true);
+        expect(isVipPurchaseLayout('vip_buy')).toBe(true);
+        expect(isVipPurchaseLayout('club_buy')).toBe(false);
     });
 
     it('keeps HC and VIP offers separate on the club purchase page', () => {
