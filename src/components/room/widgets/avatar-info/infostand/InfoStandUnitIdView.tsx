@@ -27,7 +27,7 @@ export const InfoStandUnitIdView: FC<InfoStandUnitIdViewProps> = ({ id: webId, o
 
     return (
         <>
-            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+            <div className="octane-infostand__rule" />
             <div className="flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 text-[#7ec8e3]">
                     <path

@@ -1,9 +1,9 @@
 import { CreateLinkEvent, PetRespectComposer, PetType } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
 import { ConvertSeconds, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutCounterTimeView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { useRoom, useSessionInfo } from '../../../../../hooks';
+import { InfoStandHeaderView } from './InfoStandHeaderView';
 import { InfoStandUnitIdView } from './InfoStandUnitIdView';
 
 // TypeScript interface for AvatarInfoPet
@@ -41,16 +41,11 @@ interface InfoStandWidgetPetViewProps {
 
 const PetHeader: FC<{ name: string; petType: number; petBreed: number; onClose: () => void }> = ({ name, petType, petBreed, onClose }) => (
     <div className="flex flex-col gap-1">
-        <Flex alignItems="center" gap={1} justifyContent="between">
-            <Text small wrap variant="white">
-                {name}
-            </Text>
-            <FaTimes className="cursor-pointer fa-icon" onClick={onClose} aria-label={LocalizeText('generic.close')} title={LocalizeText('generic.close')} />
-        </Flex>
+        <InfoStandHeaderView name={name} onClose={onClose} />
         <Text small wrap variant="white">
             {LocalizeText(`pet.breed.${petType}.${petBreed}`)}
         </Text>
-        <hr className="m-0" />
+        <div className="octane-infostand__rule" />
     </div>
 );
 
@@ -62,7 +57,7 @@ const MonsterplantStats: FC<{
     <>
         <Column center gap={1}>
             <LayoutPetImageView direction={4} figure={avatarInfo.petFigure} posture={avatarInfo.posture} />
-            <hr className="m-0" />
+            <div className="octane-infostand__rule" />
         </Column>
         <div className="flex flex-col gap-2">
             {!avatarInfo.dead && (
@@ -112,13 +107,11 @@ const MonsterplantStats: FC<{
                 </Text>
                 <LayoutRarityLevelView className="top-2 inset-e-2" level={avatarInfo.rarityLevel} />
             </Column>
-            <hr className="m-0" />
+            <div className="octane-infostand__rule" />
         </div>
         <div className="flex flex-col gap-1">
-            <Text small wrap variant="white">
-                {LocalizeText('pet.age', ['age'], [avatarInfo.age.toString()])}
-            </Text>
-            <hr className="m-0" />
+            <div className="octane-infostand__score">{LocalizeText('pet.age', ['age'], [avatarInfo.age.toString()])}</div>
+            <div className="octane-infostand__rule" />
         </div>
     </>
 );
@@ -179,16 +172,12 @@ const RegularPetStats: FC<{ avatarInfo: AvatarInfoPet }> = ({ avatarInfo }) => (
                     </Column>
                 </Column>
             </div>
-            <hr className="m-0" />
+            <div className="octane-infostand__rule" />
         </div>
         <div className="flex flex-col gap-1">
-            <Text small wrap variant="white">
-                {LocalizeText('infostand.text.petrespect', ['count'], [avatarInfo.respect.toString()])}
-            </Text>
-            <Text small wrap variant="white">
-                {LocalizeText('pet.age', ['age'], [avatarInfo.age.toString()])}
-            </Text>
-            <hr className="m-0" />
+            <div className="octane-infostand__score">{LocalizeText('infostand.text.petrespect', ['count'], [avatarInfo.respect.toString()])}</div>
+            <div className="octane-infostand__score">{LocalizeText('pet.age', ['age'], [avatarInfo.age.toString()])}</div>
+            <div className="octane-infostand__rule" />
         </div>
     </>
 );
