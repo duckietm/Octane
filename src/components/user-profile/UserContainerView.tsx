@@ -11,10 +11,12 @@ interface UserContainerViewProps {
     userBadges?: string[];
     userRelationships?: RelationshipStatusInfoMessageParser;
     onOpenRooms?: () => void;
+    /** Closes the profile window (the official find-friends link closes it). */
+    onClose?: () => void;
 }
 
 export const UserContainerView: FC<UserContainerViewProps> = (props) => {
-    const { userProfile = null, userBadges = [], userRelationships = null, onOpenRooms = null } = props;
+    const { userProfile = null, userBadges = [], userRelationships = null, onOpenRooms = null, onClose = null } = props;
 
     const [requestSent, setRequestSent] = useState(userProfile.requestSent);
     const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
@@ -127,7 +129,7 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                         }}
                     />
                     <p className="octane-extended-profile__relationships-label">{LocalizeText('extendedprofile.relstatus')}</p>
-                    {userRelationships && <RelationshipsContainerView relationships={userRelationships} />}
+                    {userRelationships && <RelationshipsContainerView relationships={userRelationships} onClose={onClose} />}
                     {!userRelationships && (
                         <Text small variant="muted">
                             {LocalizeText('generic.loading')}
