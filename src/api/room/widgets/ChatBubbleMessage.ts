@@ -1,3 +1,5 @@
+import type { ChatTextSize } from '../../../components/room/widgets/chat-input/chatTextSize';
+
 export class ChatBubbleMessage {
     public static BUBBLE_COUNTER: number = 0;
 
@@ -17,6 +19,9 @@ export class ChatBubbleMessage {
     public displayOrder: string = 'icon-prefix-name';
     /** -1 follows the room setting; a wired message may ask for 0 wide, 1 normal or 2 thin. */
     public bubbleWidthOverride: number = -1;
+    // The chat text size when the message arrived. A bubble keeps it for life, so
+    // changing the setting never resizes bubbles already on screen.
+    public textSize: ChatTextSize = null;
     public originalText: string = '';
     public originalFormattedText: string = '';
     public translatedText: string = '';
