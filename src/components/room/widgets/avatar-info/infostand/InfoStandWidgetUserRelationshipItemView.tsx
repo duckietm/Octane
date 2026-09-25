@@ -1,6 +1,6 @@
 import { RelationshipStatusEnum, RelationshipStatusInfo } from '@octane/renderer';
 import { FC } from 'react';
-import { GetUserProfile, LocalizeText } from '../../../../../api';
+import { GetUserProfile, LocalizeText, localizeWithFallback } from '../../../../../api';
 import { Flex, Text } from '../../../../../common';
 
 interface InfoStandWidgetUserRelationshipsRelationshipItemViewProps {
@@ -22,7 +22,13 @@ export const InfoStandWidgetUserRelationshipsRelationshipItemView: FC<InfoStandW
                 <Text small variant="white" onClick={(event) => GetUserProfile(relationship.randomFriendId)}>
                     <u>{relationship.randomFriendName}</u>
                     {relationship.friendCount > 1 &&
-                        ' ' + LocalizeText(`extendedprofile.relstatus.others.${relationshipName}`, ['count'], [(relationship.friendCount - 1).toString()])}
+                        ' ' +
+                            localizeWithFallback(
+                                `infostand.relstatus.${relationshipName}.others`,
+                                LocalizeText(`extendedprofile.relstatus.others.${relationshipName}`, ['count'], [(relationship.friendCount - 1).toString()]),
+                                ['amount'],
+                                [(relationship.friendCount - 1).toString()]
+                            )}
                 </Text>
             </Flex>
         </div>

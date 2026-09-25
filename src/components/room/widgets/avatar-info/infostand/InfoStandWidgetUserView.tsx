@@ -1,4 +1,5 @@
 import {
+    CreateLinkEvent,
     GetSessionDataManager,
     RelationshipStatusInfoEvent,
     RelationshipStatusInfoMessageParser,
@@ -8,7 +9,7 @@ import {
     UserRelationshipsComposer
 } from '@octane/renderer';
 import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { AvatarInfoUser, CloneObject, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { AvatarInfoUser, CloneObject, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../api';
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
@@ -162,6 +163,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     if (!avatarInfo) return null;
 
     const isOwnUser = avatarInfo.type === AvatarInfoUser.OWN_USER;
+    const mottoMaxLength = GetConfigurationValue<number>('motto.max.length', 38);
     const showAchievementScore = GetConfigurationValue<boolean>('activity.point.display.enabled', true);
     const hasRelationships = !!relationships?.relationshipStatusMap.length;
 
@@ -267,24 +269,40 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                         </Text>
                     )}
                     {isOwnUser && isEditingMotto && (
-                        <input
-                            autoFocus={true}
-                            className="motto-input"
-                            maxLength={GetConfigurationValue<number>('motto.max.length', 38)}
-                            type="text"
-                            value={motto}
-                            onBlur={onMottoBlur}
-                            onChange={(event) => setMotto(event.target.value)}
-                            onKeyDown={onMottoKeyDown}
-                        />
+                        <>
+                            <input
+                                autoFocus={true}
+                                className="motto-input"
+                                maxLength={mottoMaxLength}
+                                type="text"
+                                value={motto}
+                                onBlur={onMottoBlur}
+                                onChange={(event) => setMotto(event.target.value)}
+                                onKeyDown={onMottoKeyDown}
+                            />
+                            <span className="octane-infostand__motto-count">
+                                {motto.length}/{mottoMaxLength}
+                            </span>
+                        </>
                     )}
                 </div>
                 {showAchievementScore && (
                     <>
                         <div className="octane-infostand__rule" />
-                        <div className="octane-infostand__score">
-                            {LocalizeText('infostand.text.achievement_score')} {avatarInfo.achievementScore}
-                        </div>
+                        {isOwnUser ? (
+                            <button
+                                type="button"
+                                className="octane-infostand__score octane-infostand__score-link"
+                                title={localizeWithFallback('achievements.title', 'Achievements')}
+                                onClick={() => CreateLinkEvent('achievements/show')}
+                            >
+                                {LocalizeText('infostand.text.achievement_score')} {avatarInfo.achievementScore}
+                            </button>
+                        ) : (
+                            <div className="octane-infostand__score">
+                                {LocalizeText('infostand.text.achievement_score')} {avatarInfo.achievementScore}
+                            </div>
+                        )}
                     </>
                 )}
                 {avatarInfo.carryItem > 0 && (

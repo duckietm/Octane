@@ -282,6 +282,30 @@
     -webkit-font-smoothing: none;
   }
 
+  .octane-infostand__score-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      color: #91c9ff;
+    }
+  }
+
+  /* Characters left in the motto while it is edited, in the score's Volter. */
+  .octane-infostand__motto-count {
+    flex: 0 0 auto;
+    align-self: center;
+    margin-left: 4px;
+    color: #aaaaaa;
+    font-family: Volter, monospace;
+    font-size: 9px;
+    font-weight: bold;
+    -webkit-font-smoothing: none;
+  }
+
   /* A user-picked prefix colour can be as dark as the card; the pixel outline
      keeps it readable. A prefix effect sets its own shadow inline and wins. */
   .octane-infostand__identity .prefix {
