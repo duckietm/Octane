@@ -62,6 +62,11 @@ export const OctanepediaView: FC<{}> = (props) => {
         const handle = (event: MouseEvent) => {
             if (!(event.target instanceof HTMLAnchorElement)) return;
 
+            // Only the links inside this window: the listener sits on the document, so without
+            // this check it opened every link in the client (the profile's unblock link, chat
+            // links...) in a new browser page, even with Octanepedia closed.
+            if (!elementRef.current?.contains(event.target)) return;
+
             event.preventDefault();
 
             const link = event.target.href;
