@@ -419,6 +419,11 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
 
             if (!parser.success || !smartSaveResult.entity || !smartSaveResult.historyGroup) {
                 setLastError(parser.message || smartSaveResult.code || 'Operation failed');
+
+                if (smartSaveResult.entityType === 'OFFER') {
+                    refreshCurrentPage();
+                }
+
                 return;
             }
 
@@ -458,7 +463,10 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
             }
             setLastError(null);
 
-            if (smartSaveResult.entityType === 'OFFER') {
+            if (smartSaveResult.entityType === 'PAGE') {
+                refreshIndex();
+                refreshCurrentPage();
+            } else {
                 refreshCurrentPage();
             }
 
@@ -482,6 +490,14 @@ export const CatalogAdminProvider: FC<{ children: ReactNode }> = ({ children }) 
 
             if (simpleAlert) {
                 simpleAlert(parser.message || 'Operation failed', NotificationAlertType.ALERT, null, null, 'Admin Error');
+            }
+
+            if (action && PAGE_INDEX_REFRESH_ACTIONS.has(action)) {
+                refreshIndex();
+            }
+
+            if (action && OFFER_REFRESH_ACTIONS.has(action)) {
+                refreshCurrentPage();
             }
         } else {
             setLastError(null);

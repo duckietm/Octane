@@ -6,6 +6,7 @@ import {
     buildPurchasableOffer,
     catalogIndexKey,
     catalogPageKey,
+    CatalogPageData,
     cloneCachedCatalogPages,
     dropCatalogCache,
     invalidateCatalogIndex,
@@ -13,7 +14,8 @@ import {
     isOfferAllowedInCatalogType,
     readCatalogIndex,
     selectCatalogIndex,
-    selectCatalogPage
+    selectCatalogPage,
+    setCachedCatalogPageOffers
 } from './useCatalogQueries';
 
 const productData = { id: 1, name: 'chair' } as any;
@@ -190,5 +192,38 @@ describe('cache helpers', () => {
         bindCatalogQueryClient(null);
         expect(() => invalidateCatalogIndex(CatalogType.NORMAL)).not.toThrow();
         expect(readCatalogIndex(CatalogType.NORMAL)).toBeUndefined();
+    });
+});
+
+describe('setCachedCatalogPageOffers', () => {
+    it('rewrites the cached page offers and keeps the rest of the entry', () => {
+        const client = new QueryClient();
+        bindCatalogQueryClient(client);
+        const a = buildPurchasableOffer(parserOffer(1), lookups);
+        const b = buildPurchasableOffer(parserOffer(2), lookups);
+        const page = new CatalogPage(3, 'default_3x3', new PageLocalization([], []), [a, b], false);
+        const items = [{ type: 1 }] as any;
+        client.setQueryData(catalogPageKey(CatalogType.NORMAL, 3), { page, frontPageItems: items, offerId: 7 });
+
+        expect(setCachedCatalogPageOffers(CatalogType.NORMAL, 3, [b, a])).toBe(true);
+
+        const after = client.getQueryData<CatalogPageData>(catalogPageKey(CatalogType.NORMAL, 3));
+        expect(after.page.offers.map((o) => o.offerId)).toEqual([2, 1]);
+        expect(after.page.pageId).toBe(3);
+        expect(after.page.layoutCode).toBe('default_3x3');
+        expect(after.frontPageItems).toBe(items);
+        expect(after.offerId).toBe(7);
+
+        bindCatalogQueryClient(null);
+    });
+
+    it('returns false for an uncached page and when no client is bound', () => {
+        const client = new QueryClient();
+        bindCatalogQueryClient(client);
+
+        expect(setCachedCatalogPageOffers(CatalogType.NORMAL, 99, [])).toBe(false);
+
+        bindCatalogQueryClient(null);
+        expect(setCachedCatalogPageOffers(CatalogType.NORMAL, 3, [])).toBe(false);
     });
 });

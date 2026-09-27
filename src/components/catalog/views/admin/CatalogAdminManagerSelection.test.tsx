@@ -15,6 +15,8 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../../../api', () => ({
     GetConfigurationValue: () => '',
+    GetProductDataForLocalization: () => ({}),
+    GetFurnitureData: () => ({}),
     LocalizeText: (key: string) => key,
     ProductTypeEnum: { FLOOR: 's', WALL: 'i' }
 }));

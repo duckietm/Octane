@@ -582,9 +582,13 @@ export const useCatalogStore = createOctaneStore<CatalogStoreState>((set, get) =
     refreshIndex: () => invalidateCatalogIndex(get().currentType),
 
     refreshCurrentPage: () => {
-        const { currentType, pageId } = get();
+        const { currentType, pageId, pageOverride } = get();
 
-        if (pageId > -1) invalidateCatalogPage(currentType, pageId);
+        if (pageId <= -1) return;
+
+        invalidateCatalogPage(currentType, pageId);
+
+        if (pageOverride && pageOverride.pageId === pageId) set({ pageOverride: null });
     },
 
     retryCurrentPage: () => {

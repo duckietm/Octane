@@ -530,6 +530,9 @@ export class CatalogStudioDiscardEvent extends MessageEvent {}
 export class CatalogStudioRestoreEvent extends MessageEvent {}
 export class CatalogStudioPreviewEvent extends MessageEvent {}
 export class CatalogStudioDocumentResultEvent extends MessageEvent {}
+export class CatalogAdminResultEvent extends MessageEvent {}
+export class CatalogAdminOfferDetailsEvent extends MessageEvent {}
+export class CatalogAdminPageDetailsEvent extends MessageEvent {}
 // `ChooserSelectionFilter` is used as a string enum in some call sites.
 export const ChooserSelectionFilter = makeEnumProxy('ChooserSelectionFilter');
 

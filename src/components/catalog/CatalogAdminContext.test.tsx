@@ -81,6 +81,23 @@ const SaveProbe = () => {
     </div>;
 };
 
+const ReorderProbe = () => {
+    const admin = useCatalogAdmin();
+    return <button onClick={() => admin.reorderOffers([ { id: 99, orderNumber: 0 } ], 'Reordered offers')}>reorder</button>;
+};
+
+const SaveOfferProbe = () => {
+    const admin = useCatalogAdmin();
+    return <div>
+        <button onClick={() => admin.saveOffer({
+            offerId: 99, pageId: 42, itemIds: '100', catalogName: 'studio_offer', costCredits: 5, costPoints: 0,
+            pointsType: 0, amount: 1, clubOnly: '0', extradata: '', haveOffer: '1', offerId_group: 77, songId: 321,
+            limitedStack: 0, orderNumber: 0
+        })}>save-offer</button>
+        <span data-testid="mutation-id">{admin.lastMutationResult?.operationId ?? ''}</span>
+    </div>;
+};
+
 const session = {
     activeVersionId: 11,
     draftVersionId: 12,
@@ -97,8 +114,8 @@ const session = {
 };
 
 const emitAdminResult = (parser: Record<string, unknown>) => {
-    const handler = Array.from(mocks.handlers.values()).at(-1);
-    act(() => handler?.({ getParser: () => parser }));
+    const entry = Array.from(mocks.handlers.entries()).find(([key]) => key.startsWith('CatalogAdminResultEvent'));
+    act(() => entry?.[1]({ getParser: () => parser }));
 };
 
 describe('CatalogAdminProvider page mutations', () => {
@@ -257,6 +274,72 @@ describe('CatalogAdminProvider page mutations', () => {
         dispatchEvent.mockRestore();
     });
 
+    it('refreshes the index and not the current page on a PAGE Smart Save success', () => {
+        studio = {
+            ...studio,
+            locks: {
+                'PAGE:42': { draftVersionId: 12, entityType: 'PAGE', catalogType: 'NORMAL', entityId: 42,
+                    ownerId: 9, ownerName: 'Alice', token: 'page-token', expiresAt: '' }
+            }
+        };
+        render(<CatalogAdminProvider><SaveProbe /></CatalogAdminProvider>);
+
+        act(() => screen.getByText('save-page').click());
+        const operationId = mocks.sendMessage.mock.calls[0][0].getMessageArray().at(-1);
+
+        emitAdminResult({
+            success: true, message: 'Saved', smartSaveResult: {
+                protocolVersion: 1, operationId, action: 'savePage', code: 'SAVED', draftVersionId: 12,
+                revision: 4, entityType: 'PAGE', catalogType: 'NORMAL', entityId: 42,
+                entity: {
+                    catalogType: 'NORMAL', pageId: 42, parentId: -1, captionSave: 'page_42', caption: 'Renamed',
+                    pageLayout: 'default_3x3', iconColor: 1, iconImage: 1, minRank: 1, orderNum: 1,
+                    visible: true, enabled: true, clubOnly: false, catalogMode: 'NORMAL', vipOnly: false,
+                    pageHeadline: '', pageTeaser: '', pageSpecial: '', pageText1: '', pageText2: '', pageTextDetails: '',
+                    pageTextTeaser: '', roomId: 0, includes: ''
+                },
+                historyGroup: { id: 91, revision: 4, actorId: 9, actorName: 'Alice', summary: 'Edit page',
+                    source: 'UI', createdAt: '', entries: [ { entityType: 'PAGE', entityId: 42, operation: 'UPDATE' } ] },
+                fieldErrors: {}, serverDurationMs: 7
+            }
+        });
+
+        expect(mocks.refreshIndex).toHaveBeenCalledTimes(1);
+        expect(mocks.refreshCurrentPage).toHaveBeenCalledTimes(1);
+    });
+
+    it('refreshes the current page and not the index on an OFFER Smart Save success', () => {
+        studio = {
+            ...studio,
+            locks: {
+                'OFFER:99': { draftVersionId: 12, entityType: 'OFFER', catalogType: 'NORMAL', entityId: 99,
+                    ownerId: 9, ownerName: 'Alice', token: 'offer-token', expiresAt: '' }
+            }
+        };
+        render(<CatalogAdminProvider><SaveOfferProbe /></CatalogAdminProvider>);
+
+        act(() => screen.getByText('save-offer').click());
+        const operationId = mocks.sendMessage.mock.calls[0][0].getMessageArray().at(-1);
+
+        emitAdminResult({
+            success: true, message: 'Saved', smartSaveResult: {
+                protocolVersion: 1, operationId, action: 'saveOffer', code: 'SAVED', draftVersionId: 12,
+                revision: 4, entityType: 'OFFER', catalogType: 'NORMAL', entityId: 99,
+                entity: {
+                    catalogType: 'NORMAL', offerId: 99, itemIds: '100', pageId: 42, catalogName: 'studio_offer',
+                    costCredits: 5, costPoints: 0, pointsType: 0, amount: 1, limitedStack: 0, orderNumber: 0,
+                    offerIdClient: 77, songId: 321, extradata: '', haveOffer: true, clubOnly: false
+                },
+                historyGroup: { id: 92, revision: 4, actorId: 9, actorName: 'Alice', summary: 'Edit offer',
+                    source: 'UI', createdAt: '', entries: [ { entityType: 'OFFER', entityId: 99, operation: 'UPDATE' } ] },
+                fieldErrors: {}, serverDurationMs: 7
+            }
+        });
+
+        expect(mocks.refreshCurrentPage).toHaveBeenCalledTimes(1);
+        expect(mocks.refreshIndex).not.toHaveBeenCalled();
+    });
+
     it('exposes correlated field errors without clearing the editor', () => {
         studio = {
             ...studio,
@@ -314,5 +397,43 @@ describe('CatalogAdminProvider page mutations', () => {
 
         expect(mocks.refreshIndex).toHaveBeenCalledTimes(1);
         expect(mocks.refreshCurrentPage).not.toHaveBeenCalled();
+    });
+
+    it('reconciles the page cache after a rejected legacy reorder result', () => {
+        studio = {
+            ...studio,
+            locks: {
+                'OFFER:99': { draftVersionId: 12, entityType: 'OFFER', catalogType: 'NORMAL', entityId: 99,
+                    ownerId: 9, ownerName: 'Alice', token: 'offer-token', expiresAt: '' }
+            }
+        };
+        render(<CatalogAdminProvider><ReorderProbe /></CatalogAdminProvider>);
+        act(() => screen.getByText('reorder').click());
+        emitAdminResult({ success: false, message: 'Reorder rejected', smartSaveResult: null });
+
+        expect(mocks.refreshCurrentPage).toHaveBeenCalledTimes(1);
+    });
+
+    it('reconciles the page cache after a rejected OFFER Smart Save', () => {
+        studio = {
+            ...studio,
+            locks: {
+                'OFFER:99': { draftVersionId: 12, entityType: 'OFFER', catalogType: 'NORMAL', entityId: 99,
+                    ownerId: 9, ownerName: 'Alice', token: 'offer-token', expiresAt: '' }
+            }
+        };
+        render(<CatalogAdminProvider><SaveOfferProbe /></CatalogAdminProvider>);
+        act(() => screen.getByText('save-offer').click());
+        const operationId = mocks.sendMessage.mock.calls[0][0].getMessageArray().at(-1);
+
+        emitAdminResult({
+            success: false, message: 'Offer save rejected', smartSaveResult: {
+                protocolVersion: 1, operationId, action: 'saveOffer', code: 'VALIDATION_FAILED', draftVersionId: 12,
+                revision: 3, entityType: 'OFFER', catalogType: 'NORMAL', entityId: 99, entity: null,
+                historyGroup: null, fieldErrors: {}, serverDurationMs: 2
+            }
+        });
+
+        expect(mocks.refreshCurrentPage).toHaveBeenCalledTimes(1);
     });
 });

@@ -247,4 +247,22 @@ describe('catalogStore refresh actions', () => {
         expect(client.getQueryState(catalogIndexKey(CatalogType.NORMAL)).isInvalidated).toBe(true);
         expect(client.getQueryState(catalogPageKey(CatalogType.NORMAL, 2)).isInvalidated).toBe(true);
     });
+
+    it('refreshCurrentPage clears an override for the current page and keeps the search override', () => {
+        client.setQueryData(catalogPageKey(CatalogType.NORMAL, 2), { page: null, frontPageItems: [], offerId: -1 });
+        const samePage = new CatalogPage(2, 'default_3x3', new PageLocalization([], []), [], false);
+        useCatalogStore.setState({ pageId: 2, pageOverride: samePage });
+
+        useCatalogStore.getState().refreshCurrentPage();
+
+        expect(useCatalogStore.getState().pageOverride).toBeNull();
+        expect(client.getQueryState(catalogPageKey(CatalogType.NORMAL, 2)).isInvalidated).toBe(true);
+
+        const searchPage = new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), [], false, 1);
+        useCatalogStore.setState({ pageId: 2, pageOverride: searchPage });
+
+        useCatalogStore.getState().refreshCurrentPage();
+
+        expect(useCatalogStore.getState().pageOverride).toBe(searchPage);
+    });
 });
