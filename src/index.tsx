@@ -33,6 +33,7 @@ import './css/chat/ChatInputMentionSelectorView.css';
 import './css/chat/ChatInputHabbiconSelectorView.css';
 import './css/mentions/MentionToasts.css';
 import './css/mentions/MentionsPanel.css';
+import './css/soundboard/Soundboard.css';
 
 import './css/common/Buttons.css';
 import './css/habbo/HabboSkin.css';

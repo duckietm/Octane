@@ -44,7 +44,7 @@ export const normalizeSoundboardLayout = (input: unknown): SoundboardLayout => {
 
             const id = candidate.id.trim();
             const label = candidate.label.trim();
-            if (!id || !label || id === 'all' || id === 'recent' || categoryIds.has(id)) continue;
+            if (!id || !label || id === 'all' || id === 'recent' || id === 'favorites' || categoryIds.has(id)) continue;
 
             categoryIds.add(id);
             categories.push({ id, label });
@@ -122,15 +122,16 @@ export const filterSoundboardSounds = (
     sounds: DisplaySoundboardSound[],
     query: string,
     categoryId: string,
-    recentIds: number[]
+    recentIds: number[],
+    favoriteIds: number[] = []
 ): DisplaySoundboardSound[] => {
     const normalizedQuery = normalizeText(query.trim());
     const matchesQuery = (sound: DisplaySoundboardSound) => !normalizedQuery ||
         normalizeText([sound.name, ...sound.keywords].join(' ')).includes(normalizedQuery);
 
-    if (categoryId === 'recent') {
+    if (categoryId === 'recent' || categoryId === 'favorites') {
         const soundsById = new Map(sounds.map((sound) => [sound.id, sound]));
-        return recentIds.map((id) => soundsById.get(id)).filter((sound): sound is DisplaySoundboardSound => !!sound && matchesQuery(sound));
+        return (categoryId === 'recent' ? recentIds : favoriteIds).map((id) => soundsById.get(id)).filter((sound): sound is DisplaySoundboardSound => !!sound && matchesQuery(sound));
     }
 
     return sounds.filter((sound) => (categoryId === 'all' || sound.categoryId === categoryId) && matchesQuery(sound));
