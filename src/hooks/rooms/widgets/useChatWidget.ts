@@ -245,13 +245,7 @@ const useChatWidgetState = () => {
             );
         }
 
-        chatMessage.prefixText = event.prefixText || '';
-        chatMessage.prefixColor = event.prefixColor || '';
-        chatMessage.prefixIcon = event.prefixIcon || '';
-        chatMessage.prefixEffect = event.prefixEffect || '';
-        chatMessage.prefixFont = event.prefixFont || '';
         chatMessage.nickIcon = event.nickIcon || '';
-        chatMessage.displayOrder = event.displayOrder || 'icon-prefix-name';
 
         setChatMessages((prevValue) => {
             const newValue = [...prevValue, chatMessage];

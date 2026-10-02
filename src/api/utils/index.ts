@@ -16,7 +16,6 @@ export * from './emojiShortcodes';
 export * from './LocalStorageKeys';
 export * from './localizeWithFallback';
 export * from './PlaySound';
-export * from './PrefixUtils';
 export * from './ProductImageUtility';
 export * from './Randomizer';
 export * from './RememberLogin';

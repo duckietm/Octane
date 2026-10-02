@@ -80,7 +80,7 @@ describe('applyUserFigureUpdate', () => {
         expect(applyUserFigureUpdate(state, event)).toBe(state);
     });
 
-    it('applies all 13 figure-related fields when roomIndex matches', () => {
+    it('applies all figure-related fields when roomIndex matches', () => {
         const state = buildAvatarInfoUser({ roomIndex: 3 });
         const event = {
             roomIndex: 3,
@@ -88,11 +88,6 @@ describe('applyUserFigureUpdate', () => {
             customInfo: 'new motto',
             activityPoints: 1234,
             nickIcon: 'icon-vip',
-            prefixText: '[Mod]',
-            prefixColor: '#ff0000',
-            prefixIcon: 'icon-mod',
-            prefixEffect: 'glow',
-            displayOrder: 'prefix-icon-name',
             backgroundId: 8,
             standId: 4,
             overlayId: 2,
@@ -106,11 +101,6 @@ describe('applyUserFigureUpdate', () => {
         expect(next.motto).toBe('new motto');
         expect(next.achievementScore).toBe(1234);
         expect(next.nickIcon).toBe('icon-vip');
-        expect(next.prefixText).toBe('[Mod]');
-        expect(next.prefixColor).toBe('#ff0000');
-        expect(next.prefixIcon).toBe('icon-mod');
-        expect(next.prefixEffect).toBe('glow');
-        expect(next.displayOrder).toBe('prefix-icon-name');
         expect(next.backgroundId).toBe(8);
         expect(next.standId).toBe(4);
         expect(next.overlayId).toBe(2);
@@ -125,11 +115,6 @@ describe('applyUserFigureUpdate', () => {
             customInfo: '',
             activityPoints: 0,
             nickIcon: '',
-            prefixText: '',
-            prefixColor: '',
-            prefixIcon: '',
-            prefixEffect: '',
-            displayOrder: 'icon-prefix-name',
             backgroundId: 0,
             standId: 0,
             overlayId: 0

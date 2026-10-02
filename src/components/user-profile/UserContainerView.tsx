@@ -94,13 +94,7 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                         <div className="octane-extended-profile__identity-copy">
                             <UserIdentityView
                                 className="octane-extended-profile__username"
-                                displayOrder={userProfile.displayOrder}
                                 nickIcon={userProfile.nickIcon}
-                                prefixColor={userProfile.prefixColor}
-                                prefixEffect={userProfile.prefixEffect}
-                                prefixFont={userProfile.prefixFont}
-                                prefixIcon={userProfile.prefixIcon}
-                                prefixText={userProfile.prefixText}
                                 username={userProfile.username}
                             />
                             <p className="octane-extended-profile__motto">{userProfile.motto || '\u00A0'}</p>

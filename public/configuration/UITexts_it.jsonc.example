@@ -181,24 +181,6 @@
     "catalog.pets.choose.breed": "Scegli razza",
     "catalog.pets.back.breeds": "← Razze",
 
-    // Catalog: name prefix editor
-    "catalog.prefix.text": "Testo",
-    "catalog.prefix.text.placeholder": "Inserisci testo...",
-    "catalog.prefix.icon": "Icona",
-    "catalog.prefix.icon.remove": "Rimuovi icona",
-    "catalog.prefix.effect": "Effetto",
-    "catalog.prefix.color": "Colore",
-    "catalog.prefix.color.single": "🎨 Singolo",
-    "catalog.prefix.color.per.letter": "🌈 Per lettera",
-    "catalog.prefix.color.hint": "Seleziona una lettera e poi scegli il colore. Avanza automaticamente.",
-    "catalog.prefix.color.apply.all.title": "Applica il colore corrente a tutte le lettere",
-    "catalog.prefix.color.apply.all": "Applica a tutte",
-    "catalog.prefix.color.selected": "Lettera selezionata:",
-    "catalog.prefix.price": "Prezzo:",
-    "catalog.prefix.price.amount": "5 Crediti",
-    "catalog.prefix.purchased": "✓ Acquistato!",
-    "catalog.prefix.purchase": "Acquista",
-
     // Catalog: gift wrapping
     "catalog.gift_wrapping.gift_sent": "Fatto!",
 

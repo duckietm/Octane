@@ -12,9 +12,7 @@ describe('UI CSS ownership', () =>
         const toolbarView = readSource('src/components/toolbar/ToolbarView.tsx');
         const friendsBarView = readSource('src/components/friends/views/friends-bar/FriendsBarView.tsx');
         const userIdentityView = readSource('src/common/UserIdentityView.tsx');
-        const inventoryPrefixView = readSource('src/components/inventory/views/prefix/InventoryPrefixView.tsx');
         const bubbleHiddenView = readSource('src/components/octanebubblehidden/OctanebubbleHiddenView.tsx');
-        const prefixEffectsCss = readSource('src/css/common/PrefixEffects.css');
         const chatsCss = readSource('src/css/chat/Chats.css');
 
         expect(radioView).not.toContain('RADIO_STYLES');
@@ -23,11 +21,8 @@ describe('UI CSS ownership', () =>
         expect(toolbarView).toContain('airMeMenu');
         expect(friendsBarView).not.toContain('FRIENDBAR_STYLES');
         expect(userIdentityView).not.toContain('<style>');
-        expect(inventoryPrefixView).not.toContain('<style>');
         expect(bubbleHiddenView).not.toContain('<style>');
         expect(bubbleHiddenView).not.toContain('dangerouslySetInnerHTML');
-        expect(prefixEffectsCss).toContain('@keyframes prefix-pulse');
-        expect(prefixEffectsCss).toContain('@keyframes prefix-sparkle');
         expect(chatsCss).toContain('.octane-bubbles-hidden .newbubblehe');
     });
 
@@ -121,8 +116,6 @@ describe('UI CSS ownership', () =>
         expect(catalogAdminPageEditView).toContain('octane-catalog-admin-form-sheet');
         expect(catalogAdminPageEditView).not.toContain('border-2 border-card-grid-item-border rounded px-2 py-1 bg-white');
         expect(catalogAdminPageEditView).toContain('octane-catalog-admin-input');
-        expect(getCatalogLayout).not.toContain('custom_prefix');
-        expect(getCatalogLayout).not.toContain('CatalogLayoutCustomPrefixView');
         expect(catalogCss).toContain('.octane-catalog-window :where(.bg-white, .bg-gray-50, .bg-card-grid-item)');
         expect(catalogCss).toContain('.octane-catalog-window :where(input, select, textarea)');
         expect(catalogCss).toContain('.octane-catalog-window :where(.text-muted, .text-dark)');

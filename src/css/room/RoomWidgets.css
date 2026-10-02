@@ -389,8 +389,7 @@
 .bubble-container.chat-text-size .chat-bubble,
 .bubble-container.chat-text-size .chat-content,
 .bubble-container.chat-text-size .message,
-.bubble-container.chat-text-size .username,
-.bubble-container.chat-text-size .prefix {
+.bubble-container.chat-text-size .username {
     font-size: var(--chat-text-size) !important;
 }
 
@@ -399,9 +398,7 @@
 }
 
 .bubble-container.chat-text-size .username,
-.bubble-container.chat-text-size .message,
-.bubble-container.chat-text-size .prefix,
-.bubble-container.chat-text-size .prefix span {
+.bubble-container.chat-text-size .message {
     line-height: 1 !important;
 }
 

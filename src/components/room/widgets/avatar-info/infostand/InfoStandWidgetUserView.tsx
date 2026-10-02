@@ -106,11 +106,6 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
             newValue.motto = event.customInfo;
             newValue.achievementScore = event.activityPoints;
             newValue.nickIcon = event.nickIcon;
-            newValue.prefixText = event.prefixText;
-            newValue.prefixColor = event.prefixColor;
-            newValue.prefixIcon = event.prefixIcon;
-            newValue.prefixEffect = event.prefixEffect;
-            newValue.displayOrder = event.displayOrder;
             newValue.backgroundId = event.backgroundId;
             newValue.standId = event.standId;
             newValue.overlayId = event.overlayId;
@@ -184,14 +179,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <button type="button" className="octane-infostand__profile-link" onClick={handleProfileClick}>
                         <UserIdentityView
                             className="octane-infostand__identity"
-                            displayOrder={avatarInfo.displayOrder}
                             nameClassName="text-white"
                             nickIcon={avatarInfo.nickIcon}
-                            prefixColor={avatarInfo.prefixColor}
-                            prefixEffect={avatarInfo.prefixEffect}
-                            prefixFont={avatarInfo.prefixFont}
-                            prefixIcon={avatarInfo.prefixIcon}
-                            prefixText={avatarInfo.prefixText}
                             username={avatarInfo.name}
                         />
                     </button>

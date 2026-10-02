@@ -12,12 +12,6 @@ export class AvatarInfoUser implements IAvatarInfo {
     public name: string = '';
     public motto: string = '';
     public nickIcon: string = '';
-    public prefixText: string = '';
-    public prefixColor: string = '';
-    public prefixIcon: string = '';
-    public prefixEffect: string = '';
-    public prefixFont: string = '';
-    public displayOrder: string = 'icon-prefix-name';
     public achievementScore: number = 0;
     public backgroundId: number = 0;
     public standId: number = 0;

@@ -4,7 +4,6 @@ import { WiredDateToString } from '../wired/WiredDateToString';
 import { CloneObject } from './CloneObject';
 import { ConvertSeconds } from './ConvertSeconds';
 import { LocalizeShortNumber } from './LocalizeShortNumber';
-import { getPrefixFontStyle, PRESET_PREFIX_FONTS, parsePrefixColors } from './PrefixUtils';
 
 describe('ConvertSeconds', () => {
     it('formats zero seconds as the dd:hh:mm:ss zero string', () => {
@@ -126,35 +125,5 @@ describe('WiredDateToString', () => {
     it('formats two-digit values without extra padding', () => {
         const d = new Date(2024, 11, 31, 23, 59); // Dec 31, 2024, 23:59
         expect(WiredDateToString(d)).toBe('2024/12/31 23:59');
-    });
-});
-
-describe('PrefixUtils.parsePrefixColors', () => {
-    it('returns an empty array when text or colors are empty', () => {
-        expect(parsePrefixColors('', '#fff')).toEqual([]);
-        expect(parsePrefixColors('abc', '')).toEqual([]);
-    });
-
-    it('maps each text character to the nth color', () => {
-        expect(parsePrefixColors('ab', '#f00,#0f0')).toEqual(['#f00', '#0f0']);
-    });
-
-    it('reuses the last color when the text is longer than the color list', () => {
-        expect(parsePrefixColors('abcd', '#f00,#0f0')).toEqual(['#f00', '#0f0', '#0f0', '#0f0']);
-    });
-});
-
-describe('PrefixUtils.getPrefixFontStyle', () => {
-    it('returns an empty object for the default (empty) font id', () => {
-        expect(getPrefixFontStyle('')).toEqual({});
-    });
-
-    it('returns a fontFamily for a known preset', () => {
-        const out = getPrefixFontStyle('pixel');
-        expect(out.fontFamily).toBe(PRESET_PREFIX_FONTS.find((p) => p.id === 'pixel')?.family);
-    });
-
-    it('returns an empty object for an unknown font id', () => {
-        expect(getPrefixFontStyle('does-not-exist')).toEqual({});
     });
 });

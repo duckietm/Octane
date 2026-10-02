@@ -597,9 +597,8 @@ empty-map / partial-bucket branches of the offer lookup).
       factory.
     - `navigatorRoomCreatorStore.test.ts` (4) — Zustand store invariants
       with fake timers.
-    - `api-utils.test.ts` (27) — `ConvertSeconds`, `LocalizeShortNumber`,
-      `CloneObject`, `GetWiredTimeLocale`, `WiredDateToString`,
-      `PrefixUtils`.
+    - `api-utils.test.ts` — `ConvertSeconds`, `LocalizeShortNumber`,
+      `CloneObject`, `GetWiredTimeLocale`, and `WiredDateToString`.
     - `api-utils-extra.test.ts` (16) — `ColorUtils`, `FixedSizeStack`,
       `LocalizeFormattedNumber`.
     - `friendly-time.test.ts` (12) — `FriendlyTime` with a deterministic

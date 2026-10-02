@@ -186,12 +186,6 @@ export class AvatarInfoUtilities {
         userInfo.name = userData.name;
         userInfo.motto = userData.custom;
         userInfo.nickIcon = userData.nickIcon;
-        userInfo.prefixText = userData.prefixText;
-        userInfo.prefixColor = userData.prefixColor;
-        userInfo.prefixIcon = userData.prefixIcon;
-        userInfo.prefixEffect = userData.prefixEffect;
-        userInfo.prefixFont = userData.prefixFont;
-        userInfo.displayOrder = userData.displayOrder;
         userInfo.backgroundId = userData.background;
         userInfo.standId = userData.stand;
         userInfo.overlayId = userData.overlay;

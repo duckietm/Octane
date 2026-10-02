@@ -42,21 +42,18 @@ import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
 import { BADGE_MAIN_ACHIEVEMENTS, BADGE_MAIN_ALL, BADGE_MAIN_NORMAL, BADGE_RARITY_ALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
-import { InventoryPrefixView } from './views/prefix/InventoryPrefixView';
 
 const TAB_FURNITURE = 'inventory.furni';
 const TAB_BOTS = 'inventory.bots';
 const TAB_PETS = 'inventory.furni.tab.pets';
 const TAB_BADGES = 'inventory.badges';
-const TAB_PREFIXES = 'inventory.prefixes';
-const TABS = [TAB_FURNITURE, TAB_PETS, TAB_BADGES, TAB_BOTS, TAB_PREFIXES];
+const TABS = [TAB_FURNITURE, TAB_PETS, TAB_BADGES, TAB_BOTS];
 
 const TAB_LABEL_FALLBACK: Record<string, string> = {
     [TAB_FURNITURE]: 'Furniture',
     [TAB_PETS]: 'Pets',
     [TAB_BADGES]: 'Badges',
-    [TAB_BOTS]: 'Bots',
-    [TAB_PREFIXES]: 'Prefixes'
+    [TAB_BOTS]: 'Bots'
 };
 
 const tabLabel = (name: string) => {
@@ -72,7 +69,6 @@ const TAB_BY_CODE: Record<string, string> = {
     furniture: TAB_FURNITURE,
     pets: TAB_PETS,
     badges: TAB_BADGES,
-    prefixes: TAB_PREFIXES,
     bots: TAB_BOTS
 };
 
@@ -80,8 +76,7 @@ const UNSEEN_BY_TAB: Record<string, number> = {
     [TAB_FURNITURE]: UnseenItemCategory.FURNI,
     [TAB_PETS]: UnseenItemCategory.PET,
     [TAB_BADGES]: UnseenItemCategory.BADGE,
-    [TAB_BOTS]: UnseenItemCategory.BOT,
-    [TAB_PREFIXES]: UnseenItemCategory.PREFIX
+    [TAB_BOTS]: UnseenItemCategory.BOT
 };
 
 // AIR 13 keeps rented furni in the furni tab, so their unseen counter lands with owned furni.
@@ -299,7 +294,6 @@ export const InventoryView: FC<{}> = () => {
                                 {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
                                 {currentTab === TAB_BADGES && <InventoryBadgeView filteredBadgeCodes={filteredBadgeCodes} />}
                                 {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
-                                {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
                             </div>
                         </div>
                     </>

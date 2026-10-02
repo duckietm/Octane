@@ -8,7 +8,6 @@ export * from './IFurnitureItem';
 export * from './INickIconItem';
 export * from './InventoryUtilities';
 export * from './IPetItem';
-export * from './IPrefixItem';
 export * from './IUnseenItemTracker';
 export * from './PetUtilities';
 export * from './TradeState';

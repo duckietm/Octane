@@ -531,7 +531,7 @@ New `NitroEventType` member: `SOUND_VOLUMES_UPDATED`.
 
 Two parsers had nested `if(wrapper.bytesAvailable)` chains making each new optional trailing block sit one extra indent deeper than the previous:
 
-- **`UserProfileParser`** — 4 optional trailing tiers (background/stand/overlay 3 ints, cardBackgroundId 1 int, nickIcon 1 string, prefix decoration set 6 strings). Previously 4 levels of nested `if` with an inline ternary mid-block for cardBackgroundId. Refactored to a flat early-return chain.
+- **`UserProfileParser`** — optional trailing profile fields previously used nested `if(wrapper.bytesAvailable)` chains. Refactored to a flat early-return chain.
 - **`GetGuestRoomResultMessageParser`** — 2 optional trailing tiers (hotelTimeZoneId + hotelCurrentTimeMs 2 strings, roomItemLimit 1 int). Previously 2 levels of nested `if`. Refactored to flat early-return.
 
 Both files now follow the canonical pattern:

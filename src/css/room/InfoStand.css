@@ -306,12 +306,6 @@
     -webkit-font-smoothing: none;
   }
 
-  /* A user-picked prefix colour can be as dark as the card; the pixel outline
-     keeps it readable. A prefix effect sets its own shadow inline and wins. */
-  .octane-infostand__identity .prefix {
-    text-shadow: 1px 1px 0 #000000;
-  }
-
   .body-image {
     display: flex;
     align-items: center;
