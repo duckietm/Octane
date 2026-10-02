@@ -1,12 +1,10 @@
 import { GetRoomEngine, RoomChatSettings, RoomObjectCategory } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
-import { ChatBubbleMessage, GetConfigurationValue } from '../../../../api';
+import { ChatBubbleMessage } from '../../../../api';
 import { UserIdentityView } from '../../../../common';
 import { useOnClickChat } from '../../../../hooks';
-import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
 import { CHAT_TEXT_SIZE_EVENT, CHAT_TEXT_SIZE_PIXELS, ChatTextSize, getStoredChatTextSize } from '../chat-input/chatTextSize';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
-import { highlightMentions } from './highlightMentions';
 
 interface ChatWidgetMessageViewProps {
     chat: ChatBubbleMessage;
@@ -27,20 +25,14 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
     const elementRef = useRef<HTMLDivElement>(null);
     const makeRoomRef = useRef(makeRoom);
     const { onClickChat } = useOnClickChat();
-    const { userName: ownUsername = '' } = useUserDataSnapshot();
-
-    const mentionsHighlightOn = GetConfigurationValue<boolean>('mentions_ui.enabled', true);
-
-    const highlight = (html: string): string => (mentionsHighlightOn ? highlightMentions(html, ownUsername) : html);
-
-    const formattedText = useMemo(() => highlight(`${chat.formattedText}`), [chat.formattedText, ownUsername, mentionsHighlightOn]);
+    const formattedText = useMemo(() => `${chat.formattedText}`, [chat.formattedText]);
     const originalFormattedText = useMemo(
-        () => highlight(`${chat.originalFormattedText || chat.formattedText}`),
-        [chat.originalFormattedText, chat.formattedText, ownUsername, mentionsHighlightOn]
+        () => `${chat.originalFormattedText || chat.formattedText}`,
+        [chat.originalFormattedText, chat.formattedText]
     );
     const translatedFormattedText = useMemo(
-        () => highlight(`${chat.translatedFormattedText || chat.formattedText}`),
-        [chat.translatedFormattedText, chat.formattedText, ownUsername, mentionsHighlightOn]
+        () => `${chat.translatedFormattedText || chat.formattedText}`,
+        [chat.translatedFormattedText, chat.formattedText]
     );
 
     const getBubbleWidth = useMemo(() => {

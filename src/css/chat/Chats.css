@@ -1812,25 +1812,6 @@
     }
 }
 
-/* @-mention tags inside chat bubbles and the mentions panel.
-   `.mention-tag` styles ANY @user as a chip (colour inherits so it stays
-   readable on both light and dark bubble backgrounds); `.mention-tag--self`
-   marks a mention of the viewer / a broadcast alias with a gold highlight so
-   "you were mentioned" stands out. */
-.mention-tag {
-    display: inline;
-    font-weight: 700;
-    border-radius: 4px;
-    padding: 0 3px;
-    background: rgba(30, 114, 149, 0.18);
-    box-shadow: inset 0 0 0 1px rgba(30, 114, 149, 0.40);
-}
-
-.mention-tag.mention-tag--self {
-    color: #4a3300;
-    background: #ffd24d;
-    box-shadow: inset 0 0 0 1px rgba(150, 105, 0, 0.55);
-}
 .octane-bubbles-hidden .newbubblehe {
     visibility: hidden !important;
 }

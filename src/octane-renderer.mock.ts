@@ -302,11 +302,6 @@ export class HabbiconAssetManager {
     }
 }
 
-// Mentions system — incoming events extend MessageEvent (they expose
-// getParser()); the request/mark composers are symbol-only constructors.
-export class MentionReceivedEvent extends MessageEvent {}
-export class MentionsListEvent extends MessageEvent {}
-
 // ---------------------------------------------------------------------------
 // Navigator event classes — MessageEvent subclasses needed by useNavigatorStore
 // ---------------------------------------------------------------------------
@@ -466,9 +461,6 @@ export class FollowFriendMessageComposer extends StubClass {}
 export class GetUserEventCatsMessageComposer extends StubClass {}
 export class GetUserFlatCatsMessageComposer extends StubClass {}
 export class NavigatorSearchComposer extends StubClass {}
-export class RequestMentionsComposer extends StubClass {}
-export class MarkMentionsReadComposer extends StubClass {}
-export class DeleteMentionComposer extends StubClass {}
 export class DesktopViewComposer extends StubClass {}
 export class FurniturePlacePaintComposer extends StubClass {}
 export class GetGuestRoomMessageComposer extends StubClass {}

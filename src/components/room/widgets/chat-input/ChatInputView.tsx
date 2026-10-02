@@ -3,11 +3,9 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
 import { Text } from '../../../../common';
-import { useChatCommandSelector, useChatInputWidget, useChatMentions, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
+import { useChatCommandSelector, useChatInputWidget, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
 import { ChatInputCommandSelectorView } from './ChatInputCommandSelectorView';
-import { ChatInputEmojiSelectorView } from './ChatInputEmojiSelectorView';
 import { ChatInputHabbiconSelectorView } from './ChatInputHabbiconSelectorView';
-import { ChatInputMentionSelectorView } from './ChatInputMentionSelectorView';
 import { ChatInputStyleSelectorView } from './ChatInputStyleSelectorView';
 
 export const ChatInputView: FC<{}> = (props) => {
@@ -34,8 +32,6 @@ export const ChatInputView: FC<{}> = (props) => {
         selectCurrent,
         close: closeCommandSelector
     } = useChatCommandSelector(chatValue);
-
-    const mention = useChatMentions(chatValue, setChatValue, inputRef, commandSelectorVisible);
 
     const chatModeIdWhisper = useMemo(() => LocalizeText('widgets.chatinput.mode.whisper'), []);
     const chatModeIdShout = useMemo(() => LocalizeText('widgets.chatinput.mode.shout'), []);
@@ -134,15 +130,6 @@ export const ChatInputView: FC<{}> = (props) => {
         [setIsTyping, setIsIdle]
     );
 
-    const addChatEmoji = useCallback(
-        (emoji: string) => {
-            setChatValue((prev) => prev + emoji);
-            setIsTyping(true);
-            inputRef.current?.focus();
-        },
-        [setIsTyping, inputRef]
-    );
-
     const onKeyDownEvent = useCallback(
         (event: KeyboardEvent) => {
             if (floodBlocked || !inputRef.current || anotherInputHasFocus()) return;
@@ -175,31 +162,6 @@ export const ChatInputView: FC<{}> = (props) => {
                     case 'Escape':
                         event.preventDefault();
                         closeCommandSelector();
-                        return;
-                }
-            }
-
-            if (mention.visible) {
-                switch (event.key) {
-                    case 'ArrowUp':
-                        event.preventDefault();
-                        mention.moveUp();
-                        return;
-                    case 'ArrowDown':
-                        event.preventDefault();
-                        mention.moveDown();
-                        return;
-                    case 'Tab':
-                    case 'NumpadEnter':
-                    case 'Enter':
-                        if (mention.applyCurrent()) {
-                            event.preventDefault();
-                            return;
-                        }
-                        break;
-                    case 'Escape':
-                        event.preventDefault();
-                        mention.cancel();
                         return;
                 }
             }
@@ -238,9 +200,7 @@ export const ChatInputView: FC<{}> = (props) => {
             moveUp,
             moveDown,
             selectCurrent,
-            closeCommandSelector,
-            mention,
-            chatValue
+            closeCommandSelector
         ]
     );
 
@@ -358,14 +318,6 @@ export const ChatInputView: FC<{}> = (props) => {
                     onHover={setSelectedIndex}
                 />
             )}
-            {mention.visible && !commandSelectorVisible && (
-                <ChatInputMentionSelectorView
-                    suggestions={mention.suggestions}
-                    selectedIndex={mention.selectedIndex}
-                    onSelect={mention.apply}
-                    onHover={mention.setSelectedIndex}
-                />
-            )}
             <ChatInputStyleSelectorView chatStyleId={chatStyleId} chatStyleIds={chatStyleIds} selectChatStyleId={updateChatStyleId} />
             {!floodBlocked && (
                 <div className="flex-1 items-center input-sizer swf-chat-input-sizer">
@@ -389,7 +341,6 @@ export const ChatInputView: FC<{}> = (props) => {
                 </div>
             )}
             <ChatInputHabbiconSelectorView />
-            <ChatInputEmojiSelectorView addChatEmoji={addChatEmoji} />
         </div>,
         portalTarget
     );

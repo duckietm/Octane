@@ -50,7 +50,7 @@ All repos on `feat/messenger-groups-receipts`. Client commits use `git -c user.n
 
 - [ ] **Step 1: Write the failing parser test**
 
-Create `packages/communication/src/messages/parser/friendlist/__tests__/ConsoleReadReceiptParser.test.ts` (mirror the existing `__tests__/FriendCategoryComposers.test.ts` / mentions parser test style with a `TestWrapper` over `BinaryReader`/`BinaryWriter`):
+Create `packages/communication/src/messages/parser/friendlist/__tests__/ConsoleReadReceiptParser.test.ts` (mirror the existing `__tests__/FriendCategoryComposers.test.ts` parser test style with a `TestWrapper` over `BinaryReader`/`BinaryWriter`):
 ```typescript
 import { describe, expect, it } from 'vitest';
 import { BinaryReader, BinaryWriter } from '@nitrots/utils';

@@ -35,10 +35,8 @@ import { useCallback, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     GetConfigurationValue,
-    IMentionEntry,
     LocalizeBadgeName,
     LocalizeText,
-    MentionNotificationBubbleItem,
     NotificationAlertItem,
     NotificationAlertType,
     NotificationBubbleItem,
@@ -176,12 +174,6 @@ const useNotificationStore = () => {
         },
         [bubblesDisabled]
     );
-
-    const showMentionBubble = useCallback((mention: IMentionEntry) => {
-        const item = new MentionNotificationBubbleItem(mention);
-
-        setBubbleAlerts((prevValue) => [item, ...prevValue]);
-    }, []);
 
     const showNotification = (type: string, options: Map<string, string> = null) => {
         if (!options) options = new Map();
@@ -727,7 +719,6 @@ const useNotificationStore = () => {
         showTradeAlert,
         showConfirm,
         showSingleBubble,
-        showMentionBubble,
         closeAlert,
         closeBubbleAlert,
         closeConfirm
@@ -750,7 +741,7 @@ export const useNotificationState = () => {
 };
 
 export const useNotificationActions = () => {
-    const { simpleAlert, showOctaneAlert, showTradeAlert, showConfirm, showSingleBubble, showMentionBubble, closeAlert, closeBubbleAlert, closeConfirm } =
+    const { simpleAlert, showOctaneAlert, showTradeAlert, showConfirm, showSingleBubble, closeAlert, closeBubbleAlert, closeConfirm } =
         useSharedHook(useNotificationStore);
 
     return {
@@ -759,7 +750,6 @@ export const useNotificationActions = () => {
         showTradeAlert,
         showConfirm,
         showSingleBubble,
-        showMentionBubble,
         closeAlert,
         closeBubbleAlert,
         closeConfirm

@@ -2,7 +2,6 @@ export * from './furniture';
 export * from './useAvatarInfoWidget';
 export * from './useChatCommandSelector';
 export * from './useChatInputWidget';
-export * from './useChatMentions';
 export * from './useChatWidget';
 export * from './useDoorbellActions';
 export * from './useDoorbellState';

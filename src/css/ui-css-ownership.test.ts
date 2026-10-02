@@ -11,7 +11,6 @@ describe('UI CSS ownership', () =>
         const radioView = readSource('src/components/radio/RadioView.tsx');
         const toolbarView = readSource('src/components/toolbar/ToolbarView.tsx');
         const friendsBarView = readSource('src/components/friends/views/friends-bar/FriendsBarView.tsx');
-        const wheelWinReveal = readSource('src/components/fortune-wheel/WheelWinReveal.tsx');
         const userIdentityView = readSource('src/common/UserIdentityView.tsx');
         const inventoryPrefixView = readSource('src/components/inventory/views/prefix/InventoryPrefixView.tsx');
         const bubbleHiddenView = readSource('src/components/octanebubblehidden/OctanebubbleHiddenView.tsx');
@@ -23,7 +22,6 @@ describe('UI CSS ownership', () =>
         expect(toolbarView).not.toContain('backgroundPosition: \'-25px -38px\'');
         expect(toolbarView).toContain('airMeMenu');
         expect(friendsBarView).not.toContain('FRIENDBAR_STYLES');
-        expect(wheelWinReveal).not.toContain('<style>');
         expect(userIdentityView).not.toContain('<style>');
         expect(inventoryPrefixView).not.toContain('<style>');
         expect(bubbleHiddenView).not.toContain('<style>');
@@ -90,7 +88,6 @@ describe('UI CSS ownership', () =>
         const vaultCss = readSource('src/css/vault/VaultView.css');
         const userSettingsCss = readSource('src/css/user-settings/UserSettingsView.css');
         const sanctionStatusView = readSource('src/components/help/views/SanctionStatusView.tsx');
-        const mentionsView = readSource('src/components/mentions/MentionsView.tsx');
         const translationSettingsView = readSource('src/components/translation/TranslationSettingsView.tsx');
         const userAccountSettingsView = readSource('src/components/user-settings/UserAccountSettingsView.tsx');
         const hcCenterView = readSource('src/components/hc-center/HcCenterView.tsx');
@@ -180,7 +177,6 @@ describe('UI CSS ownership', () =>
         expect(vaultCss).toContain('.octane-vault-content');
         expect(userSettingsCss).toContain('.user-settings-window');
         expect(sanctionStatusView).toContain('max-w-[calc(100vw-16px)]');
-        expect(mentionsView).toContain('max-w-[calc(100vw-16px)]');
         expect(translationSettingsView).toContain('max-w-[calc(100vw-16px)]');
         expect(userAccountSettingsView).toContain('max-w-[calc(100vw-16px)]');
         expect(hcCenterView).toContain('max-w-[calc(100vw-16px)]');

@@ -92,7 +92,7 @@ describe('FriendIsTypingParser', () =>
 ```
 Run `cd Nitro_Render_V3 && yarn test --run packages/communication/src/messages/parser/friendlist/__tests__/FriendIsTypingParser.test.ts` → FAIL.
 
-(Confirm `BinaryWriter` has `writeByte`/`writeInt` — the mentions/category tests use `writeInt`/`writeString`; if `writeByte` is named differently, use the real method that writes a single byte, mirroring how the existing parser tests write a boolean/byte. If unsure, write the boolean as `w.writeInt(1)` and read with `readInt() === 1` in BOTH parser and test — but prefer a real 1-byte boolean to match the emulator's `appendBoolean`/`readBoolean`. Inspect an existing parser test that round-trips a boolean to copy the exact writer call.)
+(Confirm `BinaryWriter` has `writeByte`/`writeInt` — the category tests use `writeInt`/`writeString`; if `writeByte` is named differently, use the real method that writes a single byte, mirroring how the existing parser tests write a boolean/byte. If unsure, write the boolean as `w.writeInt(1)` and read with `readInt() === 1` in BOTH parser and test — but prefer a real 1-byte boolean to match the emulator's `appendBoolean`/`readBoolean`. Inspect an existing parser test that round-trips a boolean to copy the exact writer call.)
 
 - [ ] **Step 2: Create the parser**
 

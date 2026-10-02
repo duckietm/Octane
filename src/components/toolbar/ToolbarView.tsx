@@ -9,7 +9,7 @@ import memenuBgImg from '../../assets/images/toolbar/air/memenu-bg.png';
 import memenuCircleImg from '../../assets/images/toolbar/air/memenu-circle.png';
 import { Flex, LayoutAvatarImageView, LayoutItemCountView } from '../../common';
 import { SoundboardRoomMessageEvent } from '../../events';
-import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMentionsSnapshot, useMessageEvent, useMessenger, useModTools, useOctaneEvent, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
+import { useAchievements, useBuildHeight, useDailyTasks, useFriends, useHasPermission, useInventoryUnseenTracker, useMessageEvent, useMessenger, useModTools, useOctaneEvent, useRewardTracks, useSessionInfo, useSoundboard, useUiEvent, useWiredTools } from '../../hooks';
 import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -74,10 +74,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const unseenProgMenuCount = getTotalUnseen + unseenDailyTaskCount + unseenRewardTrackCount;
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
-    const { unreadCount: mentionsUnread = 0 } = useMentionsSnapshot();
-    const mentionsEnabled = useMemo(() => GetConfigurationValue<boolean>('mentions_ui.enabled', true), []);
     const buildersClubEnabled = useMemo(() => GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true)), []);
-    const fortuneWheelEnabled = useMemo(() => GetConfigurationValue<boolean>('toolbar.fortunewheel.enabled', true), []);
     const { openMonitor, showToolbarButton } = useWiredTools();
     const { enabled: soundboardEnabled, reset: resetSoundboard } = useSoundboard();
     const { available: buildHeightAvailable, toggle: toggleBuildHeight } = useBuildHeight();
@@ -253,14 +250,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     }, [
         buildHeightAvailable,
         buildersClubEnabled,
-        fortuneWheelEnabled,
         hkEnabled,
         iconState,
         isHk,
         isInRoom,
         isMod,
         leftCollapsed,
-        mentionsEnabled,
         rightCollapsed,
         showToolbarButton,
         soundboardEnabled,
@@ -448,10 +443,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         </motion.div> }
                     <img src={ dividerImg } alt="" className="tb-divider" />
                     { !leftCollapsed && (<>
-                    { fortuneWheelEnabled &&
-                        <motion.div variants={ itemVariants } className="tb-slot">
-                            <ToolbarItemView icon="fortune-wheel" onClick={ () => CreateLinkEvent('fortune-wheel/toggle') } className="tb-icon" />
-                        </motion.div> }
                     { (isInRoom && youtubeEnabled) &&
                         <motion.div variants={ itemVariants } className="tb-slot">
                             <ToolbarItemView icon="youtube" onClick={ openYouTubePlayer } className="tb-icon" />
@@ -500,12 +491,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         <ToolbarItemView className={ `tb-icon ${ iconState === MessengerIconState.UNREAD ? (messengerNotifyFrame === 1 ? 'is-notify-1' : 'is-notify-0') : '' }` } icon="message" onClick={ () => OpenMessengerChat() } />
                     </motion.div>
                     { !rightCollapsed && (<>
-                    { mentionsEnabled &&
-                        <motion.div variants={ itemVariants } className="relative tb-slot">
-                            <ToolbarItemView icon="mentions" onClick={ () => CreateLinkEvent('mentions/toggle') } className="tb-icon" />
-                            { (mentionsUnread > 0) &&
-                                <LayoutItemCountView count={ mentionsUnread } className="absolute -right-2 -top-1" /> }
-                        </motion.div> }
                     <div className={ `h-full shrink-0 ${ desktopBlockClasses }` } id="toolbar-friend-bar-container-desktop" />
                     </>) }
                 </motion.div>
@@ -573,10 +558,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             { (getFullCount > 0) &&
                                 <LayoutItemCountView count={ getFullCount } className="absolute -right-1 top-0" /> }
                         </motion.div> }
-                    { fortuneWheelEnabled &&
-                        <motion.div variants={ itemVariants }>
-                            <ToolbarItemView icon="fortune-wheel" onClick={ () => CreateLinkEvent('fortune-wheel/toggle') } className="tb-icon" />
-                        </motion.div> }
                 </motion.div>
                 <motion.div
                     variants={ containerVariants }
@@ -604,12 +585,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <ToolbarItemView icon="friendall" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
                             { (requests.length > 0) &&
                                 <LayoutItemCountView count={ requests.length } className="absolute -right-2 -top-1" /> }
-                        </motion.div> }
-                    { (!socialInSideStack && mentionsEnabled) &&
-                        <motion.div variants={ itemVariants } className="relative">
-                            <ToolbarItemView icon="mentions" onClick={ () => CreateLinkEvent('mentions/toggle') } className="tb-icon" />
-                            { (mentionsUnread > 0) &&
-                                <LayoutItemCountView count={ mentionsUnread } className="absolute -right-2 -top-1" /> }
                         </motion.div> }
                 </motion.div>
             </motion.div>
@@ -645,7 +620,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 { /* Below the compact breakpoint the right rail's social icons
                      live in the stack — on narrow desktop windows too, so they
                      don't jump back into the bottom bar. Real touch devices
-                     keep friends + mentions in the mobile bar instead. */ }
+                     keep friends in the mobile bar instead. */ }
                 { socialInSideStack &&
                     <motion.div variants={ itemVariants } className="relative">
                         <ToolbarItemView icon="friendall" onClick={ () => CreateLinkEvent('friends/toggle') } className="tb-icon" />
@@ -655,12 +630,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 { socialInSideStack &&
                     <motion.div variants={ itemVariants }>
                         <ToolbarItemView icon="friendsearch" onClick={ () => SendMessageComposer(new FindNewFriendsMessageComposer()) } className="tb-icon" />
-                    </motion.div> }
-                { (socialInSideStack && mentionsEnabled) &&
-                    <motion.div variants={ itemVariants } className="relative">
-                        <ToolbarItemView icon="mentions" onClick={ () => CreateLinkEvent('mentions/toggle') } className="tb-icon" />
-                        { (mentionsUnread > 0) &&
-                            <LayoutItemCountView count={ mentionsUnread } className="pointer-events-none absolute -right-1 -top-1 z-10" /> }
                     </motion.div> }
                 { (socialInSideStack && ((iconState === MessengerIconState.SHOW) || (iconState === MessengerIconState.UNREAD))) &&
                     <motion.div variants={ itemVariants }>

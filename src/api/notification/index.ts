@@ -1,4 +1,3 @@
-export * from './MentionNotificationBubbleItem';
 export * from './NotificationAlertItem';
 export * from './NotificationAlertType';
 export * from './NotificationBubbleItem';

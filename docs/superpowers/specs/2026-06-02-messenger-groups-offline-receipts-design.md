@@ -124,4 +124,4 @@ Extend the existing (already-React) friends list & instant messenger with four f
 ## Open items for planning
 
 - Confirm the client's connecting revision and source the official friend-category header IDs (custom fallback per-op).
-- Decide the feature branch base in each repo (current branches are mid-`mentions-system` work — do **not** build on top of those).
+- Decide the feature branch base in each repo (current branches contain unrelated work — do **not** build on top of those).

@@ -657,31 +657,6 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.swf-chat-input .swf-chat-emoji-trigger {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    width: 26px;
-    min-width: 26px;
-    height: 38px;
-    margin: 0 4px 0 2px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    font-size: 19px;
-    line-height: 1;
-    filter: drop-shadow(1px 1px 0 rgba(255, 255, 255, 0.7));
-}
-
-.swf-chat-input .swf-chat-emoji-trigger:hover {
-    transform: translateY(-1px);
-}
-
-.swf-chat-emoji-popover {
-    outline: 0;
-}
-
 .octane-mobile-furni-infostand-trigger {
     pointer-events: auto;
     display: flex;
