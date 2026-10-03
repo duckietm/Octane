@@ -4,8 +4,11 @@ import {
     emptySample,
     GetConfigurationValue,
     HousekeepingApi,
+    HousekeepingRoomSection,
     HousekeepingTabId,
+    HousekeepingUserSection,
     IHousekeepingActionLogEntry,
+    IHousekeepingDangerRequest,
     IHousekeepingDashboard,
     IHousekeepingRoom,
     IHousekeepingRoomSummary,
@@ -31,11 +34,16 @@ const useHousekeepingStoreInner = () => {
     // Last-tab is persisted per user (useLocalStorage auto-scopes the key
     // by userId from the URL) so reopening the panel lands on the same
     // tab the operator was using. HousekeepingView's auto-redirect
-    // effect handles the case where the persisted tab isn't available
-    // in the current `housekeeping.mode` (light bounces DASHBOARD → USERS).
+    // effect handles a persisted tab the operator may no longer open.
     const [activeTab, setActiveTab] = useLocalStorage<HousekeepingTabId>('nitro.housekeeping.last_tab', HousekeepingTabId.DASHBOARD);
     const [selectedUser, setSelectedUser] = useState<IHousekeepingUser | null>(null);
     const [selectedRoom, setSelectedRoom] = useState<IHousekeepingRoom | null>(null);
+    // Which sub-page of the user and room pages is open; kept here so a link
+    // (housekeeping/tab/economy) or the global search can land on a sub-page.
+    const [userSection, setUserSection] = useState<HousekeepingUserSection>(HousekeepingUserSection.SANCTIONS);
+    const [roomSection, setRoomSection] = useState<HousekeepingRoomSection>(HousekeepingRoomSection.SETTINGS);
+    // The dangerous action waiting for its typed confirmation, if any.
+    const [dangerRequest, setDangerRequest] = useState<IHousekeepingDangerRequest | null>(null);
     const [actionLog, setActionLog] = useState<IHousekeepingActionLogEntry[]>([]);
     const [isUserLoading, setIsUserLoading] = useState(false);
     const [isRoomLoading, setIsRoomLoading] = useState(false);
@@ -261,7 +269,8 @@ const useHousekeepingStoreInner = () => {
                 ipLast: '',
                 isBanned: false,
                 isMuted: false,
-                isTradeLocked: false
+                isTradeLocked: false,
+                profile: null
             };
 
             setSelectedUser(hint);
@@ -445,6 +454,12 @@ const useHousekeepingStoreInner = () => {
         setSelectedUser,
         selectedRoom,
         setSelectedRoom,
+        userSection,
+        setUserSection,
+        roomSection,
+        setRoomSection,
+        dangerRequest,
+        setDangerRequest,
         actionLog,
         setActionLog,
         isUserLoading,

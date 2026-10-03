@@ -1,11 +1,46 @@
 import { describe, expect, it } from 'vitest';
-import { formatCompactNumber, formatRelativePast, formatUptime } from './HousekeepingFormatters';
+import {
+    formatCompactNumber,
+    formatHousekeepingDate,
+    formatHousekeepingListCell,
+    parseAuditDetail,
+    formatRelativePast,
+    formatUptime,
+    isAuditEntryAboutRoom,
+    isAuditEntryAboutUser,
+    isPermanentHousekeepingBan,
+    resolveHousekeepingTarget
+} from './HousekeepingFormatters';
+
+describe('formatHousekeepingDate', () => {
+    it('reads unix seconds, not milliseconds', () => {
+        expect(formatHousekeepingDate(1_790_000_000, 'en-GB')).toContain('2026');
+    });
+
+    it('shows a dash for a missing or zero time', () => {
+        expect(formatHousekeepingDate(0)).toBe('-');
+        expect(formatHousekeepingDate(null)).toBe('-');
+        expect(formatHousekeepingDate(Number.NaN)).toBe('-');
+    });
+});
+
+describe('resolveHousekeepingTarget', () => {
+    it('prefers the label, then the target id', () => {
+        expect(resolveHousekeepingTarget({ targetLabel: 'alice', targetId: 4, detail: '' })).toBe('alice');
+        expect(resolveHousekeepingTarget({ targetLabel: '', targetId: 4, detail: '' })).toBe('#4');
+    });
+
+    it('falls back to the room id kept in the detail of room actions', () => {
+        expect(resolveHousekeepingTarget({ targetLabel: '', targetId: null, detail: 'roomId=411 open=false' })).toBe('#411');
+        expect(resolveHousekeepingTarget({ targetLabel: '', targetId: null, detail: 'minutes=5' })).toBe('-');
+    });
+});
 
 describe('formatUptime', () => {
-    it('renders 0/negative/NaN/Infinity as "—"', () => {
-        expect(formatUptime(-1)).toBe('—');
-        expect(formatUptime(NaN)).toBe('—');
-        expect(formatUptime(Infinity)).toBe('—');
+    it('renders 0/negative/NaN/Infinity as "-"', () => {
+        expect(formatUptime(-1)).toBe('-');
+        expect(formatUptime(NaN)).toBe('-');
+        expect(formatUptime(Infinity)).toBe('-');
     });
 
     it('renders seconds only for the fresh-boot case', () => {
@@ -33,10 +68,10 @@ describe('formatUptime', () => {
 describe('formatRelativePast', () => {
     const NOW = 1_700_000_000_000; // fixed reference
 
-    it('renders "—" for invalid input', () => {
-        expect(formatRelativePast(0, NOW)).toBe('—');
-        expect(formatRelativePast(-100, NOW)).toBe('—');
-        expect(formatRelativePast(NaN, NOW)).toBe('—');
+    it('renders "-" for invalid input', () => {
+        expect(formatRelativePast(0, NOW)).toBe('-');
+        expect(formatRelativePast(-100, NOW)).toBe('-');
+        expect(formatRelativePast(NaN, NOW)).toBe('-');
     });
 
     it('renders "now" for the first 5 seconds', () => {
@@ -65,9 +100,9 @@ describe('formatRelativePast', () => {
 });
 
 describe('formatCompactNumber', () => {
-    it('returns "—" for non-finite input', () => {
-        expect(formatCompactNumber(NaN)).toBe('—');
-        expect(formatCompactNumber(Infinity)).toBe('—');
+    it('returns "-" for non-finite input', () => {
+        expect(formatCompactNumber(NaN)).toBe('-');
+        expect(formatCompactNumber(Infinity)).toBe('-');
     });
 
     it('passes through small values', () => {
@@ -86,5 +121,64 @@ describe('formatCompactNumber', () => {
         expect(formatCompactNumber(1_000_000)).toBe('1.0M');
         expect(formatCompactNumber(2_300_000)).toBe('2.3M');
         expect(formatCompactNumber(15_000_000)).toBe('15M');
+    });
+});
+
+describe('audit entry filters', () => {
+    it('matches a user by target id only for user entries', () => {
+        expect(isAuditEntryAboutUser({ targetType: 'user', targetId: 7, detail: '' }, 7)).toBe(true);
+        expect(isAuditEntryAboutUser({ targetType: 'user', targetId: 8, detail: '' }, 7)).toBe(false);
+        expect(isAuditEntryAboutUser({ targetType: 'room', targetId: 7, detail: '' }, 7)).toBe(false);
+    });
+
+    it('matches a room by target or by the room id in the detail, without prefix collisions', () => {
+        expect(isAuditEntryAboutRoom({ targetType: 'room', targetId: 41, detail: '' }, 41)).toBe(true);
+        expect(isAuditEntryAboutRoom({ targetType: 'user', targetId: null, detail: 'roomId=41 open=true' }, 41)).toBe(true);
+        expect(isAuditEntryAboutRoom({ targetType: 'user', targetId: null, detail: 'roomId=411 open=true' }, 41)).toBe(false);
+    });
+});
+
+describe('parseAuditDetail', () => {
+    it('splits key=value pairs and keeps spaces inside values', () => {
+        expect(parseAuditDetail('roomId=12 reason=spam in chat ip=1.2.3.4')).toEqual([
+            { key: 'roomId', value: '12' },
+            { key: 'reason', value: 'spam in chat' },
+            { key: 'ip', value: '1.2.3.4' }
+        ]);
+    });
+
+    it('keeps free text and an empty detail', () => {
+        expect(parseAuditDetail('')).toEqual([]);
+        expect(parseAuditDetail('manual note')).toEqual([{ key: '', value: 'manual note' }]);
+        expect(parseAuditDetail('note first minutes=5')).toEqual([
+            { key: '', value: 'note first' },
+            { key: 'minutes', value: '5' }
+        ]);
+    });
+});
+
+describe('formatHousekeepingListCell', () => {
+    it('turns time columns into dates and empty times into a dash', () => {
+        expect(formatHousekeepingListCell('enter', '1790000000', 'en-GB')).toContain('2026');
+        expect(formatHousekeepingListCell('trade_locked_until', '0')).toBe('-');
+    });
+
+    it('keeps other values and dashes the empty ones', () => {
+        expect(formatHousekeepingListCell('message', 'hello')).toBe('hello');
+        expect(formatHousekeepingListCell('user', '')).toBe('-');
+        expect(formatHousekeepingListCell('mute_minutes', '0')).toBe('-');
+        expect(formatHousekeepingListCell('mute_minutes', '15')).toBe('15');
+    });
+});
+
+describe('isPermanentHousekeepingBan', () => {
+    const now = 1_790_622_185;
+
+    it('treats the saturated expiry of a permanent ban as permanent', () => {
+        expect(isPermanentHousekeepingBan(2_147_483_647, now)).toBe(true);
+    });
+
+    it('keeps a timed ban as a date', () => {
+        expect(isPermanentHousekeepingBan(now + 7 * 24 * 3600, now)).toBe(false);
     });
 });

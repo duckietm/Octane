@@ -21,6 +21,7 @@ import {
     GetOwnRoomObject,
     GetUserProfile,
     getMuteLabelKey,
+    isHousekeepingEnabled,
     getTradeBlockedKey,
     LocalizeText,
     MessengerFriend,
@@ -31,7 +32,18 @@ import {
     SendMessageComposer
 } from '../../../../../api';
 import { Flex } from '../../../../../common';
-import { useFriends, useHelp, useIsUserIgnored, useMessageEvent, useNotification, usePurse, useRoom, useSessionInfo, useWiredTools } from '../../../../../hooks';
+import {
+    useFriends,
+    useHasPermission,
+    useHelp,
+    useIsUserIgnored,
+    useMessageEvent,
+    useNotification,
+    usePurse,
+    useRoom,
+    useSessionInfo,
+    useWiredTools
+} from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
@@ -61,6 +73,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
     const { showConfirm = null, simpleAlert = null } = useNotification();
     const { getCurrencyAmount = null } = usePurse();
     const { openInspectionForUser, showInspectButton } = useWiredTools();
+    const canOpenHousekeeping = useHasPermission('acc_housekeeping') && isHousekeepingEnabled();
     // Reactive: the menu auto-flips Ignore <-> Unignore if the state
     // changes while the popup is open. Direct snapshot hook call
     // scope here) so useSyncExternalStore installs against the real
@@ -249,6 +262,9 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                 case 'report':
                     report(ReportType.BULLY, { reportedUserId: avatarInfo.webID });
                     break;
+                case 'housekeeping':
+                    CreateLinkEvent(`housekeeping/user/${avatarInfo.webID}/${encodeURIComponent(avatarInfo.name)}/${encodeURIComponent(avatarInfo.figure)}`);
+                    break;
                 case 'inspect':
                     openInspectionForUser(avatarInfo.roomIndex);
                     break;
@@ -355,6 +371,11 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                         <ContextMenuListItemView onClick={(event) => processAction('moderate')}>
                             <FaChevronRight className="right fa-icon" />
                             {LocalizeText('infostand.link.moderate')}
+                        </ContextMenuListItemView>
+                    )}
+                    {canOpenHousekeeping && (
+                        <ContextMenuListItemView onClick={(event) => processAction('housekeeping')}>
+                            {LocalizeText('housekeeping.menu.open_user')}
                         </ContextMenuListItemView>
                     )}
                     {avatarInfo.isAmbassador && (

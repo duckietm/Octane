@@ -100,7 +100,7 @@ export const HousekeepingPasswordReveal: FC = () => {
             <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-700">
                 <FaKey size={10} />
                 <span className="grow">
-                    {LocalizeText('housekeeping.password.title', ['username', 'id'], [passwordReveal.username || '—', String(passwordReveal.userId)])}
+                    {LocalizeText('housekeeping.password.title', ['username', 'id'], [passwordReveal.username || '-', String(passwordReveal.userId)])}
                 </span>
                 <button
                     className="inline-flex items-center justify-center w-5 h-5 rounded text-amber-700 hover:text-amber-900 hover:bg-amber-200/60"
