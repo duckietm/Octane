@@ -1,0 +1,179 @@
+/*
+ * The card theme flattens every .bg-white inside a card to a 4% tint
+ * (OctaneCardView.css, .octane-card-shell :where(.bg-white ...)). That suits
+ * flat panels, but a menu that floats over the content has to be opaque or
+ * the rows underneath read through it.
+ */
+.octane-housekeeping .octane-hk-popover {
+    background: #ffffff !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22) !important;
+}
+
+/*
+ * Housekeeping buttons. They live in this sheet rather than in utility
+ * classes because the card theme forces borders, white backgrounds and
+ * shadows inside every card with !important.
+ */
+.octane-housekeeping .hk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid var(--hk-btn-border) !important;
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--hk-btn-top) 0%, var(--hk-btn-bottom) 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 1px 2px rgba(0, 0, 0, 0.12) !important;
+    color: var(--hk-btn-text);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    transition:
+        filter 0.12s ease,
+        transform 0.06s ease;
+}
+
+.octane-housekeeping .hk-btn:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+
+.octane-housekeeping .hk-btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.octane-housekeeping .hk-btn:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 1px;
+}
+
+/* Disabled reads as disabled for every tone: flat, grey, no pointer. */
+.octane-housekeeping .hk-btn:disabled {
+    border-color: #d4d4d8 !important;
+    background: #f4f4f5 !important;
+    box-shadow: none !important;
+    color: #a1a1aa;
+    cursor: not-allowed;
+}
+
+.octane-housekeeping .hk-btn--sm {
+    height: 22px;
+    padding: 0 8px;
+    font-size: 10.5px;
+}
+
+.octane-housekeeping .hk-btn--primary {
+    --hk-btn-border: #0369a1;
+    --hk-btn-top: #38bdf8;
+    --hk-btn-bottom: #0284c7;
+    --hk-btn-text: #ffffff;
+}
+
+.octane-housekeeping .hk-btn--success {
+    --hk-btn-border: #047857;
+    --hk-btn-top: #34d399;
+    --hk-btn-bottom: #059669;
+    --hk-btn-text: #ffffff;
+}
+
+.octane-housekeeping .hk-btn--warning {
+    --hk-btn-border: #d97706;
+    --hk-btn-top: #fde68a;
+    --hk-btn-bottom: #fbbf24;
+    --hk-btn-text: #451a03;
+}
+
+.octane-housekeeping .hk-btn--danger {
+    --hk-btn-border: #be123c;
+    --hk-btn-top: #fb7185;
+    --hk-btn-bottom: #e11d48;
+    --hk-btn-text: #ffffff;
+}
+
+.octane-housekeeping .hk-btn--neutral {
+    --hk-btn-border: #a1a1aa;
+    --hk-btn-top: #ffffff;
+    --hk-btn-bottom: #e4e4e7;
+    --hk-btn-text: #27272a;
+}
+
+/* Sub-pages and list choices: a segmented control, the active part lifted. */
+.octane-housekeeping .hk-segmented {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid #d4d4d8 !important;
+    border-radius: 8px;
+    background: #e4e4e7 !important;
+}
+
+.octane-housekeeping .hk-segmented__item {
+    display: inline-flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    height: 26px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #52525b;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition:
+        background-color 0.12s ease,
+        color 0.12s ease;
+}
+
+.octane-housekeeping .hk-segmented__item:hover:not(.is-active) {
+    background: rgba(255, 255, 255, 0.55);
+    color: #18181b;
+}
+
+.octane-housekeeping .hk-segmented__item.is-active {
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18) !important;
+    color: #0369a1;
+}
+
+.octane-housekeeping .hk-segmented__item:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 1px;
+}
+
+.octane-housekeeping .hk-segmented__count {
+    min-width: 16px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #d4d4d8;
+    color: #3f3f46;
+    font-size: 9.5px;
+    line-height: 15px;
+    text-align: center;
+}
+
+.octane-housekeeping .hk-segmented__item.is-active .hk-segmented__count {
+    background: #0284c7;
+    color: #ffffff;
+}
+
+/* The segmented control compact, for choices inside a page. */
+.octane-housekeeping .hk-segmented--compact {
+    align-self: flex-start;
+}
+
+.octane-housekeeping .hk-segmented--compact .hk-segmented__item {
+    flex: 0 0 auto;
+    height: 22px;
+    font-size: 10.5px;
+}
