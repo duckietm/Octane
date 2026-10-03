@@ -48,6 +48,7 @@ import './css/game-center/GameCenterView.css';
 
 import './css/help/HelpView.css';
 
+import './css/housekeeping/HousekeepingView.css';
 import './css/hotelview/HotelView.css';
 
 import './css/login/LoginView.css';

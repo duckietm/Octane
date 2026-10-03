@@ -27,11 +27,47 @@ export type HousekeepingActionType = (typeof HousekeepingActionType)[keyof typeo
 
 export const HousekeepingTabId = {
     DASHBOARD: 'dashboard',
+    /** Who is online and the rooms in use, right now. */
+    LIVE: 'live',
     USERS: 'users',
     ROOMS: 'rooms',
+    /** Kept for old links and stored tabs: economy now lives in the user page. */
     ECONOMY: 'economy',
     AUDIT: 'audit',
+    SUPPORT: 'support',
+    BANS: 'bans',
+    HOTEL: 'hotel',
+    /** Every permission against every rank. */
+    PERMISSIONS: 'permissions',
     SOUNDBOARD: 'soundboard'
 } as const;
 
 export type HousekeepingTabId = (typeof HousekeepingTabId)[keyof typeof HousekeepingTabId];
+
+/** Sub-pages of the user page. */
+export const HousekeepingUserSection = {
+    SANCTIONS: 'sanctions',
+    ACTIVITY: 'activity',
+    SECURITY: 'security',
+    ECONOMY: 'economy',
+    ACCOUNT: 'account',
+    NOTES: 'notes',
+    HISTORY: 'history'
+} as const;
+
+export type HousekeepingUserSection = (typeof HousekeepingUserSection)[keyof typeof HousekeepingUserSection];
+
+/** Sub-pages of the room page. */
+export const HousekeepingRoomSection = {
+    SETTINGS: 'settings',
+    MODERATION: 'moderation',
+    ACTIVITY: 'activity',
+    HISTORY: 'history'
+} as const;
+
+export type HousekeepingRoomSection = (typeof HousekeepingRoomSection)[keyof typeof HousekeepingRoomSection];
+
+/** Hotel tables the panel can hot reload; each one runs the matching :update_* command on the server. */
+export const HOUSEKEEPING_RELOAD_TARGETS = ['catalog', 'texts', 'permissions', 'items', 'navigator', 'config', 'wordfilter'] as const;
+
+export type HousekeepingReloadTarget = (typeof HOUSEKEEPING_RELOAD_TARGETS)[number];

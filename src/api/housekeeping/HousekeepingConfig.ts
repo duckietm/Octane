@@ -1,10 +1,16 @@
 import { GetConfigurationValue } from '../octane';
 import { HousekeepingTabId } from './HousekeepingActionType';
-
-export type HousekeepingMode = 'light' | 'full';
+import { HousekeepingSanctionTemplate, resolveSanctionTemplates } from './HousekeepingSanctionTemplates';
+import {
+    HOUSEKEEPING_ESCALATION_KEY,
+    HOUSEKEEPING_TICKET_REPLIES_KEY,
+    HousekeepingEscalationStep,
+    HousekeepingTicketReply,
+    resolveEscalationSteps,
+    resolveTicketReplies
+} from './HousekeepingTicketTools';
 
 export const HOUSEKEEPING_ENABLED_KEY = 'housekeeping.enabled';
-export const HOUSEKEEPING_MODE_KEY = 'housekeeping.mode';
 
 /**
  * Default-off master switch. When false, the HK module is completely
@@ -15,40 +21,61 @@ export const HOUSEKEEPING_MODE_KEY = 'housekeeping.mode';
  */
 export const isHousekeepingEnabled = (): boolean => GetConfigurationValue<boolean>(HOUSEKEEPING_ENABLED_KEY, false) === true;
 
+/** Every tab of the panel, in menu order; which ones an operator sees depends on their permissions. */
+export const HOUSEKEEPING_TABS: readonly HousekeepingTabId[] = [
+    HousekeepingTabId.DASHBOARD,
+    HousekeepingTabId.LIVE,
+    HousekeepingTabId.USERS,
+    HousekeepingTabId.ROOMS,
+    HousekeepingTabId.SUPPORT,
+    HousekeepingTabId.BANS,
+    HousekeepingTabId.AUDIT,
+    HousekeepingTabId.HOTEL,
+    HousekeepingTabId.PERMISSIONS,
+    HousekeepingTabId.SOUNDBOARD
+];
+
 /**
- * `full` (default) exposes the six-tab layout: dashboard, users,
- * rooms, economy, audit, and Soundboard. `light` strips the panel down to the
- * essentials — Users + Rooms only — for operators who want the
- * in-client HK only for live moderation, not for economy
- * management. Anything else than `'light'` resolves to `'full'`
- * so a typo doesn't quietly hide tabs.
+ * The permission each tab needs on top of acc_housekeeping; tabs not listed are open to every
+ * operator (dashboard, live, support, audit). The server enforces the same areas on every action.
  */
-export const resolveHousekeepingMode = (raw: unknown): HousekeepingMode => (raw === 'light' ? 'light' : 'full');
-
-export const getHousekeepingMode = (): HousekeepingMode => resolveHousekeepingMode(GetConfigurationValue<string>(HOUSEKEEPING_MODE_KEY, 'full'));
-
-const LIGHT_TABS: ReadonlySet<HousekeepingTabId> = new Set<HousekeepingTabId>([HousekeepingTabId.USERS, HousekeepingTabId.ROOMS]);
-
-/**
- * Pure tab-availability check. Kept side-effect-free so tab list
- * filtering and toolbar / link-event gating can all read the same
- * source of truth without hitting the config layer multiple times.
- */
-export const isHousekeepingTabAvailable = (tab: HousekeepingTabId, mode: HousekeepingMode): boolean => {
-    if (mode === 'full') return true;
-
-    return LIGHT_TABS.has(tab);
+export const HOUSEKEEPING_TAB_PERMISSIONS: Partial<Record<HousekeepingTabId, string>> = {
+    [HousekeepingTabId.USERS]: 'acc_hk_users',
+    [HousekeepingTabId.ECONOMY]: 'acc_hk_users',
+    [HousekeepingTabId.ROOMS]: 'acc_hk_rooms',
+    [HousekeepingTabId.BANS]: 'acc_hk_bans',
+    [HousekeepingTabId.HOTEL]: 'acc_hk_hotel',
+    [HousekeepingTabId.PERMISSIONS]: 'acc_hk_permissions',
+    [HousekeepingTabId.SOUNDBOARD]: 'acc_soundboard_manage'
 };
 
-export const housekeepingTabsForMode = (mode: HousekeepingMode): HousekeepingTabId[] => {
-    const all: HousekeepingTabId[] = [
-        HousekeepingTabId.DASHBOARD,
-        HousekeepingTabId.USERS,
-        HousekeepingTabId.ROOMS,
-        HousekeepingTabId.ECONOMY,
-        HousekeepingTabId.AUDIT,
-        HousekeepingTabId.SOUNDBOARD
-    ];
+/** Every permission a tab can need, so a view can read them all at once. */
+export const HOUSEKEEPING_AREA_PERMISSIONS = [
+    'acc_hk_users',
+    'acc_hk_rooms',
+    'acc_hk_bans',
+    'acc_hk_economy',
+    'acc_hk_hotel',
+    'acc_hk_permissions',
+    'acc_soundboard_manage'
+] as const;
 
-    return all.filter((tab) => isHousekeepingTabAvailable(tab, mode));
+export const isHousekeepingTabOpen = (tab: HousekeepingTabId, holds: (permission: string) => boolean): boolean => {
+    const permission = HOUSEKEEPING_TAB_PERMISSIONS[tab];
+
+    return !permission || holds(permission);
 };
+
+export const HOUSEKEEPING_SANCTION_TEMPLATES_KEY = 'housekeeping.sanction_templates';
+
+/** The sanction templates for this hotel: `housekeeping.sanction_templates` when set and valid, else the defaults. */
+export const getHousekeepingSanctionTemplates = (): HousekeepingSanctionTemplate[] =>
+    resolveSanctionTemplates(GetConfigurationValue<unknown>(HOUSEKEEPING_SANCTION_TEMPLATES_KEY, null));
+
+/** The canned replies for this hotel: `housekeeping.ticket_replies` when set and valid, else the defaults. */
+export const getHousekeepingTicketReplies = (): HousekeepingTicketReply[] =>
+    resolveTicketReplies(GetConfigurationValue<unknown>(HOUSEKEEPING_TICKET_REPLIES_KEY, null));
+
+/** The escalation steps for this hotel: `housekeeping.escalation` when set and valid, else the defaults. */
+export const getHousekeepingEscalationSteps = (): HousekeepingEscalationStep[] =>
+    resolveEscalationSteps(GetConfigurationValue<unknown>(HOUSEKEEPING_ESCALATION_KEY, null));

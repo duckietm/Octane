@@ -12,7 +12,7 @@ import {
     UpdateHomeRoomMessageComposer
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { DispatchUiEvent, GetGroupInformation, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
+import { DispatchUiEvent, GetGroupInformation, isHousekeepingEnabled, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
 import weblinkIcon from '../../../assets/images/navigator/air/icon-weblink.png';
 import removeRightsIcon from '../../../assets/images/navigator/air/remove-rights.png';
 import {
@@ -43,6 +43,7 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
     const canManageAnyRoom = useHasPermission('acc_anyroomowner');
     const canUseRoomThumbnailCamera = useHasPermission('acc_camera');
     const canStaffPick = useHasPermission('acc_staff_pick');
+    const canOpenHousekeeping = useHasPermission('acc_housekeeping') && isHousekeepingEnabled();
 
     const enteredRoomId = navigatorData?.enteredGuestRoom?.roomId ?? 0;
     const { isFavourite: isRoomInFavouritesList, toggle: toggleFavourite } = useNavigatorFavourite(enteredRoomId);
@@ -239,6 +240,11 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                     {hasPermission('settings') && (
                         <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_mute')}>
                             {LocalizeText(isRoomMuted ? 'navigator.muteall_on' : 'navigator.muteall_off')}
+                        </button>
+                    )}
+                    {canOpenHousekeeping && enteredRoomId > 0 && (
+                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => CreateLinkEvent(`housekeeping/room/${enteredRoomId}`)}>
+                            {LocalizeText('housekeeping.menu.open_room')}
                         </button>
                     )}
                 </div>
