@@ -725,7 +725,8 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                                 maxHeight: 82,
                                                 backgroundSize: 'contain',
                                                 backgroundPosition: 'center',
-                                                backgroundRepeat: 'no-repeat'
+                                                backgroundRepeat: 'no-repeat',
+                                                imageRendering: 'auto'
                                             }}
                                         />
                                     )}
