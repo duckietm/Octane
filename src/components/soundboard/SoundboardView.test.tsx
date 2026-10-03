@@ -11,14 +11,14 @@ vi.mock('@octane/renderer', () => ({
 }));
 
 vi.mock('../../api', () => ({
-    LocalizeText: (key: string) => ({
+    LocalizeText: (key: string, _keys?: string[], values?: string[]) => (({
         'soundboard.search': 'Search sounds',
         'soundboard.category.all': 'All',
         'soundboard.category.recent': 'Recent',
-        'soundboard.pagination.previous': 'Previous',
-        'soundboard.pagination.next': 'Next',
+        'soundboard.category.favorites': 'Favourites',
+        'soundboard.pagination.page': 'Page',
         'soundboard.empty': 'No sounds available'
-    })[key] || key
+    } as Record<string, string>)[key] || key) + (values?.length ? ` ${values.join(' ')}` : '')
 }));
 
 vi.mock('../../hooks', () => ({ useSoundboard: vi.fn() }));
@@ -33,15 +33,18 @@ const sounds: DisplaySoundboardSound[] = Array.from({ length: 11 }, (_, index) =
     keywords: index === 1 ? ['cláp'] : []
 }));
 
-const renderContent = (recentSoundIds = [11, 2]) => render(
+const renderContent = (recentSoundIds = [11, 2], extra: Partial<Parameters<typeof SoundboardContentView>[0]> = {}) => render(
     <SoundboardContentView
         sounds={sounds}
         categories={[{ id: 'reactions', label: 'Reactions' }, { id: 'effects', label: 'Effects' }]}
         recentSoundIds={recentSoundIds}
         isCoolingDown={false}
         onPlay={vi.fn()}
+        {...extra}
     />
 );
+
+const padNames = () => within(screen.getByTestId('soundboard-grid')).getAllByRole('button').map((pad) => pad.getAttribute('aria-label'));
 
 describe('SoundboardContentView', () => {
     afterEach(cleanup);
@@ -51,11 +54,11 @@ describe('SoundboardContentView', () => {
         const grid = screen.getByTestId('soundboard-grid');
 
         expect(within(grid).getAllByRole('button')).toHaveLength(10);
-        expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Page 2' })).toBeInTheDocument();
         expect(container.textContent).not.toContain('Played by');
         expect(container.textContent).not.toContain('Pronto');
 
-        fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
         expect(within(grid).getAllByRole('button')).toHaveLength(1);
         expect(within(grid).getByRole('button', { name: 'Sound 11' })).toBeInTheDocument();
     });
@@ -77,8 +80,39 @@ describe('SoundboardContentView', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Recent' }));
 
-        const pads = within(screen.getByTestId('soundboard-grid')).getAllByRole('button');
-        expect(pads.map((pad) => pad.textContent)).toEqual(['Sound 11', 'Applauso']);
-        expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument();
+        expect(padNames()).toEqual(['Sound 11', 'Applauso']);
+        expect(screen.queryByRole('button', { name: 'Page 2' })).not.toBeInTheDocument();
+    });
+
+    test('offers a favourites category only when there are favourites, in pinned order', () => {
+        renderContent([], { favoriteIds: [5, 3] });
+
+        fireEvent.click(screen.getByRole('button', { name: /Favourites/ }));
+        expect(padNames()).toEqual(['Sound 5', 'Sound 3']);
+
+        cleanup();
+        renderContent([]);
+        expect(screen.queryByRole('button', { name: /Favourites/ })).not.toBeInTheDocument();
+    });
+
+    test('number keys play the visible pads and arrows change page', () => {
+        const onPlay = vi.fn();
+        renderContent([], { onPlay });
+
+        fireEvent.keyDown(window, { key: '1' });
+        fireEvent.keyDown(window, { key: '0' });
+        expect(onPlay.mock.calls.map(([sound]) => sound.id)).toEqual([1, 10]);
+
+        fireEvent.keyDown(window, { key: 'ArrowRight' });
+        expect(padNames()).toEqual(['Sound 11']);
+    });
+
+    test('keys do nothing while cooling down and the bar shows the time left', () => {
+        const onPlay = vi.fn();
+        renderContent([], { onPlay, isCoolingDown: true, cooldownRemainingSeconds: 3, cooldownTotalSeconds: 4 });
+
+        fireEvent.keyDown(window, { key: '1' });
+        expect(onPlay).not.toHaveBeenCalled();
+        expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75');
     });
 });

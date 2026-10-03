@@ -1,0 +1,82 @@
+/* Soundboard pads and the side feed that replaced the "played" line in room chat. */
+@keyframes soundboard-pad-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.07); }
+}
+
+.soundboard-pad[data-playing] {
+    animation: soundboard-pad-pulse 0.5s ease-in-out 3;
+    outline: 2px solid #fff;
+}
+
+.soundboard-cooldown {
+    height: 5px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #b9ccd8;
+}
+
+.soundboard-cooldown__fill {
+    height: 100%;
+    background: #3d8fba;
+    transition: width 0.25s linear;
+}
+
+.soundboard-feed {
+    position: fixed;
+    top: 80px;
+    right: 12px;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 230px;
+    pointer-events: none;
+}
+
+@keyframes soundboard-feed-in {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: none; }
+}
+
+.soundboard-feed__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: rgba(28, 51, 66, 0.92);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.25;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    animation: soundboard-feed-in 0.35s ease-out;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.soundboard-feed__icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.soundboard-feed__user {
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.soundboard-feed__sound {
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.82);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
