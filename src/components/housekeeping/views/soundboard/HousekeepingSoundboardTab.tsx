@@ -66,7 +66,7 @@ export const HousekeepingSoundboardTab: FC = () => {
 
         setPreviewFailed(false);
         void GetSoundManager()
-            .playSoundboard(resolveSoundboardSoundUrl({ classname: candidate.classname?.trim() ?? '', url: candidate.url?.trim() ?? '' }, manifest))
+            .playSoundboardPreview(resolveSoundboardSoundUrl({ classname: candidate.classname?.trim() ?? '', url: candidate.url?.trim() ?? '' }, manifest))
             .then((played) => setPreviewFailed(!played));
     };
 
