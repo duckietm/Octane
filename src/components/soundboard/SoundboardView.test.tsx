@@ -115,4 +115,20 @@ describe('SoundboardContentView', () => {
         expect(onPlay).not.toHaveBeenCalled();
         expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75');
     });
+
+    test('says how many users are muted and lets the player unmute them all', () => {
+        const onRestoreSilenced = vi.fn();
+        renderContent([], { silencedCount: 3, onRestoreSilenced });
+
+        expect(screen.getByText('soundboard.silenced.count 3')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'soundboard.silenced.restore' }));
+        expect(onRestoreSilenced).toHaveBeenCalledOnce();
+    });
+
+    test('shows no muted line while nobody is muted', () => {
+        renderContent([]);
+
+        expect(screen.queryByRole('button', { name: 'soundboard.silenced.restore' })).toBeNull();
+    });
 });

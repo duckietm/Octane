@@ -7,7 +7,7 @@ describe('soundboard feed store', () => {
     it('keeps the newest plays first up to the limit and remembers the last sound', () => {
         const { push } = useSoundboardFeedStore.getState();
 
-        for (let index = 1; index <= SOUNDBOARD_FEED_LIMIT + 2; index++) push({ username: `user${index}`, soundName: 'Click', soundId: index });
+        for (let index = 1; index <= SOUNDBOARD_FEED_LIMIT + 2; index++) push({ username: `user${index}`, userId: index, soundName: 'Click', soundId: index });
 
         const { entries, lastPlayed } = useSoundboardFeedStore.getState();
         expect(entries).toHaveLength(SOUNDBOARD_FEED_LIMIT);
@@ -17,17 +17,17 @@ describe('soundboard feed store', () => {
 
     it('never reuses a key, not even after the feed was cleared', () => {
         const { push, clear } = useSoundboardFeedStore.getState();
-        const first = push({ username: 'tester', soundName: 'Click', soundId: 1 });
+        const first = push({ username: 'tester', userId: 1, soundName: 'Click', soundId: 1 });
 
         clear();
-        const second = push({ username: 'tester', soundName: 'Click', soundId: 1 });
+        const second = push({ username: 'tester', userId: 1, soundName: 'Click', soundId: 1 });
 
         expect(second).toBeGreaterThan(first);
     });
 
     it('dismisses a single entry', () => {
-        const key = useSoundboardFeedStore.getState().push({ username: 'tester', soundName: 'Click', soundId: 1 });
-        useSoundboardFeedStore.getState().push({ username: 'other', soundName: 'Ding', soundId: 2 });
+        const key = useSoundboardFeedStore.getState().push({ username: 'tester', userId: 1, soundName: 'Click', soundId: 1 });
+        useSoundboardFeedStore.getState().push({ username: 'other', userId: 2, soundName: 'Ding', soundId: 2 });
 
         useSoundboardFeedStore.getState().dismiss(key);
         expect(useSoundboardFeedStore.getState().entries.map((entry) => entry.username)).toEqual(['other']);
