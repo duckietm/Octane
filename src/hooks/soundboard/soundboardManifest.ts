@@ -15,6 +15,10 @@ export interface SoundboardManifestEntry {
     categoryId: string | null;
     tone: SoundboardTone;
     keywords: string[];
+    /** Pads of one group cut each other off while they sound; empty means no group. */
+    group: string;
+    /** Level relative to the player's soundboard volume, above 0 and at most 1. */
+    gain: number;
 }
 
 export interface SoundboardManifest {
@@ -31,11 +35,20 @@ const readKeywords = (value: unknown): string[] =>
         ? [...new Set(value.filter((keyword): keyword is string => typeof keyword === 'string').map((keyword) => keyword.trim()).filter(Boolean))]
         : [];
 
+const readGroup = (value: unknown): string => {
+    const group = typeof value === 'string' ? value.trim().toLowerCase() : '';
+
+    return GROUP_PATTERN.test(group) ? group : '';
+};
+
+const readGain = (value: unknown): number => (typeof value === 'number' && value > 0 && value <= 1 ? value : 1);
+
 /**
  * The classname reaches the DOM as a URL path segment, so the same narrow
  * alphabet the emulator enforces is re-checked here rather than trusted.
  */
 const CLASSNAME_PATTERN = /^[a-z0-9_-]{1,64}$/;
+const GROUP_PATTERN = /^[a-z0-9_-]{1,32}$/;
 
 export const normalizeSoundboardManifest = (input: unknown): SoundboardManifest => {
     if (!isRecord(input)) return EMPTY_SOUNDBOARD_MANIFEST;
@@ -80,7 +93,9 @@ export const normalizeSoundboardManifest = (input: unknown): SoundboardManifest 
                 file,
                 categoryId: categoryIds.has(rawCategory) ? rawCategory : null,
                 tone,
-                keywords: readKeywords(candidate.keywords)
+                keywords: readKeywords(candidate.keywords),
+                group: readGroup(candidate.group),
+                gain: readGain(candidate.gain)
             });
         }
     }

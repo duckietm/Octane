@@ -42,8 +42,8 @@ describe('soundboard presentation', () => {
         );
 
         expect(sounds).toEqual([
-            { id: 7, name: 'Server name', url: '/sounds/server.mp3', classname: '', categoryId: 'fun', tone: 'purple', keywords: [] },
-            { id: 8, name: 'Server only', url: '/sounds/only.mp3', classname: '', categoryId: null, tone: 'blue', keywords: [] }
+            { id: 7, name: 'Server name', url: '/sounds/server.mp3', classname: '', categoryId: 'fun', tone: 'purple', keywords: [], group: '', gain: 1 },
+            { id: 8, name: 'Server only', url: '/sounds/only.mp3', classname: '', categoryId: null, tone: 'blue', keywords: [], group: '', gain: 1 }
         ]);
     });
 

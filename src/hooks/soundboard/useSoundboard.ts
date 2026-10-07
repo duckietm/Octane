@@ -25,7 +25,8 @@ import {
     normalizeSoundboardLayout,
     pushRecentSound,
     SoundboardCategory,
-    SoundboardLayout
+    SoundboardLayout,
+    soundboardPlayOptions
 } from './soundboardPresentation';
 import { getRemainingCooldownSeconds, shouldStartOwnCooldown } from './soundboardUi.helpers';
 import { resolveSoundboardSoundUrl } from './soundboardUrl';
@@ -91,8 +92,10 @@ export const useSoundboardState = () => {
     const handlePlay = useCallback(
         (event: SoundboardPlayEvent) => {
             const parser = event.getParser();
+            const asset = manifestRef.current.byClassname.get(parser.classname?.trim().toLowerCase() ?? '');
+
             void GetSoundManager()
-                .playSoundboard(resolveSoundboardSoundUrl({ classname: parser.classname, url: parser.url }, manifestRef.current))
+                .playSoundboard(resolveSoundboardSoundUrl({ classname: parser.classname, url: parser.url }, manifestRef.current), soundboardPlayOptions(asset))
                 .then((played) => {
                     if (!played) showSingleBubble(LocalizeText('soundboard.error.audio'), NotificationBubbleType.SOUNDBOARD);
                 });
@@ -186,7 +189,7 @@ export const useSoundboardState = () => {
 
             if (sound.local) {
                 void GetSoundManager()
-                    .playSoundboard(resolveSoundboardSoundUrl(sound, manifestRef.current))
+                    .playSoundboard(resolveSoundboardSoundUrl(sound, manifestRef.current), soundboardPlayOptions(sound))
                     .then((played) => {
                         if (!played) showSingleBubble(LocalizeText('soundboard.error.audio'), NotificationBubbleType.SOUNDBOARD);
                     });

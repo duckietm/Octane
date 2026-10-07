@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HousekeepingSoundboardTab } from './HousekeepingSoundboardTab';
 
 const mocks = vi.hoisted(() => ({
-    playSoundboard: vi.fn().mockResolvedValue(true),
+    playSoundboardPreview: vi.fn().mockResolvedValue(true),
     request: vi.fn(),
     upsert: vi.fn(),
     reorder: vi.fn(),
@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@octane/renderer', () => ({
-    GetSoundManager: () => ({ playSoundboard: mocks.playSoundboard })
+    GetSoundManager: () => ({ playSoundboardPreview: mocks.playSoundboardPreview })
 }));
 
 vi.mock('../../../../api', () => ({
@@ -66,7 +66,7 @@ vi.mock('../../../../hooks', () => ({
 
 describe('HousekeepingSoundboardTab', () => {
     beforeEach(() => {
-        mocks.playSoundboard.mockClear();
+        mocks.playSoundboardPreview.mockClear();
         mocks.request.mockClear();
         mocks.upsert.mockClear();
         mocks.reorder.mockClear();
@@ -102,7 +102,7 @@ describe('HousekeepingSoundboardTab', () => {
         fireEvent.change(screen.getByRole('spinbutton', { name: 'Minimum rank' }), { target: { value: '1' } });
 
         fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
-        expect(mocks.playSoundboard).toHaveBeenCalledWith('https://assets.example.test/sounds/fanfare.mp3');
+        expect(mocks.playSoundboardPreview).toHaveBeenCalledWith('https://assets.example.test/sounds/fanfare.mp3');
         fireEvent.click(screen.getByRole('button', { name: 'Save sound' }));
         expect(mocks.upsert).toHaveBeenCalledWith(expect.objectContaining({ id: 0, name: 'Fanfara', enabled: true }));
     });
@@ -133,7 +133,7 @@ describe('HousekeepingSoundboardTab', () => {
     });
 
     it('surfaces renderer preview failures', async () => {
-        mocks.playSoundboard.mockResolvedValueOnce(false);
+        mocks.playSoundboardPreview.mockResolvedValueOnce(false);
         render(<HousekeepingSoundboardTab />);
         fireEvent.click(screen.getByRole('button', { name: 'Preview Campanella' }));
 
