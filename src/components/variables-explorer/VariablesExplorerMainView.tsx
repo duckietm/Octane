@@ -5,7 +5,6 @@ import {
     explorerErrorMessage,
     GetWebApiHotels,
     localizeWithFallback,
-    VariablesWebApiError,
     WebApiVariable
 } from '../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
@@ -96,12 +95,7 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
                 setBulkDeleteName(null);
             })
             .catch((error) => {
-                if (error instanceof VariablesWebApiError && error.status === 403) {
-                    setStatus({ text: 'This write key may not bulk delete. Allow mass deletion in the Web API add-on first.', isError: true });
-                } else {
-                    reportError(error);
-                }
-
+                reportError(error);
                 setBulkDeleteName(null);
             })
             .finally(() => setBulkBusy(false));

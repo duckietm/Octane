@@ -1424,5 +1424,21 @@
     "disconnected.info.incorrect_password": "Vuelve a iniciar sesión.",
     "disconnected.info.idle": "Estuviste ausente demasiado tiempo, así que el hotel cerró tu sesión.",
     "disconnected.info.incompatible_client_version": "Recarga la página para obtener la última versión.",
-    "disconnected.info.generic": "Te has desconectado. Inténtalo de nuevo."
+    "disconnected.info.generic": "Te has desconectado. Inténtalo de nuevo.",
+    "infostand.button.recolor": "Cambiar color",
+    "builder.palette.title": "Paleta",
+    "builder.palette.apply_to.this": "Solo este furni",
+    "builder.palette.apply_to.all": "En varios furnis",
+    "builder.recolor.title": "Cambiar color del furni",
+    "builder.recolor.preview": "Vista previa",
+    "builder.recolor.room_colors": "Colores en esta sala",
+    "builder.recolor.apply_to": "Aplicar a:",
+    "builder.recolor.apply_to.this": "Solo este furni",
+    "builder.recolor.apply_to.same": "Todos estos en esta sala",
+    "builder.recolor.apply": "Aplicar",
+    "builder.recolor.error.no_rights": "Solo puedes cambiar colores en salas donde puedes colocar furnis del Builders Club.",
+    "builder.recolor.error.not_found": "Ese furni ya no está en esta sala.",
+    "builder.recolor.error.not_recolorable": "Este furni no existe en otros colores.",
+    "builder.recolor.error.not_builders_club": "Solo se pueden cambiar de color los furnis del Builders Club.",
+    "builder.recolor.error.no_such_color": "Este furni no existe en ese color."
 }

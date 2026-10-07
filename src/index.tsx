@@ -22,6 +22,7 @@ import './css/avatar-editor/AvatarEditorView.css';
 import './css/backgrounds/BackgroundsView.css';
 import './css/badges/BadgeLeaderboardView.css';
 import './css/catalog/CatalogView.css';
+import './css/catalog/BuildersBlocks.css';
 import './css/catalog/CatalogExperience.css';
 import './css/catalog/CatalogVipBuyView.css';
 import './css/emustats/EmuStatsView.css';
@@ -47,8 +48,8 @@ import './css/groups/GroupView.css';
 import './css/game-center/GameCenterView.css';
 
 import './css/help/HelpView.css';
-
 import './css/housekeeping/HousekeepingView.css';
+
 import './css/hotelview/HotelView.css';
 
 import './css/login/LoginView.css';

@@ -7,7 +7,7 @@ import {
     RoomSessionDimmerPresetsEvent
 } from '@octane/renderer';
 import { useEffect, useState } from 'react';
-import { DimmerFurnitureWidgetPresetItem, FurnitureDimmerUtilities } from '../../../../api';
+import { DimmerFurnitureWidgetPresetItem, FurnitureDimmerUtilities, IsAnyRoomController } from '../../../../api';
 import { useOctaneEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
 
@@ -24,7 +24,7 @@ const useFurnitureDimmerWidgetState = () => {
     const [selectedBrightness, setSelectedBrightness] = useState(0);
     const { roomSession = null } = useRoom();
 
-    const canOpenWidget = () => roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST || GetSessionDataManager().isModerator;
+    const canOpenWidget = () => roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST || IsAnyRoomController();
 
     const selectPresetId = (id: number) => {
         const preset = presets[id - 1];

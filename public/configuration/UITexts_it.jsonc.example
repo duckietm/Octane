@@ -1627,5 +1627,21 @@
     "disconnected.info.incorrect_password": "Accedi di nuovo.",
     "disconnected.info.idle": "Sei stato assente troppo a lungo, quindi l'hotel ha chiuso la tua sessione.",
     "disconnected.info.incompatible_client_version": "Ricarica la pagina per ottenere l'ultima versione.",
-    "disconnected.info.generic": "Sei stato disconnesso. Riprova."
+    "disconnected.info.generic": "Sei stato disconnesso. Riprova.",
+    "infostand.button.recolor": "Ricolora",
+    "builder.palette.title": "Tavolozza",
+    "builder.palette.apply_to.this": "Solo questo furni",
+    "builder.palette.apply_to.all": "Su più furni",
+    "builder.recolor.title": "Ricolora furni",
+    "builder.recolor.preview": "Anteprima",
+    "builder.recolor.room_colors": "Colori in questa stanza",
+    "builder.recolor.apply_to": "Applica a:",
+    "builder.recolor.apply_to.this": "Solo questo furni",
+    "builder.recolor.apply_to.same": "Tutti questi nella stanza",
+    "builder.recolor.apply": "Applica",
+    "builder.recolor.error.no_rights": "Puoi ricolorare solo nelle stanze dove puoi piazzare furni del Builders Club.",
+    "builder.recolor.error.not_found": "Quel furni non è più in questa stanza.",
+    "builder.recolor.error.not_recolorable": "Questo furni non esiste in altri colori.",
+    "builder.recolor.error.not_builders_club": "Solo i furni del Builders Club possono essere ricolorati.",
+    "builder.recolor.error.no_such_color": "Questo furni non esiste in quel colore."
 }

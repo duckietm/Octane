@@ -37,6 +37,7 @@ export const useCatalogData = () => {
     const catalogLoadError: 'timeout' | null = pageQuery.isError && !pageQuery.isFetching ? 'timeout' : null;
 
     return {
+        currentType: ui.currentType,
         isBusy,
         catalogLoadError,
         rootNode: indexQuery.data?.rootNode ?? null,

@@ -1,6 +1,6 @@
 import { GetRoomEngine, GetSessionDataManager, RoomEngineTriggerWidgetEvent, RoomObjectVariable } from '@octane/renderer';
 import { useState } from 'react';
-import { GetRoomSession, IsOwnerOfFurniture } from '../../../../api';
+import { GetRoomSession, IsAnyRoomController, IsOwnerOfFurniture } from '../../../../api';
 import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
@@ -61,7 +61,7 @@ const useFurnitureStickieWidgetState = () => {
         setColor(color || '0');
         setText(text || '');
         setType(roomObject.type || 'post_it');
-        setCanModify(GetRoomSession().isRoomOwner || GetSessionDataManager().isModerator || IsOwnerOfFurniture(roomObject));
+        setCanModify(GetRoomSession().isRoomOwner || IsAnyRoomController() || IsOwnerOfFurniture(roomObject));
     });
 
     useFurniRemovedEvent(objectId !== -1 && category !== -1, (event) => {

@@ -1424,5 +1424,21 @@
     "disconnected.info.incorrect_password": "Log opnieuw in.",
     "disconnected.info.idle": "Je was te lang weg, daarom heeft het hotel je sessie gesloten.",
     "disconnected.info.incompatible_client_version": "Herlaad de pagina om de nieuwste versie te krijgen.",
-    "disconnected.info.generic": "Je verbinding is verbroken. Probeer het opnieuw."
+    "disconnected.info.generic": "Je verbinding is verbroken. Probeer het opnieuw.",
+    "infostand.button.recolor": "Kleur wijzigen",
+    "builder.palette.title": "Palet",
+    "builder.palette.apply_to.this": "Alleen dit meubi",
+    "builder.palette.apply_to.all": "Op meerdere meubi",
+    "builder.recolor.title": "Meubel kleuren",
+    "builder.recolor.preview": "Voorbeeld",
+    "builder.recolor.room_colors": "Kleuren in deze kamer",
+    "builder.recolor.apply_to": "Toepassen op:",
+    "builder.recolor.apply_to.this": "Alleen dit meubel",
+    "builder.recolor.apply_to.same": "Al deze meubels in deze kamer",
+    "builder.recolor.apply": "Toepassen",
+    "builder.recolor.error.no_rights": "Je kunt alleen meubels kleuren in kamers waar je Builders Club meubels mag plaatsen.",
+    "builder.recolor.error.not_found": "Dit meubel staat niet meer in deze kamer.",
+    "builder.recolor.error.not_recolorable": "Dit meubel bestaat niet in andere kleuren.",
+    "builder.recolor.error.not_builders_club": "Alleen Builders Club meubels kunnen een andere kleur krijgen.",
+    "builder.recolor.error.no_such_color": "Dit meubel bestaat niet in die kleur."
 }

@@ -1,7 +1,7 @@
 import { ColorConverter } from '@octane/renderer';
 import { FC, useMemo, useState } from 'react';
 import { FaFillDrip } from 'react-icons/fa';
-import { IPurchasableOffer, SanitizeHtml } from '../../../../../api';
+import { CatalogType, IPurchasableOffer, SanitizeHtml } from '../../../../../api';
 import { AutoGrid, Button, Column, LayoutGridItem, Text } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useInventoryFurni } from '../../../../../hooks';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
@@ -13,10 +13,19 @@ import { CatalogSpinnerWidgetView } from '../widgets/CatalogSpinnerWidgetView';
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { CatalogLayoutBuildersBlocksView } from './CatalogLayoutBuildersBlocksView';
 
 export interface CatalogLayoutColorGroupViewProps extends CatalogLayoutProps {}
 
 export const CatalogLayoutColorGroupingView: FC<CatalogLayoutColorGroupViewProps> = (props) => {
+    const { currentType } = useCatalogData();
+
+    if (currentType === CatalogType.BUILDER) return <CatalogLayoutBuildersBlocksView {...props} />;
+
+    return <CatalogLayoutColorGroupingGridView {...props} />;
+};
+
+const CatalogLayoutColorGroupingGridView: FC<CatalogLayoutColorGroupViewProps> = (props) => {
     const { page = null } = props;
     const [colorableItems, setColorableItems] = useState<Map<string, number[]>>(new Map<string, number[]>());
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();

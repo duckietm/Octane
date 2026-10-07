@@ -84,7 +84,15 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread; group: M
                 <div className="messenger-message-name">{name}:</div>
                 <div className="messenger-message-bubble">
                     {group.chats.map((chat, index) =>
-                        !chat.showTranslation ? (
+                        chat.failed ? (
+                            // Refused by the server: never reached the friend.
+                            <div key={index} className="messenger-message-failed" title={chat.failureText}>
+                                <span className="messenger-message-failed-mark" aria-hidden="true">
+                                    !
+                                </span>
+                                {renderMessage(chat)}
+                            </div>
+                        ) : !chat.showTranslation ? (
                             <div key={index}>{renderMessage(chat)}</div>
                         ) : (
                             <div key={index} className="messenger-translation-block">

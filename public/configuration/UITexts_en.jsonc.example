@@ -1430,5 +1430,21 @@
     "disconnected.info.incorrect_password": "Please log in again.",
     "disconnected.info.idle": "You were away for too long, so the hotel closed your session.",
     "disconnected.info.incompatible_client_version": "Please reload the page to get the latest version.",
-    "disconnected.info.generic": "You have been disconnected. Please try again."
+    "disconnected.info.generic": "You have been disconnected. Please try again.",
+    "infostand.button.recolor": "Recolor",
+    "builder.palette.title": "Palette",
+    "builder.palette.apply_to.this": "Only this furni",
+    "builder.palette.apply_to.all": "On multiple furni",
+    "builder.recolor.title": "Recolor furniture",
+    "builder.recolor.preview": "Preview",
+    "builder.recolor.room_colors": "Colors in this room",
+    "builder.recolor.apply_to": "Apply to:",
+    "builder.recolor.apply_to.this": "Only this furniture",
+    "builder.recolor.apply_to.same": "All of these in this room",
+    "builder.recolor.apply": "Apply",
+    "builder.recolor.error.no_rights": "You can only recolor furniture in rooms where you can place Builders Club furni.",
+    "builder.recolor.error.not_found": "That furniture is not in this room anymore.",
+    "builder.recolor.error.not_recolorable": "This furniture does not come in other colors.",
+    "builder.recolor.error.not_builders_club": "Only Builders Club furniture can be recolored.",
+    "builder.recolor.error.no_such_color": "This furniture is not available in that color."
 }

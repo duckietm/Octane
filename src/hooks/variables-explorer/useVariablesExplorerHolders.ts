@@ -31,20 +31,29 @@ export const useVariablesExplorerHolders = (client: VariablesWebApiClient, scope
     const [scrollKey, setScrollKey] = useState(0);
     const [status, setStatus] = useState('');
     const requestId = useRef(0);
+    const total = useRef<number | null>(null);
 
     const load = async (requested: number, kind: WebApiTargetKind, sort: string) => {
         const id = ++requestId.current;
         const option = sortOptionById(sort);
 
         try {
-            const result = await client.listEntries(scope, name, kind, requested, VARIABLES_EXPLORER_PAGE_SIZE, option.sort, option.order);
+            // Habbo's pages carry no total: count on the first page of a filter, then keep it.
+            const knownTotal = requested > 1 ? total.current : null;
+            const [result, count] = await Promise.all([
+                client.listEntries(scope, name, kind, requested, VARIABLES_EXPLORER_PAGE_SIZE, option.sort, option.order),
+                knownTotal === null ? client.countEntries(scope, name, kind) : Promise.resolve(knownTotal)
+            ]);
 
             if (id !== requestId.current) return;
 
+            const entries = result?.entries ?? [];
+
+            total.current = Math.max(count, (requested - 1) * VARIABLES_EXPLORER_PAGE_SIZE + entries.length);
             setPage({
                 page: result?.page ?? requested,
-                total: result?.total ?? 0,
-                holders: (result?.entries ?? []).map((entry) => webApiEntryToHolder(entry, scope, kind))
+                total: total.current,
+                holders: entries.map((entry) => webApiEntryToHolder(entry, scope, kind))
             });
             setScrollKey((key) => key + 1);
             setStatus('');

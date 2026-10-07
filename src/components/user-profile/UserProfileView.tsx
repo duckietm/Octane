@@ -12,17 +12,24 @@ import {
     UserProfileParser,
     UserRelationshipsComposer
 } from '@octane/renderer';
-import { FC, useRef, useState } from 'react';
-import { CreateLinkEvent, GetRoomSession, GetUserProfile, LocalizeText, localizeWithFallback, rememberBadgeRarityFromPacket, SanitizeHtml, SendMessageComposer } from '../../api';
+import { FC, useState } from 'react';
+import {
+    CreateLinkEvent,
+    GetRoomSession,
+    GetUserProfile,
+    isProfileHiddenFromViewer,
+    LocalizeText,
+    localizeWithFallback,
+    SanitizeHtml,
+    SendMessageComposer
+} from '../../api';
 import { frankStop } from '../../assets/images/user-profile';
 import { useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
-import { useCardBackgroundTone } from '../../hooks/user-profile/useCardBackgroundTone';
 import { OctaneCard } from '../../layout';
 import { GroupsContainerView } from './GroupsContainerView';
 import { UserContainerView } from './UserContainerView';
 
 export const UserProfileView: FC<{}> = () => {
-    const contentRef = useRef<HTMLDivElement>(null);
     const [userProfile, setUserProfile] = useState<UserProfileParser>(null);
     const [userBadges, setUserBadges] = useState<string[]>([]);
     const [userRelationships, setUserRelationships] = useState<RelationshipStatusInfoMessageParser>(null);
@@ -74,7 +81,6 @@ export const UserProfileView: FC<{}> = () => {
 
         if (!userProfile || parser.userId !== userProfile.id) return;
 
-        rememberBadgeRarityFromPacket(parser.badgeDetails);
         setUserBadges(parser.badges);
     });
 
@@ -126,20 +132,15 @@ export const UserProfileView: FC<{}> = () => {
         GetUserProfile(userData.webID);
     });
 
-    const cardBackgroundId = userProfile?.cardBackgroundId ?? 0;
-    // The card background is painted on the window content; the copy on top turns light when it is dark.
-    const cardTone = useCardBackgroundTone(contentRef, cardBackgroundId);
-
     if (!userProfile) return null;
 
-    const cardBackgroundClass = cardBackgroundId
-        ? `profile-card-background card-background-${cardBackgroundId}${cardTone === 'dark' ? ' profile-card-background--dark' : ''}`
-        : '';
+    const cardBackgroundId = userProfile.cardBackgroundId ?? 0;
+    const cardBackgroundClass = cardBackgroundId ? `profile-card-background card-background-${cardBackgroundId}` : '';
 
     return (
         <OctaneCard className="octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]" uniqueKey="octane-user-profile">
             <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
-            <OctaneCard.Content ref={contentRef} className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
+            <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
                 {isBlocked && (
                     // Official blocked_container: the drama text, whose "event:profile/unblock" link
                     // opens the unblock confirm (it carries no href, so it is never followed as a
@@ -176,22 +177,20 @@ export const UserProfileView: FC<{}> = () => {
                     />
                 </div>
                 <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
-                    {/* Official full_profile_hidden: the owner hid the profile, so everybody else
-                        sees this notice in place of the groups section. The owner sees it all. */}
-                    {userProfile.isHidden && userProfile.id !== GetSessionDataManager().userId ? (
-                        <div className="octane-extended-profile__hidden">
-                            {localizeWithFallback('profile.full_profile_hidden', "This user's full profile is hidden")}
-                        </div>
-                    ) : (
-                        <div className="octane-extended-profile-window__panel h-full p-2">
+                    <div className="octane-extended-profile-window__panel h-full p-2">
+                        {isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId) ? (
+                            <p className="octane-extended-profile__hidden-notice">
+                                {localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}
+                            </p>
+                        ) : (
                             <GroupsContainerView
                                 fullWidth
                                 groups={userProfile.groups}
                                 itsMe={userProfile.id === GetSessionDataManager().userId}
                                 onLeaveGroup={onLeaveGroup}
                             />
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </OctaneCard.Content>
         </OctaneCard>

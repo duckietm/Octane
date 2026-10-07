@@ -185,6 +185,14 @@
   line-height: 16px;
 }
 
+.octane-extended-profile__hidden-notice {
+  margin: 0;
+  padding: 12px 4px;
+  color: #555;
+  font-size: 12px;
+  text-align: center;
+}
+
 .octane-extended-profile__relationship {
   display: grid;
   grid-template-columns: 19px minmax(0, 1fr);
@@ -337,24 +345,6 @@
   border: 1px solid #afafaf;
   background: #d6d3cb;
   padding: 0 !important;
-}
-
-/* Official full_profile_hidden: a 498x226 0xcccccc border at (0,5) of the bottom block, with the
-   notice in bold 0x555555 in the middle. */
-.octane-extended-profile__hidden {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 498px;
-  height: 226px;
-  margin-top: 5px;
-  border-radius: 6px;
-  background: #cccccc;
-  color: #555555;
-  font-size: 11px;
-  font-weight: 700;
-  text-align: center;
 }
 
 .octane-extended-profile-groups {
@@ -590,16 +580,6 @@
   }
 }
 
-/* Official presence: a user hiding their status sees a dimmed icon on their own profile. */
-.octane-extended-profile__presence--hidden {
-  opacity: 0.55;
-}
-
-/* The official levelRegion has no click. */
-.octane-extended-profile__summary-button--level {
-  cursor: default;
-}
-
 /* ---- official block_button and blocked_container ---- */
 
 .octane-extended-profile {
@@ -668,30 +648,4 @@
 
 .octane-extended-profile-window__content {
   position: relative;
-}
-
-/* A dark card background (measured by useCardBackgroundTone) turns the identity copy light,
-   with a soft shadow; links stay recognisable in white. */
-.profile-card-background--dark .octane-extended-profile__motto,
-.profile-card-background--dark .octane-extended-profile__meta,
-.profile-card-background--dark .octane-extended-profile__meta b,
-.profile-card-background--dark .octane-extended-profile__status-text {
-  color: #ffffff;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
-}
-
-.profile-card-background--dark .octane-extended-profile__username {
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
-}
-
-/* The italic motto is thin: a wider, softer shadow smothers dotted and striped patterns
-   right under the strokes without drawing an outline. */
-.profile-card-background--dark .octane-extended-profile__motto {
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8), 0 0 3px rgba(0, 0, 0, 0.85), 0 0 6px rgba(0, 0, 0, 0.6);
-}
-
-.profile-card-background--dark .octane-extended-profile__actions .octane-extended-profile__link,
-.profile-card-background--dark .octane-extended-profile__meta .octane-extended-profile__link {
-  color: #ffffff;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
 }

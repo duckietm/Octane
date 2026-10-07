@@ -17,6 +17,7 @@ import { FurnitureInternalLinkView } from './FurnitureInternalLinkView';
 import { FurnitureMannequinView } from './FurnitureMannequinView';
 import { FurnitureRoomLinkView } from './FurnitureRoomLinkView';
 import { FurnitureSpamWallPostItView } from './FurnitureSpamWallPostItView';
+import { FurnitureRecolorView } from './FurnitureRecolorView';
 import { FurnitureStackHeightView } from './FurnitureStackHeightView';
 import { FurnitureStickieView } from './FurnitureStickieView';
 import { FurnitureTrophyView } from './FurnitureTrophyView';
@@ -37,6 +38,9 @@ export const FurnitureWidgetsView: FC<{}> = (props) => {
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="FurnitureChest">
                 <FurnitureChestView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="FurnitureRecolor">
+                <FurnitureRecolorView />
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="FurnitureCrafting">
                 <FurnitureCraftingView />

@@ -26,6 +26,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     CloneObject,
+    getFollowErrorTextKey,
     LocalizeText,
     localizeWithFallback,
     MessengerFriend,
@@ -275,8 +276,10 @@ const useFriendsStore = () => {
         });
     });
 
-    useMessageEvent<FollowFriendFailedEvent>(FollowFriendFailedEvent, () => {
-        simpleAlert(LocalizeText('friendlist.followerror.hotelview'), NotificationAlertType.DEFAULT, null, null, LocalizeText('friendlist.alert.title'));
+    useMessageEvent<FollowFriendFailedEvent>(FollowFriendFailedEvent, (event) => {
+        const textKey = getFollowErrorTextKey(event.getParser().errorCode);
+
+        simpleAlert(LocalizeText(textKey), NotificationAlertType.DEFAULT, null, null, LocalizeText('friendlist.alert.title'));
     });
 
     useMessageEvent<MessageErrorEvent>(MessageErrorEvent, (event) => {

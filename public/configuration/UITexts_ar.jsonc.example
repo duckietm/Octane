@@ -1380,5 +1380,21 @@
     "disconnected.info.incorrect_password": "يرجى تسجيل الدخول مرة أخرى.",
     "disconnected.info.idle": "لقد غبت لفترة طويلة، لذلك أغلق الفندق جلستك.",
     "disconnected.info.incompatible_client_version": "يرجى إعادة تحميل الصفحة للحصول على أحدث إصدار.",
-    "disconnected.info.generic": "تم قطع اتصالك. يرجى المحاولة مرة أخرى."
+    "disconnected.info.generic": "تم قطع اتصالك. يرجى المحاولة مرة أخرى.",
+    "infostand.button.recolor": "تغيير اللون",
+    "builder.palette.title": "لوحة الألوان",
+    "builder.palette.apply_to.this": "هذا الأثاث فقط",
+    "builder.palette.apply_to.all": "على عدة قطع أثاث",
+    "builder.recolor.title": "تغيير لون الأثاث",
+    "builder.recolor.preview": "معاينة",
+    "builder.recolor.room_colors": "الألوان في هذه الغرفة",
+    "builder.recolor.apply_to": "تطبيق على:",
+    "builder.recolor.apply_to.this": "هذا الأثاث فقط",
+    "builder.recolor.apply_to.same": "كل هذه في هذه الغرفة",
+    "builder.recolor.apply": "تطبيق",
+    "builder.recolor.error.no_rights": "يمكنك تغيير الألوان فقط في الغرف التي يمكنك وضع أثاث Builders Club فيها.",
+    "builder.recolor.error.not_found": "هذا الأثاث لم يعد في هذه الغرفة.",
+    "builder.recolor.error.not_recolorable": "هذا الأثاث غير متوفر بألوان أخرى.",
+    "builder.recolor.error.not_builders_club": "يمكن تغيير لون أثاث Builders Club فقط.",
+    "builder.recolor.error.no_such_color": "هذا الأثاث غير متوفر بهذا اللون."
 }

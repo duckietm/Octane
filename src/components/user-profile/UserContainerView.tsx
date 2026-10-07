@@ -1,6 +1,16 @@
 import { CreateLinkEvent, GetSessionDataManager, RelationshipStatusInfoMessageParser, RequestFriendComposer, UserProfileParser } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { ensureBadgeLeaderboardLoaded, FriendlyTime, GetConfigurationValue, getBadgesRank, LocalizeText, localizeWithFallback, SanitizeHtml, SendMessageComposer } from '../../api';
+import {
+    ensureBadgeLeaderboardLoaded,
+    formatProfileValue,
+    FriendlyTime,
+    getBadgesRank,
+    isProfileHiddenFromViewer,
+    LocalizeText,
+    localizeWithFallback,
+    SanitizeHtml,
+    SendMessageComposer
+} from '../../api';
 import { badgeEmblemDefault } from '../../assets/images/leaderboard_badge';
 import { block as profileBlockIcon, level as profileLevelIcon, rooms as profileRoomsIcon } from '../../assets/images/user-profile';
 import { LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../common';
@@ -23,6 +33,8 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
 
     const [requestSent, setRequestSent] = useState(userProfile.requestSent);
     const isOwnProfile = userProfile.id === GetSessionDataManager().userId;
+    // "Hide my profile": the server left the counts, last login and relationships out.
+    const profileHidden = isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId);
     const canSendFriendRequest = !requestSent && !isOwnProfile && !userProfile.isMyFriend && !userProfile.requestSent;
     const infostandBackgroundClass = `background-${userProfile.backgroundId ?? 'default'}`;
     const infostandStandClass = `stand-${userProfile.standId ?? 'default'}`;
@@ -50,15 +62,6 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
             cancelled = true;
         };
     }, [userProfile.id]);
-
-    // Official presence: onlineStatus 1 online, 0 offline, 2 hidden (sent only to the user
-    // themself). A server without the presence block leaves it at -1 and isOnline decides.
-    const isHidden = userProfile.onlineStatus === 2;
-    const isOnline = userProfile.onlineStatus === 1 || (userProfile.onlineStatus < 0 && userProfile.isOnline);
-    // Official levelRegion: the account level; without it the achievement score stands in.
-    const level = userProfile.level ?? 0;
-    // Official user_activity_points is hidden unless activity.point.display.enabled.
-    const showActivityPoints = GetConfigurationValue<boolean>('activity.point.display.enabled', false);
 
     const addFriend = () => {
         setRequestSent(true);
@@ -114,19 +117,14 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                                 <span
                                     dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('extendedprofile.last.login').replace(/%\w+%/g, '').trim()) }}
                                 />{' '}
-                                {userProfile.secondsSinceLastVisit < 0 ? '-' : FriendlyTime.format(userProfile.secondsSinceLastVisit, '.ago', 2)}
+                                {formatProfileValue(userProfile.secondsSinceLastVisit, profileHidden, (seconds) => FriendlyTime.format(seconds, '.ago', 2))}
                             </p>
-                            {showActivityPoints && (
-                                <p
-                                    className="octane-extended-profile__meta"
-                                    dangerouslySetInnerHTML={{
-                                        __html: SanitizeHtml(LocalizeText('extendedprofile.activitypoints', ['activitypoints'], [userProfile.achievementPoints.toString()]))
-                                    }}
-                                />
-                            )}
+                            <p className="octane-extended-profile__meta octane-extended-profile__meta--strong">
+                                <b>{LocalizeText('extendedprofile.achievementscore')}</b> {userProfile.achievementPoints}
+                            </p>
                             <div className="octane-extended-profile__status">
                                 <div className="octane-extended-profile__presence">
-                                    <i className={`octane-icon ${isOnline ? 'icon-pf-online' : 'icon-pf-offline'}${isHidden ? ' octane-extended-profile__presence--hidden' : ''}`} />
+                                    <i className={`octane-icon ${userProfile.isOnline ? 'icon-pf-online' : 'icon-pf-offline'}`} />
                                 </div>
                                 <div className="octane-extended-profile__status-copy">
                                     {canSendFriendRequest && (
@@ -175,12 +173,17 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                     <p
                         className="text-sm leading-none"
                         dangerouslySetInnerHTML={{
-                            __html: SanitizeHtml(LocalizeText('extendedprofile.friends.count', ['count'], [userProfile.friendsCount.toString()]))
+                            __html: SanitizeHtml(LocalizeText('extendedprofile.friends.count', ['count'], [formatProfileValue(userProfile.friendsCount, profileHidden)]))
                         }}
                     />
                     <p className="octane-extended-profile__relationships-label">{LocalizeText('extendedprofile.relstatus')}</p>
-                    {userRelationships && <RelationshipsContainerView relationships={userRelationships} onClose={onClose} />}
-                    {!userRelationships && (
+                    {profileHidden && (
+                        <Text small variant="muted">
+                            {localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}
+                        </Text>
+                    )}
+                    {!profileHidden && userRelationships && <RelationshipsContainerView relationships={userRelationships} onClose={onClose} />}
+                    {!profileHidden && !userRelationships && (
                         <Text small variant="muted">
                             {LocalizeText('generic.loading')}
                         </Text>
@@ -203,12 +206,15 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                     <span className="octane-extended-profile__summary-value">{totalBadges}</span>
                     {badgesRank > 0 && <span className="octane-extended-profile__summary-rank">(#{badgesRank})</span>}
                 </button>
-                {/* Official levelRegion: "Level N", no click and no tooltip. */}
-                <div className="octane-extended-profile__summary-button octane-extended-profile__summary-button--center octane-extended-profile__summary-button--level">
+                <button
+                    className="octane-extended-profile__summary-button octane-extended-profile__summary-button--center"
+                    type="button"
+                    onClick={() => CreateLinkEvent('achievements/toggle')}
+                >
                     <img className="octane-extended-profile__summary-icon" src={profileLevelIcon} alt="" />
-                    <span className="octane-extended-profile__summary-label">{level > 0 ? LocalizeText('generic.level') : LocalizeText('extendedprofile.achievementscore')}</span>
-                    <span className="octane-extended-profile__summary-value">{level > 0 ? level : userProfile.achievementPoints}</span>
-                </div>
+                    <span className="octane-extended-profile__summary-label">{LocalizeText('extendedprofile.achievementscore')}</span>
+                    <span className="octane-extended-profile__summary-value">{userProfile.achievementPoints}</span>
+                </button>
             </div>
         </div>
     );

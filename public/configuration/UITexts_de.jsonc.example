@@ -1419,5 +1419,21 @@
     "disconnected.info.incorrect_password": "Bitte melde dich erneut an.",
     "disconnected.info.idle": "Du warst zu lange weg, daher hat das Hotel deine Sitzung beendet.",
     "disconnected.info.incompatible_client_version": "Bitte lade die Seite neu, um die neueste Version zu erhalten.",
-    "disconnected.info.generic": "Die Verbindung wurde getrennt. Bitte versuche es erneut."
+    "disconnected.info.generic": "Die Verbindung wurde getrennt. Bitte versuche es erneut.",
+    "infostand.button.recolor": "Umfärben",
+    "builder.palette.title": "Palette",
+    "builder.palette.apply_to.this": "Nur dieses Möbel",
+    "builder.palette.apply_to.all": "Auf mehrere Möbel",
+    "builder.recolor.title": "Möbel umfärben",
+    "builder.recolor.preview": "Vorschau",
+    "builder.recolor.room_colors": "Farben in diesem Raum",
+    "builder.recolor.apply_to": "Anwenden auf:",
+    "builder.recolor.apply_to.this": "Nur dieses Möbel",
+    "builder.recolor.apply_to.same": "Alle diese in diesem Raum",
+    "builder.recolor.apply": "Anwenden",
+    "builder.recolor.error.no_rights": "Du kannst nur in Räumen umfärben, in denen du Builders Club Möbel platzieren darfst.",
+    "builder.recolor.error.not_found": "Dieses Möbel ist nicht mehr in diesem Raum.",
+    "builder.recolor.error.not_recolorable": "Dieses Möbel gibt es nicht in anderen Farben.",
+    "builder.recolor.error.not_builders_club": "Nur Builders Club Möbel können umgefärbt werden.",
+    "builder.recolor.error.no_such_color": "Dieses Möbel gibt es nicht in dieser Farbe."
 }

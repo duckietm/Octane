@@ -21,6 +21,7 @@ export interface WiredInspectionTabViewProps {
     selectedFurni: InspectionFurniSelection | null;
     selectedUser: InspectionUserSelection | null;
     roomId: number | null;
+    previewRevision?: number;
     previewPlaceholder: string;
 
     // keep-selected toggle
@@ -64,6 +65,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
         selectedFurni,
         selectedUser,
         roomId,
+        previewRevision,
         previewPlaceholder,
         keepSelected,
         onKeepSelectedChange,
@@ -116,7 +118,12 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                     <div className="relative h-[224px] rounded border border-[#c0bdb4] bg-[#d7d7d7] overflow-hidden">
                         {inspectionType === 'furni' && selectedFurni && roomId !== null && (
                             <div className="absolute inset-0 flex items-center justify-center p-3">
-                                <LayoutRoomObjectImageView category={selectedFurni.category} objectId={selectedFurni.objectId} roomId={roomId} />
+                                <LayoutRoomObjectImageView
+                                    key={`${selectedFurni.objectId}-${previewRevision ?? 0}`}
+                                    category={selectedFurni.category}
+                                    objectId={selectedFurni.objectId}
+                                    roomId={roomId}
+                                />
                             </div>
                         )}
                         {inspectionType === 'user' && selectedUser && (

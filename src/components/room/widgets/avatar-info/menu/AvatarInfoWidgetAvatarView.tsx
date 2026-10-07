@@ -20,8 +20,8 @@ import {
     GetConfigurationValue,
     GetOwnRoomObject,
     GetUserProfile,
-    isHousekeepingEnabled,
     getMuteLabelKey,
+    isHousekeepingEnabled,
     getTradeBlockedKey,
     LocalizeText,
     MessengerFriend,
@@ -32,7 +32,18 @@ import {
     SendMessageComposer
 } from '../../../../../api';
 import { Flex } from '../../../../../common';
-import { useFriends, useHasPermission, useHelp, useIsUserIgnored, useMessageEvent, useNotification, usePurse, useRoom, useSessionInfo, useWiredTools } from '../../../../../hooks';
+import {
+    useFriends,
+    useHasPermission,
+    useHelp,
+    useIsUserIgnored,
+    useMessageEvent,
+    useNotification,
+    usePurse,
+    useRoom,
+    useSessionInfo,
+    useWiredTools
+} from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';

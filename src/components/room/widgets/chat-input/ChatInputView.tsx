@@ -1,7 +1,7 @@
-import { GetSessionDataManager, HabboClubLevelEnum, RoomControllerLevel } from '@octane/renderer';
+import { GetSessionDataManager, HabboClubLevelEnum, SecurityLevel } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
+import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, HasSessionPermission, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
 import { Text } from '../../../../common';
 import { useChatCommandSelector, useChatInputWidget, useChatMentions, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
 import { ChatInputCommandSelectorView } from './ChatInputCommandSelectorView';
@@ -275,7 +275,8 @@ export const ChatInputView: FC<{}> = (props) => {
             }
 
             if (style.isSystemStyle) {
-                if (GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR)) {
+                // The server keeps these bubbles for acc_anychatcolor.
+                if (HasSessionPermission('acc_anychatcolor', SecurityLevel.MODERATOR)) {
                     styleIds.push(style.styleId);
 
                     continue;

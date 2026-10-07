@@ -2,6 +2,7 @@ import {
     AddLinkEventTracker,
     AvatarExpressionEnum,
     FigureUpdateEvent,
+    FurnitureFloorAddEvent,
     FurnitureFloorUpdateEvent,
     FurnitureMultiStateComposer,
     FurnitureWallMultiStateComposer,
@@ -65,6 +66,7 @@ import {
 } from '../../common';
 import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredTools } from '../../hooks';
 import { WiredChestsTabView } from './WiredChestsTabView';
+import { isRecolorableFurniKey, parseRecolorableFurniValue, recolorableFurniVariables } from './WiredRecolorableFurni.helpers';
 import {
     DIRECTION_NAMES,
     EDITABLE_FURNI_VARIABLES,
@@ -719,6 +721,16 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         refreshSelectedFurni(selectedFurni.objectId, selectedFurni.category);
     });
 
+    // A recolor re-adds the furni with another type: look at the new room object.
+    useMessageEvent<FurnitureFloorAddEvent>(FurnitureFloorAddEvent, (event) => {
+        if (!selectedFurni || selectedFurni.category !== RoomObjectCategory.FLOOR) return;
+
+        if (event.getParser()?.item?.itemId !== selectedFurni.objectId) return;
+
+        refreshSelectedFurni(selectedFurni.objectId, selectedFurni.category);
+        setFurniInternalRevision((previousValue) => previousValue + 1);
+    });
+
     useMessageEvent<FurnitureFloorUpdateEvent>(FurnitureFloorUpdateEvent, () => {
         if (inspectionType !== 'user' || !selectedUser) return;
 
@@ -1300,6 +1312,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             ...(Number(selectedFurni.info?.teleportTargetId ?? 0) > 0
                 ? [{ key: '~teleport.target_id', value: String(selectedFurni.info.teleportTargetId) }]
                 : []),
+            ...recolorableFurniVariables(selectedFurnitureData, canEditInspection && selectedFurni.category === RoomObjectCategory.FLOOR),
             { key: '@id', value: String(selectedFurni.objectId) },
             { key: '@class_id', value: String(classId) },
             { key: '@height', value: String(Math.round(tileSizeZ * 100)) },
@@ -2617,6 +2630,21 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             return;
         }
 
+        // The server swaps the furni to the nearest colour of its Builders Club palette.
+        if (isRecolorableFurniKey(editingVariable)) {
+            const parsed = parseRecolorableFurniValue(editingVariable, editingValue);
+
+            if (parsed === null || !selectedFurni || !roomSession) {
+                cancelVariableEdit();
+                return;
+            }
+
+            SendMessageComposer(new WiredFurniRuntimeStateRequestComposer(selectedFurni.objectId, WIRED_FURNI_RUNTIME_ACTION_WRITE, editingVariable, parsed));
+            setEditingVariable(null);
+            setEditingValue('');
+            return;
+        }
+
         if (editingVariable === '@gravity') {
             const parsed = parseInt(editingValue.trim(), 10);
             if (!selectedFurni || !roomSession || (parsed !== 0 && parsed !== 1)) {
@@ -3003,35 +3031,38 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
     const onVariableInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         event.stopPropagation();
+        // React clears currentTarget once the event is handled, so keep the input for the next frame.
+        const input = event.currentTarget;
 
         switch (event.key) {
             case 'Enter':
             case 'NumpadEnter':
                 event.preventDefault();
                 commitVariableEdit();
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
             case 'Escape':
                 event.preventDefault();
                 cancelVariableEdit();
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
         }
     };
     const onManagedHolderValueInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         event.stopPropagation();
+        const input = event.currentTarget;
 
         switch (event.key) {
             case 'Enter':
             case 'NumpadEnter':
                 event.preventDefault();
                 commitManagedHolderValueEdit();
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
             case 'Escape':
                 event.preventDefault();
                 setEditingManagedHolderVariableId(0);
-                window.requestAnimationFrame(() => event.currentTarget.blur());
+                window.requestAnimationFrame(() => input?.blur());
                 return;
         }
     };
@@ -3156,6 +3187,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             selectedFurni={selectedFurni}
                             selectedUser={selectedUser}
                             roomId={roomSession?.roomId ?? null}
+                            previewRevision={furniInternalRevision}
                             previewPlaceholder={previewPlaceholder}
                             keepSelected={keepSelected}
                             onKeepSelectedChange={setKeepSelected}

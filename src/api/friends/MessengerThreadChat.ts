@@ -20,6 +20,7 @@ export class MessengerThreadChat {
     private _translatedMessage: string;
     private _detectedLanguage: string;
     private _targetLanguage: string;
+    private _failureText: string = null;
 
     constructor(senderId: number, message: string, secondsSinceSent: number = 0, extraData: string = null, type: number = 0) {
         this._id = ++MessengerThreadChat.CHAT_ID;
@@ -78,6 +79,19 @@ export class MessengerThreadChat {
 
     public setStatus(status: number): void {
         this._status = status;
+    }
+
+    /** The server refused the message; it never reached the friend. */
+    public get failed(): boolean {
+        return this._failureText !== null;
+    }
+
+    public get failureText(): string {
+        return this._failureText;
+    }
+
+    public setFailed(failureText: string): void {
+        this._failureText = failureText || '';
     }
 
     public get date(): Date {

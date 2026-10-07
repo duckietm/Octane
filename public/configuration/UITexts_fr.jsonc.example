@@ -1424,5 +1424,21 @@
     "disconnected.info.incorrect_password": "Connecte-toi à nouveau.",
     "disconnected.info.idle": "Tu as été absent trop longtemps, l'hôtel a donc fermé ta session.",
     "disconnected.info.incompatible_client_version": "Recharge la page pour obtenir la dernière version.",
-    "disconnected.info.generic": "Tu as été déconnecté. Réessaie."
+    "disconnected.info.generic": "Tu as été déconnecté. Réessaie.",
+    "infostand.button.recolor": "Recolorer",
+    "builder.palette.title": "Palette",
+    "builder.palette.apply_to.this": "Seulement ce mobi",
+    "builder.palette.apply_to.all": "Sur plusieurs mobis",
+    "builder.recolor.title": "Recolorer le mobi",
+    "builder.recolor.preview": "Aperçu",
+    "builder.recolor.room_colors": "Couleurs dans cet appart",
+    "builder.recolor.apply_to": "Appliquer à :",
+    "builder.recolor.apply_to.this": "Ce mobi seulement",
+    "builder.recolor.apply_to.same": "Tous ceux-ci dans cet appart",
+    "builder.recolor.apply": "Appliquer",
+    "builder.recolor.error.no_rights": "Tu ne peux recolorer que dans les apparts où tu peux placer des mobis Builders Club.",
+    "builder.recolor.error.not_found": "Ce mobi n'est plus dans cet appart.",
+    "builder.recolor.error.not_recolorable": "Ce mobi n'existe pas en d'autres couleurs.",
+    "builder.recolor.error.not_builders_club": "Seuls les mobis Builders Club peuvent être recolorés.",
+    "builder.recolor.error.no_such_color": "Ce mobi n'existe pas dans cette couleur."
 }
