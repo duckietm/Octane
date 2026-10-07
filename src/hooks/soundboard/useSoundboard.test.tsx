@@ -4,6 +4,7 @@ import { SoundboardPlayDeniedEvent, SoundboardPlayEvent, SoundboardSettingsEvent
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NotificationBubbleType } from '../../api/notification/NotificationBubbleType';
+import { useSoundboardFeedStore } from './soundboardFeedStore';
 import { useSoundboardState } from './useSoundboard';
 
 const mocks = vi.hoisted(() => ({
@@ -140,7 +141,11 @@ describe('useSoundboardState', () => {
                 })
             );
 
-        beforeEach(() => mocks.manifest.byClassname.clear());
+        beforeEach(() => {
+            mocks.manifest.byClassname.clear();
+            window.localStorage.clear();
+            useSoundboardFeedStore.getState().clear();
+        });
 
         it('plays a pad with the group and the gain its manifest entry carries', () => {
             mocks.manifest.byClassname.set('bell', { classname: 'bell', name: 'Bell', file: 'bell.ogg', group: 'bells', gain: 0.5 });
@@ -149,6 +154,32 @@ describe('useSoundboardState', () => {
             announce('bell');
 
             expect(mocks.playSoundboard).toHaveBeenCalledWith(expect.stringContaining('bell.ogg'), { group: 'bells', gain: 0.5 });
+        });
+
+        it('neither plays nor shows the pads of a user the player muted', () => {
+            const { result } = renderHook(() => useSoundboardState());
+
+            act(() => result.current.silenceUser(7));
+            announce('bell');
+
+            expect(mocks.playSoundboard).not.toHaveBeenCalled();
+            expect(useSoundboardFeedStore.getState().entries).toEqual([]);
+            expect(result.current.silencedUserIds).toEqual([7]);
+        });
+
+        it('never mutes the player own pads and unmutes everybody on request', () => {
+            const { result } = renderHook(() => useSoundboardState());
+
+            act(() => result.current.silenceUser(42));
+            act(() =>
+                mocks.handlers.get(SoundboardPlayEvent)?.({
+                    getParser: () => ({ soundId: 3, classname: 'bell', url: '', soundName: 'Bell', username: 'me', actorUserId: 42, actorRoomIndex: 1 })
+                })
+            );
+            expect(mocks.playSoundboard).toHaveBeenCalledOnce();
+
+            act(() => result.current.restoreSilencedUsers());
+            expect(result.current.silencedUserIds).toEqual([]);
         });
 
         it('plays a pad the manifest does not know without options', () => {
