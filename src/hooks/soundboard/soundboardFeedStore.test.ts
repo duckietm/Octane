@@ -15,6 +15,16 @@ describe('soundboard feed store', () => {
         expect(lastPlayed?.soundId).toBe(SOUNDBOARD_FEED_LIMIT + 2);
     });
 
+    it('never reuses a key, not even after the feed was cleared', () => {
+        const { push, clear } = useSoundboardFeedStore.getState();
+        const first = push({ username: 'tester', soundName: 'Click', soundId: 1 });
+
+        clear();
+        const second = push({ username: 'tester', soundName: 'Click', soundId: 1 });
+
+        expect(second).toBeGreaterThan(first);
+    });
+
     it('dismisses a single entry', () => {
         const key = useSoundboardFeedStore.getState().push({ username: 'tester', soundName: 'Click', soundId: 1 });
         useSoundboardFeedStore.getState().push({ username: 'other', soundName: 'Ding', soundId: 2 });

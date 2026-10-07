@@ -13,22 +13,24 @@ export interface SoundboardFeedEntry {
 interface SoundboardFeedState {
     entries: SoundboardFeedEntry[];
     lastPlayed: { soundId: number; at: number } | null;
+    // Never reset: a dismiss timer that fires after a clear must not hit a newer entry.
+    nextKey: number;
     push: (entry: Omit<SoundboardFeedEntry, 'key'>) => number;
     dismiss: (key: number) => void;
     clear: () => void;
 }
 
-let nextKey = 1;
-
-export const useSoundboardFeedStore = createOctaneStore<SoundboardFeedState>()((set) => ({
+export const useSoundboardFeedStore = createOctaneStore<SoundboardFeedState>()((set, get) => ({
     entries: [],
     lastPlayed: null,
+    nextKey: 1,
     push: (entry) => {
-        const key = nextKey++;
+        const key = get().nextKey;
 
         set((state) => ({
             entries: [{ ...entry, key }, ...state.entries].slice(0, SOUNDBOARD_FEED_LIMIT),
-            lastPlayed: { soundId: entry.soundId, at: Date.now() }
+            lastPlayed: { soundId: entry.soundId, at: Date.now() },
+            nextKey: key + 1
         }));
 
         return key;
