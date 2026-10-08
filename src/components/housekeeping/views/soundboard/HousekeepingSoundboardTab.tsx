@@ -4,6 +4,7 @@ import { LocalizeText } from '../../../../api';
 import { useSoundboardCatalog, useSoundboardManifest } from '../../../../hooks';
 import {
     filterCatalogSounds,
+    MAX_PAD_COOLDOWN_SECONDS,
     reorderCatalog,
     SoundboardCatalogDraft,
     SoundboardCatalogFilter,
@@ -11,7 +12,7 @@ import {
 } from '../../../../hooks/soundboard/soundboardCatalogState';
 import { resolveSoundboardSoundUrl } from '../../../../hooks/soundboard/soundboardUrl';
 
-const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true };
+const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true, cooldownSeconds: 0 };
 const RESULT_KEYS = [
     'success',
     'forbidden',
@@ -21,7 +22,8 @@ const RESULT_KEYS = [
     'invalid_order',
     'not_found',
     'persistence_failure',
-    'catalog_full'
+    'catalog_full',
+    'invalid_cooldown'
 ];
 
 export const HousekeepingSoundboardTab: FC = () => {
@@ -57,7 +59,8 @@ export const HousekeepingSoundboardTab: FC = () => {
             classname: sound.classname ?? '',
             url: sound.url,
             minRank: sound.minRank,
-            enabled: sound.enabled
+            enabled: sound.enabled,
+            cooldownSeconds: sound.cooldownSeconds
         });
     };
 
@@ -179,6 +182,20 @@ export const HousekeepingSoundboardTab: FC = () => {
                         className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case"
                     />
                 </label>
+                <label className="flex flex-col gap-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                    {LocalizeText('housekeeping.soundboard.cooldown')}
+                    <input
+                        type="number"
+                        min={0}
+                        max={MAX_PAD_COOLDOWN_SECONDS}
+                        step={1}
+                        aria-label={LocalizeText('housekeeping.soundboard.cooldown')}
+                        disabled={draftLocked}
+                        value={draft.cooldownSeconds}
+                        onChange={(event) => setDraft((current) => ({ ...current, cooldownSeconds: Number(event.target.value) }))}
+                        className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case"
+                    />
+                </label>
                 <label className="flex items-center gap-2 self-end py-1 text-xs font-semibold">
                     <input
                         type="checkbox"
@@ -243,6 +260,7 @@ export const HousekeepingSoundboardTab: FC = () => {
                                 </div>
                                 <div className="truncate text-[10px] text-zinc-500">
                                     {sound.classname || sound.url} · rank {sound.minRank} ·{' '}
+                                    {sound.cooldownSeconds > 0 && <>{sound.cooldownSeconds}s · </>}
                                     {sound.enabled
                                         ? LocalizeText('housekeeping.soundboard.filter.enabled')
                                         : LocalizeText('housekeeping.soundboard.filter.disabled')}

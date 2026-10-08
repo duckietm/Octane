@@ -108,6 +108,13 @@ export const useSoundboardState = () => {
                 return;
             }
 
+            // This pad is held, the others are not: tell the player, but leave the panel unlocked.
+            if (parser.reason === 5) {
+                const seconds = Math.max(1, parser.remainingSeconds);
+                showSingleBubble(LocalizeText('soundboard.error.pad_cooldown', ['seconds'], [seconds.toString()]), NotificationBubbleType.SOUNDBOARD);
+                return;
+            }
+
             const key = deniedReasonText[parser.reason] ?? 'soundboard.error.unavailable';
             showSingleBubble(LocalizeText(key), NotificationBubbleType.SOUNDBOARD);
         },

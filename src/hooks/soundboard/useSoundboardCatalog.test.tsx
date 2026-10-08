@@ -63,7 +63,7 @@ describe('useSoundboardCatalog', () => {
 
     it('blocks duplicate mutations until the server responds', () => {
         const { result } = renderHook(() => useSoundboardCatalog());
-        const draft = { id: 0, name: 'Bell', classname: '', url: '/bell.mp3', minRank: 1, enabled: true };
+        const draft = { id: 0, name: 'Bell', classname: '', url: '/bell.mp3', minRank: 1, enabled: true, cooldownSeconds: 0 };
 
         act(() => {
             expect(result.current.upsert(draft)).toBe(true);

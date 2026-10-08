@@ -583,6 +583,7 @@
     "soundboard.notice.mode.rights": "Only people with rights can use the Soundboard in this room now.",
     "soundboard.error.rights_required": "Only people with rights can use the Soundboard in this room.",
     "soundboard.error.cooldown": "Wait %seconds% seconds before playing another sound.",
+    "soundboard.error.pad_cooldown": "Wait %seconds% seconds before playing this sound again.",
     "soundboard.error.room_disabled": "The Soundboard is disabled in this room.",
     "soundboard.error.unavailable": "This sound is unavailable.",
     "soundboard.error.audio": "The sound could not be played.",
