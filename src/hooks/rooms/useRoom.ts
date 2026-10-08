@@ -80,8 +80,6 @@ const useRoomState = () => {
         roomFilter.red = r / 255;
         roomFilter.green = g / 255;
         roomFilter.blue = b / 255;
-        // A neutral filter would still cost a full-screen offscreen pass every frame.
-        roomFilter.enabled = (color & 0xffffff) !== 0xffffff;
     };
 
     useUiEvent<RoomWidgetUpdateBackgroundColorPreviewEvent>(RoomWidgetUpdateBackgroundColorPreviewEvent.PREVIEW, (event) =>
@@ -293,8 +291,6 @@ const useRoomState = () => {
 
         const background = new OctaneSprite(OctaneTexture.WHITE);
         const filter = new OctaneAdjustmentFilter();
-
-        filter.enabled = false;
         const master = canvas.master;
 
         background.tint = 0;

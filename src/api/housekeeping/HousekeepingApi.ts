@@ -44,9 +44,10 @@ import {
     HousekeepingUserDetailEvent,
     HousekeepingUserNoteComposer,
     HousekeepingWordFilterComposer,
-    IMessageComposer
+    IMessageComposer,
+    IMessageEvent
 } from '@octane/renderer';
-import { awaitMessageEvent } from '../octane/awaitMessageEvent';
+import { AwaitMessageEventInit, awaitMessageEvent } from '../octane/awaitMessageEvent';
 import { SendMessageComposer } from '../octane/SendMessageComposer';
 import { HousekeepingReloadTarget } from './HousekeepingActionType';
 import { HousekeepingMaintenanceAction } from './HousekeepingHotelTools';
@@ -72,12 +73,50 @@ const USER_SEARCH_LIMIT = 8;
  */
 export const HOUSEKEEPING_NO_ANSWER_KEY = 'housekeeping.error.no_answer';
 
-/** Maps a failed wait to the key the panel shows; a timeout becomes {@link HOUSEKEEPING_NO_ANSWER_KEY}. */
-export const housekeepingFailureKey = (error: unknown, fallback: string): string =>
-    error instanceof Error && error.message === 'timeout' ? HOUSEKEEPING_NO_ANSWER_KEY : fallback;
-
 /** Action key of the immediate answer a server sends when it refuses the housekeeping permission. */
 export const HOUSEKEEPING_DENIED_ACTION_KEY = 'housekeeping.denied';
+
+/** A lookup the server refused at once; `messageKey` is the text key the server named (no permission, lockdown). */
+export class HousekeepingDeniedError extends Error {
+    constructor(public readonly messageKey: string) {
+        super(HOUSEKEEPING_DENIED_ACTION_KEY);
+        this.name = 'HousekeepingDeniedError';
+    }
+}
+
+/**
+ * Maps a failed wait to the key the panel shows: a refusal shows the server's own reason and a
+ * timeout becomes {@link HOUSEKEEPING_NO_ANSWER_KEY}.
+ */
+export const housekeepingFailureKey = (error: unknown, fallback: string): string => {
+    if (error instanceof HousekeepingDeniedError && error.messageKey) return error.messageKey;
+
+    return error instanceof Error && error.message === 'timeout' ? HOUSEKEEPING_NO_ANSWER_KEY : fallback;
+};
+
+/**
+ * {@link awaitMessageEvent} for a housekeeping lookup. A server that refuses the request answers at
+ * once with an action result under {@link HOUSEKEEPING_DENIED_ACTION_KEY} and never sends the reply,
+ * so the wait also listens for that answer and rejects with a {@link HousekeepingDeniedError}
+ * instead of running to its timeout.
+ */
+const awaitHousekeepingReply = <T extends IMessageEvent, R>(eventCtor: new (callback: (event: T) => void) => T, init: AwaitMessageEventInit<T, R>): Promise<R> => {
+    const finished = new AbortController();
+    const signal = init.signal ? AbortSignal.any([init.signal, finished.signal]) : finished.signal;
+
+    const reply = awaitMessageEvent<T, R>(eventCtor, { ...init, signal });
+
+    const refusal = awaitMessageEvent<HousekeepingActionResultEvent, never>(HousekeepingActionResultEvent, {
+        signal,
+        timeoutMs: init.timeoutMs,
+        accept: (event) => event.getParser()?.actionKey === HOUSEKEEPING_DENIED_ACTION_KEY,
+        select: (event) => {
+            throw new HousekeepingDeniedError(event.getParser()?.message ?? '');
+        }
+    });
+
+    return Promise.race([reply, refusal]).finally(() => finished.abort());
+};
 
 const searchUsersViaPacket = async (prefix: string, signal?: AbortSignal): Promise<IHousekeepingUserSummary[]> => {
     SendMessageComposer(new HabboSearchComposer(prefix));
@@ -148,7 +187,7 @@ const mapUserDetail = (user: HousekeepingUserDetailData): IHousekeepingUser => (
 });
 
 const awaitUserDetail = (): Promise<IHousekeepingUser | null> =>
-    awaitMessageEvent<HousekeepingUserDetailEvent, IHousekeepingUser | null>(HousekeepingUserDetailEvent, {
+    awaitHousekeepingReply<HousekeepingUserDetailEvent, IHousekeepingUser | null>(HousekeepingUserDetailEvent, {
         timeoutMs: 8_000,
         select: (event) => {
             const parser = event.getParser();
@@ -253,7 +292,7 @@ const findRoomByIdViaPacket = (roomId: number): Promise<IHousekeepingRoom | null
 
     SendMessageComposer(new HousekeepingFindRoomByIdComposer(roomId));
 
-    return awaitMessageEvent<HousekeepingRoomDetailEvent, IHousekeepingRoom | null>(HousekeepingRoomDetailEvent, {
+    return awaitHousekeepingReply<HousekeepingRoomDetailEvent, IHousekeepingRoom | null>(HousekeepingRoomDetailEvent, {
         timeoutMs: 8_000,
         select: (event) => {
             const parser = event.getParser();
@@ -276,7 +315,7 @@ const findRoomByNameViaPacket = (name: string): Promise<IHousekeepingRoom[]> => 
 
     SendMessageComposer(new HousekeepingSearchRoomsComposer(trimmed, true, 50));
 
-    return awaitMessageEvent<HousekeepingRoomListEvent, IHousekeepingRoom[]>(HousekeepingRoomListEvent, {
+    return awaitHousekeepingReply<HousekeepingRoomListEvent, IHousekeepingRoom[]>(HousekeepingRoomListEvent, {
         timeoutMs: 8_000,
         select: (event) => event.getParser()?.rooms.map(mapRoom) ?? []
     });
@@ -289,7 +328,7 @@ const searchRoomsViaPacket = (prefix: string, signal?: AbortSignal): Promise<IHo
 
     SendMessageComposer(new HousekeepingSearchRoomsComposer(trimmed, false, 8));
 
-    return awaitMessageEvent<HousekeepingRoomListEvent, IHousekeepingRoomSummary[]>(HousekeepingRoomListEvent, {
+    return awaitHousekeepingReply<HousekeepingRoomListEvent, IHousekeepingRoomSummary[]>(HousekeepingRoomListEvent, {
         signal,
         timeoutMs: 8_000,
         select: (event) =>
@@ -349,7 +388,7 @@ const maintenanceViaPacket = (action: Exclude<HousekeepingMaintenanceAction, 'st
 const getMaintenanceStatusViaPacket = (signal?: AbortSignal): Promise<IHousekeepingMaintenanceStatus> => {
     SendMessageComposer(new HousekeepingMaintenanceComposer('status', '', 0));
 
-    return awaitMessageEvent<HousekeepingMaintenanceStatusEvent, IHousekeepingMaintenanceStatus>(HousekeepingMaintenanceStatusEvent, {
+    return awaitHousekeepingReply<HousekeepingMaintenanceStatusEvent, IHousekeepingMaintenanceStatus>(HousekeepingMaintenanceStatusEvent, {
         signal,
         timeoutMs: 8_000,
         select: (event) => readMaintenanceStatus(event.getParser())
@@ -394,7 +433,7 @@ const EMPTY_DASHBOARD: IHousekeepingDashboard = {
 const getDashboardViaPacket = (signal?: AbortSignal): Promise<IHousekeepingDashboard> => {
     SendMessageComposer(new HousekeepingGetDashboardComposer());
 
-    return awaitMessageEvent<HousekeepingDashboardEvent, IHousekeepingDashboard>(HousekeepingDashboardEvent, {
+    return awaitHousekeepingReply<HousekeepingDashboardEvent, IHousekeepingDashboard>(HousekeepingDashboardEvent, {
         signal,
         timeoutMs: 10_000,
         select: (event) => {
@@ -423,7 +462,7 @@ const listActionLogViaPacket = (limit: number, signal?: AbortSignal): Promise<IH
 
     SendMessageComposer(new HousekeepingListActionLogComposer(safeLimit));
 
-    return awaitMessageEvent<HousekeepingActionLogEvent, IHousekeepingActionLogEntry[]>(HousekeepingActionLogEvent, {
+    return awaitHousekeepingReply<HousekeepingActionLogEvent, IHousekeepingActionLogEntry[]>(HousekeepingActionLogEvent, {
         signal,
         timeoutMs: 10_000,
         select: (event) =>
@@ -447,7 +486,7 @@ const listActionLogViaPacket = (limit: number, signal?: AbortSignal): Promise<IH
 const requestListViaPacket = (listKey: string, targetId: number, signal?: AbortSignal, reveal = false): Promise<IHousekeepingList> => {
     SendMessageComposer(new HousekeepingRequestListComposer(listKey, targetId, reveal ? 1 : undefined));
 
-    return awaitMessageEvent<HousekeepingListEvent, IHousekeepingList>(HousekeepingListEvent, {
+    return awaitHousekeepingReply<HousekeepingListEvent, IHousekeepingList>(HousekeepingListEvent, {
         signal,
         timeoutMs: 10_000,
         // Several lists can be in flight when the operator switches quickly.
