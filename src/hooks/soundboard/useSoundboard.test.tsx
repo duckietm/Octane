@@ -26,7 +26,7 @@ vi.mock('@octane/renderer', () => {
     }
     class SoundboardRequestSettingsComposer {}
     class SoundboardSetEnabledComposer {
-        constructor(public enabled: boolean) {}
+        constructor(public mode: number) {}
     }
     class SoundboardPlayEvent {}
     class SoundboardPlayDeniedEvent {}
@@ -85,7 +85,7 @@ describe('useSoundboardState', () => {
 
         act(() =>
             mocks.handlers.get(SoundboardSettingsEvent)?.({
-                getParser: () => ({ enabled: true, cooldownSeconds: 30, sounds: [] })
+                getParser: () => ({ enabled: true, roomMode: 1, cooldownSeconds: 30, sounds: [] })
             })
         );
         act(() =>
@@ -110,6 +110,58 @@ describe('useSoundboardState', () => {
         expect((mocks.sendMessage.mock.calls[1][0] as any).id).toBe(7);
     });
 
+    describe('the room mode', () => {
+        const settings = (roomMode: number) =>
+            act(() =>
+                mocks.handlers.get(SoundboardSettingsEvent)?.({
+                    getParser: () => ({ enabled: roomMode > 0, roomMode, cooldownSeconds: 30, sounds: [] })
+                })
+            );
+
+        it('is on for both everyone and rights, and off for nobody', () => {
+            const { result } = renderHook(() => useSoundboardState());
+
+            settings(2);
+            expect(result.current.roomMode).toBe(2);
+            expect(result.current.enabled).toBe(true);
+
+            settings(0);
+            expect(result.current.enabled).toBe(false);
+        });
+
+        it('sends the chosen mode to the server', () => {
+            const { result } = renderHook(() => useSoundboardState());
+
+            act(() => result.current.setRoomMode(2));
+
+            expect(result.current.roomMode).toBe(2);
+            expect((mocks.sendMessage.mock.calls[0][0] as any).mode).toBe(2);
+        });
+
+        it('tells the player when somebody else changes it, but not on the first packet or on their own change', () => {
+            const { result } = renderHook(() => useSoundboardState());
+
+            settings(1);
+            expect(mocks.showSingleBubble).not.toHaveBeenCalled();
+
+            settings(2);
+            expect(mocks.showSingleBubble).toHaveBeenCalledWith('soundboard.notice.mode.rights:', NotificationBubbleType.SOUNDBOARD);
+
+            mocks.showSingleBubble.mockClear();
+            act(() => result.current.setRoomMode(0));
+            settings(0);
+            expect(mocks.showSingleBubble).not.toHaveBeenCalled();
+        });
+
+        it('explains a denial that needs rights', () => {
+            renderHook(() => useSoundboardState());
+
+            act(() => mocks.handlers.get(SoundboardPlayDeniedEvent)?.({ getParser: () => ({ reason: 4, remainingSeconds: 0 }) }));
+
+            expect(mocks.showSingleBubble).toHaveBeenCalledWith('soundboard.error.rights_required:', NotificationBubbleType.SOUNDBOARD);
+        });
+    });
+
     it('keeps the JSON and JSONC catalog fallback local-only', async () => {
         mocks.loadGamedata.mockImplementation(async (url: string) =>
             url.includes('layout')
@@ -122,7 +174,7 @@ describe('useSoundboardState', () => {
 
         act(() =>
             mocks.handlers.get(SoundboardSettingsEvent)?.({
-                getParser: () => ({ enabled: true, cooldownSeconds: 30, sounds: [] })
+                getParser: () => ({ enabled: true, roomMode: 1, cooldownSeconds: 30, sounds: [] })
             })
         );
 
