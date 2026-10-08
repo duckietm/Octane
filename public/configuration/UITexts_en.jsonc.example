@@ -985,6 +985,7 @@
     "soundboard.pagination.next": "Next page",
     "soundboard.room.played": "%user% played %sound%",
     "soundboard.room.setting.desc": "Allow people in this room to play sound effects",
+    "notifications.title.soundboard": "Soundboard",
     "soundboard.room.allow": "Allow Soundboard use in this room",
     "soundboard.room.mode.off": "Off",
     "soundboard.room.mode.everyone": "Everyone in the room",

@@ -4,6 +4,7 @@ import { NotificationClubGiftBubbleView } from './NotificationClubGiftBubbleView
 import { NotificationDefaultBubbleView } from './NotificationDefaultBubbleView';
 import { NotificationFriendOnlineBubbleView } from './NotificationFriendOnlineBubbleView';
 import { NotificationMentionBubbleView } from './NotificationMentionBubbleView';
+import { NotificationSoundboardBubbleView } from './NotificationSoundboardBubbleView';
 
 export const GetBubbleLayout = (item: NotificationBubbleItem, onClose: () => void) => {
     if (!item) return null;
@@ -18,6 +19,8 @@ export const GetBubbleLayout = (item: NotificationBubbleItem, onClose: () => voi
             return <NotificationClubGiftBubbleView key={item.id} {...props} />;
         case NotificationBubbleType.FRIENDONLINE:
             return <NotificationFriendOnlineBubbleView key={item.id} {...props} />;
+        case NotificationBubbleType.SOUNDBOARD:
+            return <NotificationSoundboardBubbleView key={item.id} {...props} />;
         case NotificationBubbleType.MENTION:
             return <NotificationMentionBubbleView key={item.id} item={item as MentionNotificationBubbleItem} onClose={onClose} />;
         default:
