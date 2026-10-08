@@ -1,8 +1,10 @@
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import { GetSessionDataManager } from '@octane/renderer';
 import { GetOptionalConfigurationValue } from '../../api';
 import { Base, Flex, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView, Text } from '../../common';
 import { useRoom } from '../../hooks';
 import { configFileUrl } from '../../secure-assets';
+import { ProfilePreviewView } from './ProfilePreviewView';
 
 interface ItemData {
     id: number;
@@ -24,6 +26,8 @@ interface BackgroundsViewProps {
 
 const TABS = ['backgrounds', 'stands', 'overlays', 'cards', 'borders'] as const;
 type TabType = (typeof TABS)[number];
+
+const PREVIEW_TABS: TabType[] = ['backgrounds', 'stands', 'overlays'];
 
 type RemoteData = Partial<Record<'backgrounds.data' | 'stands.data' | 'overlays.data' | 'cards.data' | 'borders.data', any[]>>;
 
@@ -155,6 +159,29 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
         return tab.slice(0, -1);
     };
 
+    const figure = GetSessionDataManager()?.figure ?? '';
+
+    // Backgrounds, stands and overlays show the player's own avatar, with the other two
+    // layers as they are now, so a choice can be judged before it is picked.
+    const renderPreview = useCallback(
+        (item: ItemData) => {
+            const current = { backgrounds: selectedBackground, stands: selectedStand, overlays: selectedOverlay }[activeTab as 'backgrounds' | 'stands' | 'overlays'];
+
+            return (
+                <ProfilePreviewView
+                    key={item.id}
+                    figure={figure}
+                    backgroundId={activeTab === 'backgrounds' ? item.id : selectedBackground}
+                    standId={activeTab === 'stands' ? item.id : selectedStand}
+                    overlayId={activeTab === 'overlays' ? item.id : selectedOverlay}
+                    selected={item.id === current}
+                    onClick={() => handleSelection(item.id)}
+                />
+            );
+        },
+        [activeTab, figure, handleSelection, selectedBackground, selectedStand, selectedOverlay]
+    );
+
     const renderItem = useCallback(
         (item: ItemData, type: string) => (
             <Flex pointer position="relative" key={item.id} onClick={() => handleSelection(item.id)}>
@@ -188,7 +215,7 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
                     Select an Option
                 </Text>
                 <Grid gap={1} columnCount={7} overflow="auto">
-                    {allData[activeTab].map((item) => renderItem(item, itemTypeFor(activeTab)))}
+                    {allData[activeTab].map((item) => (PREVIEW_TABS.includes(activeTab) ? renderPreview(item) : renderItem(item, itemTypeFor(activeTab))))}
                 </Grid>
             </OctaneCardContentView>
         </OctaneCardView>
