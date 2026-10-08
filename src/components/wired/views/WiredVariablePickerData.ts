@@ -18,8 +18,6 @@ export interface IWiredVariablePickerEntry {
     selectable: boolean;
     hasValue: boolean;
     kind: 'internal' | 'custom';
-    /** A smart variable: one derived from a property of the thing it is read on, named with a leading `~`. */
-    smart?: boolean;
     target: WiredVariablePickerTarget;
     children?: IWiredVariablePickerEntry[];
 }
@@ -55,13 +53,6 @@ const createInternalMeta = (key: string, canUseAsDestination = false, canUseAsRe
     canUseAsDestination,
     canUseAsReference
 });
-
-/**
- * The official client files variables of type 3 under "Smart variables" and strips both `@` and `~`
- * from names. Internal variables read a stored value and start with `@`; the ones computed from a
- * property of the furni (`~teleport.target_id`, `~recolorable_furni.color.rgb`) start with `~`.
- */
-export const isSmartVariableKey = (key: string) => !!key && key.trim().startsWith('~');
 
 export const normalizeInternalVariableKey = (key: string) => {
     const normalizedKey = key?.trim();
@@ -236,7 +227,6 @@ const createInternalEntry = (target: WiredVariablePickerTarget, usage: WiredVari
     selectable: getInternalSelectable(usage, meta),
     hasValue: meta.canUseAsReference,
     kind: 'internal',
-    smart: isSmartVariableKey(meta.key),
     target
 });
 
@@ -320,8 +310,6 @@ const groupEntries = (entries: IWiredVariablePickerEntry[]) => {
                 selectable: false,
                 hasValue: false,
                 kind: sortedChildren[0]?.kind || 'custom',
-                // A group made only of smart variables is one itself, so it leaves the Internal tab with them.
-                smart: sortedChildren.every((child) => child.smart),
                 target: sortedChildren[0]?.target || 'user'
             }),
             label: rootKey,
@@ -396,7 +384,6 @@ export const createFallbackVariableEntry = (target: WiredVariablePickerTarget, t
             selectable: false,
             hasValue: false,
             kind: 'internal',
-            smart: isSmartVariableKey(key),
             target
         };
     }
@@ -426,60 +413,4 @@ export const flattenWiredVariablePickerEntries = (entries: IWiredVariablePickerE
     }
 
     return flattened;
-};
-
-export type WiredVariablePickerMode = 'all' | 'recent' | 'usermade' | 'smart' | 'internal' | 'search';
-
-/**
- * What each tab of the picker shows. "Smart" holds the `~` variables and "Internal" the other
- * server-owned ones, so a variable is never listed under both.
- */
-export const filterWiredVariablePickerEntriesByMode = (
-    entries: IWiredVariablePickerEntry[],
-    mode: WiredVariablePickerMode,
-    recentTokens: string[]
-): IWiredVariablePickerEntry[] => {
-    const recentSet = new Set(recentTokens);
-
-    const filterEntries = (items: IWiredVariablePickerEntry[]): IWiredVariablePickerEntry[] => {
-        const filtered: IWiredVariablePickerEntry[] = [];
-
-        for (const entry of items) {
-            const nextChildren = entry.children?.length ? filterEntries(entry.children) : [];
-            const childVisible = !!nextChildren.length;
-            const selfVisible = (() => {
-                switch (mode) {
-                    case 'recent':
-                        return recentSet.has(entry.token);
-                    case 'usermade':
-                        return entry.kind === 'custom';
-                    case 'smart':
-                        return !!entry.smart;
-                    case 'internal':
-                        return entry.kind === 'internal' && !entry.smart;
-                    case 'search':
-                    case 'all':
-                    default:
-                        return true;
-                }
-            })();
-
-            if (!selfVisible && !childVisible) continue;
-
-            filtered.push(childVisible ? { ...entry, children: nextChildren } : entry);
-        }
-
-        return filtered;
-    };
-
-    if (mode === 'recent') {
-        const flatEntries = flattenWiredVariablePickerEntries(entries)
-            .filter((entry) => recentSet.has(entry.token))
-            .sort((left, right) => recentTokens.indexOf(left.token) - recentTokens.indexOf(right.token))
-            .map((entry) => ({ ...entry, label: entry.displayLabel }));
-
-        return flatEntries.filter((entry) => !entry.children?.length);
-    }
-
-    return filterEntries(entries);
 };

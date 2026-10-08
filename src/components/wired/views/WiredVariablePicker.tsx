@@ -10,12 +10,9 @@ import searchIcon from '../../../assets/images/wired/var/var_picker_search.png';
 import smartIcon from '../../../assets/images/wired/var/var_picker_smart.png';
 import userMadeIcon from '../../../assets/images/wired/var/var_picker_usermade.png';
 import { Text } from '../../../common';
-import {
-    filterWiredVariablePickerEntriesByMode,
-    flattenWiredVariablePickerEntries,
-    IWiredVariablePickerEntry,
-    WiredVariablePickerMode
-} from './WiredVariablePickerData';
+import { flattenWiredVariablePickerEntries, IWiredVariablePickerEntry } from './WiredVariablePickerData';
+
+type WiredVariablePickerMode = 'all' | 'recent' | 'usermade' | 'smart' | 'internal' | 'search';
 
 interface WiredVariablePickerProps {
     emptyText?: string;
@@ -57,6 +54,52 @@ const applyQuery = (entries: IWiredVariablePickerEntry[], query: string): IWired
     return nextEntries;
 };
 
+const applyMode = (entries: IWiredVariablePickerEntry[], mode: WiredVariablePickerMode, recentTokens: string[]): IWiredVariablePickerEntry[] => {
+    const recentSet = new Set(recentTokens);
+
+    const filterEntries = (items: IWiredVariablePickerEntry[]): IWiredVariablePickerEntry[] => {
+        const filtered: IWiredVariablePickerEntry[] = [];
+
+        for (const entry of items) {
+            if (mode === 'smart') continue;
+
+            const nextChildren = entry.children?.length ? filterEntries(entry.children) : [];
+            const childVisible = !!nextChildren.length;
+            const selfVisible = (() => {
+                switch (mode) {
+                    case 'recent':
+                        return recentSet.has(entry.token);
+                    case 'usermade':
+                        return entry.kind === 'custom';
+                    case 'internal':
+                        return entry.kind === 'internal';
+                    case 'search':
+                    case 'all':
+                    default:
+                        return true;
+                }
+            })();
+
+            if (!selfVisible && !childVisible) continue;
+
+            filtered.push(childVisible ? { ...entry, children: nextChildren } : entry);
+        }
+
+        return filtered;
+    };
+
+    if (mode === 'recent') {
+        const flatEntries = flattenWiredVariablePickerEntries(entries)
+            .filter((entry) => recentSet.has(entry.token))
+            .sort((left, right) => recentTokens.indexOf(left.token) - recentTokens.indexOf(right.token))
+            .map((entry) => ({ ...entry, label: entry.displayLabel }));
+
+        return flatEntries.filter((entry) => !entry.children?.length);
+    }
+
+    return filterEntries(entries);
+};
+
 export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
     const {
         entries = [],
@@ -81,7 +124,7 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
 
     const allEntries = flattenWiredVariablePickerEntries(entries);
     const selectedEntry = allEntries.find((entry) => entry.token === selectedToken) || null;
-    const modeEntries = filterWiredVariablePickerEntriesByMode(entries, mode, recentTokens);
+    const modeEntries = applyMode(entries, mode, recentTokens);
     const filteredEntries = applyQuery(modeEntries, normalizeSearch(query));
     const activeParent = filteredEntries.find((entry) => entry.token === activeParentToken && entry.children?.length) || null;
     const portalTarget = typeof document !== 'undefined' ? (document.getElementById('draggable-windows-container') ?? document.body) : null;
