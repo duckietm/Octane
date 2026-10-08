@@ -27,6 +27,7 @@ interface SoundboardContentViewProps {
     cooldownTotalSeconds?: number;
     playingSoundId?: number | null;
     silencedCount?: number;
+    rightsOnly?: boolean;
     onPlay: (sound: DisplaySoundboardSound) => void;
     onToggleFavorite?: (sound: DisplaySoundboardSound) => void;
     onRestoreSilenced?: () => void;
@@ -42,6 +43,7 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
     cooldownTotalSeconds = 0,
     playingSoundId = null,
     silencedCount = 0,
+    rightsOnly = false,
     onPlay,
     onToggleFavorite,
     onRestoreSilenced
@@ -206,6 +208,8 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
                 </div>
             )}
 
+            {rightsOnly && <div className="text-center text-[10px] text-black/60">{LocalizeText('soundboard.room.mode.rights')}</div>}
+
             <div className="text-center text-[10px] text-black/45">{LocalizeText('soundboard.hint')}</div>
         </div>
     );
@@ -215,6 +219,7 @@ export const SoundboardView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
     const {
         enabled,
+        roomMode,
         sounds,
         categories,
         recentSoundIds,
@@ -293,6 +298,7 @@ export const SoundboardView: FC<{}> = () => {
                     cooldownTotalSeconds={cooldownTotalSeconds}
                     playingSoundId={playingSoundId}
                     silencedCount={silencedUserIds.length}
+                    rightsOnly={roomMode === 2}
                     onPlay={play}
                     onToggleFavorite={(sound) => toggleFavorite(sound.id)}
                     onRestoreSilenced={restoreSilencedUsers}
