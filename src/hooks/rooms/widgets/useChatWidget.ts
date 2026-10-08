@@ -14,7 +14,9 @@ import {
     SystemChatStyleEnum
 } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useUserChatPreferencesStore } from '@/state/userChatPreferences';
 import {
+    applyUserChatPreferences,
     ChatBubbleMessage,
     ChatBubbleUtilities,
     ChatEntryType,
@@ -107,10 +109,17 @@ const useChatWidgetState = () => {
         [applyTranslationToBubble, buildTranslatedEntryPatch, updateChatEntry]
     );
 
-    const getScrollSpeed = useMemo(() => {
-        if (!chatSettings) return 6000;
+    const userBubbleWidth = useUserChatPreferencesStore((state) => state.bubbleWidth);
+    const userScrollSpeed = useUserChatPreferencesStore((state) => state.scrollSpeed);
+    const effectiveChatSettings = useMemo(
+        () => applyUserChatPreferences(chatSettings, userBubbleWidth, userScrollSpeed),
+        [chatSettings, userBubbleWidth, userScrollSpeed]
+    );
 
-        switch (chatSettings.speed) {
+    const getScrollSpeed = useMemo(() => {
+        if (!effectiveChatSettings) return 6000;
+
+        switch (effectiveChatSettings.speed) {
             case RoomChatSettings.CHAT_SCROLL_SPEED_FAST:
                 return 3000;
             case RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL:
@@ -118,7 +127,7 @@ const useChatWidgetState = () => {
             case RoomChatSettings.CHAT_SCROLL_SPEED_SLOW:
                 return 12000;
         }
-    }, [chatSettings]);
+    }, [effectiveChatSettings]);
 
     useOctaneEvent<RoomSessionChatEvent>(RoomSessionChatEvent.CHAT_EVENT, async (event) => {
         const roomObject = GetRoomEngine().getRoomObject(roomSession.roomId, event.objectId, RoomObjectCategory.UNIT);
@@ -390,7 +399,7 @@ const useChatWidgetState = () => {
         };
     }, []);
 
-    return { chatMessages, setChatMessages, chatSettings, getScrollSpeed };
+    return { chatMessages, setChatMessages, chatSettings: effectiveChatSettings, getScrollSpeed };
 };
 
 export const useChatWidget = useChatWidgetState;

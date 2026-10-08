@@ -1,38 +1,31 @@
 import { GetTargetedOfferComposer, PurchaseTargetedOfferComposer, TargetedOfferData } from '@octane/renderer';
-import { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import { FriendlyTime, GetConfigurationValue, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../../../api';
+import { useMemo, useState } from 'react';
+import {
+    FriendlyTime,
+    GetConfigurationValue,
+    getTargetedOfferPurchaseBlock,
+    LocalizeText,
+    localizeWithFallback,
+    SanitizeHtml,
+    SendMessageComposer
+} from '../../../../api';
 import { Button, Column, Flex, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { usePurse } from '../../../../hooks';
 
 let isBuyingOffer = false;
 
-export const OfferWindowView = (props: { offer: TargetedOfferData; setOpen: Dispatch<SetStateAction<boolean>> }) => {
-    const { offer = null, setOpen = null } = props;
+export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: number | null; onMinimize: () => void }) => {
+    const { offer = null, secondsLeft = null, onMinimize = null } = props;
 
     const { getCurrencyAmount } = usePurse();
 
     const [amount, setAmount] = useState<number>(1);
 
-    const canPurchase = useMemo(() => {
-        let credits = false;
-        let points = false;
-        let limit = false;
-
-        if (offer.priceInCredits > 0) credits = getCurrencyAmount(-1) >= offer.priceInCredits;
-
-        if (offer.priceInActivityPoints > 0) points = getCurrencyAmount(offer.activityPointType) >= offer.priceInActivityPoints;
-        else points = true;
-
-        if (offer.purchaseLimit > 0) limit = true;
-
-        return credits && points && limit;
-    }, [offer, getCurrencyAmount]);
-
-    const expirationTime = () => {
-        let expirationTime = Math.max(0, (offer.expirationTime - Date.now()) / 1000);
-
-        return FriendlyTime.format(expirationTime);
-    };
+    // An offer priced only in activity points needs no credits.
+    const purchaseBlock = useMemo(
+        () => getTargetedOfferPurchaseBlock(offer, getCurrencyAmount(-1), getCurrencyAmount(offer.activityPointType)),
+        [offer, getCurrencyAmount]
+    );
 
     const buyOffer = () => {
         if (isBuyingOffer) return;
@@ -49,10 +42,12 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; setOpen: Disp
 
     return (
         <OctaneCardView className="octane-targeted-offer" theme="primary-slim" uniqueKey="targeted-offer">
-            <OctaneCardHeaderView headerText={LocalizeText(offer.title)} onCloseClick={(event) => setOpen(false)} />
-            <div className="container-fluid p-1 relative justify-center items-center cursor-pointer gap-3 bg-danger">
-                {LocalizeText('targeted.offer.timeleft', ['timeleft'], [expirationTime()])}
-            </div>
+            <OctaneCardHeaderView headerText={LocalizeText(offer.title)} onCloseClick={() => onMinimize()} />
+            {secondsLeft !== null && (
+                <div className="container-fluid p-1 relative justify-center items-center cursor-pointer gap-3 bg-danger">
+                    {LocalizeText('targeted.offer.timeleft', ['timeleft'], [FriendlyTime.format(secondsLeft)])}
+                </div>
+            )}
             <OctaneCardContentView gap={1}>
                 <Flex fullHeight gap={1}>
                     <Flex column className="w-75 text-black" gap={1}>
@@ -73,10 +68,17 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; setOpen: Disp
                                     />
                                 </div>
                             )}
-                            <Button disabled={!canPurchase} variant="primary" onClick={() => buyOffer()}>
+                            <Button disabled={purchaseBlock !== null} variant="primary" onClick={() => buyOffer()}>
                                 {LocalizeText('targeted.offer.button.buy')}
                             </Button>
                         </Flex>
+                        {(purchaseBlock === 'credits' || purchaseBlock === 'points') && (
+                            <Text center small variant="danger">
+                                {purchaseBlock === 'credits'
+                                    ? localizeWithFallback('catalog.alert.notenough.credits.description', 'You do not have enough credits for this offer.')
+                                    : localizeWithFallback('catalog.alert.notenough.activitypoints.description', 'You do not have enough points for this offer.')}
+                            </Text>
+                        )}
                     </Flex>
                     <div
                         className="w-50 h-full"

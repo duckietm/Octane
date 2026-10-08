@@ -500,3 +500,83 @@
         overflow-y: auto;
     }
 }
+
+/* Personal word filter (custom_word_filter_settings). */
+.user-settings-window.air-settings-window--wordfilter {
+    --air-settings-width: 257px;
+}
+
+.air-settings-window--wordfilter .air-settings-window__title {
+    text-align: center;
+}
+
+.air-settings-wordfilter {
+    display: flex;
+    min-width: 237px;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.air-settings-wordfilter__add {
+    display: flex;
+    gap: 5px;
+}
+
+.air-settings-wordfilter__add input {
+    box-sizing: border-box;
+    min-width: 0;
+    height: 22px;
+    flex: 1 1 auto;
+    padding: 0 4px;
+    border: 1px solid #2f2f2f;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #111111;
+    font: 400 12px/20px UbuntuRegular, Ubuntu, sans-serif;
+}
+
+.air-settings-wordfilter__error {
+    margin: 0;
+    color: #ffb4a8;
+}
+
+.air-settings-wordfilter__list {
+    max-height: 160px;
+    margin: 0;
+    padding: 2px 4px;
+    overflow-y: auto;
+    border: 1px solid #2f2f2f;
+    background: rgba(0, 0, 0, 0.25);
+    list-style: none;
+}
+
+.air-settings-wordfilter__list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.air-settings-wordfilter__list li > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.air-settings-wordfilter__empty {
+    color: #b8b8b8;
+}
+
+.air-settings-wordfilter__remove {
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    font: 700 13px/16px UbuntuRegular, Ubuntu, sans-serif;
+}
+
+.air-settings-wordfilter__remove:hover,
+.air-settings-wordfilter__remove:focus-visible {
+    color: #ffb4a8;
+}

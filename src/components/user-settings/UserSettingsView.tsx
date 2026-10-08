@@ -4,14 +4,18 @@ import {
     ILinkEventTracker,
     OctaneSettingsEvent,
     RemoveLinkEventTracker,
+    RoomChatSettings,
     SoundboardSaveVolumeComposer,
     UserSettingsCameraFollowComposer,
+    UserSettingsChatPreferencesComposer,
     UserSettingsEvent,
     UserSettingsOldChatComposer,
     UserSettingsPrivacyComposer,
     UserSettingsRoomInvitesComposer,
-    UserSettingsSoundComposer
+    UserSettingsSoundComposer,
+    WiredMenuSettingsComposer
 } from '@octane/renderer';
+import { useUserChatPreferencesStore } from '@/state/userChatPreferences';
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { DispatchMainEvent, DispatchUiEvent, localizeWithFallback, SendMessageComposer } from '../../api';
 import { DraggableWindow } from '../../common';
@@ -25,8 +29,9 @@ import {
 } from '../../hooks';
 import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
 import { SoundboardVolumeControl } from './SoundboardVolumeControl';
+import { WordFilterSettingsView } from './WordFilterSettingsView';
 
-type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy';
+type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
 
 interface AirSettingsFrameProps {
@@ -118,6 +123,18 @@ export const UserSettingsView: FC<{}> = () => {
             case 'soundboard_volume':
                 clone.volumeSoundboard = clampVolume(value as number);
                 break;
+            case 'chat_bubble_width':
+            case 'chat_scroll_speed':
+                if (type === 'chat_bubble_width') clone.chatBubbleWidth = value as number;
+                else clone.chatScrollSpeed = value as number;
+                SendMessageComposer(new UserSettingsChatPreferencesComposer(clone.chatMode, clone.chatBubbleWidth, clone.chatScrollSpeed));
+                useUserChatPreferencesStore.getState().setPreferences({ bubbleWidth: clone.chatBubbleWidth, scrollSpeed: clone.chatScrollSpeed });
+                break;
+            case 'wired_whisper_disabled':
+                clone.wiredWhisperDisabled = value as boolean;
+                // The server keeps only the whisper switch of the official wired menu preferences.
+                SendMessageComposer(new WiredMenuSettingsComposer(true, true, false, clone.wiredWhisperDisabled, true, 'default'));
+                break;
         }
 
         setUserSettings(clone);
@@ -157,6 +174,16 @@ export const UserSettingsView: FC<{}> = () => {
         settingsEvent.onlineStatusVisible = parser.onlineStatusVisible;
         settingsEvent.friendsCanFollow = parser.friendsCanFollow;
         settingsEvent.friendRequestsAllowed = parser.friendRequestsAllowed;
+        settingsEvent.wiredWhisperDisabled = parser.wiredWhisperDisabled;
+        settingsEvent.chatMode = parser.chatMode;
+        settingsEvent.chatBubbleWidth = parser.chatBubbleWidth;
+        settingsEvent.chatScrollSpeed = parser.chatScrollSpeed;
+
+        useUserChatPreferencesStore.getState().setPreferences({
+            chatMode: parser.chatMode,
+            bubbleWidth: parser.chatBubbleWidth,
+            scrollSpeed: parser.chatScrollSpeed
+        });
 
         setUserSettings(settingsEvent);
         DispatchMainEvent(settingsEvent);
@@ -207,6 +234,11 @@ export const UserSettingsView: FC<{}> = () => {
         setReturnToMenu(true);
     };
     const handleBack = () => {
+        if (section === 'wordfilter') {
+            setSection('chat');
+            return;
+        }
+
         if (section && returnToMenu) {
             setSection(null);
             setReturnToMenu(false);
@@ -325,7 +357,47 @@ export const UserSettingsView: FC<{}> = () => {
                         />
                         <span>{localizeWithFallback('memenu.settings.other.enable.chat.window', 'Enable chat window')}</span>
                     </label>
+                    <label className="air-settings-select-row">
+                        <span>{localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}</span>
+                        <select
+                            aria-label={localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}
+                            value={userSettings.chatBubbleWidth}
+                            onChange={(event) => processAction('chat_bubble_width', Number(event.target.value))}
+                        >
+                            <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
+                            <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_THIN}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.thin', 'Thin')}</option>
+                            <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_WIDE}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.wide', 'Wide')}</option>
+                        </select>
+                    </label>
+                    <label className="air-settings-select-row">
+                        <span>{localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}</span>
+                        <select
+                            aria-label={localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}
+                            value={userSettings.chatScrollSpeed}
+                            onChange={(event) => processAction('chat_scroll_speed', Number(event.target.value))}
+                        >
+                            <option value={RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
+                            <option value={RoomChatSettings.CHAT_SCROLL_SPEED_SLOW}>{localizeWithFallback('navigator.roomsettings.chat.speed.slow', 'Slow')}</option>
+                            <option value={RoomChatSettings.CHAT_SCROLL_SPEED_FAST}>{localizeWithFallback('navigator.roomsettings.chat.speed.fast', 'Fast')}</option>
+                        </select>
+                    </label>
+                    <button className="air-settings-button" onClick={() => setSection('wordfilter')} type="button">
+                        {localizeWithFallback('memenu.settings.wordfilter', 'Word filter')}
+                    </button>
                 </div>
+            </AirSettingsFrame>
+        );
+    }
+
+    if (section === 'wordfilter') {
+        return (
+            <AirSettingsFrame
+                backLabel={backLabel}
+                onBack={handleBack}
+                title={localizeWithFallback('memenu.settings.wordfilter.title', 'Word filter')}
+                variant="wordfilter"
+            >
+                <WordFilterSettingsView />
             </AirSettingsFrame>
         );
     }
@@ -356,6 +428,15 @@ export const UserSettingsView: FC<{}> = () => {
                             onChange={(event) => processAction('camera_follow', event.target.checked)}
                         />
                         <span>{localizeWithFallback('memenu.settings.other.disable.room.camera.follow', "Don't focus on own avatar")}</span>
+                    </label>
+                    <label className="air-settings-check-row">
+                        <input
+                            checked={userSettings.wiredWhisperDisabled}
+                            className="air-settings-checkbox"
+                            type="checkbox"
+                            onChange={(event) => processAction('wired_whisper_disabled', event.target.checked)}
+                        />
+                        <span>{localizeWithFallback('memenu.settings.other.disable.wired.whisper', 'Hide wired whisper messages')}</span>
                     </label>
                     <label className="air-settings-check-row">
                         <input

@@ -37,6 +37,7 @@ import {
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryFurnitureDeleteView } from './views/furniture/InventoryFurnitureDeleteView';
+import { InventoryTradeNameScamWarningView } from './views/furniture/InventoryTradeNameScamWarningView';
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeView';
@@ -316,6 +317,7 @@ export const InventoryView: FC<{}> = () => {
                 )}
             </OctaneCardView>
             <InventoryFurnitureDeleteView />
+            <InventoryTradeNameScamWarningView />
         </>
     );
 };

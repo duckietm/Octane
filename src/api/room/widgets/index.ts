@@ -24,6 +24,7 @@ export * from './PetSupplementEnum';
 export * from './PostureTypeEnum';
 export * from './RoomDimmerPreset';
 export * from './RoomObjectItem';
+export * from './applyUserChatPreferences';
 export * from './resolveChatBubbleWidth';
 export * from './UseProductItem';
 export * from './VoteValue';

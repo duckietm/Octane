@@ -26,3 +26,4 @@ export * from './PlacedObjectPurchaseData';
 export * from './Product';
 export * from './ProductTypeEnum';
 export * from './SearchResult';
+export * from './TargetedOfferUtilities';
