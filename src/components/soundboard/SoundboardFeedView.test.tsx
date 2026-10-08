@@ -28,7 +28,7 @@ describe('SoundboardFeedItemView', () => {
     test('mutes the user of the entry and takes the entry off the feed', () => {
         const entry = pushEntry();
         const onSilence = vi.fn();
-        render(<SoundboardFeedItemView entry={entry} tone="blue" canSilence onSilence={onSilence} />);
+        render(<SoundboardFeedItemView entry={entry} canSilence onSilence={onSilence} />);
 
         fireEvent.click(screen.getByRole('button', { name: 'soundboard.feed.silence tester' }));
 
@@ -37,7 +37,7 @@ describe('SoundboardFeedItemView', () => {
     });
 
     test('offers no mute button for a player who cannot be muted', () => {
-        render(<SoundboardFeedItemView entry={pushEntry()} tone="blue" canSilence={false} onSilence={vi.fn()} />);
+        render(<SoundboardFeedItemView entry={pushEntry()} canSilence={false} onSilence={vi.fn()} />);
 
         expect(screen.queryByRole('button')).toBeNull();
     });

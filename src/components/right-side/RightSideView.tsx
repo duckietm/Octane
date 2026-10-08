@@ -6,6 +6,7 @@ import { NotificationCenterView } from '../notification-center/NotificationCente
 import { PurseView } from '../purse/PurseView';
 import { MysteryBoxExtensionView } from '../room/widgets/mysterybox/MysteryBoxExtensionView';
 import { RoomPromotesWidgetView } from '../room/widgets/room-promotes/RoomPromotesWidgetView';
+import { SoundboardFeedView } from '../soundboard/SoundboardFeedView';
 
 export const RightSideView: FC<{}> = (props) => {
     return (
@@ -17,6 +18,7 @@ export const RightSideView: FC<{}> = (props) => {
                 <OfferView />
                 <RoomPromotesWidgetView />
                 <NotificationCenterView />
+                <SoundboardFeedView />
             </Column>
         </div>
     );
