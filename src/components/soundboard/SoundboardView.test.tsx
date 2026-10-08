@@ -49,6 +49,17 @@ const padNames = () => within(screen.getByTestId('soundboard-grid')).getAllByRol
 describe('SoundboardContentView', () => {
     afterEach(cleanup);
 
+    test('says so when only people with rights may play', () => {
+        renderContent([], { rightsOnly: true });
+
+        expect(screen.getByText('soundboard.room.mode.rights')).toBeInTheDocument();
+
+        cleanup();
+        renderContent([]);
+
+        expect(screen.queryByText('soundboard.room.mode.rights')).toBeNull();
+    });
+
     test('shows ten text pads per page and pagination only when needed', () => {
         const { container } = renderContent();
         const grid = screen.getByTestId('soundboard-grid');
