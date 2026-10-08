@@ -18,6 +18,7 @@ const useSessionInfoState = () => {
 
     const respectUser = (userId: number) => GetSessionDataManager().giveRespect(userId);
     const respectPet = (petId: number) => GetSessionDataManager().givePetRespect(petId);
+    const replenishRespect = () => GetSessionDataManager().replenishRespect();
 
     useMessageEvent<UserInfoEvent>(UserInfoEvent, (event) => {
         setUserInfo(event.getParser().userInfo);
@@ -27,7 +28,7 @@ const useSessionInfoState = () => {
         setChatStyleId(event.getParser().chatType);
     });
 
-    return { userInfo, chatStyleId, respectUser, respectPet, updateChatStyleId };
+    return { userInfo, chatStyleId, respectUser, respectPet, replenishRespect, updateChatStyleId };
 };
 
 // Public surface. SessionDataManager already invalidates the
@@ -42,6 +43,7 @@ export const useSessionInfo = () => {
         ...shared,
         userFigure: userData.figure,
         userRespectRemaining: userData.respectsLeft,
+        respectReplenishesLeft: userData.respectReplenishesLeft ?? 0,
         petRespectRemaining: userData.respectsPetLeft
     };
 };

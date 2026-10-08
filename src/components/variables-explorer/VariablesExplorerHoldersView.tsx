@@ -12,7 +12,7 @@ import {
 import { useNotification } from '../../hooks/notification';
 import { useVariablesExplorerHolders } from '../../hooks/variables-explorer/useVariablesExplorerHolders';
 import { WiredVariableOwnersPanel } from '../wired-tools/WiredVariableOwnersPanel';
-import { ExplorerHolderTarget } from './VariablesExplorer.helpers';
+import { explorerHolderDescription, ExplorerHolderTarget } from './VariablesExplorer.helpers';
 
 export interface VariablesExplorerHoldersViewProps {
     client: VariablesWebApiClient;
@@ -51,7 +51,7 @@ export const VariablesExplorerHoldersView: FC<VariablesExplorerHoldersViewProps>
             variablesType={scope}
             hasValue={hasValue}
             holders={page?.holders ?? []}
-            describeHolder={(_entityType, entityId) => ({ categoryLabel: targetKindLabel(targetKind), entityName: `#${entityId}` })}
+            describeHolder={(_entityType, entityId, entityName) => explorerHolderDescription(targetKind, entityId, entityName)}
             currentPage={currentPage}
             totalEntries={page?.total ?? 0}
             lastPage={lastPage}

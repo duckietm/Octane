@@ -85,6 +85,31 @@ export class MessengerThread {
         return group;
     }
 
+    /**
+     * Marks the newest own chat line with this text as failed, as the server reports refused
+     * messages by their text. Returns the marked line, or null when none matches.
+     */
+    public markOwnMessageFailed(senderId: number, message: string, failureText: string): MessengerThreadChat {
+        const text = (message ?? '').trim();
+
+        for (let groupIndex = this._groups.length - 1; groupIndex >= 0; groupIndex--) {
+            const chats = this._groups[groupIndex].chats;
+
+            for (let chatIndex = chats.length - 1; chatIndex >= 0; chatIndex--) {
+                const chat = chats[chatIndex];
+
+                if (chat.senderId !== senderId || chat.type !== MessengerThreadChat.CHAT || chat.failed) continue;
+                if ((chat.message ?? '').trim() !== text) continue;
+
+                chat.setFailed(failureText);
+
+                return chat;
+            }
+        }
+
+        return null;
+    }
+
     public setRead(): void {
         this._unreadCount = 0;
     }

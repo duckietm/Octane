@@ -1,6 +1,6 @@
 import { GetRoomEngine, GetSessionDataManager, RoomObjectCategory, RoomObjectVariable } from '@octane/renderer';
 import { FC, KeyboardEvent, ReactNode, useMemo, useState } from 'react';
-import { GetRoomSession, giveableVariables, parseInt32, profileToEntries, VariablesWebApiClient, WebApiVariable } from '../../api';
+import { GetRoomSession, giveableVariables, isWallTargetKind, parseInt32, profileToEntries, VariablesWebApiClient, WebApiVariable } from '../../api';
 import wiredGlobalPlaceholderImage from '../../assets/images/wiredtools/wired_global_placeholder.png';
 import { Button, LayoutAvatarImageView, LayoutPetImageView, LayoutRoomObjectImageView } from '../../common';
 import { useVariablesExplorerProfile } from '../../hooks/variables-explorer/useVariablesExplorerProfile';
@@ -34,13 +34,14 @@ const describeLocalHolder = (target: ExplorerHolderTarget, entityId: number | nu
     if (target.scope === 'global' || entityId === null || !session || session.roomId !== roomId) return null;
 
     if (target.scope === 'furni') {
-        const category = target.kind === 'wall' ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR;
+        const wall = isWallTargetKind(target.kind);
+        const category = wall ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR;
         const roomObject = GetRoomEngine().getRoomObject(roomId, entityId, category);
 
         if (!roomObject) return null;
 
         const typeId = roomObject.model?.getValue<number>(RoomObjectVariable.FURNITURE_TYPE_ID);
-        const data = target.kind === 'wall' ? GetSessionDataManager().getWallItemData(typeId) : GetSessionDataManager().getFloorItemData(typeId);
+        const data = wall ? GetSessionDataManager().getWallItemData(typeId) : GetSessionDataManager().getFloorItemData(typeId);
 
         return {
             name: data?.name || data?.className || '',

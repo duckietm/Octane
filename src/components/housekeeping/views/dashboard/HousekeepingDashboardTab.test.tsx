@@ -19,6 +19,9 @@ const notificationState: any = {
     simpleAlert: vi.fn()
 };
 
+// The charts fetch their own list; the dashboard tests cover the cards around them.
+vi.mock('./HousekeepingStatsView', () => ({ HousekeepingStatsView: () => null }));
+
 vi.mock('../../../../hooks', () => ({
     useHousekeepingStore: () => storeState,
     useNotification: () => notificationState
@@ -27,14 +30,16 @@ vi.mock('../../../../hooks', () => ({
 vi.mock('../../../../api', () => {
     return {
         LocalizeText: (key: string) => key,
-        formatCompactNumber: (value: number) => (Number.isFinite(value) ? String(value) : '—'),
+        formatCompactNumber: (value: number) => (Number.isFinite(value) ? String(value) : '-'),
         formatRelativePast: () => 'now',
-        formatUptime: (value: number) => (Number.isFinite(value) ? `${value}s` : '—'),
+        formatUptime: (value: number) => (Number.isFinite(value) ? `${value}s` : '-'),
         HousekeepingApi: {
             sendHotelAlert: vi.fn(() => Promise.resolve({ ok: true, actionId: null, message: '' }))
         },
         HousekeepingTabId: { DASHBOARD: 'dashboard', USERS: 'users', ROOMS: 'rooms', ECONOMY: 'economy', AUDIT: 'audit' },
-        NotificationBubbleType: { INFO: 'INFO' }
+        localizeHousekeepingAction: (action: string) => action,
+        NotificationBubbleType: { INFO: 'INFO' },
+        resolveHousekeepingTarget: (entry: { targetLabel: string }) => entry.targetLabel || '-'
     };
 });
 

@@ -307,15 +307,6 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
         return getBuilderFurniPlaceableStatus(currentOffer);
     }, [currentOffer, getBuilderFurniPlaceableStatus, isBuildersClubPlaceable, builderPlaceableRefreshTick]);
-    const buildersClubPlaceOneButtonStyle = useMemo(
-        () => ({
-            background: 'linear-gradient(180deg, #d89f2d 0%, #c68515 100%)',
-            borderColor: '#d79d2e',
-            color: '#ffffff'
-        }),
-        []
-    );
-
     useEffect(() => {
         if (!isBuildersClubPlaceable) return;
 
@@ -367,18 +358,22 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
             return (
                 <div className="flex flex-col gap-1.5 items-start">
-                    <div className="flex gap-1.5 flex-wrap">
-                        <button type="button" className={standardButtonClassNames.join(' ')} disabled={isDisabled} onClick={() => startBuilderPlacement(true)}>
-                            {LocalizeText('builder.placement_widget.place_many')}
+                    <div className="octane-builders-place-buttons flex gap-1.5 flex-wrap">
+                        <button
+                            type="button"
+                            className="octane-builders-place-button is-one"
+                            disabled={isDisabled}
+                            onClick={() => startBuilderPlacement(false)}
+                        >
+                            {LocalizeText('builder.placement_widget.place_one')}
                         </button>
                         <button
                             type="button"
-                            className={standardButtonClassNames.join(' ')}
+                            className="octane-builders-place-button is-many"
                             disabled={isDisabled}
-                            onClick={() => startBuilderPlacement(false)}
-                            style={buildersClubPlaceOneButtonStyle}
+                            onClick={() => startBuilderPlacement(true)}
                         >
-                            {LocalizeText('builder.placement_widget.place_one')}
+                            {LocalizeText('builder.placement_widget.place_many')}
                         </button>
                     </div>
                     {isBlockedByVisitors && (

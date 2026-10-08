@@ -18,6 +18,8 @@ export const WIRED_MONITOR_ACTION_FETCH = 0;
 export const WIRED_MONITOR_ACTION_CLEAR_LOGS = 1;
 export const WIRED_MONITOR_POLL_MS = 250;
 export const WIRED_VARIABLES_POLL_MS = 250;
+export const WIRED_VARIABLES_IDLE_POLL_MS = 2000;
+export const WIRED_VARIABLES_LIVE_TABS = ['inspection', 'variables'];
 export const WIRED_INSPECTION_REFRESH_MS = 50;
 export const WIRED_CLOCK_REFRESH_MS = 50;
 
@@ -121,7 +123,20 @@ export const VARIABLES_ELEMENTS: VariablesElementButton[] = [
 export const INTERNAL_FURNI_OPACITY_VARIABLE_ITEM_ID = -1001;
 export const INTERNAL_FURNI_GRAVITY_VARIABLE_ITEM_ID = -1002;
 
-export const EDITABLE_FURNI_VARIABLES: string[] = ['@position_x', '@position_y', '@rotation', '@altitude', '@state', '@opacity', '@gravity', '@wallitem_offset'];
+export const EDITABLE_FURNI_VARIABLES: string[] = [
+    '@position_x',
+    '@position_y',
+    '@rotation',
+    '@altitude',
+    '@state',
+    '@opacity',
+    '@gravity',
+    '@wallitem_offset',
+    '~recolorable_furni.color.rgb',
+    '~recolorable_furni.color.rgb.r',
+    '~recolorable_furni.color.rgb.g',
+    '~recolorable_furni.color.rgb.b'
+];
 export const WIRED_FURNI_RUNTIME_ACTION_READ = 0;
 export const WIRED_FURNI_RUNTIME_ACTION_WRITE = 1;
 export const EDITABLE_USER_VARIABLES: string[] = ['@position_x', '@position_y', '@direction'];
@@ -149,6 +164,10 @@ const createVariableDefinition = (
 export const VARIABLE_DEFINITIONS: Record<VariablesElementType, VariableDefinition[]> = {
     furni: [
         createVariableDefinition('~teleport.target_id', 'Furni', 'Conditional'),
+        createVariableDefinition('~recolorable_furni.color.rgb', 'Furni', 'Conditional', true),
+        createVariableDefinition('~recolorable_furni.color.rgb.r', 'Furni', 'Conditional', true),
+        createVariableDefinition('~recolorable_furni.color.rgb.g', 'Furni', 'Conditional', true),
+        createVariableDefinition('~recolorable_furni.color.rgb.b', 'Furni', 'Conditional', true),
         createVariableDefinition('@id', 'Furni'),
         createVariableDefinition('@class_id', 'Furni'),
         createVariableDefinition('@height', 'Furni'),

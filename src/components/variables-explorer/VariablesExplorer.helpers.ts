@@ -1,4 +1,4 @@
-import { targetKindLabel, WebApiHolderScope, WebApiProfile, WebApiTargetKind, WebApiUserTargetKind, WebApiVariable, WebApiVariableScope } from '../../api';
+import { holderScopeOfKind, targetKindLabel, WebApiHolderScope, WebApiProfile, WebApiTargetKind, WebApiUserTargetKind, WebApiVariable, WebApiVariableScope } from '../../api';
 import { VARIABLES_ELEMENTS } from '../wired-tools/WiredCreatorTools.constants';
 import { VariableDefinition, VariablesElementButton, VariablesElementType } from '../wired-tools/WiredCreatorTools.types';
 
@@ -56,8 +56,10 @@ export const EXPLORER_LOOKUP_KINDS: { value: ExplorerLookupKind; label: string }
     { value: 'users', label: 'User id' },
     { value: 'pets', label: 'Pet id' },
     { value: 'bots', label: 'Bot id' },
-    { value: 'floor', label: 'Floor furni id' },
-    { value: 'wall', label: 'Wall furni id' }
+    { value: 'furni', label: 'Floor furni id' },
+    { value: 'wall-items', label: 'Wall furni id' },
+    { value: 'furni-bc', label: 'Builders Club floor furni id' },
+    { value: 'wall-items-bc', label: 'Builders Club wall furni id' }
 ];
 
 /** The lookup field's target, or `null` when the input does not fit the kind. */
@@ -73,7 +75,7 @@ export const lookupTarget = (kind: ExplorerLookupKind, input: string): ExplorerH
 
     if (entityId <= 0 || entityId > 2147483647) return null;
 
-    return { scope: kind === 'floor' || kind === 'wall' ? 'furni' : 'user', kind, entityId };
+    return { scope: holderScopeOfKind(kind), kind, entityId };
 };
 
 /** The id writes go to: the target's own, or the one a name lookup resolved to. */
@@ -82,6 +84,14 @@ export const resolvedEntityId = (target: ExplorerHolderTarget, profile: WebApiPr
     if ('entityId' in target) return target.entityId;
 
     return typeof profile?.entityId === 'number' ? profile.entityId : null;
+};
+
+/** A holders row: the kind and the name the API sent (also for users who are not in the room), else the id. */
+export const explorerHolderDescription = (kind: WebApiTargetKind, entityId: number, entityName: string): { categoryLabel: string; entityName: string } => {
+    const categoryLabel = targetKindLabel(kind);
+    const named = !!entityName && entityName !== `${categoryLabel} #${entityId}`;
+
+    return { categoryLabel, entityName: named ? entityName : `#${entityId}` };
 };
 
 export const holderPanelTitle = (target: ExplorerHolderTarget): string => {

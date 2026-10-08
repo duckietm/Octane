@@ -75,12 +75,13 @@ describe('VariablesExplorerConnectView', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Open explorer' }));
 
         await waitFor(() => expect(onConnected).toHaveBeenCalledWith({ hotelUrl: 'https://main.example', roomId: 88, readKey: KEY, writeKey: '' }, []));
-        expect(fetchMock.mock.calls[0][0]).toBe('https://main.example/api/public/rooms/88/variables');
+        expect(fetchMock.mock.calls[0][0]).toBe('https://main.example/api/public/rooms/88/variables/definitions');
+        expect((fetchMock.mock.calls[0][1].headers as Record<string, string>)['X-Wired-Read-Key']).toBe(KEY);
         expect(window.localStorage.length).toBe(0);
     });
 
     it('shows the server error when the key is refused', async () => {
-        fetchMock.mockResolvedValue(new Response(JSON.stringify({ error: { code: 'unauthorized', message: 'Unknown key' } }), { status: 401 }));
+        fetchMock.mockResolvedValue(new Response(JSON.stringify({ error: 'wired.variables.key_invalid' }), { status: 403 }));
 
         render(<VariablesExplorerConnectView prefill={{ roomId: 88, writeKey: KEY }} onConnected={vi.fn()} onClose={vi.fn()} />);
         fireEvent.click(screen.getByRole('button', { name: 'Open explorer' }));

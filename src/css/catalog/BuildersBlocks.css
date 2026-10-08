@@ -1,0 +1,149 @@
+.octane-catalog-builders-blocks {
+    height: 100%;
+    min-height: 0;
+}
+
+.octane-catalog-builders-blocks-preview {
+    flex: 0 0 190px;
+    height: 190px;
+    border-radius: 4px;
+    background: #2f2f2f;
+}
+
+.octane-catalog-builders-blocks-name {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    max-width: 70%;
+    color: #ffffff !important;
+    text-shadow: 0 1px 0 #000000;
+}
+
+.octane-catalog-builders-blocks-shapes {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.octane-catalog-builders-blocks-actions {
+    flex: 0 0 auto;
+    padding: 4px 2px 2px;
+}
+
+.octane-catalog-window .octane-builders-place-button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    height: 26px;
+    padding: 0 12px;
+    border: 2px solid;
+    border-radius: 5px;
+    color: #ffffff;
+    font-family: HabboAirUbuntu, UbuntuRegular, Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+}
+
+.octane-catalog-window .octane-builders-place-button.is-one {
+    background: linear-gradient(180deg, #d8b85a 0%, #b8952f 100%);
+    border-color: #9c7d22;
+}
+
+.octane-catalog-window .octane-builders-place-button.is-many {
+    background: linear-gradient(180deg, #62a6ba 0%, #42849a 100%);
+    border-color: #346f82;
+}
+
+.octane-catalog-window .octane-builders-place-button:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.octane-catalog-window .octane-builders-place-button:active:not(:disabled) {
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.octane-catalog-window .octane-builders-place-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.octane-builders-blocks-colors {
+    width: 300px;
+}
+
+.octane-color-preview-box {
+    display: flex;
+    flex: 0 0 100px;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 90px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #cfcfcf;
+}
+
+.octane-color-preview-box .furni-image {
+    max-width: 100%;
+    max-height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-color-preview-arrow {
+    flex: 0 0 auto;
+    color: #3ba63b;
+    font-size: 26px;
+}
+
+.octane-color-swatch-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 4px;
+    min-height: 32px;
+    max-height: 150px;
+    padding: 6px;
+    overflow-y: auto;
+    border-radius: 6px;
+    background: #d6d6d6;
+    border: 1px solid #b4b4b4;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.octane-color-swatch-grid.is-room {
+    max-height: 64px;
+    background: #e2e2e2;
+}
+
+.octane-color-swatch {
+    width: 26px;
+    height: 20px;
+    flex: 0 0 26px;
+    padding: 0;
+    border: 2px solid #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px #8d8d8d;
+    cursor: pointer;
+}
+
+.octane-color-swatch:hover {
+    box-shadow: 0 0 0 1px #3d3d3d;
+}
+
+.octane-color-swatch.is-active {
+    box-shadow: 0 0 0 2px #1d1d1d;
+}
+
+.octane-furni-recolor {
+    width: 320px;
+}

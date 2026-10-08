@@ -8,7 +8,7 @@ import popupArrowDown from '../../../assets/images/navigator/air/popup-arrow-dow
 import tileIconBlack from '../../../assets/images/navigator/air/tile-icon-black.png';
 import tileIconWhite from '../../../assets/images/navigator/air/tile-icon-white.png';
 import { DraggableWindow } from '../../../common';
-import { useNavigatorData, useNavigatorUiStore, useUserDataSnapshot } from '../../../hooks';
+import { useNavigatorData, useNavigatorUiStore, useUserDataSnapshot, useUserPermissions } from '../../../hooks';
 import { useRoomCreatorStore } from './navigatorRoomCreatorStore';
 
 const AIR_TRADE_KEYS = ['navigator.roomsettings.trade_not_allowed', 'navigator.roomsettings.trade_not_with_Controller', 'navigator.roomsettings.trade_allowed'];
@@ -96,6 +96,9 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
 export const NavigatorRoomCreatorView: FC = () => {
     const { categories } = useNavigatorData();
     const { clubLevel, securityLevel } = useUserDataSnapshot();
+    const permissions = useUserPermissions();
+    // acc_navigator_staff; a server that sends no keys keeps Flash's staff level (4).
+    const isNavigatorStaff = permissions.size ? permissions.get('acc_navigator_staff') === 1 : securityLevel >= 4;
     const beginCreate = useRoomCreatorStore((state) => state.beginCreate);
 
     const hcDisabled = GetConfigurationValue<boolean>('hc.disabled', false);
@@ -116,11 +119,11 @@ export const NavigatorRoomCreatorView: FC = () => {
         return models && models.length ? models[0].name : '';
     });
 
-    const visibleModels = useMemo(() => roomModels.filter((model) => model.clubLevel >= 0 || securityLevel >= 4), [roomModels, securityLevel]);
+    const visibleModels = useMemo(() => roomModels.filter((model) => model.clubLevel >= 0 || isNavigatorStaff), [roomModels, isNavigatorStaff]);
 
     const selectableCategories = useMemo(
-        () => (categories ?? []).filter((category) => category.visible && !category.automatic && (!category.staffOnly || securityLevel >= 7)),
-        [categories, securityLevel]
+        () => (categories ?? []).filter((category) => category.visible && !category.automatic && (!category.staffOnly || isNavigatorStaff)),
+        [categories, isNavigatorStaff]
     );
 
     const visitorOptions = useMemo(() => buildVisitorOptions(effectiveClubLevel >= 2 ? ROOM_LIMIT_HC : ROOM_LIMIT_NON_SUBSCRIBER), [effectiveClubLevel]);
@@ -143,7 +146,7 @@ export const NavigatorRoomCreatorView: FC = () => {
             return;
         }
 
-        if (model.clubLevel < 0 && securityLevel < 4) return;
+        if (model.clubLevel < 0 && !isNavigatorStaff) return;
 
         setSelectedModelName(model.name);
     };

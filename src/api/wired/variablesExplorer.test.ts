@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest';
 import {
     explorerErrorMessage,
     giveableVariables,
+    holderScopeOfKind,
+    isWallTargetKind,
     loadRememberedKeys,
     parseInt32,
     profileToEntries,
     rememberedKeysStorageKey,
     sanitizeRoomIdInput,
     saveRememberedKeys,
+    targetKindsOf,
     validateExplorerConnect,
     webApiEntryToHolder
 } from './variablesExplorer';
@@ -122,7 +125,7 @@ describe('explorer data helpers', () => {
     });
 
     it('turns an api entry into a holder row', () => {
-        const holder = webApiEntryToHolder({ entityId: 7, value: 3, createdAt: 100, updatedAt: 200 }, 'furni', 'wall');
+        const holder = webApiEntryToHolder({ entityId: 7, value: 3, createdAt: 100, updatedAt: 200 }, 'furni', 'wall-items');
 
         expect(holder).toMatchObject({
             entityType: 2,
@@ -131,6 +134,18 @@ describe('explorer data helpers', () => {
             storage: { value: 3, creationTime: 100_000, lastUpdateTime: 200_000 }
         });
         expect(holder.storage.creationTimeStr).not.toBe('');
+        expect(webApiEntryToHolder({ entityId: 4, name: 'Bob', createdAt: 0, updatedAt: 0 }, 'user', 'users').entityName).toBe('Bob');
+        expect(webApiEntryToHolder({ entityId: 9, createdAt: 0, updatedAt: 0 }, 'furni', 'furni-bc').entityName).toBe('Builders Club floor furni #9');
+    });
+
+    it("uses Habbo's furni kinds", () => {
+        expect(targetKindsOf('furni')).toEqual(['furni', 'wall-items', 'furni-bc', 'wall-items-bc']);
+        expect(targetKindsOf('user')).toEqual(['users', 'pets', 'bots']);
+        expect(holderScopeOfKind('wall-items-bc')).toBe('furni');
+        expect(holderScopeOfKind('pets')).toBe('user');
+        expect(isWallTargetKind('wall-items')).toBe(true);
+        expect(isWallTargetKind('wall-items-bc')).toBe(true);
+        expect(isWallTargetKind('furni')).toBe(false);
     });
 
     it('parses 32-bit integers only', () => {
@@ -141,8 +156,18 @@ describe('explorer data helpers', () => {
         expect(parseInt32('')).toBeNull();
     });
 
-    it('explains a rate limit with its wait', () => {
-        expect(explorerErrorMessage(new VariablesWebApiError(429, 'rate_limited', 'x', 12))).toBe('Too many requests. Try again in 12 s.');
-        expect(explorerErrorMessage(new VariablesWebApiError(401, 'unauthorized', 'x'))).toBe('The key was not accepted.');
+    it("explains Habbo's error codes", () => {
+        expect(explorerErrorMessage(new VariablesWebApiError(429, 'wired.variables.too_many_requests', 'x', 12))).toBe(
+            'Too many requests. Try again in 12 s.'
+        );
+        expect(explorerErrorMessage(new VariablesWebApiError(403, 'wired.variables.key_invalid', 'x'))).toBe('The key was not accepted.');
+        expect(explorerErrorMessage(new VariablesWebApiError(403, 'wired.variables.bulk_delete_not_enabled', 'x'))).toBe(
+            'This write key may not bulk delete. Allow mass deletion in the Web API add-on first.'
+        );
+        expect(explorerErrorMessage(new VariablesWebApiError(403, 'wired.variables.user_not_participating', 'x'))).toBe(
+            'That user is not in the room and has no saved variables in it.'
+        );
+        expect(explorerErrorMessage(new VariablesWebApiError(0, 'no_key', 'A write key is needed'))).toBe('A write key is needed');
+        expect(explorerErrorMessage(new VariablesWebApiError(418, 'something.new', 'something.new'))).toBe('something.new');
     });
 });

@@ -26,6 +26,7 @@ describe('useCatalog filter contract', () => {
             'catalogLocalizationVersion',
             'currentOffer',
             'currentPage',
+            'currentType',
             'frontPageItems',
             'furniCount',
             'furniLimit',

@@ -15,7 +15,8 @@ import {
     MessengerFriend,
     OpenUrl,
     ProductTypeEnum,
-    SendMessageComposer
+    SendMessageComposer,
+    HasSessionPermission
 } from '../../../../api';
 import giftArrowLeftImage from '../../../../assets/images/catalog/air/gift/arrow-left.png';
 import giftArrowRightImage from '../../../../assets/images/catalog/air/gift/arrow-right.png';
@@ -77,7 +78,7 @@ export const CatalogGiftView: FC = () => {
     const { setGiftReceiver = null } = useCatalogUiState();
     const { showConfirm = null, simpleAlert = null } = useNotification();
     const sessionDataManager = GetSessionDataManager();
-    const isModerator = sessionDataManager.hasSecurity(SecurityLevel.MODERATOR);
+    const isModerator = HasSessionPermission('acc_gift_hide_sender', SecurityLevel.MODERATOR);
 
     const allFriends = useMemo(() => friends.filter((friend: MessengerFriend) => friend.id !== -1), [friends]);
 

@@ -312,6 +312,7 @@
         "enabled": false,
         "sound": "sound_respect_received"
     },
+    "respect.replenish_cost_duckets": 50,
     "currency.display.number.short": false,
     "currency.asset.icon.url": "${images.url}/wallet/%type%.png",
     "catalog.asset.url": "${image.library.url}catalogue",

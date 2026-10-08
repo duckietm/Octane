@@ -432,6 +432,18 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
+.messenger-window .messenger-message-failed {
+    color: #a33;
+    text-decoration: line-through;
+}
+
+.messenger-window .messenger-message-failed-mark {
+    display: inline-block;
+    margin-right: 4px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
 .messenger-window .messenger-status-notification {
     margin: 6px 0;
     color: #666;
