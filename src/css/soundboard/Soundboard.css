@@ -25,12 +25,13 @@
 .soundboard-feed {
     position: fixed;
     top: 80px;
-    right: 12px;
+    right: 0;
     z-index: 70;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    width: 230px;
+    align-items: flex-end;
+    gap: 4px;
+    width: 188px;
     pointer-events: none;
 }
 
@@ -42,14 +43,7 @@
 .soundboard-feed__item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    background: rgba(28, 51, 66, 0.92);
-    color: #fff;
-    font-size: 12px;
-    line-height: 1.25;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    gap: 7px;
     animation: soundboard-feed-in 0.35s ease-out;
     pointer-events: auto;
     cursor: pointer;
@@ -60,11 +54,12 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-width: 2px;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: 50%;
+    font-size: 14px;
+    text-shadow: none;
 }
 
 .soundboard-feed__user {
@@ -81,25 +76,15 @@
     white-space: nowrap;
 }
 
-.soundboard-feed__silence {
+/* The silence button keeps the hotel button skin the bubble gives every button. */
+.soundboard-feed__item .soundboard-feed__silence {
     display: flex;
     flex: none;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.6);
+    min-height: 20px;
+    padding: 0 4px;
     cursor: pointer;
-}
-
-.soundboard-feed__silence:hover,
-.soundboard-feed__silence:focus-visible {
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff;
 }
 
 .soundboard-silenced {
