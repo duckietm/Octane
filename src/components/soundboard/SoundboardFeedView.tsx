@@ -24,7 +24,7 @@ export const SoundboardFeedItemView: FC<SoundboardFeedItemViewProps> = ({ entry,
     }, [dismiss, entry.key]);
 
     return (
-        <div className="soundboard-feed__item" role="status" onClick={() => dismiss(entry.key)}>
+        <div className="soundboard-feed__item octane-notification-bubble octane-swf-notification-bubble" role="status" onClick={() => dismiss(entry.key)}>
             <div aria-hidden="true" className={`soundboard-feed__icon ${SOUNDBOARD_TONE_CLASSES[tone]}`}>♪</div>
             <div className="min-w-0 flex-1">
                 <div className="soundboard-feed__user">{entry.username}</div>
