@@ -73,8 +73,9 @@ const useAvatarEditorState = () => {
             const parts: IPartColor[] = [];
 
             for (const paletteId of Object.keys(selectedColors[setType])) {
+                // No figure model while a non-clothing tab (effects) is open.
                 const partColor = activeModel
-                    .find((category) => category.setType === setType)
+                    ?.find((category) => category.setType === setType)
                     ?.colorItems[paletteId]?.find((partColor) => partColor.id === selectedColors[setType][paletteId]);
 
                 if (partColor) parts.push(partColor);
@@ -90,7 +91,7 @@ const useAvatarEditorState = () => {
         (setType: string, partId: number) => {
             if (!setType || !setType.length) return;
 
-            const category = activeModel.find((category) => category.setType === setType);
+            const category = activeModel?.find((category) => category.setType === setType);
 
             if (!category || !category.partItems || !category.partItems.length) return;
 
@@ -126,7 +127,7 @@ const useAvatarEditorState = () => {
         (setType: string, paletteId: number, colorId: number) => {
             if (!setType || !setType.length) return;
 
-            const category = activeModel.find((category) => category.setType === setType);
+            const category = activeModel?.find((category) => category.setType === setType);
 
             if (!category || !category.colorItems || !category.colorItems.length) return;
 

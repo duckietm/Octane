@@ -10,7 +10,8 @@ import {
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaDice, FaRedo, FaTrash } from 'react-icons/fa';
-import { AvatarEditorAction, LocalizeText, SendMessageComposer } from '../../api';
+import { AVATAR_EDITOR_EFFECTS_TAB, AvatarEditorAction, GetConfigurationValue, LocalizeText, SendMessageComposer } from '../../api';
+import mainEffectsSrc from '../../assets/images/avatareditor/air/main-effects.png';
 import mainGenericSrc from '../../assets/images/avatareditor/air/main-generic.png';
 import mainHeadSrc from '../../assets/images/avatareditor/air/main-head.png';
 import mainLegsSrc from '../../assets/images/avatareditor/air/main-legs.png';
@@ -20,7 +21,8 @@ import wardrobeHangerSrc from '../../assets/images/avatareditor/wardrobe-hanger.
 import mainNftSrc from '../../assets/images/wardrobe/nft.png';
 import mainPetsSrc from '../../assets/images/wardrobe/pets.png';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../common';
-import { useAvatarEditor } from '../../hooks';
+import { useAvatarEditor, useAvatarEffects } from '../../hooks';
+import { AvatarEditorEffectsView } from './AvatarEditorEffectsView';
 import { AvatarEditorFigurePreviewView } from './AvatarEditorFigurePreviewView';
 import { AvatarEditorModelView } from './AvatarEditorModelView';
 import { AvatarEditorNftView } from './AvatarEditorNftView';
@@ -34,7 +36,8 @@ const MAIN_TAB_ICONS: Record<string, string> = {
     [AvatarEditorFigureCategory.LEGS]: mainLegsSrc,
     [AvatarEditorFigureCategory.PETS]: mainPetsSrc,
     [AvatarEditorFigureCategory.MISC]: mainMiscSrc,
-    [AvatarEditorFigureCategory.NFT]: mainNftSrc
+    [AvatarEditorFigureCategory.NFT]: mainNftSrc,
+    [AVATAR_EDITOR_EFFECTS_TAB]: mainEffectsSrc
 };
 
 // AIR removes unavailable tabs from this sequence without reordering the
@@ -45,6 +48,7 @@ const MAIN_TAB_ORDER: string[] = [
     AvatarEditorFigureCategory.TORSO,
     AvatarEditorFigureCategory.LEGS,
     AvatarEditorFigureCategory.MISC,
+    AVATAR_EDITOR_EFFECTS_TAB,
     AvatarEditorFigureCategory.NFT,
     AvatarEditorFigureCategory.PETS
 ];
@@ -52,6 +56,9 @@ const MAIN_TAB_ORDER: string[] = [
 export const AvatarEditorView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isWardrobeOpen, setIsWardrobeOpen] = useState(false);
+    // Effect picked in the effects tab; null until the user picks one.
+    const [effectSelection, setEffectSelection] = useState<number>(null);
+    const { activeEffectType = 0, activateEffect = null } = useAvatarEffects();
     const {
         setIsVisible: setEditorVisibility,
         clothingChangeData = null,
@@ -69,8 +76,11 @@ export const AvatarEditorView: FC<{}> = (props) => {
 
     const isPetsOpen = activeModelKey === AvatarEditorFigureCategory.PETS;
     const isNftOpen = activeModelKey === AvatarEditorFigureCategory.NFT;
+    // Official effects.in.avatar.editor; not for a clothing change booth.
+    const effectsEnabled = !clothingChangeData && GetConfigurationValue<boolean>('effects.in.avatar.editor', true);
+    const isEffectsOpen = effectsEnabled && activeModelKey === AVATAR_EDITOR_EFFECTS_TAB;
     const canUseWardrobe = !clothingChangeData && !isNftOpen;
-    const orderedModelKeys = Object.keys(avatarModels)
+    const orderedModelKeys = [...Object.keys(avatarModels), ...(effectsEnabled ? [AVATAR_EDITOR_EFFECTS_TAB] : [])]
         .filter((modelKey) => modelKey !== AvatarEditorFigureCategory.WARDROBE)
         .sort((left, right) => {
             const leftIndex = MAIN_TAB_ORDER.indexOf(left);
@@ -98,6 +108,8 @@ export const AvatarEditorView: FC<{}> = (props) => {
                     SendMessageComposer(new SetClothingChangeDataMessageComposer(clothingChangeData.objectId, gender, getFigureString));
                 } else {
                     SendMessageComposer(new UserFigureComposer(gender, getValidFigureString));
+
+                    if (effectSelection !== null) activateEffect(effectSelection);
                 }
                 setIsVisible(false);
                 return;
@@ -150,6 +162,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
         if (!isVisible) {
             setClothingChangeData(null);
             setIsWardrobeOpen(false);
+            setEffectSelection(null);
         }
     }, [isVisible, setEditorVisibility, setClothingChangeData]);
 
@@ -201,12 +214,15 @@ export const AvatarEditorView: FC<{}> = (props) => {
                         </button>
                     )}
                     <div className="octane-avatar-editor-main">
-                        {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && (
+                        {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && !isEffectsOpen && avatarModels[activeModelKey] && (
                             <AvatarEditorModelView categories={avatarModels[activeModelKey]} name={activeModelKey} />
                         )}
                         {isPetsOpen && <AvatarEditorPetView categories={avatarModels[activeModelKey]} />}
                         {isNftOpen && <AvatarEditorNftView categories={avatarModels[activeModelKey]} />}
-                        <AvatarEditorFigurePreviewView />
+                        {isEffectsOpen && (
+                            <AvatarEditorEffectsView selectedType={effectSelection ?? (activeEffectType > 0 ? activeEffectType : -1)} onSelect={setEffectSelection} />
+                        )}
+                        <AvatarEditorFigurePreviewView effectType={effectSelection ?? 0} />
                         {!clothingChangeData && (
                             <div className="octane-avatar-editor-secondary-actions">
                                 <button

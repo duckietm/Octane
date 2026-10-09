@@ -51,10 +51,11 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const [badgesRank, setBadgesRank] = useState<{ userId: number; rank: number }>(null);
     const { roomSession = null } = useRoom();
     const webID = avatarInfo?.webID ?? 0;
+    const packetBadgesRank = avatarInfo?.badgesRank ?? -1;
 
-    // Official badges rank line, read from the cached badge leaderboard.
+    // Official badges rank line: the room user list carries it; older servers fall back to the leaderboard.
     useEffect(() => {
-        if (webID <= 0) return;
+        if (webID <= 0 || packetBadgesRank > 0) return;
 
         let cancelled = false;
 
@@ -67,9 +68,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
         return () => {
             cancelled = true;
         };
-    }, [webID]);
+    }, [webID, packetBadgesRank]);
 
-    const shownBadgesRank = badgesRank && badgesRank.userId === webID ? badgesRank.rank : -1;
+    const shownBadgesRank = packetBadgesRank > 0 ? packetBadgesRank : badgesRank && badgesRank.userId === webID ? badgesRank.rank : -1;
 
     const infostandBackgroundClass = `background-${backgroundId ?? 'default'}`;
     const infostandStandClass = `stand-${standId ?? 'default'}`;

@@ -1088,3 +1088,104 @@
 .octane-notification-item__rarity {
     margin-top: 2px;
 }
+
+/* Official club_gift_notification on the border_9 skin. */
+.octane-swf-notification-bubble.octane-club-gift-notification {
+    position: relative;
+    display: block;
+    width: 192px;
+    max-width: 192px;
+    height: 82px;
+    min-height: 82px;
+    padding: 0 !important;
+    border: 0;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px !important;
+    line-height: 14px;
+    text-shadow: none;
+}
+
+.octane-club-gift-notification__border {
+    position: absolute;
+    inset: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 7px 7px 8px 7px;
+    border-image: url("@/assets/images/notifications/notification_border_9.png") 7 7 8 7 fill / 7px 7px 8px 7px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-club-gift-notification__icon {
+    position: absolute;
+    top: 7px;
+    left: 6px;
+    width: 16px;
+    height: 16px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-club-gift-notification__text {
+    position: absolute;
+    top: 7px;
+    left: 25px;
+    width: 161px;
+    height: 36px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button {
+    position: absolute;
+    top: 44px;
+    right: 6px;
+    min-width: 96px;
+    height: 28px;
+    padding: 0 10px;
+    border: 5px solid transparent !important;
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-default.png") !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button:hover {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-hover.png") !important;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button:active {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-pressed.png") !important;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__later {
+    position: absolute;
+    top: 49px;
+    left: 8px;
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    border-image: none !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__later:hover {
+    color: #bae1f9 !important;
+}

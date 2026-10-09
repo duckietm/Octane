@@ -88,7 +88,8 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                         // Like Habbo: the breed command (46) sends the pet to a free breeding nest.
                         roomSession.sendChatMessage(`${avatarInfo.name} ${LocalizeText('pet.command.46')}`, chatStyleId);
                     } else if (mode === MODE_MONSTER_PLANT) {
-                        // messageType = RoomWidgetUserActionMessage.REQUEST_BREED_PET;
+                        // Official REQUEST_BREED_PET: mark the plants this one can breed with.
+                        CreateLinkEvent(`monsterplant-breeding/request/${avatarInfo.roomIndex}`);
                     }
                     break;
                 case 'harvest':
