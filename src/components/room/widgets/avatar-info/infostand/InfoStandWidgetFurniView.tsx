@@ -26,6 +26,7 @@ import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
 import {
     AvatarInfoFurni,
     CopyToClipboard,
+    FriendlyTime,
     GetConfigurationValue,
     GetGroupInformation,
     IPhotoData,
@@ -822,6 +823,32 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                             <Flex>
                                 <Text pointer small underline variant="white" onClick={(event) => processButtonAction('buy_one')}>
                                     {LocalizeText('infostand.button.buy')}
+                                </Text>
+                            </Flex>
+                        )}
+                        {avatarInfo.isOwner && avatarInfo.expiration >= 0 && (
+                            <Text small wrap variant="white">
+                                {localizeWithFallback('infostand.rent.expiration', `Rental time remaining: ${FriendlyTime.format(avatarInfo.expiration)}`, ['time', 'TIME'], [FriendlyTime.format(avatarInfo.expiration), FriendlyTime.format(avatarInfo.expiration)])}
+                            </Text>
+                        )}
+                        {avatarInfo.isOwner && avatarInfo.expiration >= 0 && (avatarInfo.rentCouldBeUsedForBuyout || avatarInfo.purchaseCouldBeUsedForBuyout) && (
+                            <Flex gap={2}>
+                                {avatarInfo.rentCouldBeUsedForBuyout && (
+                                    <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`rent-furni/extend/${avatarInfo.id}/${avatarInfo.category}`)}>
+                                        {localizeWithFallback('infostand.button.extend', 'Extend')}
+                                    </Text>
+                                )}
+                                {avatarInfo.purchaseCouldBeUsedForBuyout && (
+                                    <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`rent-furni/buyout/${avatarInfo.id}/${avatarInfo.category}`)}>
+                                        {localizeWithFallback('infostand.button.buyout', 'Buy-out')}
+                                    </Text>
+                                )}
+                            </Flex>
+                        )}
+                        {avatarInfo.expiration < 0 && avatarInfo.rentOfferId > 0 && (
+                            <Flex>
+                                <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`catalog/open/offerId/${avatarInfo.rentOfferId}`)}>
+                                    {localizeWithFallback('infostand.button.rent', 'Rent one')}
                                 </Text>
                             </Flex>
                         )}

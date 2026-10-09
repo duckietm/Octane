@@ -272,6 +272,7 @@ export class ThumbnailStatusMessageEvent extends MessageEvent {}
 // Shared hooks mounted by the registry subscribe even when their feature is
 // disabled. Keep these on the same dispatchable event bus as the room events.
 export class UnseenItemsEvent extends MessageEvent {}
+export class HabboClubExtendOfferMessageEvent extends MessageEvent {}
 export class AuthenticatedEvent extends MessageEvent {}
 export class GoToBreedingNestFailureEvent extends MessageEvent {}
 export class UserHabbiconsEvent extends MessageEvent {}

@@ -1,4 +1,4 @@
-import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication } from '@octane/renderer';
+import { CreateLinkEvent, DisconnectMessageComposer, GetCommunication, HabboClubExtendConfirmMessageComposer } from '@octane/renderer';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { ClearRememberLogin, FriendlyTime, GetConfigurationValue, GetRememberLogin, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
 import earningsIcon from '../../assets/images/purse-swf/icons/1747_icon_earnings_png$5e39e03f65fbbb9a85bedd0d577dc12d307477063.png';
@@ -7,6 +7,7 @@ import logoutIcon from '../../assets/images/purse-swf/icons/1936_logout_icon_png
 import settingsIcon from '../../assets/images/purse-swf/icons/2291_settings_icon_png$c9dcf215bb7a7e35a3f128c7c60151bc1008066621.png';
 import { Column } from '../../common';
 import { ClearStoredChatHistory, usePurse } from '../../hooks';
+import { ClubExtendView } from './views/ClubExtendView';
 import { CurrencyView } from './views/CurrencyView';
 import { SeasonalView } from './views/SeasonalView';
 
@@ -126,6 +127,9 @@ export const PurseView: FC<{}> = (props) => {
 
     if (!purse) return null;
 
+    // While HC is about to run out the server marks the subscription as discountable; offer to renew.
+    const showExtendPromo = !hcDisabled && purse.isExpiring && GetConfigurationValue<boolean>('club.membership.extend.promotion.enabled', true);
+
     return (
         <Column alignItems="end" className="octane-purse-container" gap={0}>
             <div className="octane-purse">
@@ -193,6 +197,17 @@ export const PurseView: FC<{}> = (props) => {
                     </div>
                 </div>
             </div>
+            {showExtendPromo && (
+                <button
+                    type="button"
+                    className="octane-purse-extend-promo"
+                    onClick={() => SendMessageComposer(new HabboClubExtendConfirmMessageComposer())}
+                >
+                    <img src={hcIcon} alt="" />
+                    <span>{localizeWithFallback('club.bar.hc.expiring', 'Save credits by renewing HC now!')}</span>
+                </button>
+            )}
+            <ClubExtendView />
             {settingsMenuOpen && (
                 <div className="octane-purse-menu">
                     <button type="button" className="octane-purse-menu__item" onClick={() => openSettingsSection('')}>

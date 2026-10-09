@@ -1,14 +1,18 @@
 import {
+    GetRoomEngine,
+    HabboWebTools,
+    RoomControllerLevel,
     RoomEngineObjectEvent,
     RoomEngineRoomAdEvent,
     RoomEngineTriggerWidgetEvent,
     RoomEngineUseProductEvent,
     RoomId,
+    RoomObjectVariable,
     RoomSessionErrorMessageEvent,
     RoomZoomEvent
 } from '@octane/renderer';
-import { FC } from 'react';
-import { DispatchUiEvent, LocalizeText, NotificationAlertType, RoomWidgetUpdateRoomObjectEvent } from '../../../api';
+import { FC, useState } from 'react';
+import { DispatchUiEvent, LocalizeText, localizeWithFallback, NotificationAlertType, RoomWidgetUpdateRoomObjectEvent } from '../../../api';
 import { WidgetErrorBoundary } from '../../../common';
 import { useOctaneEvent, useNotification, usePollSubscriptions, useRoom } from '../../../hooks';
 import { AvatarInfoWidgetView } from './avatar-info/AvatarInfoWidgetView';
@@ -20,8 +24,12 @@ import { UserChooserWidgetView } from './choosers/UserChooserWidgetView';
 import { DoorbellWidgetView } from './doorbell/DoorbellWidgetView';
 import { FriendRequestWidgetView } from './friend-request/FriendRequestWidgetView';
 import { FurnitureWidgetsView } from './furniture/FurnitureWidgetsView';
+import { PetBreedingView } from './pet-breeding/PetBreedingView';
 import { PetPackageWidgetView } from './pet-package/PetPackageWidgetView';
 import { PollWidgetView } from './poll/PollWidgetView';
+import { FurniRentConfirmView } from './rent/FurniRentConfirmView';
+import { AchievementResolutionView } from './resolution/AchievementResolutionView';
+import { RoomCompetitionView } from './room-competition/RoomCompetitionView';
 import { RoomKeybindView } from './RoomKeybindView';
 import { RoomFilterWordsWidgetView } from './room-filter-words/RoomFilterWordsWidgetView';
 import { RoomThumbnailWidgetView } from './room-thumbnail/RoomThumbnailWidgetView';
@@ -34,6 +42,48 @@ const MAX_ZOOM_SHIFT = 3;
 export const RoomWidgetsView: FC<{}> = (props) => {
     const { roomSession = null } = useRoom();
     const { simpleAlert = null } = useNotification();
+    const [adTooltip, setAdTooltip] = useState<{ objectId: number; text: string }>(null);
+
+    const getAdObject = (event: RoomEngineObjectEvent) => {
+        const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
+        const url = roomObject?.model?.getValue<string>(RoomObjectVariable.FURNITURE_AD_URL) ?? '';
+
+        return { roomObject, url: url.startsWith('http') ? url : '' };
+    };
+
+    // Like Habbo: visitors open an ad with one click; people who can move furni need a double click.
+    const handleRoomAdClick = (event: RoomEngineObjectEvent) => {
+        const { url } = getAdObject(event);
+
+        if (!url) return;
+
+        const canMoveFurni = roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST;
+        const isDoubleClick = event.type === RoomEngineRoomAdEvent.FURNI_DOUBLE_CLICK;
+
+        if (canMoveFurni !== isDoubleClick) return;
+
+        HabboWebTools.openUntrustedWebPage(url);
+    };
+
+    const handleRoomAdTooltip = (event: RoomEngineObjectEvent) => {
+        if (event.type === RoomEngineRoomAdEvent.TOOLTIP_HIDE) {
+            setAdTooltip((prev) => (prev && prev.objectId === event.objectId ? null : prev));
+
+            return;
+        }
+
+        const { roomObject, url } = getAdObject(event);
+
+        if (!url) return;
+
+        setAdTooltip({
+            objectId: event.objectId,
+            text: localizeWithFallback(
+                `${roomObject.type}.tooltip`,
+                localizeWithFallback('ads.roomad.tooltip', 'This is an advertisement. Clicking it will open another web page.')
+            )
+        });
+    };
 
     usePollSubscriptions();
 
@@ -87,11 +137,11 @@ export const RoomWidgetsView: FC<{}> = (props) => {
                     break;
                 case RoomEngineRoomAdEvent.FURNI_CLICK:
                 case RoomEngineRoomAdEvent.FURNI_DOUBLE_CLICK:
-                    //handleRoomAdClick(event);
+                    handleRoomAdClick(event);
                     break;
                 case RoomEngineRoomAdEvent.TOOLTIP_SHOW:
                 case RoomEngineRoomAdEvent.TOOLTIP_HIDE:
-                    //handleRoomAdTooltip(event);
+                    handleRoomAdTooltip(event);
                     break;
             }
 
@@ -179,6 +229,11 @@ export const RoomWidgetsView: FC<{}> = (props) => {
                     <FurnitureWidgetsView />
                 </WidgetErrorBoundary>
             </div>
+            {adTooltip && (
+                <div className="octane-room-ad-tooltip absolute left-1/2 top-[40%] -translate-x-1/2 pointer-events-none z-10 max-w-[260px] rounded-md bg-[rgba(34,34,30,0.9)] px-3 py-2 text-center text-[12px] text-white">
+                    {adTooltip.text}
+                </div>
+            )}
             <WidgetErrorBoundary name="AvatarInfoWidget">
                 <AvatarInfoWidgetView />
             </WidgetErrorBoundary>
@@ -220,6 +275,18 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="PollWidget">
                 <PollWidgetView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="FurniRentConfirm">
+                <FurniRentConfirmView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="RoomCompetition">
+                <RoomCompetitionView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="AchievementResolution">
+                <AchievementResolutionView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="PetBreeding">
+                <PetBreedingView />
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="FriendRequestWidget">
                 <FriendRequestWidgetView />

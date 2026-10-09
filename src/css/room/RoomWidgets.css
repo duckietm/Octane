@@ -208,6 +208,16 @@
     }
 }
 
+.octane-room-tools-info--enter {
+    position: absolute;
+    bottom: 0;
+    left: calc(100% + 12px);
+    min-width: 180px;
+    max-width: 320px;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
 .octane-room-tools-history {
     position: absolute;
     bottom: 0;
@@ -261,6 +271,26 @@
 .octane-widget-doorbell {
     width: 300px;
     height: 200px;
+}
+
+.octane-widget-rent-confirm {
+    width: 300px;
+    min-height: 180px;
+}
+
+.octane-resolution {
+    width: 320px;
+    min-height: 220px;
+}
+
+.octane-resolution--picker {
+    width: 360px;
+    min-height: 360px;
+}
+
+.octane-pet-breeding {
+    width: 340px;
+    min-height: 200px;
 }
 
 .octane-widget-poll {
