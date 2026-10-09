@@ -1,7 +1,7 @@
 import { BannedUserData, BannedUsersFromRoomEvent, RoomBannedUsersComposer, RoomModerationSettings, RoomUnbanUserComposer } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
+import { IRoomData, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
+import { Button, Flex, Text, UserProfileIconView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
@@ -44,86 +44,66 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
     }, [roomData.roomId]);
 
     return (
-        <Grid>
-            <Column size={6}>
-                <NavigatorRoomSettingsSectionView
-                    title={`${LocalizeText('navigator.roomsettings.moderation.banned.users')} (${bannedUsers.length})`}
-                    gap={1}
-                    className="h-full"
+        <>
+            <span className="octane-room-settings-text">
+                {localizeWithFallback('navigator.roomsettings.moderation.header', LocalizeText('navigator.roomsettings.moderation'))}
+            </span>
+            <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.moderation.mute.header')} gap={1}>
+                <select
+                    className="form-select form-select-sm"
+                    value={roomData.moderationSettings.allowMute}
+                    onChange={(event) => handleChange('moderation_mute', event.target.value)}
                 >
-                    <Flex overflow="hidden" className="octane-card-panel list-container p-2">
-                        <Column fullWidth overflow="auto" gap={1}>
-                            {bannedUsers &&
-                                bannedUsers.length > 0 &&
-                                bannedUsers.map((user, index) => {
-                                    return (
-                                        <Flex key={index} shrink alignItems="center" gap={1} overflow="hidden">
-                                            <UserProfileIconView userId={user.userId} />
-                                            <Text pointer grow onClick={(event) => setSelectedUserId(user.userId)}>
-                                                {' '}
-                                                {user.userName}
-                                            </Text>
-                                        </Flex>
-                                    );
-                                })}
-                        </Column>
-                    </Flex>
-                    <Button disabled={selectedUserId <= 0} onClick={(event) => unBanUser(selectedUserId)}>
+                    <option value={RoomModerationSettings.MODERATION_LEVEL_NONE}>{LocalizeText('navigator.roomsettings.moderation.none')}</option>
+                    <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>{LocalizeText('navigator.roomsettings.moderation.rights')}</option>
+                </select>
+            </NavigatorRoomSettingsSectionView>
+            <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.moderation.kick.header')} gap={1}>
+                <select
+                    className="form-select form-select-sm"
+                    value={roomData.moderationSettings.allowKick}
+                    onChange={(event) => handleChange('moderation_kick', event.target.value)}
+                >
+                    <option value={RoomModerationSettings.MODERATION_LEVEL_NONE}>{LocalizeText('navigator.roomsettings.moderation.none')}</option>
+                    <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>{LocalizeText('navigator.roomsettings.moderation.rights')}</option>
+                    <option value={RoomModerationSettings.MODERATION_LEVEL_ALL}>{LocalizeText('navigator.roomsettings.moderation.all')}</option>
+                </select>
+            </NavigatorRoomSettingsSectionView>
+            <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.moderation.ban.header')} gap={1}>
+                <select
+                    className="form-select form-select-sm"
+                    value={roomData.moderationSettings.allowBan}
+                    onChange={(event) => handleChange('moderation_ban', event.target.value)}
+                >
+                    <option value={RoomModerationSettings.MODERATION_LEVEL_NONE}>{LocalizeText('navigator.roomsettings.moderation.none')}</option>
+                    <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>{LocalizeText('navigator.roomsettings.moderation.rights')}</option>
+                </select>
+            </NavigatorRoomSettingsSectionView>
+            <div className="octane-room-settings-banned">
+                <div className="octane-room-settings-box octane-room-settings-banned__list list-container">
+                    {bannedUsers.map((user, index) => (
+                        <Flex
+                            key={`${user.userId}-${index}`}
+                            alignItems="center"
+                            gap={1}
+                            overflow="hidden"
+                            className={selectedUserId === user.userId ? 'octane-room-settings-banned__row is-selected' : 'octane-room-settings-banned__row'}
+                        >
+                            <UserProfileIconView userId={user.userId} />
+                            <Text pointer grow onClick={() => setSelectedUserId(user.userId)}>
+                                {user.userName}
+                            </Text>
+                        </Flex>
+                    ))}
+                </div>
+                <div className="octane-room-settings-banned__side">
+                    <span className="octane-room-settings-text">{`${LocalizeText('navigator.roomsettings.moderation.banned.users')} (${bannedUsers.length})`}</span>
+                    <Button disabled={selectedUserId <= 0} onClick={() => unBanUser(selectedUserId)}>
                         {LocalizeText('navigator.roomsettings.moderation.unban')}{' '}
                         {selectedUserId > 0 && bannedUsers.find((user) => user.userId === selectedUserId)?.userName}
                     </Button>
-                </NavigatorRoomSettingsSectionView>
-            </Column>
-            <Column size={6}>
-                <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.moderation')} gap={2} className="h-full">
-                    <Column gap={1}>
-                        <Text bold small>
-                            {LocalizeText('navigator.roomsettings.moderation.mute.header')}
-                        </Text>
-                        <select
-                            className="form-select form-select-sm"
-                            value={roomData.moderationSettings.allowMute}
-                            onChange={(event) => handleChange('moderation_mute', event.target.value)}
-                        >
-                            <option value={RoomModerationSettings.MODERATION_LEVEL_NONE}>{LocalizeText('navigator.roomsettings.moderation.none')}</option>
-                            <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>
-                                {LocalizeText('navigator.roomsettings.moderation.rights')}
-                            </option>
-                        </select>
-                    </Column>
-                    <Column gap={1}>
-                        <Text bold small>
-                            {LocalizeText('navigator.roomsettings.moderation.kick.header')}
-                        </Text>
-                        <select
-                            className="form-select form-select-sm"
-                            value={roomData.moderationSettings.allowKick}
-                            onChange={(event) => handleChange('moderation_kick', event.target.value)}
-                        >
-                            <option value={RoomModerationSettings.MODERATION_LEVEL_NONE}>{LocalizeText('navigator.roomsettings.moderation.none')}</option>
-                            <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>
-                                {LocalizeText('navigator.roomsettings.moderation.rights')}
-                            </option>
-                            <option value={RoomModerationSettings.MODERATION_LEVEL_ALL}>{LocalizeText('navigator.roomsettings.moderation.all')}</option>
-                        </select>
-                    </Column>
-                    <Column gap={1}>
-                        <Text bold small>
-                            {LocalizeText('navigator.roomsettings.moderation.ban.header')}
-                        </Text>
-                        <select
-                            className="form-select form-select-sm"
-                            value={roomData.moderationSettings.allowBan}
-                            onChange={(event) => handleChange('moderation_ban', event.target.value)}
-                        >
-                            <option value={RoomModerationSettings.MODERATION_LEVEL_NONE}>{LocalizeText('navigator.roomsettings.moderation.none')}</option>
-                            <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>
-                                {LocalizeText('navigator.roomsettings.moderation.rights')}
-                            </option>
-                        </select>
-                    </Column>
-                </NavigatorRoomSettingsSectionView>
-            </Column>
-        </Grid>
+                </div>
+            </div>
+        </>
     );
 };
