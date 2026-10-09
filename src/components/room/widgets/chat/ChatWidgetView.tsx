@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useRef } from 'react';
-import { ChatBubbleMessage, GetConfigurationValue, resolveChatBubbleWidth } from '../../../../api';
+import { CHAT_MODE_LINE_BY_LINE, ChatBubbleMessage, GetConfigurationValue, resolveChatBubbleWidth } from '../../../../api';
 import { useChatWidget, useChatWindow } from '../../../../hooks';
 import IntervalWebWorker from '../../../../workers/IntervalWebWorker';
 import { WorkerBuilder } from '../../../../workers/WorkerBuilder';
@@ -7,18 +7,20 @@ import { CHAT_TEXT_SIZE_EVENT } from '../chat-input/chatTextSize';
 import { ChatWidgetMessageView } from './ChatWidgetMessageView';
 import { ChatWidgetWindowView } from './ChatWidgetWindowView';
 import { measureBubbleVisualOffsets } from './chatBubbleMetrics';
-import { getChatViewerHeight } from './freeFlowChatLayout';
+import { getChatViewerHeight, resolveFreeFlowLayout, resolveLineByLineLayout } from './freeFlowChatLayout';
 
 const CHAT_MOVE_UP_PIXELS = 19;
-const CHAT_COLLISION_ITERATIONS = 20;
-const CHAT_COLLISION_MIN_WIDTH = 240;
 const CHAT_REMOVE_TOP_MARGIN = -10;
-const STACK_OVERLAP = 0;
+// The scroll timer checks this often, so a line-by-line insert can push the next scroll back.
+const CHAT_SCROLL_TICK_MS = 250;
 
 export const ChatWidgetView: FC<{}> = (props) => {
-    const { chatMessages = [], setChatMessages = null, chatSettings = null, getScrollSpeed = 6000 } = useChatWidget();
+    const { chatMessages = [], setChatMessages = null, chatSettings = null, getScrollSpeed = 6000, chatMode = 0 } = useChatWidget();
     const [chatWindowEnabled] = useChatWindow();
     const elementRef = useRef<HTMLDivElement>(null);
+    const isLineByLine = chatMode === CHAT_MODE_LINE_BY_LINE;
+    const nextScrollAtRef = useRef(0);
+    const lastPlacedIdRef = useRef(0);
 
     const removeHiddenChats = useCallback(() => {
         setChatMessages((prevValue) => {
@@ -45,60 +47,48 @@ export const ChatWidgetView: FC<{}> = (props) => {
         });
     }, [chatMessages]);
 
-    const getChatCollisionRect = useCallback((chat: ChatBubbleMessage) => {
-        const width = Math.max(chat.width, CHAT_COLLISION_MIN_WIDTH);
-        const horizontalPadding = Math.max(0, (width - chat.width) / 2);
-
-        return {
-            left: chat.left - horizontalPadding,
-            right: chat.left + chat.width + horizontalPadding,
-            top: chat.top,
-            bottom: chat.top + chat.height
-        };
-    }, []);
-
+    // Free flow lets bubbles slide past each other sideways; line by line gives each its own row.
     const resolveOverlappingChats = useCallback(() => {
         const visibleChats = chatMessages.filter((chat) => chat.elementRef && chat.width > 0 && chat.height > 0);
 
-        for (let iteration = 0; iteration < CHAT_COLLISION_ITERATIONS; iteration++) {
-            let moved = false;
+        if (visibleChats.length < 2) return;
 
-            for (let firstIndex = 0; firstIndex < visibleChats.length; firstIndex++) {
-                const firstChat = visibleChats[firstIndex];
+        const bubbles = visibleChats.map((chat) => ({
+            id: chat.id,
+            left: chat.left,
+            top: chat.top,
+            width: chat.width,
+            height: chat.height,
+            anchorX: chat.left + chat.width / 2,
+            overflowTop: chat.visualOffsetTop,
+            overflowBottom: chat.visualOffsetBottom
+        }));
+        const positions = isLineByLine ? resolveLineByLineLayout(bubbles) : resolveFreeFlowLayout(bubbles);
+        const byId = new Map(visibleChats.map((chat) => [chat.id, chat]));
 
-                for (let secondIndex = firstIndex + 1; secondIndex < visibleChats.length; secondIndex++) {
-                    const secondChat = visibleChats[secondIndex];
-                    const firstRect = getChatCollisionRect(firstChat);
-                    const secondRect = getChatCollisionRect(secondChat);
-                    const overlapsHorizontally = firstRect.left < secondRect.right && firstRect.right > secondRect.left;
-                    const overlapsVertically = firstRect.top < secondRect.bottom && firstRect.bottom > secondRect.top;
+        for (const position of positions) {
+            const chat = byId.get(position.id);
 
-                    if (!overlapsHorizontally || !overlapsVertically) continue;
-
-                    const topChat = firstChat.id < secondChat.id ? firstChat : secondChat;
-                    const bottomRect = topChat === firstChat ? secondRect : firstRect;
-                    const topRect = topChat === firstChat ? firstRect : secondRect;
-
-                    const amount = topRect.bottom - bottomRect.top - STACK_OVERLAP;
-
-                    if (amount <= 0) continue;
-
-                    topChat.top -= amount;
-                    moved = true;
-                }
-            }
-
-            if (!moved) break;
+            if (!chat) continue;
+            if (chat.left !== position.left) chat.left = position.left;
+            if (chat.top !== position.top) chat.top = position.top;
         }
-    }, [chatMessages, getChatCollisionRect]);
+    }, [chatMessages, isLineByLine]);
 
     const makeRoom = useCallback(
-        (_chat: ChatBubbleMessage) => {
+        (chat: ChatBubbleMessage) => {
+            // Like Habbo, a new line-by-line message restarts the scroll timer.
+            if (chat && chat.id > lastPlacedIdRef.current) {
+                lastPlacedIdRef.current = chat.id;
+
+                if (isLineByLine) nextScrollAtRef.current = Date.now() + getScrollSpeed;
+            }
+
             refreshChatMeasurements();
             resolveOverlappingChats();
             removeHiddenChats();
         },
-        [refreshChatMeasurements, removeHiddenChats, resolveOverlappingChats]
+        [getScrollSpeed, isLineByLine, refreshChatMeasurements, removeHiddenChats, resolveOverlappingChats]
     );
 
     useEffect(() => {
@@ -152,9 +142,18 @@ export const ChatWidgetView: FC<{}> = (props) => {
 
         const worker = new WorkerBuilder(IntervalWebWorker);
 
-        worker.onmessage = () => moveAllChatsUp(CHAT_MOVE_UP_PIXELS);
+        nextScrollAtRef.current = Date.now() + getScrollSpeed;
 
-        worker.postMessage({ action: 'START', content: getScrollSpeed });
+        worker.onmessage = () => {
+            const now = Date.now();
+
+            if (now < nextScrollAtRef.current) return;
+
+            nextScrollAtRef.current = now + getScrollSpeed;
+            moveAllChatsUp(CHAT_MOVE_UP_PIXELS);
+        };
+
+        worker.postMessage({ action: 'START', content: Math.min(CHAT_SCROLL_TICK_MS, getScrollSpeed) });
 
         return () => {
             worker.postMessage({ action: 'STOP' });

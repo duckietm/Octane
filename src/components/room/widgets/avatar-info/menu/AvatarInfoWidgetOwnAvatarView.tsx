@@ -97,7 +97,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
 
         if (name)
         {
-            if (!hasVip && ['blow', 'expression_67', 'laugh'].includes(name))
+            if (!hasVip && ['blow', 'dance_sixseven', 'expression_67', 'laugh'].includes(name))
             {
                 CreateLinkEvent('habboUI/open/hccenter');
                 hideMenu = false;
@@ -147,6 +147,11 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                         roomSession.sendExpressionMessage(AvatarExpressionEnum.BLOW.ordinal);
                         break;
                     case 'expression_67':
+                        roomSession.sendExpressionMessage(67);
+                        break;
+                    case 'dance_sixseven':
+                        // A running dance would override the six-seven animation.
+                        if (isDancing) roomSession.sendDanceMessage(0);
                         roomSession.sendExpressionMessage(67);
                         break;
                     case 'laugh':
@@ -301,6 +306,14 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                         <ContextMenuListItemView onClick={() => processAction('dance_2')}>{LocalizeText('widget.memenu.dance2')}</ContextMenuListItemView>
                         <ContextMenuListItemView onClick={() => processAction('dance_3')}>{LocalizeText('widget.memenu.dance3')}</ContextMenuListItemView>
                         <ContextMenuListItemView onClick={() => processAction('dance_4')}>{LocalizeText('widget.memenu.dance4')}</ContextMenuListItemView>
+                        <ContextMenuListItemView
+                            classNames={premiumExpressionClassNames}
+                            disabled={hasVip && !canUsePremiumExpression}
+                            onClick={() => processAction('dance_sixseven')}
+                        >
+                            {!hasVip && <i className="air-avatar-menu-vip" aria-hidden="true" />}
+                            {localizeWithFallback('widget.memenu.dance.sixseven', 'Six Seven')}
+                        </ContextMenuListItemView>
                         <ContextMenuListItemView onClick={() => processAction('back')}>
                             {LocalizeText('generic.back')}
                         </ContextMenuListItemView>

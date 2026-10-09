@@ -17,6 +17,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useUserChatPreferencesStore } from '@/state/userChatPreferences';
 import {
     applyUserChatPreferences,
+    CHAT_MODE_FREE_FLOW,
     ChatBubbleMessage,
     ChatBubbleUtilities,
     ChatEntryType,
@@ -27,6 +28,7 @@ import {
     loadEmojiShortcodes,
     LocalizeText,
     PlaySound,
+    resolveChatMode,
     RoomChatFormatter
 } from '../../../api';
 import { getStoredChatTextSize } from '../../../components/room/widgets/chat-input/chatTextSize';
@@ -110,6 +112,8 @@ const useChatWidgetState = () => {
 
     const userBubbleWidth = useUserChatPreferencesStore((state) => state.bubbleWidth);
     const userScrollSpeed = useUserChatPreferencesStore((state) => state.scrollSpeed);
+    const userChatMode = useUserChatPreferencesStore((state) => state.chatMode);
+    const chatMode = resolveChatMode(chatSettings?.mode ?? CHAT_MODE_FREE_FLOW, userChatMode);
     const effectiveChatSettings = useMemo(
         () => applyUserChatPreferences(chatSettings, userBubbleWidth, userScrollSpeed),
         [chatSettings, userBubbleWidth, userScrollSpeed]
@@ -357,7 +361,7 @@ const useChatWidgetState = () => {
         };
     }, []);
 
-    return { chatMessages, setChatMessages, chatSettings: effectiveChatSettings, getScrollSpeed };
+    return { chatMessages, setChatMessages, chatSettings: effectiveChatSettings, getScrollSpeed, chatMode };
 };
 
 export const useChatWidget = useChatWidgetState;

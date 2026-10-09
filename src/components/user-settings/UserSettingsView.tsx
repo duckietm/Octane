@@ -123,12 +123,14 @@ export const UserSettingsView: FC<{}> = () => {
             case 'soundboard_volume':
                 clone.volumeSoundboard = clampVolume(value as number);
                 break;
+            case 'chat_mode':
             case 'chat_bubble_width':
             case 'chat_scroll_speed':
-                if (type === 'chat_bubble_width') clone.chatBubbleWidth = value as number;
+                if (type === 'chat_mode') clone.chatMode = value as number;
+                else if (type === 'chat_bubble_width') clone.chatBubbleWidth = value as number;
                 else clone.chatScrollSpeed = value as number;
                 SendMessageComposer(new UserSettingsChatPreferencesComposer(clone.chatMode, clone.chatBubbleWidth, clone.chatScrollSpeed));
-                useUserChatPreferencesStore.getState().setPreferences({ bubbleWidth: clone.chatBubbleWidth, scrollSpeed: clone.chatScrollSpeed });
+                useUserChatPreferencesStore.getState().setPreferences({ chatMode: clone.chatMode, bubbleWidth: clone.chatBubbleWidth, scrollSpeed: clone.chatScrollSpeed });
                 break;
             case 'wired_whisper_disabled':
                 clone.wiredWhisperDisabled = value as boolean;
@@ -356,6 +358,17 @@ export const UserSettingsView: FC<{}> = () => {
                             onChange={(event) => setChatWindowEnabled(event.target.checked)}
                         />
                         <span>{localizeWithFallback('memenu.settings.other.enable.chat.window', 'Enable chat window')}</span>
+                    </label>
+                    <label className="air-settings-select-row">
+                        <span>{localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}</span>
+                        <select
+                            aria-label={localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}
+                            value={userSettings.chatMode === RoomChatSettings.CHAT_MODE_LINE_BY_LINE ? RoomChatSettings.CHAT_MODE_LINE_BY_LINE : RoomChatSettings.CHAT_MODE_FREE_FLOW}
+                            onChange={(event) => processAction('chat_mode', Number(event.target.value))}
+                        >
+                            <option value={RoomChatSettings.CHAT_MODE_FREE_FLOW}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
+                            <option value={RoomChatSettings.CHAT_MODE_LINE_BY_LINE}>{localizeWithFallback('navigator.roomsettings.chat.mode.line.by.line', 'Line-by-Line Mode')}</option>
+                        </select>
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}</span>

@@ -263,6 +263,12 @@
     height: 200px;
 }
 
+.octane-widget-poll {
+    width: 340px;
+    min-height: 220px;
+    max-height: 420px;
+}
+
 .toggle-roomtool {
     min-height: 95px;
     width: 20px;

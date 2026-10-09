@@ -23,7 +23,8 @@ const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
     const item = groupItem.getLastItem();
     if (!item) return false;
     if (!item.sellable) return false;
-    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item));
+    const sellable = groupItem.items.filter((value) => value.sellable && !value.locked);
+    DispatchUiEvent(new CatalogPostMarketplaceOfferEvent(item, sellable));
 };
 
 const attemptDeleteItem = (groupItem: GroupItem) => {
