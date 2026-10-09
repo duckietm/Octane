@@ -15,6 +15,7 @@ import { FC, useEffect, useState } from 'react';
 import { DispatchUiEvent, GetGroupInformation, isHousekeepingEnabled, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
 import weblinkIcon from '../../../assets/images/navigator/air/icon-weblink.png';
 import removeRightsIcon from '../../../assets/images/navigator/air/remove-rights.png';
+import reportFlagIcon from '../../../assets/images/navigator/air/report-flag.png';
 import {
     Flex,
     LayoutBadgeImageView,
@@ -215,35 +216,37 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                 )}
                 <div className="octane-room-info__actions">
                     {hasPermission('settings') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_room_settings')}>
+                        <button type="button" className="octane-room-info__action" onClick={() => processAction('open_room_settings')}>
                             {LocalizeText('navigator.roomsettings')}
                         </button>
                     )}
                     {hasPermission('settings') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('room_filter')}>
+                        <button type="button" className="octane-room-info__action" onClick={() => processAction('room_filter')}>
                             {LocalizeText('navigator.roomsettings.roomfilter')}
                         </button>
                     )}
                     {(hasPermission('settings') || hasPermission('floor')) && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_floorplan_editor')}>
+                        <button type="button" className="octane-room-info__action" onClick={() => processAction('open_floorplan_editor')}>
                             {LocalizeText('open.floor.plan.editor')}
                         </button>
                     )}
                     {hasPermission('staff_pick') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_pick')}>
+                        <button type="button" className="octane-room-info__action" onClick={() => processAction('toggle_pick')}>
                             {LocalizeText(isRoomPicked ? 'navigator.staffpicks.unpick' : 'navigator.staffpicks.pick')}
                         </button>
                     )}
-                    <button type="button" className="octane-room-info__action habbo-btn-danger" onClick={() => processAction('report_room')}>
-                        {LocalizeText('help.emergency.main.report.room')}
+                    <button type="button" className="octane-room-info__report" onClick={() => processAction('report_room')}>
+                        <img src={reportFlagIcon} alt="" />
+                        <span className="octane-room-info__report-divider" aria-hidden="true" />
+                        <span className="octane-room-info__report-label">{LocalizeText('help.emergency.main.report.room')}</span>
                     </button>
                     {hasPermission('settings') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_mute')}>
+                        <button type="button" className="octane-room-info__action" onClick={() => processAction('toggle_mute')}>
                             {LocalizeText(isRoomMuted ? 'navigator.muteall_on' : 'navigator.muteall_off')}
                         </button>
                     )}
                     {canOpenHousekeeping && enteredRoomId > 0 && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => CreateLinkEvent(`housekeeping/room/${enteredRoomId}`)}>
+                        <button type="button" className="octane-room-info__action" onClick={() => CreateLinkEvent(`housekeeping/room/${enteredRoomId}`)}>
                             {LocalizeText('housekeeping.menu.open_room')}
                         </button>
                     )}

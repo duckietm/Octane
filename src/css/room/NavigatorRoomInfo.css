@@ -97,21 +97,74 @@
     margin-top: 3px;
 }
 
-.octane-room-info__action {
+/* The buttons of the official room info window: the grey skin button (220 x 29, style 3)
+   and, for the report, the wide container button with the flag, a divider and the label. */
+.octane-room-info__action,
+.octane-room-info__report {
     box-sizing: border-box;
+    cursor: pointer;
+    border: 3px solid transparent;
+    border-image-source: var(--habbo-skin-button);
+    border-image-slice: 3 fill;
+    border-image-width: 3px;
+    border-radius: 0;
+    background: transparent;
+    color: #151515;
+    font-family: UbuntuRegular, Ubuntu, sans-serif;
+    text-shadow: none;
+}
+
+.octane-room-info__action:hover,
+.octane-room-info__report:hover {
+    border-image-source: var(--habbo-skin-button-hover);
+}
+
+.octane-room-info__action:active,
+.octane-room-info__report:active {
+    border-image-source: var(--habbo-skin-button-pressed);
+}
+
+.octane-room-info__action {
     width: 220px;
     max-width: 100%;
     min-height: 29px;
     height: 29px;
     padding: 0 8px;
-    font-family: UbuntuRegular, Ubuntu, sans-serif;
     font-size: 11px;
     font-weight: 700;
-    line-height: 29px;
+    line-height: 23px;
     text-align: center;
 }
 
-.octane-room-info__action.habbo-btn-primary,
-.octane-room-info__action.habbo-btn-danger {
-    border-radius: 0 !important;
+.octane-room-info__report {
+    display: flex;
+    align-items: center;
+    width: 220px;
+    max-width: 100%;
+    height: 55px;
+    padding: 0 12px 0 8px;
+    gap: 10px;
+    text-align: left;
+}
+
+.octane-room-info__report img {
+    flex: none;
+    width: 23px;
+    height: 22px;
+}
+
+.octane-room-info__report-divider {
+    flex: none;
+    align-self: stretch;
+    width: 1px;
+    margin: 12px 0;
+    background: #8a8a8a;
+    box-shadow: 1px 0 #fff;
+}
+
+.octane-room-info__report-label {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
 }
