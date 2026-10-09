@@ -1,12 +1,161 @@
 /* Soundboard pads and the side feed that replaced the "played" line in room chat. */
-@keyframes soundboard-pad-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.07); }
+/* The pads are two columns of rows: a tone icon, the name, and the key that plays it. */
+.soundboard-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.soundboard-pad {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    height: 34px;
+    padding: 0 8px 0 5px;
+    border: 1px solid #b4c6d1;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.78);
+    color: #17384b;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.12s, border-color 0.12s;
+}
+
+.soundboard-pad:hover,
+.soundboard-pad:focus-visible {
+    border-color: #3d8fba;
+    background: #fff;
+    outline: none;
+}
+
+.soundboard-pad:active {
+    background: #e3f0f7;
+}
+
+.soundboard-pad[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 .soundboard-pad[data-playing] {
-    animation: soundboard-pad-pulse 0.5s ease-in-out 3;
+    border-color: #3d8fba;
+    background: #e3f0f7;
+}
+
+.soundboard-pad__icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.soundboard-pad__name {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.soundboard-pad__star {
+    flex: none;
+    color: #d49a1c;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.soundboard-pad__key {
+    flex: none;
+    min-width: 15px;
+    border-radius: 4px;
+    background: #d6e3ea;
+    color: #3d6178;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+}
+
+/* Three bars that move while the pad's sound is playing. */
+@keyframes soundboard-bar {
+    0%, 100% { transform: scaleY(0.35); }
+    50% { transform: scaleY(1); }
+}
+
+.soundboard-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
+}
+
+.soundboard-bars i {
+    width: 3px;
+    height: 100%;
+    border-radius: 1px;
+    background: #fff;
+    transform-origin: bottom;
+    animation: soundboard-bar 0.55s ease-in-out infinite;
+}
+
+.soundboard-bars i:nth-child(2) { animation-delay: 0.15s; }
+.soundboard-bars i:nth-child(3) { animation-delay: 0.3s; }
+
+/* The shelf above the list: favourites, or what was played last. */
+.soundboard-shelf {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.soundboard-shelf__label {
+    flex: none;
+    color: #3d6178;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.soundboard-shelf__row {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.soundboard-shelf__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-width: 2px;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.soundboard-shelf__button[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.soundboard-shelf__button[data-playing] {
     outline: 2px solid #fff;
+    box-shadow: 0 0 0 4px rgba(61, 143, 186, 0.45);
 }
 
 .soundboard-cooldown {

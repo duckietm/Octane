@@ -10,9 +10,11 @@ import {
 } from '../../hooks/soundboard/soundboardPresentation';
 import { OctaneCard } from '../../layout';
 import { SoundboardPadView } from './SoundboardPadView';
+import { SoundboardShelfView } from './SoundboardShelfView';
 
 const PAGE_SIZE = 10;
 const PLAYING_MS = 1_500;
+const SHELF_SIZE = 6;
 
 const isTypingTarget = (target: EventTarget | null) =>
     target instanceof HTMLElement && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
@@ -59,6 +61,11 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
     const totalPages = Math.max(1, Math.ceil(filteredSounds.length / PAGE_SIZE));
     const pageSounds = filteredSounds.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
     const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+    const shelfIds = favoriteIds.length ? favoriteIds : recentSoundIds;
+    const shelfSounds = useMemo(
+        () => shelfIds.map((id) => sounds.find((sound) => sound.id === id)).filter((sound): sound is DisplaySoundboardSound => !!sound).slice(0, SHELF_SIZE),
+        [shelfIds, sounds]
+    );
     const cooldownPercent = isCoolingDown && cooldownTotalSeconds > 0
         ? Math.min(100, Math.round((cooldownRemainingSeconds / cooldownTotalSeconds) * 100))
         : 0;
@@ -129,6 +136,16 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
                 className="h-8 w-full rounded-md border border-[#8ca9b8] bg-white px-2.5 text-xs text-[#17384b] outline-none focus:border-[#3d8fba] focus:ring-1 focus:ring-[#3d8fba]"
             />
 
+            {!query.trim() && !!shelfSounds.length && (
+                <SoundboardShelfView
+                    label={favoriteIds.length ? `★ ${LocalizeText('soundboard.category.favorites')}` : LocalizeText('soundboard.category.recent')}
+                    sounds={shelfSounds}
+                    disabled={isCoolingDown}
+                    playingSoundId={playingSoundId}
+                    onPlay={onPlay}
+                />
+            )}
+
             <div className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={LocalizeText('soundboard.categories')}>
                 {!!favoriteIds.length && (
                     <button type="button" onClick={() => selectCategory('favorites')} className={categoryClassName('favorites')}>
@@ -154,7 +171,7 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
                 <div className="py-4 text-center text-xs text-black/50">{LocalizeText('soundboard.empty')}</div>
             ) : (
                 <div
-                    className="grid grid-cols-5 gap-1.5"
+                    className="soundboard-list"
                     data-testid="soundboard-grid"
                     onWheel={(event) => totalPages > 1 && event.deltaY !== 0 && changePage(event.deltaY > 0 ? 1 : -1)}
                 >
