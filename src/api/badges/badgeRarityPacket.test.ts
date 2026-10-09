@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BadgeRarityTier, clearBadgeRarityFromPacket, getBadgeRarityFromPacket, isBadgeRarityTierId, rememberBadgeRarityFromPacket } from './badgeRarity';
+import { BadgeRarityTier, clearBadgeRarityFromPacket, getBadgeRarityFromPacket, isBadgeRarityTierId, rememberBadgeRarityFromPacket, rememberReceivedBadgeRarity } from './badgeRarity';
 
 describe('badge rarity from the UserCurrentBadges packet', () => {
     afterEach(() => clearBadgeRarityFromPacket());
@@ -43,5 +43,13 @@ describe('badge rarity from the UserCurrentBadges packet', () => {
         rememberBadgeRarityFromPacket([{ badgeCode: 'X', ownerCount: 2, badgeRarityId: BadgeRarityTier.MYTHICAL }]);
 
         expect(getBadgeRarityFromPacket('X')).toEqual({ ownerCount: 2, tier: BadgeRarityTier.MYTHICAL });
+    });
+
+    it('remembers a received badge, but not one from a server without rarity', () => {
+        rememberReceivedBadgeRarity({ badgeCode: 'NEW1', ownerCount: 1, rarityTier: BadgeRarityTier.UNIQUE });
+        rememberReceivedBadgeRarity({ badgeCode: 'OLD1', ownerCount: 0, rarityTier: 0 });
+
+        expect(getBadgeRarityFromPacket('NEW1')).toEqual({ ownerCount: 1, tier: BadgeRarityTier.UNIQUE });
+        expect(getBadgeRarityFromPacket('OLD1')).toBeNull();
     });
 });

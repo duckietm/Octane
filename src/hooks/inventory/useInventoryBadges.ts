@@ -2,7 +2,7 @@ import { BadgeReceivedEvent, BadgesEvent, RequestBadgesComposer, SetActivatedBad
 import { useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetConfigurationValue, SendMessageComposer, UnseenItemCategory } from '../../api';
-import { rememberBadgeRarityFromPacket } from '../../api/badges/badgeRarity';
+import { rememberBadgeRarityFromPacket, rememberReceivedBadgeRarity } from '../../api/badges/badgeRarity';
 import { useMessageEvent } from '../events';
 import { useSharedVisibility } from '../useSharedVisibility';
 import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
@@ -97,6 +97,9 @@ const useInventoryBadgesState = () => {
 
     useMessageEvent<BadgeReceivedEvent>(BadgeReceivedEvent, (event) => {
         const parser = event.getParser();
+
+        rememberReceivedBadgeRarity(parser);
+
         const unseen = isUnseen(UnseenItemCategory.BADGE, parser.badgeId);
 
         setBadgeCodes((prevValue) => {

@@ -111,6 +111,10 @@ const buildStatsMap = (response: BadgeLeaderboardResponse | null): Map<string, B
 
 let cacheStatsMap: Map<string, BadgeLeaderboardStat> = new Map();
 
+// A failed load is not retried by passive views (infostand, profile) for this long.
+const FAILED_RETRY_DELAY_MS = 30_000;
+let lastFailureAt = 0;
+
 export const fetchBadgeLeaderboard = async (force = false): Promise<BadgeLeaderboardResponse> => {
     if (!force) {
         if (cacheValue) return cacheValue;
@@ -136,6 +140,10 @@ export const fetchBadgeLeaderboard = async (force = false): Promise<BadgeLeaderb
 
     try {
         return await cachePromise;
+    } catch (error) {
+        lastFailureAt = Date.now();
+
+        throw error;
     } finally {
         cachePromise = null;
     }
@@ -152,5 +160,9 @@ export const getCachedBadgeRarityStat = (badgeCode: string): BadgeLeaderboardSta
 };
 
 export const ensureBadgeLeaderboardLoaded = async (): Promise<BadgeLeaderboardResponse> => {
+    if (!cacheValue && !cachePromise && lastFailureAt && Date.now() - lastFailureAt < FAILED_RETRY_DELAY_MS) {
+        throw new Error('badge_leaderboard_unavailable');
+    }
+
     return fetchBadgeLeaderboard(false);
 };

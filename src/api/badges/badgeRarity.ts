@@ -96,6 +96,13 @@ export const rememberBadgeRarityFromPacket = (details: readonly BadgePacketRarit
     }
 };
 
+/** BadgeReceived carries the rarity too; older servers send no owner count. */
+export const rememberReceivedBadgeRarity = (badge: { badgeCode: string; ownerCount?: number; rarityTier?: number } | null | undefined): void => {
+    if (!badge?.badgeCode || !(badge.ownerCount > 0)) return;
+
+    rememberBadgeRarityFromPacket([{ badgeCode: badge.badgeCode, ownerCount: badge.ownerCount, badgeRarityId: badge.rarityTier }]);
+};
+
 export const getBadgeRarityFromPacket = (badgeCode: string | null | undefined): BadgePacketRarity | null =>
     (badgeCode && PACKET_RARITY_BY_CODE.get(badgeCode)) || null;
 

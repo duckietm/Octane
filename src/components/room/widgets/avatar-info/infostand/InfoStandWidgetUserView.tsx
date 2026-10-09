@@ -9,7 +9,18 @@ import {
     UserRelationshipsComposer
 } from '@octane/renderer';
 import React, { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { AvatarInfoUser, CloneObject, GetConfigurationValue, GetGroupInformation, GetUserProfile, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../../api';
+import {
+    AvatarInfoUser,
+    CloneObject,
+    ensureBadgeLeaderboardLoaded,
+    GetConfigurationValue,
+    getBadgesRank,
+    GetGroupInformation,
+    GetUserProfile,
+    LocalizeText,
+    localizeWithFallback,
+    SendMessageComposer
+} from '../../../../../api';
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
@@ -37,7 +48,28 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
     const [cardBackgroundId, setCardBackgroundId] = useState<number>(null);
     const [borderId, setBorderId] = useState<number>(null);
     const [isVisible, setIsVisible] = useState(false);
+    const [badgesRank, setBadgesRank] = useState<{ userId: number; rank: number }>(null);
     const { roomSession = null } = useRoom();
+    const webID = avatarInfo?.webID ?? 0;
+
+    // Official badges rank line, read from the cached badge leaderboard.
+    useEffect(() => {
+        if (webID <= 0) return;
+
+        let cancelled = false;
+
+        ensureBadgeLeaderboardLoaded()
+            .then((leaderboard) => {
+                if (!cancelled) setBadgesRank({ userId: webID, rank: getBadgesRank(leaderboard, webID) });
+            })
+            .catch(() => {});
+
+        return () => {
+            cancelled = true;
+        };
+    }, [webID]);
+
+    const shownBadgesRank = badgesRank && badgesRank.userId === webID ? badgesRank.rank : -1;
 
     const infostandBackgroundClass = `background-${backgroundId ?? 'default'}`;
     const infostandStandClass = `stand-${standId ?? 'default'}`;
@@ -305,6 +337,18 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                                 {LocalizeText('infostand.text.achievement_score')} {avatarInfo.achievementScore}
                             </div>
                         )}
+                    </>
+                )}
+                {shownBadgesRank > 0 && (
+                    <>
+                        <div className="octane-infostand__rule" />
+                        <button
+                            type="button"
+                            className="octane-infostand__score octane-infostand__score-link"
+                            onClick={() => CreateLinkEvent('badge-leaderboard/show')}
+                        >
+                            {localizeWithFallback('infostand.text.badges_rank', `Badges rank: #${shownBadgesRank}`, ['rank'], [`#${shownBadgesRank}`])}
+                        </button>
                     </>
                 )}
                 {avatarInfo.carryItem > 0 && (

@@ -1,6 +1,14 @@
 import { RequestBadgesComposer } from '@octane/renderer';
 import { FC, useEffect } from 'react';
-import { AchievementNotificationBubbleItem, CreateLinkEvent, LocalizeText, NotificationBubbleItem, SendMessageComposer } from '../../../../api';
+import {
+    AchievementNotificationBubbleItem,
+    CreateLinkEvent,
+    GetConfigurationValue,
+    LocalizeText,
+    NotificationBubbleItem,
+    SendMessageComposer
+} from '../../../../api';
+import { badgeRarityColorToCss, getBadgeRarityDisplayColor, getBadgeRarityFromPacket, getBadgeRarityLocalizationKey, isBadgeRarityStandaloneTier } from '../../../../api/badges/badgeRarity';
 import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';
 import { useInventoryBadges } from '../../../../hooks';
 
@@ -22,6 +30,9 @@ export const NotificationBadgeReceivedBubbleView: FC<NotificationBadgeReceivedBu
     const alreadyWearing = !!badgeCode && !!isWearingBadge && isWearingBadge(badgeCode);
     const slotsAvailable = !!canWearBadges && canWearBadges();
     const canShowWearButton = !!badgeCode && isLoaded && !alreadyWearing && slotsAvailable;
+    const uncommonEnabled = GetConfigurationValue<boolean>('badge_rarity.uncommon', false) === true;
+    const rarity = !isAchievement && badgeCode ? getBadgeRarityFromPacket(badgeCode) : null;
+    const showRarity = !!rarity && isBadgeRarityStandaloneTier(rarity.tier, uncommonEnabled);
 
     const handleWear = (event: React.MouseEvent) => {
         event.stopPropagation();
@@ -62,6 +73,11 @@ export const NotificationBadgeReceivedBubbleView: FC<NotificationBadgeReceivedBu
                         {!isAchievement && (
                             <Text variant="white" small>
                                 {item.message}
+                            </Text>
+                        )}
+                        {showRarity && (
+                            <Text small bold style={{ color: badgeRarityColorToCss(getBadgeRarityDisplayColor(rarity.tier, uncommonEnabled)) }}>
+                                {LocalizeText(getBadgeRarityLocalizationKey(rarity.tier, uncommonEnabled))}
                             </Text>
                         )}
                     </Flex>

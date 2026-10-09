@@ -48,6 +48,7 @@ import {
     ProductImageUtility,
     TradingNotificationType
 } from '../../api';
+import { rememberReceivedBadgeRarity } from '../../api/badges/badgeRarity';
 import { AchievementNotificationBubbleItem } from '../../api/notification/AchievementNotificationBubbleItem';
 import { localizeWithFallback } from '../../api/utils/localizeWithFallback';
 import { useMessageEvent } from '../events';
@@ -391,6 +392,7 @@ const useNotificationStore = () => {
         if (recentBadgeNotifications.has(parser.badgeCode)) return;
 
         recentBadgeNotifications.add(parser.badgeCode);
+        rememberReceivedBadgeRarity(parser);
         setTimeout(() => recentBadgeNotifications.delete(parser.badgeCode), 3000);
 
         const badgeName = LocalizeBadgeName(parser.badgeCode);
