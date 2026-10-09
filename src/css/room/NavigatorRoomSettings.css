@@ -25,22 +25,148 @@
         }
     }
 
+    /* The tabs of the AIR window are flat: a bold label (u_bold, 12 px) above its controls. */
     .octane-room-settings-section {
-        border: 1px solid var(--room-settings-line);
-        background: var(--room-settings-panel);
-        padding: 6px;
+        padding: 0;
     }
 
     .octane-room-settings-section > :first-child {
         color: #111;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .octane-room-settings-head {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .octane-room-settings-headline {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .octane-room-settings-text,
+    .octane-room-settings-check,
+    .octane-room-settings-timeout {
+        font-size: 12px;
+    }
+
+    .octane-room-settings-label {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .octane-room-settings-error {
+        color: #bb2200;
         font-size: 11px;
         font-weight: 700;
+    }
+
+    .octane-room-settings-check {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-height: 20px;
+        cursor: pointer;
+    }
+
+    .octane-room-settings-indent {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-left: 21px;
+        max-width: 195px;
+    }
+
+    .octane-room-settings-timeout {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 24px;
+    }
+
+    .octane-room-settings-timeout input {
+        width: 50px;
+    }
+
+    .octane-room-settings-box {
+        border: 1px solid var(--room-settings-line);
+        background: #fbfbf9;
+    }
+
+    .octane-room-settings-filter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 6px;
+        background: var(--room-settings-bg);
+    }
+
+    .octane-room-settings-filter input {
+        flex: 1;
+    }
+
+    .octane-room-settings-rights {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+    }
+
+    .octane-room-settings-rights__column {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .octane-room-settings-rights__list {
+        height: 246px;
+        padding: 4px;
+        overflow: auto;
+    }
+
+    .octane-room-settings-banned {
+        display: flex;
+        gap: 10px;
+    }
+
+    .octane-room-settings-banned__list {
+        flex: none;
+        width: 172px;
+        height: 156px;
+        padding: 4px;
+        overflow: auto;
+    }
+
+    .octane-room-settings-banned__row.is-selected {
+        background: #d3dde2;
+    }
+
+    .octane-room-settings-banned__side {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 6px;
+        padding-top: 30px;
+    }
+
+    /* The buttons of the window are the illumina light button of the AIR client. */
+    :where(.habbo-btn-primary, .habbo-btn-danger, .habbo-btn-secondary) {
+        border-style: solid !important;
+        border-color: transparent !important;
+        border-width: 8px 4px 8px 6px !important;
+        border-image: url('../../assets/images/habbo-skin/slices/button-illumina-default.png') 8 4 8 6 fill / 8px 4px 8px 6px stretch !important;
+        background: none !important;
+        box-shadow: none !important;
+        color: #151515 !important;
     }
 
     button {
         min-height: 29px;
         border-radius: 0 !important;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -80,7 +206,7 @@
         color: var(--room-settings-text) !important;
         box-shadow: none !important;
         font-family: UbuntuRegular, Ubuntu, sans-serif;
-        font-size: 11px !important;
+        font-size: 12px !important;
     }
 
     :where(input:focus, select:focus, textarea:focus) {

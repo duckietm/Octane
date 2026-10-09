@@ -271,8 +271,8 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                 <Text>{LocalizeText('soundboard.room.allow')}</Text>
             </Flex>
             <Flex pointer alignItems="center" justifyContent="center" gap={1} onClick={deleteRoom}>
-                <FaTimes className="fa-icon shrink-0 text-[#a81a12]" />
-                <Text variant="danger" underline bold className="whitespace-nowrap">
+                <FaTimes className="fa-icon shrink-0 text-[#bb2200]" />
+                <Text underline bold className="whitespace-nowrap text-[#bb2200]">
                     {LocalizeText('navigator.roomsettings.delete')}
                 </Text>
             </Flex>

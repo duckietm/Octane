@@ -8,10 +8,9 @@ import {
     RoomUsersWithRightsComposer
 } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
+import { IRoomData, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
+import { Button, Flex, Text, UserProfileIconView } from '../../../../common';
 import { useFriends, useMessageEvent } from '../../../../hooks';
-import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
 interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
@@ -25,6 +24,7 @@ const STAFF_CHAT_NAME = 'Staff Chat';
 export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabViewProps> = (props) => {
     const { roomData = null } = props;
     const [usersWithRights, setUsersWithRights] = useState<Map<number, string>>(new Map());
+    const [filter, setFilter] = useState('');
     const { onlineFriends = [], offlineFriends = [] } = useFriends();
     const pendingActionsRef = useRef<Set<string>>(new Set());
 
@@ -58,6 +58,11 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
     );
 
     const friendsWithoutRights = allFriends.filter((friend) => !filteredUsersWithRights.has(friend.id));
+
+    const normalizedFilter = filter.trim().toLowerCase();
+    const matchesFilter = (name: string) => !normalizedFilter || name.toLowerCase().includes(normalizedFilter);
+    const visibleUsersWithRights = Array.from(filteredUsersWithRights.entries()).filter(([, name]) => matchesFilter(name));
+    const visibleFriends = friendsWithoutRights.filter((friend) => matchesFilter(friend.name));
 
     useMessageEvent<FlatControllersEvent>(FlatControllersEvent, (event) => {
         const parser = event.getParser();
@@ -102,32 +107,30 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
     }, [roomData]);
 
     return (
-        <Grid>
-            <Column size={6}>
-                <NavigatorRoomSettingsSectionView
-                    gap={1}
-                    className="h-full"
-                    title={LocalizeText(
-                        'navigator.flatctrls.userswithrights',
-                        ['displayed', 'total'],
-                        [filteredUsersWithRights.size.toString(), filteredUsersWithRights.size.toString()]
-                    )}
-                >
-                    <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
-                        <Column fullWidth overflow="auto" gap={1}>
-                            {Array.from(filteredUsersWithRights.entries()).map(([id, name], index) => {
-                                return (
-                                    <Flex key={`${id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
-                                        <UserProfileIconView userId={id} />
-                                        <Text pointer grow onClick={() => guardedSend(`take_${id}`, new RoomTakeRightsComposer(id))}>
-                                            {name}
-                                        </Text>
-                                    </Flex>
-                                );
-                            })}
-                        </Column>
-                    </Flex>
-
+        <>
+            <div className="octane-room-settings-filter">
+                <span className="octane-room-settings-label">{localizeWithFallback('navigator.flatctrls.filter', 'Filter')}</span>
+                <input className="form-control form-control-sm" value={filter} onChange={(event) => setFilter(event.target.value)} />
+            </div>
+            <div className="octane-room-settings-rights">
+                <div className="octane-room-settings-rights__column">
+                    <span className="octane-room-settings-label">
+                        {LocalizeText(
+                            'navigator.flatctrls.userswithrights',
+                            ['displayed', 'total'],
+                            [visibleUsersWithRights.length.toString(), filteredUsersWithRights.size.toString()]
+                        )}
+                    </span>
+                    <div className="octane-room-settings-box octane-room-settings-rights__list list-container">
+                        {visibleUsersWithRights.map(([id, name], index) => (
+                            <Flex key={`${id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
+                                <UserProfileIconView userId={id} />
+                                <Text pointer grow onClick={() => guardedSend(`take_${id}`, new RoomTakeRightsComposer(id))}>
+                                    {name}
+                                </Text>
+                            </Flex>
+                        ))}
+                    </div>
                     <Button
                         variant="danger"
                         disabled={!filteredUsersWithRights.size}
@@ -135,35 +138,23 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
                     >
                         {LocalizeText('navigator.flatctrls.clear')}
                     </Button>
-                </NavigatorRoomSettingsSectionView>
-            </Column>
-
-            <Column size={6}>
-                <NavigatorRoomSettingsSectionView
-                    gap={1}
-                    className="h-full"
-                    title={LocalizeText(
-                        'navigator.flatctrls.friends',
-                        ['displayed', 'total'],
-                        [friendsWithoutRights.length.toString(), allFriends.length.toString()]
-                    )}
-                >
-                    <Flex overflow="hidden" className="octane-card-panel p-2 list-container">
-                        <Column fullWidth overflow="auto" gap={1}>
-                            {friendsWithoutRights.map((friend, index) => {
-                                return (
-                                    <Flex key={`${friend.id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
-                                        <UserProfileIconView userId={friend.id} />
-                                        <Text pointer grow onClick={() => guardedSend(`give_${friend.id}`, new RoomGiveRightsComposer(friend.id))}>
-                                            {friend.name}
-                                        </Text>
-                                    </Flex>
-                                );
-                            })}
-                        </Column>
-                    </Flex>
-                </NavigatorRoomSettingsSectionView>
-            </Column>
-        </Grid>
+                </div>
+                <div className="octane-room-settings-rights__column">
+                    <span className="octane-room-settings-label">
+                        {LocalizeText('navigator.flatctrls.friends', ['displayed', 'total'], [visibleFriends.length.toString(), allFriends.length.toString()])}
+                    </span>
+                    <div className="octane-room-settings-box octane-room-settings-rights__list list-container">
+                        {visibleFriends.map((friend, index) => (
+                            <Flex key={`${friend.id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
+                                <UserProfileIconView userId={friend.id} />
+                                <Text pointer grow onClick={() => guardedSend(`give_${friend.id}`, new RoomGiveRightsComposer(friend.id))}>
+                                    {friend.name}
+                                </Text>
+                            </Flex>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
