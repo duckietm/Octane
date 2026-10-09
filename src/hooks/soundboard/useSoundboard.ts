@@ -17,6 +17,7 @@ import { SoundboardRoomMessageEvent } from '../../events';
 import { useMessageEvent } from '../events';
 import { useNotificationActions } from '../notification';
 import { loadFavoriteIds, saveFavoriteIds, toggleFavoriteId } from './soundboardFavorites';
+import { addSilencedUserId, loadSilencedUserIds, saveSilencedUserIds } from './soundboardSilencedUsers';
 import { useSoundboardFeedStore } from './soundboardFeedStore';
 import { normalizeLegacySoundboardCatalog } from './soundboardLegacyCatalog';
 import {
@@ -25,7 +26,8 @@ import {
     normalizeSoundboardLayout,
     pushRecentSound,
     SoundboardCategory,
-    SoundboardLayout
+    SoundboardLayout,
+    soundboardPlayOptions
 } from './soundboardPresentation';
 import { getRemainingCooldownSeconds, shouldStartOwnCooldown } from './soundboardUi.helpers';
 import { resolveSoundboardSoundUrl } from './soundboardUrl';
@@ -42,6 +44,8 @@ export const useSoundboardState = () => {
     const [cooldownRemainingSeconds, setCooldownRemainingSeconds] = useState(0);
     const [cooldownTotalSeconds, setCooldownTotalSeconds] = useState(0);
     const [favoriteIds, setFavoriteIds] = useState<number[]>(loadFavoriteIds);
+    const [silencedUserIds, setSilencedUserIds] = useState<number[]>(loadSilencedUserIds);
+    const silencedUserIdsRef = useRef(silencedUserIds);
     const cooldownSecondsRef = useRef(0);
     const cooldownUntilRef = useRef(0);
     const legacyLoadStartedRef = useRef(false);
@@ -88,19 +92,29 @@ export const useSoundboardState = () => {
 
     useMessageEvent<SoundboardPlayDeniedEvent>(SoundboardPlayDeniedEvent, handleDenied);
 
+    useEffect(() => {
+        silencedUserIdsRef.current = silencedUserIds;
+    }, [silencedUserIds]);
+
     const handlePlay = useCallback(
         (event: SoundboardPlayEvent) => {
             const parser = event.getParser();
+            const ownUserId = GetSessionDataManager()?.getUserDataSnapshot?.().userId || -1;
+
+            // Somebody the player muted is neither heard nor shown; the player's own pads are never muted.
+            if (parser.actorUserId !== ownUserId && silencedUserIdsRef.current.includes(parser.actorUserId)) return;
+
+            const asset = manifestRef.current.byClassname.get(parser.classname?.trim().toLowerCase() ?? '');
+
             void GetSoundManager()
-                .playSoundboard(resolveSoundboardSoundUrl({ classname: parser.classname, url: parser.url }, manifestRef.current))
+                .playSoundboard(resolveSoundboardSoundUrl({ classname: parser.classname, url: parser.url }, manifestRef.current), soundboardPlayOptions(asset))
                 .then((played) => {
                     if (!played) showSingleBubble(LocalizeText('soundboard.error.audio'), NotificationBubbleType.SOUNDBOARD);
                 });
             setRecentSoundIds((current) => pushRecentSound(current, parser.soundId));
-            useSoundboardFeedStore.getState().push({ username: parser.username, soundName: parser.soundName, soundId: parser.soundId });
+            useSoundboardFeedStore.getState().push({ username: parser.username, userId: parser.actorUserId, soundName: parser.soundName, soundId: parser.soundId });
             DispatchUiEvent(new SoundboardRoomMessageEvent(parser.username, parser.soundName, parser.actorUserId, parser.actorRoomIndex));
 
-            const ownUserId = GetSessionDataManager()?.getUserDataSnapshot?.().userId || -1;
             if (shouldStartOwnCooldown(parser.actorUserId, ownUserId, cooldownSecondsRef.current)) {
                 const now = Date.now();
                 cooldownUntilRef.current = now + cooldownSecondsRef.current * 1_000;
@@ -186,7 +200,7 @@ export const useSoundboardState = () => {
 
             if (sound.local) {
                 void GetSoundManager()
-                    .playSoundboard(resolveSoundboardSoundUrl(sound, manifestRef.current))
+                    .playSoundboard(resolveSoundboardSoundUrl(sound, manifestRef.current), soundboardPlayOptions(sound))
                     .then((played) => {
                         if (!played) showSingleBubble(LocalizeText('soundboard.error.audio'), NotificationBubbleType.SOUNDBOARD);
                     });
@@ -212,6 +226,19 @@ export const useSoundboardState = () => {
             saveFavoriteIds(next);
             return next;
         });
+    }, []);
+
+    const silenceUser = useCallback((userId: number) => {
+        setSilencedUserIds((current) => {
+            const next = addSilencedUserId(current, userId);
+            saveSilencedUserIds(next);
+            return next;
+        });
+    }, []);
+
+    const restoreSilencedUsers = useCallback(() => {
+        setSilencedUserIds([]);
+        saveSilencedUserIds([]);
     }, []);
 
     const refresh = useCallback(() => {
@@ -246,6 +273,9 @@ export const useSoundboardState = () => {
         categories,
         recentSoundIds,
         favoriteIds,
+        silencedUserIds,
+        silenceUser,
+        restoreSilencedUsers,
         cooldownRemainingSeconds,
         cooldownTotalSeconds,
         isCoolingDown,

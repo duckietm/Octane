@@ -80,3 +80,41 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.soundboard-feed__silence {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+}
+
+.soundboard-feed__silence:hover,
+.soundboard-feed__silence:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+}
+
+.soundboard-silenced {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.soundboard-silenced__restore {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #3d8fba;
+    cursor: pointer;
+    text-decoration: underline;
+}

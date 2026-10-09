@@ -26,8 +26,10 @@ interface SoundboardContentViewProps {
     cooldownRemainingSeconds?: number;
     cooldownTotalSeconds?: number;
     playingSoundId?: number | null;
+    silencedCount?: number;
     onPlay: (sound: DisplaySoundboardSound) => void;
     onToggleFavorite?: (sound: DisplaySoundboardSound) => void;
+    onRestoreSilenced?: () => void;
 }
 
 export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
@@ -39,8 +41,10 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
     cooldownRemainingSeconds = 0,
     cooldownTotalSeconds = 0,
     playingSoundId = null,
+    silencedCount = 0,
     onPlay,
-    onToggleFavorite
+    onToggleFavorite,
+    onRestoreSilenced
 }) => {
     const [query, setQuery] = useState('');
     const [categoryId, setCategoryId] = useState('all');
@@ -193,6 +197,15 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
                 </div>
             )}
 
+            {silencedCount > 0 && (
+                <div className="soundboard-silenced text-black/60">
+                    <span>{LocalizeText('soundboard.silenced.count', ['count'], [String(silencedCount)])}</span>
+                    <button type="button" className="soundboard-silenced__restore" onClick={onRestoreSilenced}>
+                        {LocalizeText('soundboard.silenced.restore')}
+                    </button>
+                </div>
+            )}
+
             <div className="text-center text-[10px] text-black/45">{LocalizeText('soundboard.hint')}</div>
         </div>
     );
@@ -206,11 +219,13 @@ export const SoundboardView: FC<{}> = () => {
         categories,
         recentSoundIds,
         favoriteIds,
+        silencedUserIds,
         isCoolingDown,
         cooldownRemainingSeconds,
         cooldownTotalSeconds,
         play,
         toggleFavorite,
+        restoreSilencedUsers,
         refresh
     } = useSoundboard();
     const lastPlayed = useSoundboardFeedStore((state) => state.lastPlayed);
@@ -277,8 +292,10 @@ export const SoundboardView: FC<{}> = () => {
                     cooldownRemainingSeconds={cooldownRemainingSeconds}
                     cooldownTotalSeconds={cooldownTotalSeconds}
                     playingSoundId={playingSoundId}
+                    silencedCount={silencedUserIds.length}
                     onPlay={play}
                     onToggleFavorite={(sound) => toggleFavorite(sound.id)}
+                    onRestoreSilenced={restoreSilencedUsers}
                 />
             </OctaneCard.Content>
         </OctaneCard>
