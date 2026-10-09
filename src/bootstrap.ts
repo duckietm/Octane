@@ -123,6 +123,17 @@ const petConfig = await loadPetConfig();
     'friend.id': search.get('friend') || 0
 };
 
+// The ticket now lives in the config: take it out of the address bar so it can't leak through
+// history, bookmarks, screenshots or a shared link.
+if (search.has('sso')) {
+    try {
+        const url = new URL(window.location.href);
+
+        url.searchParams.delete('sso');
+        window.history.replaceState(window.history.state, '', url.toString());
+    } catch {}
+}
+
 // Legacy aliases so external scripts written against the old Nitro globals keep working
 (window as any).NitroConfig = (window as any).OctaneConfig;
 (window as any).NitroClientMode = clientMode;

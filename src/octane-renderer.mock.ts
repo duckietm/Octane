@@ -455,7 +455,10 @@ export class AchievementData extends StubClass {}
 export class CatalogPageMessageProductData extends StubClass {}
 export class GiftWrappingConfigurationParser extends StubClass {}
 export class WiredFilter extends StubClass {}
-export class HabboWebTools extends StubClass {}
+export class HabboWebTools extends StubClass {
+    static setExternalUrlConfirm(): void {}
+    static openWebPage(): void {}
+}
 
 // Composers — symbol-only constructors; only their identity matters in the
 // codebase ("did the SUT call SendMessageComposer(new FooComposer(args))").

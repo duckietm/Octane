@@ -1,6 +1,6 @@
 import { AddLinkEventTracker, ILinkEventTracker, OctaneLogger, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { GetConfigurationValue, OpenUrl } from '../../api';
+import { GetConfigurationValue, OpenUrl, resolveHabboPageUrl, SanitizePageHtml } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 
 const NEW_LINE_REGEX = /\n\r|\n|\r/gm;
@@ -16,7 +16,7 @@ export const OctanepediaView: FC<{}> = (props) => {
             try {
                 const response = await fetch(link);
 
-                if (!response) return;
+                if (!response?.ok) return;
 
                 const text = await response.text();
                 const splitData = text.split(NEW_LINE_REGEX);
@@ -34,7 +34,7 @@ export const OctanepediaView: FC<{}> = (props) => {
                     return null;
                 });
 
-                setContent(splitData.join(''));
+                setContent(SanitizePageHtml(splitData.join('')));
             } catch (error) {
                 OctaneLogger.error(`Failed to fetch ${link}`);
             }
@@ -48,7 +48,14 @@ export const OctanepediaView: FC<{}> = (props) => {
 
                 value.shift();
 
-                openPage(GetConfigurationValue<string>('habbopages.url') + value.join('/'));
+                const link = resolveHabboPageUrl(GetConfigurationValue<string>('habbopages.url'), value.join('/'));
+
+                if (!link) {
+                    OctaneLogger.warn(`Refused help page path "${value.join('/')}"`);
+                    return;
+                }
+
+                openPage(link);
             },
             eventUrlPrefix: 'habbopages/'
         };
