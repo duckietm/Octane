@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { CatalogType, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../../../api';
+import { CatalogType, getAvatarEffectDurationText, IPurchasableOffer, LocalizeText, localizeWithFallback, ProductTypeEnum } from '../../../../../api';
 import noRecycleIcon from '../../../../../assets/images/catalog/air/inventory-furni-no-recycle.png';
 import noTradeIcon from '../../../../../assets/images/catalog/air/inventory-furni-no-trade.png';
 import { useCatalogProductMetadata, useCatalogUiState } from '../../../../../hooks';
@@ -25,11 +25,20 @@ export const CatalogProductDetailsView: FC<{ offer: IPurchasableOffer }> = ({ of
     const showNoRecycle = hasMetadata && (!recyclable || !tradeable);
     const tradeableLabel = LocalizeText('shop.marketplace.item.not.tradeable');
     const recyclableLabel = LocalizeText('recycler.alert.non.recyclable');
+    // Effect offers carry their length (seconds, 0 permanent) in the product's extra param.
+    const effectDuration = product?.productType === ProductTypeEnum.EFFECT ? getAvatarEffectDurationText(product.extraParam) : null;
 
     return (
         <div aria-label={name} className="octane-catalog-product-details" role="group">
             <strong className="octane-catalog-product-details-name">{name}</strong>
             <span className="octane-catalog-product-details-description">{description}</span>
+            {effectDuration && (
+                <span className="octane-catalog-product-details-duration">
+                    {effectDuration.parameter
+                        ? localizeWithFallback(effectDuration.key, effectDuration.fallback, [effectDuration.parameter], [effectDuration.value])
+                        : localizeWithFallback(effectDuration.key, effectDuration.fallback)}
+                </span>
+            )}
             {(showNoTrade || showNoRecycle) && (
                 <div className="octane-catalog-product-details-badges" role="list">
                     {showNoTrade && (

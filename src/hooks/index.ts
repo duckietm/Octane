@@ -34,6 +34,7 @@ export * from './soundboard/useSoundboardManifest';
 export * from './translation';
 export * from './traxeditor/useTraxEditor';
 export * from './useChatWindow';
+export * from './useCustomWordFilter';
 export * from './useDevicePixelRatio';
 export * from './useKeyboardMovement';
 export * from './useLocalStorage';

@@ -463,3 +463,34 @@
     object-fit: contain;
     image-rendering: var(--octane-pixel-art, pixelated);
 }
+
+.octane-purse-extend-promo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 4px 8px;
+    border: 1px solid #c49b1c;
+    border-radius: 4px;
+    background: #fbd33a;
+    color: #3d2b00;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.octane-purse-extend-promo:hover {
+    background: #ffdf61;
+}
+
+.octane-purse-extend-promo img {
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+}
+
+.octane-club-extend {
+    width: 300px;
+    min-height: 240px;
+}

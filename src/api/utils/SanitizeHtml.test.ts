@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { SanitizeHtml } from './SanitizeHtml';
+import { SanitizeHtml, SanitizePageHtml } from './SanitizeHtml';
 
 /**
  * SanitizeHtml is the project's shared HTML sanitiser (DOMPurify with a fixed
@@ -84,5 +84,17 @@ describe('SanitizeHtml — link safety', () => {
     it('overrides an attacker-supplied rel on a target=_blank anchor', () => {
         const a = parse('<a href="https://example.com" target="_blank" rel="opener">x</a>').querySelector('a');
         expect(a?.getAttribute('rel')).toBe('noopener noreferrer');
+    });
+});
+
+describe('SanitizePageHtml', () => {
+    it('keeps page layout but drops scripts, handlers and forms', () => {
+        const html = SanitizePageHtml('<h2>Rules</h2><table><tr><td>1</td></tr></table><img src="a.png" onerror="alert(1)"><script>alert(2)</script><form><input></form>');
+
+        expect(html).toContain('<h2>Rules</h2>');
+        expect(html).toContain('<td>1</td>');
+        expect(html).not.toContain('onerror');
+        expect(html).not.toContain('<script');
+        expect(html).not.toContain('<form');
     });
 });

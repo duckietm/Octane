@@ -171,9 +171,13 @@ describe('HousekeepingSoundboardTab', () => {
     it('is routed only through the dedicated Housekeeping permission', () => {
         const source = readFileSync(resolve(process.cwd(), 'src/components/housekeeping/HousekeepingView.tsx'), 'utf8');
 
+        const config = readFileSync(resolve(process.cwd(), 'src/api/housekeeping/HousekeepingConfig.ts'), 'utf8');
+
         expect(source).toContain("useHasPermission('acc_soundboard_manage')");
-        expect(source).toContain('showSoundboard');
-        expect(source).toContain('activeTab === HousekeepingTabId.SOUNDBOARD && !canManageSoundboard');
-        expect(source).toContain('setActiveTab(HousekeepingTabId.USERS)');
+        expect(source).toContain('acc_soundboard_manage: canManageSoundboard');
+        // Every tab, Soundboard included, is offered and kept only through its area permission.
+        expect(source).toContain('isHousekeepingTabOpen(id, holds)');
+        expect(source).toContain('if (!isHousekeepingTabOpen(activeTab, holds)) setActiveTab(HousekeepingTabId.DASHBOARD)');
+        expect(config).toContain("[HousekeepingTabId.SOUNDBOARD]: 'acc_soundboard_manage'");
     });
 });

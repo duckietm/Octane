@@ -105,9 +105,12 @@ function safeLocalStorage(): Storage | null {
 }
 
 export const USER_TARGET_KINDS: WebApiUserTargetKind[] = ['users', 'pets', 'bots'];
-export const FURNI_TARGET_KINDS: WebApiFurniTargetKind[] = ['floor', 'wall'];
+/** Habbo's furni kinds; Builders Club items have their own. */
+export const FURNI_TARGET_KINDS: WebApiFurniTargetKind[] = ['furni', 'wall-items', 'furni-bc', 'wall-items-bc'];
 
 export const targetKindsOf = (scope: WebApiHolderScope): WebApiTargetKind[] => (scope === 'furni' ? FURNI_TARGET_KINDS : USER_TARGET_KINDS);
+
+export const isWallTargetKind = (kind: string): boolean => kind === 'wall-items' || kind === 'wall-items-bc';
 
 export const targetKindLabel = (kind: string): string => {
     switch (kind) {
@@ -117,10 +120,14 @@ export const targetKindLabel = (kind: string): string => {
             return 'Pet';
         case 'bots':
             return 'Bot';
-        case 'floor':
+        case 'furni':
             return 'Floor furni';
-        case 'wall':
+        case 'wall-items':
             return 'Wall furni';
+        case 'furni-bc':
+            return 'Builders Club floor furni';
+        case 'wall-items-bc':
+            return 'Builders Club wall furni';
         default:
             return kind || 'Room';
     }
@@ -136,10 +143,11 @@ export interface ExplorerSortOption {
 }
 
 export const EXPLORER_SORT_OPTIONS: ExplorerSortOption[] = [
-    { id: 'id_asc', label: 'Entity id', sort: 'entityId', order: 'asc' },
+    { id: 'id_asc', label: 'Entity id', sort: 'id', order: 'asc' },
     { id: 'value_desc', label: 'Highest value', sort: 'value', order: 'desc' },
     { id: 'value_asc', label: 'Lowest value', sort: 'value', order: 'asc' },
-    { id: 'id_desc', label: 'Newest entity id', sort: 'entityId', order: 'desc' }
+    { id: 'id_desc', label: 'Newest entity id', sort: 'id', order: 'desc' },
+    { id: 'updated_desc', label: 'Last updated', sort: 'update_time', order: 'desc' }
 ];
 
 export const sortOptionById = (id: string): ExplorerSortOption => EXPLORER_SORT_OPTIONS.find((option) => option.id === id) ?? EXPLORER_SORT_OPTIONS[0];
@@ -157,7 +165,7 @@ export const formatUnixSeconds = (seconds: number | null | undefined): string =>
 export const webApiEntryToHolder = (entry: WebApiEntry, scope: WebApiHolderScope, kind: WebApiTargetKind): IWiredVariableHolder => ({
     entityType: scope === 'furni' ? 2 : 1,
     entityId: entry.entityId,
-    entityName: `${targetKindLabel(kind)} #${entry.entityId}`,
+    entityName: entry.name || `${targetKindLabel(kind)} #${entry.entityId}`,
     storage: {
         value: entry.value ?? 0,
         creationTime: (entry.createdAt ?? 0) * 1000,
@@ -212,28 +220,31 @@ export const parseInt32 = (text: string): number | null => {
     return value >= -2147483648 && value <= 2147483647 ? value : null;
 };
 
+/** What each of the API's error codes means for the person using the explorer. */
+const ERROR_MESSAGES: Record<string, string> = {
+    'wired.variables.key_missing': 'This needs the write key.',
+    'wired.variables.key_invalid': 'The key was not accepted.',
+    'wired.variables.api_disabled': 'The Variables Web API add-on does not work in this room.',
+    'wired.variables.bulk_delete_not_enabled': 'This write key may not bulk delete. Allow mass deletion in the Web API add-on first.',
+    'wired.variables.operation_not_allowed': 'This room does not allow that.',
+    'wired.variables.user_not_participating': 'That user is not in the room and has no saved variables in it.',
+    'wired.variables.entity_not_found': 'Nothing with that id is in the room.',
+    'wired.variables.not_found': 'Not found.',
+    'room.not_found': 'That room was not found.',
+    'wired.variables.unknown_endpoint': 'The Variables Web API is not available on this hotel.',
+    'wired.variables.invalid_value': 'That value is not accepted.',
+    'wired.variables.invalid_target': 'That holder is not valid for this variable.',
+    'wired.variables.bulk_delete_invalid_variable': 'That variable is not in this room.',
+    'timeout': 'The hotel did not answer in time.',
+    'network': 'The hotel could not be reached.'
+};
+
 export const explorerErrorMessage = (error: unknown): string => {
     if (error instanceof VariablesWebApiError) {
-        switch (error.code) {
-            case 'rate_limited':
-                return `Too many requests. Try again in ${error.retryAfterSeconds ?? 10} s.`;
-            case 'unauthorized':
-                return 'The key was not accepted.';
-            case 'forbidden':
-                return error.message && error.message !== 'forbidden' ? error.message : 'This key may not do that in this room.';
-            case 'not_found':
-                return error.message && error.message !== 'not_found' ? error.message : 'Not found.';
-            case 'disabled':
-                return 'The Variables Web API is disabled on this hotel.';
-            case 'timeout':
-                return 'The hotel did not answer in time.';
-            case 'network':
-                return 'The hotel could not be reached.';
-            case 'no_key':
-                return error.message;
-            default:
-                return error.message || 'Something went wrong.';
-        }
+        if (error.code === 'wired.variables.too_many_requests') return `Too many requests. Try again in ${error.retryAfterSeconds ?? 10} s.`;
+        if (error.code === 'no_key') return error.message;
+
+        return ERROR_MESSAGES[error.code] ?? (error.message || 'Something went wrong.');
     }
 
     return error instanceof Error && error.message ? error.message : 'Something went wrong.';

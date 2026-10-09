@@ -1,6 +1,7 @@
 import { MouseEventType } from '@octane/renderer';
 import { FC, MouseEvent, PropsWithChildren, useState } from 'react';
 import { attemptPetPlacement, IPetItem, UnseenItemCategory } from '../../../../api';
+import { LayoutRarityLevelView } from '../../../../common';
 import { useInventoryPets, useInventoryUnseenTracker } from '../../../../hooks';
 import { InventoryPetImageView } from './InventoryPetImageView';
 
@@ -44,6 +45,7 @@ export const InventoryPetItemView: FC<PropsWithChildren<{ petItem: IPetItem }>> 
             <span className="octane-inventory-animal-thumb-image">
                 <InventoryPetImageView pet={petItem.petData} />
             </span>
+            {petItem.petData.rarityLevel >= 0 && <LayoutRarityLevelView className="octane-inventory-animal-rarity" level={petItem.petData.rarityLevel} />}
             {children}
         </div>
     );

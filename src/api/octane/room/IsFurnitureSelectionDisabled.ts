@@ -1,4 +1,5 @@
 import { GetRoomEngine, GetSessionDataManager, RoomEngineObjectEvent, RoomObjectVariable } from '@octane/renderer';
+import { IsAnyRoomController } from '../session/HasSessionPermission';
 
 export function IsFurnitureSelectionDisabled(event: RoomEngineObjectEvent): boolean {
     let result = false;
@@ -11,7 +12,7 @@ export function IsFurnitureSelectionDisabled(event: RoomEngineObjectEvent): bool
         if (selectionDisabled) {
             result = true;
 
-            if (GetSessionDataManager().isModerator) result = false;
+            if (IsAnyRoomController()) result = false;
         }
     }
 

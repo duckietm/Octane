@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { NotificationBubbleItem, NotificationBubbleType } from '../../api';
-import { prependSingleBubble } from './useNotification';
+import { addSingleBubble } from './useNotification';
 
 describe('Soundboard notification bubbles', () => {
     it('replaces only the previous Soundboard bubble', () => {
@@ -8,6 +8,6 @@ describe('Soundboard notification bubbles', () => {
         const previous = new NotificationBubbleItem('Wait 10', NotificationBubbleType.SOUNDBOARD);
         const next = new NotificationBubbleItem('Wait 9', NotificationBubbleType.SOUNDBOARD);
 
-        expect(prependSingleBubble([previous, info], next).map((item) => item.message)).toEqual(['Wait 9', 'Info']);
+        expect(addSingleBubble([previous, info], next).map((item) => item.message)).toEqual(['Info', 'Wait 9']);
     });
 });

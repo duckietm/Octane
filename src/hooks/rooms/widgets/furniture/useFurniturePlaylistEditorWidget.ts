@@ -20,7 +20,7 @@ import {
     SongDiskInventoryReceivedEvent
 } from '@octane/renderer';
 import { useCallback, useState } from 'react';
-import { IsOwnerOfFurniture, LocalizeText, NotificationAlertType, NotificationBubbleType, SendMessageComposer } from '../../../../api';
+import { IsAnyRoomController, IsOwnerOfFurniture, LocalizeText, NotificationAlertType, NotificationBubbleType, SendMessageComposer } from '../../../../api';
 import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useNotification } from '../../../notification';
 import { useFurniRemovedEvent } from '../../engine';
@@ -62,7 +62,7 @@ const useFurniturePlaylistEditorWidgetState = () => {
             return;
         }
 
-        if (roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST || GetSessionDataManager().isModerator)
+        if (roomSession.isRoomOwner || roomSession.controllerLevel >= RoomControllerLevel.GUEST || IsAnyRoomController())
             SendMessageComposer(new FurnitureMultiStateComposer(event.objectId, -2));
     });
 

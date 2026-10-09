@@ -2,6 +2,7 @@ import { BadgeReceivedEvent, BadgesEvent, RequestBadgesComposer, SetActivatedBad
 import { useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetConfigurationValue, SendMessageComposer, UnseenItemCategory } from '../../api';
+import { rememberBadgeRarityFromPacket, rememberReceivedBadgeRarity } from '../../api/badges/badgeRarity';
 import { useMessageEvent } from '../events';
 import { useSharedVisibility } from '../useSharedVisibility';
 import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
@@ -66,6 +67,10 @@ const useInventoryBadgesState = () => {
         const parser = event.getParser();
         const allBadgeCodes = parser.getAllBadgeCodes();
 
+        // Official `BadgesModel.initBadges`: the packet itself carries the owner count and rarity
+        // tier of every badge, so the grid never has to ask the leaderboard for them.
+        rememberBadgeRarityFromPacket(parser.getBadgeDetails());
+
         setBadgeIds(() => {
             const newValue = new Map<string, number>();
 
@@ -92,6 +97,9 @@ const useInventoryBadgesState = () => {
 
     useMessageEvent<BadgeReceivedEvent>(BadgeReceivedEvent, (event) => {
         const parser = event.getParser();
+
+        rememberReceivedBadgeRarity(parser);
+
         const unseen = isUnseen(UnseenItemCategory.BADGE, parser.badgeId);
 
         setBadgeCodes((prevValue) => {

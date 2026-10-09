@@ -36,6 +36,21 @@
     pointer-events: none;
 }
 
+.octane-inventory-animal-rarity {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    transform: scale(0.6);
+    transform-origin: top right;
+    pointer-events: none;
+}
+
+.octane-inventory-animal-preview-rarity {
+    position: absolute;
+    top: 55px;
+    right: 8px;
+}
+
 .octane-inventory-animal-thumb-image img,
 .octane-inventory-animal-image img {
     flex: none;

@@ -3,10 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useCatalogProductMetadata, useCatalogUiState } from '../../../../../hooks';
 import { CatalogProductDetailsView } from './CatalogProductDetailsView';
 
-vi.mock('../../../../../api', () => ({
+vi.mock('../../../../../api', async () => ({
     CatalogType: { BUILDER: 'BUILDERS_CLUB' },
+    getAvatarEffectDurationText: (await vi.importActual<typeof import('../../../../../api/avatar/AvatarEditorEffects')>('../../../../../api/avatar/AvatarEditorEffects')).getAvatarEffectDurationText,
     LocalizeText: (key: string) => key,
-    ProductTypeEnum: { FLOOR: 's', WALL: 'i' }
+    localizeWithFallback: (key: string, fallback: string) => fallback,
+    ProductTypeEnum: { FLOOR: 's', WALL: 'i', EFFECT: 'e' }
 }));
 
 vi.mock('../../../../../hooks', () => ({
@@ -66,5 +68,23 @@ describe('catalog product details', () => {
         expect(noTrade.querySelector('img')).toHaveAttribute('src', expect.stringContaining('inventory-furni-no-trade'));
         expect(noRecycle).toHaveClass('is-no-recycle');
         expect(noRecycle.querySelector('img')).toHaveAttribute('src', expect.stringContaining('inventory-furni-no-recycle'));
+    });
+
+    it('shows how long an effect offer lasts', () => {
+        const offer = (extraParam: string) => ({
+            localizationDescription: '',
+            localizationName: 'Fx',
+            offerId: 72,
+            page: { pageId: 17 },
+            product: { extraParam, productType: 'e' }
+        }) as any;
+
+        const { rerender } = render(<CatalogProductDetailsView offer={offer('0')} />);
+
+        expect(screen.getByText('Permanent')).toHaveClass('octane-catalog-product-details-duration');
+
+        rerender(<CatalogProductDetailsView offer={offer('604800')} />);
+
+        expect(screen.getByText('7 days')).toBeInTheDocument();
     });
 });

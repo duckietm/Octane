@@ -6,11 +6,14 @@ import {
     formatUptime,
     HousekeepingApi,
     HousekeepingTabId,
+    localizeHousekeepingAction,
     LocalizeText,
-    NotificationBubbleType
+    NotificationBubbleType,
+    resolveHousekeepingTarget
 } from '../../../../api';
-import { Button } from '../../../../common';
 import { useHousekeepingStore, useNotification } from '../../../../hooks';
+import { HousekeepingButton } from '../common/HousekeepingParts';
+import { HousekeepingStatsView } from './HousekeepingStatsView';
 
 const AUTO_REFRESH_MS = 30_000;
 const STALE_AFTER_MS = 60_000;
@@ -89,7 +92,7 @@ export const HousekeepingDashboardTab: FC = () => {
 
     const ageMs = refreshedAt ? now - refreshedAt : null;
     const isStale = ageMs !== null && ageMs > STALE_AFTER_MS;
-    const ageLabel = ageMs === null ? '—' : ageMs < 5_000 ? 'now' : `${Math.floor(ageMs / 1000)}s ago`;
+    const ageLabel = ageMs === null ? '-' : ageMs < 5_000 ? 'now' : `${Math.floor(ageMs / 1000)}s ago`;
 
     const recentSanctions = useMemo(() => actionLog.filter((entry) => entry && entry.success && entry.targetType === 'user').slice(0, 5), [actionLog]);
 
@@ -141,10 +144,10 @@ export const HousekeepingDashboardTab: FC = () => {
                         <FaCircle size={6} className={isStale ? '' : 'animate-pulse'} />
                         {isStale ? `stale · ${ageLabel}` : `live · ${ageLabel}`}
                     </span>
-                    <Button size="sm" variant="secondary" disabled={isDashboardLoading} onClick={() => refreshDashboard()}>
+                    <HousekeepingButton size="sm" variant="secondary" disabled={isDashboardLoading} onClick={() => refreshDashboard()}>
                         <FaSync size={9} className={isDashboardLoading ? 'animate-spin' : ''} />
                         <span className="ml-1 text-white">{LocalizeText('housekeeping.dashboard.refresh')}</span>
-                    </Button>
+                    </HousekeepingButton>
                 </div>
             </div>
 
@@ -195,8 +198,8 @@ export const HousekeepingDashboardTab: FC = () => {
                         </div>
                     </div>
 
-                    {/* 4-card grid */}
-                    <div className="grid grid-cols-2 gap-1.5">
+                    {/* Rooms, tickets and server side by side */}
+                    <div className="grid grid-cols-3 gap-1.5">
                         <StatCard
                             icon={<FaHome size={14} />}
                             label={LocalizeText('housekeeping.dashboard.rooms_active')}
@@ -212,16 +215,16 @@ export const HousekeepingDashboardTab: FC = () => {
                             subtle={LocalizeText('housekeeping.dashboard.sanctions_24h', ['count'], [String(dashboard.sanctionsLast24h)])}
                             tone={dashboard.pendingTickets > 0 ? 'rose' : 'emerald'}
                         />
-                        <div className="col-span-2">
-                            <StatCard
-                                icon={<FaServer size={14} />}
-                                label={LocalizeText('housekeeping.dashboard.server')}
-                                value={formatUptime(dashboard.serverUptimeSeconds)}
-                                subtle={dashboard.serverVersion}
-                                tone="violet"
-                            />
-                        </div>
+                        <StatCard
+                            icon={<FaServer size={14} />}
+                            label={LocalizeText('housekeeping.dashboard.server')}
+                            value={formatUptime(dashboard.serverUptimeSeconds)}
+                            subtle={dashboard.serverVersion}
+                            tone="violet"
+                        />
                     </div>
+
+                    <HousekeepingStatsView />
 
                     <form onSubmit={onSubmitAlert} className="flex flex-col gap-1.5 rounded-lg border border-amber-200 bg-amber-50/40 p-2.5">
                         <label className="text-[10px] uppercase tracking-wider font-semibold opacity-60 flex items-center gap-1">
@@ -243,7 +246,7 @@ export const HousekeepingDashboardTab: FC = () => {
                                 className="grow rounded border border-amber-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-black placeholder:italic"
                                 maxLength={280}
                             />
-                            <Button
+                            <HousekeepingButton
                                 size="sm"
                                 variant="primary"
                                 disabled={!canSendAlert}
@@ -251,7 +254,7 @@ export const HousekeepingDashboardTab: FC = () => {
                             >
                                 <FaPaperPlane size={9} className={isSendingAlert ? 'animate-pulse' : ''} />
                                 <span className="ml-1">{LocalizeText('housekeeping.hotel.alert.send')}</span>
-                            </Button>
+                            </HousekeepingButton>
                         </div>
                     </form>
                 </>
@@ -270,10 +273,12 @@ export const HousekeepingDashboardTab: FC = () => {
                                     {entry.actorName}
                                 </span>
                                 <span className="text-zinc-400">→</span>
-                                <span className="truncate" title={entry.targetLabel}>
-                                    {entry.targetLabel}
+                                <span className="truncate" title={entry.detail}>
+                                    {resolveHousekeepingTarget(entry)}
                                 </span>
-                                <span className="ml-auto px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-medium shrink-0 text-[10px]">{entry.action}</span>
+                                <span className="ml-auto px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-medium shrink-0 text-[10px]" title={entry.action}>
+                                    {localizeHousekeepingAction(entry.action)}
+                                </span>
                             </li>
                         ))}
                     </ul>

@@ -7,4 +7,7 @@ export interface ChatlogRecord {
     isRoomInfo?: boolean;
     roomId?: number;
     roomName?: string;
+    /** ChatRecordData.TYPE_* of the evidence the heading belongs to. */
+    recordType?: number;
+    groupId?: number;
 }

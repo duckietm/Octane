@@ -48,6 +48,7 @@ import {
     ProductImageUtility,
     TradingNotificationType
 } from '../../api';
+import { rememberReceivedBadgeRarity } from '../../api/badges/badgeRarity';
 import { AchievementNotificationBubbleItem } from '../../api/notification/AchievementNotificationBubbleItem';
 import { localizeWithFallback } from '../../api/utils/localizeWithFallback';
 import { useMessageEvent } from '../events';
@@ -90,10 +91,11 @@ export const prependSingleAlert = (alerts: NotificationAlertItem[], item: Notifi
     return [item, ...(group ? alerts.filter((value) => !group.includes(value.alertType)) : alerts)];
 };
 
-export const prependSingleBubble = (alerts: NotificationBubbleItem[], item: NotificationBubbleItem): NotificationBubbleItem[] => {
+// Like the official client, a new item goes below the ones already shown.
+export const addSingleBubble = (alerts: NotificationBubbleItem[], item: NotificationBubbleItem): NotificationBubbleItem[] => {
     const shouldReplace = item.notificationType === NotificationBubbleType.CLUBGIFT || item.notificationType === NotificationBubbleType.SOUNDBOARD;
 
-    return [item, ...(shouldReplace ? alerts.filter((value) => value.notificationType !== item.notificationType) : alerts)];
+    return [...(shouldReplace ? alerts.filter((value) => value.notificationType !== item.notificationType) : alerts), item];
 };
 
 const useNotificationStore = () => {
@@ -172,7 +174,7 @@ const useNotificationStore = () => {
 
             const notificationItem = new NotificationBubbleItem(message, type, imageUrl, internalLink, senderName);
 
-            setBubbleAlerts((prevValue) => prependSingleBubble(prevValue, notificationItem));
+            setBubbleAlerts((prevValue) => addSingleBubble(prevValue, notificationItem));
         },
         [bubblesDisabled]
     );
@@ -180,7 +182,7 @@ const useNotificationStore = () => {
     const showMentionBubble = useCallback((mention: IMentionEntry) => {
         const item = new MentionNotificationBubbleItem(mention);
 
-        setBubbleAlerts((prevValue) => [item, ...prevValue]);
+        setBubbleAlerts((prevValue) => [...prevValue, item]);
     }, []);
 
     const showNotification = (type: string, options: Map<string, string> = null) => {
@@ -360,9 +362,9 @@ const useNotificationStore = () => {
             badgeImage
         );
 
-        setBubbleAlerts((previous) => [notification, ...previous.filter((item) => item instanceof AchievementNotificationBubbleItem
+        setBubbleAlerts((previous) => [...previous.filter((item) => item instanceof AchievementNotificationBubbleItem
             ? item.badgeCode !== parser.data.badgeCode
-            : item.notificationType !== NotificationBubbleType.BADGE_RECEIVED || item.linkUrl !== parser.data.badgeCode)]);
+            : item.notificationType !== NotificationBubbleType.BADGE_RECEIVED || item.linkUrl !== parser.data.badgeCode), notification]);
     });
 
     useMessageEvent<ChestNotificationEvent>(ChestNotificationEvent, (event) => {
@@ -391,6 +393,7 @@ const useNotificationStore = () => {
         if (recentBadgeNotifications.has(parser.badgeCode)) return;
 
         recentBadgeNotifications.add(parser.badgeCode);
+        rememberReceivedBadgeRarity(parser);
         setTimeout(() => recentBadgeNotifications.delete(parser.badgeCode), 3000);
 
         const badgeName = LocalizeBadgeName(parser.badgeCode);

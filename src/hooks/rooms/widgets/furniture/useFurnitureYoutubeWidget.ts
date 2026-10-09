@@ -13,7 +13,7 @@ import {
     YoutubeDisplayVideoMessageEvent
 } from '@octane/renderer';
 import { useRef, useState } from 'react';
-import { IsOwnerOfFurniture, SendMessageComposer, YoutubeVideoPlaybackStateEnum } from '../../../../api';
+import { HasSessionPermission, IsOwnerOfFurniture, SendMessageComposer, YoutubeVideoPlaybackStateEnum } from '../../../../api';
 import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
@@ -82,7 +82,7 @@ const useFurnitureYoutubeWidgetState = () => {
         objectIdRef.current = event.objectId;
         setObjectId(event.objectId);
         setCategory(event.category);
-        setHasControl(GetSessionDataManager().hasSecurity(SecurityLevel.EMPLOYEE) || IsOwnerOfFurniture(roomObject));
+        setHasControl(HasSessionPermission('acc_anyroomowner', SecurityLevel.EMPLOYEE) || IsOwnerOfFurniture(roomObject));
 
         SendMessageComposer(new GetYoutubeDisplayStatusMessageComposer(event.objectId));
     });

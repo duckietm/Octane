@@ -5,6 +5,7 @@ import {
     FriendIsTypingEvent,
     FriendListUpdateEvent,
     GetSessionDataManager,
+    InstantMessageErrorEvent,
     MarkConsoleReadComposer,
     MessengerMessageAckEvent,
     MessengerMessageEvent,
@@ -20,6 +21,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     CloneObject,
+    getInstantMessageErrorTextKey,
     LocalizeText,
     localizeWithFallback,
     MessengerIconState,
@@ -269,6 +271,33 @@ const useMessengerState = () => {
 
         sendMessage(thread, parser.senderId, parser.messageText, parser.secondsSinceSent, parser.extraData);
         if (thread.threadId === activeThreadId && parser.senderId > 0) SendMessageComposer(new MarkConsoleReadComposer(parser.senderId));
+    });
+
+    // The server refused a console message (muted, flood, not a friend): the line was added
+    // optimistically, so mark it as not sent and say why, as Flash does.
+    useMessageEvent<InstantMessageErrorEvent>(InstantMessageErrorEvent, (event) => {
+        const parser = event.getParser();
+        // Newer codes (11-14) may be missing from older hotel texts: fall back to the generic failure.
+        const errorText = localizeWithFallback(getInstantMessageErrorTextKey(parser.errorCode), LocalizeText('messenger.error.offline_failed'));
+        const ownUserId = GetSessionDataManager().userId;
+
+        setMessageThreads((prevValue) => {
+            const index = prevValue.findIndex((thread) => thread.participant && thread.participant.id === parser.userId);
+
+            if (index === -1) return prevValue;
+
+            const newValue = [...prevValue];
+            const thread = CloneObject(newValue[index]);
+
+            thread.markOwnMessageFailed(ownUserId, parser.message, errorText);
+            thread.addMessage(null, errorText, 0, null, MessengerThreadChat.STATUS_NOTIFICATION);
+
+            if (activeThreadId === thread.threadId) thread.setRead();
+
+            newValue[index] = thread;
+
+            return newValue;
+        });
     });
 
     useMessageEvent<FriendListUpdateEvent>(FriendListUpdateEvent, (event) => {

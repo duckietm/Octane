@@ -125,6 +125,38 @@
     height: 27px;
 }
 
+.octane-navigator-air__history {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 5;
+    display: flex;
+    gap: 2px;
+}
+
+.octane-navigator-air__history-button {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 16px;
+    cursor: pointer;
+}
+
+.octane-navigator-air__history-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.octane-navigator-air__history-button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
 .octane-navigator-air__title {
     display: block;
     overflow: hidden;

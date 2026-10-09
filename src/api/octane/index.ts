@@ -6,3 +6,4 @@ export * from './PetData';
 export * from './room';
 export * from './SendMessageComposer';
 export * from './session';
+export * from './resolveHabboPageUrl';

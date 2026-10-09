@@ -272,6 +272,7 @@ export class ThumbnailStatusMessageEvent extends MessageEvent {}
 // Shared hooks mounted by the registry subscribe even when their feature is
 // disabled. Keep these on the same dispatchable event bus as the room events.
 export class UnseenItemsEvent extends MessageEvent {}
+export class HabboClubExtendOfferMessageEvent extends MessageEvent {}
 export class AuthenticatedEvent extends MessageEvent {}
 export class GoToBreedingNestFailureEvent extends MessageEvent {}
 export class UserHabbiconsEvent extends MessageEvent {}
@@ -455,12 +456,16 @@ export class AchievementData extends StubClass {}
 export class CatalogPageMessageProductData extends StubClass {}
 export class GiftWrappingConfigurationParser extends StubClass {}
 export class WiredFilter extends StubClass {}
-export class HabboWebTools extends StubClass {}
+export class HabboWebTools extends StubClass {
+    static setExternalUrlConfirm(): void {}
+    static openWebPage(): void {}
+}
 
 // Composers — symbol-only constructors; only their identity matters in the
 // codebase ("did the SUT call SendMessageComposer(new FooComposer(args))").
 export class AddFavouriteRoomMessageComposer extends StubClass {}
 export class AvatarEffectActivatedComposer extends StubClass {}
+export class AvatarEffectSelectedComposer extends StubClass {}
 export class DeleteFavouriteRoomMessageComposer extends StubClass {}
 export class FollowFriendMessageComposer extends StubClass {}
 export class GetUserEventCatsMessageComposer extends StubClass {}

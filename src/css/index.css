@@ -2389,3 +2389,97 @@ body {
         color: #a33;
     }
 }
+
+/* Official BadgeImageWidget.playGlow: a 500ms run, strength 0 -> 1 (ease-in-out cubic), then
+   cleared. The overlay repeats the badge image on top of itself so the glow and tint follow
+   the badge's own pixels: outer glow (alpha .7, blur 4->8), inner glow, 48% tint plus a
+   brightness lift. Played once when the badge is set and again on every mouse-over. */
+.badge-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.badge-glow-run {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0;
+    animation-name: badgeGlowRun;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    animation-fill-mode: none;
+}
+
+/* The official ColorMatrixFilter mixes each channel 48% towards the tier colour at full
+   strength: a flat fill of that colour masked by the badge's own pixels, faded to 0.48. */
+.badge-glow-tint {
+    position: absolute;
+    inset: 0;
+    background-color: var(--badge-glow);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    opacity: 0;
+    animation-name: badgeGlowTint;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    animation-fill-mode: none;
+}
+
+@keyframes badgeGlowTint {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0.48;
+    }
+}
+
+/* Hover breath: the outer glow only. The layer repeats the badge's own pixels unchanged, so
+   only the drop shadow around them is visible as it pulses. */
+.badge-glow-run--outline {
+    animation-name: badgeGlowOutline;
+}
+
+@keyframes badgeGlowOutline {
+    0% {
+        opacity: 0;
+        filter: drop-shadow(0 0 3px var(--badge-glow));
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 4px var(--badge-glow)) drop-shadow(0 0 8px var(--badge-glow));
+    }
+}
+
+@keyframes badgeGlowRun {
+    0% {
+        opacity: 0;
+        filter: drop-shadow(0 0 4px var(--badge-glow)) brightness(1);
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 4px var(--badge-glow)) drop-shadow(0 0 8px var(--badge-glow)) brightness(1.45) saturate(1.3);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 6px rgba(59, 130, 246, 0.3); }
+    50%      { box-shadow: 0 0 14px rgba(59, 130, 246, 0.6); }
+}
+
+@keyframes pulseGlowRed {
+    0%, 100% { box-shadow: 0 0 6px rgba(239, 68, 68, 0.3); }
+    50%      { box-shadow: 0 0 14px rgba(239, 68, 68, 0.6); }
+}
+
+@keyframes dropSettle {
+    0%   { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+@keyframes pulseGlowGold {
+    0%, 100% { box-shadow: 0 0 6px rgba(255, 193, 7, 0.4); }
+    50%      { box-shadow: 0 0 14px rgba(255, 193, 7, 0.7); }
+}

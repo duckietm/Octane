@@ -41,7 +41,9 @@ const INITIAL = {
     needsInit: true,
     needsSearch: false,
     currentTabCode: '',
-    currentFilter: ''
+    currentFilter: '',
+    searchHistory: [],
+    searchHistoryOffset: -1
 };
 
 describe('useNavigatorUiStore', () => {
@@ -176,6 +178,52 @@ describe('useNavigatorUiStore', () => {
             useNavigatorUiStore.getState().setTab('public');
             expect(useNavigatorUiStore.getState().currentTabCode).toBe('public');
             expect(useNavigatorUiStore.getState().currentFilter).toBe('');
+        });
+    });
+
+    describe('search history', () => {
+        it('goes back and forward through searches without adding entries', () => {
+            const store = useNavigatorUiStore.getState();
+
+            store.setTab('hotel_view');
+            store.setFilter('tag:pool');
+            store.setSearch('myworld_view', '');
+
+            useNavigatorUiStore.getState().goBack();
+            expect(useNavigatorUiStore.getState().currentTabCode).toBe('hotel_view');
+            expect(useNavigatorUiStore.getState().currentFilter).toBe('tag:pool');
+
+            useNavigatorUiStore.getState().goBack();
+            expect(useNavigatorUiStore.getState().currentFilter).toBe('');
+
+            useNavigatorUiStore.getState().goForward();
+            expect(useNavigatorUiStore.getState().currentFilter).toBe('tag:pool');
+            expect(useNavigatorUiStore.getState().searchHistory).toHaveLength(3);
+        });
+
+        it('drops forward entries when a new search is made after going back', () => {
+            const store = useNavigatorUiStore.getState();
+
+            store.setTab('hotel_view');
+            store.setTab('myworld_view');
+            useNavigatorUiStore.getState().goBack();
+            useNavigatorUiStore.getState().setSearch('hotel_view', 'tag:music');
+
+            const { searchHistory, searchHistoryOffset } = useNavigatorUiStore.getState();
+
+            expect(searchHistory.map((entry) => entry.filter)).toEqual(['', 'tag:music']);
+            expect(searchHistoryOffset).toBe(1);
+        });
+
+        it('does not add the same search twice in a row and ignores back at the start', () => {
+            const store = useNavigatorUiStore.getState();
+
+            store.setTab('hotel_view');
+            store.setTab('hotel_view');
+            useNavigatorUiStore.getState().goBack();
+
+            expect(useNavigatorUiStore.getState().searchHistory).toHaveLength(1);
+            expect(useNavigatorUiStore.getState().currentTabCode).toBe('hotel_view');
         });
     });
 });

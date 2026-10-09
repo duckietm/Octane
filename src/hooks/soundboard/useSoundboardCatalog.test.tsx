@@ -2,8 +2,8 @@
 
 import { SoundboardCatalogEvent, SoundboardCatalogResultEvent } from '@octane/renderer';
 import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useSoundboardCatalog } from './useSoundboardCatalog';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SOUNDBOARD_CATALOG_NO_ANSWER_CODE, SOUNDBOARD_CATALOG_TIMEOUT_MS, useSoundboardCatalog } from './useSoundboardCatalog';
 
 const mocks = vi.hoisted(() => ({
     handlers: new Map<unknown, (event: any) => void>(),
@@ -44,6 +44,10 @@ describe('useSoundboardCatalog', () => {
         mocks.sendMessage.mockClear();
     });
 
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     it('stores the full catalog and explicitly refreshes after a successful mutation', () => {
         const { result } = renderHook(() => useSoundboardCatalog());
         const sounds = [{ id: 7, name: 'Bell', classname: '', url: '/bell.mp3', enabled: true, sortOrder: 10, minRank: 1 }];
@@ -72,5 +76,41 @@ describe('useSoundboardCatalog', () => {
 
         expect(result.current.pendingOperation).toBe(1);
         expect(mocks.sendMessage).toHaveBeenCalledOnce();
+    });
+
+    it('gives up on an operation the server never answered and unlocks the panel', () => {
+        vi.useFakeTimers();
+        const { result } = renderHook(() => useSoundboardCatalog());
+
+        act(() => {
+            result.current.reorder([7]);
+        });
+        expect(result.current.pendingOperation).toBe(2);
+
+        act(() => {
+            vi.advanceTimersByTime(SOUNDBOARD_CATALOG_TIMEOUT_MS);
+        });
+
+        expect(result.current.pendingOperation).toBeNull();
+        expect(result.current.lastResult).toEqual({ operation: 2, resultCode: SOUNDBOARD_CATALOG_NO_ANSWER_CODE, soundId: 0 });
+    });
+
+    it('does not report a timeout once the server has answered', () => {
+        vi.useFakeTimers();
+        const { result } = renderHook(() => useSoundboardCatalog());
+
+        act(() => {
+            result.current.reorder([7]);
+        });
+        act(() =>
+            mocks.handlers.get(SoundboardCatalogResultEvent)?.({
+                getParser: () => ({ operation: 2, resultCode: 0, soundId: 0 })
+            })
+        );
+        act(() => {
+            vi.advanceTimersByTime(SOUNDBOARD_CATALOG_TIMEOUT_MS * 2);
+        });
+
+        expect(result.current.lastResult).toEqual({ operation: 2, resultCode: 0, soundId: 0 });
     });
 });

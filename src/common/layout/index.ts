@@ -4,6 +4,7 @@ export * from './LayoutBadgeImageView';
 export * from './LayoutCounterTimeView';
 export * from './LayoutCurrencyIcon';
 export * from './LayoutFurniIconImageView';
+export * from './LayoutColorSwatchView';
 export * from './LayoutFurniImageView';
 export * from './LayoutGiftTagView';
 export * from './LayoutGridItem';

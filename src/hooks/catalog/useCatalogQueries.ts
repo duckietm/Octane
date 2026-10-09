@@ -6,7 +6,8 @@ import {
     GetCatalogPageComposer,
     NodeData
 } from '@octane/renderer';
-import { keepPreviousData, QueryClient, UseQueryResult } from '@tanstack/react-query';
+import { QueryClient, UseQueryResult } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { awaitOctaneResponse, useOctaneQuery } from '../../api/octane-query';
 import {
     CatalogPage,
@@ -171,8 +172,19 @@ export const useCatalogIndexQuery = (type: string, enabled: boolean): UseQueryRe
         retry: false
     });
 
-export const useCatalogPageQuery = (type: string, pageId: number, enabled: boolean): UseQueryResult<CatalogPageData> =>
-    useOctaneQuery<CatalogPageMessageEvent, CatalogPageData>({
+// The page last shown per catalog type. While the next page loads every caller
+// gets this one, so a layout mounted mid-load sees the page its parent shows
+// (keepPreviousData alone is per observer: a new observer would get nothing).
+const lastShownPages = new Map<string, CatalogPageData>();
+
+export const lastShownCatalogPage = (type: string): CatalogPageData | undefined => lastShownPages.get(type);
+
+export const rememberShownCatalogPage = (type: string, data: CatalogPageData): void => {
+    lastShownPages.set(type, data);
+};
+
+export const useCatalogPageQuery = (type: string, pageId: number, enabled: boolean): UseQueryResult<CatalogPageData> => {
+    const query = useOctaneQuery<CatalogPageMessageEvent, CatalogPageData>({
         key: catalogPageKey(type, pageId) as unknown as string[],
         request: () => new GetCatalogPageComposer(pageId, -1, type),
         parser: CatalogPageMessageEvent,
@@ -185,9 +197,18 @@ export const useCatalogPageQuery = (type: string, pageId: number, enabled: boole
         enabled: enabled && pageId > -1,
         staleTime: CATALOG_PAGE_STALE_MS,
         timeoutMs: CATALOG_PAGE_TIMEOUT_MS,
-        placeholderData: keepPreviousData,
+        placeholderData: () => lastShownCatalogPage(type),
         retry: false
     });
+
+    const shown = query.isPlaceholderData ? undefined : query.data;
+
+    useEffect(() => {
+        if (shown) rememberShownCatalogPage(type, shown);
+    }, [type, shown]);
+
+    return query;
+};
 
 // The store's actions run outside React; the effects hook binds the app's
 // QueryClient here on mount so they can read and invalidate the cache.
@@ -243,4 +264,5 @@ export const cloneCachedCatalogPages = (): void => {
 
 export const dropCatalogCache = (): void => {
     boundClient?.removeQueries({ queryKey: CATALOG_QUERY_ROOT });
+    lastShownPages.clear();
 };

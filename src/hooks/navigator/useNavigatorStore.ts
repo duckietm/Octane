@@ -46,7 +46,8 @@ import {
     NotificationAlertType,
     SendMessageComposer,
     TryVisitRoom,
-    VisitDesktop
+    VisitDesktop,
+    IsAnyRoomController
 } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
 import { useNotification } from '../notification';
@@ -82,7 +83,7 @@ export const useNavigatorStore = () => {
         FavouritesEvent,
         useCallback((event) => {
             const parser = event.getParser();
-            useNavigatorFavouritesStore.getState().setAll(parser.favoriteRoomIds || []);
+            useNavigatorFavouritesStore.getState().setAll(parser.favoriteRoomIds || [], parser.limit);
         }, [])
     );
 
@@ -127,7 +128,7 @@ export const useNavigatorStore = () => {
             setNavigatorData((prev) => ({
                 ...prev,
                 eventMod: parser.securityLevel >= SecurityLevel.MODERATOR,
-                roomPicker: parser.securityLevel >= SecurityLevel.COMMUNITY
+                roomPicker: parser.permissions.size ? parser.permissions.get('acc_staff_pick') === 1 : parser.securityLevel >= SecurityLevel.COMMUNITY
             }));
         }, [])
     );
@@ -184,7 +185,7 @@ export const useNavigatorStore = () => {
                     parser.data.doorMode === RoomDataParser.NOOB_STATE &&
                     !GetSessionDataManager().isAmbassador &&
                     !GetSessionDataManager().isRealNoob &&
-                    !GetSessionDataManager().isModerator
+                    !IsAnyRoomController()
                 )
                     return;
                 CreateRoomSession(parser.data.roomId);

@@ -102,7 +102,7 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
     useEffect(() => {
         refreshOwnCustomBadges();
         ensureCustomBadgeTexts();
-        ensureBadgeLeaderboardLoaded();
+        ensureBadgeLeaderboardLoaded().catch(() => {});
     }, [refreshOwnCustomBadges]);
 
     useEffect(() => {
@@ -111,7 +111,9 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
             return;
         }
         setRarityStat(getCachedBadgeRarityStat(selectedBadgeCode));
-        ensureBadgeLeaderboardLoaded().then(() => setRarityStat(getCachedBadgeRarityStat(selectedBadgeCode)));
+        ensureBadgeLeaderboardLoaded()
+            .then(() => setRarityStat(getCachedBadgeRarityStat(selectedBadgeCode)))
+            .catch(() => {});
     }, [selectedBadgeCode]);
 
     const baseCodes = filteredBadgeCodes !== null ? filteredBadgeCodes : badgeCodes;

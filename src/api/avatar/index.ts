@@ -8,3 +8,5 @@ export * from './dedupeBadges';
 export * from './IAvatarEditorCategory';
 export * from './IAvatarEditorCategoryPartItem';
 export * from './IsNftAvatarPartSet';
+export * from './SanitizeAvatarFigure';
+export * from './AvatarEditorEffects';

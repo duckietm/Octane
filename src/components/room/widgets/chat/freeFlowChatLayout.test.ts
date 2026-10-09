@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { followFreeFlowAnchor, getChatViewerHeight, resolveFreeFlowLayout } from './freeFlowChatLayout';
+import { followFreeFlowAnchor, getChatViewerHeight, resolveFreeFlowLayout, resolveLineByLineLayout } from './freeFlowChatLayout';
 
 describe('resolveFreeFlowLayout', () => {
     it('separates a shallow horizontal collision before stacking bubbles vertically', () => {
@@ -107,5 +107,30 @@ describe('getChatViewerHeight', () => {
 describe('followFreeFlowAnchor', () => {
     it('moves a bubble by the avatar delta without discarding its collision offset', () => {
         expect(followFreeFlowAnchor(80, 100, 125)).toBe(105);
+    });
+});
+
+describe('resolveLineByLineLayout', () => {
+    it('gives every bubble its own row even when they are far apart sideways', () => {
+        const result = resolveLineByLineLayout([
+            { id: 1, left: 0, top: 100, width: 100, height: 26, anchorX: 50 },
+            { id: 2, left: 900, top: 100, width: 100, height: 26, anchorX: 950 },
+            { id: 3, left: 400, top: 100, width: 100, height: 26, anchorX: 450 }
+        ]);
+
+        expect(result.map(({ id, left, top }) => ({ id, left, top }))).toEqual([
+            { id: 1, left: 0, top: 46 },
+            { id: 2, left: 900, top: 73 },
+            { id: 3, left: 400, top: 100 }
+        ]);
+    });
+
+    it('leaves bubbles that already sit above each other alone', () => {
+        const result = resolveLineByLineLayout([
+            { id: 1, left: 0, top: 20, width: 100, height: 26, anchorX: 50 },
+            { id: 2, left: 0, top: 100, width: 100, height: 26, anchorX: 50 }
+        ]);
+
+        expect(result.map(({ top }) => top)).toEqual([20, 100]);
     });
 });

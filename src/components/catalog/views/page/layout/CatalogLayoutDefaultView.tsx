@@ -17,7 +17,7 @@ import { CatalogLayoutProps } from './CatalogLayout.types';
 
 export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
-    const { currentOffer = null, currentPage = null, roomPreviewer = null } = useCatalogData();
+    const { currentOffer = null, roomPreviewer = null } = useCatalogData();
     const { currentType = CatalogType.NORMAL } = useCatalogUiState();
     const { density = 'standard', showTilePrices = true } = useCatalogDisplayPreferences();
     const gridMetrics = getCatalogGridMetrics(density);
@@ -58,7 +58,7 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
 
                 {!currentOffer && (
                     <div className={`octane-catalog-welcome flex items-center gap-3 ${hasTeaserText ? '' : 'justify-center is-image-only'}`}>
-                        {!!page.localization.getImage(1) && (
+                        {!!page?.localization.getImage(1) && (
                             <img alt="" className="w-[70px] h-[70px] object-contain rounded shrink-0" src={page.localization.getImage(1)} />
                         )}
                         {hasTeaserText && <Text className="text-[11px]! text-muted" dangerouslySetInnerHTML={{ __html: SanitizeHtml(teaserText) }} />}
@@ -67,7 +67,7 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = (props) => {
             </div>
 
             <div className="octane-catalog-grid-shell flex-1 overflow-auto min-h-0">
-                {GetConfigurationValue('catalog.headers') && <CatalogHeaderView imageUrl={currentPage.localization.getImage(0)} />}
+                {GetConfigurationValue('catalog.headers') && <CatalogHeaderView imageUrl={page?.localization.getImage(0)} />}
                 <CatalogItemGridWidgetView
                     className={`octane-catalog-grid octane-catalog-grid-density-${density}`}
                     showPrices={showTilePrices}

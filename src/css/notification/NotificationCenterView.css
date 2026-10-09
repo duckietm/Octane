@@ -1028,3 +1028,164 @@
         transform: scaleX(0);
     }
 }
+
+/* Official layout_notification on the "black borderless" border skin (style 1). */
+@font-face {
+    font-family: Volter;
+    font-weight: 700;
+    font-style: normal;
+    src: url("@/assets/webfonts/Volter-b.ttf") format("truetype");
+}
+
+.octane-swf-notification-bubble.octane-notification-item {
+    width: 190px;
+    max-width: 190px;
+    min-height: 66px;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 2px !important;
+    border: 6px solid transparent;
+    border-image: url("@/assets/images/notifications/notification_border_black.png") 6 fill / 6px stretch;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: Volter, Ubuntu, sans-serif;
+    font-size: 9px !important;
+    font-weight: 700;
+    line-height: 11px;
+    text-shadow: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-notification-item__icon {
+    display: flex;
+    flex: 0 0 50px;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.octane-notification-item__icon img {
+    max-width: 50px !important;
+    max-height: 50px !important;
+    object-fit: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-notification-item__text {
+    display: flex;
+    flex-direction: column;
+    width: 116px;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.octane-notification-item__rarity {
+    margin-top: 2px;
+}
+
+/* Official club_gift_notification on the border_9 skin. */
+.octane-swf-notification-bubble.octane-club-gift-notification {
+    position: relative;
+    display: block;
+    width: 192px;
+    max-width: 192px;
+    height: 82px;
+    min-height: 82px;
+    padding: 0 !important;
+    border: 0;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px !important;
+    line-height: 14px;
+    text-shadow: none;
+}
+
+.octane-club-gift-notification__border {
+    position: absolute;
+    inset: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 7px 7px 8px 7px;
+    border-image: url("@/assets/images/notifications/notification_border_9.png") 7 7 8 7 fill / 7px 7px 8px 7px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+.octane-club-gift-notification__icon {
+    position: absolute;
+    top: 7px;
+    left: 6px;
+    width: 16px;
+    height: 16px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-club-gift-notification__text {
+    position: absolute;
+    top: 7px;
+    left: 25px;
+    width: 161px;
+    height: 36px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button {
+    position: absolute;
+    top: 44px;
+    right: 6px;
+    min-width: 96px;
+    height: 28px;
+    padding: 0 10px;
+    border: 5px solid transparent !important;
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-default.png") !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button:hover {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-hover.png") !important;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__button:active {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-pressed.png") !important;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__later {
+    position: absolute;
+    top: 49px;
+    left: 8px;
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    border-image: none !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-swf-notification-bubble .octane-club-gift-notification__later:hover {
+    color: #bae1f9 !important;
+}

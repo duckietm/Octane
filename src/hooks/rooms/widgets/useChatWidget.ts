@@ -14,7 +14,10 @@ import {
     SystemChatStyleEnum
 } from '@octane/renderer';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useUserChatPreferencesStore } from '@/state/userChatPreferences';
 import {
+    applyUserChatPreferences,
+    CHAT_MODE_FREE_FLOW,
     ChatBubbleMessage,
     ChatBubbleUtilities,
     ChatEntryType,
@@ -25,6 +28,7 @@ import {
     loadEmojiShortcodes,
     LocalizeText,
     PlaySound,
+    resolveChatMode,
     RoomChatFormatter
 } from '../../../api';
 import { getStoredChatTextSize } from '../../../components/room/widgets/chat-input/chatTextSize';
@@ -106,10 +110,19 @@ const useChatWidgetState = () => {
         [applyTranslationToBubble, buildTranslatedEntryPatch, updateChatEntry]
     );
 
-    const getScrollSpeed = useMemo(() => {
-        if (!chatSettings) return 6000;
+    const userBubbleWidth = useUserChatPreferencesStore((state) => state.bubbleWidth);
+    const userScrollSpeed = useUserChatPreferencesStore((state) => state.scrollSpeed);
+    const userChatMode = useUserChatPreferencesStore((state) => state.chatMode);
+    const chatMode = resolveChatMode(chatSettings?.mode ?? CHAT_MODE_FREE_FLOW, userChatMode);
+    const effectiveChatSettings = useMemo(
+        () => applyUserChatPreferences(chatSettings, userBubbleWidth, userScrollSpeed),
+        [chatSettings, userBubbleWidth, userScrollSpeed]
+    );
 
-        switch (chatSettings.speed) {
+    const getScrollSpeed = useMemo(() => {
+        if (!effectiveChatSettings) return 6000;
+
+        switch (effectiveChatSettings.speed) {
             case RoomChatSettings.CHAT_SCROLL_SPEED_FAST:
                 return 3000;
             case RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL:
@@ -117,7 +130,7 @@ const useChatWidgetState = () => {
             case RoomChatSettings.CHAT_SCROLL_SPEED_SLOW:
                 return 12000;
         }
-    }, [chatSettings]);
+    }, [effectiveChatSettings]);
 
     useOctaneEvent<RoomSessionChatEvent>(RoomSessionChatEvent.CHAT_EVENT, async (event) => {
         const roomObject = GetRoomEngine().getRoomObject(roomSession.roomId, event.objectId, RoomObjectCategory.UNIT);
@@ -348,7 +361,7 @@ const useChatWidgetState = () => {
         };
     }, []);
 
-    return { chatMessages, setChatMessages, chatSettings, getScrollSpeed };
+    return { chatMessages, setChatMessages, chatSettings: effectiveChatSettings, getScrollSpeed, chatMode };
 };
 
 export const useChatWidget = useChatWidgetState;

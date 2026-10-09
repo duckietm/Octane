@@ -1,7 +1,7 @@
 import { RoomDeleteComposer, RoomSettingsSaveErrorEvent, RoomSettingsSaveErrorParser, YouTubeRoomSettingsComposer, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { CreateLinkEvent, GetMaxVisitorsList, getYoutubeRoomEnabled, IRoomData, LocalizeText, SendMessageComposer, setYoutubeRoomEnabled } from '../../../../api';
+import { CreateLinkEvent, GetMaxVisitorsList, getYoutubeRoomEnabled, IRoomData, LocalizeText, localizeWithFallback, SendMessageComposer, setYoutubeRoomEnabled } from '../../../../api';
 import { Column, Flex, Text } from '../../../../common';
 import { useMessageEvent, useNavigatorData, useNotification, useSoundboard } from '../../../../hooks';
 
@@ -25,8 +25,8 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
     const [tagIndex, setTagIndex] = useState(0);
     const [typeError, setTypeError] = useState<string>('');
     const [youtubeEnabled, setYoutubeEnabled] = useState(getYoutubeRoomEnabled());
-    const { showConfirm = null } = useNotification();
-    const { categories } = useNavigatorData();
+    const { showConfirm = null, simpleAlert = null } = useNotification();
+    const { categories, navigatorData } = useNavigatorData();
     const { roomMode: soundboardRoomMode, setRoomMode: setSoundboardRoomMode } = useSoundboard();
 
     useMessageEvent<YouTubeRoomSettingsEvent>(YouTubeRoomSettingsEvent, (event) => {
@@ -58,8 +58,25 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
     });
 
     const deleteRoom = () => {
+        // The server ignores deleting your home room, which looked like it worked.
+        if (navigatorData?.homeRoomId && roomData.roomId === navigatorData.homeRoomId) {
+            simpleAlert(
+                localizeWithFallback('navigator.delete.homeroom.body', 'This is your home room. Pick another home room before you delete it.'),
+                null,
+                null,
+                null,
+                localizeWithFallback('navigator.delete.homeroom.title', 'Home room')
+            );
+            return;
+        }
+
+        const enteredRoom = navigatorData?.enteredGuestRoom;
+        const isGroupBase = !!enteredRoom && enteredRoom.roomId === roomData.roomId && enteredRoom.habboGroupId > 0;
+        const confirmMessage = LocalizeText('navigator.roomsettings.deleteroom.confirm.message', ['room_name'], [roomData.roomName]);
+
         showConfirm(
-            LocalizeText('navigator.roomsettings.deleteroom.confirm.message', ['room_name'], [roomData.roomName]),
+            // Deleting a group's room deletes the group with it.
+            isGroupBase ? `${confirmMessage}\n\n${localizeWithFallback('group.deletebase.body', 'This room is the home of a group: the group will be deleted too.')}` : confirmMessage,
             () => {
                 SendMessageComposer(new RoomDeleteComposer(roomData.roomId));
 

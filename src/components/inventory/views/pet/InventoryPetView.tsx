@@ -1,8 +1,9 @@
 import { InventoryFilterSelect } from '../InventoryFilterSelect';
-import { DeletePetMessageComposer, IRoomSession, RoomPreviewer } from '@octane/renderer';
+import { DeletePetMessageComposer, IRoomSession, PetType, RoomPreviewer } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { attemptPetPlacement, LocalizeText, localizeWithFallback, SendMessageComposer, UnseenItemCategory } from '../../../../api';
+import { LayoutRarityLevelView } from '../../../../common';
 import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScrollAreaView';
 import { useInventoryPets, useInventoryUnseenTracker, useNotification } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
@@ -25,14 +26,28 @@ export const InventoryPetView: FC<{
     const [typeFilter, setTypeFilter] = useState(-1);
     const availableTypes = useMemo(() => [...new Set((petItems ?? []).map(({ petData }) => petData.typeId))].sort((a, b) => a - b), [petItems]);
     const activeType = availableTypes.includes(typeFilter) ? typeFilter : -1;
+    // Like the official client, only monster plants can be filtered by rarity.
+    const [rarityFilter, setRarityFilter] = useState(-1);
+    const rarityFilterEnabled = activeType === PetType.MONSTERPLANT;
+    const availableRarities = useMemo(
+        () =>
+            [
+                ...new Set(
+                    (petItems ?? []).filter(({ petData }) => petData.typeId === PetType.MONSTERPLANT && petData.rarityLevel >= 0).map(({ petData }) => petData.rarityLevel)
+                )
+            ].sort((a, b) => a - b),
+        [petItems]
+    );
+    const activeRarity = rarityFilterEnabled && availableRarities.includes(rarityFilter) ? rarityFilter : -1;
     const visiblePets = useMemo(
         () =>
             (petItems ?? []).filter(
                 ({ petData }) =>
                     (activeType === -1 || petData.typeId === activeType) &&
+                    (activeRarity === -1 || petData.rarityLevel === activeRarity) &&
                     (!search || petData.name.toLowerCase().includes(search) || LocalizeText(`pet.type.${petData.typeId}`).toLowerCase().includes(search))
             ),
-        [petItems, activeType, search]
+        [petItems, activeType, activeRarity, search]
     );
 
     useEffect(() => {
@@ -125,12 +140,23 @@ export const InventoryPetView: FC<{
                         </option>
                     ))}
                 </InventoryFilterSelect>
-                <InventoryFilterSelect aria-label="Pet rarity" disabled>
-                    <option>
+                <InventoryFilterSelect
+                    aria-label="Pet rarity"
+                    disabled={!rarityFilterEnabled}
+                    value={activeRarity}
+                    onChange={(value) => setRarityFilter(Number(value))}
+                >
+                    <option value={-1}>
                         {LocalizeText('inventory.pets.filter.rarity.all') === 'inventory.pets.filter.rarity.all'
                             ? 'All rarities'
                             : LocalizeText('inventory.pets.filter.rarity.all')}
                     </option>
+                    {rarityFilterEnabled &&
+                        availableRarities.map((rarity) => (
+                            <option key={rarity} value={rarity}>
+                                {rarity}
+                            </option>
+                        ))}
                 </InventoryFilterSelect>
             </div>
             <div className="octane-inventory-animal-grid">
@@ -145,6 +171,9 @@ export const InventoryPetView: FC<{
             <div className="octane-inventory-animal-preview">
                 <div className="octane-inventory-animal-name">{selectedPet?.petData.name}</div>
                 <div className="octane-inventory-animal-image">{selectedPet && <InventoryPetImageView pet={selectedPet.petData} preview />}</div>
+                {selectedPet?.petData.rarityLevel >= 0 && (
+                    <LayoutRarityLevelView className="octane-inventory-animal-preview-rarity" level={selectedPet.petData.rarityLevel} />
+                )}
                 <div className="octane-inventory-animal-description">{selectedPet && LocalizeText(`pet.type.${selectedPet.petData.typeId}`)}</div>
                 <div className="octane-inventory-animal-actions">
                     <OctaneButton

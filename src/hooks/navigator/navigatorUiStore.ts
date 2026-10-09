@@ -62,6 +62,30 @@ const readResultViewModes = (): Record<string, number> => {
     }
 };
 
+export interface NavigatorSearchContext {
+    code: string;
+    filter: string;
+}
+
+export const NAVIGATOR_SEARCH_HISTORY_MAX = 50;
+
+/** Habbo-style history: a new search drops anything after the current entry, then appends. */
+export const pushSearchHistory = (
+    history: NavigatorSearchContext[],
+    offset: number,
+    entry: NavigatorSearchContext
+): { searchHistory: NavigatorSearchContext[]; searchHistoryOffset: number } => {
+    const current = history[offset];
+
+    if (!entry.code || (current && current.code === entry.code && current.filter === entry.filter)) {
+        return { searchHistory: history, searchHistoryOffset: offset };
+    }
+
+    const next = [...history.slice(0, offset + 1), entry].slice(-NAVIGATOR_SEARCH_HISTORY_MAX);
+
+    return { searchHistory: next, searchHistoryOffset: next.length - 1 };
+};
+
 export type NavigatorUiState = {
     isVisible: boolean;
     isReady: boolean;
@@ -74,6 +98,8 @@ export type NavigatorUiState = {
     needsSearch: boolean;
     currentTabCode: string;
     currentFilter: string;
+    searchHistory: NavigatorSearchContext[];
+    searchHistoryOffset: number;
     windowX: number;
     windowY: number;
     windowHeight: number;
@@ -101,6 +127,8 @@ export type NavigatorUiActions = {
     setTab(code: string): void;
     setFilter(value: string): void;
     setSearch(code: string, filter: string): void;
+    goBack(): void;
+    goForward(): void;
     hydrateAirPreferences(): void;
     applyServerSettings(settings: { openSearches: boolean; windowX: number; windowY: number; windowHeight: number }): void;
     persistWindowSettings(bounds: { x: number; y: number; width: number; height: number }): void;
@@ -121,6 +149,8 @@ export const useNavigatorUiStore = createOctaneStore<NavigatorUiState & Navigato
     needsSearch: false,
     currentTabCode: '',
     currentFilter: '',
+    searchHistory: [],
+    searchHistoryOffset: -1,
     windowX: 0,
     windowY: 0,
     windowHeight: NAVIGATOR_DEFAULT_HEIGHT,
@@ -150,9 +180,41 @@ export const useNavigatorUiStore = createOctaneStore<NavigatorUiState & Navigato
     markInitDone: () => set({ needsInit: false }),
     requestSearch: () => set({ needsSearch: true }),
     consumeSearchRequest: () => set({ needsSearch: false }),
-    setTab: (code) => set({ currentTabCode: code, currentFilter: '', isCreatorOpen: false }),
-    setFilter: (value) => set({ currentFilter: value }),
-    setSearch: (code, filter) => set({ currentTabCode: code, currentFilter: filter, isCreatorOpen: false }),
+    setTab: (code) =>
+        set((s) => ({
+            currentTabCode: code,
+            currentFilter: '',
+            isCreatorOpen: false,
+            ...pushSearchHistory(s.searchHistory, s.searchHistoryOffset, { code, filter: '' })
+        })),
+    setFilter: (value) =>
+        set((s) => ({
+            currentFilter: value,
+            ...pushSearchHistory(s.searchHistory, s.searchHistoryOffset, { code: s.currentTabCode, filter: value })
+        })),
+    setSearch: (code, filter) =>
+        set((s) => ({
+            currentTabCode: code,
+            currentFilter: filter,
+            isCreatorOpen: false,
+            ...pushSearchHistory(s.searchHistory, s.searchHistoryOffset, { code, filter })
+        })),
+    goBack: () =>
+        set((s) => {
+            const entry = s.searchHistory[s.searchHistoryOffset - 1];
+
+            if (!entry) return {};
+
+            return { currentTabCode: entry.code, currentFilter: entry.filter, isCreatorOpen: false, searchHistoryOffset: s.searchHistoryOffset - 1 };
+        }),
+    goForward: () =>
+        set((s) => {
+            const entry = s.searchHistory[s.searchHistoryOffset + 1];
+
+            if (!entry) return {};
+
+            return { currentTabCode: entry.code, currentFilter: entry.filter, isCreatorOpen: false, searchHistoryOffset: s.searchHistoryOffset + 1 };
+        }),
     hydrateAirPreferences: () =>
         set({
             isOpenSavesSearches: readBooleanPreference(QUICK_LINKS_STORAGE_KEY, false),

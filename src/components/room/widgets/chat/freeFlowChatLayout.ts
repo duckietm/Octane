@@ -112,3 +112,31 @@ export const resolveFreeFlowLayout = (bubbles: readonly FreeFlowLayoutBubble[]):
         pointerX: Math.max(POINTER_LEFT_MARGIN, Math.min(bubble.width - POINTER_RIGHT_MARGIN, bubble.anchorX - bubble.left))
     }));
 };
+
+/**
+ * Line-by-line mode: every bubble collides with every other one across the whole width, so each
+ * gets its own row. Bubbles keep their x; older ones are pushed up above newer ones.
+ */
+export const resolveLineByLineLayout = (bubbles: readonly FreeFlowLayoutBubble[]): FreeFlowLayoutPosition[] => {
+    const newestFirst = [...bubbles].sort((first, second) => second.id - first.id);
+    const tops = new Map<number, number>();
+    let limit = Number.POSITIVE_INFINITY;
+
+    for (const bubble of newestFirst) {
+        const overflowTop = bubble.overflowTop || 0;
+        const overflowBottom = bubble.overflowBottom || 0;
+        let top = bubble.top;
+
+        if (top + bubble.height + overflowBottom > limit) top = limit - bubble.height - overflowBottom;
+
+        tops.set(bubble.id, top);
+        limit = top - overflowTop - VERTICAL_GAP;
+    }
+
+    return bubbles.map((bubble) => ({
+        id: bubble.id,
+        left: bubble.left,
+        top: tops.get(bubble.id),
+        pointerX: Math.max(POINTER_LEFT_MARGIN, Math.min(bubble.width - POINTER_RIGHT_MARGIN, bubble.anchorX - bubble.left))
+    }));
+};

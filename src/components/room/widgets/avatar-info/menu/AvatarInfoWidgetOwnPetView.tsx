@@ -28,7 +28,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
     const { avatarInfo = null, onClose = null } = props;
     const [mode, setMode] = useState(MODE_NORMAL);
     const { roomSession = null, isHandItemBlocked = false } = useRoom();
-    const { petRespectRemaining = 0, respectPet = null } = useSessionInfo();
+    const { petRespectRemaining = 0, respectPet = null, chatStyleId = 0 } = useSessionInfo();
 
     const canGiveHandItem = useMemo(() => {
         if (isHandItemBlocked) return false;
@@ -85,12 +85,11 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     break;
                 case 'breed':
                     if (mode === MODE_NORMAL) {
-                        // _local_7 = RoomWidgetPetCommandMessage._Str_16282;
-                        // _local_8 = ("pet.command." + _local_7);
-                        // _local_9 = _Str_2268.catalog.localization.getLocalization(_local_8);
-                        // _local_4 = new RoomWidgetPetCommandMessage(RoomWidgetPetCommandMessage.RWPCM_PET_COMMAND, this._Str_594.id, ((this._Str_594.name + " ") + _local_9));
+                        // Like Habbo: the breed command (46) sends the pet to a free breeding nest.
+                        roomSession.sendChatMessage(`${avatarInfo.name} ${LocalizeText('pet.command.46')}`, chatStyleId);
                     } else if (mode === MODE_MONSTER_PLANT) {
-                        // messageType = RoomWidgetUserActionMessage.REQUEST_BREED_PET;
+                        // Official REQUEST_BREED_PET: mark the plants this one can breed with.
+                        CreateLinkEvent(`monsterplant-breeding/request/${avatarInfo.roomIndex}`);
                     }
                     break;
                 case 'harvest':

@@ -1,7 +1,7 @@
 import { ChatRecordData, CreateLinkEvent } from '@octane/renderer';
 import { FC, Fragment, useMemo, useState } from 'react';
-import { FaCommentDots, FaDoorOpen, FaSearch, FaSignInAlt, FaTimes, FaTools } from 'react-icons/fa';
-import { LocalizeText, TryVisitRoom } from '../../../../api';
+import { FaCamera, FaCommentDots, FaComments, FaDoorOpen, FaEnvelope, FaSearch, FaSignInAlt, FaTimes, FaTools } from 'react-icons/fa';
+import { LocalizeText, localizeWithFallback, TryVisitRoom } from '../../../../api';
 import { Column, InfiniteScroll } from '../../../../common';
 import { useModTools } from '../../../../hooks';
 import { ChatlogRecord } from './ChatlogRecord';
@@ -60,7 +60,9 @@ export const ChatlogView: FC<ChatlogViewProps> = (props) => {
             results.push({
                 isRoomInfo: true,
                 roomId: record.roomId,
-                roomName: record.roomName
+                roomName: record.roomName ?? '',
+                recordType: record.recordType,
+                groupId: record.groupId
             });
 
             record.chatlog.forEach((chatlog) => {
@@ -100,26 +102,69 @@ export const ChatlogView: FC<ChatlogViewProps> = (props) => {
         );
     };
 
-    const RoomInfo = (props: { roomId: number; roomName: string }) => (
-        <div className="flex items-center gap-2 bg-gradient-to-r from-sky-50 to-transparent rounded p-2 border border-sky-100 my-1">
-            <FaDoorOpen className="text-sky-600 shrink-0" size={14} />
-            <div className="font-semibold leading-tight grow truncate">{props.roomName}</div>
-            <div className="flex gap-1 shrink-0">
-                <button
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-white border border-sky-200 text-sky-700 hover:bg-sky-100 transition-colors"
-                    onClick={() => TryVisitRoom(props.roomId)}
-                >
-                    <FaSignInAlt size={10} /> {LocalizeText('modtools.chatlog.visit')}
-                </button>
-                <button
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-white border border-sky-200 text-sky-700 hover:bg-sky-100 transition-colors"
-                    onClick={() => openRoomInfo(props.roomId)}
-                >
-                    <FaTools size={10} /> {LocalizeText('modtools.chatlog.tools')}
-                </button>
+    const headerButtonClass = 'inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-white border border-sky-200 text-sky-700 hover:bg-sky-100 transition-colors';
+
+    // IM, forum and photo evidence has no room to visit, so the heading follows the record type.
+    const RecordHeader = (props: { record: ChatlogRecord }) => {
+        const { roomId = 0, roomName = '', recordType = ChatRecordData.TYPE_ROOM_CHAT, groupId = 0 } = props.record;
+        const hasRoom = roomId > 0;
+        const roomLabel = roomName || (hasRoom ? `#${roomId}` : '');
+        let icon = <FaDoorOpen className="text-sky-600 shrink-0" size={14} />;
+        let title = roomLabel;
+
+        switch (recordType) {
+            case ChatRecordData.TYPE_IM_SESSION:
+                icon = <FaEnvelope className="text-sky-600 shrink-0" size={14} />;
+                title = localizeWithFallback('modtools.chatlog.context.im', 'IM session');
+                break;
+            case ChatRecordData.TYPE_DISCUSSION_THREAD:
+            case ChatRecordData.TYPE_DISCUSSION_MESSAGE:
+                icon = <FaComments className="text-sky-600 shrink-0" size={14} />;
+                title = (recordType === ChatRecordData.TYPE_DISCUSSION_THREAD)
+                    ? localizeWithFallback('modtools.chatlog.context.forum_thread', 'Forum thread')
+                    : localizeWithFallback('modtools.chatlog.context.forum_message', 'Forum message');
+                break;
+            case ChatRecordData.TYPE_SELFIE:
+            case ChatRecordData.TYPE_PHOTO: {
+                icon = <FaCamera className="text-sky-600 shrink-0" size={14} />;
+                const label = (recordType === ChatRecordData.TYPE_SELFIE)
+                    ? localizeWithFallback('modtools.chatlog.context.selfie', 'Selfie report')
+                    : localizeWithFallback('modtools.chatlog.context.photo', 'Photo report');
+                title = roomLabel ? `${label}: ${roomLabel}` : label;
+                break;
+            }
+            default:
+                if (!hasRoom && !roomName) return null;
+        }
+
+        const isRoomRecord = (recordType === ChatRecordData.TYPE_ROOM_CHAT) || (recordType === ChatRecordData.TYPE_SIMPLE);
+        const showRoomTools = hasRoom && (isRoomRecord || (recordType === ChatRecordData.TYPE_SELFIE) || (recordType === ChatRecordData.TYPE_PHOTO));
+        const isForum = (recordType === ChatRecordData.TYPE_DISCUSSION_THREAD) || (recordType === ChatRecordData.TYPE_DISCUSSION_MESSAGE);
+
+        return (
+            <div className="flex items-center gap-2 bg-gradient-to-r from-sky-50 to-transparent rounded p-2 border border-sky-100 my-1">
+                {icon}
+                <div className="font-semibold leading-tight grow truncate">{title}</div>
+                <div className="flex gap-1 shrink-0">
+                    {hasRoom && isRoomRecord && (
+                        <button className={headerButtonClass} onClick={() => TryVisitRoom(roomId)}>
+                            <FaSignInAlt size={10} /> {LocalizeText('modtools.chatlog.visit')}
+                        </button>
+                    )}
+                    {showRoomTools && (
+                        <button className={headerButtonClass} onClick={() => openRoomInfo(roomId)}>
+                            <FaTools size={10} /> {LocalizeText('modtools.chatlog.tools')}
+                        </button>
+                    )}
+                    {isForum && (groupId > 0) && (
+                        <button className={headerButtonClass} onClick={() => CreateLinkEvent(`groupforum/${groupId}`)}>
+                            <FaComments size={10} /> {localizeWithFallback('modtools.chatlog.open_forum', 'Open forum')}
+                        </button>
+                    )}
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     const isEmpty = !records || records.length === 0 || totalMessages === 0;
 
@@ -169,7 +214,7 @@ export const ChatlogView: FC<ChatlogViewProps> = (props) => {
                     ) : (
                         <InfiniteScroll
                             rowRender={(row: ChatlogRecord) => {
-                                if (row.isRoomInfo) return <RoomInfo roomId={row.roomId} roomName={row.roomName} />;
+                                if (row.isRoomInfo) return <RecordHeader record={row} />;
 
                                 return (
                                     <div

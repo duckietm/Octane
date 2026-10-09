@@ -18,3 +18,12 @@ export const SanitizeHtml = (html: string): string => {
         ALLOW_DATA_ATTR: false
     });
 };
+
+/** Help pages (habbopages) are richer HTML: keep layout tags, drop scripts, handlers, forms and frames. */
+export const SanitizePageHtml = (html: string): string => {
+    return DOMPurify.sanitize(html, {
+        FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select', 'iframe', 'object', 'embed', 'svg', 'math'],
+        FORBID_ATTR: ['srcset'],
+        ALLOW_DATA_ATTR: false
+    });
+};

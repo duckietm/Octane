@@ -1,13 +1,13 @@
 import { GetRoomEngine, SellablePetPaletteData } from '@octane/renderer';
+import { getAvatarEffectIconUrl } from '../avatar/AvatarEditorEffects';
 import { GetConfigurationValue } from '../octane';
 import { ICatalogNode } from './ICatalogNode';
 import { IProduct } from './IProduct';
 import { IPurchasableOffer } from './IPurchasableOffer';
 import { ProductTypeEnum } from './ProductTypeEnum';
 
-export const GetPixelEffectIcon = (id: number) => {
-    return '';
-};
+// Official getPixelEffectIcon: the fx_icon of the effect.
+export const GetPixelEffectIcon = (id: number) => getAvatarEffectIconUrl(id);
 
 export const GetProductIconUrl = (product: IProduct, offer: IPurchasableOffer = null): string => {
     if (!product) return null;

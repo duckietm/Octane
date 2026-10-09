@@ -32,6 +32,7 @@ import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
 import { NavigatorRoomLinkView } from './views/NavigatorRoomLinkView';
 import { NavigatorRoomSettingsView } from './views/room-settings/NavigatorRoomSettingsView';
+import { NavigatorEnforceCategoryView } from './views/NavigatorEnforceCategoryView';
 import { NavigatorEmptyStateView } from './views/search/NavigatorEmptyStateView';
 import { NavigatorRoomInfoPopupView } from './views/search/NavigatorRoomInfoPopupView';
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
@@ -53,6 +54,8 @@ export const NavigatorView: FC<{}> = () => {
     const { topLevelContext, topLevelContexts, navigatorData, navigatorSearches } = useNavigatorData();
     const { searchResult, isFetching } = useNavigatorSearch();
     const { isVisible, isCreatorOpen, isRoomInfoOpen, isRoomLinkOpen, isOpenSavesSearches, needsInit, currentTabCode, windowHeight } = useNavigatorUiState();
+    const canGoBack = useNavigatorUiStore((state) => state.searchHistoryOffset > 0);
+    const canGoForward = useNavigatorUiStore((state) => state.searchHistoryOffset < state.searchHistory.length - 1);
     const elementRef = useRef<HTMLDivElement>(null);
     const [resultsScrollable, setResultsScrollable] = useState(false);
     const frameRef = useRef<HTMLDivElement>(null);
@@ -275,6 +278,28 @@ export const NavigatorView: FC<{}> = () => {
                         <div className="octane-navigator-air__skin" aria-hidden="true" />
                         <div className="octane-navigator-air__tab-shelf" aria-hidden="true" />
                         <div className="octane-navigator-air__caption">
+                            <div className="octane-navigator-air__history">
+                                <button
+                                    type="button"
+                                    className="octane-navigator-air__history-button"
+                                    aria-label={localizeWithFallback('navigator.back', 'back')}
+                                    title={localizeWithFallback('navigator.back', 'back')}
+                                    disabled={!canGoBack}
+                                    onClick={() => useNavigatorUiStore.getState().goBack()}
+                                >
+                                    ‹
+                                </button>
+                                <button
+                                    type="button"
+                                    className="octane-navigator-air__history-button"
+                                    aria-label={localizeWithFallback('navigator.forward', 'forward')}
+                                    title={localizeWithFallback('navigator.forward', 'forward')}
+                                    disabled={!canGoForward}
+                                    onClick={() => useNavigatorUiStore.getState().goForward()}
+                                >
+                                    ›
+                                </button>
+                            </div>
                             <span className="octane-navigator-air__title">{headerText}</span>
                             <button
                                 type="button"
@@ -434,6 +459,9 @@ export const NavigatorView: FC<{}> = () => {
             )}
             <WidgetErrorBoundary name="NavigatorRoomSettings">
                 <NavigatorRoomSettingsView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="NavigatorEnforceCategory">
+                <NavigatorEnforceCategoryView />
             </WidgetErrorBoundary>
         </>
     );

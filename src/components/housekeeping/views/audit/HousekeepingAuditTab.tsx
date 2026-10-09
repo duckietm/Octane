@@ -1,8 +1,17 @@
 import { FC, useMemo, useState } from 'react';
-import { FaCaretDown, FaCaretRight, FaCheck, FaExclamationCircle, FaFilter, FaStopwatch, FaSync, FaTrash } from 'react-icons/fa';
-import { formatRelativePast, GetConfigurationValue, IHousekeepingActionLogEntry, LocalizeText, sampleToMetric } from '../../../../api';
-import { Button } from '../../../../common';
+import { FaCaretDown, FaCaretRight, FaCheck, FaExclamationCircle, FaFilter, FaInfoCircle, FaStopwatch, FaSync, FaTrash } from 'react-icons/fa';
+import {
+    formatRelativePast,
+    GetConfigurationValue,
+    IHousekeepingActionLogEntry,
+    localizeHousekeepingAction,
+    LocalizeText,
+    resolveHousekeepingTarget,
+    sampleToMetric
+} from '../../../../api';
 import { useHousekeepingStore, useLocalStorage } from '../../../../hooks';
+import { HousekeepingAuditEntryDetails } from '../common/HousekeepingAuditEntryDetails';
+import { HousekeepingButton } from '../common/HousekeepingParts';
 
 type TargetFilter = 'all' | 'user' | 'room' | 'hotel';
 type SuccessFilter = 'all' | 'success' | 'failure';
@@ -32,6 +41,7 @@ export const HousekeepingAuditTab: FC = () => {
     const { actionLog, refreshAuditLog, metricsByAction, resetActionMetrics } = useHousekeepingStore();
     const telemetryEnabled = useMemo(() => GetConfigurationValue<boolean>('housekeeping.telemetry.enabled', false) === true, []);
     const [isTelemetryExpanded, setIsTelemetryExpanded] = useState(false);
+    const [expandedId, setExpandedId] = useState<number | null>(null);
     const [targetFilter, setTargetFilter] = useLocalStorage<TargetFilter>('nitro.housekeeping.audit.target_filter', 'all');
     const [successFilter, setSuccessFilter] = useLocalStorage<SuccessFilter>('nitro.housekeeping.audit.success_filter', 'all');
     const [query, setQuery] = useLocalStorage<string>('nitro.housekeeping.audit.query', '');
@@ -77,10 +87,10 @@ export const HousekeepingAuditTab: FC = () => {
                         </span>
                     )}
                 </h3>
-                <Button size="sm" variant="secondary" disabled={isRefreshing} onClick={refresh}>
+                <HousekeepingButton size="sm" variant="secondary" disabled={isRefreshing} onClick={refresh}>
                     <FaSync size={9} className={isRefreshing ? 'animate-spin' : ''} />
                     <span className="ml-1 text-white">{LocalizeText('housekeeping.audit.refresh')}</span>
-                </Button>
+                </HousekeepingButton>
             </div>
 
             {/* Filter row */}
@@ -140,28 +150,40 @@ export const HousekeepingAuditTab: FC = () => {
                     {filtered.map((entry) => (
                         <li
                             key={entry.id}
-                            className={`flex items-center gap-2 text-[11px] px-2 py-1 rounded border transition-colors ${
+                            className={`flex flex-col text-[11px] px-2 py-1 rounded border transition-colors ${
                                 entry.success ? 'border-zinc-200 bg-white hover:bg-zinc-50' : 'border-rose-200 bg-rose-50/60 hover:bg-rose-50'
                             }`}
                         >
-                            <span className="text-zinc-400 tabular-nums w-14 shrink-0">{formatRelativePast(entry.timestamp)}</span>
-                            <span className="font-semibold truncate w-24 shrink-0" title={entry.actorName}>
-                                {entry.actorName}
-                            </span>
-                            <span className="text-zinc-400 shrink-0">→</span>
-                            <span className="truncate grow" title={entry.targetLabel}>
-                                <span
-                                    className={`inline-block px-1 mr-1 rounded text-[9px] uppercase font-bold ${entry.targetType === 'user' ? 'bg-sky-100 text-sky-700' : entry.targetType === 'room' ? 'bg-violet-100 text-violet-700' : 'bg-amber-100 text-amber-700'}`}
-                                >
-                                    {entry.targetType}
+                            <div className="flex items-center gap-2">
+                                <span className="text-zinc-400 tabular-nums w-14 shrink-0">{formatRelativePast(entry.timestamp)}</span>
+                                <span className="font-semibold truncate w-24 shrink-0" title={entry.actorName}>
+                                    {entry.actorName}
                                 </span>
-                                {entry.targetLabel}
-                            </span>
-                            <span
-                                className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${entry.success ? 'bg-zinc-100 text-zinc-700' : 'bg-rose-100 text-rose-700'}`}
-                            >
-                                {entry.action}
-                            </span>
+                                <span className="text-zinc-400 shrink-0">→</span>
+                                <span className="truncate grow" title={entry.detail}>
+                                    <span
+                                        className={`inline-block px-1 mr-1 rounded text-[9px] uppercase font-bold ${entry.targetType === 'user' ? 'bg-sky-100 text-sky-700' : entry.targetType === 'room' ? 'bg-violet-100 text-violet-700' : 'bg-amber-100 text-amber-700'}`}
+                                    >
+                                        {LocalizeText(`housekeeping.audit.target.${entry.targetType}`)}
+                                    </span>
+                                    {resolveHousekeepingTarget(entry)}
+                                </span>
+                                <span
+                                    className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${entry.success ? 'bg-zinc-100 text-zinc-700' : 'bg-rose-100 text-rose-700'}`}
+                                >
+                                    {localizeHousekeepingAction(entry.action)}
+                                </span>
+                                <button
+                                    aria-expanded={expandedId === entry.id}
+                                    className={`shrink-0 rounded p-0.5 transition-colors ${expandedId === entry.id ? 'bg-sky-100 text-sky-700' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700'}`}
+                                    title={LocalizeText('housekeeping.audit.detail.toggle')}
+                                    type="button"
+                                    onClick={() => setExpandedId((current) => (current === entry.id ? null : entry.id))}
+                                >
+                                    <FaInfoCircle size={11} />
+                                </button>
+                            </div>
+                            {expandedId === entry.id && <HousekeepingAuditEntryDetails entry={entry} />}
                         </li>
                     ))}
                 </ul>

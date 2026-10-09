@@ -13,18 +13,21 @@ import {
     SetType,
     UserWardrobePageEvent
 } from '@octane/renderer';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     AvatarEditorColorSorter,
     AvatarEditorPartSorter,
     CreateLinkEvent,
+    DEFAULT_FEMALE_FIGURE,
+    DEFAULT_MALE_FIGURE,
     GetClubMemberLevel,
     GetConfigurationValue,
     IAvatarEditorCategory,
     IAvatarEditorCategoryPartItem,
     IsNftAvatarPartSet,
     Randomizer,
+    sanitizeAvatarFigure,
     SendMessageComposer
 } from '../../api';
 import { useMessageEvent } from '../events';
@@ -70,8 +73,9 @@ const useAvatarEditorState = () => {
             const parts: IPartColor[] = [];
 
             for (const paletteId of Object.keys(selectedColors[setType])) {
+                // No figure model while a non-clothing tab (effects) is open.
                 const partColor = activeModel
-                    .find((category) => category.setType === setType)
+                    ?.find((category) => category.setType === setType)
                     ?.colorItems[paletteId]?.find((partColor) => partColor.id === selectedColors[setType][paletteId]);
 
                 if (partColor) parts.push(partColor);
@@ -87,7 +91,7 @@ const useAvatarEditorState = () => {
         (setType: string, partId: number) => {
             if (!setType || !setType.length) return;
 
-            const category = activeModel.find((category) => category.setType === setType);
+            const category = activeModel?.find((category) => category.setType === setType);
 
             if (!category || !category.partItems || !category.partItems.length) return;
 
@@ -123,7 +127,7 @@ const useAvatarEditorState = () => {
         (setType: string, paletteId: number, colorId: number) => {
             if (!setType || !setType.length) return;
 
-            const category = activeModel.find((category) => category.setType === setType);
+            const category = activeModel?.find((category) => category.setType === setType);
 
             if (!category || !category.colorItems || !category.colorItems.length) return;
 
@@ -255,6 +259,47 @@ const useAvatarEditorState = () => {
 
         return nftSetIds;
     }, [figureSetNames]);
+
+    // Habbo strips what the user can't wear (club level, unowned sellables, other gender) from any look it loads.
+    const sanitizeFigure = useCallback(
+        (figure: string, forGender: string) => {
+            const clubLevel = GetClubMemberLevel();
+
+            return sanitizeAvatarFigure(figure, GetAvatarRenderManager().structureData, {
+                gender: forGender,
+                clubLevel,
+                ownedSetIds: [...figureSetIds, ...Array.from(nftFigureSetIds)],
+                mandatorySetTypes: GetAvatarRenderManager().getMandatoryAvatarPartSetIds(forGender, clubLevel)
+            });
+        },
+        [figureSetIds, nftFigureSetIds]
+    );
+
+    const loadValidAvatarData = useCallback(
+        (figure: string, forGender: string) => loadAvatarData(sanitizeFigure(figure, forGender), forGender),
+        [loadAvatarData, sanitizeFigure]
+    );
+
+    // One look per gender, like Habbo: switching shows the other gender's own look (or its default).
+    const figuresByGenderRef = useRef<Record<string, string>>({});
+
+    const switchGender = useCallback(
+        (newGender: string) => {
+            if (!newGender || newGender === gender) return;
+
+            figuresByGenderRef.current[gender] = getFigureString;
+
+            const nextFigure = figuresByGenderRef.current[newGender] ?? (newGender === AvatarFigurePartType.FEMALE ? DEFAULT_FEMALE_FIGURE : DEFAULT_MALE_FIGURE);
+
+            loadValidAvatarData(nextFigure, newGender);
+        },
+        [gender, getFigureString, loadValidAvatarData]
+    );
+
+    // Read through an effect event so a later figure set update doesn't reset the edit.
+    const loadOwnFigure = useEffectEvent(() => loadValidAvatarData(GetSessionDataManager().figure, GetSessionDataManager().gender));
+
+    const getValidFigureString = useMemo(() => sanitizeFigure(getFigureString, gender), [getFigureString, gender, sanitizeFigure]);
 
     useMessageEvent<FigureSetIdsMessageEvent>(FigureSetIdsMessageEvent, (event) => {
         const parser = event.getParser();
@@ -433,7 +478,8 @@ const useAvatarEditorState = () => {
             return;
         }
 
-        loadAvatarData(GetSessionDataManager().figure, GetSessionDataManager().gender);
+        figuresByGenderRef.current = {};
+        loadOwnFigure();
     }, [isVisible, loadAvatarData, clothingChangeData]);
 
     useEffect(() => {
@@ -455,12 +501,13 @@ const useAvatarEditorState = () => {
         selectedColorParts,
         selectEditorColor,
         selectEditorPart,
-        loadAvatarData,
+        loadAvatarData: loadValidAvatarData,
         getFigureString,
+        getValidFigureString,
         getFigureStringWithFace,
         selectedParts,
         gender,
-        setGender,
+        setGender: switchGender,
         figureSetIds,
         randomizeCurrentFigure,
         savedFigures,

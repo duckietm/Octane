@@ -53,7 +53,13 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
             useNavigatorUiStore.getState().setSearch(searchResult.code, parentFilter);
             return;
         }
-        if (searchResult.action == 2 && topLevelContext) useNavigatorUiStore.getState().setSearch(topLevelContext.code, '');
+        if (searchResult.action != 2) return;
+
+        // Back returns to the previous search, like Habbo; without history it goes to the tab root.
+        const store = useNavigatorUiStore.getState();
+
+        if (store.searchHistoryOffset > 0) store.goBack();
+        else if (topLevelContext) store.setSearch(topLevelContext.code, '');
     };
 
     const isTileMode = displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS;

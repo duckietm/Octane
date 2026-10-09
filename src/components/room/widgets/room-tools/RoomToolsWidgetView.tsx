@@ -1,6 +1,6 @@
-import { CreateLinkEvent, GetGuestRoomResultEvent, GetRoomEngine, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
+import { AddLinkEventTracker, CreateLinkEvent, GetGuestRoomResultEvent, ILinkEventTracker, GetRoomEngine, RateFlatMessageComposer, RemoveLinkEventTracker, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useEffectEvent, useRef, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, SendMessageComposer, SetLocalStorage, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
 import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
@@ -13,6 +13,19 @@ interface RoomHistoryEntry {
     roomId: number;
     roomName: string;
 }
+
+interface RoomEnterInfo {
+    roomId: number;
+    roomName: string;
+    ownerLine: string;
+    tags: string[];
+}
+
+const ROOM_INFO_TAG_MAX = 16;
+const ROOM_INFO_TAG_COUNT = 2;
+
+// Habbo shortens tags on the entry card to 16 characters.
+const trimRoomTag = (tag: string) => (tag.length > ROOM_INFO_TAG_MAX ? `${tag.slice(0, ROOM_INFO_TAG_MAX)}...` : tag);
 
 const ROOM_HISTORY_KEY = 'nitro.room.history';
 const ROOM_HISTORY_MAX = 10;
@@ -65,6 +78,9 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
     const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
     const [roomHistory, setRoomHistory] = useState<RoomHistoryEntry[]>([]);
     const [plugins, setPlugins] = useState<IOctanePlugin[]>([]);
+    const [roomEnterInfo, setRoomEnterInfo] = useState<RoomEnterInfo>(null);
+    const [isRoomInfoHovered, setIsRoomInfoHovered] = useState(false);
+    const roomInfoTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
     const { navigatorData } = useNavigatorData();
     const { hasWiredAchievements } = useAchievements();
     const { roomSession = null } = useRoom();
@@ -183,7 +199,36 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
         if (!parser.roomEnter || parser.data.roomId !== roomSession.roomId) return;
 
         onChangeRoomHistory(parser.data.roomId, parser.data.roomName);
+
+        if (!GetConfigurationValue<boolean>('room.enter.info.enabled', true)) return;
+
+        const data = parser.data;
+
+        setRoomEnterInfo({
+            roomId: data.roomId,
+            roomName: data.roomName,
+            ownerLine: data.showOwner
+                ? `${localizeWithFallback('room.tool.room.owner.prefix', 'by')} ${data.ownerName}`
+                : localizeWithFallback('room.tool.public.room', 'Public room'),
+            tags: (data.tags ?? []).filter((tag) => !!tag).slice(0, ROOM_INFO_TAG_COUNT)
+        });
     });
+
+    // The entry card hides itself after a while; hovering keeps it open.
+    useEffect(() => {
+        if (!roomEnterInfo || isRoomInfoHovered) return;
+
+        const delay = GetConfigurationValue<number>('room.enter.info.collapse.delay', 5000);
+
+        roomInfoTimerRef.current = setTimeout(() => setRoomEnterInfo(null), Math.max(1000, delay));
+
+        return () => clearTimeout(roomInfoTimerRef.current);
+    }, [roomEnterInfo, isRoomInfoHovered]);
+
+    const searchRoomTag = (tag: string) => {
+        setRoomEnterInfo(null);
+        CreateLinkEvent(`navigator/tag/${tag}`);
+    };
 
     useEffect(() => {
         setRoomHistory(readRoomHistory());
@@ -193,6 +238,24 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
         setHasLikedRoom(false);
         updateZoomScale();
     }, [roomSession?.roomId]);
+
+    // Ctrl + mouse wheel over the room zooms through the same steps as the buttons.
+    const onZoomLink = useEffectEvent((action: string) => handleToolClick(action));
+
+    useEffect(() => {
+        const linkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) => {
+                const action = url.split('/')[1];
+
+                if (action === 'zoom_in' || action === 'zoom_out') onZoomLink(action);
+            },
+            eventUrlPrefix: 'room-tools/'
+        };
+
+        AddLinkEventTracker(linkTracker);
+
+        return () => RemoveLinkEventTracker(linkTracker);
+    }, []);
 
     // The renderer can be zoomed from outside this toolbar (keyboard shortcuts,
     // other widgets), so resync the displayed level whenever the engine reports it.
@@ -270,6 +333,41 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                     </div>
                 </div>
             )}
+            <AnimatePresence>
+                {roomEnterInfo && roomEnterInfo.roomId === roomSession?.roomId && !isOpenHistory && (
+                    <motion.div
+                        key={roomEnterInfo.roomId}
+                        initial={{ x: -320, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -320, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="octane-room-tools-info octane-room-tools-info--enter"
+                        onClick={() => setRoomEnterInfo(null)}
+                        onMouseEnter={() => setIsRoomInfoHovered(true)}
+                        onMouseLeave={() => setIsRoomInfoHovered(false)}
+                    >
+                        <Text bold variant="white" className="block truncate text-[14px]">{roomEnterInfo.roomName}</Text>
+                        <Text small className="block truncate text-[#999999]">{roomEnterInfo.ownerLine}</Text>
+                        {roomEnterInfo.tags.length > 0 && (
+                            <div className="flex gap-2 mt-1">
+                                {roomEnterInfo.tags.map((tag) => (
+                                    <button
+                                        key={tag}
+                                        className="text-[12px] text-[#1b79ab] hover:text-[#47a8e6] bg-transparent border-0 p-0 cursor-pointer"
+                                        type="button"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            searchRoomTag(tag);
+                                        }}
+                                    >
+                                        #{trimRoomTag(tag)}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <AnimatePresence>
                 {isOpenHistory && isToolsOpen && (
                     <motion.div
