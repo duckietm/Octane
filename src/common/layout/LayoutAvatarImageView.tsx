@@ -16,6 +16,8 @@ export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement> {
     direction?: number;
     scale?: number;
     fit?: boolean;
+    /** With `fit`: Habbo's small avatar shown at its own pixel size, for tiny slots like the wardrobe. */
+    small?: boolean;
     compactHead?: boolean;
     compactHeadSize?: number;
     compactHeadPadding?: number;
@@ -31,6 +33,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
         direction = 0,
         scale = 1,
         fit = false,
+        small = false,
         compactHead = false,
         compactHeadSize = 22,
         compactHeadPadding = 1,
@@ -93,7 +96,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
         if (!isReady) return;
 
         const requestId = ++requestIdRef.current;
-        const figureKey = [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, airMeMenu, nativeCroppedHead].join('-');
+        const figureKey = [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, small, airMeMenu, nativeCroppedHead].join('-');
 
         const applyImage = (image: Blob | string) => {
             if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
@@ -109,7 +112,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
             const resetFigure = async (_figure: string) => {
                 if (isDisposed.current || requestIdRef.current !== requestId) return;
 
-                const avatarImage = GetAvatarRenderManager().createAvatarImage(_figure, AvatarScaleType.LARGE, gender, {
+                const avatarImage = GetAvatarRenderManager().createAvatarImage(_figure, (small && fit) ? AvatarScaleType.SMALL : AvatarScaleType.LARGE, gender, {
                     resetFigure: (figure: string) => resetFigure(figure),
                     dispose: null,
                     disposed: false
@@ -155,7 +158,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
 
             resetFigure(figure);
         }
-    }, [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, airMeMenu, nativeCroppedHead, isReady]);
+    }, [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, small, airMeMenu, nativeCroppedHead, isReady]);
 
     useEffect(() => {
         isDisposed.current = false;
@@ -189,7 +192,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
                     src={avatarUrl}
                     alt=""
                     draggable={false}
-                    className="absolute inset-0 w-full h-full object-contain"
+                    className={`absolute inset-0 w-full h-full ${small ? 'object-none object-bottom' : 'object-contain'}`}
                     style={{ imageRendering: PIXEL_ART_RENDERING }}
                 />
             )}

@@ -1,5 +1,6 @@
 import {
     AvatarEffectActivatedComposer,
+    AvatarEffectSelectedComposer,
     AvatarEffectActivatedEvent,
     AvatarEffectAddedEvent,
     AvatarEffectExpiredEvent,
@@ -106,10 +107,20 @@ const useAvatarEffectsState = () => {
         setActiveEffectType(event.getParser().type);
     });
 
+    // "Activated" only starts an owned effect's timer; "selected" is what puts it on the avatar.
     const activateEffect = useCallback((type: number) => {
         setActiveEffectType(type);
+
+        if (type <= 0) {
+            SendMessageComposer(new AvatarEffectSelectedComposer(-1));
+
+            return;
+        }
+
         SendMessageComposer(new AvatarEffectActivatedComposer(type));
-    }, []);
+
+        if (effects.some(effect => effect.type === type)) SendMessageComposer(new AvatarEffectSelectedComposer(type));
+    }, [ effects ]);
 
     const isOwned = useCallback((type: number) => effects.some(effect => effect.type === type), [ effects ]);
 

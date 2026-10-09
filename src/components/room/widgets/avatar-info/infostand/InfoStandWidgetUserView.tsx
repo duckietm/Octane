@@ -13,7 +13,7 @@ import { AvatarInfoUser, CloneObject, GetConfigurationValue, GetGroupInformation
 import homeIcon from '../../../../../assets/images/infostand/home-icon.png';
 import pencilIcon from '../../../../../assets/images/infostand/pencil-icon.png';
 import { Base, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../../../../common';
-import { useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
+import { useIsUserBlocked, useMessageEvent, useOctaneEvent, useRoom } from '../../../../../hooks';
 import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -28,6 +28,7 @@ interface InfoStandWidgetUserViewProps {
 export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props) => {
     const { avatarInfo = null, setAvatarInfo = null, onClose = null } = props;
     const [motto, setMotto] = useState<string>(null);
+    const isBlocked = useIsUserBlocked(avatarInfo?.webID ?? 0);
     const [isEditingMotto, setIsEditingMotto] = useState(false);
     const [relationships, setRelationships] = useState<RelationshipStatusInfoMessageParser>(null);
     const [backgroundId, setBackgroundId] = useState<number>(null);
@@ -195,6 +196,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             username={avatarInfo.name}
                         />
                     </button>
+                    {isBlocked && <span className="text-[11px] italic opacity-80">{localizeWithFallback('infostand.blocked_user', 'Blocked user')}</span>}
                 </div>
                 <div className="octane-infostand__rule" />
                 <div className="octane-infostand__figure-row">

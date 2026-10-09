@@ -63,7 +63,8 @@ export const AvatarEditorView: FC<{}> = (props) => {
         getFigureStringWithFace,
         gender,
         randomizeCurrentFigure = null,
-        getFigureString = null
+        getFigureString = null,
+        getValidFigureString = null
     } = useAvatarEditor();
 
     const isPetsOpen = activeModelKey === AvatarEditorFigureCategory.PETS;
@@ -96,7 +97,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
                 if (clothingChangeData) {
                     SendMessageComposer(new SetClothingChangeDataMessageComposer(clothingChangeData.objectId, gender, getFigureString));
                 } else {
-                    SendMessageComposer(new UserFigureComposer(gender, getFigureString));
+                    SendMessageComposer(new UserFigureComposer(gender, getValidFigureString));
                 }
                 setIsVisible(false);
                 return;

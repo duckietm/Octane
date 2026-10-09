@@ -465,6 +465,7 @@ export class HabboWebTools extends StubClass {
 // codebase ("did the SUT call SendMessageComposer(new FooComposer(args))").
 export class AddFavouriteRoomMessageComposer extends StubClass {}
 export class AvatarEffectActivatedComposer extends StubClass {}
+export class AvatarEffectSelectedComposer extends StubClass {}
 export class DeleteFavouriteRoomMessageComposer extends StubClass {}
 export class FollowFriendMessageComposer extends StubClass {}
 export class GetUserEventCatsMessageComposer extends StubClass {}

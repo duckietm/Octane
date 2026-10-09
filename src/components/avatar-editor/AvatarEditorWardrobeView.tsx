@@ -112,7 +112,7 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
                                         onClick={() => wearFigureAtIndex(index)}
                                     >
                                         {figureContainer ? (
-                                            <LayoutAvatarImageView direction={4} figure={figureString} gender={slotGender} fit />
+                                            <LayoutAvatarImageView direction={4} figure={figureString} gender={slotGender} fit small />
                                         ) : (
                                             <img src={emptySlotSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-empty" />
                                         )}

@@ -1027,10 +1027,11 @@
 .octane-avatar-editor-wardrobe-slot-figure {
     appearance: none;
     position: absolute;
-    left: 30px;
-    top: 4px;
-    width: 22px;
-    height: 48px;
+    /* Wider and taller than the shade (centred on it) so carried pets and tall hats fit unscaled. */
+    left: 26px;
+    top: 0;
+    width: 30px;
+    height: 53px;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -1047,15 +1048,15 @@
 .octane-avatar-editor-wardrobe-slot-figure .avatar-image-fit {
     position: absolute !important;
     inset: 0 !important;
-    width: 22px !important;
-    height: 48px !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .octane-avatar-editor-wardrobe-empty {
     display: block;
     width: 17px;
     height: 43px;
-    margin: 2px auto 0;
+    margin: 6px auto 0;
     image-rendering: var(--octane-pixel-art, pixelated);
     pointer-events: none;
 }

@@ -24,6 +24,7 @@ import {
     isHousekeepingEnabled,
     getTradeBlockedKey,
     LocalizeText,
+    localizeWithFallback,
     MessengerFriend,
     NotificationAlertType,
     ReportType,
@@ -36,6 +37,7 @@ import {
     useFriends,
     useHasPermission,
     useHelp,
+    useIsUserBlocked,
     useIsUserIgnored,
     useMessageEvent,
     useNotification,
@@ -79,6 +81,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
     // scope here) so useSyncExternalStore installs against the real
     // React dispatcher.
     const isIgnored = useIsUserIgnored(avatarInfo.name);
+    const isBlocked = useIsUserBlocked(avatarInfo.webID);
     // Reactive controller level: starts from the cached value at popup
     // open time, then updates from FlatControllerAdded/Removed events
     // and from optimistic clicks so the Give/Remove Rights buttons flip
@@ -324,6 +327,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = (
                 onClick={(event) => GetUserProfile(avatarInfo.webID)}
                 dangerouslySetInnerHTML={{ __html: SanitizeHtml(`${avatarInfo.name}`) }}
             ></ContextMenuHeaderView>
+            {isBlocked && <div className="px-2 pb-1 text-[11px] italic opacity-80">{localizeWithFallback('infostand.blocked_user', 'Blocked user')}</div>}
             {mode === MODE_NORMAL && (
                 <>
                     {canRequestFriend(avatarInfo.webID) && (
