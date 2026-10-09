@@ -1,3 +1,6 @@
+/* The room info window of the AIR client (iro_room_details_framed): 236 px wide, the content
+   is the frame 3 surface (#e9e9e1, measured on the AIR client), text is Ubuntu 12 px with
+   the labels in #777777, and the icons sit at x = 163, 185 and 206 of the 230 px content. */
 .octane-room-info {
     width: min(236px, calc(100vw - 16px));
 }
@@ -6,35 +9,67 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    padding: 8px 8px 10px !important;
+    padding: 0 5px 10px !important;
     background: #e9e9e1 !important;
     color: #111;
-}
-
-.octane-room-info__heading {
-    display: flex;
-    min-height: 17px;
-    align-items: center;
-    justify-content: space-between;
     font-size: 12px;
 }
 
-.octane-room-info__home {
-    width: 13px;
-    height: 12px;
-    border: 0;
-    background: url("@/assets/images/navigator/air/icon-home-no.png") center / contain no-repeat;
-    image-rendering: var(--octane-pixel-art, pixelated);
-    cursor: pointer;
+.octane-room-info__heading {
+    position: relative;
+    min-height: 20px;
+    margin: 0 -5px;
+    padding: 3px 0 0 5px;
 }
 
-.octane-room-info__home.is-home {
-    background-image: url("@/assets/images/navigator/air/icon-home-yes.png");
+.octane-room-info__name {
+    display: block;
+    width: 153px;
+    font-size: 12px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.octane-room-info__icon {
+    position: absolute;
+    top: 1px;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    line-height: 0;
+}
+
+.octane-room-info__icon img {
+    display: block;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-room-info__icon--rights {
+    left: 163px;
+}
+
+.octane-room-info__icon--home {
+    left: 185px;
+}
+
+.octane-room-info__icon--favourite {
+    left: 206px;
 }
 
 .octane-room-info__meta {
-    min-height: 14px;
-    font-size: 11px;
+    min-height: 16px;
+    font-size: 12px;
+}
+
+.octane-room-info__label {
+    color: #777777;
+    font-weight: 700;
+}
+
+.octane-room-info__value {
+    font-weight: 400;
 }
 
 .octane-room-info__meta .user-profile-icon {
@@ -45,8 +80,8 @@
 .octane-room-info__description {
     min-height: 0;
     overflow-wrap: anywhere;
-    font-size: 11px;
-    line-height: 13px;
+    font-size: 12px;
+    line-height: 14px;
 }
 
 .octane-room-info__thumbnail {
@@ -76,7 +111,7 @@
     min-height: 17px;
     margin: 1px 0 2px;
     color: #111;
-    font-size: 11px;
+    font-size: 12px;
     cursor: pointer;
 }
 
@@ -97,21 +132,96 @@
     margin-top: 3px;
 }
 
-.octane-room-info__action {
+/* The buttons of the official window: the illumina light button (an 11 x 28 pill cut in
+   nine parts, 6 / 4 px wide and 8 px high at the corners) and its pressed state. */
+.octane-room-info__action,
+.octane-room-info__report {
     box-sizing: border-box;
+    cursor: pointer;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 8px 4px 8px 6px;
+    border-image: url('../../assets/images/habbo-skin/slices/button-illumina-default.png') 8 4 8 6 fill / 8px 4px 8px 6px stretch;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: #151515;
+    font-family: UbuntuRegular, Ubuntu, sans-serif;
+    text-shadow: none;
+}
+
+.octane-room-info__action:hover,
+.octane-room-info__report:hover {
+    filter: brightness(1.06);
+}
+
+.octane-room-info__action:active,
+.octane-room-info__report:active {
+    border-image-source: url('../../assets/images/habbo-skin/slices/button-illumina-pressed.png');
+    filter: none;
+}
+
+.octane-room-info__action {
     width: 220px;
     max-width: 100%;
-    min-height: 29px;
     height: 29px;
-    padding: 0 8px;
-    font-family: UbuntuRegular, Ubuntu, sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 29px;
+    padding: 0 4px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 13px;
     text-align: center;
 }
 
-.octane-room-info__action.habbo-btn-primary,
-.octane-room-info__action.habbo-btn-danger {
-    border-radius: 0 !important;
+/* The report button of the official layout: a 218 x 55 container button with the flag in a
+   39 x 25 box at (11, 16), a divider at (47, 17) and the label at (56, 18). The positions
+   are measured from the button edge, so they are shifted by the 6 / 8 px skin border. */
+.octane-room-info__report {
+    position: relative;
+    align-self: center;
+    width: 218px;
+    max-width: 100%;
+    height: 55px;
+    margin: 4px 0 0;
+    padding: 0;
+    text-align: left;
+}
+
+.octane-room-info__report-icon {
+    position: absolute;
+    top: 8px;
+    left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 39px;
+    height: 25px;
+}
+
+.octane-room-info__report-icon img {
+    width: 23px;
+    height: 22px;
+}
+
+.octane-room-info__report-divider {
+    position: absolute;
+    top: 9px;
+    left: 43px;
+    width: 2px;
+    height: 20px;
+    background: #9b9b9b;
+    box-shadow: 1px 0 #fff;
+}
+
+.octane-room-info__report-label {
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    width: 151px;
+    height: 24px;
+    padding-right: 20px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    text-align: left;
 }
