@@ -1137,6 +1137,11 @@
     // Soundboard
     // ------------------------------------------------------------------------
     "soundboard.title": "Soundboard",
+    "soundboard.category.favorites": "Preferiti",
+    "soundboard.cooldown": "Attesa prima del prossimo suono",
+    "soundboard.pagination.page": "Pagina %page%",
+    "soundboard.hint": "Tasti 1-0 per suonare, frecce per cambiare pagina, clic destro per i preferiti",
+    "soundboard.feed.played": "ha riprodotto %sound%",
     "soundboard.empty": "Nessun suono disponibile",
     "soundboard.search": "Cerca suoni",
     "soundboard.categories": "Categorie suoni",

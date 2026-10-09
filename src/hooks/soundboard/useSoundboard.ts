@@ -16,6 +16,8 @@ import { DispatchUiEvent, GetConfigurationValue, LocalizeText, NotificationBubbl
 import { SoundboardRoomMessageEvent } from '../../events';
 import { useMessageEvent } from '../events';
 import { useNotificationActions } from '../notification';
+import { loadFavoriteIds, saveFavoriteIds, toggleFavoriteId } from './soundboardFavorites';
+import { useSoundboardFeedStore } from './soundboardFeedStore';
 import { normalizeLegacySoundboardCatalog } from './soundboardLegacyCatalog';
 import {
     DisplaySoundboardSound,
@@ -38,6 +40,8 @@ export const useSoundboardState = () => {
     const [layout, setLayout] = useState<SoundboardLayout>(() => normalizeSoundboardLayout(null));
     const [recentSoundIds, setRecentSoundIds] = useState<number[]>([]);
     const [cooldownRemainingSeconds, setCooldownRemainingSeconds] = useState(0);
+    const [cooldownTotalSeconds, setCooldownTotalSeconds] = useState(0);
+    const [favoriteIds, setFavoriteIds] = useState<number[]>(loadFavoriteIds);
     const cooldownSecondsRef = useRef(0);
     const cooldownUntilRef = useRef(0);
     const legacyLoadStartedRef = useRef(false);
@@ -70,6 +74,7 @@ export const useSoundboardState = () => {
                 const seconds = Math.max(1, parser.remainingSeconds);
                 const now = Date.now();
                 cooldownUntilRef.current = now + seconds * 1_000;
+                setCooldownTotalSeconds(seconds);
                 setCooldownRemainingSeconds(getRemainingCooldownSeconds(cooldownUntilRef.current, now));
                 showCooldownBubble(seconds);
                 return;
@@ -92,12 +97,14 @@ export const useSoundboardState = () => {
                     if (!played) showSingleBubble(LocalizeText('soundboard.error.audio'), NotificationBubbleType.SOUNDBOARD);
                 });
             setRecentSoundIds((current) => pushRecentSound(current, parser.soundId));
+            useSoundboardFeedStore.getState().push({ username: parser.username, soundName: parser.soundName, soundId: parser.soundId });
             DispatchUiEvent(new SoundboardRoomMessageEvent(parser.username, parser.soundName, parser.actorUserId, parser.actorRoomIndex));
 
             const ownUserId = GetSessionDataManager()?.getUserDataSnapshot?.().userId || -1;
             if (shouldStartOwnCooldown(parser.actorUserId, ownUserId, cooldownSecondsRef.current)) {
                 const now = Date.now();
                 cooldownUntilRef.current = now + cooldownSecondsRef.current * 1_000;
+                setCooldownTotalSeconds(cooldownSecondsRef.current);
                 setCooldownRemainingSeconds(getRemainingCooldownSeconds(cooldownUntilRef.current, now));
             }
         },
@@ -199,6 +206,14 @@ export const useSoundboardState = () => {
         [showCooldownBubble, showSingleBubble]
     );
 
+    const toggleFavorite = useCallback((soundId: number) => {
+        setFavoriteIds((current) => {
+            const next = toggleFavoriteId(current, soundId);
+            saveFavoriteIds(next);
+            return next;
+        });
+    }, []);
+
     const refresh = useCallback(() => {
         SendMessageComposer(new SoundboardRequestSettingsComposer());
     }, []);
@@ -217,13 +232,29 @@ export const useSoundboardState = () => {
         setLayout(normalizeSoundboardLayout(null));
         setRecentSoundIds([]);
         setCooldownRemainingSeconds(0);
+        setCooldownTotalSeconds(0);
+        useSoundboardFeedStore.getState().clear();
         cooldownUntilRef.current = 0;
         cooldownSecondsRef.current = 0;
         legacyLoadStartedRef.current = false;
         setSoundboardRoomEnabled(false);
     }, []);
 
-    return { enabled, sounds, categories, recentSoundIds, cooldownRemainingSeconds, isCoolingDown, play, refresh, setRoomEnabled, reset };
+    return {
+        enabled,
+        sounds,
+        categories,
+        recentSoundIds,
+        favoriteIds,
+        cooldownRemainingSeconds,
+        cooldownTotalSeconds,
+        isCoolingDown,
+        play,
+        toggleFavorite,
+        refresh,
+        setRoomEnabled,
+        reset
+    };
 };
 
 export const useSoundboard = () => useSharedHook(useSoundboardState);
