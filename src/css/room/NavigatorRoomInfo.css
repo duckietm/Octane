@@ -97,18 +97,16 @@
     margin-top: 3px;
 }
 
-/* The buttons of the official room info window: the grey skin button (220 x 29, style 3)
-   and, for the report, the wide container button with the flag, a divider and the label. */
+/* The buttons of the room info window: grey with a darker lower band, and the report as a
+   narrower button with the flag in a white circle. */
 .octane-room-info__action,
 .octane-room-info__report {
     box-sizing: border-box;
     cursor: pointer;
-    border: 3px solid transparent;
-    border-image-source: var(--habbo-skin-button);
-    border-image-slice: 3 fill;
-    border-image-width: 3px;
-    border-radius: 0;
-    background: transparent;
+    border: 1px solid #6b6b6b;
+    border-radius: 4px;
+    background: linear-gradient(#efefef 0 58%, #d3d3d3 58% 100%);
+    box-shadow: inset 0 1px #fff;
     color: #151515;
     font-family: UbuntuRegular, Ubuntu, sans-serif;
     text-shadow: none;
@@ -116,12 +114,13 @@
 
 .octane-room-info__action:hover,
 .octane-room-info__report:hover {
-    border-image-source: var(--habbo-skin-button-hover);
+    background: linear-gradient(#fafafa 0 58%, #dedede 58% 100%);
 }
 
 .octane-room-info__action:active,
 .octane-room-info__report:active {
-    border-image-source: var(--habbo-skin-button-pressed);
+    background: linear-gradient(#cfcfcf 0 58%, #bdbdbd 58% 100%);
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 25%);
 }
 
 .octane-room-info__action {
@@ -130,41 +129,46 @@
     min-height: 29px;
     height: 29px;
     padding: 0 8px;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 23px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 27px;
     text-align: center;
 }
 
 .octane-room-info__report {
     display: flex;
     align-items: center;
-    width: 220px;
+    align-self: center;
+    width: 196px;
     max-width: 100%;
-    height: 55px;
-    padding: 0 12px 0 8px;
-    gap: 10px;
-    text-align: left;
+    height: 31px;
+    margin: 6px 0 3px;
+    padding: 0 10px 0 8px;
+    gap: 9px;
 }
 
-.octane-room-info__report img {
+.octane-room-info__report-icon {
+    display: flex;
     flex: none;
-    width: 23px;
-    height: 22px;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #9a9a9a;
+    border-radius: 50%;
+    background: #fff;
 }
 
-.octane-room-info__report-divider {
-    flex: none;
-    align-self: stretch;
-    width: 1px;
-    margin: 12px 0;
-    background: #8a8a8a;
-    box-shadow: 1px 0 #fff;
+.octane-room-info__report-icon img {
+    width: 12px;
+    height: 12px;
+    object-fit: contain;
 }
 
 .octane-room-info__report-label {
     flex: 1;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1;
+    text-align: center;
 }

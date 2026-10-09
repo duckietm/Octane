@@ -236,8 +236,9 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                         </button>
                     )}
                     <button type="button" className="octane-room-info__report" onClick={() => processAction('report_room')}>
-                        <img src={reportFlagIcon} alt="" />
-                        <span className="octane-room-info__report-divider" aria-hidden="true" />
+                        <span className="octane-room-info__report-icon" aria-hidden="true">
+                            <img src={reportFlagIcon} alt="" />
+                        </span>
                         <span className="octane-room-info__report-label">{LocalizeText('help.emergency.main.report.room')}</span>
                     </button>
                     {hasPermission('settings') && (
