@@ -83,4 +83,15 @@ for(const [ source, file ] of publicLoaderAssets)
     }
 }
 
-writeFileSync(join(dist, 'index.html'), `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script></head><body><div id="root"></div><script src="configuration/bootstrap.js?v=${ buildVersion }"></script></body></html>`);
+// No inline or injected scripts and event handlers, no plugins, no <base> hijack. The loader runs the
+// client from blob: modules, Pixi builds shader helpers with new Function ('unsafe-eval') and third-party
+// scripts (Turnstile, ads) load over https. Build with OCTANE_CSP=off to leave it out.
+const contentSecurityPolicy = [
+    "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https: blob:",
+    "worker-src 'self' blob:",
+    "object-src 'none'",
+    "base-uri 'self'"
+].join('; ');
+const cspMeta = (process.env.OCTANE_CSP === 'off') ? '' : `<meta http-equiv="Content-Security-Policy" content="${ contentSecurityPolicy }">`;
+
+writeFileSync(join(dist, 'index.html'), `<!DOCTYPE html><html><head><meta charset="utf-8">${ cspMeta }<meta name="viewport" content="width=device-width, initial-scale=1"><script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script></head><body><div id="root"></div><script src="configuration/bootstrap.js?v=${ buildVersion }"></script></body></html>`);
