@@ -1,98 +1,40 @@
-import { RequestBadgesComposer } from '@octane/renderer';
-import { FC, useEffect } from 'react';
-import {
-    AchievementNotificationBubbleItem,
-    CreateLinkEvent,
-    GetConfigurationValue,
-    LocalizeText,
-    NotificationBubbleItem,
-    SendMessageComposer
-} from '../../../../api';
+import { FC } from 'react';
+import { AchievementNotificationBubbleItem, CreateLinkEvent, GetConfigurationValue, LocalizeText, localizeWithFallback, NotificationBubbleItem } from '../../../../api';
 import { badgeRarityColorToCss, getBadgeRarityDisplayColor, getBadgeRarityFromPacket, getBadgeRarityLocalizationKey, isBadgeRarityStandaloneTier } from '../../../../api/badges/badgeRarity';
-import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';
-import { useInventoryBadges } from '../../../../hooks';
+import { LayoutNotificationBubbleViewProps } from '../../../../common';
+import { NotificationItemLayoutView } from './NotificationItemLayoutView';
 
 export interface NotificationBadgeReceivedBubbleViewProps extends LayoutNotificationBubbleViewProps {
     item: NotificationBubbleItem;
 }
 
+// Official badge_received / achievement items: icon and one text, the click opens the link.
 export const NotificationBadgeReceivedBubbleView: FC<NotificationBadgeReceivedBubbleViewProps> = (props) => {
     const { item = null, onClose = null, ...rest } = props;
-    const { activeBadgeCodes = [], toggleBadge = null, isWearingBadge = null, canWearBadges = null } = useInventoryBadges();
-
-    useEffect(() => {
-        if (activeBadgeCodes.length === 0) SendMessageComposer(new RequestBadgesComposer());
-    }, [activeBadgeCodes.length]);
 
     const isAchievement = item instanceof AchievementNotificationBubbleItem;
+    // A badge item keeps its code in linkUrl.
     const badgeCode = isAchievement ? item.badgeCode : (item?.linkUrl ?? null);
-    const isLoaded = activeBadgeCodes.length > 0;
-    const alreadyWearing = !!badgeCode && !!isWearingBadge && isWearingBadge(badgeCode);
-    const slotsAvailable = !!canWearBadges && canWearBadges();
-    const canShowWearButton = !!badgeCode && isLoaded && !alreadyWearing && slotsAvailable;
     const uncommonEnabled = GetConfigurationValue<boolean>('badge_rarity.uncommon', false) === true;
     const rarity = !isAchievement && badgeCode ? getBadgeRarityFromPacket(badgeCode) : null;
     const showRarity = !!rarity && isBadgeRarityStandaloneTier(rarity.tier, uncommonEnabled);
 
-    const handleWear = (event: React.MouseEvent) => {
-        event.stopPropagation();
+    const text = isAchievement
+        ? item.message
+        : item.senderName
+          ? `${LocalizeText('notifications.text.received.badge', ['user_name'], [item.senderName])} ${item.message}`
+          : localizeWithFallback('notification.new.badge', `You received a new badge: ${item.message}`, ['badge_name'], [item.message]);
 
-        if (canShowWearButton && toggleBadge) toggleBadge(badgeCode);
-
-        if (onClose) onClose();
-    };
-
-    const handleDismiss = (event: React.MouseEvent) => {
-        event.stopPropagation();
-        if (onClose) onClose();
-    };
+    const openLink = () => CreateLinkEvent(isAchievement ? item.linkUrl : 'inventory/show/badges');
 
     return (
-        <LayoutNotificationBubbleView className="flex-col" onClose={onClose} {...rest}>
-            <div
-                onClick={(event) => {
-                    event.stopPropagation();
-                    if (isAchievement) {
-                        CreateLinkEvent(item.linkUrl);
-                        onClose();
-                    }
-                }}
-            >
-                <Flex alignItems="center" gap={2} className="mb-2">
-                    <Flex center className="w-[50px] h-[50px] shrink-0">
-                        {item.iconUrl && <img alt="" className="no-select" src={item.iconUrl} />}
-                    </Flex>
-                    <Flex column gap={0}>
-                        <Text bold variant="white">
-                            {isAchievement
-                                ? item.message
-                                : item.senderName
-                                  ? LocalizeText('notifications.text.received.badge', ['user_name'], [item.senderName])
-                                  : LocalizeText('prereg.reward.you.received')}
-                        </Text>
-                        {!isAchievement && (
-                            <Text variant="white" small>
-                                {item.message}
-                            </Text>
-                        )}
-                        {showRarity && (
-                            <Text small bold style={{ color: badgeRarityColorToCss(getBadgeRarityDisplayColor(rarity.tier, uncommonEnabled)) }}>
-                                {LocalizeText(getBadgeRarityLocalizationKey(rarity.tier, uncommonEnabled))}
-                            </Text>
-                        )}
-                    </Flex>
-                </Flex>
-                <Flex alignItems="center" justifyContent="end" gap={2}>
-                    {canShowWearButton && (
-                        <button className="btn btn-success w-full btn-sm" type="button" onClick={handleWear}>
-                            {LocalizeText('inventory.badges.wearbadge')}
-                        </button>
-                    )}
-                    <span className="underline cursor-pointer text-nowrap" onClick={handleDismiss}>
-                        {LocalizeText('notifications.button.later')}
-                    </span>
-                </Flex>
-            </div>
-        </LayoutNotificationBubbleView>
+        <NotificationItemLayoutView iconUrl={item.iconUrl} onClick={openLink} onClose={onClose} {...rest}>
+            <span>{text}</span>
+            {showRarity && (
+                <span className="octane-notification-item__rarity" style={{ color: badgeRarityColorToCss(getBadgeRarityDisplayColor(rarity.tier, uncommonEnabled)) }}>
+                    {LocalizeText(getBadgeRarityLocalizationKey(rarity.tier, uncommonEnabled))}
+                </span>
+            )}
+        </NotificationItemLayoutView>
     );
 };

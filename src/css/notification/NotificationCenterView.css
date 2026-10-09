@@ -1028,3 +1028,63 @@
         transform: scaleX(0);
     }
 }
+
+/* Official layout_notification on the "black borderless" border skin (style 1). */
+@font-face {
+    font-family: Volter;
+    font-weight: 700;
+    font-style: normal;
+    src: url("@/assets/webfonts/Volter-b.ttf") format("truetype");
+}
+
+.octane-swf-notification-bubble.octane-notification-item {
+    width: 190px;
+    max-width: 190px;
+    min-height: 66px;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 2px !important;
+    border: 6px solid transparent;
+    border-image: url("@/assets/images/notifications/notification_border_black.png") 6 fill / 6px stretch;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: Volter, Ubuntu, sans-serif;
+    font-size: 9px !important;
+    font-weight: 700;
+    line-height: 11px;
+    text-shadow: none;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-notification-item__icon {
+    display: flex;
+    flex: 0 0 50px;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.octane-notification-item__icon img {
+    max-width: 50px !important;
+    max-height: 50px !important;
+    object-fit: contain;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-notification-item__text {
+    display: flex;
+    flex-direction: column;
+    width: 116px;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.octane-notification-item__rarity {
+    margin-top: 2px;
+}

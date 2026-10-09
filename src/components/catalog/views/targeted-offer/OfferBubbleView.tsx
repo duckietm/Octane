@@ -8,7 +8,7 @@ export const OfferBubbleView = (props: { offer: TargetedOfferData; secondsLeft: 
     if (!offer) return null;
 
     return (
-        <LayoutNotificationBubbleView fadesOut={false} gap={2} onClick={() => onOpen()} onClose={null}>
+        <LayoutNotificationBubbleView fadesOut={false} closeOnClick={false} gap={2} onClick={() => onOpen()} onClose={null}>
             <div className="octane-targeted-offer-icon" style={{ backgroundImage: `url(${GetConfigurationValue('image.library.url') + offer.iconImageUrl})` }} />
             <div className="flex flex-col">
                 <Text className="ubuntu-bold" variant="light">
