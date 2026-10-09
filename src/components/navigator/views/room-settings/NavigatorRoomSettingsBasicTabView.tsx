@@ -27,7 +27,7 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
     const [youtubeEnabled, setYoutubeEnabled] = useState(getYoutubeRoomEnabled());
     const { showConfirm = null } = useNotification();
     const { categories } = useNavigatorData();
-    const { enabled: soundboardEnabled, setRoomEnabled: setSoundboardEnabled } = useSoundboard();
+    const { roomMode: soundboardRoomMode, setRoomMode: setSoundboardRoomMode } = useSoundboard();
 
     useMessageEvent<YouTubeRoomSettingsEvent>(YouTubeRoomSettingsEvent, (event) => {
         setYoutubeEnabled(event.getParser().youtubeEnabled);
@@ -243,16 +243,19 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                 />
                 <Text>{LocalizeText('widget.room.youtube.shared')}</Text>
             </Flex>
-            <Flex alignItems="center" gap={1}>
-                <input
+            <Column gap={1}>
+                <Text bold>{LocalizeText('soundboard.room.allow')}</Text>
+                <select
                     aria-label={LocalizeText('soundboard.room.allow')}
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={soundboardEnabled}
-                    onChange={(event) => setSoundboardEnabled(event.target.checked)}
-                />
-                <Text>{LocalizeText('soundboard.room.allow')}</Text>
-            </Flex>
+                    className="form-select form-select-sm"
+                    value={soundboardRoomMode}
+                    onChange={(event) => setSoundboardRoomMode(Number(event.target.value))}
+                >
+                    <option value="0">{LocalizeText('soundboard.room.mode.off')}</option>
+                    <option value="1">{LocalizeText('soundboard.room.mode.everyone')}</option>
+                    <option value="2">{LocalizeText('soundboard.room.mode.rights')}</option>
+                </select>
+            </Column>
             <Flex pointer alignItems="center" justifyContent="center" gap={1} onClick={deleteRoom}>
                 <FaTimes className="fa-icon shrink-0 text-[#a81a12]" />
                 <Text variant="danger" underline bold className="whitespace-nowrap">

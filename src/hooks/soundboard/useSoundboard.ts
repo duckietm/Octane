@@ -33,10 +33,22 @@ import { getRemainingCooldownSeconds, shouldStartOwnCooldown } from './soundboar
 import { resolveSoundboardSoundUrl } from './soundboardUrl';
 import { useSoundboardManifest } from './useSoundboardManifest';
 
+const roomModeNoticeKeys: Record<number, string> = {
+    0: 'soundboard.notice.mode.off',
+    1: 'soundboard.notice.mode.everyone',
+    2: 'soundboard.notice.mode.rights'
+};
+
+const deniedReasonText: Record<number, string> = {
+    2: 'soundboard.error.room_disabled',
+    4: 'soundboard.error.rights_required'
+};
+
 export type ClientSoundboardSound = DisplaySoundboardSound & { local?: boolean };
 
 export const useSoundboardState = () => {
-    const [enabled, setEnabled] = useState(false);
+    const [roomMode, setRoomModeState] = useState(0);
+    const enabled = roomMode > 0;
     const [serverSounds, setServerSounds] = useState<ISoundboardSound[]>([]);
     const [legacySounds, setLegacySounds] = useState<ISoundboardSound[]>([]);
     const [layout, setLayout] = useState<SoundboardLayout>(() => normalizeSoundboardLayout(null));
@@ -49,6 +61,7 @@ export const useSoundboardState = () => {
     const cooldownSecondsRef = useRef(0);
     const cooldownUntilRef = useRef(0);
     const legacyLoadStartedRef = useRef(false);
+    const knownRoomModeRef = useRef<number | null>(null);
     const { showSingleBubble } = useNotificationActions();
     const { manifest, manifestRef } = useSoundboardManifest();
 
@@ -60,13 +73,24 @@ export const useSoundboardState = () => {
         [showSingleBubble]
     );
 
-    const handleSettings = useCallback((event: SoundboardSettingsEvent) => {
-        const parser = event.getParser();
-        cooldownSecondsRef.current = Math.max(0, parser.cooldownSeconds);
-        setEnabled(parser.enabled);
-        setServerSounds(parser.sounds);
-        setSoundboardRoomEnabled(parser.enabled);
-    }, []);
+    const handleSettings = useCallback(
+        (event: SoundboardSettingsEvent) => {
+            const parser = event.getParser();
+            const previousMode = knownRoomModeRef.current;
+            knownRoomModeRef.current = parser.roomMode;
+            cooldownSecondsRef.current = Math.max(0, parser.cooldownSeconds);
+            setRoomModeState(parser.roomMode);
+            setServerSounds(parser.sounds);
+            setSoundboardRoomEnabled(parser.enabled);
+
+            // Only a change made while the player is in the room is news; the first packet of a room is not.
+            const noticeKey = roomModeNoticeKeys[parser.roomMode];
+            if (previousMode !== null && previousMode !== parser.roomMode && noticeKey) {
+                showSingleBubble(LocalizeText(noticeKey), NotificationBubbleType.SOUNDBOARD);
+            }
+        },
+        [showSingleBubble]
+    );
 
     useMessageEvent<SoundboardSettingsEvent>(SoundboardSettingsEvent, handleSettings);
 
@@ -84,7 +108,7 @@ export const useSoundboardState = () => {
                 return;
             }
 
-            const key = parser.reason === 2 ? 'soundboard.error.room_disabled' : 'soundboard.error.unavailable';
+            const key = deniedReasonText[parser.reason] ?? 'soundboard.error.unavailable';
             showSingleBubble(LocalizeText(key), NotificationBubbleType.SOUNDBOARD);
         },
         [showCooldownBubble, showSingleBubble]
@@ -245,15 +269,19 @@ export const useSoundboardState = () => {
         SendMessageComposer(new SoundboardRequestSettingsComposer());
     }, []);
 
-    const setRoomEnabled = useCallback((value: boolean) => {
-        setEnabled(value);
-        setSoundboardRoomEnabled(value);
-        SendMessageComposer(new SoundboardSetEnabledComposer(value));
+    const setRoomMode = useCallback((mode: number) => {
+        knownRoomModeRef.current = mode;
+        setRoomModeState(mode);
+        setSoundboardRoomEnabled(mode > 0);
+        SendMessageComposer(new SoundboardSetEnabledComposer(mode));
     }, []);
+
+    const setRoomEnabled = useCallback((value: boolean) => setRoomMode(value ? 1 : 0), [setRoomMode]);
 
     const reset = useCallback(() => {
         GetSoundManager().stopSoundboard();
-        setEnabled(false);
+        knownRoomModeRef.current = null;
+        setRoomModeState(0);
         setServerSounds([]);
         setLegacySounds([]);
         setLayout(normalizeSoundboardLayout(null));
@@ -269,6 +297,7 @@ export const useSoundboardState = () => {
 
     return {
         enabled,
+        roomMode,
         sounds,
         categories,
         recentSoundIds,
@@ -283,6 +312,7 @@ export const useSoundboardState = () => {
         toggleFavorite,
         refresh,
         setRoomEnabled,
+        setRoomMode,
         reset
     };
 };
