@@ -191,6 +191,16 @@
     background-color: transparent;
     cursor: pointer;
     z-index: 1;
+
+    /*
+     * The avatar is drawn with its feet 17px above the bottom of the well, while the
+     * platform of a stand sits about 14px higher than that: without this the feet sink
+     * into the platform. Stands 0 (no platform), 19 and 20 (full-height pictures) keep
+     * the plain position.
+     */
+    .profile-stand:is(.stand-1, .stand-2, .stand-3, .stand-4, .stand-5, .stand-6, .stand-7, .stand-8, .stand-9, .stand-10, .stand-11, .stand-12, .stand-13, .stand-14, .stand-15, .stand-16, .stand-17, .stand-18, .stand-21) ~ .avatar-image {
+      transform: translateY(-14px);
+    }
   }
 
   .octane-infostand__badges {
