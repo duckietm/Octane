@@ -8,6 +8,35 @@
   pointer-events: none;
 }
 
+/* One choice of the picker, drawn like the avatar well of the info panel (67 x 130). */
+.profile-preview {
+  position: relative;
+  display: flex;
+  flex: 0 0 67px;
+  align-items: flex-end;
+  justify-content: center;
+  width: 67px;
+  height: 130px;
+  overflow: hidden;
+  border-radius: 6px;
+  outline: 2px solid transparent;
+  cursor: pointer;
+  transition: outline-color 0.12s;
+}
+
+.profile-preview:hover {
+  outline-color: rgba(61, 143, 186, 0.6);
+}
+
+.profile-preview.is-selected {
+  outline-color: #3d8fba;
+}
+
+/* Same lift as in the info panel, so the feet land on the platform of the stand. */
+.profile-preview .profile-stand:is(.stand-1, .stand-2, .stand-3, .stand-4, .stand-5, .stand-6, .stand-7, .stand-8, .stand-9, .stand-10, .stand-11, .stand-12, .stand-13, .stand-14, .stand-15, .stand-16, .stand-17, .stand-18, .stand-21) ~ .avatar-image {
+  transform: translateY(-14px);
+}
+
 @keyframes fadeIn {
   to { opacity: 1; }
 }
