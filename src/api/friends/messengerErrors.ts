@@ -15,7 +15,11 @@ const INSTANT_MESSAGE_ERROR_TEXT_KEYS: Record<number, string> = {
     7: 'messenger.error.busy',
     8: 'messenger.error.receiverhasnochat',
     9: 'messenger.error.senderhasnochat',
-    10: 'messenger.error.offline_failed'
+    10: 'messenger.error.offline_failed',
+    11: 'messenger.error.not_group_member',
+    12: 'messenger.error.not_group_admin',
+    13: 'messenger.error.sender_im_unavailable',
+    14: 'messenger.error.recipient_im_unavailable'
 };
 
 export const getFollowErrorTextKey = (errorCode: number): string => FOLLOW_ERROR_TEXT_KEYS[errorCode] ?? 'friendlist.followerror.hotelview';

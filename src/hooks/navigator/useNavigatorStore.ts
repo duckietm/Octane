@@ -83,7 +83,7 @@ export const useNavigatorStore = () => {
         FavouritesEvent,
         useCallback((event) => {
             const parser = event.getParser();
-            useNavigatorFavouritesStore.getState().setAll(parser.favoriteRoomIds || []);
+            useNavigatorFavouritesStore.getState().setAll(parser.favoriteRoomIds || [], parser.limit);
         }, [])
     );
 

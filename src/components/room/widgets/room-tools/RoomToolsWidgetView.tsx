@@ -1,6 +1,6 @@
-import { CreateLinkEvent, GetGuestRoomResultEvent, GetRoomEngine, RateFlatMessageComposer, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
+import { AddLinkEventTracker, CreateLinkEvent, GetGuestRoomResultEvent, ILinkEventTracker, GetRoomEngine, RateFlatMessageComposer, RemoveLinkEventTracker, RoomEngineEvent, RoomGeometry } from '@octane/renderer';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useEffectEvent, useState } from 'react';
 import { GetConfigurationValue, LocalizeText, SendMessageComposer, SetLocalStorage, TryVisitRoom } from '../../../../api';
 import { Text } from '../../../../common';
 import { localizeWithFallback } from '../../../../api/utils/localizeWithFallback';
@@ -193,6 +193,24 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
         setHasLikedRoom(false);
         updateZoomScale();
     }, [roomSession?.roomId]);
+
+    // Ctrl + mouse wheel over the room zooms through the same steps as the buttons.
+    const onZoomLink = useEffectEvent((action: string) => handleToolClick(action));
+
+    useEffect(() => {
+        const linkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) => {
+                const action = url.split('/')[1];
+
+                if (action === 'zoom_in' || action === 'zoom_out') onZoomLink(action);
+            },
+            eventUrlPrefix: 'room-tools/'
+        };
+
+        AddLinkEventTracker(linkTracker);
+
+        return () => RemoveLinkEventTracker(linkTracker);
+    }, []);
 
     // The renderer can be zoomed from outside this toolbar (keyboard shortcuts,
     // other widgets), so resync the displayed level whenever the engine reports it.

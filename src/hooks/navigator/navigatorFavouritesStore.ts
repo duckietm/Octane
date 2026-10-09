@@ -2,17 +2,20 @@ import { createOctaneStore } from '../../state/createOctaneStore';
 
 export type NavigatorFavouritesState = {
     ids: Set<number>;
+    /** Most favourites the server allows; 0 until it says. */
+    limit: number;
 };
 
 export type NavigatorFavouritesActions = {
-    setAll(roomIds: number[]): void;
+    setAll(roomIds: number[], limit?: number): void;
     apply(roomId: number, added: boolean): void;
 };
 
 export const useNavigatorFavouritesStore = createOctaneStore<NavigatorFavouritesState & NavigatorFavouritesActions>()((set) => ({
     ids: new Set<number>(),
+    limit: 0,
 
-    setAll: (roomIds) => set({ ids: new Set(roomIds.map(Number)) }),
+    setAll: (roomIds, limit) => set((s) => ({ ids: new Set(roomIds.map(Number)), limit: limit ?? s.limit })),
     apply: (roomId, added) =>
         set((s) => {
             const id = Number(roomId);

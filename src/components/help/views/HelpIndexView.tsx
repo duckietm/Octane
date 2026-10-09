@@ -1,4 +1,4 @@
-import { GetCfhStatusMessageComposer } from '@octane/renderer';
+import { GetCfhStatusMessageComposer, GetMyReportsStatusMessageComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { FaArrowCircleRight } from 'react-icons/fa';
 import { CreateLinkEvent, DispatchUiEvent, GetConfigurationValue, LocalizeText, ReportState, ReportType, SendMessageComposer } from '../../../api';
@@ -52,7 +52,7 @@ export const HelpIndexView: FC<{}> = (props) => {
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.sanction.status')}
                 </button>
-                <button type="button" className="help-link" onClick={() => SendMessageComposer(new GetCfhStatusMessageComposer(true))}>
+                <button type="button" className="help-link" onClick={() => SendMessageComposer(new GetMyReportsStatusMessageComposer())}>
                     <FaArrowCircleRight className="help-link__icon" />
                     {LocalizeText('help.main.my.reports.status')}
                 </button>

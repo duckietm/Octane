@@ -32,6 +32,7 @@ import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
 import { NavigatorRoomLinkView } from './views/NavigatorRoomLinkView';
 import { NavigatorRoomSettingsView } from './views/room-settings/NavigatorRoomSettingsView';
+import { NavigatorEnforceCategoryView } from './views/NavigatorEnforceCategoryView';
 import { NavigatorEmptyStateView } from './views/search/NavigatorEmptyStateView';
 import { NavigatorRoomInfoPopupView } from './views/search/NavigatorRoomInfoPopupView';
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
@@ -434,6 +435,9 @@ export const NavigatorView: FC<{}> = () => {
             )}
             <WidgetErrorBoundary name="NavigatorRoomSettings">
                 <NavigatorRoomSettingsView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="NavigatorEnforceCategory">
+                <NavigatorEnforceCategoryView />
             </WidgetErrorBoundary>
         </>
     );

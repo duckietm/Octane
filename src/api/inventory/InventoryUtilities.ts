@@ -3,6 +3,7 @@ import {
     FurniturePlacePaintComposer,
     GetRoomEngine,
     GetRoomSessionManager,
+    PetType,
     RoomObjectCategory,
     RoomObjectPlacementSource,
     RoomObjectType
@@ -46,13 +47,20 @@ export const attemptPetPlacement = (petItem: IPetItem, flag: boolean = false) =>
 
     CreateLinkEvent('inventory/hide');
 
+    // A monster plant previews at its own growth stage instead of fully grown.
+    const posture = petData.typeId === PetType.MONSTERPLANT ? (petData.level >= 7 ? 'std' : `grw${petData.level}`) : null;
+
     if (
         GetRoomEngine().processRoomObjectPlacement(
             RoomObjectPlacementSource.INVENTORY,
             -petData.id,
             RoomObjectCategory.UNIT,
             RoomObjectType.PET,
-            petData.figureData.figuredata
+            petData.figureData.figuredata,
+            null,
+            -1,
+            -1,
+            posture
         )
     ) {
         setPlacingItemId(petData.id);

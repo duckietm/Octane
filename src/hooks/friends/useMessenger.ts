@@ -277,7 +277,8 @@ const useMessengerState = () => {
     // optimistically, so mark it as not sent and say why, as Flash does.
     useMessageEvent<InstantMessageErrorEvent>(InstantMessageErrorEvent, (event) => {
         const parser = event.getParser();
-        const errorText = LocalizeText(getInstantMessageErrorTextKey(parser.errorCode));
+        // Newer codes (11-14) may be missing from older hotel texts: fall back to the generic failure.
+        const errorText = localizeWithFallback(getInstantMessageErrorTextKey(parser.errorCode), LocalizeText('messenger.error.offline_failed'));
         const ownUserId = GetSessionDataManager().userId;
 
         setMessageThreads((prevValue) => {
