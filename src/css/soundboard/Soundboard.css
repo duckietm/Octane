@@ -23,14 +23,11 @@
 }
 
 .soundboard-feed {
-    position: fixed;
-    top: 80px;
-    right: 12px;
-    z-index: 70;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    width: 230px;
+    align-items: flex-end;
+    gap: 4px;
+    width: 100%;
     pointer-events: none;
 }
 
@@ -42,64 +39,61 @@
 .soundboard-feed__item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    background: rgba(28, 51, 66, 0.92);
-    color: #fff;
-    font-size: 12px;
-    line-height: 1.25;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    gap: 7px;
     animation: soundboard-feed-in 0.35s ease-out;
     pointer-events: auto;
     cursor: pointer;
 }
 
+.soundboard-feed__item {
+    position: relative;
+}
+
 .soundboard-feed__icon {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-width: 2px;
-    border-radius: 6px;
-    font-size: 16px;
+    flex: none;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .soundboard-feed__user {
-    overflow: hidden;
     font-weight: 700;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 
-.soundboard-feed__sound {
-    overflow: hidden;
-    color: rgba(255, 255, 255, 0.82);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+/* Shrinks over the time the entry stays, so the player sees when it goes away. */
+@keyframes soundboard-feed-timer {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
 }
 
-.soundboard-feed__silence {
+.soundboard-feed__timer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.35);
+    transform-origin: left;
+    animation: soundboard-feed-timer linear forwards;
+}
+
+.soundboard-feed__item .soundboard-feed__silence {
+    opacity: 0.6;
+}
+
+.soundboard-feed__item:hover .soundboard-feed__silence,
+.soundboard-feed__item .soundboard-feed__silence:focus-visible {
+    opacity: 1;
+}
+
+/* The silence button keeps the hotel button skin the bubble gives every button. */
+.soundboard-feed__item .soundboard-feed__silence {
     display: flex;
     flex: none;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.6);
+    min-height: 20px;
+    padding: 0 4px;
     cursor: pointer;
-}
-
-.soundboard-feed__silence:hover,
-.soundboard-feed__silence:focus-visible {
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff;
 }
 
 .soundboard-silenced {

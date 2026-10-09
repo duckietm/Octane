@@ -742,6 +742,7 @@
     "soundboard.pagination.next": "Pagina successiva",
     "soundboard.room.played": "%user% ha riprodotto %sound%",
     "soundboard.room.setting.desc": "Permetti alle persone in questa stanza di riprodurre effetti sonori",
+    "notifications.title.soundboard": "Soundboard",
     "soundboard.room.allow": "Consenti l'uso della Soundboard in questa stanza",
     "soundboard.error.cooldown": "Attendi %seconds% secondi prima di riprodurre un altro suono.",
     "soundboard.error.room_disabled": "La Soundboard è disattivata in questa stanza.",
