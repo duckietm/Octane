@@ -38,6 +38,14 @@
     overflow-wrap: anywhere;
 }
 
+.octane-catalog-product-details-duration {
+    display: block;
+    color: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 15px;
+}
+
 .octane-catalog-product-details-description:empty {
     height: 4px;
     min-height: 4px;

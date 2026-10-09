@@ -38,3 +38,40 @@ export const getAvatarEffectTimeLeftText = (secondsLeft: number, isPermanent: bo
 
     return { key: 'avatareditor.effects.active.timeleft', parameter: 'time_left', value };
 };
+
+export interface AvatarEffectDurationText {
+    key: string;
+    fallback: string;
+    parameter?: string;
+    value?: string;
+}
+
+/**
+ * The length of a catalog effect offer, from the product's extra param (seconds, 0 for permanent,
+ * as the emulator sends it). Null when the offer carries no length (an older emulator).
+ */
+export const getAvatarEffectDurationText = (extraParam: string | null | undefined): AvatarEffectDurationText => {
+    const text = (extraParam ?? '').trim();
+
+    if (!/^\d+$/.test(text)) return null;
+
+    const seconds = parseInt(text, 10);
+
+    if (seconds <= 0) return { key: 'catalog.effect.duration.permanent', fallback: 'Permanent' };
+
+    if (seconds >= 86400 && seconds % 86400 === 0) {
+        const days = String(seconds / 86400);
+
+        return { key: 'catalog.effect.duration.days', fallback: `${days} days`, parameter: 'days', value: days };
+    }
+
+    if (seconds >= 3600) {
+        const hours = String(Math.round(seconds / 3600));
+
+        return { key: 'catalog.effect.duration.hours', fallback: `${hours} hours`, parameter: 'hours', value: hours };
+    }
+
+    const minutes = String(Math.max(1, Math.round(seconds / 60)));
+
+    return { key: 'catalog.effect.duration.minutes', fallback: `${minutes} minutes`, parameter: 'minutes', value: minutes };
+};

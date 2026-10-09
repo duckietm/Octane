@@ -29,6 +29,25 @@ export interface OwnedAvatarEffect {
 }
 
 /**
+ * Applies an "effect added" push. An effect already owned keeps its running time: a timed copy adds
+ * one to the stock, a permanent one makes it permanent (official AvatarEffect.amountInInventory++).
+ */
+export const mergeAddedEffect = (effects: OwnedAvatarEffect[], added: OwnedAvatarEffect): OwnedAvatarEffect[] => {
+    const index = effects.findIndex(existing => existing.type === added.type);
+
+    if (index === -1) return [ ...effects, added ];
+
+    const existing = effects[index];
+    const next = [ ...effects ];
+
+    next[index] = added.isPermanent
+        ? { ...existing, isPermanent: true, duration: added.duration }
+        : { ...existing, inactiveCount: Math.min(99, existing.inactiveCount + 1) };
+
+    return next;
+};
+
+/**
  * Tracks the avatar effects the user owns.
  *
  * The server pushes the full list once, right after login
@@ -40,20 +59,6 @@ export interface OwnedAvatarEffect {
 const useAvatarEffectsState = () => {
     const [effects, setEffects] = useState<OwnedAvatarEffect[]>([]);
     const [activeEffectType, setActiveEffectType] = useState(0);
-
-    const upsertEffect = useCallback((effect: OwnedAvatarEffect) => {
-        setEffects(prev => {
-            const index = prev.findIndex(existing => existing.type === effect.type);
-
-            if (index === -1) return [ ...prev, effect ];
-
-            const next = [ ...prev ];
-
-            next[index] = effect;
-
-            return next;
-        });
-    }, []);
 
     useMessageEvent<AvatarEffectsEvent>(AvatarEffectsEvent, event => {
         const parsed = event.getParser().effects.map<OwnedAvatarEffect>(effect => ({
@@ -76,14 +81,14 @@ const useAvatarEffectsState = () => {
     useMessageEvent<AvatarEffectAddedEvent>(AvatarEffectAddedEvent, event => {
         const parser = event.getParser();
 
-        upsertEffect({
+        setEffects(prev => mergeAddedEffect(prev, {
             type: parser.type,
             subType: parser.subType,
             duration: parser.duration,
             inactiveCount: 1,
             secondsLeft: 0,
             isPermanent: parser.isPermanent
-        });
+        }));
     });
 
     useMessageEvent<AvatarEffectExpiredEvent>(AvatarEffectExpiredEvent, event => {
