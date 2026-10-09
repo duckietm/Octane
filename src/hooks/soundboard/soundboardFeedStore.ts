@@ -6,6 +6,7 @@ export const SOUNDBOARD_FEED_DURATION_MS = 4_500;
 export interface SoundboardFeedEntry {
     key: number;
     username: string;
+    userId: number;
     soundName: string;
     soundId: number;
 }

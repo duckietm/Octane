@@ -17,11 +17,20 @@ export interface SoundboardCatalogDraft {
     url: string;
     enabled: boolean;
     minRank: number;
+    /** Seconds one player waits before playing this pad again; 0 for none. */
+    cooldownSeconds: number;
 }
+
+export const MAX_PAD_COOLDOWN_SECONDS = 3600;
 
 export interface SoundboardCatalogValidation {
     valid: boolean;
-    errors: Partial<Record<'name' | 'url' | 'minRank', 'invalid_name' | 'invalid_url' | 'invalid_rank'>>;
+    errors: Partial<
+        Record<
+            'name' | 'url' | 'minRank' | 'cooldownSeconds',
+            'invalid_name' | 'invalid_url' | 'invalid_rank' | 'invalid_cooldown'
+        >
+    >;
 }
 
 export const filterCatalogSounds = <T extends SoundboardCatalogSoundLike>(
@@ -73,6 +82,9 @@ export const validateCatalogDraft = (draft: SoundboardCatalogDraft): SoundboardC
         errors.url = 'invalid_url';
     }
     if (!Number.isInteger(draft.minRank) || draft.minRank < 1) errors.minRank = 'invalid_rank';
+    if (!Number.isInteger(draft.cooldownSeconds) || draft.cooldownSeconds < 0 || draft.cooldownSeconds > MAX_PAD_COOLDOWN_SECONDS) {
+        errors.cooldownSeconds = 'invalid_cooldown';
+    }
 
     return { valid: Object.keys(errors).length === 0, errors };
 };

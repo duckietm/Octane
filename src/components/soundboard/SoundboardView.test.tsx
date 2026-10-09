@@ -49,6 +49,46 @@ const padNames = () => within(screen.getByTestId('soundboard-grid')).getAllByRol
 describe('SoundboardContentView', () => {
     afterEach(cleanup);
 
+    test('says so when only people with rights may play', () => {
+        renderContent([], { rightsOnly: true });
+
+        expect(screen.getByText('soundboard.room.mode.rights')).toBeInTheDocument();
+
+        cleanup();
+        renderContent([]);
+
+        expect(screen.queryByText('soundboard.room.mode.rights')).toBeNull();
+    });
+
+    test('puts the favourites on the shelf, or the recent sounds when there are none, and hides it while searching', () => {
+        renderContent([11, 2]);
+
+        expect(within(screen.getByTestId('soundboard-shelf')).getAllByRole('button').map((pad) => pad.getAttribute('aria-label'))).toEqual(['Sound 11', 'Applauso']);
+
+        cleanup();
+        renderContent([11, 2], { favoriteIds: [5, 3] });
+
+        expect(within(screen.getByTestId('soundboard-shelf')).getAllByRole('button').map((pad) => pad.getAttribute('aria-label'))).toEqual(['Sound 5', 'Sound 3']);
+
+        fireEvent.change(screen.getByRole('searchbox', { name: 'Search sounds' }), { target: { value: 'sound' } });
+        expect(screen.queryByTestId('soundboard-shelf')).toBeNull();
+    });
+
+    test('plays from the shelf, and not while cooling down', () => {
+        const onPlay = vi.fn();
+        renderContent([11], { onPlay });
+
+        fireEvent.click(within(screen.getByTestId('soundboard-shelf')).getByRole('button', { name: 'Sound 11' }));
+        expect(onPlay).toHaveBeenCalledOnce();
+
+        cleanup();
+        const held = vi.fn();
+        renderContent([11], { onPlay: held, isCoolingDown: true });
+
+        fireEvent.click(within(screen.getByTestId('soundboard-shelf')).getByRole('button', { name: 'Sound 11' }));
+        expect(held).not.toHaveBeenCalled();
+    });
+
     test('shows ten text pads per page and pagination only when needed', () => {
         const { container } = renderContent();
         const grid = screen.getByTestId('soundboard-grid');
@@ -114,5 +154,21 @@ describe('SoundboardContentView', () => {
         fireEvent.keyDown(window, { key: '1' });
         expect(onPlay).not.toHaveBeenCalled();
         expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '75');
+    });
+
+    test('says how many users are muted and lets the player unmute them all', () => {
+        const onRestoreSilenced = vi.fn();
+        renderContent([], { silencedCount: 3, onRestoreSilenced });
+
+        expect(screen.getByText('soundboard.silenced.count 3')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'soundboard.silenced.restore' }));
+        expect(onRestoreSilenced).toHaveBeenCalledOnce();
+    });
+
+    test('shows no muted line while nobody is muted', () => {
+        renderContent([]);
+
+        expect(screen.queryByRole('button', { name: 'soundboard.silenced.restore' })).toBeNull();
     });
 });

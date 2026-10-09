@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NavigatorRoomSettingsBasicTabView } from './NavigatorRoomSettingsBasicTabView';
 
 const sendMessageComposer = vi.fn();
-const setSoundboardRoomEnabled = vi.fn();
+const setSoundboardRoomMode = vi.fn();
 
 vi.mock('@octane/renderer', () => ({
     RoomDeleteComposer: class {},
@@ -23,7 +23,8 @@ vi.mock('../../../../api', () => ({
     getYoutubeRoomEnabled: () => false,
     LocalizeText: (key: string) => ({
         'widget.room.youtube.shared': 'YouTube is being shared',
-        'soundboard.room.allow': 'Allow Soundboard use in this room'
+        'soundboard.room.allow': 'Allow Soundboard use in this room',
+        'soundboard.room.mode.rights': 'Only people with rights'
     })[key] || key,
     SendMessageComposer: (composer: unknown) => sendMessageComposer(composer),
     setYoutubeRoomEnabled: vi.fn()
@@ -39,7 +40,7 @@ vi.mock('../../../../hooks', () => ({
     useMessageEvent: vi.fn(),
     useNavigatorData: () => ({ categories: [] }),
     useNotification: () => ({ showConfirm: vi.fn() }),
-    useSoundboard: () => ({ enabled: true, setRoomEnabled: setSoundboardRoomEnabled })
+    useSoundboard: () => ({ roomMode: 1, setRoomMode: setSoundboardRoomMode })
 }));
 
 const roomData = {
@@ -73,10 +74,16 @@ describe('NavigatorRoomSettingsBasicTabView room toggles', () => {
         expect((sendMessageComposer.mock.calls[0][0] as { enabled: boolean }).enabled).toBe(true);
     });
 
-    it('renders one whole-room soundboard toggle and no per-sound controls', () => {
+    it('offers the soundboard as one whole-room choice and no per-sound controls', () => {
         const { container } = render(<NavigatorRoomSettingsBasicTabView handleChange={vi.fn()} roomData={roomData} onClose={vi.fn()} />);
 
-        expect(screen.getAllByRole('checkbox', { name: 'Allow Soundboard use in this room' })).toHaveLength(1);
+        const select = screen.getByRole('combobox', { name: 'Allow Soundboard use in this room' });
+
+        expect(select).toHaveValue('1');
+
+        fireEvent.change(select, { target: { value: '2' } });
+
+        expect(setSoundboardRoomMode).toHaveBeenCalledWith(2);
         expect(container.textContent).not.toContain('Block');
         expect(container.textContent).not.toContain('Minimum rank');
         expect(container.textContent).not.toContain('Save catalog');

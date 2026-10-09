@@ -18,6 +18,21 @@ export const SOUNDBOARD_TONE_CLASSES: Record<SoundboardTone, string> = {
     purple: 'border-[#62438a] bg-[#8d65ba] hover:bg-[#7b58a4]'
 };
 
+/** The tone icon of a pad: a note, or the bars of a sound that is playing right now. */
+export const SoundboardPadIcon: FC<{ tone: SoundboardTone; playing?: boolean; className?: string }> = ({ tone, playing = false, className = '' }) => (
+    <span aria-hidden="true" className={`soundboard-pad__icon ${SOUNDBOARD_TONE_CLASSES[tone]} ${className}`}>
+        {playing ? (
+            <span className="soundboard-bars">
+                <i />
+                <i />
+                <i />
+            </span>
+        ) : (
+            '♪'
+        )}
+    </span>
+);
+
 export const SoundboardPadView: FC<SoundboardPadViewProps> = ({ sound, disabled, onPlay, hotkey, favorite = false, playing = false, onToggleFavorite }) => {
     const toggleFavorite = (event: MouseEvent) => {
         if (!onToggleFavorite) return;
@@ -37,12 +52,12 @@ export const SoundboardPadView: FC<SoundboardPadViewProps> = ({ sound, disabled,
             title={sound.name}
             onClick={() => !disabled && onPlay(sound)}
             onContextMenu={toggleFavorite}
-            className={`soundboard-pad relative flex h-14 min-w-0 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-md border-2 px-1 text-white shadow-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 aria-disabled:cursor-not-allowed aria-disabled:opacity-60 ${SOUNDBOARD_TONE_CLASSES[sound.tone]}`}
+            className="soundboard-pad"
         >
-            {hotkey && <span aria-hidden="true" className="absolute left-1 top-0.5 text-[9px] font-bold leading-none text-white/75">{hotkey}</span>}
-            {favorite && <span aria-hidden="true" className="absolute right-1 top-0.5 text-[10px] leading-none text-[#ffe58a]">★</span>}
-            <span aria-hidden="true" className="text-[15px] leading-none">♪</span>
-            <span className="line-clamp-2 w-full break-words text-center text-[10px] font-bold leading-[1.1]">{sound.name}</span>
+            <SoundboardPadIcon tone={sound.tone} playing={playing} />
+            <span className="soundboard-pad__name">{sound.name}</span>
+            {favorite && <span aria-hidden="true" className="soundboard-pad__star">★</span>}
+            {hotkey && <span aria-hidden="true" className="soundboard-pad__key">{hotkey}</span>}
         </button>
     );
 };

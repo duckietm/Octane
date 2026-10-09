@@ -52,7 +52,6 @@ import { RadioView } from './radio/RadioView';
 import { RareValuesView } from './rare-values/RareValuesView';
 import { RightSideView } from './right-side/RightSideView';
 import { RoomView } from './room/RoomView';
-import { SoundboardFeedView } from './soundboard/SoundboardFeedView';
 import { SoundboardView } from './soundboard/SoundboardView';
 import { ToolbarView } from './toolbar/ToolbarView';
 import { TranslationBootstrap } from './translation/TranslationBootstrap';
@@ -250,7 +249,6 @@ export const MainView: FC<{}> = (props) =>
             <RareValuesView />
             <FortuneWheelView />
             <SoundboardView />
-            <SoundboardFeedView />
             <TraxEditorView />
             {GetConfigurationValue<boolean>('radio_ui.enabled', false) && !IsTouchDevice() && <RadioView />}
             {GetConfigurationValue<boolean>('mentions_ui.enabled', true) && mentionsVisible && <MentionsView onClose={() => setMentionsVisible(false)} />}

@@ -15,13 +15,23 @@ describe('Soundboard catalog state', () => {
     });
 
     it('validates server-compatible names, URLs, and ranks', () => {
-        expect(validateCatalogDraft({ id: 0, name: 'Bell', classname: '', url: '/sounds/bell.mp3', minRank: 1, enabled: true }).valid).toBe(true);
-        expect(validateCatalogDraft({ id: 0, name: '', classname: '', url: 'javascript:alert(1)', minRank: 0, enabled: true }).errors).toEqual({
+        expect(validateCatalogDraft({ id: 0, name: 'Bell', classname: '', url: '/sounds/bell.mp3', minRank: 1, enabled: true, cooldownSeconds: 0 }).valid).toBe(true);
+        expect(validateCatalogDraft({ id: 0, name: '', classname: '', url: 'javascript:alert(1)', minRank: 0, enabled: true, cooldownSeconds: 0 }).errors).toEqual({
             name: 'invalid_name',
             url: 'invalid_url',
             minRank: 'invalid_rank'
         });
-        expect(validateCatalogDraft({ id: 0, name: 'Bell', classname: '', url: 'https://cdn.example/bell.mp3', minRank: 2.5, enabled: true }).valid).toBe(false);
+        expect(validateCatalogDraft({ id: 0, name: 'Bell', classname: '', url: 'https://cdn.example/bell.mp3', minRank: 2.5, enabled: true, cooldownSeconds: 0 }).valid).toBe(false);
+    });
+
+    it('accepts a pad cooldown from none to one hour and nothing else', () => {
+        const draft = { id: 0, name: 'Bell', classname: 'bell', url: '', minRank: 1, enabled: true };
+
+        expect(validateCatalogDraft({ ...draft, cooldownSeconds: 0 }).valid).toBe(true);
+        expect(validateCatalogDraft({ ...draft, cooldownSeconds: 3600 }).valid).toBe(true);
+        expect(validateCatalogDraft({ ...draft, cooldownSeconds: 3601 }).errors).toEqual({ cooldownSeconds: 'invalid_cooldown' });
+        expect(validateCatalogDraft({ ...draft, cooldownSeconds: -1 }).valid).toBe(false);
+        expect(validateCatalogDraft({ ...draft, cooldownSeconds: 1.5 }).valid).toBe(false);
     });
 
     it('reorders without mutating the source and removes duplicate IDs', () => {
