@@ -38,7 +38,8 @@ export const useSoundboardCatalog = () => {
             draft.url.trim(),
             draft.minRank,
             draft.enabled,
-            draft.classname?.trim().toLowerCase() ?? ''
+            draft.classname?.trim().toLowerCase() ?? '',
+            draft.cooldownSeconds
         ));
         return true;
     }, []);

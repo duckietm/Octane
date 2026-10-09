@@ -153,6 +153,16 @@ describe('useSoundboardState', () => {
             expect(mocks.showSingleBubble).not.toHaveBeenCalled();
         });
 
+        it('tells the player a pad is held without locking the panel', () => {
+            const { result } = renderHook(() => useSoundboardState());
+
+            settings(1);
+            act(() => mocks.handlers.get(SoundboardPlayDeniedEvent)?.({ getParser: () => ({ reason: 5, remainingSeconds: 8 }) }));
+
+            expect(mocks.showSingleBubble).toHaveBeenCalledWith('soundboard.error.pad_cooldown:8', NotificationBubbleType.SOUNDBOARD);
+            expect(result.current.isCoolingDown).toBe(false);
+        });
+
         it('explains a denial that needs rights', () => {
             renderHook(() => useSoundboardState());
 

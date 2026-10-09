@@ -4,6 +4,7 @@ import { LocalizeText } from '../../../../api';
 import { useSoundboardCatalog, useSoundboardManifest } from '../../../../hooks';
 import {
     filterCatalogSounds,
+    MAX_PAD_COOLDOWN_SECONDS,
     reorderCatalog,
     SoundboardCatalogDraft,
     SoundboardCatalogFilter,
@@ -11,7 +12,7 @@ import {
 } from '../../../../hooks/soundboard/soundboardCatalogState';
 import { resolveSoundboardSoundUrl } from '../../../../hooks/soundboard/soundboardUrl';
 
-const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true };
+const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true, cooldownSeconds: 0 };
 const RESULT_KEYS = [
     'success',
     'forbidden',
@@ -21,7 +22,8 @@ const RESULT_KEYS = [
     'invalid_order',
     'not_found',
     'persistence_failure',
-    'catalog_full'
+    'catalog_full',
+    'invalid_cooldown'
 ];
 
 export const HousekeepingSoundboardTab: FC = () => {
@@ -49,6 +51,20 @@ export const HousekeepingSoundboardTab: FC = () => {
     const filteredSounds = useMemo(() => filterCatalogSounds(orderedSounds, query, filter), [orderedSounds, query, filter]);
     const validation = validateCatalogDraft(draft);
     const draftLocked = pendingOperation !== null;
+    const orderChanged = orderedIds.length > 0 && orderedIds.some((id, index) => id !== sounds[index]?.id);
+
+    // Switches a pad on or off from its row, keeping everything else it has.
+    const toggleEnabled = (sound: ISoundboardCatalogSound) => {
+        upsert({
+            id: sound.id,
+            name: sound.name,
+            classname: sound.classname ?? '',
+            url: sound.url,
+            minRank: sound.minRank,
+            enabled: !sound.enabled,
+            cooldownSeconds: sound.cooldownSeconds
+        });
+    };
 
     const editSound = (sound: ISoundboardCatalogSound) => {
         setDraft({
@@ -57,7 +73,8 @@ export const HousekeepingSoundboardTab: FC = () => {
             classname: sound.classname ?? '',
             url: sound.url,
             minRank: sound.minRank,
-            enabled: sound.enabled
+            enabled: sound.enabled,
+            cooldownSeconds: sound.cooldownSeconds
         });
     };
 
@@ -129,6 +146,11 @@ export const HousekeepingSoundboardTab: FC = () => {
             )}
 
             <div className="grid grid-cols-2 gap-2 rounded border border-sky-200 bg-sky-50/40 p-2">
+                <div className="col-span-2 text-xs font-bold">
+                    {draft.id > 0
+                        ? LocalizeText('housekeeping.soundboard.editing', ['name', 'id'], [draft.name || '-', String(draft.id)])
+                        : LocalizeText('housekeeping.soundboard.new_sound')}
+                </div>
                 <label className="flex flex-col gap-0.5 text-[10px] font-semibold uppercase tracking-wide">
                     {LocalizeText('housekeeping.soundboard.name')}
                     <input
@@ -179,6 +201,20 @@ export const HousekeepingSoundboardTab: FC = () => {
                         className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case"
                     />
                 </label>
+                <label className="flex flex-col gap-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                    {LocalizeText('housekeeping.soundboard.cooldown')}
+                    <input
+                        type="number"
+                        min={0}
+                        max={MAX_PAD_COOLDOWN_SECONDS}
+                        step={1}
+                        aria-label={LocalizeText('housekeeping.soundboard.cooldown')}
+                        disabled={draftLocked}
+                        value={draft.cooldownSeconds}
+                        onChange={(event) => setDraft((current) => ({ ...current, cooldownSeconds: Number(event.target.value) }))}
+                        className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case"
+                    />
+                </label>
                 <label className="flex items-center gap-2 self-end py-1 text-xs font-semibold">
                     <input
                         type="checkbox"
@@ -223,7 +259,7 @@ export const HousekeepingSoundboardTab: FC = () => {
                 </div>
             </div>
 
-            <div className="flex max-h-[280px] flex-col gap-1 overflow-y-auto">
+            <div className="flex max-h-[360px] flex-col gap-1 overflow-y-auto">
                 {filteredSounds.map((sound) => {
                     const orderIndex = orderedIds.indexOf(sound.id);
 
@@ -235,17 +271,21 @@ export const HousekeepingSoundboardTab: FC = () => {
                             onDragStart={() => setDraggedId(sound.id)}
                             onDragOver={(event) => event.preventDefault()}
                             onDrop={(event) => dropOn(event, sound.id)}
-                            className="grid grid-cols-[1fr_auto] items-center gap-2 rounded border border-zinc-200 bg-white px-2 py-1.5"
+                            className={`grid grid-cols-[1fr_auto] items-center gap-2 rounded border bg-white px-2 py-1.5 ${draft.id === sound.id ? 'border-sky-400 ring-1 ring-sky-300' : 'border-zinc-200'} ${sound.enabled ? '' : 'opacity-60'}`}
                         >
                             <div className="min-w-0">
                                 <div className="truncate text-xs font-semibold">
                                     {sound.name} <span className="font-normal text-zinc-400">#{sound.id}</span>
                                 </div>
-                                <div className="truncate text-[10px] text-zinc-500">
-                                    {sound.classname || sound.url} · rank {sound.minRank} ·{' '}
-                                    {sound.enabled
-                                        ? LocalizeText('housekeeping.soundboard.filter.enabled')
-                                        : LocalizeText('housekeeping.soundboard.filter.disabled')}
+                                <div className="flex flex-wrap items-center gap-1 text-[10px] text-zinc-500">
+                                    <span className="truncate">{sound.classname || sound.url}</span>
+                                    <span className="rounded bg-zinc-100 px-1">rank {sound.minRank}</span>
+                                    {sound.cooldownSeconds > 0 && <span className="rounded bg-amber-100 px-1">{sound.cooldownSeconds}s</span>}
+                                    <span className={`rounded px-1 ${sound.enabled ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                                        {sound.enabled
+                                            ? LocalizeText('housekeeping.soundboard.filter.enabled')
+                                            : LocalizeText('housekeeping.soundboard.filter.disabled')}
+                                    </span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
@@ -265,6 +305,15 @@ export const HousekeepingSoundboardTab: FC = () => {
                                     className="rounded bg-zinc-200 px-1.5 py-1 text-[10px] disabled:opacity-40"
                                 >
                                     {LocalizeText('housekeeping.soundboard.edit')}
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={draftLocked}
+                                    aria-label={`${LocalizeText(sound.enabled ? 'housekeeping.soundboard.disable' : 'housekeeping.soundboard.enable')} ${sound.name}`}
+                                    onClick={() => toggleEnabled(sound)}
+                                    className="rounded bg-zinc-100 px-1.5 py-1 text-[10px] disabled:opacity-40"
+                                >
+                                    {sound.enabled ? '⏻' : '○'}
                                 </button>
                                 <button
                                     type="button"
@@ -290,14 +339,17 @@ export const HousekeepingSoundboardTab: FC = () => {
                 })}
             </div>
 
-            <button
-                type="button"
-                disabled={!orderedIds.length || pendingOperation !== null}
-                onClick={() => reorder(orderedIds)}
-                className="self-end rounded bg-violet-600 px-2.5 py-1 text-xs font-semibold text-white disabled:opacity-40"
-            >
-                {LocalizeText('housekeeping.soundboard.save_order')}
-            </button>
+            <div className="flex items-center justify-end gap-2">
+                {orderChanged && <span className="text-[10px] text-amber-700">{LocalizeText('housekeeping.soundboard.order_changed')}</span>}
+                <button
+                    type="button"
+                    disabled={!orderChanged || pendingOperation !== null}
+                    onClick={() => reorder(orderedIds)}
+                    className="rounded bg-violet-600 px-2.5 py-1 text-xs font-semibold text-white disabled:opacity-40"
+                >
+                    {LocalizeText('housekeeping.soundboard.save_order')}
+                </button>
+            </div>
         </div>
     );
 };

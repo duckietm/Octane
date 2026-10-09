@@ -14,8 +14,8 @@ const mocks = vi.hoisted(() => ({
     lastResult: null as { operation: number; resultCode: number; soundId: number } | null,
     pendingOperation: null as number | null,
     sounds: [
-        { id: 7, name: 'Campanella', url: '/bell.mp3', enabled: true, sortOrder: 10, minRank: 1 },
-        { id: 12, name: 'Applauso', url: '/clap.mp3', enabled: false, sortOrder: 20, minRank: 5 }
+        { id: 7, name: 'Campanella', url: '/bell.mp3', enabled: true, sortOrder: 10, minRank: 1, cooldownSeconds: 0 },
+        { id: 12, name: 'Applauso', url: '/clap.mp3', enabled: false, sortOrder: 20, minRank: 5, cooldownSeconds: 0 }
     ]
 }));
 
@@ -118,6 +118,25 @@ describe('HousekeepingSoundboardTab', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Save sound' }));
 
         expect(mocks.upsert).toHaveBeenLastCalledWith(expect.objectContaining({ id: 33, name: 'Fanfara' }));
+    });
+
+    it('switches a pad on or off from its row and keeps the rest of it', () => {
+        render(<HousekeepingSoundboardTab />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'housekeeping.soundboard.disable Campanella' }));
+
+        expect(mocks.upsert).toHaveBeenCalledWith(expect.objectContaining({ id: 7, name: 'Campanella', minRank: 1, enabled: false, cooldownSeconds: 0 }));
+    });
+
+    it('saves the order only once it has changed', () => {
+        render(<HousekeepingSoundboardTab />);
+
+        expect(screen.getByRole('button', { name: 'Save order' })).toBeDisabled();
+
+        fireEvent.click(within(screen.getByTestId('soundboard-catalog-row-7')).getByRole('button', { name: 'Move down Campanella' }));
+
+        expect(screen.getByRole('button', { name: 'Save order' })).toBeEnabled();
+        expect(screen.getByText('housekeeping.soundboard.order_changed')).toBeInTheDocument();
     });
 
     it('locks the draft while a catalog mutation is pending', () => {

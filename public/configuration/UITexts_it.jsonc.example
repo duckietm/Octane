@@ -752,6 +752,7 @@
     "soundboard.notice.mode.rights": "Ora solo chi ha i diritti può usare la Soundboard in questa stanza.",
     "soundboard.error.rights_required": "Solo chi ha i diritti può usare la Soundboard in questa stanza.",
     "soundboard.error.cooldown": "Attendi %seconds% secondi prima di riprodurre un altro suono.",
+    "soundboard.error.pad_cooldown": "Attendi %seconds% secondi prima di riprodurre di nuovo questo suono.",
     "soundboard.error.room_disabled": "La Soundboard è disattivata in questa stanza.",
     "soundboard.error.unavailable": "Questo suono non è disponibile.",
     "soundboard.error.audio": "Non è stato possibile riprodurre il suono.",
