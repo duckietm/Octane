@@ -1119,6 +1119,8 @@
     "mentions.window.noresults": "No mention matches.",
     "mentions.filter.clear": "Clear the filters",
     "mentions.action.refresh": "Refresh",
+    "mentions.window.loadmore": "Load older mentions",
+    "mentions.window.loadingmore": "Loading...",
     "mentions.selector.title": "@ Mention",
     "mentions.selector.kind.alias": "Broadcast",
     "mentions.selector.kind.user": "User",

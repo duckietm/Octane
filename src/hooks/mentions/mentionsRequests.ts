@@ -1,11 +1,22 @@
-import { DeleteMentionComposer, MarkMentionsReadComposer, RequestMentionsComposer } from '@octane/renderer';
+import { DeleteMentionComposer, MarkMentionsReadComposer, RequestMentionsComposer, RequestMentionsPageComposer } from '@octane/renderer';
 import { IMentionEntry, SendMessageComposer } from '../../api';
-import { getMentionsStatus, getUnreadCount, markAllRead, markRead, removeMention, setMentionsStatus } from './mentionsStore';
+import {
+    getHasMoreMentions,
+    getMentionsStatus,
+    getOldestMentionId,
+    getUnreadCount,
+    isLoadingMoreMentions,
+    markAllRead,
+    markRead,
+    removeMention,
+    setLoadingMoreMentions,
+    setMentionsStatus
+} from './mentionsStore';
 
 /** How long the list may take before the panel says it did not come. */
 export const MENTIONS_REQUEST_TIMEOUT_MS = 8000;
 
-const pending: { timer: ReturnType<typeof setTimeout> | null } = { timer: null };
+const pending: { timer: ReturnType<typeof setTimeout> | null; pageTimer: ReturnType<typeof setTimeout> | null } = { timer: null, pageTimer: null };
 
 /** Asks the server for the list once; asking again while it is on its way does nothing. */
 export const requestMentions = (): void => {
@@ -20,6 +31,26 @@ export const requestMentions = (): void => {
         pending.timer = null;
 
         if (getMentionsStatus() === 'loading') setMentionsStatus('error');
+    }, MENTIONS_REQUEST_TIMEOUT_MS);
+};
+
+/** Asks for the page of mentions older than the oldest one held; does nothing when there is none or one is on its way. */
+export const requestMoreMentions = (): void => {
+    if (!getHasMoreMentions() || isLoadingMoreMentions()) return;
+
+    const beforeId = getOldestMentionId();
+
+    if (beforeId <= 0) return;
+
+    setLoadingMoreMentions(true);
+    SendMessageComposer(new RequestMentionsPageComposer(beforeId));
+
+    if (pending.pageTimer) clearTimeout(pending.pageTimer);
+
+    // A page that never comes frees the button, so it can be asked for again.
+    pending.pageTimer = setTimeout(() => {
+        pending.pageTimer = null;
+        setLoadingMoreMentions(false);
     }, MENTIONS_REQUEST_TIMEOUT_MS);
 };
 

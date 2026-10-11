@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { getMentionDateGroup, IMentionEntry, LocalizeText, localizeWithFallback, MentionDateGroup, MentionType } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
-import { requestMentions, useMentionActions, useMentionsSnapshot } from '../../hooks';
+import { requestMentions, requestMoreMentions, useMentionActions, useMentionsSnapshot } from '../../hooks';
 import { setMentionsPanelOpen } from '../../hooks/mentions/mentionsStore';
 import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
 import { MentionRowView } from './MentionRowView';
@@ -54,7 +54,7 @@ const matchesQuery = (mention: IMentionEntry, query: string): boolean => {
 
 export const MentionsView: FC<MentionsViewProps> = (props) => {
     const { onClose } = props;
-    const { mentions, unreadCount, status } = useMentionsSnapshot();
+    const { mentions, unreadCount, status, hasMore, loadingMore } = useMentionsSnapshot();
     const { userName: ownUsername = '' } = useUserDataSnapshot();
     const { open, goto, remove, markAll } = useMentionActions();
     const [filter, setFilter] = useState<MentionFilter>('all');
@@ -178,6 +178,11 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
                             </div>
                         ))}
                 </div>
+                {hasMore && (
+                    <button type="button" className="mentions-refresh" disabled={loadingMore} aria-busy={loadingMore} onClick={requestMoreMentions}>
+                        {loadingMore ? localizeWithFallback('mentions.window.loadingmore', 'Loading...') : localizeWithFallback('mentions.window.loadmore', 'Load older mentions')}
+                    </button>
+                )}
                 {unreadCount > 0 && (
                     <Button variant="primary" onClick={markAll}>
                         {LocalizeText('mentions.window.markall')}

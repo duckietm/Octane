@@ -1310,6 +1310,8 @@
     "mentions.window.noresults": "Nessuna menzione corrisponde.",
     "mentions.filter.clear": "Azzera i filtri",
     "mentions.action.refresh": "Aggiorna",
+    "mentions.window.loadmore": "Carica menzioni precedenti",
+    "mentions.window.loadingmore": "Carico...",
     "mentions.selector.title": "@ Menzione",
     "mentions.selector.kind.alias": "A tutti",
     "mentions.selector.kind.user": "Utente",
