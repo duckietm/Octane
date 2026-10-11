@@ -505,16 +505,6 @@
     color: #b53636;
 }
 
-.octane-mention-notification__sender::before {
-    content: '';
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-right: 3px;
-    vertical-align: -4px;
-    background: url("@/assets/images/mentions/mentions-16.png") center / 16px 16px no-repeat;
-}
-
 /* The head is the smooth, cropped one the friends list uses, not a pixelated enlargement of the
    small image; the kind of mention is a labelled chip beside the name instead of a corner badge. */
 .mention-row-avatar {

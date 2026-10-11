@@ -1,34 +1,56 @@
-/* A mention notification: the layout of the other hotel notifications (NotificationItemLayoutView),
-   with the sender's head in the 50 x 50 icon slot and the mention beside it. */
-.octane-mention-notification__head {
+/* A mention notification, on the border_9 skin of the club gift notification: a 16 px icon and the
+   text, then "later" and a black shiny button. The box grows with the message. */
+.octane-swf-notification-bubble.octane-mention-notification {
     position: relative;
     display: block;
-    width: 44px;
-    height: 44px;
-    overflow: hidden;
+    width: 192px;
+    max-width: 192px;
+    min-height: 82px;
+    padding: 0 !important;
+    border: 0;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px !important;
+    line-height: 14px;
+    text-shadow: none;
 }
 
-.octane-mention-notification__head .avatar-image {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    transform: none !important;
-    background-position: center !important;
-    background-size: 100% 100% !important;
-    image-rendering: auto !important;
+.octane-mention-notification__border {
+    position: absolute;
+    inset: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 7px 7px 8px 7px;
+    border-image: url("@/assets/images/notifications/notification_border_9.png") 7 7 8 7 fill / 7px 7px 8px 7px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
 }
 
-.octane-mention-notification__sender {
-    font-size: 12px;
-    line-height: 15px;
+.octane-mention-notification__row {
+    position: relative;
+    display: flex;
+    gap: 3px;
+    padding: 7px 7px 0 6px;
+}
+
+.octane-mention-notification__icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-mention-notification__text {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .octane-mention-notification__room {
-    font-size: 11px;
-    line-height: 14px;
-    color: #b9bdc6;
+    display: block;
+    color: #bae1f9;
 }
 
 .octane-mention-notification__message {
@@ -37,6 +59,57 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin-top: 2px;
+}
+
+.octane-mention-notification__actions {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 6px 8px 8px;
+}
+
+.octane-swf-notification-bubble .octane-mention-notification__later {
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    border-image: none !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
     font-size: 12px;
-    line-height: 15px;
+    font-weight: 400;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-swf-notification-bubble .octane-mention-notification__later:hover {
+    color: #bae1f9 !important;
+}
+
+.octane-swf-notification-bubble .octane-mention-notification__button {
+    min-width: 96px;
+    height: 28px;
+    padding: 0 10px;
+    border: 5px solid transparent !important;
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-default.png") !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-swf-notification-bubble .octane-mention-notification__button:hover {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-hover.png") !important;
+}
+
+.octane-swf-notification-bubble .octane-mention-notification__button:active {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-pressed.png") !important;
 }

@@ -1,18 +1,18 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, MentionNotificationBubbleItem, MentionType } from '../../../../api';
-import { LayoutAvatarImageView, LayoutNotificationBubbleViewProps } from '../../../../common';
+import mentionIcon from '../../../../assets/images/mentions/mentions-16.png';
+import { LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps } from '../../../../common';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
 import { MentionMessageView } from '../../../mentions/MentionMessageView';
-import { NotificationItemLayoutView } from './NotificationItemLayoutView';
 
 export interface NotificationMentionBubbleViewProps extends LayoutNotificationBubbleViewProps {
     item: MentionNotificationBubbleItem;
 }
 
 /**
- * A mention in the layout of the other hotel notifications: the sender's head in the icon slot,
- * their name and room, and the line. One click opens the panel, where go to and delete live.
+ * A mention in the layout of the club gift notification: the border_9 box, the mention icon and
+ * the line, then "later" and a button that opens the panel, where go to and delete live.
  */
 export const NotificationMentionBubbleView: FC<NotificationMentionBubbleViewProps> = (props) => {
     const { item = null, onClose = null, ...rest } = props;
@@ -23,28 +23,32 @@ export const NotificationMentionBubbleView: FC<NotificationMentionBubbleViewProp
     const mention = item.mention;
     const isRoom = mention.mentionType === MentionType.ROOM;
 
-    const open = () => {
-        CreateLinkEvent('mentions/toggle');
-        onClose();
-    };
-
     return (
-        <NotificationItemLayoutView
-            classNames={['octane-mention-notification']}
-            icon={
-                <span className="octane-mention-notification__head">
-                    <LayoutAvatarImageView headOnly compactHead compactHeadSize={44} compactHeadPadding={0} direction={2} figure={mention.senderFigure} />
-                </span>
-            }
-            onClick={open}
-            onClose={onClose}
-            {...rest}
-        >
-            <span className="octane-mention-notification__sender">
-                <b>{mention.senderUsername}</b> {LocalizeText(isRoom ? 'mentions.type.room' : 'mentions.type.direct').toLowerCase()}
-            </span>
-            {mention.roomName && mention.roomName.length > 0 && <span className="octane-mention-notification__room">{mention.roomName}</span>}
-            <MentionMessageView className="octane-mention-notification__message" ownUsername={ownUsername} text={mention.message} />
-        </NotificationItemLayoutView>
+        <LayoutNotificationBubbleView classNames={['octane-mention-notification']} closeOnClick={false} onClose={onClose} {...rest}>
+            <div className="octane-mention-notification__border" />
+            <div className="octane-mention-notification__row">
+                <img alt="" className="octane-mention-notification__icon" src={mentionIcon} draggable={false} />
+                <div className="octane-mention-notification__text">
+                    <b>{mention.senderUsername}</b> {LocalizeText(isRoom ? 'mentions.type.room' : 'mentions.type.direct').toLowerCase()}
+                    {mention.roomName && mention.roomName.length > 0 && <span className="octane-mention-notification__room">{mention.roomName}</span>}
+                    <MentionMessageView className="octane-mention-notification__message" ownUsername={ownUsername} text={mention.message} />
+                </div>
+            </div>
+            <div className="octane-mention-notification__actions">
+                <button className="octane-mention-notification__later" type="button" onClick={() => onClose()}>
+                    {LocalizeText('notifications.button.later')}
+                </button>
+                <button
+                    className="octane-mention-notification__button"
+                    type="button"
+                    onClick={() => {
+                        CreateLinkEvent('mentions/toggle');
+                        onClose();
+                    }}
+                >
+                    {LocalizeText('mentions.window.title')}
+                </button>
+            </div>
+        </LayoutNotificationBubbleView>
     );
 };
