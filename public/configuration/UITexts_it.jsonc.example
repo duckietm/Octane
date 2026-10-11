@@ -1310,6 +1310,8 @@
     "mentions.window.noresults": "Nessuna menzione corrisponde.",
     "mentions.filter.clear": "Azzera i filtri",
     "mentions.action.refresh": "Aggiorna",
+    "mentions.chip.direct": "Diretta",
+    "mentions.chip.room": "Stanza",
     "mentions.window.loadmore": "Carica menzioni precedenti",
     "mentions.window.loadingmore": "Carico...",
     "mentions.selector.title": "@ Menzione",

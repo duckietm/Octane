@@ -514,3 +514,48 @@
     vertical-align: -4px;
     background: url("@/assets/images/mentions/mentions-16.png") center / 16px 16px no-repeat;
 }
+
+/* The head is the smooth, cropped one the friends list uses, not a pixelated enlargement of the
+   small image; the kind of mention is a labelled chip beside the name instead of a corner badge. */
+.mention-row-avatar {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #959595;
+    background: #e9e6da;
+    box-shadow: none;
+}
+
+.mention-row-avatar .avatar-image {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    background-position: center !important;
+    background-size: 100% 100% !important;
+    image-rendering: auto !important;
+}
+
+.mention-row-type {
+    display: none;
+}
+
+.mention-row-chip {
+    flex: none;
+    padding: 0 5px;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+.mention-row-chip.is-direct {
+    background: #418db0;
+}
+
+.mention-row-chip.is-room {
+    background: #d08a1e;
+}

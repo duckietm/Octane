@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { formatMentionTime, IMentionEntry, LocalizeText, MentionType } from '../../api';
+import { formatMentionTime, IMentionEntry, LocalizeText, localizeWithFallback, MentionType } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { MentionMessageView } from './MentionMessageView';
 
@@ -16,6 +16,7 @@ export const MentionRowView: FC<MentionRowViewProps> = (props) => {
 
     const isRoom = mention.mentionType === MentionType.ROOM;
     const typeTitle = LocalizeText(isRoom ? 'mentions.type.room' : 'mentions.type.direct');
+    const typeChip = isRoom ? localizeWithFallback('mentions.chip.room', 'Room') : localizeWithFallback('mentions.chip.direct', 'Direct');
     const time = formatMentionTime(mention.timestamp);
     const gotoLabel = LocalizeText('mentions.action.goto');
     const removeLabel = LocalizeText('mentions.action.remove');
@@ -24,13 +25,15 @@ export const MentionRowView: FC<MentionRowViewProps> = (props) => {
         <div className={`mention-row ${mention.read ? '' : 'is-unread'}`} role="listitem">
             {!mention.read && <span className="mention-row-unread-dot" aria-hidden />}
             <button type="button" className="mention-row-main" aria-label={`${mention.senderUsername}: ${mention.message}`} onClick={() => onOpen(mention)}>
-                <span className="mention-row-avatar" title={typeTitle}>
-                    <LayoutAvatarImageView headOnly direction={2} figure={mention.senderFigure} />
-                    <span className={`mention-row-type ${isRoom ? 'is-room' : 'is-direct'}`}>{isRoom ? '∗' : '@'}</span>
+                <span className="mention-row-avatar">
+                    <LayoutAvatarImageView headOnly compactHead compactHeadSize={40} compactHeadPadding={0} direction={2} figure={mention.senderFigure} />
                 </span>
                 <span className="mention-row-body">
                     <span className="mention-row-head">
                         <span className="mention-row-name">{mention.senderUsername}</span>
+                        <span className={`mention-row-chip ${isRoom ? 'is-room' : 'is-direct'}`} title={typeTitle}>
+                            {typeChip}
+                        </span>
                         {mention.roomName && mention.roomName.length > 0 && <span className="mention-row-room">· {mention.roomName}</span>}
                     </span>
                     <MentionMessageView className="mention-row-msg" ownUsername={ownUsername} text={mention.message} />
