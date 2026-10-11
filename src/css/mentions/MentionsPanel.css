@@ -378,3 +378,139 @@
     border-image-source: var(--habbo-skin-button-disabled);
     color: #8a8a8a;
 }
+
+/* ============================================================================
+   Refinement: the panel wears the flat, square chrome of the other hotel windows,
+   rows breathe and show two lines of the message, the actions are real buttons.
+   ============================================================================ */
+.mentions-search {
+    border-radius: 0;
+    border-color: #959595;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+.mentions-filter {
+    border-radius: 0;
+    border-color: #959595;
+    background: #f3f1ea;
+    color: #3f3f3a;
+    font-weight: 400;
+}
+
+.mentions-filter.is-active {
+    border-color: #2f6f8c;
+    background: #418db0;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.mentions-group-label {
+    padding: 6px 2px 2px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    letter-spacing: 0.5px;
+}
+
+.mention-row {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 6px 8px 12px;
+    border-radius: 0;
+    border-width: 0 0 1px;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.mention-row.is-unread {
+    background: rgba(255, 210, 77, 0.18);
+    box-shadow: inset 3px 0 0 #418db0;
+}
+
+.mention-row-unread-dot {
+    display: none;
+}
+
+.mention-row-main {
+    align-items: flex-start;
+}
+
+.mention-row-avatar {
+    border-radius: 0;
+}
+
+.mention-row-head {
+    flex-wrap: wrap;
+    row-gap: 0;
+}
+
+.mention-row-name {
+    font-size: 13px;
+}
+
+.mention-row-room {
+    padding: 0 5px;
+    background: rgba(0, 0, 0, 0.07);
+    color: #5f5f58;
+    font-size: 10px;
+    line-height: 15px;
+}
+
+.mention-row-msg {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 16px;
+    color: #2f2f2b;
+}
+
+.mention-row-meta {
+    align-items: flex-end;
+    justify-content: space-between;
+    align-self: stretch;
+    gap: 6px;
+}
+
+.mention-row-time {
+    color: #77776f;
+    font-size: 11px;
+}
+
+/* go to and delete: the default button of the classic client, 22 px */
+.mention-row-action {
+    width: 24px;
+    height: 22px;
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 3px;
+    border-image: var(--habbo-skin-button) 3 fill / 3px stretch;
+    border-radius: 0;
+    background: none;
+    color: #151515;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.mention-row-action:hover {
+    border-image-source: var(--habbo-skin-button-hover);
+    background: none;
+    color: #151515;
+}
+
+.mention-row-action.is-remove:hover {
+    border-image-source: var(--habbo-skin-button-hover);
+    background: none;
+    color: #b53636;
+}
+
+.octane-mention-notification__sender::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+    vertical-align: -4px;
+    background: url("@/assets/images/mentions/mentions-16.png") center / 16px 16px no-repeat;
+}
