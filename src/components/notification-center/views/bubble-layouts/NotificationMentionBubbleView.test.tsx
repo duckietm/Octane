@@ -28,6 +28,6 @@ describe('NotificationMentionBubbleView', () => {
         expect(bubble.className).toContain('octane-mention-notification');
         expect(bubble.className).toContain('octane-swf-notification-bubble');
         expect(container.querySelector('.octane-mention-notification__border')).not.toBeNull();
-        expect(container.querySelector('.octane-mention-notification__text')?.textContent).toContain('Alice');
+        expect(container.querySelector('.octane-mention-notification__text')?.textContent).toContain('Alice mentioned you');
     });
 });

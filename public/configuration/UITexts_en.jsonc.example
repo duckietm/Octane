@@ -1119,6 +1119,8 @@
     "mentions.window.noresults": "No mention matches.",
     "mentions.filter.clear": "Clear the filters",
     "mentions.action.refresh": "Refresh",
+    "mentions.notification.direct": "${user} mentioned you",
+    "mentions.notification.room": "${user} mentioned the room",
     "mentions.chip.direct": "Direct",
     "mentions.chip.room": "Room",
     "mentions.window.loadmore": "Load older mentions",
