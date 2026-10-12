@@ -26,3 +26,34 @@
 .octane-alert .octane-alert-link:hover {
     text-decoration: none;
 }
+
+/* Official motd_notification: a 436 px window, a list with a framed box for each message. */
+.octane-alert.octane-motd-alert {
+    width: 436px;
+    min-height: 227px;
+}
+
+.octane-motd-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    gap: 6px;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.octane-motd-item {
+    padding: 8px;
+    border: 1px solid #919191;
+    border-radius: 3px;
+    background: #ffffff;
+    font-size: 12px;
+    line-height: 17px;
+    overflow-wrap: anywhere;
+}
+
+.octane-motd-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+}
