@@ -1,3 +1,4 @@
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { getPrefixEffectStyle, getPrefixFontStyle, IPrefixItem, localizeWithFallback, LocalizeText, parsePrefixColors } from '../../../../api';
 import { GetNickIconUrl } from '../../../../assets/images/user_custom/nick_icons';
@@ -191,7 +192,9 @@ export const InventoryPrefixView: FC<{}> = () => {
             {activeTab === 'icons' &&
                 (nickIcons.length === 0 ? (
                     <InventoryCategoryEmptyView
-                        desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons you buy show up here.')}
+                        actionLabel={localizeWithFallback('inventory.empty.nickicons.action', 'Customize identity')}
+                        desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons are bought in the identity customizer.')}
+                        onAction={() => CreateLinkEvent('customize/show')}
                         title={localizeWithFallback('inventory.empty.nickicons.title', 'You have no icons')}
                     />
                 ) : (
