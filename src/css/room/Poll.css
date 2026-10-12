@@ -1,0 +1,166 @@
+/* Official poll_offer and poll_question: a 382 px window, a dark band with the picture and the
+   headline, the text, and a foot with the two links and the green thick button. */
+.octane-widget-poll.octane-poll {
+    width: 382px;
+    min-height: 0;
+    max-height: none;
+}
+
+.octane-poll .octane-card-content-shell {
+    padding: 0 !important;
+    background: #e9e9e1 !important;
+}
+
+.octane-poll-header {
+    position: relative;
+    flex: none;
+    height: 60px;
+    background: #0e3f52;
+    color: #ffffff;
+}
+
+.octane-poll-header.is-offer {
+    height: 95px;
+}
+
+.octane-poll-header__image {
+    position: absolute;
+    top: 7px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-poll-header__image.is-offer {
+    width: 80px;
+    height: 80px;
+}
+
+.octane-poll-header__headline {
+    position: absolute;
+    top: 15px;
+    right: 12px;
+    left: 80px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 22px;
+    overflow-wrap: anywhere;
+}
+
+.octane-poll-header.is-offer .octane-poll-header__headline {
+    top: 25px;
+    left: 110px;
+}
+
+.octane-poll-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 10px 12px;
+    color: #000000;
+    font-size: 12px;
+    line-height: 17px;
+    overflow-y: auto;
+    white-space: pre-line;
+}
+
+.octane-poll-body.is-question {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 420px;
+}
+
+.octane-poll-question {
+    font-weight: 700;
+}
+
+.octane-poll-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.octane-poll-answer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.octane-poll-text {
+    box-sizing: border-box;
+    width: 100%;
+    height: 25px;
+    padding: 0 6px;
+    border: 1px solid #919191;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #000000;
+    font-size: 12px;
+}
+
+.octane-poll-footer {
+    display: flex;
+    flex: none;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 12px 10px;
+}
+
+.octane-poll-number {
+    margin-right: auto;
+    color: #333333;
+    font-size: 12px;
+}
+
+.octane-poll-footer .octane-poll-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #333333;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-poll-footer .octane-poll-link.is-later {
+    color: #666666;
+}
+
+.octane-poll-footer .octane-poll-link:hover {
+    text-decoration: none;
+}
+
+.octane-poll-footer .octane-poll-ok {
+    flex: none;
+    width: 80px;
+    height: 40px;
+    padding: 0 6px;
+    border: 5px solid transparent;
+    border-image: var(--habbo-skin-shiny-thick-green) 5 fill / 5px stretch;
+    background: transparent;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-poll-footer .octane-poll-ok:hover {
+    border-image-source: var(--habbo-skin-shiny-thick-green-hover);
+}
+
+.octane-poll-footer .octane-poll-ok:active {
+    border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
+}
+
+.octane-poll-footer .octane-poll-ok:disabled {
+    border-image-source: var(--habbo-skin-shiny-thick-green-disabled);
+    color: #dddddd;
+    cursor: default;
+}
