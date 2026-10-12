@@ -1,0 +1,28 @@
+/* Official habbo_window_confirm and habbo_window_alert_link: a secondary action is an underlined
+   link beside or under the one button, not a second button. */
+.octane-confirm-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.octane-confirm-actions .octane-confirm-actions__cancel,
+.octane-alert .octane-alert-link {
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-alert .octane-alert-link {
+    margin-top: 6px;
+}
+
+.octane-confirm-actions .octane-confirm-actions__cancel:hover,
+.octane-alert .octane-alert-link:hover {
+    text-decoration: none;
+}

@@ -198,8 +198,12 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                 <>
                     <Column center alignItems="center" gap={0}>
                         <hr className="my-2 w-full" />
-                        {!item.clickUrl && <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>}
-                        {item.clickUrl && item.clickUrl.length > 0 && <Button onClick={visitUrl}>{LocalizeText(item.clickUrlText)}</Button>}
+                        <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>
+                        {item.clickUrl && item.clickUrl.length > 0 && (
+                            <button className="octane-alert-link" type="button" onClick={visitUrl}>
+                                {LocalizeText(item.clickUrlText)}
+                            </button>
+                        )}
                     </Column>
                 </>
             )}
