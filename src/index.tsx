@@ -70,6 +70,7 @@ import './css/achievements/AchievementsView.css';
 import './css/notification/NotificationCenterView.css';
 import './css/notification/HotelAlertToast.css';
 import './css/notification/CaptionNotification.css';
+import './css/notification/AlertActions.css';
 
 import './css/purse/PurseView.css';
 import './css/radio/RadioView.css';
