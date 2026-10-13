@@ -6,10 +6,13 @@ import { OctaneButton } from '../../../layout';
 export interface InventoryCategoryEmptyViewProps {
     title: string;
     desc: string;
+    /** What the button does and says; it opens the catalog when left out. */
+    actionLabel?: string;
+    onAction?: () => void;
 }
 
 export const InventoryCategoryEmptyView: FC<InventoryCategoryEmptyViewProps> = (props) => {
-    const { title = '', desc = '' } = props;
+    const { title = '', desc = '', actionLabel = null, onAction = null } = props;
 
     return (
         <div className="octane-inventory-empty">
@@ -18,8 +21,8 @@ export const InventoryCategoryEmptyView: FC<InventoryCategoryEmptyViewProps> = (
                 <div className="octane-inventory-empty-title">{title}</div>
                 <div className="octane-inventory-empty-desc">{desc}</div>
             </div>
-            <OctaneButton className="octane-inventory-empty-shop" onClick={() => CreateLinkEvent('catalog/toggle/normal')}>
-                {LocalizeText('inventory.open.catalog')}
+            <OctaneButton className="octane-inventory-empty-shop" onClick={onAction ?? (() => CreateLinkEvent('catalog/toggle/normal'))}>
+                {actionLabel ?? LocalizeText('inventory.open.catalog')}
             </OctaneButton>
         </div>
     );
