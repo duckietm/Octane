@@ -1,6 +1,6 @@
-import { Popover } from '@base-ui/react/popover';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { GetConfigurationValue, localizeWithFallback } from '../../../../api';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../../common/FloatingPopover';
 import { LazyEmojiPicker } from '../../../../common/LazyEmojiPicker';
 
 interface ChatInputEmojiSelectorViewProps {
@@ -24,22 +24,18 @@ export const ChatInputEmojiSelectorView: FC<ChatInputEmojiSelectorViewProps> = (
     if (!enabled) return null;
 
     return (
-        <Popover.Root open={selectorVisible} onOpenChange={(open) => setSelectorVisible(open)}>
-            <Popover.Trigger
+        <Popover open={selectorVisible} onOpenChange={(open) => setSelectorVisible(open)}>
+            <PopoverTrigger
                 aria-label={localizeWithFallback('widgets.chatinput.emoji', 'Emoji')}
                 className="swf-chat-emoji-trigger cursor-pointer select-none"
                 title={localizeWithFallback('widgets.chatinput.emoji', 'Emoji')}
                 type="button"
             >
                 <span aria-hidden="true">🙂</span>
-            </Popover.Trigger>
-            <Popover.Portal>
-                <Popover.Positioner align="end" className="z-[1070]" side="top" sideOffset={8}>
-                    <Popover.Popup className="swf-chat-emoji-popover">
-                        <LazyEmojiPicker onEmojiSelect={handleEmojiSelect} previewPosition="none" skinTonePosition="search" theme="light" />
-                    </Popover.Popup>
-                </Popover.Positioner>
-            </Popover.Portal>
-        </Popover.Root>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="swf-chat-emoji-popover" positionerClassName="z-[1070]" side="top" sideOffset={8}>
+                <LazyEmojiPicker onEmojiSelect={handleEmojiSelect} previewPosition="none" skinTonePosition="search" theme="light" />
+            </PopoverContent>
+        </Popover>
     );
 };

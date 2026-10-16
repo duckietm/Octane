@@ -1,5 +1,5 @@
-import { Popover } from '@base-ui/react/popover';
 import { FC, useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../../common/FloatingPopover';
 import { CHAT_TEXT_SIZES, ChatTextSize, getChatTextSizeLabel, getStoredChatTextSize, setStoredChatTextSize } from './chatTextSize';
 
 interface ChatInputStyleSelectorViewProps {
@@ -24,8 +24,8 @@ export const ChatInputStyleSelectorView: FC<ChatInputStyleSelectorViewProps> = (
     };
 
     return (
-        <Popover.Root open={selectorVisible} onOpenChange={(open) => setSelectorVisible(open)}>
-            <Popover.Trigger
+        <Popover open={selectorVisible} onOpenChange={(open) => setSelectorVisible(open)}>
+            <PopoverTrigger
                 nativeButton={false}
                 render={<div />}
                 className="swf-chat-style-trigger flex items-center cursor-pointer select-none"
@@ -35,42 +35,38 @@ export const ChatInputStyleSelectorView: FC<ChatInputStyleSelectorViewProps> = (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
                 </svg>
                 <div className="swf-chat-style-icon" />
-            </Popover.Trigger>
-            <Popover.Portal>
-                <Popover.Positioner side="top" align="start" sideOffset={9}>
-                    <Popover.Popup className="swf-chat-style-menu">
-                        <div className="swf-chat-style-menu-grid">
-                            {chatStyleIds &&
-                                chatStyleIds.length > 0 &&
-                                chatStyleIds.map((styleId) => (
-                                    <button
-                                        key={styleId}
-                                        type="button"
-                                        className={`swf-chat-style-option ${chatStyleId === styleId ? 'is-active' : ''}`}
-                                        onClick={() => selectStyle(styleId)}
-                                    >
-                                        <span className="swf-chat-style-preview bubble-container">
-                                            <span className={`chat-bubble bubble-${styleId}`} />
-                                        </span>
-                                    </button>
-                                ))}
-                        </div>
-                        <div className="swf-chat-font-row">
-                            <span className="swf-chat-font-label">Dimensione del testo</span>
-                            {CHAT_TEXT_SIZES.map((size) => (
-                                <button
-                                    key={size}
-                                    type="button"
-                                    className={`swf-chat-font-option ${chatTextSize === size ? 'is-active' : ''}`}
-                                    onClick={() => selectTextSize(size)}
-                                >
-                                    {getChatTextSizeLabel(size)}
-                                </button>
-                            ))}
-                        </div>
-                    </Popover.Popup>
-                </Popover.Positioner>
-            </Popover.Portal>
-        </Popover.Root>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="swf-chat-style-menu" side="top" sideOffset={9}>
+                <div className="swf-chat-style-menu-grid">
+                    {chatStyleIds &&
+                        chatStyleIds.length > 0 &&
+                        chatStyleIds.map((styleId) => (
+                            <button
+                                key={styleId}
+                                type="button"
+                                className={`swf-chat-style-option ${chatStyleId === styleId ? 'is-active' : ''}`}
+                                onClick={() => selectStyle(styleId)}
+                            >
+                                <span className="swf-chat-style-preview bubble-container">
+                                    <span className={`chat-bubble bubble-${styleId}`} />
+                                </span>
+                            </button>
+                        ))}
+                </div>
+                <div className="swf-chat-font-row">
+                    <span className="swf-chat-font-label">Dimensione del testo</span>
+                    {CHAT_TEXT_SIZES.map((size) => (
+                        <button
+                            key={size}
+                            type="button"
+                            className={`swf-chat-font-option ${chatTextSize === size ? 'is-active' : ''}`}
+                            onClick={() => selectTextSize(size)}
+                        >
+                            {getChatTextSizeLabel(size)}
+                        </button>
+                    ))}
+                </div>
+            </PopoverContent>
+        </Popover>
     );
 };

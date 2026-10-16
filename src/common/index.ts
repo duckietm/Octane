@@ -16,6 +16,7 @@ export * from './HorizontalRule';
 export * from './InfiniteScroll';
 export * from './layout';
 export * from './layout/limited-edition';
+export * from './FloatingPopover';
 export * from './Slider';
 export * from './scroll-area/ClassicScrollAreaView';
 export * from './Text';
