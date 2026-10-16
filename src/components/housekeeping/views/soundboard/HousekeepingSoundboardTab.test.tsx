@@ -146,7 +146,7 @@ describe('HousekeepingSoundboardTab', () => {
         expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
         expect(screen.getByRole('textbox', { name: 'URL' })).toBeDisabled();
         expect(screen.getByRole('spinbutton', { name: 'Minimum rank' })).toBeDisabled();
-        expect(screen.getByRole('checkbox', { name: 'Enabled' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Enabled' })).toHaveAttribute('aria-disabled', 'true');
         expect(screen.getByRole('button', { name: 'New sound' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Edit Campanella' })).toBeDisabled();
     });
