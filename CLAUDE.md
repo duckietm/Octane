@@ -108,6 +108,8 @@ login/WebGL, so they're not usable for in-game verification.
 - React 19.2.5, `react-dom` 19.2.5, `@types/react` 19.2.x.
 - TypeScript: TS 6 for build, **TS 7 native preview** (`@typescript/native-preview`,
   invoked via `tsgo`) for the `typecheck` script.
+- UI primitives: Base UI (`@base-ui/react`, imported per subpath) — `common/Slider.tsx` and
+  `common/FloatingPopover.tsx` wrap it. Radix UI is no longer a dependency.
 - Vite 8 + `@vitejs/plugin-react` 6 + `babel-plugin-react-compiler` 1.0.
 - ESLint 10 + `typescript-eslint` 8 + `eslint-plugin-react-hooks@7` +
   `eslint-plugin-react-compiler`.
