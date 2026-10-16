@@ -8,6 +8,7 @@ import { WiredBubbleWidthSelect } from '../WiredBubbleWidthSelect';
 import { BOT_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MESSAGE_MAX_LENGTH = 400;
 
@@ -109,7 +110,7 @@ export const WiredActionBotTalkBaseView: FC<WiredActionBotTalkBaseViewProps> = (
                     </label>
                 ))}
                 <label className="flex items-center gap-1">
-                    <input checked={hideBotName} className="form-check-input" type="checkbox" onChange={(event) => setHideBotName(event.target.checked)} />
+                    <Checkbox checked={hideBotName} onCheckedChange={(nextChecked) => setHideBotName(nextChecked)} />
                     <Text>{localizeWithFallback('wiredfurni.params.bot_talk.hide_bot_name', 'Hide the bot name')}</Text>
                 </label>
             </div>

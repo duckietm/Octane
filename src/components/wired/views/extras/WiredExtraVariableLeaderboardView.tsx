@@ -30,6 +30,7 @@ import { Text } from '../../../../common';
 import { useWired, useWiredLeaderboardStore, useWiredTools } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const P = 'wiredfurni.params.variable_leaderboard';
 const SORT_FALLBACKS = [ 'Highest value first', 'Lowest value first', 'Oldest creation first', 'Latest creation first', 'Oldest update first', 'Latest update first' ];
@@ -212,14 +213,14 @@ export const WiredExtraVariableLeaderboardView: FC<{}> = () => {
 
                 <Text bold>{text('section.filter', 'Filter')}</Text>
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" data-testid="leaderboard-filter" checked={draft.filterEnabled} onChange={(event) => patch({ filterEnabled: event.target.checked })} />
+                    <Checkbox data-testid="leaderboard-filter" checked={draft.filterEnabled} onCheckedChange={(nextChecked) => patch({ filterEnabled: nextChecked })} />
                     <Text>{text('filter.enabled', 'Only list users who have a variable')}</Text>
                 </label>
                 {draft.filterEnabled && (
                     <div className="flex flex-col gap-1 pl-4">
                         {select(text('filter.variable', 'Variable'), draft.filterVariableId, [ { value: '0', label: '-' }, ...userVariableDefinitions.map((definition) => ({ value: String(definition.itemId), label: definition.name })) ], (value) => patch({ filterVariableId: value }))}
                         <label className="flex items-center gap-1">
-                            <input type="checkbox" disabled={!filterDefinition?.hasValue} checked={draft.compareEnabled && !!filterDefinition?.hasValue} onChange={(event) => patch({ compareEnabled: event.target.checked })} />
+                            <Checkbox disabled={!filterDefinition?.hasValue} checked={draft.compareEnabled && !!filterDefinition?.hasValue} onCheckedChange={(nextChecked) => patch({ compareEnabled: nextChecked })} />
                             <Text>{text('filter.compare', 'Whose value equals')}</Text>
                         </label>
                         {draft.compareEnabled && !!filterDefinition?.hasValue && (

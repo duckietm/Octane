@@ -14,6 +14,7 @@ import {
     TIME_UTIL_SUB_VARIABLES
 } from './timeUtilitiesParams';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MODE_FALLBACKS = ['Variable value', 'Creation time', 'Last update time'];
 const SUB_VARIABLE_KEY = 'wiredfurni.params.time_util.subvariable.';
@@ -42,12 +43,7 @@ export const WiredExtraTimeUtilitiesView: FC<{}> = () => {
             {subVariables.map((subVariable) => (
                 <div key={subVariable.id} className="octane-wired__levelup-subvariable-row">
                     <label className="octane-wired__levelup-subvariable-label">
-                        <input
-                            checked={isTimeUtilSubVariableSelected(mask, subVariable.id)}
-                            className="form-check-input"
-                            type="checkbox"
-                            onChange={(event) => setMask((value) => setTimeUtilSubVariableSelected(value, subVariable.id, event.target.checked))}
-                        />
+                        <Checkbox checked={isTimeUtilSubVariableSelected(mask, subVariable.id)} onCheckedChange={(nextChecked) => setMask((value) => setTimeUtilSubVariableSelected(value, subVariable.id, nextChecked))} />
                         <Text>{localizeWithFallback(`${SUB_VARIABLE_KEY}${subVariable.id}`, subVariable.label)}</Text>
                     </label>
                     <input className="octane-wired__levelup-subvariable-token" readOnly tabIndex={-1} type="text" value={subVariable.name} />

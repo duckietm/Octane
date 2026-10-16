@@ -3,6 +3,7 @@ import { WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export const WiredTriggerUserGetsHandItemView: FC<{}> = () =>
 {
@@ -28,12 +29,7 @@ export const WiredTriggerUserGetsHandItemView: FC<{}> = () =>
                 <Text bold>Hand item filter</Text>
                 <Text small>Fires when a user receives a hand item. Leave unchecked to match any hand item.</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={ filterEnabled }
-                        className="form-check-input"
-                        id="handItemFilterEnabled"
-                        type="checkbox"
-                        onChange={ event => setFilterEnabled(event.target.checked) } />
+                    <Checkbox checked={ filterEnabled } id="handItemFilterEnabled" onCheckedChange={(nextChecked) => setFilterEnabled(nextChecked)} />
                     <Text>Only a specific hand item id</Text>
                 </div>
                 { filterEnabled &&

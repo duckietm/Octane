@@ -6,6 +6,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource, slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 /**
  * Teleport (official [fast]), our walk to furni (laid out the same), move furni to user (official: no
@@ -64,7 +65,7 @@ export const WiredActionTeleportView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text bold>{LocalizeText('wiredfurni.params.teleport.options')}</Text>
                     <label className="flex items-center gap-1">
-                        <input checked={fastTeleport} className="form-check-input" type="checkbox" onChange={(event) => setFastTeleport(event.target.checked)} />
+                        <Checkbox checked={fastTeleport} onCheckedChange={(nextChecked) => setFastTeleport(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.teleport.options.0')}</Text>
                     </label>
                 </div>

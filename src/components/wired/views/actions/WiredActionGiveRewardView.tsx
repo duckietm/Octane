@@ -7,6 +7,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 type RewardType = 'badge' | 'credits' | 'pixels' | 'diamonds' | 'points' | 'furni' | 'respect';
 
@@ -209,13 +210,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
             footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
         >
             <div className="flex items-center gap-1">
-                <input
-                    checked={limitEnabled}
-                    className="form-check-input"
-                    id="limitEnabled"
-                    type="checkbox"
-                    onChange={(event) => setLimitEnabled(event.target.checked)}
-                />
+                <Checkbox checked={limitEnabled} id="limitEnabled" onCheckedChange={(nextChecked) => setLimitEnabled(nextChecked)} />
                 <Text>{LocalizeText('wiredfurni.params.prizelimit', ['amount'], [limitEnabled ? rewardsLimit.toString() : ''])}</Text>
             </div>
             {!limitEnabled && (
@@ -241,13 +236,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
             </div>
             <hr className="m-0 bg-dark" />
             <div className="flex items-center gap-1">
-                <input
-                    checked={uniqueRewards}
-                    className="form-check-input"
-                    id="uniqueRewards"
-                    type="checkbox"
-                    onChange={(e) => setUniqueRewards(e.target.checked)}
-                />
+                <Checkbox checked={uniqueRewards} id="uniqueRewards" onCheckedChange={(nextChecked) => setUniqueRewards(nextChecked)} />
                 <Text>{localizeWithFallback('wiredfurni.params.reward.unique', 'Unique rewards')}</Text>
             </div>
             <Text center small className="p-1 rounded bg-muted">

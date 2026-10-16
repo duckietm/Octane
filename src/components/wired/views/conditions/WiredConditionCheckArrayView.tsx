@@ -43,6 +43,7 @@ import {
     wiredArrayValueAsAddress
 } from '../arrays/WiredArrayValueField';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const RESULT_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'every entry matches', value: WIRED_ARRAY_RESULT_ALL },
@@ -200,12 +201,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                         />
 
                         <label className="flex items-center gap-1 cursor-pointer">
-                            <input
-                                checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => setPayload({ ...payload, criteriaMode: event.target.checked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })}
-                            />
+                            <Checkbox checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY} onCheckedChange={(nextChecked) => setPayload({ ...payload, criteriaMode: nextChecked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })} />
                             <Text>{localizeWithFallback('wiredfurni.params.arrays.criteria.any', 'An entry counts if any rule fits')}</Text>
                         </label>
 
@@ -286,12 +282,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
 
                 {ownerSources.length > 0 && (
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={payload.quantifier === WIRED_ARRAY_QUANTIFIER_ANY}
-                            className="form-check-input"
-                            type="checkbox"
-                            onChange={(event) => setPayload({ ...payload, quantifier: event.target.checked ? WIRED_ARRAY_QUANTIFIER_ANY : WIRED_ARRAY_QUANTIFIER_ALL })}
-                        />
+                        <Checkbox checked={payload.quantifier === WIRED_ARRAY_QUANTIFIER_ANY} onCheckedChange={(nextChecked) => setPayload({ ...payload, quantifier: nextChecked ? WIRED_ARRAY_QUANTIFIER_ANY : WIRED_ARRAY_QUANTIFIER_ALL })} />
                         <Text>{localizeWithFallback('wiredfurni.params.arrays.quantifier.any', 'One owner passing is enough')}</Text>
                     </label>
                 )}

@@ -237,6 +237,7 @@
    of illumina_light_checkbox_basic, the radio is radio_button_off/on - so the size
    is the artwork's own and must not be scaled. */
 input[type='checkbox'],
+.octane-checkbox,
 .form-check-input[type='checkbox'] {
     width: 19px;
     height: 20px;
@@ -253,8 +254,15 @@ input[type='checkbox'],
 }
 
 input[type='checkbox']:checked,
+.octane-checkbox[data-checked],
 .form-check-input[type='checkbox']:checked {
     background-image: var(--habbo-skin-checkbox-checked);
+}
+
+/* Base UI renders the box as a span (the real input is visually hidden). */
+.octane-checkbox {
+    display: inline-block;
+    padding: 0;
 }
 
 input[type='radio'],
@@ -279,6 +287,7 @@ input[type='radio']:checked,
 }
 
 input[type='checkbox']:focus-visible,
+.octane-checkbox:focus-visible,
 input[type='radio']:focus-visible {
     outline: 1px solid #4b7ea1;
     outline-offset: 1px;

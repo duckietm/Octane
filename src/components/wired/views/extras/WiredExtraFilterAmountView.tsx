@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MIN_FILTER = 1;
 const MAX_FILTER = 1000;
@@ -71,7 +72,7 @@ export const WiredExtraFilterAmountView: FC<{ name: string }> = ({ name }) => {
                     onValueChange={setAmount}
                 />
                 <label className="flex items-center gap-1">
-                    <input checked={randomPick} className="form-check-input" type="checkbox" onChange={(event) => setRandomPick(event.target.checked)} />
+                    <Checkbox checked={randomPick} onCheckedChange={(nextChecked) => setRandomPick(nextChecked)} />
                     <Text>{localizeWithFallback('wiredfurni.params.filter.random', 'Pick at random (off: the first N)')}</Text>
                 </label>
             </div>

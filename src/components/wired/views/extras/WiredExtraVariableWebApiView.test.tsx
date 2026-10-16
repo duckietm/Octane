@@ -79,7 +79,7 @@ const deliverKey = (itemId: number, isReadKey: boolean, key: string) =>
         for (const handler of mocks.handlers) handler({ getParser: () => ({ itemId, isReadKey, key }) });
     });
 
-const bulkDeleteBox = () => screen.getByRole('checkbox') as HTMLInputElement;
+const bulkDeleteBox = () => screen.getByRole('checkbox');
 
 describe('WiredExtraVariableWebApiView', () => {
     afterEach(cleanup);
@@ -147,7 +147,7 @@ describe('WiredExtraVariableWebApiView', () => {
         fireEvent.click(screen.getAllByRole('button', { name: 'Clear' })[1]);
 
         expect(bulkDeleteBox()).not.toBeChecked();
-        expect(bulkDeleteBox()).toBeDisabled();
+        expect(bulkDeleteBox()).toHaveAttribute('aria-disabled', 'true');
 
         act(() => mocks.save());
         expect(mocks.setIntParams).toHaveBeenCalledWith([0]);

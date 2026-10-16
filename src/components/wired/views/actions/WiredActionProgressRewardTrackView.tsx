@@ -8,6 +8,7 @@ import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { clampProgressAmount, PROGRESS_ACHIEVEMENT_MAX_AMOUNT } from './WiredActionProgressAchievementView';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 /**
  * Habbo's progress-reward-track action (`wf_act_progress_reward_track`): moves one task of a reward
@@ -87,7 +88,7 @@ export const WiredActionProgressRewardTrackView: FC<{}> = () => {
                 />
             </div>
             <label className="flex items-center gap-1">
-                <input type="checkbox" className="form-check-input" checked={addToExisting} onChange={(event) => setAddToExisting(event.target.checked)} />
+                <Checkbox checked={addToExisting} onCheckedChange={(nextChecked) => setAddToExisting(nextChecked)} />
                 <Text>{localizeWithFallback('wiredfurni.params.reward_track.add_to_existing_score', 'Add to the existing score')}</Text>
             </label>
             <div className="flex flex-col gap-1">

@@ -3,6 +3,7 @@ import { LocalizeText } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const TEAM_TYPES = [0, 1, 2, 3, 4];
 
@@ -51,17 +52,12 @@ export const WiredSelectorUsersTeamView: FC<{}> = () => {
                 <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
 
                 <label className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        checked={filterExisting}
-                        onChange={(event) => setFilterExisting(event.target.checked)}
-                    />
+                    <Checkbox checked={filterExisting} onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
                 </label>
 
                 <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={invert} onChange={(event) => setInvert(event.target.checked)} />
+                    <Checkbox checked={invert} onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
                 </label>
             </div>

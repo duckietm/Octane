@@ -14,6 +14,7 @@ import {
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 type VariableTargetType = 'user' | 'furni' | 'global';
 
@@ -196,67 +197,32 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
                     <Text bold>{LocalizeText('wiredfurni.params.variables.trigger_options')}</Text>
 
                     <label className="flex items-center gap-1">
-                        <input
-                            checked={effectiveCreatedEnabled}
-                            className="form-check-input"
-                            disabled={targetType === 'global'}
-                            type="checkbox"
-                            onChange={(event) => setCreatedEnabled(event.target.checked)}
-                        />
+                        <Checkbox checked={effectiveCreatedEnabled} disabled={targetType === 'global'} onCheckedChange={(nextChecked) => setCreatedEnabled(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.trigger_options.0')}</Text>
                     </label>
 
                     <label className="flex items-center gap-1">
-                        <input
-                            checked={valueChangedEnabled}
-                            className="form-check-input"
-                            type="checkbox"
-                            onChange={(event) => setValueChangedEnabled(event.target.checked)}
-                        />
+                        <Checkbox checked={valueChangedEnabled} onCheckedChange={(nextChecked) => setValueChangedEnabled(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.trigger_options.1')}</Text>
                     </label>
 
                     <div className="ml-3 flex flex-col gap-1">
                         <label className="flex items-center gap-1">
-                            <input
-                                checked={effectiveIncreasedEnabled}
-                                className="form-check-input"
-                                disabled={!valueChangedEnabled}
-                                type="checkbox"
-                                onChange={(event) => setIncreasedEnabled(event.target.checked)}
-                            />
+                            <Checkbox checked={effectiveIncreasedEnabled} disabled={!valueChangedEnabled} onCheckedChange={(nextChecked) => setIncreasedEnabled(nextChecked)} />
                             <Text>{LocalizeText('wiredfurni.params.variables.trigger_options.1.0')}</Text>
                         </label>
                         <label className="flex items-center gap-1">
-                            <input
-                                checked={effectiveDecreasedEnabled}
-                                className="form-check-input"
-                                disabled={!valueChangedEnabled}
-                                type="checkbox"
-                                onChange={(event) => setDecreasedEnabled(event.target.checked)}
-                            />
+                            <Checkbox checked={effectiveDecreasedEnabled} disabled={!valueChangedEnabled} onCheckedChange={(nextChecked) => setDecreasedEnabled(nextChecked)} />
                             <Text>{LocalizeText('wiredfurni.params.variables.trigger_options.1.1')}</Text>
                         </label>
                         <label className="flex items-center gap-1">
-                            <input
-                                checked={effectiveUnchangedEnabled}
-                                className="form-check-input"
-                                disabled={!valueChangedEnabled}
-                                type="checkbox"
-                                onChange={(event) => setUnchangedEnabled(event.target.checked)}
-                            />
+                            <Checkbox checked={effectiveUnchangedEnabled} disabled={!valueChangedEnabled} onCheckedChange={(nextChecked) => setUnchangedEnabled(nextChecked)} />
                             <Text>{LocalizeText('wiredfurni.params.variables.trigger_options.1.2')}</Text>
                         </label>
                     </div>
 
                     <label className="flex items-center gap-1">
-                        <input
-                            checked={effectiveDeletedEnabled}
-                            className="form-check-input"
-                            disabled={targetType === 'global'}
-                            type="checkbox"
-                            onChange={(event) => setDeletedEnabled(event.target.checked)}
-                        />
+                        <Checkbox checked={effectiveDeletedEnabled} disabled={targetType === 'global'} onCheckedChange={(nextChecked) => setDeletedEnabled(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.trigger_options.2')}</Text>
                     </label>
                 </div>
@@ -267,12 +233,7 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
                     <Text bold>{localizeWithFallback('wiredfurni.params.variables.trigger_origin', 'Changed by:')}</Text>
                     {ORIGIN_OPTIONS.map((option) => (
                         <label key={option.bit} className="flex items-center gap-1">
-                            <input
-                                checked={isOriginChecked(option.bit)}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => toggleOrigin(option.bit, event.target.checked)}
-                            />
+                            <Checkbox checked={isOriginChecked(option.bit)} onCheckedChange={(nextChecked) => toggleOrigin(option.bit, nextChecked)} />
                             <Text>{localizeWithFallback(option.key, option.fallback)}</Text>
                         </label>
                     ))}

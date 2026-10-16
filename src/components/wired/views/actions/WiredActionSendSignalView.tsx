@@ -5,6 +5,7 @@ import { useNotification, useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES, USER_SOURCES } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_SELECTED = 100;
@@ -226,23 +227,13 @@ export const WiredActionSendSignalView: FC<{}> = () =>
             <div className="flex flex-col gap-3">
                 <Text bold>{ localizeWithFallback('wiredfurni.params.signal.send_options', LocalizeText('wiredfurni.params.signal.options')) }</Text>
                 <div className="form-check">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id="signal-per-furni"
-                        checked={ signalPerFurni }
-                        onChange={ e => confirmSplit(e.target.checked, setSignalPerFurni) } />
+                    <Checkbox id="signal-per-furni" checked={ signalPerFurni } onCheckedChange={(nextChecked) => confirmSplit(nextChecked, setSignalPerFurni)} />
                     <label className="form-check-label" htmlFor="signal-per-furni">
                         <Text small>{ LocalizeText('wiredfurni.params.signal.split_furni') }</Text>
                     </label>
                 </div>
                 <div className="form-check">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id="signal-per-user"
-                        checked={ signalPerUser }
-                        onChange={ e => confirmSplit(e.target.checked, setSignalPerUser) } />
+                    <Checkbox id="signal-per-user" checked={ signalPerUser } onCheckedChange={(nextChecked) => confirmSplit(nextChecked, setSignalPerUser)} />
                     <label className="form-check-label" htmlFor="signal-per-user">
                         <Text small>{ LocalizeText('wiredfurni.params.signal.split_users') }</Text>
                     </label>

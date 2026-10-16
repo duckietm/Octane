@@ -4,6 +4,7 @@ import { Button, LayoutAvatarImageView, LayoutPetImageView, LayoutRoomObjectImag
 import { INSPECTION_ELEMENTS } from './WiredCreatorTools.constants';
 import { InspectionFurniSelection, InspectionUserSelection, InspectionVariable } from './WiredCreatorTools.types';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
+import { Checkbox } from '../../common/Checkbox';
 
 /**
  * Structural shape we need from the renderer's variable-definition
@@ -150,12 +151,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                     </div>
                 </div>
                 <label className="flex items-center gap-2 text-[12px] text-[#111]">
-                    <input
-                        checked={keepSelected}
-                        className="form-check-input mt-0"
-                        type="checkbox"
-                        onChange={(event) => onKeepSelectedChange(event.target.checked)}
-                    />
+                    <Checkbox checked={keepSelected} className="mt-0" onCheckedChange={(nextChecked) => onKeepSelectedChange(nextChecked)} />
                     <span>Keep selected</span>
                 </label>
             </div>

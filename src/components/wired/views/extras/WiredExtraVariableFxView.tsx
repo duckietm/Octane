@@ -35,6 +35,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries, IWiredVariablePickerEntry, WiredVariablePickerTarget } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export interface WiredExtraVariableFxViewProps {
     category: number;
@@ -167,7 +168,7 @@ export const WiredExtraVariableFxView: FC<WiredExtraVariableFxViewProps> = (prop
     ) => (
         <div className="flex flex-col gap-1 octane-wired-fx-editor__override">
             <label className="flex items-center gap-1 cursor-pointer">
-                <input type="checkbox" className="form-check-input" checked={enabled} onChange={(event) => onChange(event.target.checked, target, token)} />
+                <Checkbox checked={enabled} onCheckedChange={(nextChecked) => onChange(nextChecked, target, token)} />
                 <Text bold>{label}</Text>
             </label>
             {enabled && (

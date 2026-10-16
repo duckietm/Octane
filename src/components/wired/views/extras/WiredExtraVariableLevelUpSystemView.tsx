@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MODE_LINEAR = 1;
 const MODE_EXPONENTIAL = 2;
@@ -493,12 +494,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                             {subvariableOptions.map((subvariable) => (
                                 <div key={subvariable.key} className="octane-wired__levelup-subvariable-row">
                                     <label className="octane-wired__levelup-subvariable-label">
-                                        <input
-                                            checked={selectedSubvariables.includes(subvariable.key)}
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            onChange={() => toggleSubvariable(subvariable.key)}
-                                        />
+                                        <Checkbox checked={selectedSubvariables.includes(subvariable.key)} onCheckedChange={() => toggleSubvariable(subvariable.key)} />
                                         <Text>{LocalizeText(`wiredfurni.params.levelup.subvariable.${subvariable.key}`)}</Text>
                                     </label>
                                     <input className="octane-wired__levelup-subvariable-token" readOnly tabIndex={-1} type="text" value={subvariable.suffix} />

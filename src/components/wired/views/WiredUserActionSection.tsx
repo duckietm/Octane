@@ -9,6 +9,7 @@ import {
     WiredUserActionChoice
 } from '../../../api';
 import { Text } from '../../../common';
+import { Checkbox } from '../../../common/Checkbox';
 
 /**
  * The official action picker of the "user performs action" boxes: section action_selection, and for
@@ -23,7 +24,7 @@ export const WiredUserActionSection: FC<{ choice: WiredUserActionChoice; onChang
             <Text bold>{ localizeWithFallback(titleKey, '') }</Text>
             <div className="flex items-center gap-2">
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={ enabled } onChange={ event => onToggle(event.target.checked) } />
+                    <Checkbox checked={ enabled } onCheckedChange={(nextChecked) => onToggle(nextChecked)} />
                     <Text>{ localizeWithFallback(filterKey, '') }</Text>
                 </label>
                 <select className="form-select form-select-sm" title={ localizeWithFallback(tooltipKey, '') } value={ value } onChange={ event => onSelect(parseInt(event.target.value, 10)) }>

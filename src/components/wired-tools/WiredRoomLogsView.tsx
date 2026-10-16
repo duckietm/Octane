@@ -7,6 +7,7 @@ import { useWiredPageRequests } from '../../hooks/wired-tools/useWiredPageReques
 import { MONITOR_ERROR_INFO, MONITOR_LOG_ORDER } from './WiredCreatorTools.constants';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
+import { Checkbox } from '../../common/Checkbox';
 
 /** Rows per page, as the official log list shows them. */
 export const WIRED_ROOM_LOGS_PAGE_SIZE = 50;
@@ -184,7 +185,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                         )}
                     </Text>
                     <label className="flex items-center gap-1 text-[12px] whitespace-nowrap">
-                        <input type="checkbox" checked={autoRefresh} onChange={(event) => setAutoRefresh(event.target.checked)} />
+                        <Checkbox checked={autoRefresh} onCheckedChange={(nextChecked) => setAutoRefresh(nextChecked)} />
                         {localizeWithFallback('wiredmenu.logs_overview.auto_refresh', 'Auto refresh')}
                     </label>
                     <Button variant="secondary" onClick={() => requests.refresh()}>

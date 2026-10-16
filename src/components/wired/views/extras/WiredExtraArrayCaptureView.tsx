@@ -27,6 +27,7 @@ import {
     wiredArrayValueAsAddress
 } from '../arrays/WiredArrayValueField';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const DIRECTION_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'the first match', value: WIRED_ARRAY_CAPTURE_DIRECTION_FIRST },
@@ -147,12 +148,7 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                             onChange={(criteria) => setPayload({ ...payload, criteria })}
                         />
                         <label className="flex items-center gap-1 cursor-pointer">
-                            <input
-                                checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => setPayload({ ...payload, criteriaMode: event.target.checked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })}
-                            />
+                            <Checkbox checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY} onCheckedChange={(nextChecked) => setPayload({ ...payload, criteriaMode: nextChecked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })} />
                             <Text>{localizeWithFallback('wiredfurni.params.arrays.criteria.any', 'An entry counts if any rule fits')}</Text>
                         </label>
                         <div className="flex flex-col gap-1">
