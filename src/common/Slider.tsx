@@ -1,5 +1,5 @@
-import * as RadixSlider from '@radix-ui/react-slider';
-import { CSSProperties, FC, HTMLProps, ReactElement } from 'react';
+import { Slider as BaseSlider } from '@base-ui/react/slider';
+import { CSSProperties, FC, ReactNode } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { Button } from './Button';
 import { Flex } from './Flex';
@@ -19,12 +19,12 @@ export interface SliderProps {
     onChange?: (value: any, thumbIndex: number) => void;
     disabled?: boolean;
     disabledButton?: boolean;
-    invert?: boolean;
     className?: string;
     style?: CSSProperties;
     trackClassName?: string;
     thumbClassName?: string;
-    renderThumb?: (props: HTMLProps<HTMLDivElement>, state: SliderThumbState) => ReactElement;
+    thumbAriaLabel?: string;
+    renderThumbContent?: (state: SliderThumbState) => ReactNode;
 }
 
 const toArray = (value: number | number[] | undefined): number[] => {
@@ -46,12 +46,12 @@ export const Slider: FC<SliderProps> = (props) => {
         value,
         defaultValue,
         onChange,
-        invert,
         className,
         style,
         trackClassName,
         thumbClassName,
-        renderThumb
+        thumbAriaLabel,
+        renderThumbContent
     } = props;
 
     const valueArr = toArray(value);
@@ -88,10 +88,6 @@ export const Slider: FC<SliderProps> = (props) => {
     };
 
     const renderThumbElement = (i: number) => {
-        const baseProps: HTMLProps<HTMLDivElement> = {
-            className: cn('thumb', `thumb-${i}`, thumbClassName)
-        };
-
         const state: SliderThumbState = {
             index: i,
             value: isRange ? valueArr : currentValue,
@@ -99,9 +95,9 @@ export const Slider: FC<SliderProps> = (props) => {
         };
 
         return (
-            <RadixSlider.Thumb key={i} asChild>
-                {renderThumb ? renderThumb(baseProps, state) : <div {...baseProps} />}
-            </RadixSlider.Thumb>
+            <BaseSlider.Thumb key={i} index={i} aria-label={thumbAriaLabel} className={cn('thumb', `thumb-${i}`, thumbClassName)}>
+                {renderThumbContent?.(state)}
+            </BaseSlider.Thumb>
         );
     };
 
@@ -112,23 +108,25 @@ export const Slider: FC<SliderProps> = (props) => {
                     <FaAngleLeft />
                 </Button>
             )}
-            <RadixSlider.Root
-                inverted={invert}
+            <BaseSlider.Root
                 disabled={disabled}
                 className={cn('octane-slider', 'relative', 'min-w-0', 'grow', className)}
                 style={style}
                 max={max}
                 min={min}
                 step={step}
-                value={value !== undefined ? valueArr : undefined}
-                defaultValue={defaultValue !== undefined ? toArray(defaultValue) : undefined}
-                onValueChange={emit}
+                thumbAlignment="center"
+                value={value !== undefined ? (isRange ? valueArr : currentValue) : undefined}
+                defaultValue={defaultValue !== undefined ? defaultValue : undefined}
+                onValueChange={(next) => emit(toArray(next))}
             >
-                <RadixSlider.Track className={cn('track', 'track-1', 'grow', trackClassName)}>
-                    <RadixSlider.Range className={cn('track', 'track-0', trackClassName)} />
-                </RadixSlider.Track>
-                {valueArr.map((_, i) => renderThumbElement(i))}
-            </RadixSlider.Root>
+                <BaseSlider.Control className="flex h-full w-full grow items-center">
+                    <BaseSlider.Track className={cn('track', 'track-1', 'grow', trackClassName)}>
+                        <BaseSlider.Indicator className={cn('track', 'track-0', trackClassName)} />
+                    </BaseSlider.Track>
+                    {valueArr.map((_, i) => renderThumbElement(i))}
+                </BaseSlider.Control>
+            </BaseSlider.Root>
             {!disabledButton && (
                 <Button classNames={['octane-slider-button', 'octane-slider-button-right']} disabled={disabled || maximum <= currentValue} onClick={stepUp}>
                     <FaAngleRight />
