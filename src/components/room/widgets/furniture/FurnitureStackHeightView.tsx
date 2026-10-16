@@ -35,7 +35,7 @@ export const FurnitureStackHeightView: FC<{}> = (props) => {
                     <Slider
                         max={maxHeight}
                         min={0}
-                        renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
+                        renderThumbContent={(state) => state.valueNow}
                         step={0.01}
                         value={height}
                         onChange={(event) => updateHeight(event)}

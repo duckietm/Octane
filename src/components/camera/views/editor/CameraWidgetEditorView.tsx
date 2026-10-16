@@ -304,9 +304,7 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                             step={1}
                             value={Math.round(currentEffect.strength * 100)}
                             onChange={(value) => setSelectedEffectAlpha(value / 100)}
-                            renderThumb={({ key, ...thumbProps }) => (
-                                <div key={key} {...thumbProps} aria-label={LocalizeText(`camera.effect.name.${currentEffect.effect.name}`)} />
-                            )}
+                            thumbAriaLabel={LocalizeText(`camera.effect.name.${currentEffect.effect.name}`)}
                         />
                     </div>
                 )}

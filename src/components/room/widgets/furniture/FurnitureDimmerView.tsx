@@ -111,7 +111,7 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
                             <Slider
                                 max={FurnitureDimmerUtilities.MAX_BRIGHTNESS}
                                 min={FurnitureDimmerUtilities.MIN_BRIGHTNESS}
-                                renderThumb={(props, state) => <div {...props}>{FurnitureDimmerUtilities.scaleBrightness(state.valueNow)}</div>}
+                                renderThumbContent={(state) => FurnitureDimmerUtilities.scaleBrightness(state.valueNow)}
                                 thumbClassName={'thumb percent'}
                                 value={selectedBrightness}
                                 onChange={(value) => setSelectedBrightness(value)}
