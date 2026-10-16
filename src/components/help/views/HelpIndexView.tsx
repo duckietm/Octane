@@ -6,6 +6,7 @@ import confusedImage from '../../../assets/images/help/help-confused.png';
 import needHelpImage from '../../../assets/images/help/help-need-help.png';
 import { GuideToolEvent } from '../../../events';
 import { useHelp } from '../../../hooks';
+import { Checkbox } from '../../../common/Checkbox';
 
 /* Official main_help: a 420 px page of sections, each headed by its title: the help of the guides,
    the report of a bully, the self-help links, and the emergency box with its way out of the room. */
@@ -88,7 +89,7 @@ export const HelpIndexView: FC<{}> = () => {
                         {localizeWithFallback('help.main2.emergency.button', 'Get help now!')}
                     </button>
                     <label className="octane-help-index__leave">
-                        <input checked={leaveRoom} type="checkbox" onChange={(event) => setLeaveRoom(event.target.checked)} />
+                        <Checkbox checked={leaveRoom} onCheckedChange={(nextChecked) => setLeaveRoom(nextChecked)} />
                         <span>{localizeWithFallback('help.main2.emergency.leave', 'I want to leave the room')}</span>
                     </label>
                 </div>

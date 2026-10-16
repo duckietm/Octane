@@ -4,6 +4,7 @@ import { FaTimes } from 'react-icons/fa';
 import { CreateLinkEvent, GetMaxVisitorsList, getYoutubeRoomEnabled, IRoomData, LocalizeText, localizeWithFallback, SendMessageComposer, setYoutubeRoomEnabled } from '../../../../api';
 import { Column, Flex, Text } from '../../../../common';
 import { useMessageEvent, useNavigatorData, useNotification, useSoundboard } from '../../../../hooks';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const ROOM_NAME_MIN_LENGTH = 3;
 const ROOM_NAME_MAX_LENGTH = 60;
@@ -232,32 +233,16 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                 </Flex>
             </Column>
             <Flex alignItems="center" gap={1}>
-                <input
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={roomData.allowWalkthrough}
-                    onChange={(event) => handleChange('allow_walkthrough', event.target.checked)}
-                />
+                <Checkbox checked={roomData.allowWalkthrough} onCheckedChange={(nextChecked) => handleChange('allow_walkthrough', nextChecked)} />
                 <Text>{LocalizeText('navigator.roomsettings.allow_walk_through')}</Text>
             </Flex>
             {/* Polaris-only. Keep when matching Habbo AIR chrome. */}
             <Flex alignItems="center" gap={1}>
-                <input
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={roomData.allowUnderpass}
-                    onChange={(event) => handleChange('allow_underpass', event.target.checked)}
-                />
+                <Checkbox checked={roomData.allowUnderpass} onCheckedChange={(nextChecked) => handleChange('allow_underpass', nextChecked)} />
                 <Text>{LocalizeText('navigator.roomsettings.allow_underpass')}</Text>
             </Flex>
             <Flex alignItems="center" gap={1}>
-                <input
-                    aria-label={LocalizeText('widget.room.youtube.shared')}
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={youtubeEnabled}
-                    onChange={(event) => toggleYouTube(event.target.checked)}
-                />
+                <Checkbox aria-label={LocalizeText('widget.room.youtube.shared')} checked={youtubeEnabled} onCheckedChange={(nextChecked) => toggleYouTube(nextChecked)} />
                 <Text>{LocalizeText('widget.room.youtube.shared')}</Text>
             </Flex>
             <Column gap={1}>

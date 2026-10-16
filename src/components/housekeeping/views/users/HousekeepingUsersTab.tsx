@@ -25,6 +25,7 @@ import { HousekeepingUserNotesView } from './HousekeepingUserNotesView';
 import { HousekeepingUserCard } from './HousekeepingUserCard';
 import { HousekeepingUserEconomyView } from './HousekeepingUserEconomyView';
 import { DEFAULT_SANCTION_DRAFT, HousekeepingSanctionDraft, HousekeepingUserSanctionsView, sanctionReason } from './HousekeepingUserSanctionsView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const BULK_CONFIRM_THRESHOLD = 5;
 
@@ -173,13 +174,7 @@ export const HousekeepingUsersTab: FC = () => {
                                           className="flex w-full items-center gap-2 border-b border-zinc-100 px-2 py-1 text-xs last:border-b-0 hover:bg-sky-50"
                                           onMouseDown={(event) => event.preventDefault()}
                                       >
-                                          <input
-                                              checked={isChecked}
-                                              className="shrink-0"
-                                              title={isChecked ? LocalizeText('housekeeping.bulk.clear') : LocalizeText('housekeeping.bulk.apply')}
-                                              type="checkbox"
-                                              onChange={() => toggleUserSelection(entry.id)}
-                                          />
+                                          <Checkbox checked={isChecked} className="shrink-0" title={isChecked ? LocalizeText('housekeeping.bulk.clear') : LocalizeText('housekeeping.bulk.apply')} onCheckedChange={() => toggleUserSelection(entry.id)} />
                                           <button
                                               className="flex grow items-center gap-2 text-left"
                                               onClick={() => {

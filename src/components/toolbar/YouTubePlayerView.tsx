@@ -11,6 +11,8 @@ import { CopyToClipboard, GetRoomSession, getYoutubeRoomEnabled, LocalizeText, S
 import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent } from '../../hooks';
 import ReactPlayer from '../youtube/YoutubeReactPlayer';
+import { Checkbox } from '../../common/Checkbox';
+import { Slider } from '../../common/Slider';
 
 const CONTROL_COMMAND_PREVIOUS_VIDEO = 0;
 const CONTROL_COMMAND_NEXT_VIDEO = 1;
@@ -555,16 +557,16 @@ export const YouTubePlayerView: FC<{}> = () => {
                                 </button>
                             </div>
                             {showVolumeSlider && (
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
+                                <Slider
+                                    disabledButton
+                                    className="octane-slider--compact"
+                                    min={0}
+                                    max={100}
                                     value={volume}
-                                    onChange={(e) => {
-                                        setVolume(parseInt(e.target.value));
-                                        setVolumePreset(parseInt(e.target.value));
+                                    onChange={(value) => {
+                                        setVolume(value);
+                                        setVolumePreset(value);
                                     }}
-                                    className="w-full"
                                 />
                             )}
                             <div className="flex gap-1 mt-2">
@@ -578,13 +580,13 @@ export const YouTubePlayerView: FC<{}> = () => {
 
                         <div className="flex flex-wrap gap-3">
                             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
-                                <input type="checkbox" checked={isMuted} onChange={(e) => setIsMuted(e.target.checked)} className="w-4 h-4" />🔇 Mute
+                                <Checkbox checked={isMuted} onCheckedChange={(nextChecked) => setIsMuted(nextChecked)} className="w-4 h-4" />🔇 Mute
                             </label>
                             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
-                                <input type="checkbox" checked={isLooping} onChange={(e) => setIsLooping(e.target.checked)} className="w-4 h-4" />🔁 Loop
+                                <Checkbox checked={isLooping} onCheckedChange={(nextChecked) => setIsLooping(nextChecked)} className="w-4 h-4" />🔁 Loop
                             </label>
                             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
-                                <input type="checkbox" checked={isFullscreen} onChange={(e) => setIsFullscreen(e.target.checked)} className="w-4 h-4" />
+                                <Checkbox checked={isFullscreen} onCheckedChange={(nextChecked) => setIsFullscreen(nextChecked)} className="w-4 h-4" />
                                 🖥️ Fullscreen
                             </label>
                         </div>

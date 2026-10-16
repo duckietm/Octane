@@ -18,6 +18,7 @@ import { GetConfigurationValue, LocalizeText, OpenUrl, SendMessageComposer } fro
 import { Button, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useMessageEvent, useNotification, usePurse } from '../../../hooks';
 import { joinCameraPhotoUrl } from '../CameraAirUtilities';
+import { Checkbox } from '../../../common/Checkbox';
 
 export interface CameraWidgetCheckoutViewProps {
     base64Url: string;
@@ -379,7 +380,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
 
                 {spendingDisclaimerEnabled && (
                     <label className="octane-camera-checkout__spending-disclaimer">
-                        <input type="checkbox" checked={disclaimerAccepted} onChange={(event) => setDisclaimerAccepted(event.target.checked)} />
+                        <Checkbox checked={disclaimerAccepted} onCheckedChange={(nextChecked) => setDisclaimerAccepted(nextChecked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}

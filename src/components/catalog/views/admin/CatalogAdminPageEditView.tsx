@@ -11,6 +11,7 @@ import { claimCatalogAdminHydration } from './CatalogAdminFormHydration';
 import { CatalogAdminModalView } from './CatalogAdminModalView';
 import { createCatalogAdminPageDetailsFromSnapshot } from './CatalogAdminPageState';
 import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MODE_OPTIONS = [
     { value: 'NORMAL', label: 'Normal' },
@@ -506,19 +507,19 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     </label>
                                     <div className="octane-catalog-admin-form-toggles">
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={visible === '1'} type="checkbox" onChange={(e) => setVisible(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={visible === '1'} onCheckedChange={(nextChecked) => setVisible(nextChecked ? '1' : '0')} />
                                             {LocalizeText('catalog.admin.visible')}
                                         </label>
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={enabled === '1'} type="checkbox" onChange={(e) => setEnabled(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={enabled === '1'} onCheckedChange={(nextChecked) => setEnabled(nextChecked ? '1' : '0')} />
                                             {LocalizeText('catalog.admin.enabled')}
                                         </label>
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={clubOnly === '1'} type="checkbox" onChange={(e) => setClubOnly(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={clubOnly === '1'} onCheckedChange={(nextChecked) => setClubOnly(nextChecked ? '1' : '0')} />
                                             {localizeWithFallback('catalog.admin.page.club.only', 'HC only')}
                                         </label>
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={vipOnly === '1'} type="checkbox" onChange={(e) => setVipOnly(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={vipOnly === '1'} onCheckedChange={(nextChecked) => setVipOnly(nextChecked ? '1' : '0')} />
                                             {localizeWithFallback('catalog.admin.page.vip.only', 'VIP only')}
                                         </label>
                                     </div>

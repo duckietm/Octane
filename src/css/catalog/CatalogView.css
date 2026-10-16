@@ -469,13 +469,15 @@
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.octane-catalog-admin-form-toggle:has(input:checked) {
+.octane-catalog-admin-form-toggle:has(input:checked),
+.octane-catalog-admin-form-toggle:has(.octane-checkbox[data-checked]) {
     border-color: var(--catalog-admin-blue);
     background: rgba(65, 141, 176, 0.12);
     color: var(--catalog-admin-blue-dark);
 }
 
-.octane-catalog-admin-form-toggle input[type="checkbox"] {
+.octane-catalog-admin-form-toggle input[type="checkbox"],
+.octane-catalog-admin-form-toggle .octane-checkbox {
     pointer-events: none;
 }
 

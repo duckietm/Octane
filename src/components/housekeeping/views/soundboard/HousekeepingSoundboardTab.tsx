@@ -11,6 +11,7 @@ import {
     validateCatalogDraft
 } from '../../../../hooks/soundboard/soundboardCatalogState';
 import { resolveSoundboardSoundUrl } from '../../../../hooks/soundboard/soundboardUrl';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true, cooldownSeconds: 0 };
 const RESULT_KEYS = [
@@ -216,12 +217,7 @@ export const HousekeepingSoundboardTab: FC = () => {
                     />
                 </label>
                 <label className="flex items-center gap-2 self-end py-1 text-xs font-semibold">
-                    <input
-                        type="checkbox"
-                        checked={draft.enabled}
-                        disabled={draftLocked}
-                        onChange={(event) => setDraft((current) => ({ ...current, enabled: event.target.checked }))}
-                    />
+                    <Checkbox checked={draft.enabled} disabled={draftLocked} onCheckedChange={(nextChecked) => setDraft((current) => ({ ...current, enabled: nextChecked }))} />
                     {LocalizeText('housekeeping.soundboard.enabled')}
                 </label>
                 {!validation.valid && (

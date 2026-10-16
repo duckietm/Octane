@@ -1218,7 +1218,8 @@
     line-height: 17px;
 }
 
-.octane-catalog-purchase-confirm-disclaimer input {
+.octane-catalog-purchase-confirm-disclaimer input,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox {
     position: absolute;
     top: 0;
     left: 13px;
@@ -1233,11 +1234,13 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.octane-catalog-purchase-confirm-disclaimer input:checked {
+.octane-catalog-purchase-confirm-disclaimer input:checked,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox[data-checked] {
     background-image: url("../../assets/images/catalog/air/gift/checkbox-selected.png");
 }
 
-.octane-catalog-purchase-confirm-disclaimer input:focus-visible {
+.octane-catalog-purchase-confirm-disclaimer input:focus-visible,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox:focus-visible {
     outline: 1px solid #000000;
     outline-offset: 1px;
 }

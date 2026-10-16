@@ -3,6 +3,7 @@ import { FaBroadcastTower, FaChevronDown, FaChevronUp, FaPlay, FaStop, FaTimes }
 import { LocalizeText, localizeWithFallback } from '../../api';
 import { DraggableWindow, DraggableWindowPosition, LayoutImage } from '../../common';
 import { RadioStation, useRadio } from '../../hooks';
+import { Slider } from '../../common/Slider';
 
 export const RadioView: FC<{}> = () => {
     const { stations, currentId, isPlaying, volume, loadError, play, stop, setVolume } = useRadio();
@@ -110,15 +111,7 @@ export const RadioView: FC<{}> = () => {
                         {selectedPlaying && (
                             <div className="flex items-center gap-2 px-3 pb-2.5">
                                 <span className="text-xs text-white/55">🔊</span>
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={1}
-                                    step={0.01}
-                                    value={volume}
-                                    onChange={(e) => setVolume(e.target.valueAsNumber)}
-                                    className="radio-vol h-1 grow cursor-pointer"
-                                />
+                                <Slider disabledButton className="octane-slider--compact radio-vol grow" min={0} max={1} step={0.01} value={volume} onChange={(value) => setVolume(value)} />
                             </div>
                         )}
 

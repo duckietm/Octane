@@ -4,6 +4,7 @@ import { ChatEntryType, LocalizeText, SanitizeHtml } from '../../../../api';
 import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useChatHistory, useChatWindow, useOnClickChat } from '../../../../hooks';
 import { useRoom } from '../../../../hooks/rooms';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const BOTTOM_SCROLL_THRESHOLD = 20;
 
@@ -94,11 +95,11 @@ export const ChatWidgetWindowView: FC<{}> = () => {
             <OctaneCardContentView className="bg-[#f2f2f2] relative" overflow="hidden">
                 <div className="flex items-center gap-2 px-2 py-1 border-b border-black/20 bg-white/40 text-black text-[11px]">
                     <label className="flex items-center gap-1 cursor-pointer select-none">
-                        <input checked={hidePets} type="checkbox" onChange={(event) => setHidePets(event.target.checked)} />
+                        <Checkbox checked={hidePets} onCheckedChange={(nextChecked) => setHidePets(nextChecked)} />
                         <span>{LocalizeText('widget.room.chat.hide_pets')}</span>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer select-none">
-                        <input checked={hideAvatars} type="checkbox" onChange={(event) => setHideAvatars(event.target.checked)} />
+                        <Checkbox checked={hideAvatars} onCheckedChange={(nextChecked) => setHideAvatars(nextChecked)} />
                         <span>{LocalizeText('widget.room.chat.hide_avatars')}</span>
                     </label>
                     <button

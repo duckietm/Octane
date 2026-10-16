@@ -3,6 +3,7 @@ import { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from '
 import { IGroupData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Flex, HorizontalRule, Text } from '../../../../common';
 import { useNotification } from '../../../../hooks';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const STATES: string[] = ['regular', 'exclusive', 'private'];
 
@@ -97,7 +98,7 @@ export const GroupTabSettingsView: FC<GroupTabSettingsViewProps> = (props) => {
             </div>
             <HorizontalRule />
             <div className="flex items-center gap-1">
-                <input checked={groupDecorate} className="form-check-input" type="checkbox" onChange={(event) => setGroupDecorate((prevValue) => !prevValue)} />
+                <Checkbox checked={groupDecorate} onCheckedChange={() => setGroupDecorate((prevValue) => !prevValue)} />
                 <div className="flex flex-col gap-1">
                     <Text bold>{LocalizeText('group.edit.settings.rights.caption')}</Text>
                     <Text>{LocalizeText('group.edit.settings.rights.members.help')}</Text>
@@ -105,7 +106,7 @@ export const GroupTabSettingsView: FC<GroupTabSettingsViewProps> = (props) => {
             </div>
             <HorizontalRule />
             <div className="flex items-center gap-1">
-                <input checked={groupForum} className="form-check-input" type="checkbox" onChange={handleForumToggle} />
+                <Checkbox checked={groupForum} onCheckedChange={() => handleForumToggle()} />
                 <div className="flex flex-col gap-1">
                     <Text bold>{LocalizeText('group.forum.enable.caption')}</Text>
                     <Text>{LocalizeText('group.forum.enable.help')}</Text>

@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../api';
 import { Button, Column, Flex, Text } from '../../../common';
+import { Checkbox } from '../../../common/Checkbox';
 
 interface GuideToolMenuViewProps {
     isOnDuty: boolean;
@@ -43,33 +44,15 @@ export const GuideToolMenuView: FC<GuideToolMenuViewProps> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('guide.help.guide.tool.tickettypeselection.caption')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={isHandlingGuideRequests}
-                        className="form-check-input"
-                        disabled={isOnDuty}
-                        type="checkbox"
-                        onChange={(event) => setIsHandlingGuideRequests(event.target.checked)}
-                    />
+                    <Checkbox checked={isHandlingGuideRequests} disabled={isOnDuty} onCheckedChange={(nextChecked) => setIsHandlingGuideRequests(nextChecked)} />
                     <Text>{LocalizeText('guide.help.guide.tool.tickettypeselection.guiderequests')}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={isHandlingHelpRequests}
-                        className="form-check-input"
-                        disabled={isOnDuty}
-                        type="checkbox"
-                        onChange={(event) => setIsHandlingHelpRequests(event.target.checked)}
-                    />
+                    <Checkbox checked={isHandlingHelpRequests} disabled={isOnDuty} onCheckedChange={(nextChecked) => setIsHandlingHelpRequests(nextChecked)} />
                     <Text>{LocalizeText('guide.help.guide.tool.tickettypeselection.onlyhelprequests')}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={isHandlingBullyReports}
-                        className="form-check-input"
-                        disabled={isOnDuty}
-                        type="checkbox"
-                        onChange={(event) => setIsHandlingBullyReports(event.target.checked)}
-                    />
+                    <Checkbox checked={isHandlingBullyReports} disabled={isOnDuty} onCheckedChange={(nextChecked) => setIsHandlingBullyReports(nextChecked)} />
                     <Text>{LocalizeText('guide.help.guide.tool.tickettypeselection.bullyreports')}</Text>
                 </div>
             </div>

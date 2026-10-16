@@ -690,7 +690,8 @@
     line-height: 17px;
 }
 
-.octane-club-purchase-confirm-disclaimer input {
+.octane-club-purchase-confirm-disclaimer input,
+.octane-club-purchase-confirm-disclaimer .octane-checkbox {
     appearance: none;
     position: absolute;
     top: 0;
@@ -707,7 +708,8 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.octane-club-purchase-confirm-disclaimer input:checked {
+.octane-club-purchase-confirm-disclaimer input:checked,
+.octane-club-purchase-confirm-disclaimer .octane-checkbox[data-checked] {
     background-image: url("../../assets/images/catalog/air/gift/checkbox-selected.png");
 }
 

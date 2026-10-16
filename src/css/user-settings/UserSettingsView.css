@@ -380,7 +380,8 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.air-settings-checkbox:checked {
+.air-settings-checkbox:checked,
+.air-settings-checkbox[data-checked] {
     /* One SVG per state. The skin sheet has no clean ticked box — its
        (410,16) region is a dark slab that vanishes on this panel — and
        layering a tick over the sprite left the box unpainted in the client. */

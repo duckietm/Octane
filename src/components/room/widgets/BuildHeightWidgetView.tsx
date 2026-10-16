@@ -2,6 +2,7 @@ import { FC, useEffect } from 'react';
 import { LocalizeText } from '../../../api';
 import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../common';
 import { useBuildHeight } from '../../../hooks';
+import { Checkbox } from '../../../common/Checkbox';
 
 const STEP = 0.1;
 
@@ -50,13 +51,7 @@ export const BuildHeightWidgetView: FC<{}> = () => {
                         className={underpassAllowed ? undefined : 'opacity-50'}
                         title={underpassAllowed ? undefined : LocalizeText('widget.buildheight.underpass.min_height', ['height'], [format(UNDERPASS_MIN_HEIGHT)])}
                     >
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            checked={underpass && underpassAllowed}
-                            disabled={!underpassAllowed}
-                            onChange={(event) => toggleUnderpass(event.target.checked)}
-                        />
+                        <Checkbox checked={underpass && underpassAllowed} disabled={!underpassAllowed} onCheckedChange={(nextChecked) => toggleUnderpass(nextChecked)} />
                         <Text>{LocalizeText('widget.buildheight.underpass')}</Text>
                     </Flex>
                     <Button variant="danger" onClick={close}>{LocalizeText('widget.buildheight.reset')}</Button>

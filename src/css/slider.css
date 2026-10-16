@@ -52,3 +52,13 @@
         }
     }
 }
+.octane-slider.octane-slider--compact {
+    height: 16px;
+
+    .thumb {
+        width: 12px;
+        height: 12px;
+        padding: 0;
+        line-height: 12px;
+    }
+}

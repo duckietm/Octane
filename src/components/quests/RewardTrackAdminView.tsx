@@ -4,6 +4,7 @@ import { localizeWithFallback, reorderRewardTrackEntries, RewardTrackFieldErrors
 import { Button, LayoutFurniIconImageView } from '../../common';
 import { RewardTrackAdminEntity, RewardTrackAdminPrizeInput, RewardTrackAdminTaskInput, RewardTrackAdminTrackInput, useRewardTrackAdmin } from '../../hooks';
 import { RewardTrackAdminModalView } from './RewardTrackAdminModalView';
+import { Checkbox } from '../../common/Checkbox';
 
 const text = (key: string, fallback: string) => localizeWithFallback(`reward_track.admin.${key}`, fallback);
 
@@ -160,7 +161,7 @@ const Field: FC<{ label: string; error?: string; children: ReactNode; span?: num
 
 const Toggle: FC<{ label: string; checked: boolean; onChange: (checked: boolean) => void }> = ({ label, checked, onChange }) => (
     <label className="octane-reward-track-admin-toggle-field">
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        <Checkbox checked={checked} onCheckedChange={(nextChecked) => onChange(nextChecked)} />
         <span>{label}</span>
     </label>
 );
@@ -729,7 +730,7 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                             {taskErrors[`level.${index}.pointsReward`] && <span className="octane-reward-track-admin-field-error">{taskErrors[`level.${index}.pointsReward`]}</span>}
                                                         </td>
                                                         <td>
-                                                            <input type="checkbox" checked={level.premium} onChange={(e) => updateLevel(index, { premium: e.target.checked })} />
+                                                            <Checkbox checked={level.premium} onCheckedChange={(nextChecked) => updateLevel(index, { premium: nextChecked })} />
                                                         </td>
                                                         <td className="octane-reward-track-admin-row-actions">
                                                             <Button

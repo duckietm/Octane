@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFurnitureAreaHideWidget } from '../../../../hooks';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export const FurnitureAreaHideView: FC<{}> = (props) => {
     const {
@@ -44,36 +45,18 @@ export const FurnitureAreaHideView: FC<{}> = (props) => {
                 <Column gap={1}>
                     <Text bold>{LocalizeText('widget.areahide.options')}</Text>
                     <Flex gap={1}>
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="setWallItems"
-                            checked={wallItems}
-                            onChange={(event) => setWallItems(event.target.checked ? true : false)}
-                        />
+                        <Checkbox id="setWallItems" checked={wallItems} onCheckedChange={(nextChecked) => setWallItems(nextChecked ? true : false)} />
                         <Text>{LocalizeText('widget.areahide.options.wallitems')}</Text>
                     </Flex>
                     <Flex gap={1}>
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="setInverted"
-                            checked={inverted}
-                            onChange={(event) => setInverted(event.target.checked ? true : false)}
-                        />
+                        <Checkbox id="setInverted" checked={inverted} onCheckedChange={(nextChecked) => setInverted(nextChecked ? true : false)} />
                         <Column gap={1}>
                             <Text>{LocalizeText('widget.areahide.options.invert')}</Text>
                             <Text>{LocalizeText('widget.areahide.options.invert.info')}</Text>
                         </Column>
                     </Flex>
                     <Flex gap={1}>
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="setInvisibility"
-                            checked={invisibility}
-                            onChange={(event) => setInvisibility(event.target.checked ? true : false)}
-                        />
+                        <Checkbox id="setInvisibility" checked={invisibility} onCheckedChange={(nextChecked) => setInvisibility(nextChecked ? true : false)} />
                         <Column gap={1}>
                             <Text>{LocalizeText('widget.areahide.options.invisibility')}</Text>
                             <Text>{LocalizeText('widget.areahide.options.invisibility.info')}</Text>

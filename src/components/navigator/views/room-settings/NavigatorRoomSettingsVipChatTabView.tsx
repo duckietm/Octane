@@ -4,6 +4,7 @@ import { GetClubMemberLevel, IRoomData, LocalizeText } from '../../../../api';
 import { Column, Flex, Grid, Text } from '../../../../common';
 import { OctaneInput } from '../../../../layout';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
@@ -92,13 +93,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                 <Column gap={1} size={6}>
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.vip_settings')} gap={1} className="h-full">
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={roomData.hideWalls}
-                                className="form-check-input"
-                                disabled={!isHC}
-                                type="checkbox"
-                                onChange={(event) => handleChange('hide_walls', event.target.checked)}
-                            />
+                            <Checkbox checked={roomData.hideWalls} disabled={!isHC} onCheckedChange={(nextChecked) => handleChange('hide_walls', nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.hide_walls')}</Text>
                         </div>
                         <select
@@ -128,21 +123,11 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                 <Column gap={1} size={12}>
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.room_behavior')} gap={1}>
                         <Flex alignItems="center" gap={1}>
-                            <input
-                                checked={!roomData.leaveOnDoorTileEnabled}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => handleChange('leave_on_door_tile_enabled', !event.target.checked)}
-                            />
+                            <Checkbox checked={!roomData.leaveOnDoorTileEnabled} onCheckedChange={(nextChecked) => handleChange('leave_on_door_tile_enabled', !nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.do_not_leave_on_door_tile')}</Text>
                         </Flex>
                         <Flex alignItems="center" gap={1}>
-                            <input
-                                checked={roomData.idleSleepEnabled}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => handleChange('idle_sleep_enabled', event.target.checked)}
-                            />
+                            <Checkbox checked={roomData.idleSleepEnabled} onCheckedChange={(nextChecked) => handleChange('idle_sleep_enabled', nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.idle_sleep')}</Text>
                             <OctaneInput
                                 className="form-control-sm w-20"
@@ -168,12 +153,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <Text small>{LocalizeText('navigator.roomsettings.timeout.seconds')}</Text>
                         </Flex>
                         <Flex alignItems="center" gap={1}>
-                            <input
-                                checked={roomData.idleAutokickEnabled}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => handleChange('idle_autokick_enabled', event.target.checked)}
-                            />
+                            <Checkbox checked={roomData.idleAutokickEnabled} onCheckedChange={(nextChecked) => handleChange('idle_autokick_enabled', nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.idle_autokick')}</Text>
                             <OctaneInput
                                 className="form-control-sm w-20"
