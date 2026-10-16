@@ -14,6 +14,7 @@ import {
 } from '../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { VariablesExplorerPrefill } from '../../state/variablesExplorer';
+import { Checkbox } from '../../common/Checkbox';
 
 export interface VariablesExplorerConnectViewProps {
     prefill: VariablesExplorerPrefill | null;
@@ -167,7 +168,7 @@ export const VariablesExplorerConnectView: FC<VariablesExplorerConnectViewProps>
                         {fieldError('writeKey')}
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
-                        <input checked={remember} className="form-check-input" type="checkbox" onChange={(event) => setRemember(event.target.checked)} />
+                        <Checkbox checked={remember} onCheckedChange={(nextChecked) => setRemember(nextChecked)} />
                         <Text small>{localizeWithFallback('wiredmenu.variables_explorer.remember', 'Remember the keys for this room on this device')}</Text>
                     </label>
                     {!!message && (

@@ -16,6 +16,8 @@ export const Checkbox: FC<CheckboxProps> = (props) => {
 
     return (
         <BaseCheckbox.Root
+            // An <i>, not the default span: host windows style `span` / `input` children generically.
+            render={<i />}
             className={className ? `octane-checkbox ${className}` : 'octane-checkbox'}
             onCheckedChange={(checked) => onCheckedChange?.(checked)}
             {...rest}

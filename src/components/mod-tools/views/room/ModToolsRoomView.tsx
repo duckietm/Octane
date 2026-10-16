@@ -13,6 +13,7 @@ import { LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useMessageEvent, useModTools } from '../../../../hooks';
 import { ModToolsTemplateSelectView } from '../ModToolsTemplateSelectView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 interface ModToolsRoomViewProps {
     roomId: number;
@@ -153,20 +154,15 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                         <img alt="" className="octane-mod-tools-button-icon" src={warningIcon} /> {LocalizeText('modtools.roominfo.moderate.title')}
                     </div>
                     <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input checked={kickUsers} className="form-check-input" type="checkbox" onChange={(event) => setKickUsers(event.target.checked)} />
+                        <Checkbox checked={kickUsers} onCheckedChange={(nextChecked) => setKickUsers(nextChecked)} />
                         <span>{LocalizeText('modtools.roominfo.moderate.kick')}</span>
                     </label>
                     <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input checked={lockRoom} className="form-check-input" type="checkbox" onChange={(event) => setLockRoom(event.target.checked)} />
+                        <Checkbox checked={lockRoom} onCheckedChange={(nextChecked) => setLockRoom(nextChecked)} />
                         <span>{LocalizeText('modtools.roominfo.moderate.doorbell')}</span>
                     </label>
                     <label className="flex items-center gap-2 text-sm cursor-pointer">
-                        <input
-                            checked={changeRoomName}
-                            className="form-check-input"
-                            type="checkbox"
-                            onChange={(event) => setChangeRoomName(event.target.checked)}
-                        />
+                        <Checkbox checked={changeRoomName} onCheckedChange={(nextChecked) => setChangeRoomName(nextChecked)} />
                         <span>{LocalizeText('modtools.roominfo.moderate.rename')}</span>
                     </label>
                     <ModToolsTemplateSelectView templates={settings?.roomMessageTemplates} onSelect={setMessage} />

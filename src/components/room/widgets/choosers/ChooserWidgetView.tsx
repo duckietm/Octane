@@ -4,6 +4,7 @@ import { chooserSelectionVisualizer, localizeWithFallback, LocalizeText, RoomObj
 import { Button, InfiniteScroll, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useFurniPickupGuard } from '../../../../hooks';
 import { classNames, OctaneInput } from '../../../../layout';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const LIMIT_FURNI_PICKALL = 100;
 const FILTER_ALL = 'all';
@@ -156,13 +157,7 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                 <div className="octane-chooser-table">
                     <div className="octane-chooser-row octane-chooser-head">
                         {pickallFurni && (
-                            <input
-                                aria-label={LocalizeText('widget.chooser.checkall')}
-                                checked={checkAll}
-                                className="octane-chooser-check form-check-input"
-                                type="checkbox"
-                                onChange={() => checkedId()}
-                            />
+                            <Checkbox aria-label={LocalizeText('widget.chooser.checkall')} checked={checkAll} className="octane-chooser-check" onCheckedChange={() => checkedId()} />
                         )}
                         <span className="octane-chooser-cell grow">{isUsers ? localizeWithFallback('new_user_chooser.col.name', 'Name') : localizeWithFallback('new_furni_chooser.col.name', 'Name')}</span>
                         <span className={classNames('octane-chooser-cell', isUsers ? 'w-[90px]' : 'w-[120px]')}>
@@ -182,16 +177,10 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                                     }}
                                 >
                                     {pickallFurni && (
-                                        <input
-                                            checked={isChecked(row.id)}
-                                            className="octane-chooser-check form-check-input"
-                                            type="checkbox"
-                                            onChange={() => checkedId(row.id)}
-                                            onClick={(e) => {
+                                        <Checkbox checked={isChecked(row.id)} className="octane-chooser-check" onCheckedChange={() => checkedId(row.id)} onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleItemSelection(row);
-                                            }}
-                                        />
+                                            }} />
                                     )}
                                     <span className="octane-chooser-cell grow truncate">{row.name}</span>
                                     <span className={classNames('octane-chooser-cell truncate', isUsers ? 'w-[90px]' : 'w-[120px]')}>

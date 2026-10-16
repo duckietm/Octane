@@ -828,7 +828,8 @@
     cursor: pointer;
 }
 
-.hotelview-editor .hotelview-editor-toggle input[type='checkbox'] {
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox'],
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox {
     flex: 0 0 18px;
     width: 18px;
     height: 18px;
@@ -844,16 +845,19 @@
 }
 
 .hotelview-editor .hotelview-editor-toggle input[type='checkbox']::before,
-.hotelview-editor .hotelview-editor-toggle input[type='checkbox']::after {
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox']::after,
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox::before {
     content: none;
 }
 
-.hotelview-editor .hotelview-editor-toggle input[type='checkbox']:checked {
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox']:checked,
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox[data-checked] {
     border-color: #124d60;
     background: #1e748f;
 }
 
-.hotelview-editor .hotelview-editor-toggle input[type='checkbox']:checked::after {
+.hotelview-editor .hotelview-editor-toggle input[type='checkbox']:checked::after,
+.hotelview-editor .hotelview-editor-toggle .octane-checkbox[data-checked]::after {
     content: '✓';
     position: absolute;
     inset: -1px 0 0;

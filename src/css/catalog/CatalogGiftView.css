@@ -287,7 +287,8 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.octane-catalog-gift-show-face:checked {
+.octane-catalog-gift-show-face:checked,
+.octane-catalog-gift-show-face[data-checked] {
     background-image: url("../../assets/images/catalog/air/gift/checkbox-selected.png");
 }
 

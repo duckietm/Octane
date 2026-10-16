@@ -2,6 +2,7 @@ import { ClubOfferData } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
+import { Checkbox } from '../../../../../common/Checkbox';
 
 interface CatalogClubPurchaseConfirmViewProps {
     offer: ClubOfferData;
@@ -63,7 +64,7 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
 
                 {disclaimerEnabled && (
                     <label className="octane-club-purchase-confirm-disclaimer">
-                        <input checked={disclaimerAccepted} type="checkbox" onChange={(event) => setDisclaimerAccepted(event.target.checked)} />
+                        <Checkbox checked={disclaimerAccepted} onCheckedChange={(nextChecked) => setDisclaimerAccepted(nextChecked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}

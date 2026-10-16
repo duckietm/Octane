@@ -2,6 +2,7 @@ import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../api';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
 import { LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
+import { Checkbox } from '../../../common/Checkbox';
 
 interface CatalogPurchaseConfirmViewProps {
     offer: IPurchasableOffer;
@@ -144,7 +145,7 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                 </div>
                 {spendingDisclaimerEnabled && (
                     <label className="octane-catalog-purchase-confirm-disclaimer">
-                        <input checked={spendingDisclaimerAccepted} type="checkbox" onChange={(event) => setSpendingDisclaimerAccepted(event.target.checked)} />
+                        <Checkbox checked={spendingDisclaimerAccepted} onCheckedChange={(nextChecked) => setSpendingDisclaimerAccepted(nextChecked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}

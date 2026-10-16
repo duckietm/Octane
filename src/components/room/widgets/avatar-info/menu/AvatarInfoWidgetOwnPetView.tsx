@@ -13,6 +13,7 @@ import { useRoom, useSessionInfo } from '../../../../../hooks';
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
+import { Checkbox } from '../../../../../common/Checkbox';
 
 interface AvatarInfoWidgetOwnPetViewProps {
     avatarInfo: AvatarInfoPet;
@@ -156,7 +157,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                     <>
                         <ContextMenuListItemView onClick={(event) => processAction('mount')}>{LocalizeText('infostand.button.mount')}</ContextMenuListItemView>
                         <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_riding_permission')}>
-                            <input checked={!!avatarInfo.publiclyRideable} readOnly={true} type="checkbox" />
+                            <Checkbox checked={!!avatarInfo.publiclyRideable} readOnly={true} />
                             {LocalizeText('infostand.button.toggle_riding_permission')}
                         </ContextMenuListItemView>
                         {petRespectRemaining > 0 && (
@@ -204,7 +205,7 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = (
                         {!avatarInfo.dead && avatarInfo.level === avatarInfo.maximumLevel && avatarInfo.breedable && (
                             <>
                                 <ContextMenuListItemView gap={1} onClick={(event) => processAction('toggle_breeding_permission')}>
-                                    <input checked={avatarInfo.publiclyBreedable} readOnly={true} type="checkbox" />
+                                    <Checkbox checked={avatarInfo.publiclyBreedable} readOnly={true} />
                                     {LocalizeText('infostand.button.toggle_breeding_permission')}
                                 </ContextMenuListItemView>
                                 <ContextMenuListItemView onClick={(event) => processAction('breed')}>

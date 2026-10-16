@@ -2,6 +2,7 @@ import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '
 import { FC, useEffect, useState } from 'react';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useTranslation } from '../../hooks';
+import { Checkbox } from '../../common/Checkbox';
 
 export const TranslationSettingsView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -63,12 +64,7 @@ export const TranslationSettingsView: FC<{}> = () => {
             <OctaneCardHeaderView headerText="Google Translate" onCloseClick={() => setIsVisible(false)} />
             <OctaneCardContentView className="flex flex-col gap-3 text-black">
                 <div className="flex items-center gap-2">
-                    <input
-                        checked={settings.enabled}
-                        className="form-check-input"
-                        type="checkbox"
-                        onChange={(event) => updateSettings({ enabled: event.target.checked })}
-                    />
+                    <Checkbox checked={settings.enabled} onCheckedChange={(nextChecked) => updateSettings({ enabled: nextChecked })} />
                     <Text>Enable automatic translation</Text>
                 </div>
                 <div className="rounded border border-black/10 bg-black/5 p-2 text-[11px] leading-4">

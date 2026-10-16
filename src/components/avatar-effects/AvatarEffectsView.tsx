@@ -13,6 +13,7 @@ import { LocalizeText } from '../../api';
 import { useAvatarEffects } from '../../hooks';
 import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { AvatarEffectPreviewView } from './AvatarEffectPreviewView';
+import { Checkbox } from '../../common/Checkbox';
 
 interface EffectMapEntry {
     id: string;
@@ -228,7 +229,7 @@ export const AvatarEffectsView: FC<{}> = () => {
                         </span>
                         {!!ownedEffects.length && (
                             <label className="flex cursor-pointer items-center gap-1 normal-case font-semibold text-[#3a78c4]">
-                                <input type="checkbox" checked={ownedOnly} onChange={(event) => setOwnedOnly(event.target.checked)} />
+                                <Checkbox checked={ownedOnly} onCheckedChange={(nextChecked) => setOwnedOnly(nextChecked)} />
                                 {LocalizeText('inventory.effects.owned.only') || `owned (${ownedEffects.length})`}
                             </label>
                         )}

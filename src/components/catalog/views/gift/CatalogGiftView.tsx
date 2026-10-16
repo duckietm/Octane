@@ -44,6 +44,7 @@ import {
     resolveGiftWrappingSelection,
     wrapGiftSelectionIndex
 } from './CatalogGiftView.helpers';
+import { Checkbox } from '../../../../common/Checkbox';
 
 interface GiftPaletteColor {
     id: number;
@@ -553,14 +554,7 @@ export const CatalogGiftView: FC = () => {
 
                 {isModerator && (
                     <>
-                        <input
-                            aria-label={LocalizeText('catalog.gift_wrapping.show_face.title')}
-                            checked={showMyFace}
-                            className="octane-catalog-gift-show-face"
-                            id="octane-catalog-gift-show-face"
-                            type="checkbox"
-                            onChange={(event) => setShowMyFace(event.target.checked)}
-                        />
+                        <Checkbox aria-label={LocalizeText('catalog.gift_wrapping.show_face.title')} checked={showMyFace} className="octane-catalog-gift-show-face" id="octane-catalog-gift-show-face" onCheckedChange={(nextChecked) => setShowMyFace(nextChecked)} />
                         <label className="octane-catalog-gift-show-face-label" htmlFor="octane-catalog-gift-show-face">
                             {LocalizeText('catalog.gift_wrapping.show_face.title')}
                         </label>

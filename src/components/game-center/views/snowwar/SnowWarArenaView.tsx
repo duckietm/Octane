@@ -43,6 +43,7 @@ import {
     isSnowWarFloorTile,
     SnowWarEditorTile,
 } from './SnowWarEditorTools';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -1931,11 +1932,7 @@ export const SnowWarArenaView: FC = () =>
                         {backdropItem && (
                             <label className="snowwar-editor__field">
                                 {localizeWithFallback('snowwar.editor.overlay', 'Overlay floor tiles (hide tiles behind image)')}
-                                <input
-                                    type="checkbox"
-                                    checked={(backdropItem.offsetZ ?? 0) > 0}
-                                    onChange={event => setBackdropOffsetZ(event.target.checked ? 1 : 0)}
-                                />
+                                <Checkbox checked={(backdropItem.offsetZ ?? 0) > 0} onCheckedChange={(nextChecked) => setBackdropOffsetZ(nextChecked ? 1 : 0)} />
                             </label>
                         )}
                     </div>

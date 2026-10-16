@@ -45,6 +45,10 @@
     }
 }
 
-.radio-vol {
-    accent-color: #38bdf8;
+.radio-vol .track-0 {
+    background-color: #38bdf8;
+}
+
+.radio-vol .thumb {
+    background-color: #38bdf8;
 }

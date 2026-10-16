@@ -15,6 +15,7 @@ import {
 } from '../../../../common';
 import { useFurnitureDimmerWidget, useOctaneEvent } from '../../../../hooks';
 import { classNames } from '../../../../layout';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export const FurnitureDimmerView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -118,12 +119,7 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
                             />
                         </div>
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={selectedEffectId === 2}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => setSelectedEffectId(event.target.checked ? 2 : 1)}
-                            />
+                            <Checkbox checked={selectedEffectId === 2} onCheckedChange={(nextChecked) => setSelectedEffectId(nextChecked ? 2 : 1)} />
                             <Text>{LocalizeText('widget.dimmer.type.checkbox')}</Text>
                         </div>
                         <div className="flex gap-1">

@@ -2,6 +2,7 @@ import { GetRoomEngine, RoomObjectCategory, RoomObjectVariable } from '@octane/r
 import { FC, PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { LocalizeText } from '../../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
+import { Slider } from '../../../../../common/Slider';
 
 const PAD_W = 230;
 const PAD_H = 150;
@@ -120,30 +121,14 @@ export const ImagePositionEditorView: FC<Props> = (props) => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <span className="w-12 text-[11px] text-black/70">{LocalizeText('image.position.editor.scale')}</span>
-                        <input
-                            type="range"
-                            min={10}
-                            max={500}
-                            step={1}
-                            value={scale}
-                            onChange={(e) => setScale(e.target.valueAsNumber || 100)}
-                            className="grow"
-                        />
+                        <span className="w-12 shrink-0 text-[11px] text-black/70">{LocalizeText('image.position.editor.scale')}</span>
+                        <Slider disabledButton className="octane-slider--compact grow" min={10} max={500} step={1} value={scale} onChange={(value) => setScale(value || 100)} />
                         <span className="w-12 text-right text-[11px] tabular-nums text-black/70">{(scale / 100).toFixed(2)}x</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <span className="w-12 text-[11px] text-black/70">{LocalizeText('image.position.editor.opacity')}</span>
-                        <input
-                            type="range"
-                            min={0}
-                            max={100}
-                            step={1}
-                            value={alpha}
-                            onChange={(e) => setAlpha(Number.isFinite(e.target.valueAsNumber) ? e.target.valueAsNumber : 100)}
-                            className="grow"
-                        />
+                        <span className="w-12 shrink-0 text-[11px] text-black/70">{LocalizeText('image.position.editor.opacity')}</span>
+                        <Slider disabledButton className="octane-slider--compact grow" min={0} max={100} step={1} value={alpha} onChange={(value) => setAlpha(Number.isFinite(value) ? value : 100)} />
                         <span className="w-12 text-right text-[11px] tabular-nums text-black/70">{alpha}%</span>
                     </div>
 

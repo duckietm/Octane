@@ -13,6 +13,7 @@ import { CSSProperties, FC, FormEvent, PointerEvent, useEffect, useRef, useState
 import { GetConfigurationValue, SendMessageComposer } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { useMessageEvent } from '../../hooks';
+import { Checkbox } from '../../common/Checkbox';
 
 interface HotelViewLandingData {
     canEdit: boolean;
@@ -579,7 +580,7 @@ export const HotelView: FC = () => {
                                 </div>
                                 {!editingSlot.enabled && <em>Disabled slot</em>}
                             </div>
-                            <label className="hotelview-editor-toggle"><input type="checkbox" checked={editingSlot.enabled} onChange={(event) => setEditingSlot({ ...editingSlot, enabled: event.target.checked })} /><span>Enabled: {editingSlot.enabled ? 'Yes' : 'No'}</span></label>
+                            <label className="hotelview-editor-toggle"><Checkbox checked={editingSlot.enabled} onCheckedChange={(nextChecked) => setEditingSlot({ ...editingSlot, enabled: nextChecked })} /><span>Enabled: {editingSlot.enabled ? 'Yes' : 'No'}</span></label>
                             <label>Widget type<select value={editingSlot.type} onChange={(event) => selectSlotWidgetType(event.target.value as IHotelViewLandingSlot['type'])}>{SLOT_WIDGET_TYPES.map((widget) => <option key={widget.value} value={widget.value}>{widget.label}</option>)}</select></label>
                             <label>Title<input value={editingSlot.title} onChange={(event) => setEditingSlot({ ...editingSlot, title: event.target.value })} /></label>
                             <label>Body<textarea value={editingSlot.body} onChange={(event) => setEditingSlot({ ...editingSlot, body: event.target.value })} /></label>
@@ -590,7 +591,7 @@ export const HotelView: FC = () => {
                             {['catalogpromo', 'catalogpromosmall', 'expiringcatalogpage', 'expiringcatalogpagesmall', 'nextlimitedrarecountdown'].includes(editingSlot.type) && <label>Catalog page name / ID<input value={parseSlotConfig(editingSlot.configJson).catalogPage || ''} placeholder="limited_rares" onChange={(event) => updateEditingConfig((config) => ({ ...config, catalogPage: event.target.value }))} /></label>}
                             {(editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>Featured catalog slot<input type="number" min="1" value={parseSlotConfig(editingSlot.configJson).featuredSlot || ''} placeholder="Optional" onChange={(event) => updateEditingConfig((config) => ({ ...config, featuredSlot: Number(event.target.value) || undefined }))} /></label>}
                             {editingSlot.type !== 'communitygoal' && <><label>Progress<input type="number" min="0" max="100" value={editingSlot.progress} onChange={(event) => setEditingSlot({ ...editingSlot, progress: Number(event.target.value) })} /></label><label>Progress label<input value={editingSlot.progressLabel} onChange={(event) => setEditingSlot({ ...editingSlot, progressLabel: event.target.value })} /></label></>}
-                            {editingSlot.type === 'nextlimitedrarecountdown' && <label className="hotelview-editor-toggle"><input type="checkbox" checked={parseSlotConfig(editingSlot.configJson).useServerLTD !== false} onChange={(event) => updateEditingConfig((config) => ({ ...config, useServerLTD: event.target.checked }))} /><span>Use emulator LTD configuration: {parseSlotConfig(editingSlot.configJson).useServerLTD !== false ? 'Yes' : 'No'}</span></label>}
+                            {editingSlot.type === 'nextlimitedrarecountdown' && <label className="hotelview-editor-toggle"><Checkbox checked={parseSlotConfig(editingSlot.configJson).useServerLTD !== false} onCheckedChange={(nextChecked) => updateEditingConfig((config) => ({ ...config, useServerLTD: nextChecked }))} /><span>Use emulator LTD configuration: {parseSlotConfig(editingSlot.configJson).useServerLTD !== false ? 'Yes' : 'No'}</span></label>}
                             {(editingSlot.type === 'nextlimitedrarecountdown' || editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>Countdown ends<input className="hotelview-countdown-editor-input" value={countdownInput} placeholder="DD/MM/YYYY HH:mm" onChange={(event) => {
                                 setCountdownInput(event.target.value);
 
@@ -638,7 +639,7 @@ export const HotelView: FC = () => {
                             <label>Drape URL<input value={editingScene.drapeUrl} onChange={(event) => setEditingScene({ ...editingScene, drapeUrl: event.target.value })} /></label>
                             <label>Left image URL<input value={editingScene.leftUrl} onChange={(event) => setEditingScene({ ...editingScene, leftUrl: event.target.value })} /></label>
                             <label>Right image URL<input value={editingScene.rightUrl} onChange={(event) => setEditingScene({ ...editingScene, rightUrl: event.target.value })} /></label>
-                            <label className="hotelview-editor-toggle"><input type="checkbox" checked={editingScene.hallOfFameEnabled} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameEnabled: event.target.checked })} /><span>Hall of Fame: {editingScene.hallOfFameEnabled ? 'Enabled' : 'Disabled'}</span></label>
+                            <label className="hotelview-editor-toggle"><Checkbox checked={editingScene.hallOfFameEnabled} onCheckedChange={(nextChecked) => setEditingScene({ ...editingScene, hallOfFameEnabled: nextChecked })} /><span>Hall of Fame: {editingScene.hallOfFameEnabled ? 'Enabled' : 'Disabled'}</span></label>
                             {editingScene.hallOfFameEnabled && <>
                                 <label>Hall of Fame ranking<select value={editingScene.hallOfFameMode} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameMode: event.target.value })}><option value="latest_registered">Latest registered users</option><option value="online_time">Most online time</option><option value="achievement_score">Highest achievement score</option><option value="currency">Highest currency balance</option></select></label>
                                 {editingScene.hallOfFameMode === 'currency' && <label>Currency type<input type="number" min="0" value={editingScene.hallOfFameCurrencyType} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameCurrencyType: Math.max(0, Number(event.target.value) || 0) })} /></label>}

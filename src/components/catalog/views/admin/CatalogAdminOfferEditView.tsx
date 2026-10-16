@@ -9,6 +9,7 @@ import { claimCatalogAdminHydration } from './CatalogAdminFormHydration';
 import { CatalogAdminModalView } from './CatalogAdminModalView';
 import { CatalogAdminOfferPriceView } from './CatalogAdminOfferPriceView';
 import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export const isCatalogAdminNewOffer = (offer: IPurchasableOffer | null): boolean =>
     offer?.offerId === -1;
@@ -488,12 +489,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                 </div>
                             </div>
                             <label className="octane-catalog-admin-form-toggle">
-                                <input
-                                    checked={haveOffer === '1'}
-                                    id="haveOffer"
-                                    type="checkbox"
-                                    onChange={(e) => setHaveOffer(e.target.checked ? '1' : '0')}
-                                />
+                                <Checkbox checked={haveOffer === '1'} id="haveOffer" onCheckedChange={(nextChecked) => setHaveOffer(nextChecked ? '1' : '0')} />
                                 <span>{LocalizeText('catalog.admin.offer.have.offer')}</span>
                             </label>
                         </section>

@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { IRoomData, LocalizeText } from '../../../../api';
 import { Column, Flex, Text } from '../../../../common';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
@@ -111,30 +112,15 @@ export const NavigatorRoomSettingsAccessTabView: FC<NavigatorRoomSettingsTabView
                 </NavigatorRoomSettingsSectionView>
                 <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.pets')} gap={1}>
                     <Flex alignItems="center" gap={1}>
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            checked={roomData.muteAllPets}
-                            onChange={(event) => handleChange('mute_all_pets', event.target.checked)}
-                        />
+                        <Checkbox checked={roomData.muteAllPets} onCheckedChange={(nextChecked) => handleChange('mute_all_pets', nextChecked)} />
                         <Text>{LocalizeText('navigator.roomsettings.mute_all_pets')}</Text>
                     </Flex>
                     <Flex alignItems="center" gap={1}>
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            checked={roomData.allowPets}
-                            onChange={(event) => handleChange('allow_pets', event.target.checked)}
-                        />
+                        <Checkbox checked={roomData.allowPets} onCheckedChange={(nextChecked) => handleChange('allow_pets', nextChecked)} />
                         <Text>{LocalizeText('navigator.roomsettings.allowpets')}</Text>
                     </Flex>
                     <Flex alignItems="center" gap={1}>
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            checked={roomData.allowPetsEat}
-                            onChange={(event) => handleChange('allow_pets_eat', event.target.checked)}
-                        />
+                        <Checkbox checked={roomData.allowPetsEat} onCheckedChange={(nextChecked) => handleChange('allow_pets_eat', nextChecked)} />
                         <Text>{LocalizeText('navigator.roomsettings.allowfoodconsume')}</Text>
                     </Flex>
                 </NavigatorRoomSettingsSectionView>

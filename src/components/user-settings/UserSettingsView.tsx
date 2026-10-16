@@ -31,6 +31,7 @@ import {
 import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
 import { SoundboardVolumeControl } from './SoundboardVolumeControl';
 import { WordFilterSettingsView } from './WordFilterSettingsView';
+import { Checkbox } from '../../common/Checkbox';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -353,21 +354,11 @@ export const UserSettingsView: FC<{}> = () => {
                 <p className="air-settings-chat__info">{localizeWithFallback('toolbar.chat.settings.info', 'Choose how chat appears for you.')}</p>
                 <div className="air-settings-chat__list">
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.oldChat}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('oldchat', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.oldChat} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('oldchat', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.chat.prefer.old.chat', 'Prefer old chat')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={chatWindowEnabled}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setChatWindowEnabled(event.target.checked)}
-                        />
+                        <Checkbox checked={chatWindowEnabled} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setChatWindowEnabled(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.enable.chat.window', 'Enable chat window')}</span>
                     </label>
                     <label className="air-settings-select-row">
@@ -436,48 +427,23 @@ export const UserSettingsView: FC<{}> = () => {
             >
                 <div className="air-settings-other__list">
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.roomInvites}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('room_invites', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.roomInvites} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('room_invites', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.ignore.room.invites', 'Ignore room invites')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.cameraFollow}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('camera_follow', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.cameraFollow} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('camera_follow', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.disable.room.camera.follow', "Don't focus on own avatar")}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.wiredWhisperDisabled}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('wired_whisper_disabled', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.wiredWhisperDisabled} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('wired_whisper_disabled', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.disable.wired.whisper', 'Hide wired whisper messages')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={catalogPlaceMultipleObjects}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setCatalogPlaceMultipleObjects(event.target.checked)}
-                        />
+                        <Checkbox checked={catalogPlaceMultipleObjects} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setCatalogPlaceMultipleObjects(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.place.multiple.objects', 'Place multiple catalog items')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={catalogSkipPurchaseConfirmation}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setCatalogSkipPurchaseConfirmation(event.target.checked)}
-                        />
+                        <Checkbox checked={catalogSkipPurchaseConfirmation} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setCatalogSkipPurchaseConfirmation(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.skip.purchase.confirmation', 'Skip catalog purchase confirmation')}</span>
                     </label>
                     <label className="air-settings-select-row">
@@ -493,21 +459,11 @@ export const UserSettingsView: FC<{}> = () => {
                         </select>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={showTilePrices}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setShowTilePrices(event.target.checked)}
-                        />
+                        <Checkbox checked={showTilePrices} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setShowTilePrices(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.catalog.show.prices', 'Show prices on catalog items')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={keyboardMovement}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setKeyboardMovement(event.target.checked)}
-                        />
+                        <Checkbox checked={keyboardMovement} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setKeyboardMovement(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.keyboard.movement', 'Move with the arrow keys')}</span>
                     </label>
                 </div>
@@ -545,24 +501,14 @@ export const UserSettingsView: FC<{}> = () => {
                 <fieldset>
                     <legend>{localizeWithFallback('privacy.settings.follow.title', 'Follow settings')}</legend>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.friendsCanFollow}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('friends_can_follow', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.friendsCanFollow} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('friends_can_follow', nextChecked)} />
                         <span>{localizeWithFallback('settings.privacy.follow_description', 'My friends can follow me from one room to another')}</span>
                     </label>
                 </fieldset>
                 <fieldset>
                     <legend>{localizeWithFallback('privacy.settings.friend_requests.title', 'Friend requests')}</legend>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.friendRequestsAllowed}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('friend_requests_allowed', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.friendRequestsAllowed} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('friend_requests_allowed', nextChecked)} />
                         <span>{localizeWithFallback('settings.privacy.friend_requests_description', 'Other Habbos can send me a friend request')}</span>
                     </label>
                 </fieldset>

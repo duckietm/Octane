@@ -9,6 +9,7 @@ import { FaDiscord } from 'react-icons/fa';
 import { GetConfigurationValue, LocalizeText, OpenUrl } from '../../api';
 import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { DiscordPreferences, useDiscordSettings } from '../../hooks';
+import { Checkbox } from '../../common/Checkbox';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -30,13 +31,7 @@ const CheckboxRow: FC<CheckboxRowProps> = ({ label, description, checked, disabl
             (disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-[#5865F2]')
         }
     >
-        <input
-            type="checkbox"
-            className="mt-1 h-4 w-4 shrink-0 accent-[#5865F2]"
-            checked={checked}
-            disabled={disabled}
-            onChange={(event) => onChange(event.target.checked)}
-        />
+        <Checkbox className="mt-1 h-4 w-4 shrink-0 accent-[#5865F2]" checked={checked} disabled={disabled} onCheckedChange={(nextChecked) => onChange(nextChecked)} />
         <div className="flex flex-col leading-tight">
             <Text bold>{label}</Text>
             {description && (

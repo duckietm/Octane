@@ -20,6 +20,7 @@ import { RegistrationAvatarWardrobe } from './components/RegistrationAvatarWardr
 import { TurnstileWidget } from './TurnstileWidget';
 import { t } from './utils/i18n';
 import { clearRegistrationDraft, loadRegistrationDraft, saveRegistrationDraft } from './utils/registrationDraft';
+import { Checkbox } from '../../common/Checkbox';
 
 type DialogMode = 'login' | 'register' | 'forgot';
 type LoginLocale = { code: string; file: string; label: string; flag: string };
@@ -831,7 +832,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                             />
                         </div>
                         <label className="remember-row">
-                            <input type="checkbox" name="remember" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                            <Checkbox name="remember" checked={rememberMe} onCheckedChange={(nextChecked) => setRememberMe(nextChecked)} />
                             <span>{t('login.remember_me', 'Remember me')}</span>
                         </label>
                         {turnstileEnabled && mode === 'login' && (
