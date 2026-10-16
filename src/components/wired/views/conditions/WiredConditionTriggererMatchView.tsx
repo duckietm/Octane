@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const ENTITY_HABBO = 1;
 const ENTITY_PET = 2;
@@ -117,14 +118,7 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
                 {[ENTITY_HABBO, ENTITY_PET, ENTITY_BOT].map((value) => {
                     return (
                         <div key={value} className="flex items-center gap-1">
-                            <input
-                                checked={(entityType & value) !== 0}
-                                className="form-check-input"
-                                id={`triggererEntityType${value}`}
-                                name="triggererEntityType"
-                                type="checkbox"
-                                onChange={() => setEntityType((current) => current ^ value)}
-                            />
+                            <Checkbox checked={(entityType & value) !== 0} id={`triggererEntityType${value}`} name="triggererEntityType" onCheckedChange={() => setEntityType((current) => current ^ value)} />
                             <Text>{LocalizeText(`wiredfurni.params.usertype.${value}`)}</Text>
                         </div>
                     );

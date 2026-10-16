@@ -3,6 +3,7 @@ import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MODE_SKIP = 0;
 const MODE_EXACT = 1;
@@ -179,12 +180,7 @@ export const WiredConditionMatchDateView: FC<{}> = () => {
 
                             return (
                                 <label key={value} className="flex items-center gap-1">
-                                    <input
-                                        checked={checked}
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        onChange={(event) => setWeekdayMask(toggleMaskValue(weekdayMask, value, event.target.checked))}
-                                    />
+                                    <Checkbox checked={checked} onCheckedChange={(nextChecked) => setWeekdayMask(toggleMaskValue(weekdayMask, value, nextChecked))} />
                                     <Text>{LocalizeText(`wiredfurni.params.time.weekday.${value}`)}</Text>
                                 </label>
                             );
@@ -211,12 +207,7 @@ export const WiredConditionMatchDateView: FC<{}> = () => {
 
                             return (
                                 <label key={value} className="flex items-center gap-1">
-                                    <input
-                                        checked={checked}
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        onChange={(event) => setMonthMask(toggleMaskValue(monthMask, value, event.target.checked))}
-                                    />
+                                    <Checkbox checked={checked} onCheckedChange={(nextChecked) => setMonthMask(toggleMaskValue(monthMask, value, nextChecked))} />
                                     <Text>{LocalizeText(`wiredfurni.params.time.month.${value}`)}</Text>
                                 </label>
                             );

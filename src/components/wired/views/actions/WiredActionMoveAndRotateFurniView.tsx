@@ -6,6 +6,7 @@ import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon'
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const rotationOptions: number[] = [0, 1, 2, 3, 4, 5, 6];
 
@@ -96,12 +97,7 @@ export const WiredActionMoveAndRotateFurniView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.user_collide')}</Text>
                 <label className="flex items-center gap-1 cursor-pointer">
-                    <input
-                        checked={blockOnUserCollision}
-                        className="form-check-input"
-                        type="checkbox"
-                        onChange={(event) => setBlockOnUserCollision(event.target.checked)}
-                    />
+                    <Checkbox checked={blockOnUserCollision} onCheckedChange={(nextChecked) => setBlockOnUserCollision(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.user_collide.0')}</Text>
                 </label>
             </div>

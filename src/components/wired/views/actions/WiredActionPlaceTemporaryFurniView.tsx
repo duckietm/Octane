@@ -10,6 +10,7 @@ import { WiredVariablePicker } from '../WiredVariablePicker';
 import { flattenWiredVariablePickerEntries, getCustomVariableItemId } from '../WiredVariablePickerData';
 import { customVariablePickerEntries, normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_PICKED = 100;
@@ -187,7 +188,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
 
                 <div className="flex flex-col gap-1">
                     <label className="flex items-center gap-1">
-                        <input type="checkbox" className="form-check-input" checked={ spawnWithVariable } onChange={ event => setSpawnWithVariable(event.target.checked) } />
+                        <Checkbox checked={ spawnWithVariable } onCheckedChange={(nextChecked) => setSpawnWithVariable(nextChecked)} />
                         <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_variable', 'Spawn with variable') }</Text>
                     </label>
                     { spawnWithVariable &&

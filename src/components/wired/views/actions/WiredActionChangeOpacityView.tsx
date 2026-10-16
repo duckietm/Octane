@@ -17,6 +17,7 @@ import {
     WIRED_OPACITY_VISIBILITY_SOURCE_USERS,
     WiredActionChangeOpacityState
 } from './WiredActionChangeOpacityState';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const EASING_FALLBACKS = ['Instant', 'Linear', 'Ease in', 'Ease out', 'Ease in and out'];
 
@@ -145,7 +146,7 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_transparency.click_handling', 'Click handling:')}</Text>
                 <label className="flex items-center gap-1">
-                    <input checked={state.clickThrough} className="form-check-input" type="checkbox" onChange={(event) => update({ clickThrough: event.target.checked })} />
+                    <Checkbox checked={state.clickThrough} onCheckedChange={(nextChecked) => update({ clickThrough: nextChecked })} />
                     <Text>{localizeWithFallback('wiredfurni.params.set_furni_transparency.allow_click_through', 'The target cannot be clicked')}</Text>
                 </label>
             </div>

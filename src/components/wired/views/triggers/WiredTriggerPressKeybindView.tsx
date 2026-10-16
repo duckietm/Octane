@@ -3,6 +3,7 @@ import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export const WiredTriggerPressKeybindView: FC<{}> = () =>
 {
@@ -38,12 +39,7 @@ export const WiredTriggerPressKeybindView: FC<{}> = () =>
                 <Text bold>{localizeWithFallback('wiredfurni.params.presskeybind', 'Press keybind')}</Text>
                 <Text small>{localizeWithFallback('wiredfurni.params.presskeybind.info', 'Fires when a user presses a key in the room. Leave unchecked to match any key.')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={ matchEnabled }
-                        className="form-check-input"
-                        id="keybindMatchEnabled"
-                        type="checkbox"
-                        onChange={ event => setMatchEnabled(event.target.checked) } />
+                    <Checkbox checked={ matchEnabled } id="keybindMatchEnabled" onCheckedChange={(nextChecked) => setMatchEnabled(nextChecked)} />
                     <Text>{localizeWithFallback('wiredfurni.params.presskeybind.specific', 'Only a specific key')}</Text>
                 </div>
                 { matchEnabled &&

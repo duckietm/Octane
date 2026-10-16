@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export const CHEST_REWARD_MODE_AMOUNT = 0;
 export const CHEST_REWARD_MODE_EVERYTHING = 1;
@@ -132,7 +133,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                     onChange={(event) => setPopupText(normalizeChestPopup(event.target.value))}
                 />
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={showByDefault} onChange={(event) => setShowByDefault(event.target.checked)} />
+                    <Checkbox checked={showByDefault} onCheckedChange={(nextChecked) => setShowByDefault(nextChecked)} />
                     <Text>{localizeWithFallback('wiredfurni.reward_contract.reward_popup.show_by_default', 'Show the popup by default')}</Text>
                 </label>
             </div>

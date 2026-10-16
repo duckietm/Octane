@@ -19,6 +19,7 @@ import { Button, Text } from '../../../../common';
 import { useMessageEvent, useNotification, useWired } from '../../../../hooks';
 import { useVariablesExplorerStore } from '../../../../state/variablesExplorer';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 /** The server takes one key request per box every 2 s. */
 const GENERATE_COOLDOWN_MS = 2000;
@@ -197,13 +198,7 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeText('wiredfurni.params.web_api.permissions', 'Extra permissions:')}</Text>
                     <label className={`flex items-center gap-1 ${canAllowBulkDelete(writeKey) ? 'cursor-pointer' : 'opacity-60'}`}>
-                        <input
-                            checked={bulkDelete && canAllowBulkDelete(writeKey)}
-                            className="form-check-input"
-                            disabled={!canAllowBulkDelete(writeKey)}
-                            type="checkbox"
-                            onChange={(event) => toggleBulkDelete(event.target.checked)}
-                        />
+                        <Checkbox checked={bulkDelete && canAllowBulkDelete(writeKey)} disabled={!canAllowBulkDelete(writeKey)} onCheckedChange={(nextChecked) => toggleBulkDelete(nextChecked)} />
                         <Text>{localizeText('wiredfurni.params.web_api.permissions.bulk_delete', 'Allow mass deletion')}</Text>
                     </label>
                     <Text small className="text-[#6b6659]">

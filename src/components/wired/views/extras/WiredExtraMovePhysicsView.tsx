@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const SOURCE_ALL_ROOM = 900;
 const DEFAULT_SOURCE = SOURCE_ALL_ROOM;
@@ -110,29 +111,19 @@ export const WiredExtraMovePhysicsView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <Text bold>{LocalizeText('wiredfurni.params.select_options')}</Text>
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input checked={keepAltitude} className="form-check-input" type="checkbox" onChange={(event) => setKeepAltitude(event.target.checked)} />
+                    <Checkbox checked={keepAltitude} onCheckedChange={(nextChecked) => setKeepAltitude(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.movephysics.keep_altitude')}</Text>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        checked={moveThroughFurni}
-                        className="form-check-input"
-                        type="checkbox"
-                        onChange={(event) => setMoveThroughFurni(event.target.checked)}
-                    />
+                    <Checkbox checked={moveThroughFurni} onCheckedChange={(nextChecked) => setMoveThroughFurni(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.movephysics.move_through_furni')}</Text>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        checked={moveThroughUsers}
-                        className="form-check-input"
-                        type="checkbox"
-                        onChange={(event) => setMoveThroughUsers(event.target.checked)}
-                    />
+                    <Checkbox checked={moveThroughUsers} onCheckedChange={(nextChecked) => setMoveThroughUsers(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.movephysics.move_through_users')}</Text>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input checked={blockByFurni} className="form-check-input" type="checkbox" onChange={(event) => setBlockByFurni(event.target.checked)} />
+                    <Checkbox checked={blockByFurni} onCheckedChange={(nextChecked) => setBlockByFurni(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.movephysics.block_by_furni')}</Text>
                 </label>
             </div>

@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const TARGET_USER = 0;
 const TARGET_ROOM = 3;
@@ -246,7 +247,7 @@ export const WiredExtraVariableReferenceView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input checked={readOnly} className="form-check-input" type="checkbox" onChange={(event) => setReadOnly(event.target.checked)} />
+                        <Checkbox checked={readOnly} onCheckedChange={(nextChecked) => setReadOnly(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.settings.read_only')}</Text>
                     </label>
                 </div>

@@ -4,6 +4,7 @@ import { LocalizeText } from '../../../../api';
 import { Button, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 export const WiredActionFurniAreaView: FC<{}> = (props) => {
     const [rootX, setRootX] = useState(0);
@@ -126,12 +127,12 @@ export const WiredActionFurniAreaView: FC<{}> = (props) => {
                 <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
 
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={filterExisting} onChange={(e) => setFilterExisting(e.target.checked)} />
+                    <Checkbox checked={filterExisting} onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
                 </label>
 
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={invert} onChange={(e) => setInvert(e.target.checked)} />
+                    <Checkbox checked={invert} onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
                 </label>
             </div>

@@ -20,6 +20,7 @@ import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSourcesSelector';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 // Official source values (InputSourcesConf): 0 trigger, 11 clicked user, 100 picks, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -296,11 +297,11 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () =>
 
                 <Text bold>{ LocalizeText('wiredfurni.params.selector_options_selector') }</Text>
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={ filterExisting } onChange={ event => setFilterExisting(event.target.checked) } />
+                    <Checkbox checked={ filterExisting } onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{ LocalizeText('wiredfurni.params.selector_option.0') }</Text>
                 </label>
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={ invert } onChange={ event => setInvert(event.target.checked) } />
+                    <Checkbox checked={ invert } onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{ LocalizeText('wiredfurni.params.selector_option.1') }</Text>
                 </label>
 

@@ -10,6 +10,7 @@ import {
 } from '../../api';
 import { Button, Text } from '../../common';
 import { useNotification, useRoom, useWiredTools } from '../../hooks';
+import { Checkbox } from '../../common/Checkbox';
 
 const WIRED_ACCESS_EVERYONE = 1;
 const WIRED_ACCESS_USERS_WITH_RIGHTS = 2;
@@ -139,7 +140,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
 
         return (
             <label key={option.label} className={`flex items-center gap-2 text-[12px] ${disabled ? 'text-[#8c877d]' : 'text-[#222]'}`}>
-                <input checked={checked} className="form-check-input mt-0" disabled={disabled} type="checkbox" onChange={() => onToggle(option.bit)} />
+                <Checkbox checked={checked} className="mt-0" disabled={disabled} onCheckedChange={() => onToggle(option.bit)} />
                 <span>{option.label}</span>
             </label>
         );
@@ -222,30 +223,15 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                         General:
                     </Text>
                     <label className="flex items-center gap-2 text-[12px] text-[#222]">
-                        <input
-                            checked={accountPreferences.showToolbarButton}
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            onChange={(event) => updateAccountPreferences({ showToolbarButton: event.target.checked })}
-                        />
+                        <Checkbox checked={accountPreferences.showToolbarButton} className="mt-0" onCheckedChange={(nextChecked) => updateAccountPreferences({ showToolbarButton: nextChecked })} />
                         <span>Show wired menu in toolbar</span>
                     </label>
                     <label className="flex items-center gap-2 text-[12px] text-[#222]">
-                        <input
-                            checked={accountPreferences.showInspectButton}
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            onChange={(event) => updateAccountPreferences({ showInspectButton: event.target.checked })}
-                        />
+                        <Checkbox checked={accountPreferences.showInspectButton} className="mt-0" onCheckedChange={(nextChecked) => updateAccountPreferences({ showInspectButton: nextChecked })} />
                         <span>Furni/user inspect button</span>
                     </label>
                     <label className="flex items-center gap-2 text-[12px] text-[#222]">
-                        <input
-                            checked={accountPreferences.showSystemNotifications}
-                            className="form-check-input mt-0"
-                            type="checkbox"
-                            onChange={(event) => updateAccountPreferences({ showSystemNotifications: event.target.checked })}
-                        />
+                        <Checkbox checked={accountPreferences.showSystemNotifications} className="mt-0" onCheckedChange={(nextChecked) => updateAccountPreferences({ showSystemNotifications: nextChecked })} />
                         <span>Show all system notifications</span>
                     </label>
                     <label className="flex items-center gap-2 text-[12px] text-[#222]">

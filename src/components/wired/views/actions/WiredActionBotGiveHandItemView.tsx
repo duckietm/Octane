@@ -7,6 +7,7 @@ import { WiredHandItemField } from '../WiredHandItemField';
 import { CLICKED_USER_SOURCE_VALUE, REACHED_USER_SOURCE_VALUE, WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const USER_SOURCE_OPTIONS: WiredSourceOption[] = [
     { value: 0, label: 'wiredfurni.params.sources.users.0' },
@@ -70,13 +71,7 @@ export const WiredActionBotGiveHandItemView: FC<{}> = (props) => {
             }
         >
             <div className="form-check">
-                <input
-                    checked={botSource === 100}
-                    className="form-check-input"
-                    id="botGiveHandItemUseNamedBot"
-                    type="checkbox"
-                    onChange={(event) => setBotSource(event.target.checked ? 100 : 0)}
-                />
+                <Checkbox checked={botSource === 100} id="botGiveHandItemUseNamedBot" onCheckedChange={(nextChecked) => setBotSource(nextChecked ? 100 : 0)} />
                 <label className="form-check-label" htmlFor="botGiveHandItemUseNamedBot">
                     {LocalizeText('wiredfurni.params.bot.usage')}
                 </label>

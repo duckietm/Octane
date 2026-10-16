@@ -7,6 +7,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MIN_LEVEL = 1;
 const MAX_LEVEL = 100;
@@ -73,12 +74,7 @@ export const WiredConditionUserLevelView: FC<{}> = () => {
                 <WiredComparisonOperator name="wiredUserLevelComparison" value={comparison} onChange={setComparison} />
 
                 <label className="flex items-center gap-1 cursor-pointer">
-                    <input
-                        checked={quantifier === QUANTIFIER_ANY}
-                        className="form-check-input"
-                        type="checkbox"
-                        onChange={(event) => setQuantifier(event.target.checked ? QUANTIFIER_ANY : QUANTIFIER_ALL)}
-                    />
+                    <Checkbox checked={quantifier === QUANTIFIER_ANY} onCheckedChange={(nextChecked) => setQuantifier(nextChecked ? QUANTIFIER_ANY : QUANTIFIER_ALL)} />
                     <Text>{localizeWithFallback('wiredfurni.params.level.any_user', 'One user is enough (otherwise every user must match)')}</Text>
                 </label>
             </div>

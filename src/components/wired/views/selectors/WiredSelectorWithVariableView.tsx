@@ -18,6 +18,7 @@ import {
     WiredVariablePickerTarget
 } from '../WiredVariablePickerData';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -304,13 +305,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                 <div className="octane-wired__divider" />
 
                 <label className="flex items-center gap-2">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={selectByValue}
-                        disabled={!canSelectByValue}
-                        onChange={(event) => setSelectByValue(event.target.checked)}
-                    />
+                    <Checkbox checked={selectByValue} disabled={!canSelectByValue} onCheckedChange={(nextChecked) => setSelectByValue(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.variables.value_settings.select_by_value')}</Text>
                 </label>
 
@@ -388,7 +383,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                             )}
                             {selectByValue && referenceMode === 'variable' && (
                                 <label className="octane-wired__give-var-checkbox">
-                                    <input checked={sameHolder} className="form-check-input" type="checkbox" onChange={(event) => setSameHolder(event.target.checked)} />
+                                    <Checkbox checked={sameHolder} onCheckedChange={(nextChecked) => setSameHolder(nextChecked)} />
                                     <Text>{localizeWithFallback('wiredfurni.params.variables.same_holder', 'Read it on each target itself')}</Text>
                                 </label>
                             )}
@@ -429,17 +424,12 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                 <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
 
                 <label className="flex items-center gap-2">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={filterExisting}
-                        onChange={(event) => setFilterExisting(event.target.checked)}
-                    />
+                    <Checkbox checked={filterExisting} onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
                 </label>
 
                 <label className="flex items-center gap-2">
-                    <input className="form-check-input" type="checkbox" checked={invert} onChange={(event) => setInvert(event.target.checked)} />
+                    <Checkbox checked={invert} onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
                 </label>
             </div>

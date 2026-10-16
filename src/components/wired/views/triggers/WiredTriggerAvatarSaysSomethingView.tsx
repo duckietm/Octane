@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const MATCH_CONTAINS = 0;
 const MATCH_EXACT = 1;
@@ -98,23 +99,11 @@ export const WiredTriggerAvatarSaysSomethingView: FC<WiredTriggerAvatarSaysSomet
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.select_options')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={hideMessage}
-                        className="form-check-input"
-                        id="sayHideMessage"
-                        type="checkbox"
-                        onChange={(event) => setHideMessage(event.target.checked)}
-                    />
+                    <Checkbox checked={hideMessage} id="sayHideMessage" onCheckedChange={(nextChecked) => setHideMessage(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.chat.hide')}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={ownerOnly}
-                        className="form-check-input"
-                        id="sayOwnerOnly"
-                        type="checkbox"
-                        onChange={(event) => setOwnerOnly(event.target.checked)}
-                    />
+                    <Checkbox checked={ownerOnly} id="sayOwnerOnly" onCheckedChange={(nextChecked) => setOwnerOnly(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.chat.onlyowner')}</Text>
                 </div>
             </div>

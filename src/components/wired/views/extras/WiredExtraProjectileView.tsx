@@ -54,6 +54,7 @@ import {
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredProjectileDirectionGrid } from './WiredProjectileDirectionGrid';
+import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -133,7 +134,7 @@ const Checkbox: FC<{ checked: boolean; disabled?: boolean; label: string; onChan
 
     return (
         <label className={`flex items-center gap-1 ${disabled ? 'opacity-50' : 'cursor-pointer'}`}>
-            <input checked={checked} className="form-check-input" disabled={disabled} type="checkbox" onChange={(event) => onChange(event.target.checked)} />
+            <BaseCheckbox checked={checked} disabled={disabled} onCheckedChange={onChange} />
             <Text small>{label}</Text>
         </label>
     );

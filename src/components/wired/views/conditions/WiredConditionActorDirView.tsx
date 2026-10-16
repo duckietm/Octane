@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 const toggleDirection = (mask: number, direction: number, checked: boolean) => {
     if (checked) return mask | (1 << direction);
@@ -87,12 +88,7 @@ export const WiredConditionActorDirView: FC<{}> = () => {
 
                             return (
                                 <label key={`actor-dir-${direction}`} className="flex items-center justify-center gap-[2px] cursor-pointer">
-                                    <input
-                                        checked={checked}
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        onChange={(event) => setDirectionMask(toggleDirection(directionMask, direction, event.target.checked))}
-                                    />
+                                    <Checkbox checked={checked} onCheckedChange={(nextChecked) => setDirectionMask(toggleDirection(directionMask, direction, nextChecked))} />
                                     <span className="inline-flex items-center justify-center">
                                         <WiredDirectionIcon direction={direction} selected={checked} />
                                     </span>

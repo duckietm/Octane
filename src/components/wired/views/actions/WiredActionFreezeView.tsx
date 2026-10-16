@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 /** The official effect list; the box saves the index (wiredfurni.params.freeze.effect.0..4). */
 const EFFECT_OPTIONS = [218, 12, 11, 53, 163];
@@ -46,7 +47,7 @@ export const WiredActionFreezeView: FC<{}> = () => {
                     ))}
                 </select>
                 <label className="flex items-center gap-1">
-                    <input checked={cancelOnTeleport} className="form-check-input" type="checkbox" onChange={(event) => setCancelOnTeleport(event.target.checked)} />
+                    <Checkbox checked={cancelOnTeleport} onCheckedChange={(nextChecked) => setCancelOnTeleport(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.freeze.cancel_on_teleport')}</Text>
                 </label>
             </div>

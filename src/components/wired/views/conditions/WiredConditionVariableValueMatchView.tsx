@@ -17,6 +17,7 @@ import {
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -542,7 +543,7 @@ export const WiredConditionVariableValueMatchView: FC<{}> = () => {
                         )}
                         {referenceMode === 'variable' && (
                             <label className="octane-wired__give-var-checkbox">
-                                <input checked={sameHolder} className="form-check-input" type="checkbox" onChange={(event) => setSameHolder(event.target.checked)} />
+                                <Checkbox checked={sameHolder} onCheckedChange={(nextChecked) => setSameHolder(nextChecked)} />
                                 <Text>{localizeWithFallback('wiredfurni.params.variables.same_holder', 'Read it on each target itself')}</Text>
                             </label>
                         )}

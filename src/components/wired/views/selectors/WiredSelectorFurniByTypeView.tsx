@@ -3,6 +3,7 @@ import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 
 export const WiredSelectorFurniByTypeView: FC<{}> = () => {
@@ -34,7 +35,7 @@ export const WiredSelectorFurniByTypeView: FC<{}> = () => {
         <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
             <div className="flex flex-col gap-2">
                 <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={matchState} onChange={(e) => setMatchState(e.target.checked)} />
+                    <Checkbox checked={matchState} onCheckedChange={(nextChecked) => setMatchState(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.state_match')}</Text>
                 </label>
 
@@ -43,12 +44,12 @@ export const WiredSelectorFurniByTypeView: FC<{}> = () => {
                 <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
 
                 <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={filterExisting} onChange={(e) => setFilterExisting(e.target.checked)} />
+                    <Checkbox checked={filterExisting} onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
                 </label>
 
                 <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={invert} onChange={(e) => setInvert(e.target.checked)} />
+                    <Checkbox checked={invert} onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
                 </label>
             </div>

@@ -83,8 +83,8 @@ describe('WiredExtraProjectileView', () => {
         render(<WiredExtraProjectileView />);
 
         fireEvent.change(screen.getByRole('combobox', { name: 'System:' }), { target: { value: '1' } });
-        fireEvent.click(screen.getByLabelText("Visually change the shooter's direction"));
-        fireEvent.click(screen.getByLabelText('Do a little hop when shooting sideways'));
+        fireEvent.click(screen.getByRole('checkbox', { name: "Visually change the shooter's direction" }));
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Do a little hop when shooting sideways' }));
         fireEvent.change(screen.getByRole('combobox', { name: 'Shooter:' }), { target: { value: '200' } });
 
         fireEvent.click(screen.getByRole('button', { name: /Animation trajectory/ }));
@@ -92,8 +92,8 @@ describe('WiredExtraProjectileView', () => {
         fireEvent.change(screen.getByRole('spinbutton', { name: 'Tiles:' }), { target: { value: '-99' } });
 
         fireEvent.click(screen.getByRole('button', { name: /internal variables/ }));
-        fireEvent.click(screen.getByLabelText('@projectile.animation.position.y'));
-        fireEvent.click(screen.getByLabelText('@projectile.animation.user_collisions'));
+        fireEvent.click(screen.getByRole('checkbox', { name: '@projectile.animation.position.y' }));
+        fireEvent.click(screen.getByRole('checkbox', { name: '@projectile.animation.user_collisions' }));
 
         baseProps.save();
 
@@ -106,7 +106,7 @@ describe('WiredExtraProjectileView', () => {
         const { container } = render(<WiredExtraProjectileView />);
 
         fireEvent.click(screen.getByRole('button', { name: /Animation time/ }));
-        fireEvent.click(screen.getByLabelText('Scale the animation time with the distance'));
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Scale the animation time with the distance' }));
         fireEvent.change(screen.getByRole('spinbutton', { name: 'Time per tile (ms):' }), { target: { value: '0' } });
         fireEvent.click(container.querySelectorAll('input[name="projectileTimeValue"]')[1]);
 
