@@ -103,10 +103,10 @@ describe('RewardTrackAdminView', () => {
         const rows = screen.getAllByTestId('rt-admin-level-row');
         expect(rows).toHaveLength(2);
 
-        const inputs = rows[1].querySelectorAll('input');
-        fireEvent.change(inputs[0], { target: { value: '5' } });
-        fireEvent.change(inputs[1], { target: { value: '25' } });
-        fireEvent.click(inputs[2]);
+        const [requiredCount, pointsReward] = within(rows[1]).getAllByRole('spinbutton');
+        fireEvent.change(requiredCount, { target: { value: '5' } });
+        fireEvent.change(pointsReward, { target: { value: '25' } });
+        fireEvent.click(within(rows[1]).getByRole('checkbox'));
         fireEvent.click(within(form).getByText('Save'));
 
         expect(mocks.saveTask).toHaveBeenCalledWith({

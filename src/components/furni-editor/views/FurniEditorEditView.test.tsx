@@ -87,8 +87,8 @@ describe('FurniEditorEditView', () => {
     it('renders the items_base fields that the server accepts but the form used to hide', () => {
         renderView({ item: { ...item, effectIdMale: 12, effectIdFemale: 13, clothingOnWalk: 'ch-210', vendingIds: '1,2', multiheight: '0.5,1.0' } });
 
-        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue(12);
-        expect(screen.getByLabelText('Effect ID (female)')).toHaveValue(13);
+        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue('12');
+        expect(screen.getByLabelText('Effect ID (female)')).toHaveValue('13');
         expect(screen.getByLabelText('Clothing on walk')).toHaveValue('ch-210');
         expect(screen.getByLabelText('Vending IDs')).toHaveValue('1,2');
         expect(screen.getByLabelText('Multiheight')).toHaveValue('0.5,1.0');
@@ -211,9 +211,11 @@ describe('FurniEditorEditView', () => {
         fireEvent.change(screen.getByLabelText('Multiheight'), { target: { value: '1' } });
         expect(screen.getByRole('button', { name: 'Save (2)' })).toBeEnabled();
 
+        // A real click moves focus off the number field first, which lets Base UI re-sync its text.
+        fireEvent.blur(screen.getByLabelText('Effect ID (male)'));
         fireEvent.click(screen.getByRole('button', { name: 'Revert Effect ID (male)' }));
 
-        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue(0);
+        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue('0');
         expect(screen.getByLabelText('Multiheight')).toHaveValue('1');
         expect(screen.getByRole('button', { name: 'Save (1)' })).toBeEnabled();
     });
@@ -298,7 +300,7 @@ describe('FurniEditorEditView', () => {
         expect(screen.getByRole('button', { name: '3 suggestions ›' })).toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: 'Apply Width 2' }));
-        expect(screen.getByRole('spinbutton', { name: 'Width' })).toHaveValue(2);
+        expect(screen.getByRole('spinbutton', { name: 'Width' })).toHaveValue('2');
         expect(screen.queryByRole('button', { name: 'Apply Width 2' })).toBeNull();
 
         fireEvent.click(screen.getByRole('button', { name: 'apply all' }));
@@ -318,7 +320,7 @@ describe('FurniEditorEditView', () => {
         renderView({ item: { ...item, interactionType: 'gate' }, interactions: ['default', 'gate', 'vendingmachine'] });
 
         fireEvent.click(screen.getByRole('button', { name: 'Apply Modes 2' }));
-        expect(screen.getByLabelText('Modes')).toHaveValue(2);
+        expect(screen.getByLabelText('Modes')).toHaveValue('2');
 
         const picker = screen.getByLabelText('Interaction type');
         fireEvent.focus(picker);
@@ -394,8 +396,10 @@ describe('FurniEditorEditView', () => {
             />
         );
 
+        // A real click moves focus off the number field first, which lets Base UI re-sync its text.
+        fireEvent.blur(screen.getByLabelText('Effect ID (male)'));
         fireEvent.click(screen.getByRole('button', { name: 'Undo last save' }));
-        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue(0);
+        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue('0');
         expect(screen.getByRole('button', { name: 'Save (1)' })).toBeEnabled();
     });
 
@@ -451,9 +455,11 @@ describe('FurniEditorEditView', () => {
         renderView();
 
         fireEvent.change(screen.getByLabelText('Effect ID (male)'), { target: { value: '5' } });
+        // A real click moves focus off the number field first, which lets Base UI re-sync its text.
+        fireEvent.blur(screen.getByLabelText('Effect ID (male)'));
         fireEvent.click(screen.getByRole('button', { name: 'Discard changes' }));
 
-        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue(0);
+        expect(screen.getByLabelText('Effect ID (male)')).toHaveValue('0');
         expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     });
 });
