@@ -108,8 +108,21 @@ login/WebGL, so they're not usable for in-game verification.
 - React 19.2.5, `react-dom` 19.2.5, `@types/react` 19.2.x.
 - TypeScript: TS 6 for build, **TS 7 native preview** (`@typescript/native-preview`,
   invoked via `tsgo`) for the `typecheck` script.
-- UI primitives: Base UI (`@base-ui/react`, imported per subpath) — `common/Slider.tsx` and
-  `common/FloatingPopover.tsx` wrap it. Radix UI is no longer a dependency.
+- UI primitives: Base UI (`@base-ui/react`, imported per subpath). Radix UI is no longer a
+  dependency. Use the `src/common/` wrappers instead of native controls or hand-rolled
+  ARIA widgets:
+  `Checkbox`, `Radio` (a controlled one-item `RadioGroup`, drop-in for
+  `<input type="radio" checked onChange>`), `Select` (drop-in for `<select>` + `<option>`,
+  change event keeps `target.value`), `NumberInput` (drop-in for `type="number"`, event keeps
+  `target.value` / `target.valueAsNumber`, role spinbutton), `Slider`, `FloatingPopover`,
+  `TabBar`, `InlineDialog` (non-modal dialog mounted inline), `CollapsibleSection`, `Tooltip`.
+  Skin them through the `octane-*` classes (`.octane-checkbox[data-checked]`,
+  `.octane-radio`, `.octane-select-trigger`, `.octane-number-input`): CSS written for
+  `input[type=...]` / `select` must be mirrored onto those classes. Base UI roots render as
+  `<i>` so a window's generic `span` / `input` rules do not hit them. In tests, read
+  `aria-checked` / `aria-disabled` (not `.checked` / `.disabled`), pick options with
+  `src/test-utils/selectOption.ts`, and use `getByRole('checkbox'|'radio', { name })` rather
+  than `getByLabelText` for wrapped boxes (the label also matches the hidden input).
 - Vite 8 + `@vitejs/plugin-react` 6 + `babel-plugin-react-compiler` 1.0.
 - ESLint 10 + `typescript-eslint` 8 + `eslint-plugin-react-hooks@7` +
   `eslint-plugin-react-compiler`.
