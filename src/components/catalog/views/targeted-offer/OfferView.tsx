@@ -1,18 +1,18 @@
 import { GetTargetedOfferComposer, SetTargetedOfferStateComposer, TargetedOfferData, TargetedOfferEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { getTargetedOfferSecondsLeft, SendMessageComposer, TargetedOfferTrackingState } from '../../../../api';
-import { useOctaneQuery } from '../../../../api/octane-query';
+import { useMessageEventState } from '../../../../hooks/events';
 import { OfferBubbleView } from './OfferBubbleView';
 import { OfferWindowView } from './OfferWindowView';
 
 export const OfferView = () => {
-    const { data: offer } = useOctaneQuery<TargetedOfferEvent, TargetedOfferData>({
-        key: ['octane', 'catalog', 'targeted-offer'],
-        request: () => new GetTargetedOfferComposer(),
-        parser: TargetedOfferEvent,
-        select: (evt) => evt.getParser()?.data ?? null,
-        staleTime: Infinity
-    });
+    // Primary visible content: plain event subscription (see the useOctaneQuery fragility note in CLAUDE.md).
+    // Also picks up server pushes of a new offer, which the one-shot query ignored.
+    const offer = useMessageEventState<TargetedOfferEvent, TargetedOfferData | null>(TargetedOfferEvent, (evt) => evt.getParser()?.data ?? null, null);
+
+    useEffect(() => {
+        SendMessageComposer(new GetTargetedOfferComposer());
+    }, []);
 
     // null follows the state the server remembered: open unless the user minimized it last time.
     const [opened, setOpened] = useState<boolean>(null);
