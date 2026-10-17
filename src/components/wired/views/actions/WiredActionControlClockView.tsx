@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // Game timers and the football, Banzai and Freeze counters as well as the clock counter.
 
@@ -52,14 +53,7 @@ export const WiredActionControlClockView: FC<{}> = () => {
                 {CONTROL_OPTIONS.map((option) => {
                     return (
                         <div key={option.value} className="flex items-center gap-1">
-                            <input
-                                checked={control === option.value}
-                                className="form-check-input"
-                                id={`controlClock${option.value}`}
-                                name="controlClock"
-                                type="radio"
-                                onChange={() => setControl(option.value)}
-                            />
+                            <Radio checked={control === option.value} id={`controlClock${option.value}`} name="controlClock" onCheckedChange={() => setControl(option.value)} />
                             <Text>{LocalizeText(option.label)}</Text>
                         </div>
                     );

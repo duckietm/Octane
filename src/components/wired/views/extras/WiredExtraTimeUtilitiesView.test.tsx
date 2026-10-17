@@ -61,7 +61,7 @@ describe('WiredExtraTimeUtilitiesView', () => {
     it('shows the saved selection and mode', () => {
         render(<WiredExtraTimeUtilitiesView />);
 
-        expect((screen.getByRole('radio', { name: 'Creation time' }) as HTMLInputElement).checked).toBe(true);
+        expect(screen.getByRole('radio', { name: 'Creation time' })).toBeChecked();
         expect(screen.getByRole('checkbox', { name: 'Hour of the day' })).toBeChecked();
         expect(screen.getByRole('checkbox', { name: 'Year' })).not.toBeChecked();
         expect(screen.getByDisplayValue('hour_of_day')).toBeTruthy();

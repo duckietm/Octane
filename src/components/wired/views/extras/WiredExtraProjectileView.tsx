@@ -55,6 +55,7 @@ import {
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredProjectileDirectionGrid } from './WiredProjectileDirectionGrid';
 import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -211,7 +212,7 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
     return (
         <div className="flex flex-col gap-1">
             <label className="flex items-center gap-1 cursor-pointer">
-                <input checked={!fromVariable} className="form-check-input" name={name} type="radio" onChange={() => props.onFromVariable(false)} />
+                <Radio checked={!fromVariable} name={name} onCheckedChange={() => props.onFromVariable(false)} />
                 <Text small>{label}</Text>
                 <input
                     aria-label={label}
@@ -223,7 +224,7 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
                 />
             </label>
             <label className="flex items-center gap-1 cursor-pointer">
-                <input checked={fromVariable} className="form-check-input" name={name} type="radio" onChange={() => props.onFromVariable(true)} />
+                <Radio checked={fromVariable} name={name} onCheckedChange={() => props.onFromVariable(true)} />
                 <Text small>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
             </label>
             {fromVariable && (
@@ -362,13 +363,7 @@ export const WiredExtraProjectileView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         {DISTANCE_MODES.map((mode) => (
                             <label key={mode.value} className="flex items-center gap-1 cursor-pointer">
-                                <input
-                                    checked={distanceMode === mode.value}
-                                    className="form-check-input"
-                                    name="projectileDistanceMode"
-                                    type="radio"
-                                    onChange={() => setParam(PROJECTILE_PARAM_DISTANCE_MODE, mode.value)}
-                                />
+                                <Radio checked={distanceMode === mode.value} name="projectileDistanceMode" onCheckedChange={() => setParam(PROJECTILE_PARAM_DISTANCE_MODE, mode.value)} />
                                 <Text small>{text(`distance.${mode.key}`, mode.fallback)}</Text>
                             </label>
                         ))}

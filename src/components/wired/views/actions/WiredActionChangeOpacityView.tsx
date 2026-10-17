@@ -18,6 +18,7 @@ import {
     WiredActionChangeOpacityState
 } from './WiredActionChangeOpacityState';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const EASING_FALLBACKS = ['Instant', 'Linear', 'Ease in', 'Ease out', 'Ease in and out'];
 
@@ -77,7 +78,7 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
     const choice = visibilityChoice(state.opacity);
     const radio = (value: VisibilityChoice, key: string, fallback: string) => (
         <label className="flex items-center gap-1">
-            <input checked={choice === value} className="form-check-input" name="wiredTransparency" type="radio" onChange={() => changeVisibility(value)} />
+            <Radio checked={choice === value} name="wiredTransparency" onCheckedChange={() => changeVisibility(value)} />
             <Text>{localizeWithFallback(key, fallback)}</Text>
         </label>
     );

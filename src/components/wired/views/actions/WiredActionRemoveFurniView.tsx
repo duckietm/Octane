@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { FURNI_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // Ours (wf_act_pickup_furni, code 1156). Server WiredEffectRemoveFurni: intParams = [mode, furniSource]. furniSource is resolved via
 // WiredSourceUtil.resolveItems, which supports SELECTED(100)/SELECTOR(200)/SIGNAL(201)/TRIGGER(0).
@@ -46,23 +47,11 @@ export const WiredActionRemoveFurniView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <Text bold>{localizeWithFallback('wiredfurni.removefurni.instructions', 'Choose what happens to the removed furni:')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="removeMode"
-                        checked={mode === MODE_RETURN}
-                        onChange={() => setMode(MODE_RETURN)}
-                    />
+                    <Radio name="removeMode" checked={mode === MODE_RETURN} onCheckedChange={() => setMode(MODE_RETURN)} />
                     <Text>{localizeWithFallback('wiredfurni.removefurni.mode.return', "Return to owner's inventory")}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="removeMode"
-                        checked={mode === MODE_DELETE}
-                        onChange={() => setMode(MODE_DELETE)}
-                    />
+                    <Radio name="removeMode" checked={mode === MODE_DELETE} onCheckedChange={() => setMode(MODE_DELETE)} />
                     <Text>{localizeWithFallback('wiredfurni.removefurni.mode.delete', 'Delete permanently (cannot be undone)')}</Text>
                 </div>
             </div>

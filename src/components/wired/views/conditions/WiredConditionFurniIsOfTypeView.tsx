@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES, sortWiredSourceOptions, WiredSourceOption } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_SELECTED = 100;
@@ -205,13 +206,7 @@ export const WiredConditionFurniIsOfTypeView: FC<WiredConditionFurniIsOfTypeView
                 <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                 {[0, 1].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={quantifier === value}
-                            className="form-check-input"
-                            name="stuffIsQuantifier"
-                            type="radio"
-                            onChange={() => setQuantifier(value)}
-                        />
+                        <Radio checked={quantifier === value} name="stuffIsQuantifier" onCheckedChange={() => setQuantifier(value)} />
                         <Text>{LocalizeText(`${quantifierKeyPrefix}.${value}`)}</Text>
                     </label>
                 ))}

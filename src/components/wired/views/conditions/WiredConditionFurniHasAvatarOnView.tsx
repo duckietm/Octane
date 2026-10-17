@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 interface WiredConditionFurniHasAvatarOnViewProps {
     negative?: boolean;
@@ -42,13 +43,7 @@ export const WiredConditionFurniHasAvatarOnView: FC<WiredConditionFurniHasAvatar
                 <Text bold>{LocalizeText('wiredfurni.params.requireall')}</Text>
                 {[0, 1].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={requireAll === value}
-                            className="form-check-input"
-                            name="furniHasAvatarRequireAll"
-                            type="radio"
-                            onChange={() => setRequireAll(value)}
-                        />
+                        <Radio checked={requireAll === value} name="furniHasAvatarRequireAll" onCheckedChange={() => setRequireAll(value)} />
                         <Text>{LocalizeText(`wiredfurni.params.${negative ? 'not_requireall' : 'requireall'}.${value + 2}`)}</Text>
                     </label>
                 ))}

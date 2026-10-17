@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const MODE_GIVE = 0;
 const MODE_TAKE = 1;
@@ -60,21 +61,11 @@ export const WiredActionGiveOrTakeFurniView: FC<{}> = props =>
             </div>
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="giveOrTake"
-                        checked={ giveOrTake === MODE_GIVE }
-                        onChange={ () => setGiveOrTake(MODE_GIVE) } />
+                    <Radio name="giveOrTake" checked={ giveOrTake === MODE_GIVE } onCheckedChange={() => setGiveOrTake(MODE_GIVE)} />
                     <Text>{ localizeWithFallback('wiredfurni.params.give', 'Give') }</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="giveOrTake"
-                        checked={ giveOrTake === MODE_TAKE }
-                        onChange={ () => setGiveOrTake(MODE_TAKE) } />
+                    <Radio name="giveOrTake" checked={ giveOrTake === MODE_TAKE } onCheckedChange={() => setGiveOrTake(MODE_TAKE)} />
                     <Text>{ localizeWithFallback('wiredfurni.params.take', 'Take') }</Text>
                 </div>
             </div>

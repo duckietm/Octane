@@ -6,6 +6,7 @@ import { OctaneInput } from '../../../../layout';
 import { BOT_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const normalizeBotSource = (value: number, hasBotName = false) => (BOT_SOURCES.some((option) => option.value === value) ? value : hasBotName ? 100 : 0);
 
@@ -56,25 +57,11 @@ export const WiredActionBotFollowAvatarView: FC<{}> = (props) => {
                 <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
                 <OctaneInput maxLength={32} title={LocalizeText('wiredfurni.tooltip.bot.name')} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={followMode === 1}
-                        className="form-check-input"
-                        id="followMode1"
-                        name="followMode"
-                        type="radio"
-                        onChange={(event) => setFollowMode(1)}
-                    />
+                    <Radio checked={followMode === 1} id="followMode1" name="followMode" onCheckedChange={() => setFollowMode(1)} />
                     <Text>{LocalizeText('wiredfurni.params.start.following')}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={followMode === 0}
-                        className="form-check-input"
-                        id="followMode2"
-                        name="followMode"
-                        type="radio"
-                        onChange={(event) => setFollowMode(0)}
-                    />
+                    <Radio checked={followMode === 0} id="followMode2" name="followMode" onCheckedChange={() => setFollowMode(0)} />
                     <Text>{LocalizeText('wiredfurni.params.stop.following')}</Text>
                 </div>
             </div>

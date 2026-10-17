@@ -492,7 +492,8 @@
     cursor: pointer;
 }
 
-.air-settings-radio:checked {
+.air-settings-radio:checked,
+.air-settings-radio[data-checked] {
     background: radial-gradient(circle, #2f2f2f 0 3px, #ffffff 4px) !important;
 }
 

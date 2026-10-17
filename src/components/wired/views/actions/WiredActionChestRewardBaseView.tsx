@@ -7,6 +7,7 @@ import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 export const CHEST_REWARD_MODE_AMOUNT = 0;
 export const CHEST_REWARD_MODE_EVERYTHING = 1;
@@ -96,7 +97,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                 <Text bold>{localizeWithFallback('wiredfurni.params.rewarding_mode', 'Rewarding mode')}</Text>
                 {[CHEST_REWARD_MODE_AMOUNT, CHEST_REWARD_MODE_EVERYTHING].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input type="radio" className="form-check-input" name="chestRewardMode" checked={mode === value} onChange={() => setMode(value)} />
+                        <Radio name="chestRewardMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
                         <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? 'Give a specific amount' : 'Give everything')}</Text>
                     </label>
                 ))}
@@ -153,7 +154,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                     ) : (
                         extra.options.map((option) => (
                             <label key={option.value} className="flex items-center gap-1">
-                                <input type="radio" className="form-check-input" name="chestRewardExtra" checked={extraValue === option.value} onChange={() => setExtraValue(option.value)} />
+                                <Radio name="chestRewardExtra" checked={extraValue === option.value} onCheckedChange={() => setExtraValue(option.value)} />
                                 <Text>{localizeWithFallback(option.key, option.label)}</Text>
                             </label>
                         ))

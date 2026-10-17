@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Radio } from '../../../../common/Radio';
 
 export const WiredTriggerAvatarLeaveRoomView: FC<{}> = (props) => {
     const [username, setUsername] = useState('');
@@ -22,25 +23,11 @@ export const WiredTriggerAvatarLeaveRoomView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.picktriggerer')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={avatarMode === 0}
-                        className="form-check-input"
-                        id="avatarMode0"
-                        name="avatarMode"
-                        type="radio"
-                        onChange={(event) => setAvatarMode(0)}
-                    />
+                    <Radio checked={avatarMode === 0} id="avatarMode0" name="avatarMode" onCheckedChange={() => setAvatarMode(0)} />
                     <Text>{LocalizeText('wiredfurni.params.anyavatar')}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={avatarMode === 1}
-                        className="form-check-input"
-                        id="avatarMode1"
-                        name="avatarMode"
-                        type="radio"
-                        onChange={(event) => setAvatarMode(1)}
-                    />
+                    <Radio checked={avatarMode === 1} id="avatarMode1" name="avatarMode" onCheckedChange={() => setAvatarMode(1)} />
                     <Text>{LocalizeText('wiredfurni.params.certainavatar')}</Text>
                 </div>
                 {avatarMode === 1 && <OctaneInput type="text" value={username} onChange={(event) => setUsername(event.target.value)} />}

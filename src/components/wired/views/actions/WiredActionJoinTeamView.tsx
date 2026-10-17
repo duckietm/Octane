@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 /** How the team is picked: the chosen one, the one with the fewest members, or a random one. */
 export const JOIN_TEAM_MODES: Array<{ fallback: string; value: number }> = [
@@ -54,15 +55,7 @@ export const WiredActionJoinTeamView: FC<{}> = () => {
                 <div className="grid grid-cols-2 gap-1">
                     {[1, 2, 3, 4].map((team) => (
                         <label key={team} className="flex gap-1">
-                            <input
-                                checked={selectedTeam === team}
-                                className="form-check-input"
-                                disabled={joinMode !== 0}
-                                id={`selectedTeam${team}`}
-                                name="selectedTeam"
-                                type="radio"
-                                onChange={() => setSelectedTeam(team)}
-                            />
+                            <Radio checked={selectedTeam === team} disabled={joinMode !== 0} id={`selectedTeam${team}`} name="selectedTeam" onCheckedChange={() => setSelectedTeam(team)} />
                             <Text>{LocalizeText(`wiredfurni.params.team.${team}`)}</Text>
                         </label>
                     ))}
@@ -76,14 +69,7 @@ export const WiredActionJoinTeamView: FC<{}> = () => {
                     { value: 2, label: 'Freeze' }
                 ].map((option) => (
                     <label key={option.value} className="flex gap-1">
-                        <input
-                            checked={selectedTeamType === option.value}
-                            className="form-check-input"
-                            id={`selectedTeamType${option.value}`}
-                            name="selectedTeamType"
-                            type="radio"
-                            onChange={() => setSelectedTeamType(option.value)}
-                        />
+                        <Radio checked={selectedTeamType === option.value} id={`selectedTeamType${option.value}`} name="selectedTeamType" onCheckedChange={() => setSelectedTeamType(option.value)} />
                         <Text>{localizeWithFallback(`wiredfurni.params.team_type.${option.value}`, option.label)}</Text>
                     </label>
                 ))}
@@ -92,14 +78,7 @@ export const WiredActionJoinTeamView: FC<{}> = () => {
                 <Text bold>{localizeWithFallback('wiredfurni.params.team.join_mode', 'Join')}</Text>
                 {JOIN_TEAM_MODES.map((mode) => (
                     <label key={mode.value} className="flex gap-1">
-                        <input
-                            checked={joinMode === mode.value}
-                            className="form-check-input"
-                            id={`joinMode${mode.value}`}
-                            name="joinMode"
-                            type="radio"
-                            onChange={() => setJoinMode(mode.value)}
-                        />
+                        <Radio checked={joinMode === mode.value} id={`joinMode${mode.value}`} name="joinMode" onCheckedChange={() => setJoinMode(mode.value)} />
                         <Text>{localizeWithFallback(`wiredfurni.params.team.join_mode.${mode.value}`, mode.fallback)}</Text>
                     </label>
                 ))}

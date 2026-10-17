@@ -20,6 +20,7 @@ import {
     WiredVariablePickerTarget,
     WiredVariablePickerUsage
 } from './WiredVariablePickerData';
+import { Radio } from '../../../common/Radio';
 
 /** Where an official value variable is read, with the official variable target ids. */
 export const WIRED_VALUE_TARGETS: Array<{ key: WiredVariablePickerTarget; value: number; icon: string }> = [
@@ -125,7 +126,7 @@ export const WiredValueOrVariableSection: FC<WiredValueOrVariableSectionProps> =
 
     const radio = (mode: boolean, label: string) => (
         <label className="flex items-center gap-1">
-            <input type="radio" className="form-check-input" name={ name } checked={ isVariable === mode } onChange={ () => props.onIsVariableChange(mode) } />
+            <Radio name={ name } checked={ isVariable === mode } onCheckedChange={() => props.onIsVariableChange(mode)} />
             <Text>{ label }</Text>
         </label>
     );

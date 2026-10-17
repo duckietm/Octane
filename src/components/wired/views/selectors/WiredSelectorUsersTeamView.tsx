@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const TEAM_TYPES = [0, 1, 2, 3, 4];
 
@@ -35,13 +36,7 @@ export const WiredSelectorUsersTeamView: FC<{}> = () => {
                     <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
                     {TEAM_TYPES.map((value) => (
                         <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={teamType === value}
-                                className="form-check-input"
-                                name="usersTeamSelector"
-                                type="radio"
-                                onChange={() => setTeamType(value)}
-                            />
+                            <Radio checked={teamType === value} name="usersTeamSelector" onCheckedChange={() => setTeamType(value)} />
                             <Text>{LocalizeText(value === 0 ? 'wiredfurni.params.team.any' : `wiredfurni.params.team.${value}`)}</Text>
                         </label>
                     ))}

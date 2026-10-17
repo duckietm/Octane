@@ -6,6 +6,7 @@ import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon'
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const toggleDirection = (mask: number, direction: number, checked: boolean) => {
     if (checked) return mask | (1 << direction);
@@ -57,13 +58,7 @@ export const WiredConditionActorDirView: FC<{}> = () => {
                                 {[0, 1].map((value) => {
                                     return (
                                         <label key={value} className="flex items-center gap-1">
-                                            <input
-                                                checked={quantifier === value}
-                                                className="form-check-input"
-                                                name="actorDirQuantifier"
-                                                type="radio"
-                                                onChange={() => setQuantifier(value)}
-                                            />
+                                            <Radio checked={quantifier === value} name="actorDirQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                             <Text>{LocalizeText(`wiredfurni.params.quantifier.users.${value}`)}</Text>
                                         </label>
                                     );

@@ -20,6 +20,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
+import { Radio } from '../../../../common/Radio';
 
 const EMPTY_FORM: IGlobalPlaceholderForm = { name: '', mode: GLOBAL_PLACEHOLDER_FROM_VALUE, value: '', roomId: 0, placeholderName: '', rooms: [] };
 
@@ -74,13 +75,7 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text>{localizeWithFallback('wiredfurni.params.choose_type', 'Choose type')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={form.mode === GLOBAL_PLACEHOLDER_FROM_VALUE}
-                            className="form-check-input"
-                            name="wiredGlobalPlaceholderMode"
-                            type="radio"
-                            onChange={() => setForm((current) => ({ ...current, mode: GLOBAL_PLACEHOLDER_FROM_VALUE }))}
-                        />
+                        <Radio checked={form.mode === GLOBAL_PLACEHOLDER_FROM_VALUE} name="wiredGlobalPlaceholderMode" onCheckedChange={() => setForm((current) => ({ ...current, mode: GLOBAL_PLACEHOLDER_FROM_VALUE }))} />
                         <Text>{localizeWithFallback('wiredfurni.params.from_value', 'From a value')}</Text>
                     </label>
                     {form.mode === GLOBAL_PLACEHOLDER_FROM_VALUE && (
@@ -96,20 +91,11 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                         />
                     )}
                     <label className={`flex items-center gap-1 ${anotherRoomDisabled ? 'opacity-50' : 'cursor-pointer'}`}>
-                        <input
-                            checked={form.mode === GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM}
-                            className="form-check-input"
-                            disabled={anotherRoomDisabled}
-                            name="wiredGlobalPlaceholderMode"
-                            type="radio"
-                            onChange={() =>
-                                setForm((current) => ({
+                        <Radio checked={form.mode === GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM} disabled={anotherRoomDisabled} name="wiredGlobalPlaceholderMode" onCheckedChange={() => setForm((current) => ({
                                     ...current,
                                     mode: GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM,
                                     roomId: current.roomId || current.rooms[0]?.roomId || 0
-                                }))
-                            }
-                        />
+                                }))} />
                         <Text>{localizeWithFallback('wiredfurni.params.from_another_room', 'From another room')}</Text>
                     </label>
                     {anotherRoomDisabled && (

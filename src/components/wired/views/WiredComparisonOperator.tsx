@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { localizeWithFallback } from '../../../api';
 import { Text } from '../../../common';
+import { Radio } from '../../../common/Radio';
 
 // Comparison operators for wired chest conditions.
 //
@@ -49,13 +50,7 @@ export const WiredComparisonOperator: FC<WiredComparisonOperatorProps> = ({ name
         <div className="flex flex-wrap gap-2">
             {OPTIONS.map((option) => (
                 <label key={option.value} className="flex items-center gap-1">
-                    <input
-                        type="radio"
-                        className="form-check-input"
-                        name={name}
-                        checked={value === option.value}
-                        onChange={() => onChange(option.value)}
-                    />
+                    <Radio name={name} checked={value === option.value} onCheckedChange={() => onChange(option.value)} />
                     <Text>{option.symbol}</Text>
                 </label>
             ))}

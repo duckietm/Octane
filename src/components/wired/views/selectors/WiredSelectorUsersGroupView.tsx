@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useUserGroups, useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const GROUP_CURRENT_ROOM = 0;
 const GROUP_SELECTED = 1;
@@ -49,13 +50,7 @@ export const WiredSelectorUsersGroupView: FC<{}> = () => {
                     <Text bold>{LocalizeText('wiredfurni.params.groupselection')}</Text>
                     {[GROUP_CURRENT_ROOM, GROUP_SELECTED].map((value) => (
                         <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={groupType === value}
-                                className="form-check-input"
-                                name="usersGroupSelectorType"
-                                type="radio"
-                                onChange={() => setGroupType(value)}
-                            />
+                            <Radio checked={groupType === value} name="usersGroupSelectorType" onCheckedChange={() => setGroupType(value)} />
                             <Text>{LocalizeText(`wiredfurni.params.grouptype.${value}`)}</Text>
                         </label>
                     ))}

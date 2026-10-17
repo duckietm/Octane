@@ -18,6 +18,7 @@ import {
     WiredVariablePickerTarget
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Radio } from '../../../../common/Radio';
 
 /**
  * Habbo's "movement curve" (wf_xtra_mov_curve): how high the furni the stack moves jump, typed or
@@ -178,7 +179,7 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
                 <div className={`octane-wired__give-var-section ${isJump ? '' : 'opacity-50 pointer-events-none'}`}>
                     <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.movement_curve', 'Movement curve:')}</div>
                     <label className="octane-wired__change-var-radio">
-                        <input checked={!fromVariable} type="radio" onChange={() => setFromVariable(false)} />
+                        <Radio checked={!fromVariable} onCheckedChange={() => setFromVariable(false)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.reference_value.set_value')}</Text>
                         <OctaneInput
                             className="octane-wired__give-var-number"
@@ -192,7 +193,7 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
 
                     <div className="octane-wired__change-var-reference-block">
                         <label className="octane-wired__change-var-radio">
-                            <input checked={fromVariable} type="radio" onChange={() => setFromVariable(true)} />
+                            <Radio checked={fromVariable} onCheckedChange={() => setFromVariable(true)} />
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                             <div className="octane-wired__give-var-targets">
                                 {TARGETS.map((button) => (

@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const MATCH_CONTAINS = 0;
 const MATCH_EXACT = 1;
@@ -62,36 +63,15 @@ export const WiredTriggerAvatarSaysSomethingView: FC<WiredTriggerAvatarSaysSomet
                 <div className="flex flex-col gap-1">
                     <Text bold>{LocalizeText('wiredfurni.params.chattriggertype')}</Text>
                     <div className="flex items-center gap-1">
-                        <input
-                            checked={matchMode === MATCH_CONTAINS}
-                            className="form-check-input"
-                            id="sayMatchContains"
-                            name="sayMatchMode"
-                            type="radio"
-                            onChange={() => setMatchMode(MATCH_CONTAINS)}
-                        />
+                        <Radio checked={matchMode === MATCH_CONTAINS} id="sayMatchContains" name="sayMatchMode" onCheckedChange={() => setMatchMode(MATCH_CONTAINS)} />
                         <Text>{LocalizeText('wiredfurni.params.chatcontains')}</Text>
                     </div>
                     <div className="flex items-center gap-1">
-                        <input
-                            checked={matchMode === MATCH_EXACT}
-                            className="form-check-input"
-                            id="sayMatchExact"
-                            name="sayMatchMode"
-                            type="radio"
-                            onChange={() => setMatchMode(MATCH_EXACT)}
-                        />
+                        <Radio checked={matchMode === MATCH_EXACT} id="sayMatchExact" name="sayMatchMode" onCheckedChange={() => setMatchMode(MATCH_EXACT)} />
                         <Text>{LocalizeText('wiredfurni.params.exactmatch')}</Text>
                     </div>
                     <div className="flex items-center gap-1">
-                        <input
-                            checked={matchMode === MATCH_ALL}
-                            className="form-check-input"
-                            id="sayMatchAll"
-                            name="sayMatchMode"
-                            type="radio"
-                            onChange={() => setMatchMode(MATCH_ALL)}
-                        />
+                        <Radio checked={matchMode === MATCH_ALL} id="sayMatchAll" name="sayMatchMode" onCheckedChange={() => setMatchMode(MATCH_ALL)} />
                         <Text>{LocalizeText('wiredfurni.params.allmatch')}</Text>
                     </div>
                 </div>

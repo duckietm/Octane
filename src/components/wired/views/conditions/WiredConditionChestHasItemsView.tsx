@@ -6,6 +6,7 @@ import { normalizeWiredComparison, WIRED_CMP_DEFAULT, WiredComparisonOperator } 
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries, createFallbackVariableEntry, flattenWiredVariablePickerEntries, normalizeVariableTokenFromWire } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // Server contract (WiredConditionChestHasItems):
 //   official: intData[0] = amount, [1] = amount mode, [2] = variable target (user 1, global -10), [3] = comparison
@@ -67,11 +68,11 @@ export const WiredConditionChestHasItemsView: FC<{}> = () => {
                 <WiredComparisonOperator name="chestHasItemsComparison" value={comparison} onChange={setComparison} />
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-1">
-                        <input checked={amountMode === AMOUNT_CONSTANT} className="form-check-input" id="chestAmountConstant" name="chestAmountMode" type="radio" onChange={() => setAmountMode(AMOUNT_CONSTANT)} />
+                        <Radio checked={amountMode === AMOUNT_CONSTANT} id="chestAmountConstant" name="chestAmountMode" onCheckedChange={() => setAmountMode(AMOUNT_CONSTANT)} />
                         <Text>{localizeWithFallback('wiredfurni.params.amount.from_value', 'A number')}</Text>
                     </div>
                     <div className="flex items-center gap-1">
-                        <input checked={amountMode === AMOUNT_VARIABLE} className="form-check-input" id="chestAmountVariable" name="chestAmountMode" type="radio" onChange={() => setAmountMode(AMOUNT_VARIABLE)} />
+                        <Radio checked={amountMode === AMOUNT_VARIABLE} id="chestAmountVariable" name="chestAmountMode" onCheckedChange={() => setAmountMode(AMOUNT_VARIABLE)} />
                         <Text>{localizeWithFallback('wiredfurni.params.amount.from_variable', 'The value of a variable')}</Text>
                     </div>
                 </div>
@@ -89,7 +90,7 @@ export const WiredConditionChestHasItemsView: FC<{}> = () => {
                                 { target: TARGET_USER, key: 'wiredfurni.params.variables.target.user', fallback: 'The user who triggered' }
                             ].map((option) => (
                                 <div key={option.target} className="flex items-center gap-1">
-                                    <input checked={amountTarget === option.target} className="form-check-input" id={`chestAmountTarget${option.target}`} name="chestAmountTarget" type="radio" onChange={() => setAmountTarget(option.target)} />
+                                    <Radio checked={amountTarget === option.target} id={`chestAmountTarget${option.target}`} name="chestAmountTarget" onCheckedChange={() => setAmountTarget(option.target)} />
                                     <Text>{localizeWithFallback(option.key, option.fallback)}</Text>
                                 </div>
                             ))}

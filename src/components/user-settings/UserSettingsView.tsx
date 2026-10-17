@@ -32,6 +32,7 @@ import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
 import { SoundboardVolumeControl } from './SoundboardVolumeControl';
 import { WordFilterSettingsView } from './WordFilterSettingsView';
 import { Checkbox } from '../../common/Checkbox';
+import { Radio } from '../../common/Radio';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -478,23 +479,11 @@ export const UserSettingsView: FC<{}> = () => {
                     <legend>{localizeWithFallback('privacy.settings.online.title', 'Online status')}</legend>
                     <p>{localizeWithFallback('settings.privacy.online_status_description', 'Who can see your online status:')}</p>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.onlineStatusVisible}
-                            className="air-settings-radio"
-                            name="online-status-visibility"
-                            type="radio"
-                            onChange={() => processAction('online_status_visible', true)}
-                        />
+                        <Radio checked={userSettings.onlineStatusVisible} className="air-settings-radio" name="online-status-visibility" onCheckedChange={() => processAction('online_status_visible', true)} />
                         <span>{localizeWithFallback('settings.privacy.everyone', 'Everyone')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={!userSettings.onlineStatusVisible}
-                            className="air-settings-radio"
-                            name="online-status-visibility"
-                            type="radio"
-                            onChange={() => processAction('online_status_visible', false)}
-                        />
+                        <Radio checked={!userSettings.onlineStatusVisible} className="air-settings-radio" name="online-status-visibility" onCheckedChange={() => processAction('online_status_visible', false)} />
                         <span>{localizeWithFallback('settings.privacy.noone', 'Nobody')}</span>
                     </label>
                 </fieldset>

@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 export const WiredSelectorFurniOnFurniView: FC<{}> = () => {
     // Official layout: [selection type], the furni in the official source slot, filter / invert in the official fields.
@@ -43,13 +44,7 @@ export const WiredSelectorFurniOnFurniView: FC<{}> = () => {
                     {[0, 1, 2, 3].map((value) => {
                         return (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={selectionType === value}
-                                    className="form-check-input"
-                                    name="furniOnFurniSelectionType"
-                                    type="radio"
-                                    onChange={() => setSelectionType(value)}
-                                />
+                                <Radio checked={selectionType === value} name="furniOnFurniSelectionType" onCheckedChange={() => setSelectionType(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.onfurni.${value}`)}</Text>
                             </label>
                         );

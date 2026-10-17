@@ -44,6 +44,7 @@ import {
 } from '../arrays/WiredArrayValueField';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const RESULT_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'every entry matches', value: WIRED_ARRAY_RESULT_ALL },
@@ -138,23 +139,11 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
 
                 <div className="flex gap-2">
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={isMatch}
-                            className="form-check-input"
-                            name="wiredCheckArrayMode"
-                            type="radio"
-                            onChange={() => setPayload({ ...payload, conditionMode: WIRED_ARRAY_CONDITION_MODE_MATCH })}
-                        />
+                        <Radio checked={isMatch} name="wiredCheckArrayMode" onCheckedChange={() => setPayload({ ...payload, conditionMode: WIRED_ARRAY_CONDITION_MODE_MATCH })} />
                         <Text>{localizeWithFallback('wiredfurni.params.arrays.check.entries', 'Its entries')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={!isMatch}
-                            className="form-check-input"
-                            name="wiredCheckArrayMode"
-                            type="radio"
-                            onChange={() => setPayload({ ...payload, conditionMode: WIRED_ARRAY_CONDITION_MODE_STATE })}
-                        />
+                        <Radio checked={!isMatch} name="wiredCheckArrayMode" onCheckedChange={() => setPayload({ ...payload, conditionMode: WIRED_ARRAY_CONDITION_MODE_STATE })} />
                         <Text>{localizeWithFallback('wiredfurni.params.arrays.check.state', 'Its state')}</Text>
                     </label>
                 </div>
@@ -163,23 +152,11 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                     <>
                         <div className="flex gap-2">
                             <label className="flex items-center gap-1 cursor-pointer">
-                                <input
-                                    checked={!isSpecificIndex}
-                                    className="form-check-input"
-                                    name="wiredCheckArrayScope"
-                                    type="radio"
-                                    onChange={() => setPayload({ ...payload, searchScope: WIRED_ARRAY_SCOPE_ANY_INDEX })}
-                                />
+                                <Radio checked={!isSpecificIndex} name="wiredCheckArrayScope" onCheckedChange={() => setPayload({ ...payload, searchScope: WIRED_ARRAY_SCOPE_ANY_INDEX })} />
                                 <Text>{localizeWithFallback('wiredfurni.params.arrays.check.anywhere', 'Anywhere')}</Text>
                             </label>
                             <label className="flex items-center gap-1 cursor-pointer">
-                                <input
-                                    checked={isSpecificIndex}
-                                    className="form-check-input"
-                                    name="wiredCheckArrayScope"
-                                    type="radio"
-                                    onChange={() => setPayload({ ...payload, searchScope: WIRED_ARRAY_SCOPE_SPECIFIC_INDEX })}
-                                />
+                                <Radio checked={isSpecificIndex} name="wiredCheckArrayScope" onCheckedChange={() => setPayload({ ...payload, searchScope: WIRED_ARRAY_SCOPE_SPECIFIC_INDEX })} />
                                 <Text>{localizeWithFallback('wiredfurni.params.arrays.check.at_index', 'At one index')}</Text>
                             </label>
                         </div>

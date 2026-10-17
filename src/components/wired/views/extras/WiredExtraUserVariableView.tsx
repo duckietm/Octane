@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const AVAILABILITY_ROOM = 0;
 const AVAILABILITY_PERMANENT = 10;
@@ -129,16 +130,16 @@ export const WiredExtraVariableView: FC<WiredExtraVariableViewProps> = props =>
                 <div className="flex flex-col gap-1">
                     <Text>{ LocalizeText('wiredfurni.params.variables.availability') }</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input checked={ (availability === props.availabilityRoomValue) } className="form-check-input" name={ props.availabilityRadioName } type="radio" onChange={ () => setAvailability(props.availabilityRoomValue) } />
+                        <Radio checked={ (availability === props.availabilityRoomValue) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(props.availabilityRoomValue)} />
                         <Text>{ roomAvailabilityText }</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input checked={ (availability === AVAILABILITY_PERMANENT) } className="form-check-input" name={ props.availabilityRadioName } type="radio" onChange={ () => setAvailability(AVAILABILITY_PERMANENT) } />
+                        <Radio checked={ (availability === AVAILABILITY_PERMANENT) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(AVAILABILITY_PERMANENT)} />
                         <Text>{ LocalizeText('wiredfurni.params.variables.availability.10') }</Text>
                     </label>
                     { !!props.showSharedAvailability &&
                         <label className="flex items-center gap-1 cursor-pointer">
-                            <input checked={ (availability === AVAILABILITY_SHARED) } className="form-check-input" name={ props.availabilityRadioName } type="radio" onChange={ () => setAvailability(AVAILABILITY_SHARED) } />
+                            <Radio checked={ (availability === AVAILABILITY_SHARED) } name={ props.availabilityRadioName } onCheckedChange={() => setAvailability(AVAILABILITY_SHARED)} />
                             <Text>{ LocalizeText('wiredfurni.params.variables.availability.11') }</Text>
                         </label> }
                 </div>

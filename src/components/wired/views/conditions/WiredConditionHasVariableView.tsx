@@ -15,6 +15,7 @@ import {
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 interface WiredConditionHasVariableViewProps {
     negative?: boolean;
@@ -189,13 +190,7 @@ export const WiredConditionHasVariableView: FC<WiredConditionHasVariableViewProp
                         <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                         {[QUANTIFIER_ALL, QUANTIFIER_ANY].map((value) => (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={quantifier === value}
-                                    className="form-check-input"
-                                    name={`wiredConditionHasVariableQuantifier-${negative ? 'neg' : 'pos'}`}
-                                    type="radio"
-                                    onChange={() => setQuantifier(value)}
-                                />
+                                <Radio checked={quantifier === value} name={`wiredConditionHasVariableQuantifier-${negative ? 'neg' : 'pos'}`} onCheckedChange={() => setQuantifier(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.quantifier.variables.${value}`)}</Text>
                             </label>
                         ))}

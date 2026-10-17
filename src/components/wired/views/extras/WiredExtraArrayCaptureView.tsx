@@ -28,6 +28,7 @@ import {
 } from '../arrays/WiredArrayValueField';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const DIRECTION_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'the first match', value: WIRED_ARRAY_CAPTURE_DIRECTION_FIRST },
@@ -109,23 +110,11 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
 
                 <div className="flex gap-2">
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={!isFind}
-                            className="form-check-input"
-                            name="wiredArrayCaptureMode"
-                            type="radio"
-                            onChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_INDEX })}
-                        />
+                        <Radio checked={!isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_INDEX })} />
                         <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.index', 'By index')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={isFind}
-                            className="form-check-input"
-                            name="wiredArrayCaptureMode"
-                            type="radio"
-                            onChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_FIND })}
-                        />
+                        <Radio checked={isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_FIND })} />
                         <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.find', 'By search')}</Text>
                     </label>
                 </div>

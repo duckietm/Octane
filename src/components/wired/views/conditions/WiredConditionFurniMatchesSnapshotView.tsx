@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 interface WiredConditionFurniMatchesSnapshotViewProps {
     negative?: boolean;
@@ -52,13 +53,7 @@ export const WiredConditionFurniMatchesSnapshotView: FC<WiredConditionFurniMatch
                         {[0, 1].map((value) => {
                             return (
                                 <label key={value} className="flex items-center gap-1">
-                                    <input
-                                        checked={quantifier === value}
-                                        className="form-check-input"
-                                        name="snapshotQuantifier"
-                                        type="radio"
-                                        onChange={() => setQuantifier(value)}
-                                    />
+                                    <Radio checked={quantifier === value} name="snapshotQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                     <Text>{LocalizeText(`wiredfurni.params.quantifier.furni${negative ? '.neg' : ''}.${value}`)}</Text>
                                 </label>
                             );

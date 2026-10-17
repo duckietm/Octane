@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const MAX_PICK_COUNT = 20;
 
@@ -42,7 +43,7 @@ export const WiredSelectorRemoteView: FC<{}> = () => {
                 <Text bold>{localizeWithFallback('wiredfurni.params.remote_selection.type', 'Selection type')}</Text>
                 {[false, true].map((value) => (
                     <label key={String(value)} className="flex items-center gap-1">
-                        <input type="radio" className="form-check-input" name="remoteSelectionType" checked={intersect === value} onChange={() => setIntersect(value)} />
+                        <Radio name="remoteSelectionType" checked={intersect === value} onCheckedChange={() => setIntersect(value)} />
                         <Text>{localizeWithFallback(`wiredfurni.params.remote_selection.type.${value ? 1 : 0}`, value ? 'Intersection' : 'Union')}</Text>
                     </label>
                 ))}

@@ -18,6 +18,7 @@ import {
     WiredVariablePickerTarget
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Radio } from '../../../../common/Radio';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type AmountMode = 'constant' | 'variable';
@@ -289,7 +290,7 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
                 <div className="octane-wired__give-var-section">
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.setfilter')}</div>
                     <label className="octane-wired__change-var-radio">
-                        <input checked={amountMode === 'constant'} type="radio" onChange={() => setAmountMode('constant')} />
+                        <Radio checked={amountMode === 'constant'} onCheckedChange={() => setAmountMode('constant')} />
                         <Text>{LocalizeText('wiredfurni.params.variables.reference_value.set_value')}</Text>
                         <OctaneInput
                             className="octane-wired__give-var-number"
@@ -303,7 +304,7 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
 
                     <div className="octane-wired__change-var-reference-block">
                         <label className="octane-wired__change-var-radio">
-                            <input checked={amountMode === 'variable'} type="radio" onChange={() => setAmountMode('variable')} />
+                            <Radio checked={amountMode === 'variable'} onCheckedChange={() => setAmountMode('variable')} />
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                             <div className="octane-wired__give-var-targets">
                                 {TARGET_BUTTONS.map((button) => (

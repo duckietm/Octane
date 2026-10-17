@@ -15,6 +15,7 @@ import {
 } from './timeUtilitiesParams';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const MODE_FALLBACKS = ['Variable value', 'Creation time', 'Last update time'];
 const SUB_VARIABLE_KEY = 'wiredfurni.params.time_util.subvariable.';
@@ -60,13 +61,7 @@ export const WiredExtraTimeUtilitiesView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         {TIME_UTIL_MODES.map((option) => (
                             <label key={option} className="flex items-center gap-2">
-                                <input
-                                    checked={mode === option}
-                                    className="form-check-input"
-                                    name="wiredTimeUtilMode"
-                                    type="radio"
-                                    onChange={() => setMode(option)}
-                                />
+                                <Radio checked={mode === option} name="wiredTimeUtilMode" onCheckedChange={() => setMode(option)} />
                                 <Text>{localizeWithFallback(`wiredfurni.params.time_util.mode.${option}`, MODE_FALLBACKS[option])}</Text>
                             </label>
                         ))}

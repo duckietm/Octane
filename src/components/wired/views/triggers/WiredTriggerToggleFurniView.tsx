@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const FURNI_SOURCE_OPTIONS: WiredSourceOption[] = [
     { value: 100, label: 'wiredfurni.params.sources.furni.100' },
@@ -46,25 +47,11 @@ export const WiredTriggerToggleFurniView: FC<WiredTriggerToggleFurniViewProps> =
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText(includesWiredChanges ? 'wiredfurni.params.select_options' : 'wiredfurni.params.condition.state')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={triggerMode === 1}
-                        className="form-check-input"
-                        id="stateTrigger1"
-                        name="stateTrigger"
-                        type="radio"
-                        onChange={() => setTriggerMode(1)}
-                    />
+                    <Radio checked={triggerMode === 1} id="stateTrigger1" name="stateTrigger" onCheckedChange={() => setTriggerMode(1)} />
                     <Text>{LocalizeText('wiredfurni.params.state_trigger.1')}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={triggerMode === 0}
-                        className="form-check-input"
-                        id="stateTrigger0"
-                        name="stateTrigger"
-                        type="radio"
-                        onChange={() => setTriggerMode(0)}
-                    />
+                    <Radio checked={triggerMode === 0} id="stateTrigger0" name="stateTrigger" onCheckedChange={() => setTriggerMode(0)} />
                     <Text>{LocalizeText('wiredfurni.params.state_trigger.0')}</Text>
                 </div>
             </div>

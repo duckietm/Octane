@@ -3,6 +3,7 @@ import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // Server saveData expects [baseItemId, quantity, placementMode, storedX, storedY, rotation].
 const MODE_THIS_TILE = 0;
@@ -56,23 +57,11 @@ export const WiredActionPlaceFurniView: FC<{}> = () => {
             </div>
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="placementMode"
-                        checked={placementMode === MODE_THIS_TILE}
-                        onChange={() => setPlacementMode(MODE_THIS_TILE)}
-                    />
+                    <Radio name="placementMode" checked={placementMode === MODE_THIS_TILE} onCheckedChange={() => setPlacementMode(MODE_THIS_TILE)} />
                     <Text>{localizeWithFallback('wiredfurni.params.place_furni.target_location.0', "Place on this furni's tile")}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="placementMode"
-                        checked={placementMode === MODE_STORED_XY}
-                        onChange={() => setPlacementMode(MODE_STORED_XY)}
-                    />
+                    <Radio name="placementMode" checked={placementMode === MODE_STORED_XY} onCheckedChange={() => setPlacementMode(MODE_STORED_XY)} />
                     <Text>{localizeWithFallback('wiredfurni.params.place_furni.target_location.1', 'Place at coordinates')}</Text>
                 </div>
             </div>

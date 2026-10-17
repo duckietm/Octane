@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredUserActionSection } from '../WiredUserActionSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 
 const USER_ACTION_SOURCES: WiredSourceOption[] = [
@@ -60,14 +61,7 @@ export const WiredConditionUserPerformsActionView: FC<WiredConditionUserPerforms
                                 {[0, 1].map((value) => {
                                     return (
                                         <div key={value} className="flex items-center gap-1">
-                                            <input
-                                                checked={quantifier === value}
-                                                className="form-check-input"
-                                                id={`userActionQuantifier${value}`}
-                                                name="userActionQuantifier"
-                                                type="radio"
-                                                onChange={() => setQuantifier(value)}
-                                            />
+                                            <Radio checked={quantifier === value} id={`userActionQuantifier${value}`} name="userActionQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                             <Text>{LocalizeText(`${quantifierKeyPrefix}.${value}`)}</Text>
                                         </div>
                                     );

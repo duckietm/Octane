@@ -299,6 +299,7 @@
 
     .form-check-input,
     .octane-checkbox,
+    .octane-radio,
     input[type='checkbox'],
     input[type='radio'] {
         width: 18px;
@@ -314,12 +315,14 @@
         position: relative;
     }
 
+    .octane-radio,
     input[type='radio'] {
         border-radius: 50%;
     }
 
     .form-check-input:focus,
     .octane-checkbox:focus,
+    .octane-radio:focus,
     input[type='checkbox']:focus,
     input[type='radio']:focus {
         outline: 1px solid #4b7ea1;
@@ -327,6 +330,7 @@
     }
 
     .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
     input[type='radio']:checked {
         background:
             radial-gradient(circle at center, #4a4a4a 0 34%, transparent 38%),
@@ -1207,6 +1211,7 @@
 
     .form-check-input,
     .octane-checkbox,
+    .octane-radio,
     input[type='checkbox'],
     input[type='radio'] {
         border-color: #181818;
@@ -1215,6 +1220,7 @@
     }
 
     .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
     input[type='radio']:checked {
         background:
             radial-gradient(circle at center, #f4f4f4 0 34%, transparent 38%),
@@ -1345,6 +1351,7 @@
 
     .form-check-input,
     .octane-checkbox,
+    .octane-radio,
     input[type='checkbox'],
     input[type='radio'] {
         border-color: #222222;
@@ -1352,6 +1359,7 @@
     }
 
     .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
     input[type='radio']:checked {
         background: radial-gradient(circle at center, #222222 0 34%, transparent 38%), #ffffff;
         border-color: #222222;

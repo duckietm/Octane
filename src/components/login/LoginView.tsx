@@ -21,6 +21,7 @@ import { TurnstileWidget } from './TurnstileWidget';
 import { t } from './utils/i18n';
 import { clearRegistrationDraft, loadRegistrationDraft, saveRegistrationDraft } from './utils/registrationDraft';
 import { Checkbox } from '../../common/Checkbox';
+import { Radio } from '../../common/Radio';
 
 type DialogMode = 'login' | 'register' | 'forgot';
 type LoginLocale = { code: string; file: string; label: string; flag: string };
@@ -1569,11 +1570,11 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
 
                     <div className="gender-row">
                         <label>
-                            <input type="radio" name="register-gender" checked={gender === 'F'} onChange={() => applyGender('F')} />
+                            <Radio name="register-gender" checked={gender === 'F'} onCheckedChange={() => applyGender('F')} />
                             <span>{t('nitro.login.register.gender.girl', 'Girl')}</span>
                         </label>
                         <label>
-                            <input type="radio" name="register-gender" checked={gender === 'M'} onChange={() => applyGender('M')} />
+                            <Radio name="register-gender" checked={gender === 'M'} onCheckedChange={() => applyGender('M')} />
                             <span>{t('nitro.login.register.gender.boy', 'Boy')}</span>
                         </label>
                     </div>
@@ -1664,12 +1665,7 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
 
                     <div className="room-templates-list">
                         <label className={`room-template-option room-template-skip ${selectedTemplateId === null ? 'selected' : ''}`}>
-                            <input
-                                type="radio"
-                                name="register-room-template"
-                                checked={selectedTemplateId === null}
-                                onChange={() => setSelectedTemplateId(null)}
-                            />
+                            <Radio name="register-room-template" checked={selectedTemplateId === null} onCheckedChange={() => setSelectedTemplateId(null)} />
                             <div className="room-template-body">
                                 <div className="room-template-title">{t('nitro.login.register.room.skip.title', "I'm okay — I'll create my own rooms")}</div>
                                 <div className="room-template-description">
@@ -1686,12 +1682,7 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                                     key={template.templateId}
                                     className={`room-template-option ${selectedTemplateId === template.templateId ? 'selected' : ''}`}
                                 >
-                                    <input
-                                        type="radio"
-                                        name="register-room-template"
-                                        checked={selectedTemplateId === template.templateId}
-                                        onChange={() => setSelectedTemplateId(template.templateId)}
-                                    />
+                                    <Radio name="register-room-template" checked={selectedTemplateId === template.templateId} onCheckedChange={() => setSelectedTemplateId(template.templateId)} />
                                     {template.thumbnail && (
                                         <img
                                             className="room-template-thumb"

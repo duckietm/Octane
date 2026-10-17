@@ -4,6 +4,7 @@ import { IGroupData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Flex, HorizontalRule, Text } from '../../../../common';
 import { useNotification } from '../../../../hooks';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const STATES: string[] = ['regular', 'exclusive', 'private'];
 
@@ -78,13 +79,7 @@ export const GroupTabSettingsView: FC<GroupTabSettingsViewProps> = (props) => {
                 {STATES.map((state, index) => {
                     return (
                         <Flex key={index} alignItems="center" gap={1}>
-                            <input
-                                checked={groupState === index}
-                                className="form-check-input"
-                                name="groupState"
-                                type="radio"
-                                onChange={(event) => setGroupState(index)}
-                            />
+                            <Radio checked={groupState === index} name="groupState" onCheckedChange={() => setGroupState(index)} />
                             <div className="flex flex-col gap-0">
                                 <div className="flex gap-1">
                                     <i className={`icon icon-group-type-${index}`} />

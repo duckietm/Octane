@@ -106,7 +106,7 @@ export const WiredActionBotTalkBaseView: FC<WiredActionBotTalkBaseViewProps> = (
                 <WiredTextFormattingHelp />
                 {modes.map((mode) => (
                     <label key={mode.value} className="flex items-center gap-1">
-                        <input checked={talkMode === mode.value} className="form-check-input" name="botTalkMode" type="radio" onChange={() => setTalkMode(mode.value)} />
+                        <Radio checked={talkMode === mode.value} name="botTalkMode" onCheckedChange={() => setTalkMode(mode.value)} />
                         <Text>{LocalizeText(mode.label)}</Text>
                     </label>
                 ))}

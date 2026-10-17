@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const TEAM_OPTIONS = [0, 1, 2, 3, 4];
 const PLACEMENT_OPTIONS = [1, 2, 3, 4];
@@ -54,14 +55,7 @@ export const WiredConditionTeamHasRankView: FC<{}> = () => {
                                 {[0, 1].map((value) => {
                                     return (
                                         <div key={value} className="flex items-center gap-1">
-                                            <input
-                                                checked={quantifier === value}
-                                                className="form-check-input"
-                                                id={`teamRankQuantifier${value}`}
-                                                name="teamRankQuantifier"
-                                                type="radio"
-                                                onChange={() => setQuantifier(value)}
-                                            />
+                                            <Radio checked={quantifier === value} id={`teamRankQuantifier${value}`} name="teamRankQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                             <Text>{LocalizeText(`wiredfurni.params.quantifier.users.${value}`)}</Text>
                                         </div>
                                     );
@@ -80,14 +74,7 @@ export const WiredConditionTeamHasRankView: FC<{}> = () => {
 
                     return (
                         <div key={value} className="flex items-center gap-1">
-                            <input
-                                checked={team === value}
-                                className="form-check-input"
-                                id={`teamHasRank${value}`}
-                                name="teamHasRank"
-                                type="radio"
-                                onChange={() => setTeam(value)}
-                            />
+                            <Radio checked={team === value} id={`teamHasRank${value}`} name="teamHasRank" onCheckedChange={() => setTeam(value)} />
                             <Text>{LocalizeText(labelKey)}</Text>
                         </div>
                     );
@@ -98,14 +85,7 @@ export const WiredConditionTeamHasRankView: FC<{}> = () => {
                 {PLACEMENT_OPTIONS.map((value) => {
                     return (
                         <div key={value} className="flex items-center gap-1">
-                            <input
-                                checked={placement === value}
-                                className="form-check-input"
-                                id={`teamRankPlacement${value}`}
-                                name="teamRankPlacement"
-                                type="radio"
-                                onChange={() => setPlacement(value)}
-                            />
+                            <Radio checked={placement === value} id={`teamRankPlacement${value}`} name="teamRankPlacement" onCheckedChange={() => setPlacement(value)} />
                             <Text>{LocalizeText(`wiredfurni.params.placement.${value}`)}</Text>
                         </div>
                     );

@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const MODE_LINEAR = 1;
 const MODE_EXPONENTIAL = 2;
@@ -351,13 +352,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                         <div className="octane-wired__levelup-section-body">
                             <div className={`octane-wired__levelup-mode-block ${mode === MODE_LINEAR ? 'is-active' : 'is-inactive'}`}>
                                 <label className="octane-wired__levelup-mode-label">
-                                    <input
-                                        checked={mode === MODE_LINEAR}
-                                        className="form-check-input"
-                                        name="wiredVariableLevelUpMode"
-                                        type="radio"
-                                        onChange={() => setMode(MODE_LINEAR)}
-                                    />
+                                    <Radio checked={mode === MODE_LINEAR} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_LINEAR)} />
                                     <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.1', 'Lineare')}</Text>
                                 </label>
                                 <div className="octane-wired__levelup-fields">
@@ -386,13 +381,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
 
                             <div className={`octane-wired__levelup-mode-block ${mode === MODE_EXPONENTIAL ? 'is-active' : 'is-inactive'}`}>
                                 <label className="octane-wired__levelup-mode-label">
-                                    <input
-                                        checked={mode === MODE_EXPONENTIAL}
-                                        className="form-check-input"
-                                        name="wiredVariableLevelUpMode"
-                                        type="radio"
-                                        onChange={() => setMode(MODE_EXPONENTIAL)}
-                                    />
+                                    <Radio checked={mode === MODE_EXPONENTIAL} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_EXPONENTIAL)} />
                                     <Text>{localizeOrFallback('wiredfurni.params.levelup.mode.2', 'Esponenziale')}</Text>
                                 </label>
                                 <div className="octane-wired__levelup-fields">
@@ -431,13 +420,7 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
 
                             <div className={`octane-wired__levelup-mode-block ${mode === MODE_MANUAL ? 'is-active' : 'is-inactive'}`}>
                                 <label className="octane-wired__levelup-mode-label">
-                                    <input
-                                        checked={mode === MODE_MANUAL}
-                                        className="form-check-input"
-                                        name="wiredVariableLevelUpMode"
-                                        type="radio"
-                                        onChange={() => setMode(MODE_MANUAL)}
-                                    />
+                                    <Radio checked={mode === MODE_MANUAL} name="wiredVariableLevelUpMode" onCheckedChange={() => setMode(MODE_MANUAL)} />
                                     <Text>
                                         {localizeWithFallback(
                                             'wiredfurni.params.levelup.mode.0',

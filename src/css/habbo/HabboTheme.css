@@ -289,6 +289,7 @@ input[type='checkbox']:checked,
 }
 
 input[type='radio'],
+.octane-radio,
 .form-check-input[type='radio'] {
     width: 11px;
     height: 12px;
@@ -305,19 +306,55 @@ input[type='radio'],
 }
 
 input[type='radio']:checked,
+.octane-radio[data-checked],
 .form-check-input[type='radio']:checked {
     background-image: var(--habbo-skin-radio-checked);
 }
 
 input[type='checkbox']:focus-visible,
 .octane-checkbox:focus-visible,
+.octane-radio:focus-visible,
 input[type='radio']:focus-visible {
     outline: 1px solid #4b7ea1;
     outline-offset: 1px;
 }
 
 input[type='checkbox']:disabled,
+.octane-checkbox[data-disabled],
+.octane-radio[data-disabled],
 input[type='radio']:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+}
+
+/* Base UI renders the radio as an <i> inside its own one-item group. */
+.octane-radio {
+    display: inline-block;
+    padding: 0;
+}
+
+.octane-radio-group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    vertical-align: middle;
+}
+
+/* Windows that drew a plain native radio keep a plain round dot instead of the Habbo skin. */
+:is(.octane-catalog-window, .octane-catalog-admin-modal, .octane-reward-track-admin, .octane-room-settings, .octane-login-card .room-template-option) .octane-radio {
+    position: relative;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    border: 1px solid #565650;
+    border-radius: 50%;
+    background: #fbfbf9;
+}
+
+:is(.octane-catalog-window, .octane-catalog-admin-modal, .octane-reward-track-admin, .octane-room-settings, .octane-login-card .room-template-option) .octane-radio[data-checked]::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #111;
 }

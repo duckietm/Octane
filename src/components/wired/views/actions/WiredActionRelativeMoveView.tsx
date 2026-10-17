@@ -6,6 +6,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const MAX_DISTANCE = 20;
 
@@ -68,13 +69,7 @@ export const WiredActionRelativeMoveView: FC<{}> = () => {
                     {HORIZONTAL_OPTIONS.map((option) => {
                         return (
                             <label key={option.value} className="flex items-center gap-1">
-                                <input
-                                    checked={horizontalDirection === option.value}
-                                    className="form-check-input"
-                                    name="relativeMoveHorizontal"
-                                    type="radio"
-                                    onChange={() => setHorizontalDirection(option.value)}
-                                />
+                                <Radio checked={horizontalDirection === option.value} name="relativeMoveHorizontal" onCheckedChange={() => setHorizontalDirection(option.value)} />
                                 <Text>{option.icon}</Text>
                             </label>
                         );
@@ -89,13 +84,7 @@ export const WiredActionRelativeMoveView: FC<{}> = () => {
                     {VERTICAL_OPTIONS.map((option) => {
                         return (
                             <label key={option.value} className="flex items-center gap-1">
-                                <input
-                                    checked={verticalDirection === option.value}
-                                    className="form-check-input"
-                                    name="relativeMoveVertical"
-                                    type="radio"
-                                    onChange={() => setVerticalDirection(option.value)}
-                                />
+                                <Radio checked={verticalDirection === option.value} name="relativeMoveVertical" onCheckedChange={() => setVerticalDirection(option.value)} />
                                 <Text>{option.icon}</Text>
                             </label>
                         );

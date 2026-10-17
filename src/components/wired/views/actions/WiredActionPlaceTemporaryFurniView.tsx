@@ -11,6 +11,7 @@ import { flattenWiredVariablePickerEntries, getCustomVariableItemId } from '../W
 import { customVariablePickerEntries, normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_PICKED = 100;
@@ -142,7 +143,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
     const customTargetUsed = location === 1 || altitude === 2;
     const radio = (name: string, value: number, current: number, onChange: (value: number) => void, label: string, info?: string) => (
         <label key={ `${ name }${ value }` } className="flex items-start gap-1">
-            <input type="radio" className="form-check-input" name={ name } checked={ current === value } onChange={ () => onChange(value) } />
+            <Radio name={ name } checked={ current === value } onCheckedChange={() => onChange(value)} />
             <span className="flex flex-col">
                 <Text>{ label }</Text>
                 { info && <Text small className="text-muted">{ info }</Text> }

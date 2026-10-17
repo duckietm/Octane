@@ -2,6 +2,7 @@ import { FC, useMemo } from 'react';
 import { IWiredArrayEditorDefinition, localizeWithFallback, wiredArrayDefinitionsOfType } from '../../../../api';
 import { Text } from '../../../../common';
 import { WIRED_ARRAY_TARGETS } from './WiredArrayValueField';
+import { Radio } from '../../../../common/Radio';
 
 const FALLBACK_TARGET_LABELS: Record<number, string> = {
     0: 'Furni',
@@ -29,13 +30,7 @@ export const WiredArrayDefinitionSelect: FC<WiredArrayDefinitionSelectProps> = (
             <div className="flex flex-wrap gap-2">
                 {WIRED_ARRAY_TARGETS.map((entry) => (
                     <label key={entry.type} className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={variableType === entry.type}
-                            className="form-check-input"
-                            name="wiredArrayDefinitionTarget"
-                            type="radio"
-                            onChange={() => onChange(entry.type, 0)}
-                        />
+                        <Radio checked={variableType === entry.type} name="wiredArrayDefinitionTarget" onCheckedChange={() => onChange(entry.type, 0)} />
                         <Text>{localizeWithFallback(entry.label, FALLBACK_TARGET_LABELS[entry.type])}</Text>
                     </label>
                 ))}

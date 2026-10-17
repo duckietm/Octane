@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { normalizeWiredComparison, WIRED_CMP_GREATER_EQUAL, WiredComparisonOperator } from '../WiredComparisonOperator';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // 0 is the triggering user's team, as officially.
 const TEAM_OPTIONS = [0, 1, 2, 3, 4];
@@ -106,14 +107,7 @@ export const WiredConditionTeamHasScoreView: FC<WiredConditionTeamHasScoreViewPr
                                 {[0, 1].map((value) => {
                                     return (
                                         <div key={value} className="flex items-center gap-1">
-                                            <input
-                                                checked={quantifier === value}
-                                                className="form-check-input"
-                                                id={`teamScoreQuantifier${value}`}
-                                                name="teamScoreQuantifier"
-                                                type="radio"
-                                                onChange={() => setQuantifier(value)}
-                                            />
+                                            <Radio checked={quantifier === value} id={`teamScoreQuantifier${value}`} name="teamScoreQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                             <Text>{LocalizeText(`wiredfurni.params.quantifier.users.${value}`)}</Text>
                                         </div>
                                     );
@@ -133,14 +127,7 @@ export const WiredConditionTeamHasScoreView: FC<WiredConditionTeamHasScoreViewPr
                         {TEAM_OPTIONS.map((value) => {
                             return (
                                 <div key={value} className="flex items-center gap-1">
-                                    <input
-                                        checked={team === value}
-                                        className="form-check-input"
-                                        id={`teamHasScore${value}`}
-                                        name="teamHasScore"
-                                        type="radio"
-                                        onChange={() => setTeam(value)}
-                                    />
+                                    <Radio checked={team === value} id={`teamHasScore${value}`} name="teamHasScore" onCheckedChange={() => setTeam(value)} />
                                     <Text>{LocalizeText(value === 0 ? 'wiredfurni.params.team.triggerer' : `wiredfurni.params.team.${value}`)}</Text>
                                 </div>
                             );
@@ -151,14 +138,7 @@ export const WiredConditionTeamHasScoreView: FC<WiredConditionTeamHasScoreViewPr
                         {COMPARISON_OPTIONS.map((value) => {
                             return (
                                 <div key={value} className="flex items-center gap-1">
-                                    <input
-                                        checked={comparison === value}
-                                        className="form-check-input"
-                                        id={`teamScoreComparison${value}`}
-                                        name="teamScoreComparison"
-                                        type="radio"
-                                        onChange={() => setComparison(value)}
-                                    />
+                                    <Radio checked={comparison === value} id={`teamScoreComparison${value}`} name="teamScoreComparison" onCheckedChange={() => setComparison(value)} />
                                     <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
                                 </div>
                             );

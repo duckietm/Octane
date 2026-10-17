@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 export const WiredActionToggleFurniStateView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
@@ -39,13 +40,7 @@ export const WiredActionToggleFurniStateView: FC<{}> = (props) => {
                 <Text bold>{localizeWithFallback('wiredfurni.params.toggletype_selection', LocalizeText('wiredfurni.params.operator.2'))}</Text>
                 {[0, 1].map((option) => (
                     <label key={option} className="flex items-center gap-1">
-                        <input
-                            checked={toggleType === option}
-                            className="form-check-input"
-                            name="toggleType"
-                            type="radio"
-                            onChange={() => setToggleType(option)}
-                        />
+                        <Radio checked={toggleType === option} name="toggleType" onCheckedChange={() => setToggleType(option)} />
                         <Text>{LocalizeText(`wiredfurni.params.toggletype.${option}`)}</Text>
                     </label>
                 ))}

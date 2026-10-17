@@ -111,23 +111,11 @@ export const WiredActionChatView: FC<{}> = (props) => {
                             <Text bold>{LocalizeText('wiredfurni.params.show_message.visibility_selection.title')}</Text>
                         </summary>
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={visibilitySelection === 0}
-                                className="form-check-input"
-                                name="showMessageVisibilitySelection"
-                                type="radio"
-                                onChange={() => setVisibilitySelection(0)}
-                            />
+                            <Radio checked={visibilitySelection === 0} name="showMessageVisibilitySelection" onCheckedChange={() => setVisibilitySelection(0)} />
                             <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.0')}</Text>
                         </div>
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={visibilitySelection === 1}
-                                className="form-check-input"
-                                name="showMessageVisibilitySelection"
-                                type="radio"
-                                onChange={() => setVisibilitySelection(1)}
-                            />
+                            <Radio checked={visibilitySelection === 1} name="showMessageVisibilitySelection" onCheckedChange={() => setVisibilitySelection(1)} />
                             <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.1')}</Text>
                         </div>
                     </details>

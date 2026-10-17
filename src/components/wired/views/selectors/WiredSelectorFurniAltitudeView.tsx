@@ -4,6 +4,7 @@ import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 const MIN_ALTITUDE = 0;
 const MAX_ALTITUDE = 80;
@@ -94,13 +95,7 @@ export const WiredSelectorFurniAltitudeView: FC<{}> = () => {
                     {[0, 1, 2].map((value) => {
                         return (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={comparison === value}
-                                    className="form-check-input"
-                                    name="furniAltitudeComparison"
-                                    type="radio"
-                                    onChange={() => setComparison(value)}
-                                />
+                                <Radio checked={comparison === value} name="furniAltitudeComparison" onCheckedChange={() => setComparison(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
                             </label>
                         );

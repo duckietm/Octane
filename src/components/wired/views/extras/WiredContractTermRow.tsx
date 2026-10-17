@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { Text } from '../../../../common';
 import { ChestFurniIconPreview } from '../ChestFurniIconPreview';
 import { CONTRACT_KIND_CURRENCY, CONTRACT_KIND_FURNI, ContractTermRow, CURRENCY_OPTIONS } from './contractTermWire';
+import { Radio } from '../../../../common/Radio';
 
 interface WiredContractTermRowProps {
     row: ContractTermRow;
@@ -23,21 +24,11 @@ export const WiredContractTermRow: FC<WiredContractTermRowProps> = ({ row, showD
         )}
         <div className="flex flex-wrap gap-2">
             <label className="flex items-center gap-1">
-                <input
-                    type="radio"
-                    className="form-check-input"
-                    checked={row.kind === CONTRACT_KIND_CURRENCY}
-                    onChange={() => onChange({ kind: CONTRACT_KIND_CURRENCY })}
-                />
+                <Radio checked={row.kind === CONTRACT_KIND_CURRENCY} onCheckedChange={() => onChange({ kind: CONTRACT_KIND_CURRENCY })} />
                 <Text small>Currency</Text>
             </label>
             <label className="flex items-center gap-1">
-                <input
-                    type="radio"
-                    className="form-check-input"
-                    checked={row.kind === CONTRACT_KIND_FURNI}
-                    onChange={() => onChange({ kind: CONTRACT_KIND_FURNI, wallItem: false, baseItemId: row.baseItemId || 0 })}
-                />
+                <Radio checked={row.kind === CONTRACT_KIND_FURNI} onCheckedChange={() => onChange({ kind: CONTRACT_KIND_FURNI, wallItem: false, baseItemId: row.baseItemId || 0 })} />
                 <Text small>Furni</Text>
             </label>
         </div>
@@ -45,13 +36,7 @@ export const WiredContractTermRow: FC<WiredContractTermRowProps> = ({ row, showD
             <div className="flex flex-col gap-1">
                 {CURRENCY_OPTIONS.map((option) => (
                     <label key={option.value} className="flex items-center gap-2">
-                        <input
-                            type="radio"
-                            className="form-check-input"
-                            name={`currency-${row.direction}-${row.kind}`}
-                            checked={row.currencyType === option.value}
-                            onChange={() => onChange({ currencyType: option.value })}
-                        />
+                        <Radio name={`currency-${row.direction}-${row.kind}`} checked={row.currencyType === option.value} onCheckedChange={() => onChange({ currencyType: option.value })} />
                         <Text small>{option.label}</Text>
                     </label>
                 ))}
