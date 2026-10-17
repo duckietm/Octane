@@ -105,7 +105,15 @@ vi.mock('./WiredFurniSelectorView', () => ({ WiredFurniSelectorView: () => null 
 
 import { WiredBaseView } from './WiredBaseView';
 
-const openMenu = () => fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
+const openMenu = () => {
+    const toggle = screen.getByRole('button', { name: 'Menu' });
+
+    // Base UI opens its menu on mousedown (a real click is pointerdown, mousedown, mouseup, click).
+    fireEvent.pointerDown(toggle);
+    fireEvent.mouseDown(toggle);
+    fireEvent.mouseUp(toggle);
+    fireEvent.click(toggle);
+};
 
 describe('WiredBaseView quick menu', () => {
     beforeEach(() => {
@@ -126,7 +134,7 @@ describe('WiredBaseView quick menu', () => {
         const { rerender } = render(<WiredBaseView hasSpecialInput={false} requiresFurni={0} save={save} wiredType="action" />);
 
         openMenu();
-        expect(screen.getByRole('menuitem', { name: 'Paste' })).toBeDisabled();
+        expect(screen.getByRole('menuitem', { name: 'Paste' })).toHaveAttribute('aria-disabled', 'true');
 
         fireEvent.click(screen.getByRole('menuitem', { name: 'Copy' }));
         expect(save).toHaveBeenCalledTimes(1);
@@ -174,8 +182,8 @@ describe('WiredBaseView quick menu', () => {
         mocks.roomSettings.canModify = false;
         render(<WiredBaseView hasSpecialInput={false} requiresFurni={0} save={vi.fn()} wiredType="action" />);
         openMenu();
-        expect(screen.getByRole('menuitem', { name: 'Copy' })).toBeDisabled();
-        expect(screen.getByRole('menuitem', { name: 'Save' })).toBeDisabled();
+        expect(screen.getByRole('menuitem', { name: 'Copy' })).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('menuitem', { name: 'Save' })).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('has the official open-menu and close entries and splits the header name', () => {

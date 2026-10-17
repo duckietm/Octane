@@ -1,6 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronRight, FaExclamationTriangle, FaHistory, FaSyncAlt, FaUndo } from 'react-icons/fa';
 import { CatalogStudioHistoryGroup, CatalogStudioValidationIssue } from './CatalogStudioTypes';
+import { InlineDialog } from '../../../../common/InlineDialog';
 
 interface CatalogStudioProblemsHistoryPanelProps {
     issues: CatalogStudioValidationIssue[];
@@ -154,7 +155,7 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
             </div>)}
         </div>
 
-        {undoCandidate && <div className="octane-catalog-admin-publish-confirmation" role="dialog" aria-modal="true" aria-label="Confirm operation undo">
+        {undoCandidate && <InlineDialog className="octane-catalog-admin-publish-confirmation" aria-modal="true" aria-label="Confirm operation undo" onClose={() => setUndoCandidate(null)}>
             <FaUndo />
             <div>
                 <strong>Undo &ldquo;{undoCandidate.summary}&rdquo;?</strong>
@@ -164,6 +165,6 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                 <button className="octane-catalog-admin-btn" onClick={() => setUndoCandidate(null)}>Cancel</button>
                 <button className="octane-catalog-admin-btn is-publish" onClick={undoNow}>Undo operation</button>
             </div>
-        </div>}
+        </InlineDialog>}
     </div>;
 };

@@ -1,3 +1,4 @@
+import { Progress } from '@base-ui/react/progress';
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizeText } from '../../api';
@@ -190,16 +191,11 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
                 </div>
             )}
 
-            <div
-                className="soundboard-cooldown"
-                role="progressbar"
-                aria-label={LocalizeText('soundboard.cooldown')}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={cooldownPercent}
-            >
-                <div className="soundboard-cooldown__fill" style={{ width: `${cooldownPercent}%` }} />
-            </div>
+            <Progress.Root className="soundboard-cooldown" aria-label={LocalizeText('soundboard.cooldown')} max={100} min={0} value={cooldownPercent}>
+                <Progress.Track className="soundboard-cooldown__track">
+                    <Progress.Indicator className="soundboard-cooldown__fill" />
+                </Progress.Track>
+            </Progress.Root>
 
             {totalPages > 1 && (
                 <div className="flex select-none items-center justify-center gap-1.5">

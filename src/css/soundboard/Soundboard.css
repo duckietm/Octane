@@ -165,6 +165,10 @@
     background: #b9ccd8;
 }
 
+.soundboard-cooldown__track {
+    height: 100%;
+}
+
 .soundboard-cooldown__fill {
     height: 100%;
     background: #3d8fba;

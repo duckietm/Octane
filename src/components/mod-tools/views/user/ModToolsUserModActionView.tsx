@@ -16,6 +16,7 @@ import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeade
 import { useModTools, useNotification } from '../../../../hooks';
 import { ModToolsTemplateSelectView } from '../ModToolsTemplateSelectView';
 import { Select } from '../../../../common/Select';
+import { InlineDialog } from '../../../../common/InlineDialog';
 
 interface ModToolsUserModActionViewProps {
     user: ISelectedUser;
@@ -298,11 +299,11 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                     </Button>
                 </div>
                 {pendingSanction && (
-                    <div
+                    <InlineDialog
                         aria-label="Confirm moderation action"
                         aria-modal="true"
                         className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-white/95 p-3 text-center"
-                        role="dialog"
+                        onClose={() => setPendingSanction(null)}
                     >
                         <img alt="" className="octane-mod-tools-header-icon" src={warningIcon} />
                         <div className="text-sm">
@@ -323,7 +324,7 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                                 {LocalizeText('modtools.user.modaction.button.apply')}
                             </Button>
                         </div>
-                    </div>
+                    </InlineDialog>
                 )}
             </OctaneCardContentView>
         </OctaneCardView>

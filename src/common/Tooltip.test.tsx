@@ -1,25 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resolveTooltipPlacement, resolveTooltipPosition, TOOLTIP_EDGE, TOOLTIP_GAP, Tooltip } from './Tooltip';
-
-describe('tooltip placement', () => {
-    it('goes above while the bubble and its 10px gap fit, below otherwise', () => {
-        expect(resolveTooltipPlacement('auto', 100, 20)).toBe('above');
-        expect(resolveTooltipPlacement('auto', 30, 20)).toBe('below');
-        expect(resolveTooltipPlacement('below', 100, 20)).toBe('below');
-        expect(resolveTooltipPlacement('above', 0, 20)).toBe('above');
-    });
-
-    it('centres on the target with the official gap and clamps to the viewport', () => {
-        const anchor = { top: 100, left: 50, width: 40, height: 20 };
-        const bubble = { width: 60, height: 22 };
-
-        expect(resolveTooltipPosition(anchor, bubble, 'auto', 800)).toEqual({ side: 'above', top: 100 - 22 - TOOLTIP_GAP, left: 40 });
-        expect(resolveTooltipPosition(anchor, bubble, 'below', 800)).toEqual({ side: 'below', top: 100 + 20 + TOOLTIP_GAP, left: 40 });
-        expect(resolveTooltipPosition({ ...anchor, left: 0 }, bubble, 'auto', 800).left).toBe(TOOLTIP_EDGE);
-        expect(resolveTooltipPosition({ ...anchor, left: 790 }, bubble, 'auto', 800).left).toBe(800 - 60 - TOOLTIP_EDGE);
-    });
-});
+import { Tooltip } from './Tooltip';
 
 describe('Tooltip', () => {
     beforeEach(() => vi.useFakeTimers());
@@ -46,9 +27,10 @@ describe('Tooltip', () => {
         const bubble = screen.getByRole('tooltip');
         expect(bubble).toHaveTextContent('Open the navigator');
         expect(bubble.classList.contains('octane-tooltip')).toBe(true);
-        // jsdom reports a 0x0 target at the top of the screen, so there is no room above.
-        expect(bubble.classList.contains('octane-tooltip--below')).toBe(true);
-        expect(bubble.parentElement).toBe(document.body);
+        // Base UI portals the popup into the body, inside a positioner wrapper.
+        expect(document.body.contains(bubble)).toBe(true);
+        expect(bubble.closest('.octane-tooltip-positioner')).not.toBeNull();
+        expect(bubble.getAttribute('data-side')).toBeTruthy();
 
         fireEvent.mouseLeave(screen.getByRole('button', { name: 'Navigator' }));
         expect(screen.queryByRole('tooltip')).toBeNull();
@@ -86,6 +68,27 @@ describe('Tooltip', () => {
 
         fireEvent.mouseEnter(screen.getByRole('button', { name: 'Target' }));
         expect(screen.queryByRole('tooltip')).toBeNull();
+    });
+
+    it('keeps an explicit placement on its side', () => {
+        const { rerender } = render(
+            <Tooltip content="Hint" delay={0} placement="below">
+                <button type="button">Target</button>
+            </Tooltip>
+        );
+
+        fireEvent.focus(screen.getByRole('button', { name: 'Target' }));
+        expect(screen.getByRole('tooltip').getAttribute('data-side')).toBe('bottom');
+
+        fireEvent.blur(screen.getByRole('button', { name: 'Target' }));
+        rerender(
+            <Tooltip content="Hint" delay={0} placement="above">
+                <button type="button">Target</button>
+            </Tooltip>
+        );
+
+        fireEvent.focus(screen.getByRole('button', { name: 'Target' }));
+        expect(screen.getByRole('tooltip').getAttribute('data-side')).toBe('top');
     });
 
     it('keeps a block anchor full width so wrapped buttons do not shrink', () => {

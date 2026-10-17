@@ -4,6 +4,7 @@ import { FriendlyTime, GetConfigurationValue, GetGroupInformation, GetUserProfil
 import { LayoutBadgeImageView, LayoutRoomThumbnailView, UserProfileIconView } from '../../../../common';
 import { useHelp, useNavigatorData, useNavigatorFavourite, useNavigatorRoomInfoPopupStore, useNavigatorUiStore } from '../../../../hooks';
 import { classNames } from '../../../../layout';
+import { InlineDialog } from '../../../../common/InlineDialog';
 
 const getTradeModeText = (tradeMode: number) => {
     switch (tradeMode) {
@@ -44,9 +45,9 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
     const bubbleStyle = { left: x, top: y, width: 374, transform: 'translateY(-50%)' };
 
     return (
-        <div
-            role="dialog"
+        <InlineDialog
             aria-label={LocalizeText('navigator.room.info.popup.title')}
+            onClose={closePopup}
             className="octane-navigator-air__room-bubble"
             style={bubbleStyle}
             onMouseEnter={() => useNavigatorRoomInfoPopupStore.getState().setHovered(true)}
@@ -173,6 +174,6 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </InlineDialog>
     );
 };

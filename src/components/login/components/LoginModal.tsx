@@ -1,4 +1,5 @@
-import { FC, MouseEvent, PropsWithChildren, useEffect } from 'react';
+import { FC, MouseEvent, PropsWithChildren } from 'react';
+import { InlineDialog } from '../../../common/InlineDialog';
 
 interface LoginModalProps extends PropsWithChildren {
     title: string;
@@ -9,26 +10,20 @@ interface LoginModalProps extends PropsWithChildren {
 }
 
 export const LoginModal: FC<LoginModalProps> = ({ title, titleId, closeLabel, dialogClassName = '', onClose, children }) => {
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return;
-
-            event.preventDefault();
-            onClose();
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
-
     const handleOverlayClick = (event: MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) onClose();
     };
 
     return (
         <div className="octane-login-modal" onClick={handleOverlayClick}>
-            <div className={`dialog ${dialogClassName}`.trim()} role="dialog" aria-modal="true" aria-labelledby={titleId}>
+            <InlineDialog
+                aria-labelledby={titleId}
+                aria-modal="true"
+                className={`dialog ${dialogClassName}`.trim()}
+                initialFocus={false}
+                modal="trap-focus"
+                onClose={onClose}
+            >
                 <div className="octane-login-card octane-card-shell">
                     <div className="card-title octane-card-header-shell">
                         <span id={titleId} className="octane-card-title">
@@ -38,7 +33,7 @@ export const LoginModal: FC<LoginModalProps> = ({ title, titleId, closeLabel, di
                     </div>
                     {children}
                 </div>
-            </div>
+            </InlineDialog>
         </div>
     );
 };

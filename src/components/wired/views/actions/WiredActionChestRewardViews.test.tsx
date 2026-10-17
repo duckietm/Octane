@@ -66,6 +66,9 @@ describe('chest reward wired actions', () => {
         trigger = { stringData: 'hi', intData: [0, 5, 1, -20, 1, 13], userSourceTypes: [200], variableIds: ['44'] };
         render(<WiredActionGiveCurrencyFromChestView />);
 
+        // The extra option sits in a collapsible section that starts closed (and hidden).
+        fireEvent.click(screen.getByRole('button', { name: 'Earnings category:' }));
+
         expect(screen.getByRole('combobox', { name: 'chest extra' })).toHaveTextContent('Agency');
         expect(baseProps.validate()).toBe(true);
         baseProps.save();

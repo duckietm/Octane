@@ -9,6 +9,7 @@ import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { CollapsibleSection } from '../../../../common/CollapsibleSection';
 
 export const CHEST_REWARD_MODE_AMOUNT = 0;
 export const CHEST_REWARD_MODE_EVERYTHING = 1;
@@ -139,10 +140,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                     <Text>{localizeWithFallback('wiredfurni.reward_contract.reward_popup.show_by_default', 'Show the popup by default')}</Text>
                 </label>
             </div>
-            <details>
-                <summary>
-                    <Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>
-                </summary>
+            <CollapsibleSection title={<Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>}>
                 <fieldset className="flex flex-col gap-1 pt-1" disabled={extraDisabled}>
                     {extra.dropdown ? (
                         <Select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
@@ -161,7 +159,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                         ))
                     )}
                 </fieldset>
-            </details>
+            </CollapsibleSection>
         </WiredActionBaseView>
     );
 };

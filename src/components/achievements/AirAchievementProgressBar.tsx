@@ -1,3 +1,4 @@
+import { Progress } from '@base-ui/react/progress';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import { AchievementUtilities, LocalizeText } from '../../api';
 
@@ -54,14 +55,7 @@ export const AirAchievementProgressBar: FC<AirAchievementProgressBarProps> = ({
     } as CSSProperties;
 
     return (
-        <div
-            className={`air-achievement-progress ${className}`.trim()}
-            style={style}
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={maxProgress}
-        >
+        <Progress.Root className={`air-achievement-progress ${className}`.trim()} max={maxProgress} min={0} style={style} value={progress}>
             <span className="air-achievement-progress__left" aria-hidden="true" />
             <span className="air-achievement-progress__track" style={{ width }} aria-hidden="true" />
             <span className="air-achievement-progress__right" style={{ left: width + 4 }} aria-hidden="true" />
@@ -77,6 +71,6 @@ export const AirAchievementProgressBar: FC<AirAchievementProgressBarProps> = ({
                       )
                     : `${animation.progress + scoreAtStartOfLevel}/${maxProgress + scoreAtStartOfLevel}`}
             </span>
-        </div>
+        </Progress.Root>
     );
 };

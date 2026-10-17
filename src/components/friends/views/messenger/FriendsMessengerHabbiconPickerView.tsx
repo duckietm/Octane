@@ -1,6 +1,7 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { HABBICON_GRID_COLUMNS, HabbiconEntry, localizeHabbiconName, localizeWithFallback, padHabbiconRow, useHabbiconCatalog } from '../../../../api';
 import { LayoutHabbiconImageView, LayoutItemCountView } from '../../../../common';
+import { InlineDialog } from '../../../../common/InlineDialog';
 
 type PickerSection = {
     id: string;
@@ -109,7 +110,7 @@ export const FriendsMessengerHabbiconPickerView: FC<{
     };
 
     return (
-        <div ref={pickerRef} className="messenger-habbicon-picker" role="dialog" aria-label="Habbicons" style={{ height: windowHeight }}>
+        <InlineDialog ref={pickerRef} aria-label="Habbicons" className="messenger-habbicon-picker" closeOnEscape={false} style={{ height: windowHeight }}>
             <div className="messenger-habbicon-controls">
                 <div className="messenger-habbicon-search">
                     <input autoFocus maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
@@ -148,6 +149,6 @@ export const FriendsMessengerHabbiconPickerView: FC<{
             ) : (
                 <div className="messenger-habbicon-empty">{localizeWithFallback('habbicons.no_habbicons', 'No Habicons')}</div>
             )}
-        </div>
+        </InlineDialog>
     );
 };

@@ -515,9 +515,12 @@ body {
 /* Ubuntu 11 white. HintManager.as parks it 10px above or below the target,    */
 /* slides it in and bobs it 5px on |sin(t * 0.003)|, i.e. about once a second.  */
 /* -------------------------------------------------------------------------- */
-.octane-tooltip {
-    position: fixed;
+.octane-tooltip-positioner {
     z-index: 9999;
+    pointer-events: none;
+}
+
+.octane-tooltip {
     box-sizing: border-box;
     max-width: 260px;
     padding: 0 1px;
@@ -535,15 +538,11 @@ body {
     user-select: none;
 }
 
-.octane-tooltip.is-measuring {
-    visibility: hidden;
-}
-
-.octane-tooltip--above {
+.octane-tooltip[data-side='top'] {
     animation: octane-tooltip-in-above 120ms ease-out, octane-tooltip-bob-above 1050ms ease-in-out 120ms infinite;
 }
 
-.octane-tooltip--below {
+.octane-tooltip[data-side='bottom'] {
     animation: octane-tooltip-in-below 120ms ease-out, octane-tooltip-bob-below 1050ms ease-in-out 120ms infinite;
 }
 
@@ -568,8 +567,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .octane-tooltip--above,
-    .octane-tooltip--below {
+    .octane-tooltip[data-side='top'],
+    .octane-tooltip[data-side='bottom'] {
         animation: none;
     }
 }
@@ -2517,4 +2516,37 @@ body {
 @keyframes pulseGlowGold {
     0%, 100% { box-shadow: 0 0 6px rgba(255, 193, 7, 0.4); }
     50%      { box-shadow: 0 0 14px rgba(255, 193, 7, 0.7); }
+}
+
+/* CollapsibleSection (common/CollapsibleSection.tsx): the Base UI stand-in for <details><summary>. */
+.octane-collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-collapsible-trigger::before {
+    content: '';
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid currentColor;
+    transition: transform 0.12s ease;
+}
+
+.octane-collapsible-trigger[data-panel-open]::before {
+    transform: rotate(90deg);
+}
+
+.octane-collapsible-panel[hidden] {
+    display: none;
 }

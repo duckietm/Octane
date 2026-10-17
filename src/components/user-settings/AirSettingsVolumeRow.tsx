@@ -1,4 +1,5 @@
-import { ChangeEvent, FC, KeyboardEvent, useEffect, useRef } from 'react';
+import { Slider } from '@base-ui/react/slider';
+import { FC, useEffect, useRef } from 'react';
 
 interface AirSettingsVolumeRowProps {
     id: string;
@@ -10,8 +11,6 @@ interface AirSettingsVolumeRowProps {
     onCommit: (value: number) => void;
 }
 
-const COMMIT_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'];
-
 export const AirSettingsVolumeRow: FC<AirSettingsVolumeRowProps> = ({ id, label, muteLabel, maximumLabel, value, onChange, onCommit }) => {
     const pendingValueRef = useRef(value);
 
@@ -19,18 +18,13 @@ export const AirSettingsVolumeRow: FC<AirSettingsVolumeRowProps> = ({ id, label,
         pendingValueRef.current = value;
     }, [value]);
 
-    const changeValue = (event: ChangeEvent<HTMLInputElement>) => {
-        const nextValue = Number(event.currentTarget.value);
-
+    const changeValue = (nextValue: number) => {
         pendingValueRef.current = nextValue;
         onChange(nextValue);
     };
 
+    // Base UI commits on pointer release and on keyboard steps; a blur commits what is pending, like before.
     const commitValue = () => onCommit(pendingValueRef.current);
-
-    const commitKeyboardValue = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (COMMIT_KEYS.includes(event.key)) commitValue();
-    };
 
     const setDirectValue = (nextValue: number) => {
         pendingValueRef.current = nextValue;
@@ -50,20 +44,20 @@ export const AirSettingsVolumeRow: FC<AirSettingsVolumeRowProps> = ({ id, label,
                 type="button"
             />
             <div className="air-settings-volume-row__slider">
-                <input
-                    aria-label={label}
-                    id={id}
-                    max="100"
-                    min="0"
-                    step="1"
-                    type="range"
+                <Slider.Root
+                    className="air-settings-volume-row__control"
+                    max={100}
+                    min={0}
+                    step={1}
                     value={value}
-                    onBlur={commitValue}
-                    onChange={changeValue}
-                    onKeyUp={commitKeyboardValue}
-                    onMouseUp={commitValue}
-                    onTouchEnd={commitValue}
-                />
+                    onValueChange={(next) => changeValue(next as number)}
+                    onValueCommitted={(next) => onCommit(next as number)}
+                >
+                    <Slider.Control className="air-settings-volume-row__control-area">
+                        <Slider.Track className="air-settings-volume-row__track" />
+                        <Slider.Thumb aria-label={label} className="air-settings-volume-row__thumb" id={id} index={0} onBlur={commitValue} />
+                    </Slider.Control>
+                </Slider.Root>
             </div>
             <button
                 aria-label={`${label}: ${maximumLabel}`}

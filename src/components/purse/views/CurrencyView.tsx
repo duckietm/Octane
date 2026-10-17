@@ -1,3 +1,4 @@
+import { Tooltip } from '@base-ui/react/tooltip';
 import { FC, useMemo } from 'react';
 import { LocalizeFormattedNumber, LocalizeShortNumber } from '../../../api';
 import creditsIcon from '../../../assets/images/purse/air/credits.png';
@@ -43,14 +44,20 @@ export const CurrencyView: FC<CurrencyViewProps> = (props) => {
     if (!shouldShorten) return element;
 
     return (
-        <div className="group relative">
-            {element}
-            <div
-                role="tooltip"
-                className="pointer-events-none absolute right-full top-1/2 z-50 mr-2 -translate-y-1/2 whitespace-nowrap rounded bg-black/80 px-2 py-1 text-xs text-white opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100"
-            >
-                {LocalizeFormattedNumber(amount)}
-            </div>
-        </div>
+        <Tooltip.Root>
+            <Tooltip.Trigger delay={0} render={<div className="relative" />}>
+                {element}
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+                <Tooltip.Positioner className="pointer-events-none z-[9999]" side="left" sideOffset={8}>
+                    <Tooltip.Popup
+                        role="tooltip"
+                        className="whitespace-nowrap rounded bg-black/80 px-2 py-1 text-xs text-white shadow transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0"
+                    >
+                        {LocalizeFormattedNumber(amount)}
+                    </Tooltip.Popup>
+                </Tooltip.Positioner>
+            </Tooltip.Portal>
+        </Tooltip.Root>
     );
 };

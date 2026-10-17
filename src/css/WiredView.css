@@ -178,10 +178,11 @@
         background: linear-gradient(180deg, #ffffff 0%, #dcdcdc 100%);
     }
 
+    .octane-wired__menu-positioner {
+        z-index: 3;
+    }
+
     .octane-wired__menu-list {
-        position: absolute;
-        top: 20px;
-        right: 0;
         min-width: 190px;
         padding: 2px;
         border: 1px solid #000;
@@ -206,11 +207,13 @@
         cursor: pointer;
     }
 
-    .octane-wired__menu-item:hover:not(:disabled) {
+    .octane-wired__menu-item:hover:not(:disabled),
+    .octane-wired__menu-item[data-highlighted]:not([data-disabled]) {
         background: #dbeaf4;
     }
 
-    .octane-wired__menu-item:disabled {
+    .octane-wired__menu-item:disabled,
+    .octane-wired__menu-item[data-disabled] {
         color: #9a9488;
         cursor: default;
     }

@@ -9,6 +9,9 @@ import { BOT_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { WiredPlaceholderInsert } from '../WiredPlaceholderInsert';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { CollapsibleSection } from '../../../../common/CollapsibleSection';
 
 const MESSAGE_MAX_LENGTH = 400;
 
@@ -115,12 +118,9 @@ export const WiredActionBotTalkBaseView: FC<WiredActionBotTalkBaseViewProps> = (
                     <Text>{localizeWithFallback('wiredfurni.params.bot_talk.hide_bot_name', 'Hide the bot name')}</Text>
                 </label>
             </div>
-            <details>
-                <summary className="cursor-pointer">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.show_message.bubble_width.title', 'Bubble width')}</Text>
-                </summary>
+            <CollapsibleSection title={<Text bold>{localizeWithFallback('wiredfurni.params.show_message.bubble_width.title', 'Bubble width')}</Text>}>
                 <WiredBubbleWidthSelect value={bubbleWidth} onChange={setBubbleWidth} />
-            </details>
+            </CollapsibleSection>
         </WiredActionBaseView>
     );
 };

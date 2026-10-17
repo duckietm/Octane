@@ -147,3 +147,9 @@
 .octane-number-field {
     display: contents;
 }
+
+/* common/InlineDialog.tsx mounts its popup through a Base UI portal wrapper inside the host
+   element; the wrapper must not take part in the host's layout. */
+.octane-inline-dialog-host {
+    display: contents;
+}

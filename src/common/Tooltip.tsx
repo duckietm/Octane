@@ -1,5 +1,5 @@
-import { FC, FocusEvent, MouseEvent, ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
+import { FC, FocusEvent, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 export type TooltipPlacement = 'auto' | 'above' | 'below';
 
@@ -19,63 +19,26 @@ export interface TooltipProps extends TooltipOptions {
     children?: ReactNode;
 }
 
-export interface TooltipAnchorRect {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-}
-
-export interface TooltipLayout {
-    side: 'above' | 'below';
-    top: number;
-    left: number;
-}
-
 /* HintManager.as keeps 10px between the target and the bubble. */
 export const TOOLTIP_GAP = 10;
 /* Keep the bubble off the viewport edge when the target sits near it. */
 export const TOOLTIP_EDGE = 4;
 export const TOOLTIP_DEFAULT_DELAY = 250;
 
-/**
- * Pure placement decision. Matches the official hint: go above when the
- * bubble and its gap fit between the target and the top of the screen,
- * otherwise flip below.
- */
-export const resolveTooltipPlacement = (placement: TooltipPlacement, anchorTop: number, bubbleHeight: number): 'above' | 'below' => {
-    if (placement !== 'auto') return placement;
-
-    return anchorTop - bubbleHeight - TOOLTIP_GAP > 0 ? 'above' : 'below';
-};
-
-/** Pure position: centred on the target, clamped to the viewport width. */
-export const resolveTooltipPosition = (
-    anchor: TooltipAnchorRect,
-    bubble: { width: number; height: number },
-    placement: TooltipPlacement,
-    viewportWidth: number
-): TooltipLayout => {
-    const side = resolveTooltipPlacement(placement, anchor.top, bubble.height);
-    const top = side === 'above' ? anchor.top - bubble.height - TOOLTIP_GAP : anchor.top + anchor.height + TOOLTIP_GAP;
-    const centred = anchor.left + (anchor.width - bubble.width) / 2;
-    const left = Math.max(TOOLTIP_EDGE, Math.min(centred, viewportWidth - bubble.width - TOOLTIP_EDGE));
-
-    return { side, top: Math.round(top), left: Math.round(left) };
-};
+/* An explicit placement never flips to the other side (only 'auto' does, like the official hint). */
+const FIXED_SIDE = { side: 'none', align: 'shift', fallbackAxisSide: 'none' } as const;
 
 const hasContent = (content: ReactNode) => content !== null && content !== undefined && content !== false && content !== '';
 
 /**
  * Headless tooltip: spread `anchorProps` on the element that owns the hover
  * and render `tooltip` anywhere in the tree (it portals to the body). Use it
- * directly when wrapping the anchor would disturb its layout.
+ * directly when wrapping the anchor would disturb its layout. The bubble is a
+ * Base UI Tooltip popup anchored to the hovered element.
  */
 export const useTooltip = (options: TooltipOptions) => {
     const { content, placement = 'auto', delay = TOOLTIP_DEFAULT_DELAY, disabled = false, className = '' } = options;
-    const [anchorRect, setAnchorRect] = useState<TooltipAnchorRect | null>(null);
-    const [layout, setLayout] = useState<TooltipLayout | null>(null);
-    const bubbleRef = useRef<HTMLDivElement>(null);
+    const [anchor, setAnchor] = useState<Element | null>(null);
     const timerRef = useRef<number | null>(null);
 
     const clearTimer = () => {
@@ -87,8 +50,7 @@ export const useTooltip = (options: TooltipOptions) => {
 
     const hide = useCallback(() => {
         clearTimer();
-        setAnchorRect(null);
-        setLayout(null);
+        setAnchor(null);
     }, []);
 
     const show = useCallback(
@@ -97,10 +59,7 @@ export const useTooltip = (options: TooltipOptions) => {
 
             const open = () => {
                 timerRef.current = null;
-
-                const rect = target.getBoundingClientRect();
-
-                setAnchorRect({ top: rect.top, left: rect.left, width: rect.width, height: rect.height });
+                setAnchor(target);
             };
 
             if (delay > 0) timerRef.current = window.setTimeout(open, delay);
@@ -115,24 +74,9 @@ export const useTooltip = (options: TooltipOptions) => {
         if (disabled) hide();
     }, [disabled, hide]);
 
-    // The bubble has to exist before its size can decide above or below, so
-    // it renders hidden first and gets its final spot here.
-    useLayoutEffect(() => {
-        if (!anchorRect || !bubbleRef.current) return;
-
-        const bubble = bubbleRef.current;
-        const next = resolveTooltipPosition(anchorRect, { width: bubble.offsetWidth, height: bubble.offsetHeight }, placement, window.innerWidth);
-
-        // `content` is often a fresh element every render, so this runs a lot;
-        // handing back the previous layout when nothing moved lets React bail
-        // out instead of re-rendering in a loop.
-        setLayout((previous) => (previous && previous.side === next.side && previous.top === next.top && previous.left === next.left ? previous : next));
-    }, [anchorRect, placement, content]);
-
-    // Anything that moves the target makes the stored rect stale; hiding is
-    // cheaper and less surprising than chasing it.
+    // The popup follows its anchor, but a scrolled or resized page is not worth a hint.
     useEffect(() => {
-        if (!anchorRect) return;
+        if (!anchor) return;
 
         window.addEventListener('scroll', hide, true);
         window.addEventListener('resize', hide);
@@ -141,9 +85,9 @@ export const useTooltip = (options: TooltipOptions) => {
             window.removeEventListener('scroll', hide, true);
             window.removeEventListener('resize', hide);
         };
-    }, [anchorRect, hide]);
+    }, [anchor, hide]);
 
-    const isOpen = !disabled && anchorRect !== null && hasContent(content);
+    const isOpen = !disabled && anchor !== null && hasContent(content);
 
     const anchorProps = {
         onMouseEnter: (event: MouseEvent<Element>) => {
@@ -156,19 +100,24 @@ export const useTooltip = (options: TooltipOptions) => {
         onBlur: () => hide()
     };
 
-    const tooltip = isOpen
-        ? createPortal(
-              <div
-                  ref={bubbleRef}
-                  role="tooltip"
-                  className={['octane-tooltip', layout ? `octane-tooltip--${layout.side}` : 'is-measuring', className].filter(Boolean).join(' ')}
-                  style={{ top: layout ? layout.top : 0, left: layout ? layout.left : 0 }}
-              >
-                  {content}
-              </div>,
-              document.body
-          )
-        : null;
+    const tooltip = isOpen ? (
+        <BaseTooltip.Root open>
+            <BaseTooltip.Portal>
+                <BaseTooltip.Positioner
+                    anchor={anchor}
+                    className="octane-tooltip-positioner"
+                    collisionAvoidance={placement === 'auto' ? undefined : FIXED_SIDE}
+                    collisionPadding={TOOLTIP_EDGE}
+                    side={placement === 'below' ? 'bottom' : 'top'}
+                    sideOffset={TOOLTIP_GAP}
+                >
+                    <BaseTooltip.Popup className={['octane-tooltip', className].filter(Boolean).join(' ')} role="tooltip">
+                        {content}
+                    </BaseTooltip.Popup>
+                </BaseTooltip.Positioner>
+            </BaseTooltip.Portal>
+        </BaseTooltip.Root>
+    ) : null;
 
     return { anchorProps, tooltip, isOpen, hide };
 };
