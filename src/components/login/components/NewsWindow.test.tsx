@@ -20,7 +20,7 @@ const renderNews = async () => {
 
     await screen.findByText('Grand opening');
 
-    const handle = screen.getByText('Hotel News').parentElement as HTMLElement;
+    const handle = screen.getByText('Hotel News').parentElement;
     const stack = handle.closest('.login-news-stack') as HTMLElement;
 
     return { handle, stack };

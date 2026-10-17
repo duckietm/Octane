@@ -1697,7 +1697,7 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                                             src={template.thumbnail}
                                             alt={template.title}
                                             onError={(e) => {
-                                                (e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
+                                                (e.currentTarget).style.visibility = 'hidden';
                                             }}
                                         />
                                     )}

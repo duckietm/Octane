@@ -16,7 +16,7 @@ vi.mock('../../hooks', () => ({ useSoundboard: vi.fn() }));
 const pushEntry = () => {
     const key = useSoundboardFeedStore.getState().push({ username: 'tester', userId: 7, soundName: 'Bell', soundId: 3 });
 
-    return useSoundboardFeedStore.getState().entries.find((entry) => entry.key === key)!;
+    return useSoundboardFeedStore.getState().entries.find((entry) => entry.key === key);
 };
 
 describe('SoundboardFeedItemView', () => {

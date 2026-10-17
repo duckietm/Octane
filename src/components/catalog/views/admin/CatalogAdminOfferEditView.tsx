@@ -124,8 +124,8 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
     const lastMutationResult = catalogAdmin?.lastMutationResult ?? null;
     const studioSessionReady = catalogAdmin?.studioSessionReady ?? false;
 
-    const initializationClaimRef = useRef({ current: null as string | null });
-    const detailsClaimRef = useRef({ current: null as string | null });
+    const initializationClaimRef = useRef({ current: null });
+    const detailsClaimRef = useRef({ current: null });
     const catalogNameInputRef = useRef<HTMLInputElement>(null);
     const itemIdsInputRef = useRef<HTMLInputElement>(null);
     const limitedStackInputRef = useRef<HTMLInputElement>(null);

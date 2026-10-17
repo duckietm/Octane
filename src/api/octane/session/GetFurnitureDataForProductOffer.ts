@@ -5,7 +5,7 @@ export function GetFurnitureDataForProductOffer(offer: CatalogPageMessageProduct
 
     let furniData: IFurnitureData = null;
 
-    switch (offer.productType as FurnitureType) {
+    switch (offer.productType) {
         case FurnitureType.FLOOR:
             furniData = GetSessionDataManager().getFloorItemData(offer.furniClassId);
             break;

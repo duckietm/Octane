@@ -333,7 +333,7 @@ export const HotelView: FC = () => {
         const config = parseSlotConfig(slot.configJson);
         const position = dragPosition?.slotId === slot.id
             ? dragPosition
-            : (Number.isFinite(config.positionX) && Number.isFinite(config.positionY) ? { x: config.positionX as number, y: config.positionY as number } : null);
+            : (Number.isFinite(config.positionX) && Number.isFinite(config.positionY) ? { x: config.positionX, y: config.positionY } : null);
 
         return position ? { left: `${position.x}px`, top: `${position.y}px` } : undefined;
     };
@@ -489,7 +489,7 @@ export const HotelView: FC = () => {
                 ...scene,
                 [`${key}X`]: position.x,
                 [`${key}Y`]: position.y
-            } as IHotelViewLandingScene;
+            };
 
             setLandingData((current) => ({ ...current, scene: updatedScene }));
             SendMessageComposer(new HotelViewLandingSaveSceneComposer(updatedScene));

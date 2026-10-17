@@ -66,7 +66,7 @@ describe('SanitizeHtml — preserves the markup the chat/profile UI relies on', 
         const div = parse('<span style="color:red">hi</span>');
         const span = div.querySelector('span');
         expect(span).not.toBeNull();
-        expect((span as HTMLElement).style.color).toBe('red');
+        expect((span).style.color).toBe('red');
     });
 
     it('keeps <br>', () => {

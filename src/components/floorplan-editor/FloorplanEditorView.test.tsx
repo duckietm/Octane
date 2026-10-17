@@ -93,18 +93,18 @@ describe('FloorplanEditorView container', () => {
         openEditor();
         const handler = messageHandlers.get(RoomEntryTileMessageEvent);
         expect(handler).toBeTruthy();
-        act(() => handler!({ getParser: () => ({ x: 3, y: 4, direction: 6 }) }));
+        act(() => handler({ getParser: () => ({ x: 3, y: 4, direction: 6 }) }));
         // Seed tilemap + thickness so Save is callable
         const fhmHandler = messageHandlers.get(FloorHeightMapEvent);
-        act(() => fhmHandler!({ getParser: () => ({ model: '00\rxq', wallHeight: 5 }) }));
+        act(() => fhmHandler({ getParser: () => ({ model: '00\rxq', wallHeight: 5 }) }));
         const rvsHandler = messageHandlers.get(RoomVisualizationSettingsEvent);
-        act(() => rvsHandler!({ getParser: () => ({ thicknessWall: 1, thicknessFloor: 1 }) }));
+        act(() => rvsHandler({ getParser: () => ({ thicknessWall: 1, thicknessFloor: 1 }) }));
         // With LocalizeText mocked to identity, the button text is literally the i18n key.
         // Button renders as <div> (not <button>) — use findByExactText.
         const saveBtn = findByExactText('floor.plan.editor.save');
         expect(saveBtn).toBeTruthy();
         sendMessageComposer.mockClear();
-        fireEvent.click(saveBtn!);
+        fireEvent.click(saveBtn);
         expect(sendMessageComposer).toHaveBeenCalledTimes(1);
         const composer = sendMessageComposer.mock.calls[0][0];
         expect(composer).toBeInstanceOf(UpdateFloorPropertiesMessageComposer);
@@ -117,11 +117,11 @@ describe('FloorplanEditorView container', () => {
         openEditor();
         const fhmHandler = messageHandlers.get(FloorHeightMapEvent);
         // parser.wallHeight = 4 → state.wallHeight = 4 + 1 = 5 → Save sends 5 - 1 = 4
-        act(() => fhmHandler!({ getParser: () => ({ model: '0', wallHeight: 4 }) }));
+        act(() => fhmHandler({ getParser: () => ({ model: '0', wallHeight: 4 }) }));
         const saveBtn = findByExactText('floor.plan.editor.save');
         expect(saveBtn).toBeTruthy();
         sendMessageComposer.mockClear();
-        fireEvent.click(saveBtn!);
+        fireEvent.click(saveBtn);
         const composer = sendMessageComposer.mock.calls[0][0];
         expect(composer).toBeInstanceOf(UpdateFloorPropertiesMessageComposer);
         expect(composer.wallHeight).toBe(4);
@@ -130,15 +130,15 @@ describe('FloorplanEditorView container', () => {
     it('Save composer thickness goes through convertNumbersForSaving', () => {
         openEditor();
         const fhmHandler = messageHandlers.get(FloorHeightMapEvent);
-        act(() => fhmHandler!({ getParser: () => ({ model: '0', wallHeight: 0 }) }));
+        act(() => fhmHandler({ getParser: () => ({ model: '0', wallHeight: 0 }) }));
         const rvsHandler = messageHandlers.get(RoomVisualizationSettingsEvent);
         // server sends 2 for both; convertSettingToNumber(2) = 3; reducer stores thickness=3
         // Save applies convertNumbersForSaving(3) = 1
-        act(() => rvsHandler!({ getParser: () => ({ thicknessWall: 2, thicknessFloor: 2 }) }));
+        act(() => rvsHandler({ getParser: () => ({ thicknessWall: 2, thicknessFloor: 2 }) }));
         const saveBtn = findByExactText('floor.plan.editor.save');
         expect(saveBtn).toBeTruthy();
         sendMessageComposer.mockClear();
-        fireEvent.click(saveBtn!);
+        fireEvent.click(saveBtn);
         const composer = sendMessageComposer.mock.calls[0][0];
         expect(composer).toBeInstanceOf(UpdateFloorPropertiesMessageComposer);
         expect(composer.thicknessWall).toBe(1);
@@ -149,7 +149,7 @@ describe('FloorplanEditorView container', () => {
         openEditor();
         const fhmHandler = messageHandlers.get(FloorHeightMapEvent);
         // 2x2 grid: '00\r00' → rows 0 and 1, each with 2 walkable tiles
-        act(() => fhmHandler!({ getParser: () => ({ model: '00\r00', wallHeight: 0 }) }));
+        act(() => fhmHandler({ getParser: () => ({ model: '00\r00', wallHeight: 0 }) }));
         const occHandler = messageHandlers.get(RoomOccupiedTilesMessageEvent);
         expect(occHandler).toBeTruthy();
         // Mark col 1 of row 0 as occupied; blockedTilesMap[row][col]
@@ -157,11 +157,11 @@ describe('FloorplanEditorView container', () => {
             [false, true],
             [false, false]
         ];
-        act(() => occHandler!({ getParser: () => ({ blockedTilesMap }) }));
+        act(() => occHandler({ getParser: () => ({ blockedTilesMap }) }));
         const saveBtn = findByExactText('floor.plan.editor.save');
         expect(saveBtn).toBeTruthy();
         sendMessageComposer.mockClear();
-        fireEvent.click(saveBtn!);
+        fireEvent.click(saveBtn);
         const composer = sendMessageComposer.mock.calls[0][0];
         expect(composer).toBeInstanceOf(UpdateFloorPropertiesMessageComposer);
         // Occupied is purely informational: the tile stays walkable and the
@@ -177,7 +177,7 @@ describe('FloorplanEditorView container', () => {
         expect(document.body.textContent).toContain('floor.plan.editor.title');
         const disposeHandler = octaneHandlers.get(RoomEngineEvent.DISPOSED);
         expect(disposeHandler).toBeTruthy();
-        act(() => disposeHandler!({}));
+        act(() => disposeHandler({}));
         expect(document.body.textContent).not.toContain('floor.plan.editor.title');
     });
 
@@ -220,7 +220,7 @@ describe('FloorplanEditorView container', () => {
 
         const saveBtn = findByExactText('floor.plan.editor.save');
         expect(saveBtn).toBeTruthy();
-        fireEvent.click(saveBtn!);
+        fireEvent.click(saveBtn);
 
         expect(onSave).toHaveBeenCalledWith('00\r0x');
         expect(onClose).toHaveBeenCalledTimes(1);
@@ -236,13 +236,13 @@ describe('FloorplanEditorView container', () => {
         expect(container.querySelector('[data-testid="floorplan-3d"]')).toBeNull();
         expect(container.querySelector('[data-testid="floorplan-view-2d"]')?.getAttribute('data-active')).toBe('true');
 
-        fireEvent.click(container.querySelector('[data-testid="floorplan-view-3d"]')!);
+        fireEvent.click(container.querySelector('[data-testid="floorplan-view-3d"]'));
 
         expect(container.querySelector('[data-testid="floorplan-3d"]')).toBeTruthy();
         expect(container.querySelector('[data-testid="floorplan-preview-2d"]')).toBeNull();
         expect(window.localStorage.getItem('octane.floorplan.preview3d')).toBe('true');
 
-        fireEvent.click(container.querySelector('[data-testid="floorplan-view-2d"]')!);
+        fireEvent.click(container.querySelector('[data-testid="floorplan-view-2d"]'));
 
         expect(container.querySelector('[data-testid="floorplan-3d"]')).toBeNull();
         expect(window.localStorage.getItem('octane.floorplan.preview3d')).toBe('false');

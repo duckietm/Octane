@@ -6,12 +6,12 @@ import { useNavigatorUiStore } from './navigatorUiStore';
 import { useNavigatorSearch } from './useNavigatorSearch';
 
 const makeSearchEvent = (code: string) => {
-    const result = new (NavigatorSearchResultSet as any)() as any;
+    const result = new (NavigatorSearchResultSet as any)();
     result.code = code;
     result.data = '';
     result.results = [];
 
-    const ev = new (NavigatorSearchEvent as any)() as any;
+    const ev = new (NavigatorSearchEvent as any)();
     ev.getParser = () => ({ result });
     return ev;
 };
@@ -57,7 +57,7 @@ describe('useNavigatorSearch', () => {
         await waitFor(() => expect(result.current.isFetching).toBe(true));
 
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
 
         await waitFor(() => expect(result.current.searchResult).not.toBeNull());
@@ -73,7 +73,7 @@ describe('useNavigatorSearch', () => {
         });
         await waitFor(() => expect(result.current.isFetching).toBe(true));
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
         await waitFor(() => expect(result.current.isFetching).toBe(false));
 
@@ -84,7 +84,7 @@ describe('useNavigatorSearch', () => {
         await waitFor(() => expect(result.current.isFetching).toBe(true));
 
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
 
         await waitFor(() => expect(result.current.isFetching).toBe(false));
@@ -102,7 +102,7 @@ describe('useNavigatorSearch', () => {
 
         await waitFor(() => expect(result.current.isFetching).toBe(true));
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
         await waitFor(() => expect(result.current.isFetching).toBe(false));
 
@@ -116,7 +116,7 @@ describe('useNavigatorSearch', () => {
         await waitFor(() => expect(result.current.isFetching).toBe(true));
 
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('events') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('events'));
         });
 
         await waitFor(() => expect(result.current.isFetching).toBe(false));
@@ -133,7 +133,7 @@ describe('useNavigatorSearch', () => {
         await waitFor(() => expect(result.current.isFetching).toBe(true));
 
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
 
         await waitFor(() => {
@@ -150,7 +150,7 @@ describe('useNavigatorSearch', () => {
         });
         await waitFor(() => expect(result.current.isFetching).toBe(true));
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
         await waitFor(() => expect(result.current.isFetching).toBe(false));
 
@@ -162,7 +162,7 @@ describe('useNavigatorSearch', () => {
         expect(useNavigatorUiStore.getState().needsSearch).toBe(false);
 
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
         await waitFor(() => expect(result.current.isFetching).toBe(false));
     });
@@ -177,13 +177,13 @@ describe('useNavigatorSearch', () => {
         await waitFor(() => expect(result.current.isFetching).toBe(true));
 
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('wrong_tab') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('wrong_tab'));
         });
 
         expect(result.current.searchResult).toBeNull();
 
         act(() => {
-            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public'));
         });
 
         await waitFor(() => expect(result.current.searchResult).not.toBeNull());

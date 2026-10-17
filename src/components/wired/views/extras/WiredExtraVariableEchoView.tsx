@@ -224,7 +224,7 @@ export const WiredExtraVariableEchoView: FC<{}> = () => {
                 </div>
 
                 <WiredVariablePicker
-                    entries={resolvedVariableEntries as IWiredVariablePickerEntry[]}
+                    entries={resolvedVariableEntries}
                     recentScope="variable-echo"
                     selectedToken={sourceVariableToken}
                     onSelect={(entry) => setSourceVariableToken(entry.token)}

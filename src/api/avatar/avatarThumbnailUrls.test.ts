@@ -34,8 +34,8 @@ describe('canvasToThumbnailUrl', () => {
     const originalRevoke = URL.revokeObjectURL;
 
     beforeEach(() => {
-        URL.createObjectURL = vi.fn(() => 'blob:thumb-1') as unknown as typeof URL.createObjectURL;
-        URL.revokeObjectURL = vi.fn() as unknown as typeof URL.revokeObjectURL;
+        URL.createObjectURL = vi.fn(() => 'blob:thumb-1');
+        URL.revokeObjectURL = vi.fn();
     });
 
     afterEach(() => {
@@ -63,7 +63,7 @@ describe('canvasToThumbnailUrl', () => {
         const entry = await canvasToThumbnailUrl(canvas);
 
         expect(entry?.url.startsWith('data:image/png;base64,')).toBe(true);
-        expect(entry?.bytes).toBe(entry!.url.length * 2);
+        expect(entry?.bytes).toBe(entry.url.length * 2);
         expect(() => entry?.revoke()).not.toThrow();
     });
 

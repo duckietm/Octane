@@ -23,7 +23,7 @@ describe('createVariablesWebApiClient', () => {
             jsonResponse(200, { variables: [{ name: 'score', scope: 'user', has_value: true, text_connected: false }] })
         );
 
-        const variables = await makeClient(fetchImpl as unknown as typeof fetch).listVariables();
+        const variables = await makeClient(fetchImpl).listVariables();
 
         expect(variables).toEqual([{ name: 'score', scope: 'user', hasValue: true, textConnected: false }]);
         const [url, init] = calls(fetchImpl)[0];
@@ -41,7 +41,7 @@ describe('createVariablesWebApiClient', () => {
             .mockResolvedValueOnce(jsonResponse(404, { error: 'wired.variables.unknown_endpoint' }))
             .mockResolvedValueOnce(jsonResponse(200, { users: ['coins'], furni: ['uses_left'], global: ['jackpot'] }));
 
-        const variables = await makeClient(fetchImpl as unknown as typeof fetch).listVariables();
+        const variables = await makeClient(fetchImpl).listVariables();
 
         expect(calls(fetchImpl)[1][0]).toBe('https://hotel.example/api/public/rooms/77/variables');
         expect(variables).toEqual([
@@ -72,7 +72,7 @@ describe('createVariablesWebApiClient', () => {
 
     it('writes values as text with the write key header', async () => {
         const fetchImpl = vi.fn(async () => jsonResponse(200, { value: '3', creation_time: ISO, update_time: ISO }));
-        const client = makeClient(fetchImpl as unknown as typeof fetch);
+        const client = makeClient(fetchImpl);
 
         await client.putEntry('furni', 'lamp', 'wall-items', 9, 3);
         await client.patchEntry('user', 'score', 'users', 5, { value: 4 });
@@ -95,14 +95,14 @@ describe('createVariablesWebApiClient', () => {
     it('reads with the write key when there is no read key', async () => {
         const fetchImpl = vi.fn(async () => jsonResponse(200, { value: '1', creation_time: ISO, update_time: ISO }));
 
-        await makeClient(fetchImpl as unknown as typeof fetch, { readKey: '' }).getGlobal('jackpot');
+        await makeClient(fetchImpl, { readKey: '' }).getGlobal('jackpot');
 
         expect(headersOf(calls(fetchImpl)[0][1])['X-Wired-Read-Key']).toBe(WRITE_KEY);
     });
 
     it('refuses a write without a write key before calling the server', async () => {
         const fetchImpl = vi.fn();
-        const client = makeClient(fetchImpl as unknown as typeof fetch, { writeKey: '' });
+        const client = makeClient(fetchImpl, { writeKey: '' });
 
         await expect(client.deleteEntry('furni', 'lamp', 'furni', 9)).rejects.toMatchObject({ code: 'no_key' });
         expect(fetchImpl).not.toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe('createVariablesWebApiClient', () => {
     it('stops calling the server after a 429 until Retry-After has passed', async () => {
         let now = 1_000_000;
         const fetchImpl = vi.fn(async () => jsonResponse(429, { error: 'wired.variables.too_many_requests' }, { 'Retry-After': '7' }));
-        const client = makeClient(fetchImpl as unknown as typeof fetch, { now: () => now });
+        const client = makeClient(fetchImpl, { now: () => now });
 
         await expect(client.getGlobalProfile()).rejects.toMatchObject({ code: 'wired.variables.too_many_requests', retryAfterSeconds: 7 });
         await expect(client.getGlobalProfile()).rejects.toMatchObject({ code: 'wired.variables.too_many_requests', retryAfterSeconds: 7 });
@@ -170,7 +170,7 @@ describe('createVariablesWebApiClient', () => {
                 size: 100
             })
         );
-        const client = makeClient(fetchImpl as unknown as typeof fetch);
+        const client = makeClient(fetchImpl);
 
         const page = await client.listEntries('furni', 'lamp', 'wall-items', 2, 500, 'value', 'desc');
         await client.listEntries('user', 'score', 'users', 1, 50);
@@ -186,7 +186,7 @@ describe('createVariablesWebApiClient', () => {
         const fetchImpl = vi.fn(
             async () => new Response(null, { status: 204, headers: { 'X-RateLimit-Limit': '60', 'X-RateLimit-Remaining': '59', 'X-RateLimit-Reset': '10' } })
         );
-        const client = makeClient(fetchImpl as unknown as typeof fetch);
+        const client = makeClient(fetchImpl);
 
         await expect(client.deleteUserProfile('users', 3)).resolves.toBeUndefined();
         expect(client.rateLimit).toEqual({ limit: 60, remaining: 59, reset: 10 });
@@ -200,7 +200,7 @@ describe('createVariablesWebApiClient', () => {
             })
         );
 
-        const profile = await makeClient(fetchImpl as unknown as typeof fetch).getUserProfileByName('Bob & Co');
+        const profile = await makeClient(fetchImpl).getUserProfileByName('Bob & Co');
 
         expect(calls(fetchImpl)[0][0]).toBe('https://hotel.example/api/public/rooms/77/variables_profile/user/users?name=Bob%20%26%20Co');
         expect(profile).toEqual({
@@ -214,7 +214,7 @@ describe('createVariablesWebApiClient', () => {
     it('patches a profile with values as text', async () => {
         const fetchImpl = vi.fn(async () => jsonResponse(200, { furni_bc: { id: 9 }, variables: {} }));
 
-        const profile = await makeClient(fetchImpl as unknown as typeof fetch).patchProfile('furni', 'furni-bc', 9, { lamp: 2, old: null, flag: true });
+        const profile = await makeClient(fetchImpl).patchProfile('furni', 'furni-bc', 9, { lamp: 2, old: null, flag: true });
 
         const [url, init] = calls(fetchImpl)[0];
         expect(url).toBe('https://hotel.example/api/public/rooms/77/variables_profile/furni/furni-bc/9');

@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
     openExplorer: vi.fn(),
     handlers: [] as Array<(event: unknown) => void>,
     isOwner: true,
-    save: null as null | (() => void)
+    save: null
 }));
 
 let trigger: { id: number; stringData: string; intData: number[] } | null = null;

@@ -21,7 +21,7 @@ export const AvatarEditorPaletteSetItem: FC<
             type="button"
             aria-pressed={isSelected}
             className={`avatar-editor-palette-item${isSelected ? ' is-selected' : ''}${isLocked ? ' is-locked' : ''}${className ? ` ${className}` : ''}`}
-            style={style as CSSProperties}
+            style={style}
             {...rest}
         >
             <span className="avatar-editor-palette-color" style={{ backgroundColor: ColorUtils.makeColorNumberHex(partColor.rgb & 0xffffff) }} />

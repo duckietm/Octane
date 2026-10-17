@@ -174,8 +174,8 @@ describe('RewardTrackAdminView', () => {
 
         const form = screen.getByTestId('rt-admin-prize-form');
         const inputs = form.querySelectorAll('input');
-        expect((inputs[0] as HTMLInputElement).value).toBe('p1_premium');
-        expect((inputs[1] as HTMLInputElement).value).toBe('30');
+        expect((inputs[0]).value).toBe('p1_premium');
+        expect((inputs[1]).value).toBe('30');
 
         fireEvent.click(within(form).getByText('Save'));
         expect(mocks.savePrize).toHaveBeenCalledWith(expect.objectContaining({ id: 'p1_premium', premium: true, requiredPoints: 30 }));

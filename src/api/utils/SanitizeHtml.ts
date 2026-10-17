@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 // reverse-tabnab the opener. Registered once at module load; applies to every
 // SanitizeHtml() call (and overrides any attacker-supplied rel).
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-    const element = node as Element;
+    const element = node;
 
     if (element.tagName === 'A' && element.getAttribute('target')) {
         element.setAttribute('rel', 'noopener noreferrer');

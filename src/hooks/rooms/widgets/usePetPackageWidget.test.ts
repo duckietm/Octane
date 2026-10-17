@@ -13,7 +13,7 @@ describe('getPetPackageNameError', () => {
     });
 
     it('returns empty string for falsy values (null/undefined coerced)', () => {
-        expect(getPetPackageNameError(null as never)).toBe('');
+        expect(getPetPackageNameError(null)).toBe('');
         expect(getPetPackageNameError(undefined as never)).toBe('');
     });
 

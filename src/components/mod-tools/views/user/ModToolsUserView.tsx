@@ -33,7 +33,7 @@ interface StatCardProps {
 }
 
 const StatCard: FC<StatCardProps> = ({ icon, label, value, tone = 'neutral' }) => {
-    const numericValue = typeof value === 'number' ? value : parseInt(value as string, 10);
+    const numericValue = typeof value === 'number' ? value : parseInt(value, 10);
     const isElevated = !Number.isNaN(numericValue) && numericValue > 0;
     const toneClasses = (() => {
         if (tone === 'danger' && isElevated) return 'bg-rose-50 border-rose-200 text-rose-700';

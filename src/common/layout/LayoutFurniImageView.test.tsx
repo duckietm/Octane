@@ -4,7 +4,7 @@ import { LayoutFurniImageView } from './LayoutFurniImageView';
 
 const { generateImage, getImage } = vi.hoisted(() => ({
     generateImage: vi.fn(),
-    getImage: vi.fn().mockResolvedValue({ height: 10, src: 'data:x', width: 10 } as HTMLImageElement)
+    getImage: vi.fn().mockResolvedValue({ height: 10, src: 'data:x', width: 10 })
 }));
 
 vi.mock('@octane/renderer', async (importOriginal) => {

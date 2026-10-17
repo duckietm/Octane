@@ -14,7 +14,7 @@ vi.mock('../../api', async () => {
         ...actualExplorer,
         ...actualWebApi,
         createVariablesWebApiClient: (options: Parameters<typeof actualWebApi.createVariablesWebApiClient>[0]) =>
-            actualWebApi.createVariablesWebApiClient({ ...options, fetchImpl: fetchMock as unknown as typeof fetch }),
+            actualWebApi.createVariablesWebApiClient({ ...options, fetchImpl: fetchMock }),
         GetWebApiHotels: () => [{ name: 'Main hotel', url: 'https://main.example' }],
         localizeWithFallback: (_key: string, fallback: string) => fallback
     };

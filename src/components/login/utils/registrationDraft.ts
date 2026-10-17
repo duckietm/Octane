@@ -66,7 +66,7 @@ export const loadRegistrationDraft = (): RegistrationDraft | null => {
 
         const gender: RegistrationDraftGender = candidate.gender === 'M' ? 'M' : 'F';
         const selectedTemplateId =
-            Number.isInteger(candidate.selectedTemplateId) && (candidate.selectedTemplateId as number) >= 0 ? (candidate.selectedTemplateId as number) : null;
+            Number.isInteger(candidate.selectedTemplateId) && (candidate.selectedTemplateId) >= 0 ? (candidate.selectedTemplateId) : null;
 
         return {
             step: candidate.step,

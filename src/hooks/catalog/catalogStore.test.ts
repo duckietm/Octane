@@ -219,7 +219,7 @@ describe('catalogStore localization refresh', () => {
         const offer = { offerId: 1, clone };
         const page = new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), [offer as any], false, 1);
 
-        useCatalogStore.setState({ pageOverride: page as any });
+        useCatalogStore.setState({ pageOverride: page });
         useCatalogStore.getState().bumpLocalizationVersion();
 
         expect(clone).toHaveBeenCalledOnce();

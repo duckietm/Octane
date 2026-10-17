@@ -41,7 +41,7 @@ describe('mentionsStore', () => {
         setMentions([make(1), make(2)]);
         markRead(1);
         expect(getUnreadCount()).toBe(1);
-        expect(getMentionsSnapshot().find((m) => m.mentionId === 1)!.read).toBe(true);
+        expect(getMentionsSnapshot().find((m) => m.mentionId === 1).read).toBe(true);
     });
 });
 

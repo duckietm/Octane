@@ -11,7 +11,7 @@ import { useDoorbellState } from './useDoorbellState';
 // reference too; pass null since the SUT only reads `.userName`.
 const dispatchDoorbell = (type: string, userName: string) => {
     act(() => {
-        mockEventDispatcher.dispatchEvent(new RoomSessionDoorbellEvent(type, null as any, userName));
+        mockEventDispatcher.dispatchEvent(new RoomSessionDoorbellEvent(type, null, userName));
     });
 };
 

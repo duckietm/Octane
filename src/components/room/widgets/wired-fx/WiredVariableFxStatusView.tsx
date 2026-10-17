@@ -52,7 +52,7 @@ const Bar: FC<{ rendererId: number; progress: number; segments: number; color: s
         return (
             <div className={classNames('octane-wired-fx__bar', `octane-wired-fx__bar--${modifier}`, 'octane-wired-fx__bar--segmented', metallic ? 'octane-wired-fx__bar--metallic' : '')} style={style} data-testid="fx-bar">
                 {wiredVariableFxSegmentFills(progress, segments).map((fill, index) => (
-                    <span key={index} className="octane-wired-fx__segment" style={{ ['--fx-fill' as string]: fill } as CSSProperties} />
+                    <span key={index} className="octane-wired-fx__segment" style={{ ['--fx-fill' as string]: fill }} />
                 ))}
             </div>
         );
@@ -98,9 +98,9 @@ export const WiredVariableFxStatusView: FC<WiredVariableFxStatusViewProps> = (pr
             const hearts = segments > 0 ? segments : 5;
 
             return (
-                <div className={rootClass} style={{ ['--fx-color' as string]: color ?? undefined } as CSSProperties} data-testid="fx-status">
+                <div className={rootClass} style={{ ['--fx-color' as string]: color ?? undefined }} data-testid="fx-status">
                     {wiredVariableFxSegmentFills(progress, hearts).map((fill, index) => (
-                        <span key={index} className="octane-wired-fx__heart" style={{ ['--fx-fill' as string]: fill } as CSSProperties}>
+                        <span key={index} className="octane-wired-fx__heart" style={{ ['--fx-fill' as string]: fill }}>
                             ♥
                         </span>
                     ))}
@@ -120,7 +120,7 @@ export const WiredVariableFxStatusView: FC<WiredVariableFxStatusViewProps> = (pr
 
             return (
                 <div className={rootClass} data-testid="fx-status">
-                    <span className={classNames('octane-wired-fx__level', level.maxed ? 'octane-wired-fx__level--maxed' : '')} style={{ ['--fx-color' as string]: color ?? undefined } as CSSProperties}>
+                    <span className={classNames('octane-wired-fx__level', level.maxed ? 'octane-wired-fx__level--maxed' : '')} style={{ ['--fx-color' as string]: color ?? undefined }}>
                         {level.level}
                     </span>
                     <Bar rendererId={subRenderer} progress={level.maxed ? 1 : progress} segments={segments} color={color} widthPx={widthPx} />
@@ -144,7 +144,7 @@ export const WiredVariableFxStatusView: FC<WiredVariableFxStatusViewProps> = (pr
             const alignment = config.extra?.[WIRED_FX_CONFIG_EXTRA.ICON_ALIGNMENT] ?? 'left';
 
             return (
-                <div className={classNames(rootClass, 'octane-wired-fx--boss')} style={{ ['--fx-color' as string]: color ?? undefined } as CSSProperties} data-testid="fx-status">
+                <div className={classNames(rootClass, 'octane-wired-fx--boss')} style={{ ['--fx-color' as string]: color ?? undefined }} data-testid="fx-status">
                     {(alignment === 'left' || alignment === 'double') && <Icon icon={icon} />}
                     <div className="octane-wired-fx__boss-body">
                         <Bar rendererId={WIRED_FX_RENDERER.PLAIN} progress={progress} segments={0} color={color ?? '#e04b4b'} widthPx={Math.max(widthPx * 3, 220)} />

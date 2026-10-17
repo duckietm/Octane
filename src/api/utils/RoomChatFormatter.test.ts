@@ -74,7 +74,7 @@ describe('RoomChatFormatter — legitimate markup is preserved', () => {
         const div = parse('<font color="red">hi</font>');
         const span = div.querySelector('span');
         expect(span).not.toBeNull();
-        expect((span as HTMLElement).style.color).toBe('red');
+        expect((span).style.color).toBe('red');
         expect(span?.textContent).toBe('hi');
     });
 

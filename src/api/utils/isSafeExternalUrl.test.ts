@@ -31,7 +31,7 @@ describe('isSafeExternalUrl', () => {
 
     it('rejects empty / malformed input', () => {
         expect(isSafeExternalUrl('')).toBe(false);
-        expect(isSafeExternalUrl(null as unknown as string)).toBe(false);
+        expect(isSafeExternalUrl(null)).toBe(false);
         expect(isSafeExternalUrl('not a url')).toBe(false);
     });
 });

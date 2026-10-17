@@ -118,7 +118,7 @@ describe('selectCatalogPage', () => {
     });
 
     it('builds the page, skipping parser offers without products', () => {
-        const data = selectCatalogPage(parserPage() as any, CatalogType.NORMAL, lookups);
+        const data = selectCatalogPage(parserPage(), CatalogType.NORMAL, lookups);
 
         expect(data.page).toBeInstanceOf(CatalogPage);
         expect(data.page.pageId).toBe(3);
@@ -131,14 +131,14 @@ describe('selectCatalogPage', () => {
 
     it('applies the builder pricing-model filter', () => {
         const bundle = parserOffer(9, [parserProduct(), parserProduct({ furniClassId: 11 })]);
-        const data = selectCatalogPage(parserPage({ offers: [bundle, parserOffer(1)] }) as any, CatalogType.BUILDER, lookups);
+        const data = selectCatalogPage(parserPage({ offers: [bundle, parserOffer(1)] }), CatalogType.BUILDER, lookups);
 
         expect(data.page.offers.map((offer) => offer.offerId)).toEqual([1]);
     });
 
     it('passes the front page items through', () => {
         const items = [{ type: 1 }] as any;
-        const data = selectCatalogPage(parserPage({ frontPageItems: items }) as any, CatalogType.NORMAL, lookups);
+        const data = selectCatalogPage(parserPage({ frontPageItems: items }), CatalogType.NORMAL, lookups);
 
         expect(data.frontPageItems).toBe(items);
     });

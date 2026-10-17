@@ -185,7 +185,7 @@ export const rememberShownCatalogPage = (type: string, data: CatalogPageData): v
 
 export const useCatalogPageQuery = (type: string, pageId: number, enabled: boolean): UseQueryResult<CatalogPageData> => {
     const query = useOctaneQuery<CatalogPageMessageEvent, CatalogPageData>({
-        key: catalogPageKey(type, pageId) as unknown as string[],
+        key: catalogPageKey(type, pageId),
         request: () => new GetCatalogPageComposer(pageId, -1, type),
         parser: CatalogPageMessageEvent,
         accept: (event) => {
@@ -193,7 +193,7 @@ export const useCatalogPageQuery = (type: string, pageId: number, enabled: boole
 
             return parser.pageId === pageId && normalizeCatalogType(parser.catalogType) === type;
         },
-        select: (event) => selectCatalogPage(event.getParser() as unknown as ParserPage, type),
+        select: (event) => selectCatalogPage(event.getParser(), type),
         enabled: enabled && pageId > -1,
         staleTime: CATALOG_PAGE_STALE_MS,
         timeoutMs: CATALOG_PAGE_TIMEOUT_MS,

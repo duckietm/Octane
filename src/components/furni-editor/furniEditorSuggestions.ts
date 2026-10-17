@@ -227,7 +227,7 @@ export const suggestFromSiblings = (siblings: RelatedRow[], form: EditableFields
         const best = [...tally.values()].sort((a, b) => b.count - a.count)[0];
         if (!best || best.count * 2 <= siblings.length) continue;
         if (String(form[field]) === String(best.value)) continue;
-        out.push({ field, value: best.value as never, reason: `${best.count} of ${siblings.length} in the line` });
+        out.push({ field, value: best.value, reason: `${best.count} of ${siblings.length} in the line` });
     }
     return out;
 };

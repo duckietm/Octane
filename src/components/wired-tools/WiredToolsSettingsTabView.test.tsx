@@ -5,7 +5,7 @@ import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-    config: {} as Record<string, unknown>,
+    config: {},
     showConfirm: vi.fn(),
     saveRoomSettings: vi.fn(),
     saveRoomTimezone: vi.fn(),

@@ -175,7 +175,7 @@ describe('buildCatalogNodeTree', () => {
 
     it('returns a CatalogNode root with the depth=0', () => {
         const rootData = makeNodeData({ pageId: 0, pageName: 'root' });
-        const { rootNode, offersToNodes } = buildCatalogNodeTree(rootData as any);
+        const { rootNode, offersToNodes } = buildCatalogNodeTree(rootData);
 
         expect(rootNode.pageId).toBe(0);
         expect(rootNode.depth).toBe(0);
@@ -187,7 +187,7 @@ describe('buildCatalogNodeTree', () => {
         const branch = makeNodeData({ pageId: 3, pageName: 'shop', offerIds: [100], children: [leaf] });
         const rootData = makeNodeData({ pageId: 0, pageName: 'root', children: [branch] });
 
-        const { rootNode, offersToNodes } = buildCatalogNodeTree(rootData as any);
+        const { rootNode, offersToNodes } = buildCatalogNodeTree(rootData);
 
         // tree shape
         expect(rootNode.children).toHaveLength(1);
@@ -209,7 +209,7 @@ describe('buildCatalogNodeTree', () => {
         const leaf = makeNodeData({ pageId: 5, pageName: 'sale' });
         const rootData = makeNodeData({ pageId: 0, pageName: 'root', children: [leaf] });
 
-        const { rootNode } = buildCatalogNodeTree(rootData as any);
+        const { rootNode } = buildCatalogNodeTree(rootData);
 
         expect(rootNode.children[0].parent).toBe(rootNode);
     });

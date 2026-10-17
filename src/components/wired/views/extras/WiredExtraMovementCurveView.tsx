@@ -94,7 +94,7 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
                 ? contextVariableDefinitions
                 : userVariableDefinitions;
     const entries = useMemo(() => {
-        const built = buildWiredVariablePickerEntries(target as WiredVariablePickerTarget, 'change-reference', definitions);
+        const built = buildWiredVariablePickerEntries(target, 'change-reference', definitions);
         if (!variableToken || flattenWiredVariablePickerEntries(built).some((entry) => entry.token === variableToken)) return built;
 
         const fallback = createFallbackVariableEntry(target, variableToken);

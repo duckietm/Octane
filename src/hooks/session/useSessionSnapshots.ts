@@ -58,7 +58,7 @@ const DEFAULT_USER_DATA: Readonly<IUserDataSnapshot> = Object.freeze({
     isSystemOpen: false,
     isSystemShutdown: false,
     uiFlags: 0,
-    tags: Object.freeze<string[]>([]) as ReadonlyArray<string>,
+    tags: Object.freeze<string[]>([]),
     rankId: 0,
     rankName: '',
     rankBadge: '',
@@ -66,10 +66,10 @@ const DEFAULT_USER_DATA: Readonly<IUserDataSnapshot> = Object.freeze({
     rankPrefixColor: ''
 }) as Readonly<IUserDataSnapshot>;
 
-const EMPTY_IGNORED_LIST: ReadonlyArray<string> = Object.freeze<string[]>([]) as ReadonlyArray<string>;
-const EMPTY_BLOCKED_LIST: ReadonlyArray<number> = Object.freeze<number[]>([]) as ReadonlyArray<number>;
+const EMPTY_IGNORED_LIST: ReadonlyArray<string> = Object.freeze<string[]>([]);
+const EMPTY_BLOCKED_LIST: ReadonlyArray<number> = Object.freeze<number[]>([]);
 const EMPTY_GROUP_BADGES: ReadonlyMap<number, string> = new Map();
-const EMPTY_USER_LIST: ReadonlyArray<IRoomUserData> = Object.freeze<IRoomUserData[]>([]) as ReadonlyArray<IRoomUserData>;
+const EMPTY_USER_LIST: ReadonlyArray<IRoomUserData> = Object.freeze<IRoomUserData[]>([]);
 const EMPTY_PERMISSIONS: ReadonlyMap<string, number> = new Map();
 
 const DEFAULT_VOLUMES: Readonly<ISoundVolumesSnapshot> = Object.freeze({
