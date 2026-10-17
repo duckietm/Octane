@@ -114,8 +114,13 @@ login/WebGL, so they're not usable for in-game verification.
   `Checkbox`, `Radio` (a controlled one-item `RadioGroup`, drop-in for
   `<input type="radio" checked onChange>`), `Select` (drop-in for `<select>` + `<option>`,
   change event keeps `target.value`), `NumberInput` (drop-in for `type="number"`, event keeps
-  `target.value` / `target.valueAsNumber`, role spinbutton), `Slider`, `FloatingPopover`,
-  `TabBar`, `InlineDialog` (non-modal dialog mounted inline), `CollapsibleSection`, `Tooltip`.
+  `target.value` / `target.valueAsNumber`, role spinbutton, hover/focus up-down overlay), `Slider`, `FloatingPopover`,
+  `TabBar`, `InlineDialog` (dialog mounted inline; `modal="trap-focus"` for the catalog confirms), `CollapsibleSection`, `Tooltip`.
+  Radios that share a `name` keep native group behaviour (arrow keys, one tab stop).
+  Deliberately native: `<button>` (Base UI Button defaults to `type="button"`, which would break
+  forms relying on the implicit submit), text `<input>` and `<textarea>` (no behaviour to gain),
+  and the draggable-window dialogs (`UserSettingsView`, `LayoutMiniCameraView`: `DraggableWindow`
+  looks up its handle once at mount) plus the habbicon hub popup (bespoke click-positioned popover).
   Skin them through the `octane-*` classes (`.octane-checkbox[data-checked]`,
   `.octane-radio`, `.octane-select-trigger`, `.octane-number-input`): CSS written for
   `input[type=...]` / `select` must be mirrored onto those classes. Base UI roots render as
