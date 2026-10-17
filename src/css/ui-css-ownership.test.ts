@@ -127,7 +127,7 @@ describe('UI CSS ownership', () =>
         expect(getCatalogLayout).not.toContain('custom_prefix');
         expect(getCatalogLayout).not.toContain('CatalogLayoutCustomPrefixView');
         expect(catalogCss).toContain('.octane-catalog-window :where(.bg-white, .bg-gray-50, .bg-card-grid-item)');
-        expect(catalogCss).toContain('.octane-catalog-window :where(input, select, textarea)');
+        expect(catalogCss).toContain('.octane-catalog-window :where(input, select, .octane-select-trigger, textarea)');
         expect(catalogCss).toContain('.octane-catalog-window :where(.text-muted, .text-dark)');
         expect(catalogCss).toContain('.octane-catalog-admin-body :where(.uppercase.font-bold)');
         expect(catalogCss).toContain('.octane-catalog-admin-input');
@@ -141,21 +141,21 @@ describe('UI CSS ownership', () =>
         expect(inventoryCategoryFilterView).toContain('octane-inventory-filter-bar');
         expect(inventoryCss).toContain('.octane-inventory-window .octane-inventory-filter-bar.is-badges');
         expect(inventoryCss).toContain('.octane-inventory-window :where(.bg-card-grid-item, .bg-white, .bg-light, .bg-muted)');
-        expect(inventoryCss).toContain('.octane-inventory-window :where(input, select, textarea)');
+        expect(inventoryCss).toContain('.octane-inventory-window :where(input, select, .octane-select-trigger, textarea)');
         expect(friendsCategoryManagerView).not.toContain('style={ { width: 270, minWidth: 270 } }');
         expect(friendsListRemoveConfirmationView).not.toContain('style={ { width: 270, height: 225');
         expect(friendsListRoomInviteView).not.toContain('style={ { width: 270, height: 225');
-        expect(friendsCss).toContain('.octane-friends-category-manager :where(input, select, textarea)');
+        expect(friendsCss).toContain('.octane-friends-category-manager :where(input, select, .octane-select-trigger, textarea)');
         expect(friendsCss).toContain('width: min(270px, calc(100vw - 16px))');
         expect(roomSettingsCss).toContain('.octane-room-settings');
         // Checkboxes/radios are excluded from the text-input skin: its
         // `background` shorthand would wipe the @tailwindcss/forms check glyph.
-        expect(roomSettingsCss).toContain(':where(input:not([type="checkbox"]):not([type="radio"]), select, textarea)');
+        expect(roomSettingsCss).toContain(':where(input:not([type="checkbox"]):not([type="radio"]), select, .octane-select-trigger, textarea)');
         expect(indexCss).not.toContain('.octane-wired :where(select, input[type=\'text\'], input[type=\'number\'], textarea)');
-        expect(wiredCss).toContain('.octane-wired :where(select, input[type=\'text\'], input[type=\'number\'], textarea)');
+        expect(wiredCss).toContain('.octane-wired :where(select, .octane-select-trigger, input[type=\'text\'], input[type=\'number\'], textarea)');
         expect(wiredCss).toContain('.octane-wired__variable-picker-portal');
         // Text fields only: a checkbox is not a text field, and the mod tool used to paint it as one.
-        expect(indexCss).toContain(".octane-mod-tools :where(input:not([type='checkbox']):not([type='radio']), select, textarea)");
+        expect(indexCss).toContain(".octane-mod-tools :where(input:not([type='checkbox']):not([type='radio']), select, .octane-select-trigger, textarea)");
         expect(indexCss).not.toContain('.octane-mod-tools :where(input, select, textarea)');
         expect(indexCss).toContain('[class*="octane-mod-tools-"] :where(.bg-white, .bg-light, .bg-muted, .bg-card-grid-item, .bg-white\\/70)');
         expect(wiredCss).toContain('.octane-wired__body');

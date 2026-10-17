@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HousekeepingSoundboardTab } from './HousekeepingSoundboardTab';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 const mocks = vi.hoisted(() => ({
     playSoundboardPreview: vi.fn().mockResolvedValue(true),
@@ -83,7 +84,7 @@ describe('HousekeepingSoundboardTab', () => {
         expect(container.textContent).toContain('Applauso');
         expect(container.textContent).not.toContain('Campanella');
 
-        fireEvent.change(screen.getByRole('combobox', { name: 'Filter sounds' }), { target: { value: 'enabled' } });
+        selectOption(screen.getByRole('combobox', { name: 'Filter sounds' }), 'Enabled');
         expect(container.textContent).not.toContain('Applauso');
 
         fireEvent.change(screen.getByRole('searchbox', { name: 'Search sounds' }), { target: { value: '' } });

@@ -3,6 +3,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../test-utils/selectOption';
 
 const mocks = vi.hoisted(() => ({
     send: vi.fn(),
@@ -139,17 +140,17 @@ describe('WiredVariableOwnersView', () => {
         mocks.send.mockClear();
         vi.advanceTimersByTime(400);
 
-        const [userTypeSelect, sortSelect] = screen.getAllByRole('combobox') as HTMLSelectElement[];
+        const [userTypeSelect, sortSelect] = screen.getAllByRole('combobox');
 
-        fireEvent.change(sortSelect, { target: { value: '1' } });
+        selectOption(sortSelect, 'Highest value');
         expect(mocks.send.mock.calls[0][0].getMessageArray()).toEqual(['user:42', 1, 50, 0, 1]);
 
         vi.advanceTimersByTime(400);
-        fireEvent.change(userTypeSelect, { target: { value: '1' } });
+        selectOption(userTypeSelect, 'In the room');
         expect(mocks.send.mock.calls[1][0].getMessageArray()).toEqual(['user:42', 1, 50, 1, 1]);
 
         deliverPage({ totalEntries: 0, currentPage: 1, elements: [], userTypeFilter: 1, sortTypeFilter: 2 });
-        expect(userTypeSelect.value).toBe('1');
-        expect(sortSelect.value).toBe('2');
+        expect(userTypeSelect).toHaveTextContent('In the room');
+        expect(sortSelect).toHaveTextContent('Name');
     });
 });

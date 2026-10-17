@@ -1,6 +1,7 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ModToolsTemplateSelectView } from './ModToolsTemplateSelectView';
+import { selectOption } from '../../../test-utils/selectOption';
 
 vi.mock('../../../api', () => ({
     localizeWithFallback: (_key: string, fallback: string) => fallback
@@ -13,7 +14,7 @@ describe('ModToolsTemplateSelectView', () => {
         const onSelect = vi.fn();
 
         render(<ModToolsTemplateSelectView templates={['First text', 'Second text']} onSelect={onSelect} />);
-        fireEvent.change(screen.getByRole('combobox'), { target: { value: '1' } });
+        selectOption(screen.getByRole('combobox'), 'Second text');
 
         expect(onSelect).toHaveBeenCalledWith('Second text');
     });

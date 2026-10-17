@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../../test-utils/selectOption';
 
 vi.mock('../../../api', () => ({
     localizeWithFallback: (key: string, fallback: string) => fallback
@@ -20,8 +21,8 @@ describe('WiredBubbleWidthSelect', () => {
 
         render(<WiredBubbleWidthSelect value={-1} onChange={vi.fn()} />);
 
-        const select = screen.getByRole('combobox', { name: 'Bubble width' });
-        expect(Array.from(select.querySelectorAll('option')).map((option) => option.textContent)).toEqual(['Room setting', 'Wide', 'Normal', 'Thin']);
+        fireEvent.click(screen.getByRole('combobox', { name: 'Bubble width' }));
+        expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(['Room setting', 'Wide', 'Normal', 'Thin']);
     });
 
     it('hands the chosen width to the window as a number', () => {
@@ -29,7 +30,7 @@ describe('WiredBubbleWidthSelect', () => {
 
         render(<WiredBubbleWidthSelect value={-1} onChange={onChange} />);
 
-        fireEvent.change(screen.getByRole('combobox', { name: 'Bubble width' }), { target: { value: '2' } });
+        selectOption(screen.getByRole('combobox', { name: 'Bubble width' }), 'Thin');
 
         expect(onChange).toHaveBeenCalledWith(2);
     });

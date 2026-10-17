@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 const setIntParams = vi.fn();
 const setStringParam = vi.fn();
@@ -42,17 +43,17 @@ describe('WiredActionWriteToLogsView', () => {
         trigger = { stringData: '', intData: [] };
         render(<WiredActionWriteToLogsView />);
 
-        expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('0');
+        expect(screen.getByRole('combobox')).toHaveTextContent('Debug');
     });
 
     it('shows what the box stored and saves the level, the message as typed and the user source slot', () => {
         trigger = { stringData: 'door opened', intData: [2], userSourceTypes: [5] };
         render(<WiredActionWriteToLogsView />);
 
-        expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('2');
+        expect(screen.getByRole('combobox')).toHaveTextContent('Warning');
         expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('door opened');
 
-        fireEvent.change(screen.getByRole('combobox'), { target: { value: '3' } });
+        selectOption(screen.getByRole('combobox'), 'Error');
         fireEvent.change(screen.getByRole('textbox'), { target: { value: '  boss escaped  ' } });
         baseProps.save();
 

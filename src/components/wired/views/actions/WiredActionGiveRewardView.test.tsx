@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ButtonHTMLAttributes, InputHTMLAttributes, PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 const setIntParams = vi.fn();
 const setStringParam = vi.fn();
@@ -51,7 +52,7 @@ describe('WiredActionGiveRewardView', () => {
         trigger = { stringData: '', intData: [] };
         render(<WiredActionGiveRewardView />);
 
-        fireEvent.change(screen.getByLabelText('Reward type'), { target: { value: 'badge' } });
+        selectOption(screen.getByRole('combobox', { name: 'Reward type' }), 'Badge');
         fireEvent.change(screen.getByLabelText('Badge code'), { target: { value: 'ADM' } });
         act(() => save());
 
@@ -62,7 +63,7 @@ describe('WiredActionGiveRewardView', () => {
         trigger = { stringData: '0,NL1,50', intData: [0, 0, 0, 0, 0] };
         render(<WiredActionGiveRewardView />);
 
-        expect(screen.getByLabelText('Reward type')).toHaveValue('badge');
+        expect(screen.getByRole('combobox', { name: 'Reward type' })).toHaveTextContent('Badge');
         expect(screen.getByLabelText('Badge code')).toHaveValue('NL1');
         expect(screen.getByLabelText('Chance %')).toHaveValue(50);
     });

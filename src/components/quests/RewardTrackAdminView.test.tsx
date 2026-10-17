@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { localInputToUnix, RewardTrackAdminView, unixToLocalInput } from './RewardTrackAdminView';
+import { selectOption } from '../../test-utils/selectOption';
 
 const mocks = vi.hoisted(() => ({
     saveTrack: vi.fn(),
@@ -239,7 +240,7 @@ describe('RewardTrackAdminView', () => {
         const form = screen.getByTestId('rt-admin-prize-form');
         expect(screen.queryByTestId('rt-admin-furni-picker')).toBeNull();
 
-        fireEvent.change(form.querySelector('select'), { target: { value: 'furni' } });
+        selectOption(within(form).getByRole('combobox'), 'furni');
         expect(screen.getByTestId('rt-admin-furni-picker')).toBeTruthy();
     });
 

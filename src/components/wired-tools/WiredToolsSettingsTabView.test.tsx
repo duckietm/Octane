@@ -3,6 +3,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../test-utils/selectOption';
 
 const mocks = vi.hoisted(() => ({
     config: {} as Record<string, unknown>,
@@ -83,10 +84,10 @@ describe('WiredToolsSettingsTabView', () => {
         mocks.config['wired.timezones'] = 'UTC,Europe/Amsterdam,Europe/Berlin';
         render(<WiredToolsSettingsTabView />);
 
-        const select = screen.getByLabelText('Timezone') as HTMLSelectElement;
-        expect(select.value).toBe('Europe/Amsterdam');
+        const select = screen.getByRole('combobox', { name: 'Timezone' });
+        expect(select).toHaveTextContent('Europe/Amsterdam');
 
-        fireEvent.change(select, { target: { value: 'Europe/Berlin' } });
+        selectOption(select, 'Europe/Berlin');
 
         expect(mocks.saveRoomTimezone).toHaveBeenCalledWith('Europe/Berlin');
     });

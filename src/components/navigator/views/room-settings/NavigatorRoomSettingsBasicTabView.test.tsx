@@ -3,6 +3,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NavigatorRoomSettingsBasicTabView } from './NavigatorRoomSettingsBasicTabView';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 const sendMessageComposer = vi.fn();
 const setSoundboardRoomMode = vi.fn();
@@ -79,9 +80,9 @@ describe('NavigatorRoomSettingsBasicTabView room toggles', () => {
 
         const select = screen.getByRole('combobox', { name: 'Allow Soundboard use in this room' });
 
-        expect(select).toHaveValue('1');
+        expect(select.textContent).toContain('soundboard.room.mode.everyone');
 
-        fireEvent.change(select, { target: { value: '2' } });
+        selectOption(select, 'Only people with rights');
 
         expect(setSoundboardRoomMode).toHaveBeenCalledWith(2);
         expect(container.textContent).not.toContain('Block');

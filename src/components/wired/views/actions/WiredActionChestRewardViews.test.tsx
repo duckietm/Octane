@@ -66,7 +66,7 @@ describe('chest reward wired actions', () => {
         trigger = { stringData: 'hi', intData: [0, 5, 1, -20, 1, 13], userSourceTypes: [200], variableIds: ['44'] };
         render(<WiredActionGiveCurrencyFromChestView />);
 
-        expect((screen.getByLabelText('chest extra') as HTMLSelectElement).value).toBe('13');
+        expect(screen.getByRole('combobox', { name: 'chest extra' })).toHaveTextContent('Agency');
         expect(baseProps.validate()).toBe(true);
         baseProps.save();
 

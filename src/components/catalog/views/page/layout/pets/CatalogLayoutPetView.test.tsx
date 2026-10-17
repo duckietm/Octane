@@ -211,8 +211,13 @@ describe('pet catalog layout', () => {
 
         render(<CatalogLayoutPetView page={{ ...page, offers: [currentOffer] } as any} hideNavigation={() => undefined} />);
 
-        expect(await screen.findAllByRole('option')).toHaveLength(2);
-        expect(screen.getByRole('combobox')).toHaveValue('0');
+        fireEvent.click(await screen.findByRole('combobox'));
+        const breedOptions = await screen.findAllByRole('option');
+
+        expect(breedOptions).toHaveLength(2);
+        expect(breedOptions[0]).toHaveAttribute('aria-selected', 'true');
+        expect(screen.getByRole('combobox').textContent).toBe(breedOptions[0].textContent);
+        fireEvent.keyDown(screen.getByRole('combobox'), { key: 'Escape' });
         expect(screen.getByTestId('pet-image')).toHaveAttribute('data-type-id', '7');
         expect(screen.getByTestId('pet-image')).toHaveAttribute('data-palette-id', '20');
         expect(screen.getByTestId('pet-image')).toHaveAttribute('data-pet-color', '11259375');
