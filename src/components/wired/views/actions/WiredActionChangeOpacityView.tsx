@@ -95,11 +95,11 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
                     <Text bold>{localizeWithFallback('wiredfurni.params.sources.merged.title.target', 'Select target:')}</Text>
                     <div className="flex gap-3">
                         <label className="flex items-center gap-1">
-                            <input checked={!state.targetUsers} className="form-check-input" name="wiredTransparencyTarget" type="radio" onChange={() => update({ targetUsers: false })} />
+                            <Radio checked={!state.targetUsers} name="wiredTransparencyTarget" onCheckedChange={() => update({ targetUsers: false })} />
                             <Text>{localizeWithFallback('wiredfurni.params.sources.furni.title', 'Furni')}</Text>
                         </label>
                         <label className="flex items-center gap-1">
-                            <input checked={state.targetUsers} className="form-check-input" name="wiredTransparencyTarget" type="radio" onChange={() => update({ targetUsers: true })} />
+                            <Radio checked={state.targetUsers} name="wiredTransparencyTarget" onCheckedChange={() => update({ targetUsers: true })} />
                             <Text>{localizeWithFallback('wiredfurni.params.sources.users.title', 'Users')}</Text>
                         </label>
                     </div>

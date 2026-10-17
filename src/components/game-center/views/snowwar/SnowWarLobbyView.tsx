@@ -7,6 +7,7 @@ import { useSnowWar } from '../../../../hooks';
 import { getSnowWarFigure } from './SnowWarAvatarView';
 import { SnowWarSkillStars } from './SnowWarSkillStars';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const TEAM_COLORS = ['#e64545', '#4577e6', '#3fb550', '#e6c245'];
 
@@ -232,9 +233,9 @@ export const SnowWarLobbyView: FC = () =>
                     <SnowWarStrokeText text={ localizeWithFallback('snowwar.loading_arena', 'Going to the arena...') } />
                 </div>
 
-                <button className="snowwar-results__leave" type="button" onClick={ () => exitGame() }>
+                <BaseButton className="snowwar-results__leave" type="button" onClick={ () => exitGame() }>
                     { localizeWithFallback('snowwar.leave_game', 'Leave game') }
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

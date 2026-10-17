@@ -12,6 +12,7 @@ import {
 import delayPreciseIcon from '../../../../assets/images/wired/delay/delay_precise.png';
 import delayStandardIcon from '../../../../assets/images/wired/delay/delay_standard.png';
 import { Slider, Text } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface WiredActionDelaySectionProps {
     /** The delay as sent: pulses, or a negative number of milliseconds in precise mode. */
@@ -65,22 +66,22 @@ export const WiredActionDelaySection: FC<WiredActionDelaySectionProps> = ({ valu
                     }}
                 />
                 <div className="octane-wired__delay-mode">
-                    <button
+                    <BaseButton
                         type="button"
                         className="octane-wired__delay-mode-button"
                         title={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}
                         onClick={() => setMenuOpen((open) => !open)}
                     >
                         <img src={precise ? delayPreciseIcon : delayStandardIcon} alt="" />
-                    </button>
+                    </BaseButton>
                     {menuOpen && (
                         <div className="octane-wired__delay-mode-menu">
-                            <button type="button" className={!precise ? 'is-active' : ''} onClick={() => selectMode(false)}>
+                            <BaseButton type="button" className={!precise ? 'is-active' : ''} onClick={() => selectMode(false)}>
                                 {LocalizeText('wiredfurni.params.delay.mode.standard')}
-                            </button>
-                            <button type="button" className={precise ? 'is-active' : ''} onClick={() => selectMode(true)}>
+                            </BaseButton>
+                            <BaseButton type="button" className={precise ? 'is-active' : ''} onClick={() => selectMode(true)}>
                                 {LocalizeText('wiredfurni.params.delay.mode.precise')}
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                 </div>

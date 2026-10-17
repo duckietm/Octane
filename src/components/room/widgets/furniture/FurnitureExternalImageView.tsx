@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { formatCameraPhotoDate, GetAllowedCameraPhotoUrl, GetUserProfile, LocalizeText, ReportType } from '../../../../api';
 import { DraggableWindow } from '../../../../common';
 import { getPhotoCreator, useFurnitureExternalImageWidget, useHelp, useNotification, useRoom } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // Official stories_image_widget: the photo in a 1px black outline on a translucent panel, browse arrows
 // either side, date and creator under it, and report / remove / close at the top right.
@@ -76,15 +77,15 @@ export const FurnitureExternalImageView: FC<{}> = (props) => {
                 </div>
                 {canBrowse && (
                     <>
-                        <button type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--previous" onClick={() => browse(-1)} />
-                        <button type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--next" onClick={() => browse(1)} />
+                        <BaseButton type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--previous" onClick={() => browse(-1)} />
+                        <BaseButton type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--next" onClick={() => browse(1)} />
                     </>
                 )}
                 {creationDate && <span className="octane-photo-viewer__date">{creationDate}</span>}
                 {creator.name && (
-                    <button type="button" className="octane-photo-viewer__creator" onClick={() => creator.id > 0 && GetUserProfile(creator.id)}>
+                    <BaseButton type="button" className="octane-photo-viewer__creator" onClick={() => creator.id > 0 && GetUserProfile(creator.id)}>
                         {creator.name}
-                    </button>
+                    </BaseButton>
                 )}
                 {caption && (
                     <div className="octane-photo-viewer__caption" title={caption}>
@@ -92,21 +93,21 @@ export const FurnitureExternalImageView: FC<{}> = (props) => {
                     </div>
                 )}
                 <div className="octane-photo-viewer__buttons">
-                    <button
+                    <BaseButton
                         type="button"
                         className="octane-photo-viewer__button octane-photo-viewer__button--report"
                         title={LocalizeText('help.report.photo.button')}
                         onClick={onReport}
                     />
                     {canRemove && (
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-photo-viewer__button octane-photo-viewer__button--remove"
                             title={LocalizeText('inventory.remove.external_image_wallitem_delete')}
                             onClick={onRemove}
                         />
                     )}
-                    <button type="button" className="octane-photo-viewer__close" title={LocalizeText('generic.close')} onClick={onClose} />
+                    <BaseButton type="button" className="octane-photo-viewer__close" title={LocalizeText('generic.close')} onClick={onClose} />
                 </div>
             </div>
         </DraggableWindow>

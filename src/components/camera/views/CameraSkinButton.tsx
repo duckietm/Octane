@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { CameraCenteredText } from './CameraNativeText';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface CameraSkinButtonProps {
     label: string;
@@ -17,7 +18,7 @@ export const CameraSkinButton: FC<CameraSkinButtonProps> = ({ label, variant, di
     const light = variant === 'green' || variant === 'thick-green';
 
     return (
-        <button className={`octane-camera-button is-${variant} ${className}`} disabled={disabled} type="button" onClick={onClick}>
+        <BaseButton className={`octane-camera-button is-${variant} ${className}`} disabled={disabled} type="button" onClick={onClick}>
             <span className="octane-camera-button-label">
                 <CameraCenteredText
                     color={light ? 0xffffff : 0x000000}
@@ -27,6 +28,6 @@ export const CameraSkinButton: FC<CameraSkinButtonProps> = ({ label, variant, di
                     width={labelWidth}
                 />
             </span>
-        </button>
+        </BaseButton>
     );
 };

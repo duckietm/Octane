@@ -22,6 +22,7 @@ import { localizeWiredVariableOperation, WIRED_VARIABLE_ADVANCED_OPERATIONS, WIR
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { BaseButton } from '../../../../common/BaseButton';
+import { Checkbox } from '../../../../common/Checkbox';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -491,13 +492,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                         )}
                         {referenceMode === 'variable' && (
                             <label className={`flex items-center gap-1 ${sameHolderAvailable ? '' : 'opacity-50'}`}>
-                                <input
-                                    checked={sameHolderActive}
-                                    className="form-check-input"
-                                    disabled={!sameHolderAvailable}
-                                    type="checkbox"
-                                    onChange={(event) => setReferenceSameHolder(event.target.checked)}
-                                />
+                                <Checkbox checked={sameHolderActive} disabled={!sameHolderAvailable} onCheckedChange={(nextChecked) => setReferenceSameHolder(nextChecked)} />
                                 <Text>{LocalizeText('wiredfurni.params.variables.reference_value.same_holder')}</Text>
                             </label>
                         )}
