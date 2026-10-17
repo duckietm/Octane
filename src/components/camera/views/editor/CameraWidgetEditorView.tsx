@@ -14,6 +14,7 @@ import { CameraCenteredText, CameraNativeText } from '../CameraNativeText';
 import { CameraSkinButton } from '../CameraSkinButton';
 import { CameraWidgetEffectListView } from './effect-list';
 import { BaseButton } from '../../../../common/BaseButton';
+import { ToggleButton } from '../../../../common/ToggleButton';
 
 export interface CameraWidgetEditorViewProps {
     picture: CameraPicture;
@@ -313,15 +314,15 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                     <span className="octane-camera-editor__tool-icon" aria-hidden="true" />
                     <CameraNativeText color={0x000000} size={11} text={LocalizeText('floor.plan.editor.save')} textStyle="u_button_tab" underline />
                 </BaseButton>
-                <BaseButton
+                <ToggleButton
                     type="button"
                     className="octane-camera-editor__tool octane-camera-editor__tool--zoom"
-                    aria-pressed={isZoomed}
+                    pressed={isZoomed}
                     onClick={() => processAction('zoom')}
                 >
                     <span className="octane-camera-editor__tool-icon" aria-hidden="true" />
                     <CameraNativeText color={0x000000} size={11} text={LocalizeText('room.zoom.button.text')} textStyle="u_button_tab" underline />
-                </BaseButton>
+                </ToggleButton>
 
                 <div className="octane-camera-editor__button-separator" />
                 <CameraSkinButton className="octane-camera-editor__cancel" label={LocalizeText('catalog.purchase_confirmation.cancel')} labelWidth={152} variant="gray-dark" onClick={() => processAction('cancel')} />

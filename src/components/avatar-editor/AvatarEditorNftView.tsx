@@ -7,6 +7,7 @@ import { AvatarEditorIcon } from './AvatarEditorIcon';
 import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
 import { BaseButton } from '../../common/BaseButton';
+import { ToggleButton } from '../../common/ToggleButton';
 
 export const AvatarEditorNftView: FC<{
     categories: IAvatarEditorCategory[];
@@ -73,14 +74,13 @@ export const AvatarEditorNftView: FC<{
             <div ref={subcategoryRef} className={`octane-avatar-editor-subcategories${hasPagedSubcategories ? ' is-paged' : ''}`}>
                 {categories.map((category) => (
                     <Fragment key={category.setType}>
-                        <BaseButton
+                        <ToggleButton
                             type="button"
-                            className="category-item"
-                            aria-pressed={resolvedSetType === category.setType}
+                            className="category-item" pressed={resolvedSetType === category.setType}
                             onClick={() => selectSet(category.setType)}
                         >
                             <AvatarEditorIcon icon={category.setType} selected={resolvedSetType === category.setType} />
-                        </BaseButton>
+                        </ToggleButton>
                         {category.setType === AvatarFigurePartType.HEAD && resolvedSetType === AvatarFigurePartType.HEAD && (
                             <>
                                 <BaseButton type="button" className="category-item" onClick={() => setGender?.(AvatarFigurePartType.MALE)}>

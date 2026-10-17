@@ -7,6 +7,7 @@ import { AvatarEditorIcon } from './AvatarEditorIcon';
 import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
 import { BaseButton } from '../../common/BaseButton';
+import { ToggleButton } from '../../common/ToggleButton';
 
 export const AvatarEditorPetView: FC<{
     categories: IAvatarEditorCategory[];
@@ -82,9 +83,9 @@ export const AvatarEditorPetView: FC<{
     return (
         <div className="octane-avatar-editor-model octane-avatar-editor-pet-model">
             <div className="octane-avatar-editor-subcategories octane-avatar-editor-pet-subcategories">
-                <BaseButton type="button" className="category-item" aria-pressed="true">
+                <ToggleButton type="button" className="category-item" pressed>
                     <AvatarEditorIcon icon="pt" selected />
-                </BaseButton>
+                </ToggleButton>
                 <div className="octane-avatar-editor-pet-equipped">
                     {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
                     <span>{selectedPartItem ? 'Companion equipped' : 'No companion selected'}</span>

@@ -28,6 +28,7 @@ import {
 } from './petCatalog.helpers';
 import { Select } from '../../../../../../common/Select';
 import { BaseButton } from '../../../../../../common/BaseButton';
+import { ToggleButton } from '../../../../../../common/ToggleButton';
 
 interface PendingPetPurchase {
     extraData: string;
@@ -273,10 +274,9 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 role="group"
                             >
                                 {legacyColors.map((colors, index) => (
-                                    <BaseButton
+                                    <ToggleButton
                                         key={`${colors[0]}-${index}`}
-                                        aria-label={`${colorLabel} ${index + 1}`}
-                                        aria-pressed={selectedColorIndex === index}
+                                        aria-label={`${colorLabel} ${index + 1}`} pressed={selectedColorIndex === index}
                                         className="octane-catalog-pet-color-swatch"
                                         disabled={controlsDisabled}
                                         style={{ backgroundColor: ColorConverter.int2rgb(colors[0]) }}
@@ -328,10 +328,9 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 const locked = isBreedLocked(choice.palette);
 
                                 return (
-                                    <BaseButton
+                                    <ToggleButton
                                         key={choice.palette.paletteId}
-                                        aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`}
-                                        aria-pressed={selectedPaletteIndex === index}
+                                        aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`} pressed={selectedPaletteIndex === index}
                                         className={`octane-catalog-pet-color-swatch${locked ? ' octane-catalog-pet-color-swatch--locked' : ''}`}
                                         disabled={controlsDisabled || locked}
                                         style={style}
@@ -340,7 +339,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                         onClick={() => setSelectedPaletteIndex(index)}
                                     >
                                         {locked && <FaLock className="octane-catalog-pet-swatch-lock" />}
-                                    </BaseButton>
+                                    </ToggleButton>
                                 );
                             })}
                         </CatalogScrollAreaView>

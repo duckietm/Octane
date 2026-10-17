@@ -11,6 +11,7 @@ import { AvatarEditorIcon } from '../../avatar-editor/AvatarEditorIcon';
 import { t } from '../utils/i18n';
 import { TabBar, TabBarTab } from '../../../common/TabBar';
 import { BaseButton } from '../../../common/BaseButton';
+import { ToggleButton } from '../../../common/ToggleButton';
 
 type GenderKey = 'M' | 'F';
 type FigureSelection = Record<string, { partId: number; colors: number[] }>;
@@ -275,13 +276,12 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
                     <div className="registration-wardrobe-section-title">{t('nitro.login.register.wardrobe.colors', 'Colors')}</div>
                     <div className="registration-wardrobe-palette">
                         {availableColors.map((color) => (
-                            <BaseButton
+                            <ToggleButton
                                 key={color.id}
                                 type="button"
                                 className={color.id === selectedColor ? 'active' : ''}
                                 style={{ backgroundColor: color.hex }}
-                                aria-label={`${t('nitro.login.register.wardrobe.color', 'Color')} ${color.id}`}
-                                aria-pressed={color.id === selectedColor}
+                                aria-label={`${t('nitro.login.register.wardrobe.color', 'Color')} ${color.id}`} pressed={color.id === selectedColor}
                                 disabled={selectedPart < 0}
                                 onClick={() => onSelectColor(activeSetType, color.id)}
                             />

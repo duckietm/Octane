@@ -4,6 +4,7 @@ import { ProductTypeEnum } from '../../../../../api';
 import previewArrowLeft from '../../../../../assets/images/catalog/air/preview-arrow-left.png';
 import previewArrowRight from '../../../../../assets/images/catalog/air/preview-arrow-right.png';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { ToggleButton } from '../../../../../common/ToggleButton';
 
 interface CatalogPreviewControlsProps {
     productType: string;
@@ -135,15 +136,14 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                 </>
             )}
             {canToggleZoom && (
-                <BaseButton
-                    aria-label="Toggle zoom"
-                    aria-pressed={avatarZoomed}
+                <ToggleButton
+                    aria-label="Toggle zoom" pressed={avatarZoomed}
                     className="octane-catalog-preview-region octane-catalog-preview-zoom-btn"
                     type="button"
                     onClick={(event) => runPreviewAction(event, () => setAvatarZoomed((value) => !value))}
                 >
                     <i aria-hidden="true" className="octane-icon icon-zoom-more" />
-                </BaseButton>
+                </ToggleButton>
             )}
             {isAvatarPreview && (
                 <BaseButton

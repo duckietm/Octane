@@ -7,6 +7,7 @@ import { AvatarEditorIcon } from './AvatarEditorIcon';
 import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
 import { BaseButton } from '../../common/BaseButton';
+import { ToggleButton } from '../../common/ToggleButton';
 
 export const AvatarEditorModelView: FC<{
     name: string;
@@ -75,15 +76,14 @@ export const AvatarEditorModelView: FC<{
                 )}
                 {name !== AvatarEditorFigureCategory.GENERIC &&
                     categories.map((category) => (
-                        <BaseButton
+                        <ToggleButton
                             type="button"
                             key={category.setType}
-                            className="category-item"
-                            aria-pressed={resolvedSetType === category.setType}
+                            className="category-item" pressed={resolvedSetType === category.setType}
                             onClick={() => selectSet(category.setType)}
                         >
                             <AvatarEditorIcon icon={category.setType} selected={resolvedSetType === category.setType} />
-                        </BaseButton>
+                        </ToggleButton>
                     ))}
             </div>
 

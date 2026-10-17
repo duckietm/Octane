@@ -7,6 +7,7 @@ import { setMentionsPanelOpen } from '../../hooks/mentions/mentionsStore';
 import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
 import { MentionRowView } from './MentionRowView';
 import { BaseButton } from '../../common/BaseButton';
+import { ToggleButton } from '../../common/ToggleButton';
 
 interface MentionsViewProps {
     onClose: () => void;
@@ -151,10 +152,10 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
                             const showCount = key === 'unread' && unreadCount > 0;
 
                             return (
-                                <BaseButton key={key} type="button" aria-pressed={active} className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
+                                <ToggleButton key={key} type="button" pressed={active} className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
                                     {LocalizeText(label)}
                                     {showCount ? ` ${unreadCount}` : ''}
-                                </BaseButton>
+                                </ToggleButton>
                             );
                         })}
                     </div>

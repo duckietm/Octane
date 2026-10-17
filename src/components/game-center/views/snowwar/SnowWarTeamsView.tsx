@@ -7,6 +7,7 @@ import { useSnowWar } from '../../../../hooks';
 import { SnowWarSkillStars } from './SnowWarSkillStars';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
 import { BaseButton } from '../../../../common/BaseButton';
+import { ToggleButton } from '../../../../common/ToggleButton';
 
 // Red = team 0, Blue = team 1 (matches the arena's TEAM_COLORS ordering).
 const TEAMS = [
@@ -110,17 +111,16 @@ export const SnowWarTeamsView: FC = () =>
                                 ? localizeWithFallback(`snowwar.field.name.${arena.id}`, localizeWithFallback(`gamecenter.snowwar.map.name.${arena.id}`, arena.name))
                                 : arena.name;
                             return (
-                                <BaseButton
+                                <ToggleButton
                                     key={arena.id}
                                     type="button"
                                     className={`snowwar-teams__arena${selected ? ' snowwar-teams__arena--selected' : ''}`}
-                                    disabled={!isLeader}
-                                    aria-pressed={selected}
+                                    disabled={!isLeader} pressed={selected}
                                     onClick={() => selectArena(arena.id)}>
                                     <img src={getArenaPreviewUrl(arena.id, arena.official)} alt="" />
                                     {!arena.official && <small>{localizeWithFallback('snowwar.arena.custom', 'Custom')}</small>}
                                     <span>{name}</span>
-                                </BaseButton>
+                                </ToggleButton>
                             );
                         })}
                     </div>

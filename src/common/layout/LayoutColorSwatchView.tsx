@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { BaseButton } from '../BaseButton';
+import { ToggleButton } from '../ToggleButton';
 
 interface LayoutColorSwatchViewProps
 {
@@ -12,8 +13,7 @@ interface LayoutColorSwatchViewProps
 export const LayoutColorSwatchView: FC<LayoutColorSwatchViewProps> = ({ color, active = false, title = undefined, onClick = undefined }) =>
 {
     return (
-        <BaseButton
-            aria-pressed={active}
+        <ToggleButton pressed={active}
             className={`octane-color-swatch${ active ? ' is-active' : '' }`}
             style={{ backgroundColor: color }}
             title={title}

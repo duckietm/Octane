@@ -3,6 +3,7 @@ import { Column, Flex, LayoutFurniIconImageView, Text } from '../../../common';
 import { FurniItem } from '../../../hooks/furni-editor';
 import { suggestInteractionType } from '../furniEditorSuggestions';
 import { BaseButton } from '../../../common/BaseButton';
+import { ToggleButton } from '../../../common/ToggleButton';
 
 interface FurniEditorSearchViewProps {
     items: FurniItem[];
@@ -196,16 +197,15 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                 </Text>
                 {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
                 {flaggedCount > 0 && (
-                    <BaseButton
+                    <ToggleButton
                         type="button"
-                        onClick={() => setOnlyFlagged((prev) => !prev)}
-                        aria-pressed={onlyFlagged}
+                        onClick={() => setOnlyFlagged((prev) => !prev)} pressed={onlyFlagged}
                         title="Rows whose interaction type has no class or does not match the classname"
                         className={`ml-auto inline-flex items-center gap-1.5 text-[10px] font-medium rounded-full border px-2 py-0.5 transition ${onlyFlagged ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-[#ffffff] border-slate-200 text-slate-500 hover:border-slate-300'}`}
                     >
                         <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
                         {flaggedCount} to check on this page
-                    </BaseButton>
+                    </ToggleButton>
                 )}
             </Flex>
 

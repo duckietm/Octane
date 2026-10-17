@@ -29,6 +29,7 @@ import { AvatarEditorNftView } from './AvatarEditorNftView';
 import { AvatarEditorPetView } from './AvatarEditorPetView';
 import { AvatarEditorWardrobeView } from './AvatarEditorWardrobeView';
 import { BaseButton } from '../../common/BaseButton';
+import { ToggleButton } from '../../common/ToggleButton';
 
 const MAIN_TAB_ICONS: Record<string, string> = {
     [AvatarEditorFigureCategory.GENERIC]: mainGenericSrc,
@@ -204,15 +205,14 @@ export const AvatarEditorView: FC<{}> = (props) => {
                         </OctaneCardTabsView>
                     </div>
                     {canUseWardrobe && (
-                        <BaseButton
+                        <ToggleButton
                             type="button"
-                            className={`octane-avatar-editor-wardrobe-toggle${isWardrobeOpen ? ' is-open' : ''}`}
-                            aria-pressed={isWardrobeOpen}
+                            className={`octane-avatar-editor-wardrobe-toggle${isWardrobeOpen ? ' is-open' : ''}`} pressed={isWardrobeOpen}
                             aria-label={LocalizeText('avatareditor.wardrobe.title')}
                             onClick={() => setIsWardrobeOpen((open) => !open)}
                         >
                             <img alt="" draggable={false} src={wardrobeHangerSrc} />
-                        </BaseButton>
+                        </ToggleButton>
                     )}
                     <div className="octane-avatar-editor-main">
                         {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && !isEffectsOpen && avatarModels[activeModelKey] && (
