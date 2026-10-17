@@ -1,3 +1,6 @@
+import { Collapsible } from '@base-ui/react/collapsible';
+import { Toggle } from '@base-ui/react/toggle';
+import { ToggleGroup } from '@base-ui/react/toggle-group';
 import { FC, useEffect, useState } from 'react';
 import { FaBroadcastTower, FaChevronDown, FaChevronUp, FaPlay, FaStop, FaTimes } from 'react-icons/fa';
 import { LocalizeText, localizeWithFallback } from '../../api';
@@ -31,11 +34,16 @@ export const RadioView: FC<{}> = () => {
         play(station);
     };
 
-    const toggleCollapsed = () => {
-        setCollapsed((value) => {
-            if (!value) setOpen(false);
-            return !value;
-        });
+    const onGroupChange = (pressed: string[]) => {
+        const nextId = pressed.find((id) => id !== selectedId) ?? selectedId;
+        const station = stations.find((s) => s.id === nextId);
+
+        if (station) onPick(station);
+    };
+
+    const onCollapsedChange = (expanded: boolean) => {
+        setCollapsed(!expanded);
+        if (!expanded) setOpen(false);
     };
 
     const onClose = () => {
@@ -47,7 +55,7 @@ export const RadioView: FC<{}> = () => {
 
     return (
         <DraggableWindow uniqueKey="octane-radio" windowPosition={DraggableWindowPosition.TOP_LEFT}>
-            <div className="radio-widget w-[244px] max-w-[64vw] select-none overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[rgba(22,24,30,0.94)] to-[rgba(10,11,14,0.94)] text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-sm">
+            <Collapsible.Root className="radio-widget w-[244px] max-w-[64vw] select-none overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[rgba(22,24,30,0.94)] to-[rgba(10,11,14,0.94)] text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-sm" open={!collapsed} onOpenChange={onCollapsedChange}>
                 <div className="drag-handler flex cursor-move items-center gap-2 border-b border-white/10 px-3 py-1.5">
                     <FaBroadcastTower className={`text-[11px] ${isPlaying ? 'text-sky-400' : 'text-white/45'}`} />
                     <span className="grow text-[10px] font-bold uppercase tracking-[0.14em] text-white/55">{LocalizeText('radio.title')}</span>
@@ -57,14 +65,12 @@ export const RadioView: FC<{}> = () => {
                         <span />
                         <span />
                     </div>
-                    <button
-                        type="button"
-                        onClick={toggleCollapsed}
+                    <Collapsible.Trigger
                         title={collapsed ? LocalizeText('radio.show') : LocalizeText('radio.hide')}
                         className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-white/8 text-white/60 transition-colors hover:bg-white/15 hover:text-white"
                     >
                         {collapsed ? <FaChevronDown className="text-[9px]" /> : <FaChevronUp className="text-[9px]" />}
-                    </button>
+                    </Collapsible.Trigger>
                     <button
                         type="button"
                         onClick={onClose}
@@ -75,8 +81,8 @@ export const RadioView: FC<{}> = () => {
                     </button>
                 </div>
 
-                {!collapsed && (
-                    <>
+                <Collapsible.Panel>
+                    <Collapsible.Root open={open} onOpenChange={setOpen} className="contents">
                         <div className="flex items-center gap-2.5 px-3 py-2.5">
                             <button
                                 type="button"
@@ -98,14 +104,12 @@ export const RadioView: FC<{}> = () => {
                                     {selected?.genre && <span className="truncate text-[10px] text-white/45">{selected.genre}</span>}
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setOpen((value) => !value)}
+                            <Collapsible.Trigger
                                 title={LocalizeText('radio.title')}
                                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${open ? 'bg-white/20' : 'bg-white/8 hover:bg-white/15'}`}
                             >
                                 <FaChevronDown className={`text-[10px] transition-transform ${open ? 'rotate-180' : ''}`} />
-                            </button>
+                            </Collapsible.Trigger>
                         </div>
 
                         {selectedPlaying && (
@@ -115,50 +119,54 @@ export const RadioView: FC<{}> = () => {
                             </div>
                         )}
 
-                        {open && (
-                            <div className="border-t border-white/10 bg-black/20 p-1.5">
-                                {loadError && <div className="px-2 py-2 text-[11px] text-red-400">{LocalizeText('radio.error')}</div>}
-                                {!loadError && !stations.length && <div className="px-2 py-2 text-[11px] text-white/50">{LocalizeText('radio.empty')}</div>}
-                                <div className="radio-scroll flex max-h-[156px] flex-col gap-1 overflow-y-auto pr-0.5">
-                                    {stations.map((station) => {
-                                        const isActive = station.id === selectedId;
-                                        const playingThis = currentId === station.id && isPlaying;
-                                        return (
-                                            <div
-                                                key={station.id}
-                                                onClick={() => onPick(station)}
-                                                className={`flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors ${isActive ? 'bg-sky-500/15 ring-1 ring-sky-400/40' : 'hover:bg-white/8'}`}
-                                            >
-                                                {station.logo ? (
-                                                    <LayoutImage imageUrl={station.logo} className="h-7 w-7 shrink-0 rounded bg-contain bg-center bg-no-repeat" />
-                                                ) : (
-                                                    <div
-                                                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[11px] ${playingThis ? 'bg-sky-500/80' : 'bg-white/10'}`}
-                                                    >
-                                                        {playingThis ? <FaStop /> : <FaPlay className="translate-x-px" />}
-                                                    </div>
-                                                )}
-                                                <div className="min-w-0 grow">
-                                                    <div className="truncate text-xs font-bold leading-tight">{station.name}</div>
-                                                    {station.genre && <div className="truncate text-[10px] text-white/45">{station.genre}</div>}
+                        <Collapsible.Panel className="border-t border-white/10 bg-black/20 p-1.5">
+                            {loadError && <div className="px-2 py-2 text-[11px] text-red-400">{LocalizeText('radio.error')}</div>}
+                            {!loadError && !stations.length && <div className="px-2 py-2 text-[11px] text-white/50">{LocalizeText('radio.empty')}</div>}
+                            <ToggleGroup
+                                aria-label={LocalizeText('radio.title')}
+                                className="radio-scroll flex max-h-[156px] flex-col gap-1 overflow-y-auto pr-0.5"
+                                orientation="vertical"
+                                value={selectedId ? [selectedId] : []}
+                                onValueChange={onGroupChange}
+                            >
+                                {stations.map((station) => {
+                                    const isActive = station.id === selectedId;
+                                    const playingThis = currentId === station.id && isPlaying;
+                                    return (
+                                        <Toggle
+                                            key={station.id}
+                                            nativeButton={false}
+                                            render={<div />}
+                                            value={station.id}
+                                            className={`flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors ${isActive ? 'bg-sky-500/15 ring-1 ring-sky-400/40' : 'hover:bg-white/8'}`}
+                                        >
+                                            {station.logo ? (
+                                                <LayoutImage imageUrl={station.logo} className="h-7 w-7 shrink-0 rounded bg-contain bg-center bg-no-repeat" />
+                                            ) : (
+                                                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[11px] ${playingThis ? 'bg-sky-500/80' : 'bg-white/10'}`}>
+                                                    {playingThis ? <FaStop /> : <FaPlay className="translate-x-px" />}
                                                 </div>
-                                                {playingThis && (
-                                                    <div className="radio-eq is-live shrink-0">
-                                                        <span />
-                                                        <span />
-                                                        <span />
-                                                        <span />
-                                                    </div>
-                                                )}
+                                            )}
+                                            <div className="min-w-0 grow">
+                                                <div className="truncate text-xs font-bold leading-tight">{station.name}</div>
+                                                {station.genre && <div className="truncate text-[10px] text-white/45">{station.genre}</div>}
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                                            {playingThis && (
+                                                <div className="radio-eq is-live shrink-0">
+                                                    <span />
+                                                    <span />
+                                                    <span />
+                                                    <span />
+                                                </div>
+                                            )}
+                                        </Toggle>
+                                    );
+                                })}
+                            </ToggleGroup>
+                        </Collapsible.Panel>
+                    </Collapsible.Root>
+                </Collapsible.Panel>
+            </Collapsible.Root>
         </DraggableWindow>
     );
 };
