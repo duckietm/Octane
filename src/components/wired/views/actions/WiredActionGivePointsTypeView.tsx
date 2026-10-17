@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const POINTS_TYPE_OPTIONS = [
     { value: 0, key: 'wiredfurni.params.points_type.0', label: 'Pixels / Duckets' },
@@ -54,14 +55,7 @@ export const WiredActionGivePointsTypeView: FC<{}> = (props) => {
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.setpoints', ['points'], [amount.toString()])}</Text>
-                <input
-                    className="form-control form-control-sm"
-                    type="number"
-                    min={1}
-                    max={1000}
-                    value={amount}
-                    onChange={(event) => setAmount(parseInt(event.target.value, 10) || 0)}
-                />
+                <NumberInput className="form-control form-control-sm" min={1} max={1000} value={amount} onChange={(event) => setAmount(parseInt(event.target.value, 10) || 0)} />
             </div>
         </WiredActionBaseView>
     );

@@ -13,6 +13,7 @@ import {
 import { resolveSoundboardSoundUrl } from '../../../../hooks/soundboard/soundboardUrl';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true, cooldownSeconds: 0 };
 const RESULT_KEYS = [
@@ -192,30 +193,11 @@ export const HousekeepingSoundboardTab: FC = () => {
                 </label>
                 <label className="flex flex-col gap-0.5 text-[10px] font-semibold uppercase tracking-wide">
                     {LocalizeText('housekeeping.soundboard.min_rank')}
-                    <input
-                        type="number"
-                        min={1}
-                        step={1}
-                        aria-label={LocalizeText('housekeeping.soundboard.min_rank')}
-                        disabled={draftLocked}
-                        value={draft.minRank}
-                        onChange={(event) => setDraft((current) => ({ ...current, minRank: Number(event.target.value) }))}
-                        className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case"
-                    />
+                    <NumberInput min={1} step={1} aria-label={LocalizeText('housekeeping.soundboard.min_rank')} disabled={draftLocked} value={draft.minRank} onChange={(event) => setDraft((current) => ({ ...current, minRank: Number(event.target.value) }))} className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case" />
                 </label>
                 <label className="flex flex-col gap-0.5 text-[10px] font-semibold uppercase tracking-wide">
                     {LocalizeText('housekeeping.soundboard.cooldown')}
-                    <input
-                        type="number"
-                        min={0}
-                        max={MAX_PAD_COOLDOWN_SECONDS}
-                        step={1}
-                        aria-label={LocalizeText('housekeeping.soundboard.cooldown')}
-                        disabled={draftLocked}
-                        value={draft.cooldownSeconds}
-                        onChange={(event) => setDraft((current) => ({ ...current, cooldownSeconds: Number(event.target.value) }))}
-                        className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case"
-                    />
+                    <NumberInput min={0} max={MAX_PAD_COOLDOWN_SECONDS} step={1} aria-label={LocalizeText('housekeeping.soundboard.cooldown')} disabled={draftLocked} value={draft.cooldownSeconds} onChange={(event) => setDraft((current) => ({ ...current, cooldownSeconds: Number(event.target.value) }))} className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs font-normal normal-case" />
                 </label>
                 <label className="flex items-center gap-2 self-end py-1 text-xs font-semibold">
                     <Checkbox checked={draft.enabled} disabled={draftLocked} onCheckedChange={(nextChecked) => setDraft((current) => ({ ...current, enabled: nextChecked }))} />

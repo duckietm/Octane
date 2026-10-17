@@ -1,6 +1,7 @@
 import { KeyboardEvent, ReactNode } from 'react';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { Select } from '../../common/Select';
+import { NumberInput } from '../../common/NumberInput';
 
 export interface WiredHolderPanelEntry {
     id: string;
@@ -182,16 +183,7 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                                     </button>
                                                 )}
                                                 {!!entry.hasValue && isEditing && (
-                                                    <input
-                                                        autoFocus
-                                                        className="w-[72px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                                        type="number"
-                                                        value={editingValue}
-                                                        onBlur={onEditBlur}
-                                                        onChange={(event) => onEditingValueChange(event.target.value)}
-                                                        onClick={(event) => event.stopPropagation()}
-                                                        onKeyDownCapture={onEditKeyDown}
-                                                    />
+                                                    <NumberInput autoFocus className="w-[72px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={editingValue} onBlur={onEditBlur} onChange={(event) => onEditingValueChange(event.target.value)} onClick={(event) => event.stopPropagation()} onKeyDownCapture={onEditKeyDown} />
                                                 )}
                                             </td>
                                         </tr>
@@ -219,13 +211,7 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                 ))}
                             </Select>
                             <Text bold>Value:</Text>
-                            <input
-                                className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60"
-                                disabled={!selectedGiveOption?.hasValue}
-                                type="number"
-                                value={giveValue}
-                                onChange={(event) => onGiveValueChange(event.target.value)}
-                            />
+                            <NumberInput className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60" disabled={!selectedGiveOption?.hasValue} value={giveValue} onChange={(event) => onGiveValueChange(event.target.value)} />
                             <Button disabled={!canGive} variant="secondary" onClick={onGive}>
                                 Create
                             </Button>

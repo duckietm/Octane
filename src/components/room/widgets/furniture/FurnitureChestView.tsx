@@ -41,6 +41,7 @@ import { FurniChestGridItem } from './FurniChestGridItem';
 import { FurniChestSearchBar } from './FurniChestSearchBar';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 interface ChestEntry {
     currencyType: number;
@@ -630,13 +631,7 @@ export const FurnitureChestView: FC = () => {
                     </div>
                     {depositOpen && (
                         <Flex alignItems="center" gap={1} className="mt-1">
-                            <input
-                                type="number"
-                                min={0}
-                                className="form-control form-control-sm"
-                                value={depositAmount}
-                                onChange={(e) => setDepositAmount(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                            />
+                            <NumberInput min={0} className="form-control form-control-sm" value={depositAmount} onChange={(e) => setDepositAmount(Math.max(0, parseInt(e.target.value, 10) || 0))} />
                             <ChestButton wide disabled={!canDeposit} onClick={deposit}>
                                 {LocalizeText('wiredchests.deposit')}
                             </ChestButton>

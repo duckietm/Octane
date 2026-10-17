@@ -16,6 +16,7 @@ import { useWiredTools } from '../../../../hooks';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries, createFallbackVariableEntry, flattenWiredVariablePickerEntries, WiredVariablePickerTarget } from '../WiredVariablePickerData';
 import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const WIRED_ARRAY_TARGETS: Array<{ label: string; target: WiredVariablePickerTarget; type: number }> = [
     { label: 'wiredfurni.params.variables.furni', target: 'furni', type: WIRED_ARRAY_TYPE_FURNI },
@@ -96,14 +97,7 @@ export const WiredArrayValueField: FC<WiredArrayValueFieldProps> = (props) => {
             </div>
 
             {!isVariable && (
-                <input
-                    className="form-control form-control-sm"
-                    min={constantMin}
-                    style={{ maxWidth: 160 }}
-                    type="number"
-                    value={value.value}
-                    onChange={(event) => onChange({ ...value, value: event.target.value })}
-                />
+                <NumberInput className="form-control form-control-sm" min={constantMin} style={{ maxWidth: 160 }} value={value.value} onChange={(event) => onChange({ ...value, value: event.target.value })} />
             )}
 
             {isVariable && (

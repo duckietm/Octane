@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { ChestFurniIconPreview } from '../ChestFurniIconPreview';
 import { normalizeWiredComparison, WIRED_CMP_DEFAULT, WiredComparisonOperator } from '../WiredComparisonOperator';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { NumberInput } from '../../../../common/NumberInput';
 
 // Server contract (WiredConditionChestHasItemType): intData[0] = baseItemId, intData[1] = amount,
 // intData[2] = comparison op. baseItemId stays at [0] for back-compat; old saves (2 ints) read the
@@ -38,26 +39,12 @@ export const WiredConditionChestHasItemTypeView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.base_item_id', 'Furni base item ID')}</Text>
                     <ChestFurniIconPreview baseItemId={baseItemId} />
-                    <input
-                        type="number"
-                        min={0}
-                        className="form-control form-control-sm"
-                        style={{ maxWidth: 140 }}
-                        value={baseItemId}
-                        onChange={(event) => setBaseItemId(Math.max(0, parseInt(event.target.value, 10) || 0))}
-                    />
+                    <NumberInput min={0} className="form-control form-control-sm" style={{ maxWidth: 140 }} value={baseItemId} onChange={(event) => setBaseItemId(Math.max(0, parseInt(event.target.value, 10) || 0))} />
                 </div>
                 <WiredComparisonOperator name="chestHasItemTypeComparison" value={comparison} onChange={setComparison} />
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.count', 'Amount')}</Text>
-                    <input
-                        type="number"
-                        min={1}
-                        className="form-control form-control-sm"
-                        style={{ maxWidth: 140 }}
-                        value={amount}
-                        onChange={(event) => setAmount(Math.max(1, parseInt(event.target.value, 10) || 1))}
-                    />
+                    <NumberInput min={1} className="form-control form-control-sm" style={{ maxWidth: 140 }} value={amount} onChange={(event) => setAmount(Math.max(1, parseInt(event.target.value, 10) || 1))} />
                 </div>
             </div>
         </WiredConditionBaseView>

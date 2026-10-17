@@ -7,6 +7,7 @@ import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NumberInput } from '../../../../common/NumberInput';
 
 // Official source values: 0 trigger, 11 clicked user, 100 picks, 200 selector, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -76,14 +77,7 @@ export const WiredActionMoveAsGroupView: FC<{}> = () =>
     const offsetInput = (label: string, value: number, onChange: (value: number) => void) => (
         <div className="flex items-center gap-1">
             <Text small>{ label }</Text>
-            <input
-                type="number"
-                className="form-control form-control-sm"
-                style={ { width: 64 } }
-                min={ -MAX_OFFSET }
-                max={ MAX_OFFSET }
-                value={ value }
-                onChange={ event => onChange(clampOffset(parseInt(event.target.value, 10))) } />
+            <NumberInput className="form-control form-control-sm" style={ { width: 64 } } min={ -MAX_OFFSET } max={ MAX_OFFSET } value={ value } onChange={ event => onChange(clampOffset(parseInt(event.target.value, 10))) } />
         </div>
     );
 

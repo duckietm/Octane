@@ -6,6 +6,7 @@ import { InspectionFurniSelection, InspectionUserSelection, InspectionVariable }
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
+import { NumberInput } from '../../common/NumberInput';
 
 /**
  * Structural shape we need from the renderer's variable-definition
@@ -235,13 +236,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                                 ))}
                             </Select>
                             <Text bold>Value:</Text>
-                            <input
-                                className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60"
-                                disabled={!selectedInspectionGiveDefinition?.hasValue}
-                                type="number"
-                                value={inspectionGiveValue}
-                                onChange={(event) => onInspectionGiveValueChange(event.target.value)}
-                            />
+                            <NumberInput className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60" disabled={!selectedInspectionGiveDefinition?.hasValue} value={inspectionGiveValue} onChange={(event) => onInspectionGiveValueChange(event.target.value)} />
                             <Button disabled={!canGiveInspectionVariable} variant="secondary" onClick={onGiveInspectionVariable}>
                                 Create
                             </Button>

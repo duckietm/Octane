@@ -9,6 +9,7 @@ import { HousekeepingSubTab, HousekeepingSubTabs } from '../common/HousekeepingS
 import { HousekeepingRoomCard } from './HousekeepingRoomCard';
 import { HousekeepingRoomModerationView } from './HousekeepingRoomModerationView';
 import { HousekeepingRoomSettingsForm } from './HousekeepingRoomSettingsForm';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const ROOM_ACTIVITY_LISTS: HousekeepingListChoice[] = [
     { key: 'room.chatlog', labelKey: 'housekeeping.list.room.chatlog' },
@@ -53,17 +54,9 @@ export const HousekeepingRoomsTab: FC = () => {
             <div className="flex items-center gap-1.5">
                 <div className="flex grow items-center gap-1 rounded-md border border-zinc-300 bg-white px-2 py-1 shadow-sm focus-within:border-sky-400 focus-within:ring-1 focus-within:ring-sky-300">
                     <FaSearch className="shrink-0 text-zinc-400" size={11} />
-                    <input
-                        className="grow bg-transparent text-sm outline-none placeholder:italic placeholder:text-zinc-500"
-                        min={1}
-                        placeholder={LocalizeText('housekeeping.room.search.placeholder')}
-                        type="number"
-                        value={query}
-                        onChange={(event) => setQuery(event.target.value)}
-                        onKeyDown={(event) => {
+                    <NumberInput className="grow bg-transparent text-sm outline-none placeholder:italic placeholder:text-zinc-500" min={1} placeholder={LocalizeText('housekeeping.room.search.placeholder')} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => {
                             if (event.key === 'Enter') submitLookup();
-                        }}
-                    />
+                        }} />
                 </div>
                 {currentRoomId > 0 && currentRoomId !== selectedRoom?.id && (
                     <HousekeepingButton

@@ -1,4 +1,5 @@
 import { DetailedHTMLProps, InputHTMLAttributes, PropsWithChildren, Ref } from 'react';
+import { NumberInput, NumberInputProps } from '../common/NumberInput';
 import { classNames } from './classNames';
 
 const classes = {
@@ -32,6 +33,20 @@ export const OctaneInput = ({
     className = null,
     ...rest
 }: OctaneInputProps) => {
+    const composedClassName = classNames(
+        classes.base,
+        classes.size[inputSize],
+        rounded && classes.rounded,
+        classes.color[color],
+        disabled && classes.disabled,
+        className
+    );
+
+    // A number box is a Base UI number field; the change event keeps `target.value` / `target.valueAsNumber`.
+    if (type === 'number') {
+        return <NumberInput {...(rest as unknown as NumberInputProps)} ref={ref} autoComplete={autoComplete} className={composedClassName} disabled={disabled} />;
+    }
+
     return (
         <input
             ref={ref}

@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const GIVE_EFFECT_MAX_ID = 10000;
 const DEFAULT_EFFECT_ID = 13;
@@ -46,16 +47,7 @@ export const WiredActionGiveEffectView: FC<{}> = () => {
     const numberSection = (label: string, fallback: string, value: string, max: number, onChange: (value: string) => void) => (
         <div className="flex flex-col gap-1">
             <Text bold>{localizeWithFallback(label, fallback)}</Text>
-            <input
-                aria-label={fallback}
-                className="form-control form-control-sm"
-                max={max}
-                min={0}
-                style={{ maxWidth: 110 }}
-                type="number"
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-            />
+            <NumberInput aria-label={fallback} className="form-control form-control-sm" max={max} min={0} style={{ maxWidth: 110 }} value={value} onChange={(event) => onChange(event.target.value)} />
         </div>
     );
 

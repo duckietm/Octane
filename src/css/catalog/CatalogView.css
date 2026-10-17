@@ -3470,6 +3470,7 @@
 }
 
 .octane-catalog-admin-preview-persona input[type="number"],
+.octane-catalog-admin-preview-persona .octane-number-input,
 .octane-catalog-admin-bulk-grid input:not([type="checkbox"]),
 .octane-catalog-admin-bulk-grid select,
 .octane-catalog-admin-bulk-grid .octane-select-trigger,

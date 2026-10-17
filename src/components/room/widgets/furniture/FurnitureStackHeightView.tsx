@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Slider, Text } from '../../../../common';
 import { useFurnitureStackHeightWidget } from '../../../../hooks';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const FurnitureStackHeightView: FC<{}> = (props) => {
     const { objectId = -1, height = 0, maxHeight = 40, isWalkHeightHelper = false, onClose = null, updateHeight = null } = useFurnitureStackHeightWidget();
@@ -40,15 +41,7 @@ export const FurnitureStackHeightView: FC<{}> = (props) => {
                         value={height}
                         onChange={(event) => updateHeight(event)}
                     />
-                    <input
-                        className="show-number-arrows"
-                        max={maxHeight}
-                        min={0}
-                        style={{ width: 50 }}
-                        type="number"
-                        value={tempHeight}
-                        onChange={(event) => updateTempHeight(event.target.value)}
-                    />
+                    <NumberInput className="show-number-arrows" max={maxHeight} min={0} style={{ width: 50 }} value={tempHeight} onChange={(event) => updateTempHeight(event.target.value)} />
                 </div>
                 <div className="flex flex-col gap-1">
                     <Button onClick={(event) => SendMessageComposer(new FurnitureStackHeightComposer(objectId, -100))}>

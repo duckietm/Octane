@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MAX_PICK_COUNT = 20;
 
@@ -50,15 +51,7 @@ export const WiredSelectorRemoteView: FC<{}> = () => {
 
                 <label className="flex items-center gap-2">
                     <Text>{localizeWithFallback('wiredfurni.params.remote_selection.filter', 'Use this many of the picked, at random (0 = all)')}</Text>
-                    <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        style={{ width: 64 }}
-                        min={0}
-                        max={MAX_PICK_COUNT}
-                        value={pickCount}
-                        onChange={(event) => setPickCount(Math.max(0, Math.min(MAX_PICK_COUNT, parseInt(event.target.value, 10) || 0)))}
-                    />
+                    <NumberInput className="form-control form-control-sm" style={{ width: 64 }} min={0} max={MAX_PICK_COUNT} value={pickCount} onChange={(event) => setPickCount(Math.max(0, Math.min(MAX_PICK_COUNT, parseInt(event.target.value, 10) || 0)))} />
                 </label>
 
                 <hr className="m-0 bg-dark" />

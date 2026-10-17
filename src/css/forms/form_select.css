@@ -142,3 +142,8 @@
     color: #555;
     font-weight: 700;
 }
+
+/* Base UI number field (common/NumberInput.tsx): the wrapper span must not affect layout. */
+.octane-number-field {
+    display: contents;
+}

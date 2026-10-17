@@ -5,6 +5,7 @@ import { Column, Flex, Text } from '../../common';
 import { useFortuneWheel } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { Select } from '../../common/Select';
+import { NumberInput } from '../../common/NumberInput';
 
 interface EditRow {
     id: number;
@@ -129,19 +130,8 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                                         </option>
                                     ))}
                                 </Select>
-                                <input
-                                    type="number"
-                                    value={row.num}
-                                    disabled={row.category === 'nothing'}
-                                    onChange={(event) => updateRow(row.id, { num: parseInt(event.target.value) || 0 })}
-                                    className="w-16 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34] disabled:opacity-40"
-                                />
-                                <input
-                                    type="number"
-                                    value={row.weight}
-                                    onChange={(event) => updateRow(row.id, { weight: parseInt(event.target.value) || 0 })}
-                                    className="w-12 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
-                                />
+                                <NumberInput value={row.num} disabled={row.category === 'nothing'} onChange={(event) => updateRow(row.id, { num: parseInt(event.target.value) || 0 })} className="w-16 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34] disabled:opacity-40" />
+                                <NumberInput value={row.weight} onChange={(event) => updateRow(row.id, { weight: parseInt(event.target.value) || 0 })} className="w-12 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]" />
                                 <input
                                     type="text"
                                     value={row.label}

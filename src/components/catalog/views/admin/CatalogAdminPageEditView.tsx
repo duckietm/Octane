@@ -13,6 +13,7 @@ import { createCatalogAdminPageDetailsFromSnapshot } from './CatalogAdminPageSta
 import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MODE_OPTIONS = [
     { value: 'NORMAL', label: 'Normal' },
@@ -428,37 +429,19 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.min.rank', 'Min rank')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={1}
-                                        type="number"
-                                        value={minRank}
-                                        onChange={(e) => setMinRank(parseInt(e.target.value) || 1)}
-                                    />
+                                    <NumberInput className={inputClass} min={1} value={minRank} onChange={(e) => setMinRank(parseInt(e.target.value) || 1)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.icon.image', 'Icon image')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={iconImage}
-                                        onChange={(e) => setIconImage(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={iconImage} onChange={(e) => setIconImage(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.icon.color', 'Icon color')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={iconColor}
-                                        onChange={(e) => setIconColor(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={iconColor} onChange={(e) => setIconColor(parseInt(e.target.value) || 0)} />
                                 </div>
                             </div>
                         </section>
@@ -488,19 +471,13 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
-                                    <input className={inputClass} type="number" value={orderNum} onChange={(e) => setOrderNum(parseInt(e.target.value) || 0)} />
+                                    <NumberInput className={inputClass} value={orderNum} onChange={(e) => setOrderNum(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.parent.id', 'Parent ID')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        disabled={isRoot}
-                                        type="number"
-                                        value={parentId}
-                                        onChange={(e) => setParentId(parseInt(e.target.value) || -1)}
-                                    />
+                                    <NumberInput className={inputClass} disabled={isRoot} value={parentId} onChange={(e) => setParentId(parseInt(e.target.value) || -1)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field is-span-2">
                                     <label className="octane-catalog-admin-label is-field">
@@ -529,13 +506,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.room.id', 'Room ID')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={roomId}
-                                        onChange={(e) => setRoomId(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={roomId} onChange={(e) => setRoomId(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">

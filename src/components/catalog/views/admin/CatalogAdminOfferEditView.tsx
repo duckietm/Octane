@@ -11,6 +11,7 @@ import { CatalogAdminOfferPriceView } from './CatalogAdminOfferPriceView';
 import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const isCatalogAdminNewOffer = (offer: IPurchasableOffer | null): boolean =>
     offer?.offerId === -1;
@@ -368,33 +369,15 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.quantity')}</label>
-                                    <input
-                                        ref={limitedStackInputRef}
-                                        aria-invalid={!!smartSave.fieldErrors.limitedStack}
-                                        className={inputClass}
-                                        min={1}
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(parseInt(e.target.value) || 1)}
-                                    />
+                                    <NumberInput ref={limitedStackInputRef} aria-invalid={!!smartSave.fieldErrors.limitedStack} className={inputClass} min={1} value={amount} onChange={(e) => setAmount(parseInt(e.target.value) || 1)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
-                                    <input
-                                        className={inputClass}
-                                        type="number"
-                                        value={orderNumber}
-                                        onChange={(e) => setOrderNumber(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} value={orderNumber} onChange={(e) => setOrderNumber(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.offer.id', 'Offer ID')}</label>
-                                    <input
-                                        className={inputClass}
-                                        type="number"
-                                        value={offerId}
-                                        onChange={(e) => setOfferIdGroup(parseInt(e.target.value) || -1)}
-                                    />
+                                    <NumberInput className={inputClass} value={offerId} onChange={(e) => setOfferIdGroup(parseInt(e.target.value) || -1)} />
                                 </div>
                             </div>
                         </section>
@@ -404,23 +387,11 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                             <div className="octane-catalog-admin-form-grid is-3col">
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.credits')}</label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={costCredits}
-                                        onChange={(e) => setCostCredits(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={costCredits} onChange={(e) => setCostCredits(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points')}</label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={costPoints}
-                                        onChange={(e) => setCostPoints(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={costPoints} onChange={(e) => setCostPoints(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points.type')}</label>
@@ -449,13 +420,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.offer.limited.stack', 'Limited stack')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={limitedStack}
-                                        onChange={(e) => setLimitedStack(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={limitedStack} onChange={(e) => setLimitedStack(parseInt(e.target.value) || 0)} />
                                     {smartSave.fieldErrors.limitedStack && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.limitedStack}</span>}
                                 </div>
                                 {!isNewOffer && (
@@ -463,7 +428,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                         <label className="octane-catalog-admin-label is-field">
                                             {localizeWithFallback('catalog.admin.offer.limited.sold', 'Already sold')}
                                         </label>
-                                        <input className={inputClass} readOnly type="number" value={limitedSells} />
+                                        <NumberInput className={inputClass} readOnly value={limitedSells} />
                                     </div>
                                 )}
                                 <div className="octane-catalog-admin-form-field">
@@ -480,13 +445,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.offer.song.id', 'Song ID')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={songId}
-                                        onChange={(e) => setSongId(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={songId} onChange={(e) => setSongId(parseInt(e.target.value) || 0)} />
                                 </div>
                             </div>
                             <label className="octane-catalog-admin-form-toggle">

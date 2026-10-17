@@ -70,6 +70,7 @@ import statStateIcon from '../../../../../assets/images/infostand/stat-state.png
 import statXIcon from '../../../../../assets/images/infostand/stat-x.png';
 import statYIcon from '../../../../../assets/images/infostand/stat-y.png';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
+import { NumberInput } from '../../../../../common/NumberInput';
 
 interface InfoStandWidgetFurniViewProps {
     avatarInfo: AvatarInfoFurni;
@@ -1097,17 +1098,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                                     <Text small variant="white">
                                                         {LocalizeText('stack.magic.tile.height.label')}
                                                     </Text>
-                                                    <input
-                                                        spellCheck={false}
-                                                        type="number"
-                                                        className="w-full text-xs bg-[#1a1a2a] text-white border border-[#ffffff44] rounded px-1 py-0.5"
-                                                        value={furniLocationZ !== null ? furniLocationZ.toString() : ''}
-                                                        onChange={handleHeightChange}
-                                                        onBlur={handleHeightBlur}
-                                                        min={0}
-                                                        max={40}
-                                                        step={0.1}
-                                                    />
+                                                    <NumberInput spellCheck={false} className="w-full text-xs bg-[#1a1a2a] text-white border border-[#ffffff44] rounded px-1 py-0.5" value={furniLocationZ !== null ? furniLocationZ.toString() : ''} onChange={handleHeightChange} onBlur={handleHeightBlur} min={0} max={40} step={0.1} />
                                                     <div className="flex justify-center gap-1">
                                                         <div className="flex flex-col items-center gap-[2px]">
                                                             <div

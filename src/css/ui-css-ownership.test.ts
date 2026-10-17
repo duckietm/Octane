@@ -151,8 +151,8 @@ describe('UI CSS ownership', () =>
         // Checkboxes/radios are excluded from the text-input skin: its
         // `background` shorthand would wipe the @tailwindcss/forms check glyph.
         expect(roomSettingsCss).toContain(':where(input:not([type="checkbox"]):not([type="radio"]), select, .octane-select-trigger, textarea)');
-        expect(indexCss).not.toContain('.octane-wired :where(select, input[type=\'text\'], input[type=\'number\'], textarea)');
-        expect(wiredCss).toContain('.octane-wired :where(select, .octane-select-trigger, input[type=\'text\'], input[type=\'number\'], textarea)');
+        expect(indexCss).not.toContain('.octane-wired :where(select, input[type=\'text\'], input[type=\'number\'], .octane-number-input, textarea)');
+        expect(wiredCss).toContain('.octane-wired :where(select, .octane-select-trigger, input[type=\'text\'], input[type=\'number\'], .octane-number-input, textarea)');
         expect(wiredCss).toContain('.octane-wired__variable-picker-portal');
         // Text fields only: a checkbox is not a text field, and the mod tool used to paint it as one.
         expect(indexCss).toContain(".octane-mod-tools :where(input:not([type='checkbox']):not([type='radio']), select, .octane-select-trigger, textarea)");

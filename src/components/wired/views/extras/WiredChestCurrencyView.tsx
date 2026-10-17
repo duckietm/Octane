@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 // Currency type convention (matches server InteractionWiredChestCurrency): -1 = credits, >=0 = points type.
 const CURRENCY_OPTIONS: { value: number; label: string }[] = [
@@ -42,13 +43,7 @@ export const WiredChestCurrencyView: FC<{}> = () => {
                     ))}
                 </div>
                 <Text bold>Amount stored</Text>
-                <input
-                    type="number"
-                    min={0}
-                    className="form-control form-control-sm"
-                    value={amount}
-                    onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))}
-                />
+                <NumberInput min={0} className="form-control form-control-sm" value={amount} onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))} />
             </div>
         </WiredExtraBaseView>
     );

@@ -12,6 +12,7 @@ import { customVariablePickerEntries, normalizeWiredValueTarget, variableTokenFr
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_PICKED = 100;
@@ -153,7 +154,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
     const offsetInput = (label: string, value: number, bound: number, onChange: (value: number) => void) => (
         <div className="flex items-center gap-1">
             <Text small>{ label }</Text>
-            <input type="number" className="form-control form-control-sm" style={ { width: 72 } } min={ -bound } max={ bound } value={ value } onChange={ event => onChange(clamp(parseInt(event.target.value, 10), bound)) } />
+            <NumberInput className="form-control form-control-sm" style={ { width: 72 } } min={ -bound } max={ bound } value={ value } onChange={ event => onChange(clamp(parseInt(event.target.value, 10), bound)) } />
         </div>
     );
 

@@ -3,6 +3,7 @@ import { RgbaColor, RgbaColorPicker } from 'react-colorful';
 import { FaDownload, FaTrash, FaUndo, FaUpload } from 'react-icons/fa';
 import { LocalizeText, PRESET_COLORS, THEME_PRESETS, useUiSettings } from '../../api';
 import { Flex, Text } from '../../common';
+import { NumberInput } from '../../common/NumberInput';
 
 const hexToRgba = (hex: string, a = 1): RgbaColor => {
     const num = parseInt(hex.replace('#', ''), 16);
@@ -143,53 +144,25 @@ export const InterfaceColorTabView: FC<{}> = () => {
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={color.r}
-                        onChange={(e) => onRgbInput('r', parseInt(e.target.value))}
-                        min={0}
-                        max={255}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={color.r} onChange={(e) => onRgbInput('r', parseInt(e.target.value))} min={0} max={255} />
                     <Text small className="text-black">
                         R
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={color.g}
-                        onChange={(e) => onRgbInput('g', parseInt(e.target.value))}
-                        min={0}
-                        max={255}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={color.g} onChange={(e) => onRgbInput('g', parseInt(e.target.value))} min={0} max={255} />
                     <Text small className="text-black">
                         G
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={color.b}
-                        onChange={(e) => onRgbInput('b', parseInt(e.target.value))}
-                        min={0}
-                        max={255}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={color.b} onChange={(e) => onRgbInput('b', parseInt(e.target.value))} min={0} max={255} />
                     <Text small className="text-black">
                         B
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={alphaPercent}
-                        onChange={(e) => onAlphaInput(parseInt(e.target.value))}
-                        min={0}
-                        max={100}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={alphaPercent} onChange={(e) => onAlphaInput(parseInt(e.target.value))} min={0} max={100} />
                     <Text small className="text-black">
                         A
                     </Text>

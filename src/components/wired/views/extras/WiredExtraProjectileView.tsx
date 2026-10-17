@@ -57,6 +57,7 @@ import { WiredProjectileDirectionGrid } from './WiredProjectileDirectionGrid';
 import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -145,13 +146,7 @@ const Checkbox: FC<{ checked: boolean; disabled?: boolean; label: string; onChan
 const NumberField: FC<{ disabled?: boolean; label: string; value: number; onChange: (value: number) => void }> = ({ disabled = false, label, value, onChange }) => (
     <label className={`flex items-center justify-between gap-2 ${disabled ? 'opacity-50' : ''}`}>
         <Text small>{label}</Text>
-        <input
-            className="form-control form-control-sm octane-wired__projectile-number"
-            disabled={disabled}
-            type="number"
-            value={value}
-            onChange={(event) => onChange(parseInt(event.target.value, 10))}
-        />
+        <NumberInput className="form-control form-control-sm octane-wired__projectile-number" disabled={disabled} value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))} />
     </label>
 );
 
@@ -215,14 +210,7 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
             <label className="flex items-center gap-1 cursor-pointer">
                 <Radio checked={!fromVariable} name={name} onCheckedChange={() => props.onFromVariable(false)} />
                 <Text small>{label}</Text>
-                <input
-                    aria-label={label}
-                    className="form-control form-control-sm octane-wired__projectile-number ms-auto"
-                    disabled={fromVariable}
-                    type="number"
-                    value={value}
-                    onChange={(event) => props.onValue(parseInt(event.target.value, 10))}
-                />
+                <NumberInput aria-label={label} className="form-control form-control-sm octane-wired__projectile-number ms-auto" disabled={fromVariable} value={value} onChange={(event) => props.onValue(parseInt(event.target.value, 10))} />
             </label>
             <label className="flex items-center gap-1 cursor-pointer">
                 <Radio checked={fromVariable} name={name} onCheckedChange={() => props.onFromVariable(true)} />

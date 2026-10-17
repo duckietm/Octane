@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const WiredTriggerUserGetsHandItemView: FC<{}> = () =>
 {
@@ -33,12 +34,7 @@ export const WiredTriggerUserGetsHandItemView: FC<{}> = () =>
                     <Text>Only a specific hand item id</Text>
                 </div>
                 { filterEnabled &&
-                    <input
-                        className="form-control form-control-sm"
-                        type="number"
-                        min={ 0 }
-                        value={ handItemId }
-                        onChange={ event => setHandItemId(parseInt(event.target.value, 10) || 0) } /> }
+                    <NumberInput className="form-control form-control-sm" min={ 0 } value={ handItemId } onChange={ event => setHandItemId(parseInt(event.target.value, 10) || 0) } /> }
             </div>
         </WiredTriggerBaseView>
     );

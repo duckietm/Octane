@@ -3,6 +3,7 @@ import { FC, PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, 
 import { LocalizeText } from '../../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 import { Slider } from '../../../../../common/Slider';
+import { NumberInput } from '../../../../../common/NumberInput';
 
 const PAD_W = 230;
 const PAD_H = 150;
@@ -135,15 +136,15 @@ export const ImagePositionEditorView: FC<Props> = (props) => {
                     <div className="grid grid-cols-3 gap-2">
                         <label className="flex flex-col gap-0.5 text-[11px] text-black/70">
                             {LocalizeText('image.position.editor.offsetx')}
-                            <input type="number" value={x} onChange={(e) => setX(e.target.valueAsNumber || 0)} className="form-control form-control-sm" />
+                            <NumberInput value={x} onChange={(e) => setX(e.target.valueAsNumber || 0)} className="form-control form-control-sm" />
                         </label>
                         <label className="flex flex-col gap-0.5 text-[11px] text-black/70">
                             {LocalizeText('image.position.editor.offsety')}
-                            <input type="number" value={y} onChange={(e) => setY(e.target.valueAsNumber || 0)} className="form-control form-control-sm" />
+                            <NumberInput value={y} onChange={(e) => setY(e.target.valueAsNumber || 0)} className="form-control form-control-sm" />
                         </label>
                         <label className="flex flex-col gap-0.5 text-[11px] text-black/70">
                             {LocalizeText('image.position.editor.offsetz')}
-                            <input type="number" value={z} onChange={(e) => setZ(e.target.valueAsNumber || 0)} className="form-control form-control-sm" />
+                            <NumberInput value={z} onChange={(e) => setZ(e.target.valueAsNumber || 0)} className="form-control form-control-sm" />
                         </label>
                     </div>
 

@@ -38,6 +38,7 @@ import {
 import { useMessageEvent, useNotification } from '../../../hooks';
 import { classNames } from '../../../layout';
 import { Select } from '../../../common/Select';
+import { NumberInput } from '../../../common/NumberInput';
 
 export const GroupMembersView: FC<{}> = (props) => {
     const [groupId, setGroupId] = useState<number>(-1);
@@ -366,17 +367,10 @@ export const GroupMembersView: FC<{}> = (props) => {
                         <Text small className="octane-group-members-footer__label">
                             {localizeWithFallback('group.members.members', `Members (${membersData.totalMembersCount})`, ['count'], [membersData.totalMembersCount.toString()])}
                         </Text>
-                        <input
-                            className="octane-group-members-footer__input"
-                            type="number"
-                            min={1}
-                            max={Math.max(1, totalPages)}
-                            value={membersData.pageIndex + 1}
-                            onChange={(event) => {
+                        <NumberInput className="octane-group-members-footer__input" min={1} max={Math.max(1, totalPages)} value={membersData.pageIndex + 1} onChange={(event) => {
                                 const value = Math.min(Math.max(parseInt(event.target.value) || 1, 1), Math.max(1, totalPages));
                                 setPageId(value - 1);
-                            }}
-                        />
+                            }} />
                         <Text small className="octane-group-members-footer__total">
                             / {Math.max(1, totalPages)}
                         </Text>

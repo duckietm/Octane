@@ -21,6 +21,7 @@ import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSourcesSelector';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NumberInput } from '../../../../common/NumberInput';
 
 // Official source values (InputSourcesConf): 0 trigger, 11 clicked user, 100 picks, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -274,23 +275,9 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () =>
 
                 <div className="flex items-center justify-end gap-2">
                     <Text small>x:</Text>
-                    <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        style={ { width: 56 } }
-                        min={ -NEIGHBORHOOD_MAX_ROOT }
-                        max={ NEIGHBORHOOD_MAX_ROOT }
-                        value={ root.x }
-                        onChange={ event => setRoot({ x: clampRoot(parseInt(event.target.value)), y: root.y }) } />
+                    <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.x } onChange={ event => setRoot({ x: clampRoot(parseInt(event.target.value)), y: root.y }) } />
                     <Text small>y:</Text>
-                    <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        style={ { width: 56 } }
-                        min={ -NEIGHBORHOOD_MAX_ROOT }
-                        max={ NEIGHBORHOOD_MAX_ROOT }
-                        value={ root.y }
-                        onChange={ event => setRoot({ x: root.x, y: clampRoot(parseInt(event.target.value)) }) } />
+                    <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.y } onChange={ event => setRoot({ x: root.x, y: clampRoot(parseInt(event.target.value)) }) } />
                 </div>
 
                 <hr className="m-0 bg-dark" />

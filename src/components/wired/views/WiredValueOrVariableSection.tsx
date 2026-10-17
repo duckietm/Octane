@@ -21,6 +21,7 @@ import {
     WiredVariablePickerUsage
 } from './WiredVariablePickerData';
 import { Radio } from '../../../common/Radio';
+import { NumberInput } from '../../../common/NumberInput';
 
 /** Where an official value variable is read, with the official variable target ids. */
 export const WIRED_VALUE_TARGETS: Array<{ key: WiredVariablePickerTarget; value: number; icon: string }> = [
@@ -135,7 +136,7 @@ export const WiredValueOrVariableSection: FC<WiredValueOrVariableSectionProps> =
         <div className="flex flex-col gap-1">
             { radio(false, localizeWithFallback('wiredfurni.params.variables.reference_type.constant', 'Value')) }
             { !isVariable &&
-                <input type="number" className="form-control form-control-sm" style={ { width: 110 } } min={ min } value={ value } onChange={ event => props.onValueChange(event.target.value) } /> }
+                <NumberInput className="form-control form-control-sm" style={ { width: 110 } } min={ min } value={ value } onChange={ event => props.onValueChange(event.target.value) } /> }
             { radio(true, localizeWithFallback('wiredfurni.params.variables.reference_type.variable', 'Value of a variable')) }
             { isVariable &&
                 <>

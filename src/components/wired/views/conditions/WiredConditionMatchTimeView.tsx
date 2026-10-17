@@ -1,9 +1,10 @@
-import { ChangeEvent, FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MODE_SKIP = 0;
 const MODE_EXACT = 1;
@@ -32,7 +33,7 @@ interface TimeFilterSectionProps {
     onToChange: (value: number) => void;
 }
 
-const parseInputValue = (event: ChangeEvent<HTMLInputElement>, min: number, max: number) => {
+const parseInputValue = (event: { target: { value: string } }, min: number, max: number) => {
     return clampValue(parseInt(event.target.value || min.toString(), 10), min, max);
 };
 
@@ -40,15 +41,7 @@ const InlineNumberInput: FC<{ value: number; min: number; max: number; onChange:
     const { value = 0, min = 0, max = 0, onChange = null } = props;
 
     return (
-        <input
-            className="form-control form-control-sm text-center"
-            max={max}
-            min={min}
-            style={{ width: 56 }}
-            type="number"
-            value={value}
-            onChange={(event) => onChange(parseInputValue(event, min, max))}
-        />
+        <NumberInput className="form-control form-control-sm text-center" max={max} min={min} style={{ width: 56 }} value={value} onChange={(event) => onChange(parseInputValue(event, min, max))} />
     );
 };
 

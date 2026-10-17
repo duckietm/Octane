@@ -6,6 +6,7 @@ import { useMessageEvent } from '../../hooks';
 import { useWiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { NO_PAGE } from './WiredPaging.helpers';
+import { NumberInput } from '../../common/NumberInput';
 
 export const WIRED_ARRAY_INSPECTOR_PAGE_SIZE = 25;
 const REQUEST_PAGE_RATELIMIT = 300;
@@ -175,19 +176,13 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
 
                 <label className="flex items-center gap-2 text-[12px]">
                     <Text>{localizeWithFallback('wiredmenu.arrays.owner', 'Owner id')}:</Text>
-                    <input
-                        className="w-[110px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                        type="number"
-                        value={ownerInput}
-                        onChange={(event) => setOwnerInput(event.target.value)}
-                        onKeyDown={(event) => {
+                    <NumberInput className="w-[110px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={ownerInput} onChange={(event) => setOwnerInput(event.target.value)} onKeyDown={(event) => {
                             if (event.key !== 'Enter') return;
 
                             const parsed = parseInt(ownerInput.trim(), 10);
 
                             setOwnerId(Number.isFinite(parsed) ? parsed : 0);
-                        }}
-                    />
+                        }} />
                     <Text small className="text-black/60">
                         {localizeWithFallback('wiredmenu.arrays.owner.hint', 'Room arrays ignore this. Press Enter to load.')}
                     </Text>

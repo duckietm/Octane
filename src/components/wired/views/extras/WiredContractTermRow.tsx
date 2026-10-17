@@ -4,6 +4,7 @@ import { ChestFurniIconPreview } from '../ChestFurniIconPreview';
 import { CONTRACT_KIND_CURRENCY, CONTRACT_KIND_FURNI, ContractTermRow, CURRENCY_OPTIONS } from './contractTermWire';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 interface WiredContractTermRowProps {
     row: ContractTermRow;
@@ -45,22 +46,9 @@ export const WiredContractTermRow: FC<WiredContractTermRowProps> = ({ row, showD
         ) : (
             <div className="flex flex-col gap-1">
                 <ChestFurniIconPreview baseItemId={row.baseItemId} />
-                <input
-                    type="number"
-                    min={0}
-                    className="form-control form-control-sm"
-                    placeholder="Base item ID"
-                    value={row.baseItemId}
-                    onChange={(event) => onChange({ baseItemId: Math.max(0, parseInt(event.target.value, 10) || 0) })}
-                />
+                <NumberInput min={0} className="form-control form-control-sm" placeholder="Base item ID" value={row.baseItemId} onChange={(event) => onChange({ baseItemId: Math.max(0, parseInt(event.target.value, 10) || 0) })} />
             </div>
         )}
-        <input
-            type="number"
-            min={0}
-            className="form-control form-control-sm"
-            value={row.amount}
-            onChange={(event) => onChange({ amount: Math.max(0, parseInt(event.target.value, 10) || 0) })}
-        />
+        <NumberInput min={0} className="form-control form-control-sm" value={row.amount} onChange={(event) => onChange({ amount: Math.max(0, parseInt(event.target.value, 10) || 0) })} />
     </div>
 );

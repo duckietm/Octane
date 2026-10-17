@@ -16,6 +16,7 @@ import {
     suggestFromSiblings,
     suggestInteractionType
 } from '../furniEditorSuggestions';
+import { NumberInput } from '../../../common/NumberInput';
 
 interface FurniEditorEditViewProps {
     item: FurniDetail;
@@ -1407,14 +1408,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                     <label className={labelClass} htmlFor="furni-editor-width">
                                         Width{revert('width')}
                                     </label>
-                                    <input
-                                        id="furni-editor-width"
-                                        aria-label={FIELD_LABELS.width}
-                                        type="number"
-                                        className={inputClass('width')}
-                                        value={form.width}
-                                        onChange={(e) => setField('width', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-width" aria-label={FIELD_LABELS.width} className={inputClass('width')} value={form.width} onChange={(e) => setField('width', Number(e.target.value))} />
                                     {validation.width && <span className="text-[9px] text-red-500">{validation.width}</span>}
                                     {chipsFor('width')}
                                 </div>
@@ -1422,14 +1416,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                     <label className={labelClass} htmlFor="furni-editor-length">
                                         Length{revert('length')}
                                     </label>
-                                    <input
-                                        id="furni-editor-length"
-                                        aria-label={FIELD_LABELS.length}
-                                        type="number"
-                                        className={inputClass('length')}
-                                        value={form.length}
-                                        onChange={(e) => setField('length', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-length" aria-label={FIELD_LABELS.length} className={inputClass('length')} value={form.length} onChange={(e) => setField('length', Number(e.target.value))} />
                                     {validation.length && <span className="text-[9px] text-red-500">{validation.length}</span>}
                                     {chipsFor('length')}
                                 </div>
@@ -1439,15 +1426,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="stackHeight" />
                                         {revert('stackHeight')}
                                     </label>
-                                    <input
-                                        id="furni-editor-stackHeight"
-                                        aria-label={FIELD_LABELS.stackHeight}
-                                        type="number"
-                                        step="0.01"
-                                        className={inputClass('stackHeight')}
-                                        value={form.stackHeight}
-                                        onChange={(e) => setField('stackHeight', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-stackHeight" aria-label={FIELD_LABELS.stackHeight} step="0.01" className={inputClass('stackHeight')} value={form.stackHeight} onChange={(e) => setField('stackHeight', Number(e.target.value))} />
                                     {validation.stackHeight && <span className="text-[9px] text-red-500">{validation.stackHeight}</span>}
                                     {chipsFor('stackHeight')}
                                 </div>
@@ -1525,14 +1504,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="interactionModesCount" />
                                         {revert('interactionModesCount')}
                                     </label>
-                                    <input
-                                        id="furni-editor-interactionModesCount"
-                                        aria-label={FIELD_LABELS.interactionModesCount}
-                                        type="number"
-                                        className={inputClass('interactionModesCount')}
-                                        value={form.interactionModesCount}
-                                        onChange={(e) => setField('interactionModesCount', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-interactionModesCount" aria-label={FIELD_LABELS.interactionModesCount} className={inputClass('interactionModesCount')} value={form.interactionModesCount} onChange={(e) => setField('interactionModesCount', Number(e.target.value))} />
                                     {fieldError('interactionModesCount')}
                                     {chipsFor('interactionModesCount')}
                                 </div>
@@ -1596,15 +1568,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="effectIdMale" />
                                         {revert('effectIdMale')}
                                     </label>
-                                    <input
-                                        id="furni-editor-effectIdMale"
-                                        aria-label={FIELD_LABELS.effectIdMale}
-                                        type="number"
-                                        min={0}
-                                        className={inputClass('effectIdMale')}
-                                        value={form.effectIdMale}
-                                        onChange={(e) => setField('effectIdMale', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-effectIdMale" aria-label={FIELD_LABELS.effectIdMale} min={0} className={inputClass('effectIdMale')} value={form.effectIdMale} onChange={(e) => setField('effectIdMale', Number(e.target.value))} />
                                     {fieldError('effectIdMale')}
                                 </div>
                                 <div>
@@ -1613,15 +1577,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="effectIdFemale" />
                                         {revert('effectIdFemale')}
                                     </label>
-                                    <input
-                                        id="furni-editor-effectIdFemale"
-                                        aria-label={FIELD_LABELS.effectIdFemale}
-                                        type="number"
-                                        min={0}
-                                        className={inputClass('effectIdFemale')}
-                                        value={form.effectIdFemale}
-                                        onChange={(e) => setField('effectIdFemale', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-effectIdFemale" aria-label={FIELD_LABELS.effectIdFemale} min={0} className={inputClass('effectIdFemale')} value={form.effectIdFemale} onChange={(e) => setField('effectIdFemale', Number(e.target.value))} />
                                     {fieldError('effectIdFemale')}
                                 </div>
                                 <div>

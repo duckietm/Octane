@@ -6,6 +6,7 @@ import { normalizeWiredComparison, WIRED_CMP_GREATER_EQUAL, WiredComparisonOpera
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MIN_RANK = 1;
 const MAX_RANK = 1000;
@@ -45,15 +46,7 @@ export const WiredConditionUserRankView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.rank', 'Rank')}</Text>
-                    <input
-                        type="number"
-                        min={MIN_RANK}
-                        max={MAX_RANK}
-                        className="form-control form-control-sm"
-                        style={{ maxWidth: 140 }}
-                        value={rank}
-                        onChange={(event) => setRank(clampRank(parseInt(event.target.value, 10)))}
-                    />
+                    <NumberInput min={MIN_RANK} max={MAX_RANK} className="form-control form-control-sm" style={{ maxWidth: 140 }} value={rank} onChange={(event) => setRank(clampRank(parseInt(event.target.value, 10)))} />
                 </div>
                 <WiredComparisonOperator name="wiredUserRankComparison" value={comparison} onChange={setComparison} />
                 <label className="flex items-center gap-1 cursor-pointer">

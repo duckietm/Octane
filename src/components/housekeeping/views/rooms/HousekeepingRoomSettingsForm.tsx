@@ -15,6 +15,7 @@ import {
 import { useNavigatorData } from '../../../../hooks';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingField, HousekeepingSection } from '../common/HousekeepingParts';
 import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 interface HousekeepingRoomSettingsFormProps {
     room: IHousekeepingRoom;
@@ -101,14 +102,7 @@ export const HousekeepingRoomSettingsForm: FC<HousekeepingRoomSettingsFormProps>
                     </Select>
                 </HousekeepingField>
                 <HousekeepingField hint={`${HK_ROOM_MIN_USERS}-${HK_ROOM_MAX_USERS}`} label={LocalizeText('navigator.maxvisitors')}>
-                    <input
-                        className={`${HOUSEKEEPING_INPUT_CLASS} tabular-nums`}
-                        max={HK_ROOM_MAX_USERS}
-                        min={HK_ROOM_MIN_USERS}
-                        type="number"
-                        value={draft.maxUsers || ''}
-                        onChange={(event) => update('maxUsers', parseInt(event.target.value) || 0)}
-                    />
+                    <NumberInput className={`${HOUSEKEEPING_INPUT_CLASS} tabular-nums`} max={HK_ROOM_MAX_USERS} min={HK_ROOM_MIN_USERS} value={draft.maxUsers || ''} onChange={(event) => update('maxUsers', parseInt(event.target.value) || 0)} />
                 </HousekeepingField>
                 <HousekeepingField label={LocalizeText('navigator.tradesettings')}>
                     <Select

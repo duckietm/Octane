@@ -15,6 +15,7 @@ import {
 import { AutoGrid, Button, Column, Flex, Grid, LayoutGridItem, Text } from '../../../../common';
 import { useInventoryTrade, useNotification } from '../../../../hooks';
 import { InventoryFurnitureSearchView } from './InventoryFurnitureSearchView';
+import { NumberInput } from '../../../../common/NumberInput';
 
 interface InventoryTradeViewProps {
     cancelTrade: () => void;
@@ -214,14 +215,7 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
                         <Column alignItems="end" gap={1}>
                             <Grid overflow="hidden">
                                 <Column overflow="hidden" size={6}>
-                                    <input
-                                        className="w-[49px] min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem] rounded-[.2rem] form-control-sm"
-                                        disabled={!groupItem}
-                                        placeholder={LocalizeText('catalog.bundlewidget.spinner.select.amount')}
-                                        type="number"
-                                        value={quantity}
-                                        onChange={(event) => setQuantity(event.target.valueAsNumber)}
-                                    />
+                                    <NumberInput className="w-[49px] min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem] rounded-[.2rem] form-control-sm" disabled={!groupItem} placeholder={LocalizeText('catalog.bundlewidget.spinner.select.amount')} value={quantity} onChange={(event) => setQuantity(event.target.valueAsNumber)} />
                                 </Column>
                                 <Column overflow="hidden" size={6}>
                                     <Button disabled={!groupItem} variant="secondary" onClick={(event) => changeCount(groupItem.getUnlockedCount())}>

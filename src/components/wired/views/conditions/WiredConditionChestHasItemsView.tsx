@@ -7,6 +7,7 @@ import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries, createFallbackVariableEntry, flattenWiredVariablePickerEntries, normalizeVariableTokenFromWire } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 // Server contract (WiredConditionChestHasItems):
 //   official: intData[0] = amount, [1] = amount mode, [2] = variable target (user 1, global -10), [3] = comparison
@@ -79,7 +80,7 @@ export const WiredConditionChestHasItemsView: FC<{}> = () => {
                 {amountMode === AMOUNT_CONSTANT ? (
                     <div className="flex flex-col gap-1">
                         <Text bold>{localizeWithFallback('wiredfurni.params.count', 'Amount')}</Text>
-                        <input className="form-control form-control-sm" min={0} style={{ maxWidth: 140 }} type="number" value={amount} onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))} />
+                        <NumberInput className="form-control form-control-sm" min={0} style={{ maxWidth: 140 }} value={amount} onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))} />
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">
