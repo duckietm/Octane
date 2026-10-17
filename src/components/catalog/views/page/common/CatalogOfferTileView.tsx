@@ -113,6 +113,7 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
             onKeyDown={onKeyDown}
         >
             <LayoutGridItem
+                component="div"
                 className={`group/tile relative ${itemActive ? 'is-active' : ''} ${priceTemplateClassName}`.trim()}
                 gap={1}
                 itemCount={offer.pricingModel === Offer.PRICING_MODEL_MULTI ? product.productCount : 1}

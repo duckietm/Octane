@@ -11,6 +11,7 @@ import {
 } from '../../../../api';
 import { Button, Column, Flex, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { usePurse } from '../../../../hooks';
+import { NumberInput } from '../../../../common/NumberInput';
 
 let isBuyingOffer = false;
 
@@ -59,13 +60,7 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
                             {offer.purchaseLimit > 1 && (
                                 <div className="flex gap-1">
                                     <Text variant="muted">{LocalizeText('catalog.bundlewidget.quantity')}</Text>
-                                    <input
-                                        max={offer.purchaseLimit}
-                                        min={1}
-                                        type="number"
-                                        value={amount}
-                                        onChange={(evt) => setAmount(parseInt(evt.target.value))}
-                                    />
+                                    <NumberInput max={offer.purchaseLimit} min={1} value={amount} onChange={(evt) => setAmount(parseInt(evt.target.value))} />
                                 </div>
                             )}
                             <Button disabled={purchaseBlock !== null} variant="primary" onClick={() => buyOffer()}>

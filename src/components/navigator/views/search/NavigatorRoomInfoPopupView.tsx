@@ -4,6 +4,8 @@ import { FriendlyTime, GetConfigurationValue, GetGroupInformation, GetUserProfil
 import { LayoutBadgeImageView, LayoutRoomThumbnailView, UserProfileIconView } from '../../../../common';
 import { useHelp, useNavigatorData, useNavigatorFavourite, useNavigatorRoomInfoPopupStore, useNavigatorUiStore } from '../../../../hooks';
 import { classNames } from '../../../../layout';
+import { InlineDialog } from '../../../../common/InlineDialog';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const getTradeModeText = (tradeMode: number) => {
     switch (tradeMode) {
@@ -44,9 +46,9 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
     const bubbleStyle = { left: x, top: y, width: 374, transform: 'translateY(-50%)' };
 
     return (
-        <div
-            role="dialog"
+        <InlineDialog
             aria-label={LocalizeText('navigator.room.info.popup.title')}
+            onClose={closePopup}
             className="octane-navigator-air__room-bubble"
             style={bubbleStyle}
             onMouseEnter={() => useNavigatorRoomInfoPopupStore.getState().setHovered(true)}
@@ -66,7 +68,7 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                 {(showOwner || hasGroup) && (
                     <div className="octane-navigator-air__room-popover-owner-row">
                         {showOwner && (
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="octane-navigator-air__room-owner"
                                 onClick={() => {
@@ -76,10 +78,10 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                             >
                                 <UserProfileIconView userId={room.ownerId} />
                                 <span>{room.ownerName}</span>
-                            </button>
+                            </BaseButton>
                         )}
                         {hasGroup && (
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="octane-navigator-air__room-group"
                                 onClick={() => {
@@ -89,7 +91,7 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                             >
                                 <i className="octane-navigator-air__group" />
                                 <span>{room.groupName}</span>
-                            </button>
+                            </BaseButton>
                         )}
                     </div>
                 )}
@@ -107,11 +109,11 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                         <span>{room.maxUserCount}</span>
                     </div>
                     <div className="octane-navigator-air__room-popover-actions">
-                        <button type="button" onClick={() => toggleFavourite()}>
+                        <BaseButton type="button" onClick={() => toggleFavourite()}>
                             <i className={classNames('icon icon-navigator-favorite-room', isFavourite ? 'active' : '')} />
                             <span>{LocalizeText('navigator.room.popup.room.info.favorite')}</span>
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             onClick={() => {
                                 if (navigatorData?.homeRoomId !== room.roomId) {
@@ -121,9 +123,9 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                         >
                             <i className={classNames('icon icon-navigator-my-room', navigatorData?.homeRoomId === room.roomId ? 'active' : '')} />
                             <span>{LocalizeText('navigator.room.popup.room.info.home')}</span>
-                        </button>
+                        </BaseButton>
                         {isOwner && (
-                            <button
+                            <BaseButton
                                 type="button"
                                 onClick={() => {
                                     SendMessageComposer(new RoomSettingsComposer(room.roomId));
@@ -132,10 +134,10 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                             >
                                 <i className="icon icon-navigator-room-settings" />
                                 <span>{LocalizeText('navigator.room.popup.info.room.settings')}</span>
-                            </button>
+                            </BaseButton>
                         )}
                         {roomReportingEnabled && !isOwner && (
-                            <button
+                            <BaseButton
                                 type="button"
                                 onClick={() => {
                                     report?.(ReportType.ROOM, { roomId: room.roomId, roomName: room.roomName });
@@ -144,16 +146,16 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                             >
                                 <i className="icon icon-navigator-room-report" />
                                 <span>{LocalizeText('navigator.room.popup.report.room')}</span>
-                            </button>
+                            </BaseButton>
                         )}
                     </div>
                 </div>
                 {room.tags && room.tags.length > 0 && (
                     <div className="octane-navigator-air__room-popover-tags">
                         {room.tags.map((tag) => (
-                            <button key={tag} type="button" className="octane-navigator-air__tag" onClick={() => searchTag(tag)}>
+                            <BaseButton key={tag} type="button" className="octane-navigator-air__tag" onClick={() => searchTag(tag)}>
                                 #{tag}
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 )}
@@ -173,6 +175,6 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </InlineDialog>
     );
 };

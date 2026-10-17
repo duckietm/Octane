@@ -9,6 +9,8 @@ import {
     WiredUserActionChoice
 } from '../../../api';
 import { Text } from '../../../common';
+import { Checkbox } from '../../../common/Checkbox';
+import { Select } from '../../../common/Select';
 
 /**
  * The official action picker of the "user performs action" boxes: section action_selection, and for
@@ -23,12 +25,12 @@ export const WiredUserActionSection: FC<{ choice: WiredUserActionChoice; onChang
             <Text bold>{ localizeWithFallback(titleKey, '') }</Text>
             <div className="flex items-center gap-2">
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={ enabled } onChange={ event => onToggle(event.target.checked) } />
+                    <Checkbox checked={ enabled } onCheckedChange={(nextChecked) => onToggle(nextChecked)} />
                     <Text>{ localizeWithFallback(filterKey, '') }</Text>
                 </label>
-                <select className="form-select form-select-sm" title={ localizeWithFallback(tooltipKey, '') } value={ value } onChange={ event => onSelect(parseInt(event.target.value, 10)) }>
+                <Select className="form-select form-select-sm" title={ localizeWithFallback(tooltipKey, '') } value={ value } onChange={ event => onSelect(parseInt(event.target.value, 10)) }>
                     { values.map(entry => <option key={ entry } value={ entry }>{ localizeWithFallback(labelKey(entry), String(entry)) }</option>) }
-                </select>
+                </Select>
             </div>
         </div>
     );
@@ -37,9 +39,9 @@ export const WiredUserActionSection: FC<{ choice: WiredUserActionChoice; onChang
         <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
                 <Text bold>{ localizeWithFallback('wiredfurni.params.action_selection', 'Action') }</Text>
-                <select className="form-select form-select-sm" title={ localizeWithFallback('wiredfurni.tooltip.action', '') } value={ choice.action } onChange={ event => patch({ action: parseInt(event.target.value, 10) }) }>
+                <Select className="form-select form-select-sm" title={ localizeWithFallback('wiredfurni.tooltip.action', '') } value={ choice.action } onChange={ event => patch({ action: parseInt(event.target.value, 10) }) }>
                     { WIRED_USER_ACTIONS.map(action => <option key={ action.code } value={ action.code }>{ localizeWithFallback(`wiredfurni.params.action.${ action.code }`, action.name) }</option>) }
-                </select>
+                </Select>
             </div>
             { choice.action === WIRED_USER_ACTION_SIGN && extraSection(
                 'wiredfurni.params.sign_selection', 'wiredfurni.params.sign_filter', 'wiredfurni.tooltip.sign',

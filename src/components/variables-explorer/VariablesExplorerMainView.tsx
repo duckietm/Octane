@@ -23,6 +23,7 @@ import {
 import { VariablesExplorerBulkDeleteView } from './VariablesExplorerBulkDeleteView';
 import { VariablesExplorerHolderView } from './VariablesExplorerHolderView';
 import { VariablesExplorerHoldersView } from './VariablesExplorerHoldersView';
+import { Select } from '../../common/Select';
 
 export interface VariablesExplorerMainViewProps {
     connection: ExplorerConnection;
@@ -164,7 +165,7 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
                     />
                     <div className="mx-3 flex flex-wrap items-center gap-2 text-[12px]">
                         <Text bold>Look up a holder:</Text>
-                        <select
+                        <Select
                             aria-label="Holder kind"
                             className={FIELD_CLASS}
                             value={lookupKind}
@@ -175,7 +176,7 @@ export const VariablesExplorerMainView: FC<VariablesExplorerMainViewProps> = ({ 
                                     {kind.label}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                         <input
                             aria-label="Holder"
                             className={`${FIELD_CLASS} w-[140px]`}

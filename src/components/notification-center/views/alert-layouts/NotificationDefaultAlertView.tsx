@@ -9,6 +9,7 @@ import {
     SanitizeHtml
 } from '../../../../api';
 import { Button, Column, Flex, LayoutNotificationAlertView, LayoutNotificationAlertViewProps } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface NotificationDefaultAlertViewProps extends LayoutNotificationAlertViewProps {
     item: NotificationAlertItem;
@@ -40,17 +41,20 @@ const CommandFilterInput: FC<CommandFilterInputProps> = ({ value, onChange }) =>
     />
 );
 
+/** The command listing arrives on the same channel as the message of the day, and is drawn by this view. */
+export const isCommandListLines = (lines: string[]): boolean => {
+    const commandLines = lines.filter((line) => COMMAND_LINE_PATTERN.test(line));
+
+    return commandLines.length >= 4 || lines.some((line) => COMMAND_HEADING_PATTERN.test(line.trim()));
+};
+
 export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps> = (props) => {
     const { item = null, title = (props.item && props.item.title) || '', onClose = null, classNames = [], ...rest } = props;
     const [imageFailed, setImageFailed] = useState<boolean>(false);
     const [commandFilter, setCommandFilter] = useState<string>('');
 
     const alertLines = useMemo(() => item.messages.flatMap((message) => message.split(/\r\n|\r|\n/g)), [item.messages]);
-    const hasCommandTemplate = useMemo(() => {
-        const commandLines = alertLines.filter((line) => COMMAND_LINE_PATTERN.test(line));
-
-        return commandLines.length >= 4 || alertLines.some((line) => COMMAND_HEADING_PATTERN.test(line.trim()));
-    }, [alertLines]);
+    const hasCommandTemplate = useMemo(() => isCommandListLines(alertLines), [alertLines]);
     const commandTemplateContent = useMemo(() => {
         const intro: string[] = [];
         const commands: CommandTemplateEntry[] = [];
@@ -162,7 +166,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                             <CommandFilterInput value={commandFilter} onChange={setCommandFilter} />
                             {!visibleCommands.length && <div className="notification-command-copy">{LocalizeText('generic.no_results_found')}</div>}
                             {visibleCommands.map((entry, index) => (
-                                <button
+                                <BaseButton
                                     key={`${entry.command}-${index}`}
                                     className="notification-command-row"
                                     type="button"
@@ -173,7 +177,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                                         {entry.args && <span className="notification-command-args">{entry.args}</span>}
                                         {entry.description && <span className="notification-command-description">{entry.description}</span>}
                                     </span>
-                                </button>
+                                </BaseButton>
                             ))}
                         </div>
                     )}
@@ -198,8 +202,12 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                 <>
                     <Column center alignItems="center" gap={0}>
                         <hr className="my-2 w-full" />
-                        {!item.clickUrl && <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>}
-                        {item.clickUrl && item.clickUrl.length > 0 && <Button onClick={visitUrl}>{LocalizeText(item.clickUrlText)}</Button>}
+                        <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>
+                        {item.clickUrl && item.clickUrl.length > 0 && (
+                            <BaseButton className="octane-alert-link" type="button" onClick={visitUrl}>
+                                {LocalizeText(item.clickUrlText)}
+                            </BaseButton>
+                        )}
                     </Column>
                 </>
             )}

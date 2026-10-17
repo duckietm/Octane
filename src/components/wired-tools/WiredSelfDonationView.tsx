@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { GetConfigurationValue, localizeWithFallback, NotificationAlertType, SendMessageComposer } from '../../api';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useMessageEvent, useNotification } from '../../hooks';
+import { NumberInput } from '../../common/NumberInput';
 
 /** The official tool's range; the server clamps to its own `hotel.selfdonation.max.amount`. */
 const DEFAULT_MAX_AMOUNT = 500;
@@ -93,16 +94,7 @@ export const WiredSelfDonationView = ({ onClose }: WiredSelfDonationViewProps) =
             <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
                 <label className="flex items-center gap-2 text-[12px]">
                     <Text bold>{localizeWithFallback('selfdonation.amount', 'Amount')}:</Text>
-                    <input
-                        aria-label="Amount"
-                        className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                        type="number"
-                        min={1}
-                        max={maxAmount}
-                        value={amount}
-                        onChange={(event) => setAmount(Number.parseInt(event.target.value, 10) || 1)}
-                        onBlur={() => setAmount(clampedAmount)}
-                    />
+                    <NumberInput aria-label="Amount" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" min={1} max={maxAmount} value={amount} onChange={(event) => setAmount(Number.parseInt(event.target.value, 10) || 1)} onBlur={() => setAmount(clampedAmount)} />
                     <Text small>{localizeWithFallback('selfdonation.amount.range', '1 to %max%', ['max'], [String(maxAmount)])}</Text>
                 </label>
                 <label className="flex items-center gap-2 text-[12px]">

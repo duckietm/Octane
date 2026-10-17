@@ -7,8 +7,8 @@ vi.mock('../../../api', () => ({
     SendMessageComposer: (composer: unknown) => sent.push(composer)
 }));
 
-const { deleteMention, markAllMentionsRead, markMentionRead, MENTIONS_REQUEST_TIMEOUT_MS, requestMentions } = await import('../mentionsRequests');
-const { getMentionsSnapshot, getMentionsStatus, getUnreadCount, resetMentions, setMentions } = await import('../mentionsStore');
+const { deleteMention, markAllMentionsRead, markMentionRead, MENTIONS_REQUEST_TIMEOUT_MS, requestMentions, requestMoreMentions } = await import('../mentionsRequests');
+const { getMentionsSnapshot, getMentionsStatus, getUnreadCount, isLoadingMoreMentions, resetMentions, setMentions } = await import('../mentionsStore');
 
 const make = (id: number, read = false): IMentionEntry => ({
     mentionId: id,
@@ -80,5 +80,46 @@ describe('mentions requests', () => {
 
         expect(sent).toHaveLength(1);
         expect(getMentionsSnapshot().map((mention) => mention.mentionId)).toEqual([2]);
+    });
+});
+
+describe('mentions paging request', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        sent.length = 0;
+        resetMentions();
+    });
+
+    afterEach(() => vi.useRealTimers());
+
+    it('does nothing when no older mention remains', () => {
+        setMentions([make(5)], false);
+
+        requestMoreMentions();
+
+        expect(sent).toHaveLength(0);
+    });
+
+    it('asks once while the page is on its way', () => {
+        setMentions([make(5), make(4)], true);
+
+        requestMoreMentions();
+        requestMoreMentions();
+
+        expect(sent).toHaveLength(1);
+        expect(isLoadingMoreMentions()).toBe(true);
+    });
+
+    it('frees the request when the page never comes', () => {
+        setMentions([make(5)], true);
+
+        requestMoreMentions();
+        vi.advanceTimersByTime(MENTIONS_REQUEST_TIMEOUT_MS);
+
+        expect(isLoadingMoreMentions()).toBe(false);
+
+        requestMoreMentions();
+
+        expect(sent).toHaveLength(2);
     });
 });

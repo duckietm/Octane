@@ -8,6 +8,7 @@ import { GroupTabBadgeView } from './tabs/GroupTabBadgeView';
 import { GroupTabColorsView } from './tabs/GroupTabColorsView';
 import { GroupTabIdentityView } from './tabs/GroupTabIdentityView';
 import { GroupTabSettingsView } from './tabs/GroupTabSettingsView';
+import { BaseButton } from '../../../common/BaseButton';
 
 const TABS: number[] = [1, 2, 3, 5];
 
@@ -100,7 +101,7 @@ export const GroupManagerView: FC<{}> = (props) => {
             tabs={
                 <div className="octane-group-native__tabs">
                     {TABS.map((tab, index) => (
-                        <button
+                        <BaseButton
                             key={tab}
                             className={`octane-group-native__tab${currentTab === tab ? ' is-selected' : ''}`}
                             style={{ left: TAB_RECTS[index][0], width: TAB_RECTS[index][1], paddingLeft: TAB_RECTS[index][2] * 2 }}
@@ -108,7 +109,7 @@ export const GroupManagerView: FC<{}> = (props) => {
                             onClick={() => changeTab(tab)}
                         >
                             <GroupText blend="multiply" className="is-static" text={LocalizeText(`group.edit.tab.${tab}`)} textStyle="button_tab" x={0} y={0} />
-                        </button>
+                        </BaseButton>
                     ))}
                 </div>
             }

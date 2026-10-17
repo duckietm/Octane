@@ -2,6 +2,7 @@ import { OpenMysteryTrophyMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface FurnitureMysteryTrophyOpenDialogViewProps {
     objectId: number;
@@ -46,7 +47,7 @@ export const FurnitureMysteryTrophyOpenDialogView: FC<FurnitureMysteryTrophyOpen
                             <div className="mysterytrophy-pencil-image shrink-0 small fa-icon"></div>
                         </div>
                         <div className="flex items-center mt-2 gap-5 justify-center">
-                            <Text pointer className="text-decoration" onClick={() => onClose()}>
+                            <Text component={BaseButton} type="button" pointer className="text-decoration" onClick={() => onClose()}>
                                 {LocalizeText('cancel')}
                             </Text>
                             <Button variant="success" onClick={() => onConfirm()}>

@@ -26,6 +26,9 @@ import {
     isLegacyPetType,
     PetPaletteLike,
 } from './petCatalog.helpers';
+import { Select } from '../../../../../../common/Select';
+import { BaseButton } from '../../../../../../common/BaseButton';
+import { ToggleButton } from '../../../../../../common/ToggleButton';
 
 interface PendingPetPurchase {
     extraData: string;
@@ -271,10 +274,9 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 role="group"
                             >
                                 {legacyColors.map((colors, index) => (
-                                    <button
+                                    <ToggleButton
                                         key={`${colors[0]}-${index}`}
-                                        aria-label={`${colorLabel} ${index + 1}`}
-                                        aria-pressed={selectedColorIndex === index}
+                                        aria-label={`${colorLabel} ${index + 1}`} pressed={selectedColorIndex === index}
                                         className="octane-catalog-pet-color-swatch"
                                         disabled={controlsDisabled}
                                         style={{ backgroundColor: ColorConverter.int2rgb(colors[0]) }}
@@ -287,7 +289,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                         {selectablePalettes.length > 1 && (
                             <label className="octane-catalog-pet-breed-selector">
                                 <span>{LocalizeText('catalog.pets.choose.breed')}</span>
-                                <select
+                                <Select
                                     value={selectedPaletteIndex}
                                     disabled={controlsDisabled}
                                     onChange={(event) => setSelectedPaletteIndex(Number(event.target.value))}
@@ -302,7 +304,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                             </option>
                                         );
                                     })}
-                                </select>
+                                </Select>
                             </label>
                         )}
                     </>
@@ -326,10 +328,9 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 const locked = isBreedLocked(choice.palette);
 
                                 return (
-                                    <button
+                                    <ToggleButton
                                         key={choice.palette.paletteId}
-                                        aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`}
-                                        aria-pressed={selectedPaletteIndex === index}
+                                        aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`} pressed={selectedPaletteIndex === index}
                                         className={`octane-catalog-pet-color-swatch${locked ? ' octane-catalog-pet-color-swatch--locked' : ''}`}
                                         disabled={controlsDisabled || locked}
                                         style={style}
@@ -338,7 +339,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                         onClick={() => setSelectedPaletteIndex(index)}
                                     >
                                         {locked && <FaLock className="octane-catalog-pet-swatch-lock" />}
-                                    </button>
+                                    </ToggleButton>
                                 );
                             })}
                         </CatalogScrollAreaView>
@@ -368,13 +369,13 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                         </span>
                     )}
                     <div className="octane-catalog-pet-purchase-row">
-                        <button
+                        <BaseButton
                             className="octane-catalog-standard-button octane-catalog-standard-buy-button"
                             disabled={controlsDisabled || !purchaseExtraData}
                             onClick={requestPurchase}
                         >
                             {LocalizeText('catalog.purchase_confirmation.buy')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
             </div>

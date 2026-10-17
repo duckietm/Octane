@@ -37,6 +37,9 @@ import {
 } from '../../../common';
 import { useGroupMemberRemoval, useMessageEvent, useNotification } from '../../../hooks';
 import { classNames } from '../../../layout';
+import { Select } from '../../../common/Select';
+import { NumberInput } from '../../../common/NumberInput';
+import { BaseButton } from '../../../common/BaseButton';
 
 export const GroupMembersView: FC<{}> = (props) => {
     const [groupId, setGroupId] = useState<number>(-1);
@@ -281,19 +284,19 @@ export const GroupMembersView: FC<{}> = (props) => {
                             value={searchQuery}
                             onChange={(event) => setSearchQuery(event.target.value)}
                         />
-                        <select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
+                        <Select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
                             <option value="0">{LocalizeText('group.members.search.all')}</option>
                             <option value="1">{LocalizeText('group.members.search.admins')}</option>
                             {membersData.admin && <option value="2">{LocalizeText('group.members.search.pending')}</option>}
                             {membersData.admin && blockingEnabled && <option value="3">{localizeWithFallback('group.members.search.blocked', 'Show blocked users')}</option>}
-                        </select>
+                        </Select>
                     </Column>
                 </div>
                 <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
                     {membersData.result.map((member, index) => {
                         return (
                             <Flex key={index} alignItems="center" className="octane-group-member-row" gap={0} overflow="hidden">
-                                <div className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
+                                <BaseButton type="button" className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
                                     <LayoutAvatarImageView
                                         className="octane-group-member-row__head"
                                         direction={2}
@@ -303,9 +306,9 @@ export const GroupMembersView: FC<{}> = (props) => {
                                         compactHeadSize={40}
                                         compactHeadPadding={0}
                                     />
-                                </div>
+                                </BaseButton>
                                 <Column className="octane-group-member-row__copy" grow gap={0}>
-                                    <Text bold pointer small className="octane-group-member-row__name" onClick={(event) => GetUserProfile(member.id)}>
+                                    <Text component={BaseButton} type="button" bold pointer small className="octane-group-member-row__name" onClick={(event) => GetUserProfile(member.id)}>
                                         {member.name}
                                     </Text>
                                     {member.rank !== GroupRank.REQUESTED && (
@@ -317,7 +320,7 @@ export const GroupMembersView: FC<{}> = (props) => {
                                 <div className="octane-group-member-row__actions">
                                     {member.rank !== GroupRank.REQUESTED && member.rank !== GroupRank.BLOCKED && (
                                         <div className="flex items-center justify-center">
-                                            <div
+                                            <BaseButton type="button" aria-label={LocalizeText(getRankDescription(member))}
                                                 className={classNames(
                                                     `octane-icon icon-group-small-${member.rank === GroupRank.OWNER ? 'owner' : member.rank === GroupRank.ADMIN ? 'admin' : membersData.admin && member.rank === GroupRank.MEMBER ? 'not-admin' : ''}`,
                                                     membersData.admin && 'cursor-pointer'
@@ -329,7 +332,7 @@ export const GroupMembersView: FC<{}> = (props) => {
                                     )}
                                     {membersData.admin && member.rank === GroupRank.REQUESTED && (
                                         <Flex alignItems="center">
-                                            <div
+                                            <BaseButton type="button" aria-label={LocalizeText('group.members.accept')}
                                                 className="cursor-pointer octane-friends-spritesheet icon-accept"
                                                 title={LocalizeText('group.members.accept')}
                                                 onClick={(event) => acceptMembership(member)}
@@ -338,31 +341,31 @@ export const GroupMembersView: FC<{}> = (props) => {
                                     )}
                                     {membersData.admin && member.rank === GroupRank.BLOCKED && (
                                         <Flex alignItems="center">
-                                            <button
+                                            <BaseButton
                                                 className="octane-group-member-row__action cursor-pointer text-[#1e7295] hover:text-[#0d4a63]"
                                                 title={localizeWithFallback('group.members.unblock', 'Unblock')}
                                                 type="button"
                                                 onClick={() => unblockMember(member)}
                                             >
                                                 <FaUndo size={11} />
-                                            </button>
+                                            </BaseButton>
                                         </Flex>
                                     )}
                                     {membersData.admin && blockingEnabled && (member.rank === GroupRank.MEMBER || member.rank === GroupRank.ADMIN) && member.id !== GetSessionDataManager().userId && (
                                         <Flex alignItems="center">
-                                            <button
+                                            <BaseButton
                                                 className="octane-group-member-row__action cursor-pointer text-[#a81a12] hover:text-[#6f0f0a]"
                                                 title={localizeWithFallback('group.members.block', 'Block from group')}
                                                 type="button"
                                                 onClick={() => blockMember(member)}
                                             >
                                                 <FaBan size={11} />
-                                            </button>
+                                            </BaseButton>
                                         </Flex>
                                     )}
                                     {membersData.admin && member.rank !== GroupRank.OWNER && member.rank !== GroupRank.BLOCKED && member.id !== GetSessionDataManager().userId && (
                                         <Flex alignItems="center">
-                                            <div
+                                            <BaseButton type="button" aria-label={LocalizeText(member.rank === GroupRank.REQUESTED ? 'group.members.reject' : 'group.members.kick')}
                                                 className="cursor-pointer octane-friends-spritesheet icon-deny"
                                                 title={LocalizeText(member.rank === GroupRank.REQUESTED ? 'group.members.reject' : 'group.members.kick')}
                                                 onClick={(event) => removeMemberOrDeclineMembership(member)}
@@ -387,17 +390,10 @@ export const GroupMembersView: FC<{}> = (props) => {
                         <Text small className="octane-group-members-footer__label">
                             {localizeWithFallback('group.members.members', `Members (${membersData.totalMembersCount})`, ['count'], [membersData.totalMembersCount.toString()])}
                         </Text>
-                        <input
-                            className="octane-group-members-footer__input"
-                            type="number"
-                            min={1}
-                            max={Math.max(1, totalPages)}
-                            value={membersData.pageIndex + 1}
-                            onChange={(event) => {
+                        <NumberInput className="octane-group-members-footer__input" min={1} max={Math.max(1, totalPages)} value={membersData.pageIndex + 1} onChange={(event) => {
                                 const value = Math.min(Math.max(parseInt(event.target.value) || 1, 1), Math.max(1, totalPages));
                                 setPageId(value - 1);
-                            }}
-                        />
+                            }} />
                         <Text small className="octane-group-members-footer__total">
                             / {Math.max(1, totalPages)}
                         </Text>

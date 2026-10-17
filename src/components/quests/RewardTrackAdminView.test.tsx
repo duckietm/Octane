@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { localInputToUnix, RewardTrackAdminView, unixToLocalInput } from './RewardTrackAdminView';
+import { selectOption } from '../../test-utils/selectOption';
 
 const mocks = vi.hoisted(() => ({
     saveTrack: vi.fn(),
@@ -90,6 +91,23 @@ describe('RewardTrackAdminView', () => {
         expect(screen.getAllByTestId('rt-admin-prize-row')).toHaveLength(1);
     });
 
+    it('folds a panel from its chevron and from the rest of its head, once per click', () => {
+        render(<RewardTrackAdminView onClose={() => null} />);
+
+        const chevron = screen.getByTestId('rt-admin-collapse-tasks');
+
+        expect(chevron.getAttribute('aria-expanded')).toBe('false');
+
+        fireEvent.click(chevron);
+        expect(chevron.getAttribute('aria-expanded')).toBe('true');
+        expect(screen.getAllByTestId('rt-admin-task-row')).toHaveLength(2);
+
+        // The head (not only the chevron) folds the panel too.
+        fireEvent.click(chevron.parentElement as HTMLElement);
+        expect(chevron.getAttribute('aria-expanded')).toBe('false');
+        expect(screen.queryAllByTestId('rt-admin-task-row')).toHaveLength(0);
+    });
+
     it('edits a task, adds a level and sends the whole task back', () => {
         renderOpen();
 
@@ -102,10 +120,10 @@ describe('RewardTrackAdminView', () => {
         const rows = screen.getAllByTestId('rt-admin-level-row');
         expect(rows).toHaveLength(2);
 
-        const inputs = rows[1].querySelectorAll('input');
-        fireEvent.change(inputs[0], { target: { value: '5' } });
-        fireEvent.change(inputs[1], { target: { value: '25' } });
-        fireEvent.click(inputs[2]);
+        const [requiredCount, pointsReward] = within(rows[1]).getAllByRole('spinbutton');
+        fireEvent.change(requiredCount, { target: { value: '5' } });
+        fireEvent.change(pointsReward, { target: { value: '25' } });
+        fireEvent.click(within(rows[1]).getByRole('checkbox'));
         fireEvent.click(within(form).getByText('Save'));
 
         expect(mocks.saveTask).toHaveBeenCalledWith({
@@ -239,7 +257,7 @@ describe('RewardTrackAdminView', () => {
         const form = screen.getByTestId('rt-admin-prize-form');
         expect(screen.queryByTestId('rt-admin-furni-picker')).toBeNull();
 
-        fireEvent.change(form.querySelector('select'), { target: { value: 'furni' } });
+        selectOption(within(form).getByRole('combobox'), 'furni');
         expect(screen.getByTestId('rt-admin-furni-picker')).toBeTruthy();
     });
 

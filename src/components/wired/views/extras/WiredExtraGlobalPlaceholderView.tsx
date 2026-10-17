@@ -20,6 +20,8 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const EMPTY_FORM: IGlobalPlaceholderForm = { name: '', mode: GLOBAL_PLACEHOLDER_FROM_VALUE, value: '', roomId: 0, placeholderName: '', rooms: [] };
 
@@ -74,13 +76,7 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text>{localizeWithFallback('wiredfurni.params.choose_type', 'Choose type')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={form.mode === GLOBAL_PLACEHOLDER_FROM_VALUE}
-                            className="form-check-input"
-                            name="wiredGlobalPlaceholderMode"
-                            type="radio"
-                            onChange={() => setForm((current) => ({ ...current, mode: GLOBAL_PLACEHOLDER_FROM_VALUE }))}
-                        />
+                        <Radio checked={form.mode === GLOBAL_PLACEHOLDER_FROM_VALUE} name="wiredGlobalPlaceholderMode" onCheckedChange={() => setForm((current) => ({ ...current, mode: GLOBAL_PLACEHOLDER_FROM_VALUE }))} />
                         <Text>{localizeWithFallback('wiredfurni.params.from_value', 'From a value')}</Text>
                     </label>
                     {form.mode === GLOBAL_PLACEHOLDER_FROM_VALUE && (
@@ -96,20 +92,11 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                         />
                     )}
                     <label className={`flex items-center gap-1 ${anotherRoomDisabled ? 'opacity-50' : 'cursor-pointer'}`}>
-                        <input
-                            checked={form.mode === GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM}
-                            className="form-check-input"
-                            disabled={anotherRoomDisabled}
-                            name="wiredGlobalPlaceholderMode"
-                            type="radio"
-                            onChange={() =>
-                                setForm((current) => ({
+                        <Radio checked={form.mode === GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM} disabled={anotherRoomDisabled} name="wiredGlobalPlaceholderMode" onCheckedChange={() => setForm((current) => ({
                                     ...current,
                                     mode: GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM,
                                     roomId: current.roomId || current.rooms[0]?.roomId || 0
-                                }))
-                            }
-                        />
+                                }))} />
                         <Text>{localizeWithFallback('wiredfurni.params.from_another_room', 'From another room')}</Text>
                     </label>
                     {anotherRoomDisabled && (
@@ -118,16 +105,16 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                     {form.mode === GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM && (
                         <div className="flex flex-col gap-1">
                             <Text>{localizeWithFallback('wiredfurni.params.room_selection', 'Room')}</Text>
-                            <select className="form-select form-select-sm" value={form.roomId} onChange={(event) => selectRoom(parseInt(event.target.value, 10) || 0)}>
+                            <Select className="form-select form-select-sm" value={form.roomId} onChange={(event) => selectRoom(parseInt(event.target.value, 10) || 0)}>
                                 <option value={0}>{localizeWithFallback('wiredfurni.params.room_selection.tooltip', 'Pick a room')}</option>
                                 {form.rooms.map((room) => (
                                     <option key={room.roomId} value={room.roomId}>
                                         {room.roomName}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                             <Text>{localizeWithFallback('wiredfurni.params.placeholder_selection', 'Placeholder')}</Text>
-                            <select
+                            <Select
                                 className="form-select form-select-sm"
                                 value={form.placeholderName}
                                 onChange={(event) => {
@@ -142,7 +129,7 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                                         {`$(${name})`}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                     )}
                 </div>

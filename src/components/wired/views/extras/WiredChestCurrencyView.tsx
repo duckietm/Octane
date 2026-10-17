@@ -3,6 +3,8 @@ import { WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 // Currency type convention (matches server InteractionWiredChestCurrency): -1 = credits, >=0 = points type.
 const CURRENCY_OPTIONS: { value: number; label: string }[] = [
@@ -35,25 +37,13 @@ export const WiredChestCurrencyView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     {CURRENCY_OPTIONS.map((option) => (
                         <label key={option.value} className="flex items-center gap-2">
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                name="chestCurrencyType"
-                                checked={currencyType === option.value}
-                                onChange={() => setCurrencyType(option.value)}
-                            />
+                            <Radio name="chestCurrencyType" checked={currencyType === option.value} onCheckedChange={() => setCurrencyType(option.value)} />
                             <Text small>{option.label}</Text>
                         </label>
                     ))}
                 </div>
                 <Text bold>Amount stored</Text>
-                <input
-                    type="number"
-                    min={0}
-                    className="form-control form-control-sm"
-                    value={amount}
-                    onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))}
-                />
+                <NumberInput min={0} className="form-control form-control-sm" value={amount} onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))} />
             </div>
         </WiredExtraBaseView>
     );

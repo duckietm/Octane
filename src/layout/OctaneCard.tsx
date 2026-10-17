@@ -3,6 +3,7 @@ import { DraggableWindow, DraggableWindowPosition, DraggableWindowProps } from '
 import { CardResizeHandle } from '../common/card/CardResizeHandle';
 import { classNames } from './classNames';
 import { OctaneItemCountBadge } from './OctaneItemCountBadge';
+import { BaseButton } from '../common/BaseButton';
 
 type OctaneCardRootProps = PropsWithChildren<
     {
@@ -62,7 +63,7 @@ type OctaneCardHeaderProps = {
 } & DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
 const OctaneCardHeader = ({ ref, headerText = '', onCloseClick = null, className = null, ...rest }: OctaneCardHeaderProps) => {
-    const onMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    const onMouseDown = (event: MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         event.nativeEvent.stopImmediatePropagation();
     };
@@ -77,7 +78,8 @@ const OctaneCardHeader = ({ ref, headerText = '', onCloseClick = null, className
         >
             <div className="flex items-center justify-center w-full ">
                 <span className="octane-card-title text-white">{headerText}</span>
-                <div
+                <BaseButton
+                    aria-label="close"
                     className="octane-card-close-button absolute flex items-center justify-center cursor-pointer"
                     onClick={onCloseClick}
                     onMouseDownCapture={onMouseDown}

@@ -178,10 +178,11 @@
         background: linear-gradient(180deg, #ffffff 0%, #dcdcdc 100%);
     }
 
+    .octane-wired__menu-positioner {
+        z-index: 3;
+    }
+
     .octane-wired__menu-list {
-        position: absolute;
-        top: 20px;
-        right: 0;
         min-width: 190px;
         padding: 2px;
         border: 1px solid #000;
@@ -206,11 +207,13 @@
         cursor: pointer;
     }
 
-    .octane-wired__menu-item:hover:not(:disabled) {
+    .octane-wired__menu-item:hover:not(:disabled),
+    .octane-wired__menu-item[data-highlighted]:not([data-disabled]) {
         background: #dbeaf4;
     }
 
-    .octane-wired__menu-item:disabled {
+    .octane-wired__menu-item:disabled,
+    .octane-wired__menu-item[data-disabled] {
         color: #9a9488;
         cursor: default;
     }
@@ -298,6 +301,8 @@
     }
 
     .form-check-input,
+    .octane-checkbox,
+    .octane-radio,
     input[type='checkbox'],
     input[type='radio'] {
         width: 18px;
@@ -313,11 +318,14 @@
         position: relative;
     }
 
+    .octane-radio,
     input[type='radio'] {
         border-radius: 50%;
     }
 
     .form-check-input:focus,
+    .octane-checkbox:focus,
+    .octane-radio:focus,
     input[type='checkbox']:focus,
     input[type='radio']:focus {
         outline: 1px solid #4b7ea1;
@@ -325,6 +333,7 @@
     }
 
     .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
     input[type='radio']:checked {
         background:
             radial-gradient(circle at center, #4a4a4a 0 34%, transparent 38%),
@@ -333,6 +342,7 @@
     }
 
     .form-check-input[type='checkbox']:checked,
+    .octane-checkbox[data-checked],
     input[type='checkbox']:checked {
         background: linear-gradient(180deg, #d9d9d9 0%, #c8c8c8 100%);
         border-color: #767676;
@@ -340,6 +350,8 @@
 
     .form-check-input[type='checkbox']:checked::before,
     .form-check-input[type='checkbox']:checked::after,
+    .octane-checkbox[data-checked]::before,
+    .octane-checkbox[data-checked]::after,
     input[type='checkbox']:checked::before,
     input[type='checkbox']:checked::after {
         content: '';
@@ -354,11 +366,13 @@
     }
 
     .form-check-input[type='checkbox']:checked::before,
+    .octane-checkbox[data-checked]::before,
     input[type='checkbox']:checked::before {
         transform: translate(-50%, -50%) rotate(45deg);
     }
 
     .form-check-input[type='checkbox']:checked::after,
+    .octane-checkbox[data-checked]::after,
     input[type='checkbox']:checked::after {
         transform: translate(-50%, -50%) rotate(-45deg);
     }
@@ -377,6 +391,7 @@
     .form-select,
     input[type='text'],
     input[type='number'],
+    .octane-number-input,
     textarea {
         min-height: 24px;
         border: 1px solid #8d8d8d !important;
@@ -913,7 +928,7 @@
     color: #2f5f7a !important;
 }
 
-.octane-wired :where(select, input[type='text'], input[type='number'], textarea) {
+.octane-wired :where(select, .octane-select-trigger, input[type='text'], input[type='number'], .octane-number-input, textarea) {
     min-height: 22px;
     border: 1px solid #8b8b8b !important;
     border-radius: 3px !important;
@@ -923,7 +938,7 @@
     font-size: 11px !important;
 }
 
-.octane-wired :where(select, input[type='text'], input[type='number'], textarea):focus {
+.octane-wired :where(select, .octane-select-trigger, input[type='text'], input[type='number'], .octane-number-input, textarea):focus {
     border-color: #5c8fa8 !important;
     box-shadow: 0 0 0 2px rgba(92, 143, 168, 0.24), inset 0 1px 0 rgba(0, 0, 0, 0.14) !important;
     outline: none !important;
@@ -954,6 +969,17 @@
     box-shadow: none !important;
 }
 
+
+.octane-wired.octane-wired__vpicker-positioner {
+    z-index: 5000;
+    width: auto;
+    max-width: none;
+    overflow: visible;
+    background: transparent;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
 
 /*
  * AIR variable picker (WIN63-202610131318-860371703, uibuilder/presets/newvariablepicker). Colours, tab widths and the
@@ -1043,7 +1069,7 @@
 }
 
 .octane-wired__vpicker-expanded {
-    position: fixed;
+    position: relative;
     box-sizing: border-box;
     padding-bottom: 1px;
     pointer-events: auto;
@@ -1199,6 +1225,8 @@
     }
 
     .form-check-input,
+    .octane-checkbox,
+    .octane-radio,
     input[type='checkbox'],
     input[type='radio'] {
         border-color: #181818;
@@ -1207,6 +1235,7 @@
     }
 
     .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
     input[type='radio']:checked {
         background:
             radial-gradient(circle at center, #f4f4f4 0 34%, transparent 38%),
@@ -1215,13 +1244,16 @@
     }
 
     .form-check-input[type='checkbox']:checked,
+    .octane-checkbox[data-checked],
     input[type='checkbox']:checked {
         background: linear-gradient(180deg, #7a7a7a 0%, #5a5a5a 100%);
         border-color: #181818;
     }
 
     .form-check-input[type='checkbox']:checked::before,
+    .octane-checkbox[data-checked]::before,
     .form-check-input[type='checkbox']:checked::after,
+    .octane-checkbox[data-checked]::after,
     input[type='checkbox']:checked::before,
     input[type='checkbox']:checked::after {
         background: #f4f4f4;
@@ -1231,6 +1263,7 @@
     .form-select,
     input[type='text'],
     input[type='number'],
+    .octane-number-input,
     textarea {
         border-color: #181818 !important;
         background: #2b2b2b !important;
@@ -1282,6 +1315,7 @@
     .form-select,
     input[type='text'],
     input[type='number'],
+    .octane-number-input,
     textarea {
         border-color: #b5b5b5 !important;
         background: #ffffff !important;
@@ -1333,6 +1367,8 @@
     }
 
     .form-check-input,
+    .octane-checkbox,
+    .octane-radio,
     input[type='checkbox'],
     input[type='radio'] {
         border-color: #222222;
@@ -1340,12 +1376,14 @@
     }
 
     .form-check-input[type='radio']:checked,
+    .octane-radio[data-checked],
     input[type='radio']:checked {
         background: radial-gradient(circle at center, #222222 0 34%, transparent 38%), #ffffff;
         border-color: #222222;
     }
 
     .form-check-input[type='checkbox']:checked,
+    .octane-checkbox[data-checked],
     input[type='checkbox']:checked {
         background: #ffeda5;
         border-color: #222222;
@@ -1355,6 +1393,7 @@
     .form-select,
     input[type='text'],
     input[type='number'],
+    .octane-number-input,
     textarea {
         border-color: #222222 !important;
         background: #ffffff !important;

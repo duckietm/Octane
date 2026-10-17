@@ -6,6 +6,7 @@ import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 /** The times slider runs 1..11; 11 is "unlimited" and goes out as 0. */
 const TIMES_UNLIMITED = 11;
@@ -76,7 +77,7 @@ export const WiredActionGiveScoreBaseView: FC<WiredActionGiveScoreBaseViewProps>
                 <Text bold>{LocalizeText('wiredfurni.params.points_operation')}</Text>
                 {[0, 1].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input checked={operation === value} className="form-check-input" name="pointsOperation" type="radio" onChange={() => setOperation(value)} />
+                        <Radio checked={operation === value} name="pointsOperation" onCheckedChange={() => setOperation(value)} />
                         <Text>{LocalizeText(`wiredfurni.params.points_operation.${value}`)}</Text>
                     </label>
                 ))}
@@ -87,7 +88,7 @@ export const WiredActionGiveScoreBaseView: FC<WiredActionGiveScoreBaseViewProps>
                     <div className="grid grid-cols-2 gap-1">
                         {[1, 2, 3, 4].map((value) => (
                             <label key={value} className="flex items-center gap-1">
-                                <input checked={team === value} className="form-check-input" name="scoreTeam" type="radio" onChange={() => setTeam(value)} />
+                                <Radio checked={team === value} name="scoreTeam" onCheckedChange={() => setTeam(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.team.${value}`)}</Text>
                             </label>
                         ))}

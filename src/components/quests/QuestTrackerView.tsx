@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { getQuestDescription, getQuestImageUrl, getQuestName, getQuestProgressPercent, localizeWithFallback } from '../../api';
 import { LayoutProgressBar } from '../../common';
 import { useQuests } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 /** The official check animation: 13 frames over success_pic_1..6, then a 1 s close wait. */
 const COMPLETION_FRAMES = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 4];
@@ -95,9 +96,9 @@ export const QuestTrackerView: FC<{}> = () => {
                     [String(completing ? trackedQuest.totalSteps : trackedQuest.completedSteps), String(trackedQuest.totalSteps)]
                 )}
             />
-            <span className="octane-quest-tracker-moreinfo" onClick={() => CreateLinkEvent('quests/details')}>
+            <BaseButton className="octane-quest-tracker-moreinfo" onClick={() => CreateLinkEvent('quests/details')}>
                 {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
-            </span>
+            </BaseButton>
         </div>
     );
 };

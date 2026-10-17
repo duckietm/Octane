@@ -237,6 +237,7 @@
    of illumina_light_checkbox_basic, the radio is radio_button_off/on - so the size
    is the artwork's own and must not be scaled. */
 input[type='checkbox'],
+.octane-checkbox,
 .form-check-input[type='checkbox'] {
     width: 19px;
     height: 20px;
@@ -253,11 +254,42 @@ input[type='checkbox'],
 }
 
 input[type='checkbox']:checked,
+.octane-checkbox[data-checked],
 .form-check-input[type='checkbox']:checked {
     background-image: var(--habbo-skin-checkbox-checked);
 }
 
+/* Base UI renders the box as a span (the real input is visually hidden). */
+.octane-checkbox {
+    display: inline-block;
+    padding: 0;
+}
+
+/* Windows that drew a plain native checkbox keep a plain box instead of the Habbo skin. */
+:is(.octane-catalog-admin-modal, .octane-catalog-admin-preview-persona, .octane-catalog-admin-bulk-grid, .octane-reward-track-admin, .octane-room-settings) .octane-checkbox {
+    position: relative;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    border: 1px solid #565650;
+    background: #fbfbf9;
+}
+
+:is(.octane-catalog-admin-modal, .octane-catalog-admin-preview-persona, .octane-catalog-admin-bulk-grid, .octane-reward-track-admin, .octane-room-settings) .octane-checkbox[data-checked]::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 4px;
+    height: 8px;
+    border: solid #111;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
 input[type='radio'],
+.octane-radio,
 .form-check-input[type='radio'] {
     width: 11px;
     height: 12px;
@@ -274,18 +306,55 @@ input[type='radio'],
 }
 
 input[type='radio']:checked,
+.octane-radio[data-checked],
 .form-check-input[type='radio']:checked {
     background-image: var(--habbo-skin-radio-checked);
 }
 
 input[type='checkbox']:focus-visible,
+.octane-checkbox:focus-visible,
+.octane-radio:focus-visible,
 input[type='radio']:focus-visible {
     outline: 1px solid #4b7ea1;
     outline-offset: 1px;
 }
 
 input[type='checkbox']:disabled,
+.octane-checkbox[data-disabled],
+.octane-radio[data-disabled],
 input[type='radio']:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+}
+
+/* Base UI renders the radio as an <i> inside its own one-item group. */
+.octane-radio {
+    display: inline-block;
+    padding: 0;
+}
+
+.octane-radio-group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    vertical-align: middle;
+}
+
+/* Windows that drew a plain native radio keep a plain round dot instead of the Habbo skin. */
+:is(.octane-catalog-window, .octane-catalog-admin-modal, .octane-reward-track-admin, .octane-room-settings, .octane-login-card .room-template-option) .octane-radio {
+    position: relative;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    border: 1px solid #565650;
+    border-radius: 50%;
+    background: #fbfbf9;
+}
+
+:is(.octane-catalog-window, .octane-catalog-admin-modal, .octane-reward-track-admin, .octane-room-settings, .octane-login-card .room-template-option) .octane-radio[data-checked]::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #111;
 }

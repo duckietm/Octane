@@ -43,14 +43,19 @@ vi.mock('../../hooks', async (importOriginal) => {
 describe('PurseView', () => {
     afterEach(() => cleanup());
 
-    it('shortens large currency amounts and keeps the exact value in a tooltip', () => {
+    it('shortens large currency amounts and keeps the exact value in a tooltip', async () => {
         const { container } = render(<PurseView />);
         const amounts = Array.from(container.querySelectorAll('.octane-purse-button__amount')).map((element) => element.textContent?.trim());
 
         expect(screen.getByText('3.7k')).toBeInTheDocument();
         expect(amounts).toContain('3.7k');
         expect(amounts).not.toContain('3 692');
-        expect(screen.getByRole('tooltip')).toHaveTextContent('3 692');
+
+        expect(screen.queryByRole('tooltip')).toBeNull();
+
+        fireEvent.mouseEnter(screen.getByText('3.7k').closest('.relative') as HTMLElement);
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('3 692');
     });
 
     it('keeps official Help / Logout / Settings inside the 77px purse and Translate in the settings menu', () => {
@@ -60,7 +65,7 @@ describe('PurseView', () => {
         expect(actionColumn).toBeTruthy();
 
         const actionButtons = within(actionColumn as HTMLElement).getAllByRole('button');
-        expect(actionButtons.map((button) => button.textContent?.trim() || button.getAttribute('title'))).toEqual([
+        expect(actionButtons.map((button) => button.textContent?.trim() || button.getAttribute('aria-label'))).toEqual([
             'Help',
             'Log out',
             'widget.memenu.settings.title'

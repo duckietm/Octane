@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { VALUE_KEY_DISLIKE, VALUE_KEY_LIKE } from '../../../../api';
 import { Column, Flex, Text } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface WordQuizQuestionViewProps {
     question: string;
@@ -34,10 +35,10 @@ export const WordQuizQuestionView: FC<WordQuizQuestionViewProps> = (props) => {
                         {question}
                     </Text>
                     <div className="flex w-full gap-1 justify-center">
-                        <Flex center pointer className="bg-danger rounded p-1" onClick={(event) => vote(VALUE_KEY_DISLIKE)}>
+                        <Flex component={BaseButton} type="button" center pointer className="bg-danger rounded p-1" onClick={(event) => vote(VALUE_KEY_DISLIKE)}>
                             <div className="word-quiz-dislike" />
                         </Flex>
-                        <Flex center pointer className="bg-success rounded p-1" onClick={(event) => vote(VALUE_KEY_LIKE)}>
+                        <Flex component={BaseButton} type="button" center pointer className="bg-success rounded p-1" onClick={(event) => vote(VALUE_KEY_LIKE)}>
                             <div className="word-quiz-like" />
                         </Flex>
                     </div>

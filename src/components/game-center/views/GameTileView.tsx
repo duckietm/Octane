@@ -18,6 +18,7 @@ import snowStormLogo from '../../../assets/images/snowstorm/snowstorm.png';
 import { useGameCenter, useNotification, useSnowWar } from '../../../hooks';
 import { localizeWithFallback, snowWarErrorText } from './snowwar/SnowWarErrorTexts';
 import { SnowWarStrokeText } from './snowwar/SnowWarStrokeText';
+import { BaseButton } from '../../../common/BaseButton';
 
 /**
  * One 275x250 game card in the game center hub. Play joins the game's queue
@@ -117,25 +118,25 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                                         .replace('%position%', queuePosition.toString())
                                         .replace('%size%', queueSize.toString())}
                         </div>
-                        <button className="snowwar-button snowwar-button--danger" type="button" onClick={() => leaveQueue()}>
+                        <BaseButton className="snowwar-button snowwar-button--danger" type="button" onClick={() => leaveQueue()}>
                             {localizeWithFallback('snowwar.queue.leave', 'Leave queue')}
-                        </button>
+                        </BaseButton>
                     </div>
                 )}
                 {!isSnowWar && (
-                    <button disabled className="snowwar-button game-tile__play" type="button">
+                    <BaseButton disabled className="snowwar-button game-tile__play" type="button">
                         {localizeWithFallback('gamecenter.coming_soon', 'Coming soon!')}
-                    </button>
+                    </BaseButton>
                 )}
                 {isSnowWar && !inQueue && (
                     <div className="game-tile__links">
-                        <button className="game-tile__link" type="button" onClick={() => setInstructionsOpen(true)}>
+                        <BaseButton className="game-tile__link" type="button" onClick={() => setInstructionsOpen(true)}>
                             {localizeWithFallback('snowwar.instructions.link', 'How To Play')}
-                        </button>
+                        </BaseButton>
                         {showLeaderboard && (
-                            <button className="game-tile__link" type="button" onClick={() => requestLeaderboard(false, true, 0)}>
+                            <BaseButton className="game-tile__link" type="button" onClick={() => requestLeaderboard(false, true, 0)}>
                                 {localizeWithFallback('snowwar.leaderboards.link', 'Leaderboard')}
-                            </button>
+                            </BaseButton>
                         )}
                     </div>
                 )}
@@ -155,7 +156,7 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                                 <span>{localizeWithFallback('snowwar.buy_more_games', 'Buy more games:')}</span>
                                 <div className="game-tile__token-buttons">
                                     {tokenButtons.map(({ button, offer }) => (
-                                        <button
+                                        <BaseButton
                                             key={offer.offerId}
                                             aria-label={`${button.games}`}
                                             className="game-tile__token"
@@ -167,15 +168,15 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                             </div>
                         )}
                         {gamesLeft.showCounter && (
-                            <button className="game-tile__vip" type="button" onClick={openClubCenter}>
+                            <BaseButton className="game-tile__vip" type="button" onClick={openClubCenter}>
                                 <img alt="" className="game-tile__hc-icon" src={SNOWWAR_AIR_ASSETS.hc_icon} />
                                 <span>{localizeWithFallback('snowwar.get_more_games', 'Get additional free daily games with HC!')}</span>
-                            </button>
+                            </BaseButton>
                         )}
                         <div className="game-tile__actions">
                             {/* AIR updateGettingMoreGamesOption: no play button with 0 games left. */}
                             {gamesLeft.canStart && (
-                                <button
+                                <BaseButton
                                     className={`snowwar-button game-tile__play${(blockSeconds > 0) ? ' game-tile__play--blocked' : ''}`}
                                     disabled={blockSeconds > 0}
                                     type="button"
@@ -183,12 +184,12 @@ export const GameTileView: FC<{ game: GameConfigurationData }> = ({ game }) =>
                                     {(blockSeconds > 0)
                                         ? formatSnowWarBlockCountdown(blockSeconds)
                                         : localizeWithFallback('snowwar.play', 'Play now!')}
-                                </button>
+                                </BaseButton>
                             )}
                             {queueInfo?.canEdit && (
-                                <button className="snowwar-button snowwar-button--edit" type="button" onClick={() => startEditing()}>
+                                <BaseButton className="snowwar-button snowwar-button--edit" type="button" onClick={() => startEditing()}>
                                     {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
-                                </button>
+                                </BaseButton>
                             )}
                         </div>
                     </div>

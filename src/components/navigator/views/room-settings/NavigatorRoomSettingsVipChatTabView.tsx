@@ -4,6 +4,8 @@ import { GetClubMemberLevel, IRoomData, LocalizeText } from '../../../../api';
 import { Column, Flex, Grid, Text } from '../../../../common';
 import { OctaneInput } from '../../../../layout';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
@@ -36,7 +38,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                 <Column gap={1} size={6}>
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.chat_settings')} gap={1} className="h-full">
                         <Text small>{LocalizeText('navigator.roomsettings.chat_settings.info')}</Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             disabled={!isHC}
                             value={roomData.chatSettings.mode}
@@ -44,8 +46,8 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                         >
                             <option value={RoomChatSettings.CHAT_MODE_FREE_FLOW}>{LocalizeText('navigator.roomsettings.chat.mode.free.flow')}</option>
                             <option value={RoomChatSettings.CHAT_MODE_LINE_BY_LINE}>{LocalizeText('navigator.roomsettings.chat.mode.line.by.line')}</option>
-                        </select>
-                        <select
+                        </Select>
+                        <Select
                             className="form-select form-select-sm"
                             disabled={!isHC}
                             value={roomData.chatSettings.weight}
@@ -56,8 +58,8 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             </option>
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_THIN}>{LocalizeText('navigator.roomsettings.chat.bubbles.width.thin')}</option>
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_WIDE}>{LocalizeText('navigator.roomsettings.chat.bubbles.width.wide')}</option>
-                        </select>
-                        <select
+                        </Select>
+                        <Select
                             className="form-select form-select-sm"
                             disabled={!isHC}
                             value={roomData.chatSettings.speed}
@@ -66,8 +68,8 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_FAST}>{LocalizeText('navigator.roomsettings.chat.speed.fast')}</option>
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL}>{LocalizeText('navigator.roomsettings.chat.speed.normal')}</option>
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_SLOW}>{LocalizeText('navigator.roomsettings.chat.speed.slow')}</option>
-                        </select>
-                        <select
+                        </Select>
+                        <Select
                             className="form-select form-select-sm"
                             disabled={!isHC}
                             value={roomData.chatSettings.protection}
@@ -76,7 +78,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <option value={RoomChatSettings.FLOOD_FILTER_LOOSE}>{LocalizeText('navigator.roomsettings.chat.flood.loose')}</option>
                             <option value={RoomChatSettings.FLOOD_FILTER_NORMAL}>{LocalizeText('navigator.roomsettings.chat.flood.normal')}</option>
                             <option value={RoomChatSettings.FLOOD_FILTER_STRICT}>{LocalizeText('navigator.roomsettings.chat.flood.strict')}</option>
-                        </select>
+                        </Select>
                         <Text small>{LocalizeText('navigator.roomsettings.chat_settings.hearing.distance')}</Text>
                         <OctaneInput
                             className="form-control-sm"
@@ -92,16 +94,10 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                 <Column gap={1} size={6}>
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.vip_settings')} gap={1} className="h-full">
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={roomData.hideWalls}
-                                className="form-check-input"
-                                disabled={!isHC}
-                                type="checkbox"
-                                onChange={(event) => handleChange('hide_walls', event.target.checked)}
-                            />
+                            <Checkbox checked={roomData.hideWalls} disabled={!isHC} onCheckedChange={(nextChecked) => handleChange('hide_walls', nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.hide_walls')}</Text>
                         </div>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             disabled={!isHC}
                             value={roomData.wallThickness}
@@ -111,8 +107,8 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <option value="1">{LocalizeText('navigator.roomsettings.wall_thickness.thick')}</option>
                             <option value="-1">{LocalizeText('navigator.roomsettings.wall_thickness.thin')}</option>
                             <option value="-2">{LocalizeText('navigator.roomsettings.wall_thickness.thinnest')}</option>
-                        </select>
-                        <select
+                        </Select>
+                        <Select
                             className="form-select form-select-sm"
                             disabled={!isHC}
                             value={roomData.floorThickness}
@@ -122,27 +118,17 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <option value="1">{LocalizeText('navigator.roomsettings.floor_thickness.thick')}</option>
                             <option value="-1">{LocalizeText('navigator.roomsettings.floor_thickness.thin')}</option>
                             <option value="-2">{LocalizeText('navigator.roomsettings.floor_thickness.thinnest')}</option>
-                        </select>
+                        </Select>
                     </NavigatorRoomSettingsSectionView>
                 </Column>
                 <Column gap={1} size={12}>
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.room_behavior')} gap={1}>
                         <Flex alignItems="center" gap={1}>
-                            <input
-                                checked={!roomData.leaveOnDoorTileEnabled}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => handleChange('leave_on_door_tile_enabled', !event.target.checked)}
-                            />
+                            <Checkbox checked={!roomData.leaveOnDoorTileEnabled} onCheckedChange={(nextChecked) => handleChange('leave_on_door_tile_enabled', !nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.do_not_leave_on_door_tile')}</Text>
                         </Flex>
                         <Flex alignItems="center" gap={1}>
-                            <input
-                                checked={roomData.idleSleepEnabled}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => handleChange('idle_sleep_enabled', event.target.checked)}
-                            />
+                            <Checkbox checked={roomData.idleSleepEnabled} onCheckedChange={(nextChecked) => handleChange('idle_sleep_enabled', nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.idle_sleep')}</Text>
                             <OctaneInput
                                 className="form-control-sm w-20"
@@ -168,12 +154,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             <Text small>{LocalizeText('navigator.roomsettings.timeout.seconds')}</Text>
                         </Flex>
                         <Flex alignItems="center" gap={1}>
-                            <input
-                                checked={roomData.idleAutokickEnabled}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => handleChange('idle_autokick_enabled', event.target.checked)}
-                            />
+                            <Checkbox checked={roomData.idleAutokickEnabled} onCheckedChange={(nextChecked) => handleChange('idle_autokick_enabled', nextChecked)} />
                             <Text small>{LocalizeText('navigator.roomsettings.idle_autokick')}</Text>
                             <OctaneInput
                                 className="form-control-sm w-20"

@@ -19,6 +19,15 @@ const REPEAT_DELAY = 180;
  * movement for the rest of the session. An empty chat box is not typing:
  * only a message actually being composed should swallow the arrows.
  */
+const TEXT_ENTRY_SELECTOR = 'input, textarea, select, [role="combobox"], [role="listbox"], [role="option"], [role="spinbutton"], [role="checkbox"], [role="radio"], [role="slider"], .octane-select-trigger';
+
+/** Native fields and the Base UI controls that take keys (select, number, checkbox, radio, slider). */
+export const isTextEntryTarget = (target: EventTarget | null): boolean => {
+    if (!(target instanceof HTMLElement)) return false;
+
+    return target.isContentEditable || target.matches(TEXT_ENTRY_SELECTOR);
+};
+
 export const isTyping = () => {
     const element = document.activeElement as HTMLElement;
 
@@ -28,9 +37,7 @@ export const isTyping = () => {
         return !!(element as HTMLInputElement).value.length;
     }
 
-    const tag = element.tagName;
-
-    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || !!element.isContentEditable;
+    return isTextEntryTarget(element);
 };
 
 export const useRoomKeyboardMovement = () => {

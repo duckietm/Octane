@@ -1,3 +1,4 @@
+import { Menu } from '@base-ui/react/menu';
 import {
     ApplySnapshotMessageComposer,
     ConditionDefinition,
@@ -10,7 +11,7 @@ import {
     WiredSelectorDefinition,
     WiredVariableDefinition
 } from '@octane/renderer';
-import { CSSProperties, FC, MouseEvent, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import {
     CreateLinkEvent,
     GetConfigurationValue,
@@ -35,6 +36,7 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { useNotification, useWired, useWiredTools } from '../../../hooks';
 import { WiredFurniSelectorView } from './WiredFurniSelectorView';
 import { finalizeWiredVariablePickers } from './WiredVariablePickerHistory';
+import { BaseButton } from '../../../common/BaseButton';
 
 export interface WiredBaseViewProps {
     wiredType: string;
@@ -92,6 +94,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
     const [keepOpenOnSave, setKeepOpenOnSave] = useState<boolean>(false);
     const [showFooter, setShowFooter] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [menuElement, setMenuElement] = useState<HTMLElement | null>(null);
     const {
         trigger = null,
         setTrigger = null,
@@ -209,16 +212,6 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
     // The quick menu. Copy pushes the view's current settings into the hook first (the same
     // step "ready" takes), so the clipboard holds what is on screen and not what was last saved.
     const canEdit = !!roomSettings.canModify;
-    // The header is the drag handle; a press on the menu is a click, not the start of a drag.
-    const stopDrag = (event: MouseEvent<HTMLElement>) => {
-        event.stopPropagation();
-        event.nativeEvent.stopImmediatePropagation();
-    };
-
-    const runMenuAction = (action: () => void) => {
-        setIsMenuOpen(false);
-        action();
-    };
     const onCopy = () => {
         if (validate && !validate()) return;
 
@@ -352,42 +345,58 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
             style={resolvedCardStyle}
         >
             <OctaneCardHeaderView classNames={['octane-wired__header']} headerText={LocalizeText('wiredfurni.title')} onCloseClick={onClose}>
-                <div className="octane-wired__menu">
-                    <button
-                        aria-expanded={isMenuOpen}
-                        aria-haspopup="menu"
-                        aria-label={localizeWithFallback('wiredfurni.params.menu', 'Menu')}
-                        className="octane-wired__menu-toggle"
-                        title={localizeWithFallback('wiredfurni.params.menu', 'Menu')}
-                        type="button"
-                        onClick={() => setIsMenuOpen((value) => !value)}
-                        onMouseDownCapture={stopDrag}
-                    >
-                        &#8801;
-                    </button>
-                    {isMenuOpen && (
-                        <div className="octane-wired__menu-list" role="menu" onMouseDownCapture={stopDrag}>
-                            {menuItems.map((item, index) =>
-                                item ? (
-                                    <button
-                                        key={item.id}
-                                        aria-checked={item.checked}
-                                        className="octane-wired__menu-item"
-                                        disabled={item.disabled}
-                                        role={item.checked === undefined ? 'menuitem' : 'menuitemcheckbox'}
-                                        title={item.tooltip}
-                                        type="button"
-                                        onClick={() => (item.checked === undefined ? runMenuAction(item.onClick) : item.onClick())}
-                                    >
-                                        {item.checked !== undefined && <span className="octane-wired__menu-check">{item.checked ? '\u2611' : '\u2610'}</span>}
-                                        <span>{item.label}</span>
-                                    </button>
-                                ) : (
-                                    <div key={`spacer-${index}`} className="octane-wired__menu-spacer" />
-                                )
-                            )}
-                        </div>
-                    )}
+                <div ref={setMenuElement} className="octane-wired__menu">
+                    {/* The header is the drag handle; it ignores presses on buttons, so the trigger and the items are buttons. */}
+                    <Menu.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                        <Menu.Trigger
+                            aria-label={localizeWithFallback('wiredfurni.params.menu', 'Menu')}
+                            className="octane-wired__menu-toggle"
+                            title={localizeWithFallback('wiredfurni.params.menu', 'Menu')}
+                        >
+                            &#8801;
+                        </Menu.Trigger>
+                        {/* Rendered inside the menu wrapper, not the body, so the window's scoped css still applies. */}
+                        <Menu.Portal container={menuElement}>
+                            <Menu.Positioner align="end" className="octane-wired__menu-positioner" side="bottom" sideOffset={2}>
+                                <Menu.Popup className="octane-wired__menu-list">
+                                    {menuItems.map((item, index) =>
+                                        item ? (
+                                            item.checked === undefined ? (
+                                                <Menu.Item
+                                                    key={item.id}
+                                                    className="octane-wired__menu-item"
+                                                    disabled={item.disabled}
+                                                    nativeButton
+                                                    render={<BaseButton type="button" />}
+                                                    title={item.tooltip}
+                                                    onClick={() => item.onClick()}
+                                                >
+                                                    <span>{item.label}</span>
+                                                </Menu.Item>
+                                            ) : (
+                                                <Menu.CheckboxItem
+                                                    key={item.id}
+                                                    checked={item.checked}
+                                                    className="octane-wired__menu-item"
+                                                    closeOnClick={false}
+                                                    disabled={item.disabled}
+                                                    nativeButton
+                                                    render={<BaseButton type="button" />}
+                                                    title={item.tooltip}
+                                                    onCheckedChange={() => item.onClick()}
+                                                >
+                                                    <span className="octane-wired__menu-check">{item.checked ? '\u2611' : '\u2610'}</span>
+                                                    <span>{item.label}</span>
+                                                </Menu.CheckboxItem>
+                                            )
+                                        ) : (
+                                            <div key={`spacer-${index}`} className="octane-wired__menu-spacer" />
+                                        )
+                                    )}
+                                </Menu.Popup>
+                            </Menu.Positioner>
+                        </Menu.Portal>
+                    </Menu.Root>
                 </div>
             </OctaneCardHeaderView>
             <OctaneCardContentView classNames={['octane-wired__content']} gap={0}>
@@ -400,9 +409,9 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                             {splitWiredName(wiredName).title}
                         </Text>
                         {headerButton && (
-                            <button className="octane-wired__header-button" type="button" onClick={onHeaderButton}>
+                            <BaseButton className="octane-wired__header-button" type="button" onClick={onHeaderButton}>
                                 {localizeWithFallback(WIRED_HEADER_BUTTON_KEYS[headerButton].key, WIRED_HEADER_BUTTON_KEYS[headerButton].fallback)}
-                            </button>
+                            </BaseButton>
                         )}
                     </div>
                 </div>
@@ -427,9 +436,9 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                             <div className="octane-wired__section octane-wired__section--footer">
                                 {footerCollapsible ? (
                                     <>
-                                        <button className="octane-wired__advanced-toggle" type="button" onClick={() => setShowFooter((value) => !value)}>
+                                        <BaseButton className="octane-wired__advanced-toggle" type="button" onClick={() => setShowFooter((value) => !value)}>
                                             {LocalizeText(showFooter ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                                        </button>
+                                        </BaseButton>
                                         {showFooter && <div className="octane-wired__advanced-body">{footer}</div>}
                                     </>
                                 ) : (

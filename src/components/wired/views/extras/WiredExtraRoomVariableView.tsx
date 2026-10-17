@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const AVAILABILITY_ROOM_ACTIVE = 1;
 const AVAILABILITY_PERMANENT = 10;
@@ -80,33 +81,15 @@ export const WiredExtraRoomVariableView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.availability')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={availability === AVAILABILITY_ROOM_ACTIVE}
-                            className="form-check-input"
-                            name="wiredRoomVariableAvailability"
-                            type="radio"
-                            onChange={() => setAvailability(AVAILABILITY_ROOM_ACTIVE)}
-                        />
+                        <Radio checked={availability === AVAILABILITY_ROOM_ACTIVE} name="wiredRoomVariableAvailability" onCheckedChange={() => setAvailability(AVAILABILITY_ROOM_ACTIVE)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.availability.1')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={availability === AVAILABILITY_PERMANENT}
-                            className="form-check-input"
-                            name="wiredRoomVariableAvailability"
-                            type="radio"
-                            onChange={() => setAvailability(AVAILABILITY_PERMANENT)}
-                        />
+                        <Radio checked={availability === AVAILABILITY_PERMANENT} name="wiredRoomVariableAvailability" onCheckedChange={() => setAvailability(AVAILABILITY_PERMANENT)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.availability.10')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={availability === AVAILABILITY_SHARED}
-                            className="form-check-input"
-                            name="wiredRoomVariableAvailability"
-                            type="radio"
-                            onChange={() => setAvailability(AVAILABILITY_SHARED)}
-                        />
+                        <Radio checked={availability === AVAILABILITY_SHARED} name="wiredRoomVariableAvailability" onCheckedChange={() => setAvailability(AVAILABILITY_SHARED)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.availability.11')}</Text>
                     </label>
                 </div>

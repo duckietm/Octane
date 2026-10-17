@@ -7,6 +7,8 @@ import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const SOURCE_GROUP_USERS = 0;
 const SOURCE_GROUP_FURNI = 1;
@@ -161,13 +163,7 @@ export const WiredConditionSelectionQuantityView: FC<{}> = () => {
                 {COMPARISON_OPTIONS.map((value) => {
                     return (
                         <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={comparison === value}
-                                className="form-check-input"
-                                name="selectionQuantityComparison"
-                                type="radio"
-                                onChange={() => setComparison(value)}
-                            />
+                            <Radio checked={comparison === value} name="selectionQuantityComparison" onCheckedChange={() => setComparison(value)} />
                             <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
                         </label>
                     );
@@ -200,14 +196,14 @@ export const WiredConditionSelectionQuantityView: FC<{}> = () => {
                 headerContent={
                     <div className="octane-wired__give-var-targets">
                         {SOURCE_GROUP_BUTTONS.map((button) => (
-                            <button
+                            <BaseButton
                                 key={button.key}
                                 type="button"
                                 className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${isUserGroup === button.isUserGroup ? 'is-active' : ''}`}
                                 onClick={() => changeGroup(button.isUserGroup)}
                             >
                                 <img src={button.icon} alt={button.key} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 }

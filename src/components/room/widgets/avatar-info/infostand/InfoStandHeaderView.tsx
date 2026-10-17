@@ -1,5 +1,7 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../../../api';
+import { BaseButton } from '../../../../../common/BaseButton';
+import { Hint } from '../../../../../common/Tooltip';
 
 interface InfoStandHeaderViewProps {
     name: string;
@@ -13,13 +15,14 @@ interface InfoStandHeaderViewProps {
  */
 export const InfoStandHeaderView: FC<InfoStandHeaderViewProps> = ({ name, onClose }) => (
     <>
-        <button
-            type="button"
-            className="octane-infostand__close"
-            aria-label={LocalizeText('generic.close')}
-            title={LocalizeText('generic.close')}
-            onClick={onClose}
-        />
+        <Hint content={LocalizeText('generic.close')}>
+            <BaseButton
+                type="button"
+                className="octane-infostand__close"
+                aria-label={LocalizeText('generic.close')}
+                onClick={onClose}
+            />
+        </Hint>
         <div className="octane-infostand__header">
             <span className="octane-infostand__identity">{name}</span>
         </div>

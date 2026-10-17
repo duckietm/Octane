@@ -3,6 +3,7 @@ import { FaExclamationTriangle } from 'react-icons/fa';
 import { LocalizeText, matchesDangerConfirmation } from '../../api';
 import { useHousekeepingStore } from '../../hooks';
 import { HousekeepingButton } from './views/common/HousekeepingParts';
+import { InlineDialog } from '../../common/InlineDialog';
 
 /**
  * Second step of a dangerous action, drawn over the panel: the operator has to
@@ -29,7 +30,12 @@ export const HousekeepingDangerConfirmView: FC = () => {
     };
 
     return (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true">
+        <InlineDialog
+            aria-label={LocalizeText('housekeeping.danger.title')}
+            aria-modal="true"
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClose={close}
+        >
             <div className="octane-hk-popover flex w-[360px] max-w-full flex-col gap-2 rounded-lg border border-rose-300 p-3 text-black">
                 <div className="flex items-center gap-2 text-sm font-bold text-rose-700">
                     <FaExclamationTriangle size={14} />
@@ -45,7 +51,6 @@ export const HousekeepingDangerConfirmView: FC = () => {
                         onChange={(event) => setTyped(event.target.value)}
                         onKeyDown={(event) => {
                             if (event.key === 'Enter') confirm();
-                            if (event.key === 'Escape') close();
                         }}
                     />
                 </label>
@@ -58,6 +63,6 @@ export const HousekeepingDangerConfirmView: FC = () => {
                     </HousekeepingButton>
                 </div>
             </div>
-        </div>
+        </InlineDialog>
     );
 };

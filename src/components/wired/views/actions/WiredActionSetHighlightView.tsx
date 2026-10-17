@@ -21,6 +21,9 @@ import {
     wiredHighlightStrengthOptions,
     WiredActionSetHighlightState
 } from './WiredActionSetHighlightState';
+import { ToggleButton } from '../../../../common/ToggleButton';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const TYPE_FALLBACKS = ['Outline', 'Soft glow', 'Darken', 'Colour tint', 'Brighten', 'Neon aura'];
 const EASING_FALLBACKS = ['Instant', 'Linear', 'Ease in', 'Ease out', 'Ease in and out'];
@@ -106,11 +109,11 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
                     <Text bold>{localizeWithFallback('wiredfurni.params.sources.merged.title.target', 'Select target:')}</Text>
                     <div className="flex gap-3">
                         <label className="flex items-center gap-1">
-                            <input checked={!state.targetUsers} className="form-check-input" name="wiredHighlightTarget" type="radio" onChange={() => update({ targetUsers: false })} />
+                            <Radio checked={!state.targetUsers} name="wiredHighlightTarget" onCheckedChange={() => update({ targetUsers: false })} />
                             <Text>{localizeWithFallback('wiredfurni.params.sources.furni.title', 'Furni')}</Text>
                         </label>
                         <label className="flex items-center gap-1">
-                            <input checked={state.targetUsers} className="form-check-input" name="wiredHighlightTarget" type="radio" onChange={() => update({ targetUsers: true })} />
+                            <Radio checked={state.targetUsers} name="wiredHighlightTarget" onCheckedChange={() => update({ targetUsers: true })} />
                             <Text>{localizeWithFallback('wiredfurni.params.sources.users.title', 'Users')}</Text>
                         </label>
                     </div>
@@ -132,43 +135,43 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.furni_visualization.audience', 'Who should see the effect?')}</Text>
-                <select className="form-select form-select-sm" value={state.audience} onChange={(event) => changeAudience(Number(event.target.value))}>
+                <Select className="form-select form-select-sm" value={state.audience} onChange={(event) => changeAudience(Number(event.target.value))}>
                     <option value={WIRED_HIGHLIGHT_AUDIENCE_SOURCE_USERS}>{localizeWithFallback('wiredfurni.params.furni_visualization.audience.selected_users', 'Selected users')}</option>
                     <option value={WIRED_HIGHLIGHT_AUDIENCE_EVERYONE}>{localizeWithFallback('wiredfurni.params.furni_visualization.audience.everyone', 'Everyone, also users who enter later')}</option>
-                </select>
+                </Select>
             </div>
 
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.type', 'Highlight type:')}</Text>
-                <select aria-label="highlight type" className="form-select form-select-sm" value={state.highlightType} onChange={(event) => changeType(Number(event.target.value))}>
+                <Select aria-label="highlight type" className="form-select form-select-sm" value={state.highlightType} onChange={(event) => changeType(Number(event.target.value))}>
                     {WIRED_HIGHLIGHT_TYPES.map((type) => (
                         <option key={type} value={type}>
                             {localizeWithFallback(`wiredfurni.params.set_furni_highlight.type.${type}`, TYPE_FALLBACKS[type])}
                         </option>
                     ))}
-                </select>
+                </Select>
                 {showWarning && <Text small variant="danger">{localizeWithFallback('wiredfurni.params.set_furni_highlight.normal_furni_warning', 'This highlight type does not work on items outside Builders Club.')}</Text>}
             </div>
 
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.strength', 'Strength:')}</Text>
-                <select aria-label="highlight strength" className="form-select form-select-sm" value={state.strength} onChange={(event) => update({ strength: Number(event.target.value) })}>
+                <Select aria-label="highlight strength" className="form-select form-select-sm" value={state.strength} onChange={(event) => update({ strength: Number(event.target.value) })}>
                     {strengthOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                             {strengthLabel(option.level)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
 
             <div className={`flex flex-col gap-1 ${hasColor ? '' : 'opacity-50 pointer-events-none'}`}>
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.color', 'Highlight colour:')}</Text>
                 <div className="flex flex-wrap gap-1">
                     {palette.map((color) => (
-                        <button
+                        <ToggleButton
                             key={color}
                             aria-label={hexColor(color)}
-                            aria-pressed={state.color === color}
+                            pressed={state.color === color}
                             className={`h-[14px] w-[14px] border ${state.color === color ? 'border-black' : 'border-[#9a9a9a]'}`}
                             style={{ background: hexColor(color) }}
                             type="button"
@@ -180,24 +183,24 @@ export const WiredActionSetHighlightView: FC<{}> = () => {
 
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.animation', 'Animation:')}</Text>
-                <select aria-label="highlight animation" className="form-select form-select-sm" value={state.animation} onChange={(event) => update({ animation: Number(event.target.value) })}>
+                <Select aria-label="highlight animation" className="form-select form-select-sm" value={state.animation} onChange={(event) => update({ animation: Number(event.target.value) })}>
                     {wiredHighlightAnimations(state.highlightType).map((animation) => (
                         <option key={animation} value={animation}>
                             {localizeWithFallback(`wiredfurni.params.set_furni_highlight.animation.${animation}`, animation === 0 ? 'Steady' : 'Pulse')}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
 
             <div className={`flex flex-col gap-1 ${state.animation === WIRED_HIGHLIGHT_ANIMATION_STEADY ? '' : 'opacity-50 pointer-events-none'}`}>
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_highlight.easing', 'Transition:')}</Text>
-                <select aria-label="highlight easing" className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
+                <Select aria-label="highlight easing" className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
                     {EASING_FALLBACKS.map((fallback, value) => (
                         <option key={value} value={value}>
                             {localizeWithFallback(`wiredfurni.params.set_furni_highlight.easing.${value}`, fallback)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
         </WiredActionBaseView>
     );

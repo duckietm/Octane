@@ -32,13 +32,13 @@ describe('Wired variable picker', () => {
         render(<WiredVariablePicker entries={entries} selectedToken="" onSelect={vi.fn()} />);
 
         open();
-        expect(screen.getByTitle('wiredfurni.variable_picker.tab.user_created')).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.getByTitle('wiredfurni.variable_picker.tab.user_created')).toHaveAttribute('aria-selected', 'true');
         expect(rowNames()).toEqual(['my_score', 'flag']);
         cleanup();
 
         render(<WiredVariablePicker entries={entries} selectedToken={entries[2].token} onSelect={vi.fn()} />);
         open();
-        expect(screen.getByTitle('wiredfurni.variable_picker.tab.internal')).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.getByTitle('wiredfurni.variable_picker.tab.internal')).toHaveAttribute('aria-selected', 'true');
     });
 
     it('nests the tree to any depth and selects a leaf', () => {
@@ -75,7 +75,7 @@ describe('Wired variable picker', () => {
         render(<WiredVariablePicker entries={entries} selectedToken="" onSelect={vi.fn()} />);
         open();
         fireEvent.change(screen.getByRole('textbox'), { target: { value: 'old event' } });
-        expect(screen.getByTitle('wiredfurni.variable_picker.tab.search')).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.getByTitle('wiredfurni.variable_picker.tab.search')).toHaveAttribute('aria-selected', 'true');
         expect(rowNames()).toEqual(['event.variable_update.old_value']);
         fireEvent.change(screen.getByRole('textbox'), { target: { value: 'deposit' } });
         expect(rowNames()).toEqual(['event']);
@@ -117,5 +117,49 @@ describe('Wired variable picker', () => {
         tab('all');
         tab('recent');
         expect(rowNames()).toEqual(['my_score']);
+    });
+    it('closes on Escape and on a press outside, keeping the selection', () => {
+        const onSelect = vi.fn();
+
+        render(<WiredVariablePicker entries={entries} selectedToken={entries[3].token} onSelect={onSelect} />);
+        open();
+        expect(rowNames().length).toBeGreaterThan(0);
+        fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
+        expect(rowNames()).toEqual([]);
+        expect(screen.getByRole('textbox')).toHaveValue('my_score');
+
+        open();
+        fireEvent.change(screen.getByRole('textbox'), { target: { value: 'half typed' } });
+        fireEvent.pointerDown(document.body);
+        fireEvent.mouseDown(document.body);
+        fireEvent.click(document.body);
+        expect(rowNames()).toEqual([]);
+        expect(screen.getByRole('textbox')).toHaveValue('my_score');
+        expect(onSelect).not.toHaveBeenCalled();
+    });
+
+    it('takes a typed exact name when the press lands outside', () => {
+        const onSelect = vi.fn();
+
+        render(<WiredVariablePicker entries={entries} selectedToken="" onSelect={onSelect} />);
+        open();
+        fireEvent.change(screen.getByRole('textbox'), { target: { value: 'my_score' } });
+        fireEvent.pointerDown(document.body);
+        fireEvent.mouseDown(document.body);
+        fireEvent.click(document.body);
+        expect(onSelect).toHaveBeenCalledWith(entries[3]);
+        expect(rowNames()).toEqual([]);
+    });
+
+    it('keeps the picker open for a press inside a sub-list', () => {
+        render(<WiredVariablePicker entries={entries} selectedToken="" onSelect={vi.fn()} />);
+        open();
+        tab('all');
+        hover('event');
+        const sub = row('transaction_complete');
+
+        fireEvent.pointerDown(sub);
+        fireEvent.mouseDown(sub);
+        expect(rowNames().slice(-2)).toEqual(['transaction_complete', 'variable_update']);
     });
 });

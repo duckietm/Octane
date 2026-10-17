@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { IMentionEntry } from '../../../api/mentions';
-import { addMention, getMentionsSnapshot, getMentionsStatus, getUnreadCount, isMentionsPanelOpen, markAllRead, markRead, MAX_MENTIONS, resetMentions, setMentions, setMentionsPanelOpen, setMentionsStatus } from '../mentionsStore';
+import { addMention, appendMentions, getHasMoreMentions, getMentionsSnapshot, getOldestMentionId, isLoadingMoreMentions, setLoadingMoreMentions, getMentionsStatus, getUnreadCount, isMentionsPanelOpen, markAllRead, markRead, MAX_MENTIONS, resetMentions, setMentions, setMentionsPanelOpen, setMentionsStatus } from '../mentionsStore';
 
 const make = (id: number, read = false): IMentionEntry => ({
     mentionId: id,
@@ -89,5 +89,46 @@ describe('mentionsStore status, cap and duplicates', () => {
         expect(isMentionsPanelOpen()).toBe(true);
         resetMentions();
         expect(isMentionsPanelOpen()).toBe(false);
+    });
+});
+
+describe('mentionsStore paging', () => {
+    beforeEach(() => resetMentions());
+
+    it('remembers whether older mentions remain and waits for the next page', () => {
+        setMentions([make(5), make(4)], true);
+        expect(getHasMoreMentions()).toBe(true);
+        setLoadingMoreMentions(true);
+        expect(isLoadingMoreMentions()).toBe(true);
+    });
+
+    it('asks the next page from the oldest id it holds', () => {
+        setMentions([make(9), make(4), make(7)], true);
+        expect(getOldestMentionId()).toBe(4);
+    });
+
+    it('has nothing to ask from when no mention has an id', () => {
+        expect(getOldestMentionId()).toBe(0);
+        setMentions([make(0)], true);
+        expect(getOldestMentionId()).toBe(0);
+    });
+
+    it('adds a page below the list, skips what it already holds, and ends the waiting', () => {
+        setMentions([{ ...make(5), timestamp: 50 }, { ...make(4), timestamp: 40 }], true);
+        setLoadingMoreMentions(true);
+        appendMentions([{ ...make(4), timestamp: 40 }, { ...make(3), timestamp: 30 }, { ...make(2), timestamp: 20 }], false);
+
+        expect(getMentionsSnapshot().map((mention) => mention.mentionId)).toEqual([5, 4, 3, 2]);
+        expect(getHasMoreMentions()).toBe(false);
+        expect(isLoadingMoreMentions()).toBe(false);
+    });
+
+    it('a fresh list replaces the paging state', () => {
+        setMentions([make(5)], true);
+        setLoadingMoreMentions(true);
+        setMentions([make(6)], false);
+
+        expect(getHasMoreMentions()).toBe(false);
+        expect(isLoadingMoreMentions()).toBe(false);
     });
 });

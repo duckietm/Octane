@@ -1,6 +1,7 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import { LocalizeText, SearchFilterOptions } from '../../../../api';
 import dropmenuArrow from '../../../../assets/images/habbo-skin/slices/dropmenu-default-arrow.png';
+import { ListSelect } from '../../../../common/ListSelect';
 
 interface NavigatorFilterChipsViewProps {
     value: number;
@@ -11,60 +12,28 @@ export const NavigatorFilterChipsView: FC<NavigatorFilterChipsViewProps> = (prop
     const { value, onChange } = props;
     const [open, setOpen] = useState(false);
     const rootRef = useRef<HTMLDivElement>(null);
-    const current = SearchFilterOptions[value] ?? SearchFilterOptions[0];
-
-    useEffect(() => {
-        if (!open) return;
-
-        const onPointerDown = (event: PointerEvent) => {
-            if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-        };
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') setOpen(false);
-        };
-
-        document.addEventListener('pointerdown', onPointerDown);
-        document.addEventListener('keydown', onKeyDown);
-
-        return () => {
-            document.removeEventListener('pointerdown', onPointerDown);
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, [open]);
+    const selected = SearchFilterOptions[value] ? value : 0;
 
     return (
         <div ref={rootRef} className={`octane-navigator-air__filter${open ? ' is-open' : ''}`}>
-            <button
-                type="button"
-                className="octane-navigator-air__filter-button"
-                aria-haspopup="listbox"
-                aria-expanded={open}
+            <ListSelect
                 aria-label={LocalizeText('navigator.filter.anything')}
-                onClick={() => setOpen((currentOpen) => !currentOpen)}
-            >
-                <span>{LocalizeText('navigator.filter.' + current.name)}</span>
-                <img src={dropmenuArrow} alt="" width={16} height={16} />
-            </button>
-            {open && (
-                <ul className="octane-navigator-air__filter-list" role="listbox">
-                    {SearchFilterOptions.map((filter, index) => (
-                        <li key={filter.name}>
-                            <button
-                                type="button"
-                                role="option"
-                                aria-selected={index === value}
-                                className={index === value ? 'is-selected' : undefined}
-                                onClick={() => {
-                                    onChange(index);
-                                    setOpen(false);
-                                }}
-                            >
-                                {LocalizeText('navigator.filter.' + filter.name)}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+                container={rootRef}
+                itemClassName="octane-navigator-air__filter-option"
+                options={SearchFilterOptions.map((filter, index) => ({ value: String(index), label: LocalizeText('navigator.filter.' + filter.name) }))}
+                popupClassName="octane-navigator-air__filter-list"
+                sideOffset={-1}
+                triggerClassName="octane-navigator-air__filter-button"
+                value={String(selected)}
+                renderTrigger={(current) => (
+                    <>
+                        <span>{current?.label}</span>
+                        <img src={dropmenuArrow} alt="" width={16} height={16} />
+                    </>
+                )}
+                onOpenChange={setOpen}
+                onValueChange={(next) => onChange(Number(next))}
+            />
         </div>
     );
 };

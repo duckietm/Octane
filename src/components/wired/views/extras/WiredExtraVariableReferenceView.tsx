@@ -4,6 +4,8 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 const TARGET_USER = 0;
 const TARGET_ROOM = 3;
@@ -208,7 +210,7 @@ export const WiredExtraVariableReferenceView: FC<{}> = () => {
 
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.room_selection')}</Text>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={sourceRoomId}
                         onChange={(event) => setSourceRoomId(parseInt(event.target.value, 10) || 0)}
@@ -219,12 +221,12 @@ export const WiredExtraVariableReferenceView: FC<{}> = () => {
                                 {option.roomName}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
 
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_ref_selection')}</Text>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={`${sourceVariableItemId}:${sourceTargetType}`}
                         onChange={(event) => {
@@ -240,13 +242,13 @@ export const WiredExtraVariableReferenceView: FC<{}> = () => {
                                 {`${variable.name} (${getTargetLabel(variable.targetType)})`}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
 
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input checked={readOnly} className="form-check-input" type="checkbox" onChange={(event) => setReadOnly(event.target.checked)} />
+                        <Checkbox checked={readOnly} onCheckedChange={(nextChecked) => setReadOnly(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.variables.settings.read_only')}</Text>
                     </label>
                 </div>

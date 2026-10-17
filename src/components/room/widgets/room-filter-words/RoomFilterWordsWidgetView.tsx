@@ -4,6 +4,7 @@ import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFilterWordsWidget, useNavigatorData } from '../../../../hooks';
 import { classNames, OctaneInput } from '../../../../layout';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
     const [word, setWord] = useState<string>('bobba');
@@ -65,7 +66,7 @@ export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
                         wordsFilter.length > 0 &&
                         wordsFilter.map((word, index) => {
                             return (
-                                <Flex
+                                <Flex component={BaseButton} type="button"
                                     key={index}
                                     pointer
                                     alignItems="center"

@@ -3,6 +3,7 @@ import { FC, useEffect } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../../api';
 import { Button, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { usePetPackageWidget } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const PET_PACKAGE_PREVIEW: Record<string, { typeId: number; paletteId: number }> = {
     val11_present: { typeId: 11, paletteId: 0 },
@@ -81,7 +82,7 @@ export const PetPackageWidgetView: FC<{}> = (props) => {
                                 </div>
                                 {errorResult.length > 0 && <div className="invalid-feedback d-block m-0">{errorResult}</div>}
                                 <div className="flex items-center gap-5 justify-center mt-2">
-                                    <Text pointer className="text-decoration" onClick={() => onClose()}>
+                                    <Text component={BaseButton} type="button" pointer className="text-decoration" onClick={() => onClose()}>
                                         {LocalizeText('cancel')}
                                     </Text>
                                     <Button disabled={petName.length < 3} variant={petName.length < 3 ? 'danger' : 'success'} onClick={() => onConfirm()}>

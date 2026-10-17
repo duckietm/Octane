@@ -10,7 +10,7 @@ import {
     RoomChatlogEvent,
     UserChatlogEvent
 } from '@octane/renderer';
-import { FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ElementType, FC, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { OpenUrl, SendMessageComposer } from '../../../api';
 import { NativeText } from '../../../common/native-text/NativeText';
 import { useMessageEvent } from '../../../hooks';
@@ -18,6 +18,7 @@ import evidenceXml from '../../../assets/mod-tools/xml/evidence_frame.xml?raw';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Button, Native0Rows, Native0Scrollbar } from '../native/NativeWindow0';
 import { chatlineMatches } from './chatlogFilter';
+import { BaseButton } from '../../../common/BaseButton';
 
 export type EvidenceChatlogKind = 'user' | 'room' | 'cfh';
 
@@ -293,19 +294,21 @@ export const EvidenceChatlogList: FC<EvidenceChatlogListProps> = ({ evidence, li
                             );
                         }
 
+                        const Chatter: ElementType = item.line.userId > 0 ? BaseButton : 'div';
+
                         return (
                             <div key={`${evidence.serial}:${index}`} style={{ position: 'absolute', left: 0, top: tops[index], width: lineWidth, height: heights[index] }}>
                                 <div style={{ position: 'absolute', left: time.x, top: time.y, width: time.width, height: heights[index], overflow: 'hidden', fontSize: 0, lineHeight: 0 }}>
                                     <NativeText background={item.color} text={item.line.timestamp} textStyle="u_bold" />
                                 </div>
-                                <div style={{ position: 'absolute', left: chatter.x, top: chatter.y, width: chatter.width, height: heights[index], overflow: 'hidden', fontSize: 0, lineHeight: 0, cursor: item.line.userId > 0 ? 'pointer' : undefined }} onClick={item.line.userId > 0 ? () => onOpenUserInfo(item.line.userId) : undefined}>
+                                <Chatter {...(item.line.userId > 0 ? { type: 'button' } : {})} style={{ position: 'absolute', left: chatter.x, top: chatter.y, width: chatter.width, height: heights[index], overflow: 'hidden', fontSize: 0, lineHeight: 0, cursor: item.line.userId > 0 ? 'pointer' : undefined }} onClick={item.line.userId > 0 ? () => onOpenUserInfo(item.line.userId) : undefined}>
                                     <NativeText
                                         background={item.color}
                                         overrides={{ underline: item.line.userId > 0, bold: true }}
                                         text={item.line.userId > 0 ? item.line.userName : item.line.userId === 0 ? 'Bot / pet' : '-'}
                                         textStyle="u_bold"
                                     />
-                                </div>
+                                </Chatter>
                                 <MessageText
                                     background={item.color}
                                     bold={item.line.hasHighlighting}

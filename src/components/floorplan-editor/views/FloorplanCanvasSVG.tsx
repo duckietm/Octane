@@ -5,6 +5,8 @@ import { useTool } from '../hooks/useTool';
 import { MAX_NUM_TILE_PER_AXIS, TILE_SIZE } from '../state/constants';
 import { FloorplanAction, FloorplanState } from '../state/types';
 import { FloorplanTile } from './FloorplanTile';
+import { BaseButton } from '../../../common/BaseButton';
+import { Hint } from '../../../common/Tooltip';
 
 type Props = {
     state: FloorplanState;
@@ -244,13 +246,12 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                 {outOfBoundsOverlay}
             </svg>
             <div className="fp-stage-buttons">
-                <button type="button" data-testid="zoom-reset" title="Fit room to view" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
+                <Hint content="Fit room to view"><BaseButton aria-label="Fit room to view" type="button" data-testid="zoom-reset" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
                     <FaExpand size={10} />
-                </button>
-                <button
+                </BaseButton></Hint>
+                <Hint content="Recenter on room (keep zoom)"><BaseButton aria-label="Recenter on room (keep zoom)"
                     type="button"
                     data-testid="zoom-recenter"
-                    title="Recenter on room (keep zoom)"
                     className="fp-round-btn is-small"
                     disabled={!roomBounds}
                     onClick={() => {
@@ -259,23 +260,24 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                     }}
                 >
                     <FaCrosshairs size={10} />
-                </button>
-                <button
-                    type="button"
-                    data-testid="zoom-flip"
-                    data-active={flipped ? 'true' : 'false'}
-                    title={flipped ? 'Original view' : 'View from the other side'}
-                    className={`fp-round-btn is-small ${flipped ? 'is-on' : ''}`}
-                    onClick={() => setFlipped((v) => !v)}
-                >
-                    <FaSyncAlt size={10} />
-                </button>
-                <button type="button" data-testid="zoom-in" title={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} className="fp-round-btn" disabled={zoom >= ZOOM_MAX - 1e-3} onClick={zoomIn}>
+                </BaseButton></Hint>
+                <Hint content={flipped ? 'Original view' : 'View from the other side'}>
+                    <BaseButton aria-label={flipped ? 'Original view' : 'View from the other side'}
+                        type="button"
+                        data-testid="zoom-flip"
+                        data-active={flipped ? 'true' : 'false'}
+                        className={`fp-round-btn is-small ${flipped ? 'is-on' : ''}`}
+                        onClick={() => setFlipped((v) => !v)}
+                    >
+                        <FaSyncAlt size={10} />
+                    </BaseButton>
+                </Hint>
+                <Hint content={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-in" className="fp-round-btn" disabled={zoom >= ZOOM_MAX - 1e-3} onClick={zoomIn}>
                     <FaPlus size={13} />
-                </button>
-                <button type="button" data-testid="zoom-out" title={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} className="fp-round-btn" disabled={zoom <= ZOOM_MIN + 1e-3} onClick={zoomOut}>
+                </BaseButton></Hint>
+                <Hint content={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`}><BaseButton aria-label={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} type="button" data-testid="zoom-out" className="fp-round-btn" disabled={zoom <= ZOOM_MIN + 1e-3} onClick={zoomOut}>
                     <FaMinus size={13} />
-                </button>
+                </BaseButton></Hint>
             </div>
         </div>
     );

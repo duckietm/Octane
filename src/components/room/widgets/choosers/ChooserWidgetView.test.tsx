@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 vi.mock('@octane/renderer', () => ({ FurniturePickupAllComposer: class {}, RoomObjectCategory: { FLOOR: 1, WALL: 2, UNIT: 100 } }));
 vi.mock('../../../../api', () => ({
@@ -78,7 +79,7 @@ describe('ChooserWidgetView', () => {
 
         expect(screen.getByText('3 items found')).toBeTruthy();
 
-        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Bob' } });
+        selectOption(screen.getByRole('combobox'), 'Bob');
         expect(screen.getByText('2 items found')).toBeTruthy();
         expect(screen.getByText('1')).toBeTruthy();
     });

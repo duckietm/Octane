@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 export const WiredConditionFurniHasFurniOnView: FC<{}> = (props) => {
     const [requireAll, setRequireAll] = useState(-1);
@@ -37,14 +38,7 @@ export const WiredConditionFurniHasFurniOnView: FC<{}> = (props) => {
                 {[0, 1].map((value) => {
                     return (
                         <div key={value} className="flex items-center gap-1">
-                            <input
-                                checked={requireAll === value}
-                                className="form-check-input"
-                                id={`requireAll${value}`}
-                                name="requireAll"
-                                type="radio"
-                                onChange={(event) => setRequireAll(value)}
-                            />
+                            <Radio checked={requireAll === value} id={`requireAll${value}`} name="requireAll" onCheckedChange={() => setRequireAll(value)} />
                             <Text>{LocalizeText('wiredfurni.params.requireall.' + value)}</Text>
                         </div>
                     );

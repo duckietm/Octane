@@ -21,6 +21,7 @@ import {
     normalizeCatalogSearchText,
     shouldRunCatalogSearch
 } from './catalogSearch.helpers';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 export const CatalogSearchView: FC<{}> = () => {
     const [searchValue, setSearchValue] = useState('');
@@ -132,14 +133,14 @@ export const CatalogSearchView: FC<{}> = () => {
                 onKeyDown={onSearchKeyDown}
             />
             {searchValue && searchValue.length > 0 && (
-                <button
+                <BaseButton
                     aria-label={localizeWithFallback('generic.clear', 'Clear')}
                     type="button"
                     className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] text-muted hover:text-danger cursor-pointer transition-colors"
                     onClick={clearSearch}
                 >
                     <FaTimes />
-                </button>
+                </BaseButton>
             )}
         </div>
     );

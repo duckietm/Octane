@@ -13,7 +13,7 @@ import {
 } from '@octane/renderer';
 import { FC, Fragment, useMemo, useState } from 'react';
 import { GroupItem, localizeWithFallback, ProductImageUtility } from '../../../../api';
-import { AutoGrid, Button, Column, Flex, Grid, LayoutGridItem, Text } from '../../../../common';
+import { AutoGrid, BaseButton, Button, Column, Flex, Grid, LayoutGridItem, Text } from '../../../../common';
 import { useInventoryFurni, useWiredTrading } from '../../../../hooks';
 import { WIRED_TRADING_STATE_ADDING_ITEMS, WIRED_TRADING_STATE_CONFIRMED, WIRED_TRADING_STATE_CONFIRMING, WIRED_TRADING_STATE_COUNTDOWN } from '../../../../hooks/inventory/useWiredTrading';
 
@@ -221,6 +221,8 @@ export const InventoryWiredTradeView: FC<{}> = () => {
                         {groupItems.map((group, index) => (
                             <LayoutGridItem
                                 key={index}
+                                aria-pressed={selected === group}
+                                component={BaseButton}
                                 itemActive={selected === group}
                                 itemCount={group.getUnlockedCount()}
                                 itemImage={group.iconUrl}

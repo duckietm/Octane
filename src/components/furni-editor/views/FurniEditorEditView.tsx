@@ -1,3 +1,5 @@
+import { Autocomplete } from '@base-ui/react/autocomplete';
+import { Dialog } from '@base-ui/react/dialog';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CopyToClipboard } from '../../../api';
@@ -16,6 +18,11 @@ import {
     suggestFromSiblings,
     suggestInteractionType
 } from '../furniEditorSuggestions';
+import { NumberInput } from '../../../common/NumberInput';
+import { TabBar, TabBarTab } from '../../../common/TabBar';
+import { BaseButton } from '../../../common/BaseButton';
+import { SuggestInput } from '../../../common/SuggestInput';
+import { ToggleButton } from '../../../common/ToggleButton';
 
 interface FurniEditorEditViewProps {
     item: FurniDetail;
@@ -99,6 +106,8 @@ const FIELD_LABELS: Record<EditField, string> = {
     effectIdFemale: 'Effect ID (female)',
     clothingOnWalk: 'Clothing on walk'
 };
+
+const JUMP_FIELD_LABELS = Object.values(FIELD_LABELS);
 
 // Mirrors FurniEditorUpdatePayload.validateValue on the emulator: a value the
 // server would reject is flagged here instead of failing silently after Save.
@@ -190,12 +199,16 @@ interface InteractionTypePickerProps {
 const InteractionTypePicker: FC<InteractionTypePickerProps> = ({ id, value, options, className, onChange }) => {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState<string | null>(null);
+    // The row the arrow keys / pointer put the highlight on; Enter takes it, else the first match.
+    const highlighted = useRef<string | undefined>(undefined);
     const shown = query ?? value;
     const needle = shown.trim().toLowerCase();
     const matches = useMemo(() => {
         const list = needle ? options.filter((type) => type.toLowerCase().includes(needle)) : options;
         return list.slice(0, 12);
     }, [options, needle]);
+    // '' is the "none" row: only offered while nothing is typed.
+    const items = useMemo(() => (needle ? matches : ['', ...matches]), [matches, needle]);
 
     const pick = (type: string) => {
         onChange(type);
@@ -205,73 +218,73 @@ const InteractionTypePicker: FC<InteractionTypePickerProps> = ({ id, value, opti
 
     return (
         <div className="relative">
-            <input
-                id={id}
-                role="combobox"
-                aria-label={FIELD_LABELS.interactionType}
-                aria-expanded={open}
-                aria-autocomplete="list"
-                aria-controls={`${id}-list`}
-                className={`${className} font-mono pr-7`}
+            <Autocomplete.Root
+                filter={null}
+                items={items}
+                mode="list"
+                open={open}
                 value={shown}
-                placeholder="none"
-                spellCheck={false}
-                onFocus={() => setOpen(true)}
-                onBlur={() => {
-                    if (query !== null) onChange(query.trim());
-                    setQuery(null);
-                    setOpen(false);
+                onItemHighlighted={(item) => {
+                    highlighted.current = item;
                 }}
-                onChange={(e) => {
-                    setQuery(e.target.value);
+                onOpenChange={setOpen}
+                onValueChange={(next, details) => {
+                    if (details.reason === 'item-press') {
+                        pick(next);
+                        return;
+                    }
+
+                    setQuery(next);
                     setOpen(true);
                 }}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' && matches.length && open) {
-                        e.preventDefault();
-                        pick(matches[0]);
-                    } else if (e.key === 'Escape' && open) {
-                        e.stopPropagation();
+            >
+                <Autocomplete.Input
+                    id={id}
+                    aria-label={FIELD_LABELS.interactionType}
+                    className={`${className} font-mono pr-7`}
+                    placeholder="none"
+                    spellCheck={false}
+                    onFocus={() => setOpen(true)}
+                    onBlur={() => {
+                        if (query !== null) onChange(query.trim());
                         setQuery(null);
                         setOpen(false);
-                    }
-                }}
-            />
-            <span aria-hidden="true" className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none">
-                ▾
-            </span>
-            {open && (
-                <ul
-                    id={`${id}-list`}
-                    role="listbox"
-                    className="absolute z-20 mt-0.5 left-0 right-0 max-h-40 overflow-y-auto rounded-lg border border-slate-200 bg-[#ffffff] shadow-lg text-[11px] font-mono py-0.5"
-                >
-                    {!needle && (
-                        <li
-                            role="option"
-                            aria-selected={value === ''}
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => pick('')}
-                            className="px-2 py-1 text-slate-400 hover:bg-slate-100 cursor-pointer"
-                        >
-                            none (default behaviour)
-                        </li>
-                    )}
-                    {matches.map((type) => (
-                        <li
-                            key={type}
-                            role="option"
-                            aria-selected={type === value}
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => pick(type)}
-                            className={`px-2 py-1 cursor-pointer hover:bg-slate-100 ${type === value ? 'text-primary font-semibold' : 'text-slate-700'}`}
-                        >
-                            {type}
-                        </li>
-                    ))}
-                    {needle && matches.length === 0 && <li className="px-2 py-1 text-amber-700">No registered type matches</li>}
-                </ul>
-            )}
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && open && matches.length && highlighted.current === undefined) {
+                            e.preventDefault();
+                            pick(matches[0]);
+                        } else if (e.key === 'Escape' && open) {
+                            e.stopPropagation();
+                            setQuery(null);
+                            setOpen(false);
+                        }
+                    }}
+                />
+                <span aria-hidden="true" className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none">
+                    ▾
+                </span>
+                <Autocomplete.Portal>
+                    <Autocomplete.Positioner align="start" className="octane-select-positioner" sideOffset={2}>
+                        <Autocomplete.Popup className="w-[var(--anchor-width)] max-h-40 overflow-y-auto rounded-lg border border-slate-200 bg-[#ffffff] shadow-lg text-[11px] font-mono py-0.5">
+                            <Autocomplete.List>
+                                {(type: string) => (
+                                    <Autocomplete.Item
+                                        key={type || 'none'}
+                                        className={`px-2 py-1 cursor-pointer data-[highlighted]:bg-slate-100 ${type === '' ? 'text-slate-400' : type === value ? 'text-primary font-semibold' : 'text-slate-700'}`}
+                                        value={type}
+                                    >
+                                        {type === '' ? 'none (default behaviour)' : type}
+                                    </Autocomplete.Item>
+                                )}
+                            </Autocomplete.List>
+                            <Autocomplete.Empty>
+                                <div className="px-2 py-1 text-amber-700">No registered type matches</div>
+                            </Autocomplete.Empty>
+                        </Autocomplete.Popup>
+                    </Autocomplete.Positioner>
+                </Autocomplete.Portal>
+            </Autocomplete.Root>
         </div>
     );
 };
@@ -325,7 +338,7 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                 {width}×{length}
             </span>
             <div className="absolute bottom-1 left-1 flex gap-1">
-                <button
+                <BaseButton
                     type="button"
                     onClick={() => setDirectionIndex((prev) => prev + 1)}
                     aria-label={`Rotate, facing ${direction}`}
@@ -333,9 +346,9 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                     className="inline-flex items-center gap-0.5 text-[9px] rounded-full border border-slate-200 bg-[#ffffff] px-1.5 py-px text-slate-600 hover:border-slate-300"
                 >
                     <span aria-hidden="true">⟳</span> {direction}
-                </button>
+                </BaseButton>
                 {stateCount > 1 && (
-                    <button
+                    <BaseButton
                         type="button"
                         onClick={nextState}
                         aria-label={`Next state, showing ${state < 0 ? 'base' : state + 1} of ${stateCount}`}
@@ -343,7 +356,7 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                         className="inline-flex items-center gap-0.5 text-[9px] rounded-full border border-slate-200 bg-[#ffffff] px-1.5 py-px text-slate-600 hover:border-slate-300"
                     >
                         <span aria-hidden="true">▸</span> {state < 0 ? 'base' : `${state + 1}/${stateCount}`}
-                    </button>
+                    </BaseButton>
                 )}
             </div>
         </div>
@@ -374,22 +387,33 @@ const ConfirmModal: FC<ConfirmModalProps> = ({ title, confirmLabel, confirmVaria
     }, [onCancel]);
 
     return (
-        <div className="fixed inset-0 bg-[#00000080] flex items-center justify-center z-[60]" onClick={onCancel}>
-            <div role="dialog" aria-label={title} className="bg-[#ffffff] rounded-lg shadow-xl p-4 w-[340px]" onClick={(e) => e.stopPropagation()}>
-                <Text bold className="text-[14px] mb-2 block">
-                    {title}
-                </Text>
-                <div className="mb-3">{children}</div>
-                <Flex gap={1} justifyContent="end">
-                    <Button variant="secondary" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                    <Button variant={confirmVariant} onClick={onConfirm}>
-                        {confirmLabel}
-                    </Button>
-                </Flex>
-            </div>
-        </div>
+        <Dialog.Root
+            open
+            onOpenChange={(open) => {
+                if (!open) onCancel();
+            }}
+        >
+            <Dialog.Portal>
+                <Dialog.Backdrop className="fixed inset-0 bg-[#00000080] z-[60]" />
+                <Dialog.Popup
+                    aria-label={title}
+                    className="fixed left-1/2 top-1/2 z-[61] -translate-x-1/2 -translate-y-1/2 bg-[#ffffff] rounded-lg shadow-xl p-4 w-[340px]"
+                >
+                    <Text bold className="text-[14px] mb-2 block">
+                        {title}
+                    </Text>
+                    <div className="mb-3">{children}</div>
+                    <Flex gap={1} justifyContent="end">
+                        <Button variant="secondary" onClick={onCancel}>
+                            Cancel
+                        </Button>
+                        <Button variant={confirmVariant} onClick={onConfirm}>
+                            {confirmLabel}
+                        </Button>
+                    </Flex>
+                </Dialog.Popup>
+            </Dialog.Portal>
+        </Dialog.Root>
     );
 };
 
@@ -404,7 +428,7 @@ const Section: FC<SectionProps> = ({ title, children, defaultOpen = true }) => {
 
     return (
         <div className="bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm">
-            <button
+            <BaseButton
                 type="button"
                 className={`w-full flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-slate-50 transition-colors rounded-t-xl ${open ? '' : 'rounded-b-xl'}`}
                 onClick={() => setOpen((p) => !p)}
@@ -413,7 +437,7 @@ const Section: FC<SectionProps> = ({ title, children, defaultOpen = true }) => {
                 <span className="text-[11px] text-slate-400 transition-transform duration-200" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
                     ▾
                 </span>
-            </button>
+            </BaseButton>
             {open && <div className="px-3 pb-2.5 pt-0.5">{children}</div>}
         </div>
     );
@@ -470,11 +494,11 @@ const CopyValue: FC<{ value: string | number; compact?: boolean }> = ({ value, c
     }, [copied]);
 
     return (
-        <div
-            role="button"
+        <BaseButton
+            type="button"
             title="Click to copy"
             onClick={copy}
-            className={`group relative cursor-pointer w-full font-mono rounded-lg border transition ${compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-3 py-1.5 text-sm'} ${copied ? 'border-primary/50 bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100'}`}
+            className={`group relative cursor-pointer w-full text-left font-mono rounded-lg border transition ${compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-3 py-1.5 text-sm'} ${copied ? 'border-primary/50 bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100'}`}
         >
             <span className={`block truncate ${compact ? 'pr-8' : 'pr-12'}`}>{String(value)}</span>
             <span
@@ -482,7 +506,7 @@ const CopyValue: FC<{ value: string | number; compact?: boolean }> = ({ value, c
             >
                 {copied ? 'copied!' : 'copy'}
             </span>
-        </div>
+        </BaseButton>
     );
 };
 
@@ -835,7 +859,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
     // "was X" next to a changed field's label: one click puts the stored value back.
     const revert = (field: EditField) =>
         isChanged(field) && (
-            <button
+            <BaseButton
                 type="button"
                 onClick={() => setField(field, stored[field])}
                 title="Put the stored value back"
@@ -843,12 +867,12 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                 className="ml-auto inline-flex items-center gap-0.5 text-[9px] font-normal text-amber-600 hover:text-amber-800 transition"
             >
                 <span aria-hidden="true">↺</span> was {formatValue(stored[field])}
-            </button>
+            </BaseButton>
         );
 
     const chipClass = 'mt-1 inline-flex items-center gap-1 text-[10px] font-medium rounded-md px-2 py-0.5 transition';
     const suggestionChip = (s: Suggestion) => (
-        <button
+        <BaseButton
             key={`${s.field}:${String(s.value)}`}
             type="button"
             onClick={() => applySuggestion(s)}
@@ -858,7 +882,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         >
             <span aria-hidden="true">✦</span> Suggested: <span className="font-mono">{formatValue(s.value)}</span>
             <span className="text-primary/70 font-normal">· {s.reason}</span>
-        </button>
+        </BaseButton>
     );
     const warningChip = (w: { field: EditField; message: string }) => (
         <span key={w.field} role="note" className={`${chipClass} text-amber-700 bg-amber-100 border border-amber-200`}>
@@ -875,7 +899,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
     const permissionChips = permissionSuggestions.length > 0 && (
         <div className="flex flex-wrap items-center gap-0.5">
             {permissionSuggestions.map((s) => (
-                <button
+                <BaseButton
                     key={s.field}
                     type="button"
                     onClick={() => applySuggestion(s)}
@@ -885,7 +909,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                 >
                     <span aria-hidden="true">✦</span> {FIELD_LABELS[s.field]} {formatValue(s.value)}
                     <span className="text-primary/70 font-normal">· {s.reason}</span>
-                </button>
+                </BaseButton>
             ))}
         </div>
     );
@@ -898,13 +922,13 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         <div className="h-full min-h-0 grid grid-cols-[176px_minmax(0,1fr)] gap-2">
             {/* Sidebar: who this furni is, what state it is in, and the actions. Never scrolls away. */}
             <aside className="min-h-0 flex flex-col gap-2 bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm p-2 overflow-y-auto">
-                <button
+                <BaseButton
                     type="button"
                     onClick={handleBack}
                     className="self-start inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 hover:text-slate-800 transition"
                 >
                     <span aria-hidden="true">‹</span> Back
-                </button>
+                </BaseButton>
                 <FurniPreview item={item} width={form.width} length={form.length} modes={form.interactionModesCount} />
                 <div className="min-w-0">
                     <div className="flex items-center gap-1">
@@ -928,9 +952,9 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                     </div>
                     <div className={statusRow}>
                         <span className="text-slate-500">Catalogue</span>
-                        <button type="button" className={statusLink} onClick={() => setGroup('catalogue')}>
+                        <BaseButton type="button" className={statusLink} onClick={() => setGroup('catalogue')}>
                             {catalogItems.length === 0 ? 'not listed' : `${catalogItems.length} offer${catalogItems.length === 1 ? '' : 's'}`} ›
-                        </button>
+                        </BaseButton>
                     </div>
                     <div className={statusRow}>
                         <span className="text-slate-500">Placed in rooms</span>
@@ -938,16 +962,16 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                     </div>
                     {(suggestions.length > 0 || warnings.length > 0) && (
                         <div className={`${statusRow} text-primary`}>
-                            <button type="button" className={statusLink} onClick={() => jumpToField((suggestions[0] ?? warnings[0]).field)}>
+                            <BaseButton type="button" className={statusLink} onClick={() => jumpToField((suggestions[0] ?? warnings[0]).field)}>
                                 {suggestions.length > 0
                                     ? `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'}`
                                     : `${warnings.length} warning${warnings.length === 1 ? '' : 's'}`}{' '}
                                 ›
-                            </button>
+                            </BaseButton>
                             {suggestions.length > 1 && (
-                                <button type="button" className={statusLink} onClick={applyAllSuggestions}>
+                                <BaseButton type="button" className={statusLink} onClick={applyAllSuggestions}>
                                     apply all
-                                </button>
+                                </BaseButton>
                             )}
                         </div>
                     )}
@@ -956,17 +980,17 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                             <span>
                                 {duplicates.length} duplicate{duplicates.length === 1 ? '' : 's'}
                             </span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                                 see ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     {related.siblings.length > 0 && (
                         <div className={statusRow}>
                             <span className="text-slate-500">Same line</span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                                 {related.siblings.length} furni ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     {furnidataIdMismatch !== null && (
@@ -976,9 +1000,9 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                             >
                                 Furnidata id {furnidataIdMismatch} ≠ sprite
                             </span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                                 see ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     <div className={statusRow}>
@@ -1000,21 +1024,21 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                     {interactionUnregistered && (
                         <div className={`${statusRow} text-amber-700`}>
                             <span>Type has no class</span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('behaviour')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('behaviour')}>
                                 fix ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     <div className={`${statusRow} border-b`}>
                         <span className="text-slate-500">Furnidata</span>
-                        <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                        <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                             {furnidataMissReason === 'not_found' && !furniDataEntry
                                 ? 'missing'
                                 : furnidataEditable
                                   ? 'resolved'
                                   : furnidataMissReason.replace(/_/g, ' ')}{' '}
                             ›
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
                 {isDirty && (
@@ -1025,9 +1049,9 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                         <ul className="mt-0.5 space-y-px leading-snug">
                             {changedFields.map((field) => (
                                 <li key={field} className="truncate">
-                                    <button type="button" className="text-amber-700 hover:underline" onClick={() => jumpToField(field)}>
+                                    <BaseButton type="button" className="text-amber-700 hover:underline" onClick={() => jumpToField(field)}>
                                         {FIELD_LABELS[field]}
-                                    </button>{' '}
+                                    </BaseButton>{' '}
                                     · {formatValue(stored[field])} → {formatValue(form[field])}
                                 </li>
                             ))}
@@ -1072,20 +1096,14 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
             {/* Field groups: one at a time, chips carry a dot when a group holds unsaved changes. */}
             <div className="min-h-0 flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                    <div
-                        className="inline-flex items-center gap-0.5 rounded-lg bg-slate-100 border border-slate-200 p-0.5"
-                        role="tablist"
-                        aria-label="Field groups"
-                    >
+                    <TabBar className="inline-flex items-center gap-0.5 rounded-lg bg-slate-100 border border-slate-200 p-0.5" aria-label="Field groups" value={group}>
                         {GROUPS.map(({ id, label }) => {
                             const changed = changedByGroup[id];
                             const invalid = invalidByGroup[id];
                             return (
-                                <button
+                                <TabBarTab
                                     key={id}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={group === id}
+                                    value={id}
                                     onClick={() => setGroup(id)}
                                     className={`relative inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-md transition ${group === id ? 'bg-[#ffffff] text-slate-800 font-semibold shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/60'}`}
                                 >
@@ -1096,23 +1114,18 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                             className={`w-1.5 h-1.5 rounded-full ring-2 ring-[#ffffff] ${invalid ? 'bg-[#ef4444]' : 'bg-[#f59e0b]'}`}
                                         />
                                     )}
-                                </button>
+                                </TabBarTab>
                             );
                         })}
-                    </div>
-                    <input
-                        list="furni-editor-fields"
+                    </TabBar>
+                    <SuggestInput
+                        options={JUMP_FIELD_LABELS}
                         value={jumpQuery}
-                        onChange={(e) => handleJump(e.target.value)}
+                        onChange={handleJump}
                         placeholder="Jump to field"
                         aria-label="Jump to field"
                         className="ml-auto w-28 px-2.5 py-1 text-[11px] rounded-lg border border-slate-200 bg-[#ffffff] text-slate-700 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition"
                     />
-                    <datalist id="furni-editor-fields">
-                        {(Object.keys(FIELD_LABELS) as EditField[]).map((field) => (
-                            <option key={field} value={FIELD_LABELS[field]} />
-                        ))}
-                    </datalist>
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto pr-0.5">
                     <div className={groupClass('names')}>
@@ -1165,7 +1178,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                 <Button variant="secondary" disabled={loading} onClick={() => onRevertFurnidata(item.id)}>
                                                     Revert
                                                 </Button>
-                                                <button
+                                                <BaseButton
                                                     type="button"
                                                     disabled={loading}
                                                     onClick={() => onImportText(item.id)}
@@ -1186,7 +1199,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                         <path d="M4 16h12" />
                                                     </svg>
                                                     Import from Habbo
-                                                </button>
+                                                </BaseButton>
                                             </>
                                         )}
                                     </Flex>
@@ -1335,7 +1348,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 </Text>
                                 <div data-testid="furni-editor-duplicates" className="flex flex-col gap-0.5">
                                     {duplicates.map((row) => (
-                                        <button
+                                        <BaseButton
                                             key={row.id}
                                             type="button"
                                             onClick={() => openFurni(row.spriteId)}
@@ -1345,7 +1358,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                             <span className="font-mono text-slate-500">
                                                 #{row.id} · s{row.spriteId}
                                             </span>
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </Section>
@@ -1357,7 +1370,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 </Text>
                                 <div data-testid="furni-editor-siblings" className="flex flex-col gap-0.5">
                                     {related.siblings.map((row) => (
-                                        <button
+                                        <BaseButton
                                             key={row.id}
                                             type="button"
                                             onClick={() => openFurni(row.spriteId)}
@@ -1368,7 +1381,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                 {row.width}×{row.length}
                                             </span>
                                             <span className="font-mono text-slate-400">{row.interactionType || 'none'}</span>
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </Section>
@@ -1407,14 +1420,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                     <label className={labelClass} htmlFor="furni-editor-width">
                                         Width{revert('width')}
                                     </label>
-                                    <input
-                                        id="furni-editor-width"
-                                        aria-label={FIELD_LABELS.width}
-                                        type="number"
-                                        className={inputClass('width')}
-                                        value={form.width}
-                                        onChange={(e) => setField('width', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-width" aria-label={FIELD_LABELS.width} className={inputClass('width')} value={form.width} onChange={(e) => setField('width', Number(e.target.value))} />
                                     {validation.width && <span className="text-[9px] text-red-500">{validation.width}</span>}
                                     {chipsFor('width')}
                                 </div>
@@ -1422,14 +1428,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                     <label className={labelClass} htmlFor="furni-editor-length">
                                         Length{revert('length')}
                                     </label>
-                                    <input
-                                        id="furni-editor-length"
-                                        aria-label={FIELD_LABELS.length}
-                                        type="number"
-                                        className={inputClass('length')}
-                                        value={form.length}
-                                        onChange={(e) => setField('length', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-length" aria-label={FIELD_LABELS.length} className={inputClass('length')} value={form.length} onChange={(e) => setField('length', Number(e.target.value))} />
                                     {validation.length && <span className="text-[9px] text-red-500">{validation.length}</span>}
                                     {chipsFor('length')}
                                 </div>
@@ -1439,15 +1438,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="stackHeight" />
                                         {revert('stackHeight')}
                                     </label>
-                                    <input
-                                        id="furni-editor-stackHeight"
-                                        aria-label={FIELD_LABELS.stackHeight}
-                                        type="number"
-                                        step="0.01"
-                                        className={inputClass('stackHeight')}
-                                        value={form.stackHeight}
-                                        onChange={(e) => setField('stackHeight', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-stackHeight" aria-label={FIELD_LABELS.stackHeight} step="0.01" className={inputClass('stackHeight')} value={form.stackHeight} onChange={(e) => setField('stackHeight', Number(e.target.value))} />
                                     {validation.stackHeight && <span className="text-[9px] text-red-500">{validation.stackHeight}</span>}
                                     {chipsFor('stackHeight')}
                                 </div>
@@ -1463,11 +1454,11 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                             {group.keys.map((key) => {
                                                 const on = form[key] === true;
                                                 return (
-                                                    <button
+                                                    <ToggleButton
                                                         key={key}
                                                         type="button"
+                                                        pressed={on}
                                                         onClick={() => setField(key, !on)}
-                                                        aria-pressed={on}
                                                         title={on ? 'Enabled — click to disable' : 'Disabled — click to enable'}
                                                         className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg border font-medium transition ${on ? 'bg-[#418db0] border-[#418db0] text-[#ffffff] shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200 hover:text-slate-600'}${isChanged(key) ? ' ring-2 ring-amber-300' : ''}`}
                                                     >
@@ -1475,7 +1466,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                             className={`inline-block w-2 h-2 rounded-full ring-1 ${on ? 'bg-[#22c55e] ring-[#ffffff]/70' : 'bg-[#ef4444] ring-[#00000014]'}`}
                                                         />
                                                         {key.replace('allow', '')}
-                                                    </button>
+                                                    </ToggleButton>
                                                 );
                                             })}
                                         </div>
@@ -1502,7 +1493,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         onChange={(value) => setField('interactionType', value)}
                                     />
                                     {suggestedType && (
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             onClick={() => setField('interactionType', suggestedType.type)}
                                             title={suggestedType.reason}
@@ -1510,7 +1501,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         >
                                             <span aria-hidden="true">✦</span> Suggested: <span className="font-mono">{suggestedType.type}</span>
                                             <span className="text-primary/70 font-normal">· {suggestedType.reason}</span>
-                                        </button>
+                                        </BaseButton>
                                     )}
                                     {interactionUnregistered && (
                                         <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-100 border border-amber-200 rounded-md px-2 py-0.5">
@@ -1525,14 +1516,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="interactionModesCount" />
                                         {revert('interactionModesCount')}
                                     </label>
-                                    <input
-                                        id="furni-editor-interactionModesCount"
-                                        aria-label={FIELD_LABELS.interactionModesCount}
-                                        type="number"
-                                        className={inputClass('interactionModesCount')}
-                                        value={form.interactionModesCount}
-                                        onChange={(e) => setField('interactionModesCount', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-interactionModesCount" aria-label={FIELD_LABELS.interactionModesCount} className={inputClass('interactionModesCount')} value={form.interactionModesCount} onChange={(e) => setField('interactionModesCount', Number(e.target.value))} />
                                     {fieldError('interactionModesCount')}
                                     {chipsFor('interactionModesCount')}
                                 </div>
@@ -1596,15 +1580,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="effectIdMale" />
                                         {revert('effectIdMale')}
                                     </label>
-                                    <input
-                                        id="furni-editor-effectIdMale"
-                                        aria-label={FIELD_LABELS.effectIdMale}
-                                        type="number"
-                                        min={0}
-                                        className={inputClass('effectIdMale')}
-                                        value={form.effectIdMale}
-                                        onChange={(e) => setField('effectIdMale', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-effectIdMale" aria-label={FIELD_LABELS.effectIdMale} min={0} className={inputClass('effectIdMale')} value={form.effectIdMale} onChange={(e) => setField('effectIdMale', Number(e.target.value))} />
                                     {fieldError('effectIdMale')}
                                 </div>
                                 <div>
@@ -1613,15 +1589,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         <Tip field="effectIdFemale" />
                                         {revert('effectIdFemale')}
                                     </label>
-                                    <input
-                                        id="furni-editor-effectIdFemale"
-                                        aria-label={FIELD_LABELS.effectIdFemale}
-                                        type="number"
-                                        min={0}
-                                        className={inputClass('effectIdFemale')}
-                                        value={form.effectIdFemale}
-                                        onChange={(e) => setField('effectIdFemale', Number(e.target.value))}
-                                    />
+                                    <NumberInput id="furni-editor-effectIdFemale" aria-label={FIELD_LABELS.effectIdFemale} min={0} className={inputClass('effectIdFemale')} value={form.effectIdFemale} onChange={(e) => setField('effectIdFemale', Number(e.target.value))} />
                                     {fieldError('effectIdFemale')}
                                 </div>
                                 <div>

@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Select } from '../../../../common/Select';
 
 /**
  * Habbo's "write to logs" (`wf_act_log`, and `wf_act_neg_log` for when the conditions fail): a
@@ -55,13 +56,13 @@ export const WiredActionWriteToLogsView: FC<{}> = () => {
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.write_to_logs.log_level.title', 'Log level')}</Text>
-                <select className="form-select form-select-sm" value={level} onChange={(event) => setLevel(normalizeLevel(parseInt(event.target.value, 10)))}>
+                <Select className="form-select form-select-sm" value={level} onChange={(event) => setLevel(normalizeLevel(parseInt(event.target.value, 10)))}>
                     {WRITE_TO_LOGS_LEVELS.map((entry) => (
                         <option key={entry.value} value={entry.value}>
                             {localizeWithFallback(`wiredfurni.params.write_to_logs.log_level.${entry.value}`, entry.fallback)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.write_to_logs.log_message.title', 'Message')}</Text>

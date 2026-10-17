@@ -1,5 +1,7 @@
 import { FC, MouseEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { LocalizeText } from '../../../../api';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface CatalogAdminModalViewProps {
     title?: ReactNode;
@@ -11,7 +13,7 @@ interface CatalogAdminModalViewProps {
 export const CatalogAdminModalView: FC<CatalogAdminModalViewProps> = (props) => {
     const { title = null, widthClassName = 'w-[420px]', onClose, children = null } = props;
 
-    const onCloseMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    const onCloseMouseDown = (event: MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         event.nativeEvent.stopImmediatePropagation();
     };
@@ -26,8 +28,10 @@ export const CatalogAdminModalView: FC<CatalogAdminModalViewProps> = (props) => 
             >
                 <div className="octane-card-header-shell relative flex min-h-card-header max-h-card-header items-center justify-center px-3 py-2">
                     <span className="octane-card-title text-white">{title}</span>
-                    <div
+                    <BaseButton
+                        aria-label={LocalizeText('generic.close')}
                         className="octane-card-close-button absolute right-2 cursor-pointer"
+                        type="button"
                         onClick={onClose}
                         onMouseDownCapture={onCloseMouseDown}
                     />

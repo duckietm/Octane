@@ -17,6 +17,7 @@ import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon'
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const NORMAL_DIRECTION_VALUE_MAP: Record<number, { value: number; icon: string }> = {
     0: { value: 6, icon: iconWiredDirN },
@@ -78,14 +79,7 @@ export const WiredActionMoveFurniView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.movefurni')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={movement === 0}
-                        className="form-check-input"
-                        id="movement0"
-                        name="selectedTeam"
-                        type="radio"
-                        onChange={(event) => setMovement(0)}
-                    />
+                    <Radio checked={movement === 0} id="movement0" name="selectedTeam" onCheckedChange={() => setMovement(0)} />
                     <Text>{LocalizeText('wiredfurni.params.movefurni.0')}</Text>
                 </div>
                 <div className="grid grid-cols-4 gap-2 max-w-[240px]">
@@ -99,14 +93,7 @@ export const WiredActionMoveFurniView: FC<{}> = (props) => {
 
                             return (
                                 <label key={`move-furni-${direction}`} className="flex items-center justify-center gap-[2px] cursor-pointer">
-                                    <input
-                                        checked={movement === option.value}
-                                        className="form-check-input"
-                                        id={`movement${option.value}`}
-                                        name="movement"
-                                        type="radio"
-                                        onChange={(event) => setMovement(option.value)}
-                                    />
+                                    <Radio checked={movement === option.value} id={`movement${option.value}`} name="movement" onCheckedChange={() => setMovement(option.value)} />
                                     <span className="inline-flex items-center justify-center">
                                         <WiredDirectionIcon direction={option.value} iconSrc={option.icon} selected={movement === option.value} />
                                     </span>
@@ -119,14 +106,7 @@ export const WiredActionMoveFurniView: FC<{}> = (props) => {
                     {extraDirectionOptions.map((option) => {
                         return (
                             <label key={`extra-${option.value}`} className="flex items-center gap-[2px] cursor-pointer">
-                                <input
-                                    checked={movement === option.value}
-                                    className="form-check-input"
-                                    id={`movement${option.value}`}
-                                    name="movement"
-                                    type="radio"
-                                    onChange={(event) => setMovement(option.value)}
-                                />
+                                <Radio checked={movement === option.value} id={`movement${option.value}`} name="movement" onCheckedChange={() => setMovement(option.value)} />
                                 <span className="inline-flex items-center justify-center">
                                     <WiredDirectionIcon direction={option.value} iconSrc={option.icon} selected={movement === option.value} />
                                 </span>
@@ -140,14 +120,7 @@ export const WiredActionMoveFurniView: FC<{}> = (props) => {
                 {rotationOptions.map((option) => {
                     return (
                         <div key={option} className="flex items-center gap-1">
-                            <input
-                                checked={rotation === option}
-                                className="form-check-input"
-                                id={`rotation${option}`}
-                                name="rotation"
-                                type="radio"
-                                onChange={(event) => setRotation(option)}
-                            />
+                            <Radio checked={rotation === option} id={`rotation${option}`} name="rotation" onCheckedChange={() => setRotation(option)} />
                             <Text>
                                 {[1, 2].includes(option) && <i className={`octane-icon icon-rot-${option}`} />}
                                 {LocalizeText(`wiredfurni.params.rotatefurni.${option}`)}

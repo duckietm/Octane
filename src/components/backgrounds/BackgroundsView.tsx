@@ -5,6 +5,7 @@ import { Base, Flex, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCa
 import { useRoom } from '../../hooks';
 import { configFileUrl } from '../../secure-assets';
 import { ProfilePreviewView } from './ProfilePreviewView';
+import { BaseButton } from '../../common/BaseButton';
 
 interface ItemData {
     id: number;
@@ -184,7 +185,7 @@ export const BackgroundsView: FC<BackgroundsViewProps> = ({
 
     const renderItem = useCallback(
         (item: ItemData, type: string) => (
-            <Flex pointer position="relative" key={item.id} onClick={() => handleSelection(item.id)}>
+            <Flex component={BaseButton} pointer position="relative" key={item.id} onClick={() => handleSelection(item.id)}>
                 <Base
                     className={`profile-${type} ${type}-${item.id}`}
                     style={

@@ -157,9 +157,10 @@
 .air-settings-button:focus-visible,
 .air-settings-checkbox:focus-visible,
 .air-settings-radio:focus-visible,
-.air-settings-volume-row input:focus-visible,
+.air-settings-volume-row__thumb:has(input:focus-visible),
 .air-settings-volume-row__speaker:focus-visible,
-.air-settings-select-row select:focus-visible {
+.air-settings-select-row select:focus-visible,
+.air-settings-select-row .octane-select-trigger:focus-visible {
     outline: 1px solid #fff27a;
     outline-offset: 1px;
 }
@@ -277,53 +278,31 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.air-settings-volume-row input[type='range'] {
-    appearance: none;
-    -webkit-appearance: none;
+/* The thumb is centred on the value, so the control spans the thumb's travel (a native range kept
+   6px of padding on each side of its 144px box: centres run from 12px to 132px). */
+.air-settings-volume-row__control {
     position: absolute;
     top: 9px;
-    left: 0;
-    box-sizing: border-box;
-    width: 144px;
+    left: 12px;
+    width: 120px;
     height: 15px;
     margin: 0;
-    padding: 0 6px;
-    border: 0;
-    border-radius: 0;
-    outline: 0;
-    background: transparent;
-    box-shadow: none;
+}
+
+.air-settings-volume-row__control-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
 }
 
-.air-settings-volume-row input[type='range']::-webkit-slider-runnable-track {
-    width: 132px;
-    height: 1px;
-    border: 0;
+.air-settings-volume-row__track {
+    position: absolute;
+    inset: 0;
     background: transparent;
 }
 
-.air-settings-volume-row input[type='range']::-webkit-slider-thumb {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 12px;
-    height: 15px;
-    margin-top: -7px;
-    border: 0;
-    border-radius: 0;
-    background: url('../../assets/images/user-settings/air/slider-button.png') no-repeat 0 0;
-    box-shadow: none;
-    image-rendering: var(--octane-pixel-art, pixelated);
-}
-
-.air-settings-volume-row input[type='range']::-moz-range-track {
-    width: 132px;
-    height: 1px;
-    border: 0;
-    background: transparent;
-}
-
-.air-settings-volume-row input[type='range']::-moz-range-thumb {
+.air-settings-volume-row__thumb {
     width: 12px;
     height: 15px;
     border: 0;
@@ -380,7 +359,8 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.air-settings-checkbox:checked {
+.air-settings-checkbox:checked,
+.air-settings-checkbox[data-checked] {
     /* One SVG per state. The skin sheet has no clean ticked box — its
        (410,16) region is a dark slab that vanishes on this panel — and
        layering a tick over the sprite left the box unpainted in the client. */
@@ -409,7 +389,8 @@
     white-space: nowrap;
 }
 
-.air-settings-select-row select {
+.air-settings-select-row select,
+.air-settings-select-row .octane-select-trigger {
     appearance: auto;
     box-sizing: border-box;
     width: 96px;
@@ -491,7 +472,8 @@
     cursor: pointer;
 }
 
-.air-settings-radio:checked {
+.air-settings-radio:checked,
+.air-settings-radio[data-checked] {
     background: radial-gradient(circle, #2f2f2f 0 3px, #ffffff 4px) !important;
 }
 

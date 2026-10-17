@@ -2,10 +2,12 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { getMentionDateGroup, IMentionEntry, LocalizeText, localizeWithFallback, MentionDateGroup, MentionType } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
-import { requestMentions, useMentionActions, useMentionsSnapshot } from '../../hooks';
+import { requestMentions, requestMoreMentions, useMentionActions, useMentionsSnapshot } from '../../hooks';
 import { setMentionsPanelOpen } from '../../hooks/mentions/mentionsStore';
 import { useUserDataSnapshot } from '../../hooks/session/useSessionSnapshots';
 import { MentionRowView } from './MentionRowView';
+import { BaseButton } from '../../common/BaseButton';
+import { ToggleButton } from '../../common/ToggleButton';
 
 interface MentionsViewProps {
     onClose: () => void;
@@ -54,7 +56,7 @@ const matchesQuery = (mention: IMentionEntry, query: string): boolean => {
 
 export const MentionsView: FC<MentionsViewProps> = (props) => {
     const { onClose } = props;
-    const { mentions, unreadCount, status } = useMentionsSnapshot();
+    const { mentions, unreadCount, status, hasMore, loadingMore } = useMentionsSnapshot();
     const { userName: ownUsername = '' } = useUserDataSnapshot();
     const { open, goto, remove, markAll } = useMentionActions();
     const [filter, setFilter] = useState<MentionFilter>('all');
@@ -104,9 +106,9 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
             return (
                 <>
                     <span className="mentions-empty-text">{localizeWithFallback('mentions.window.error', 'The mentions could not be loaded.')}</span>
-                    <button type="button" className="mentions-filter is-active" onClick={requestMentions}>
+                    <BaseButton type="button" className="mentions-filter is-active" onClick={requestMentions}>
                         {localizeWithFallback('mentions.window.retry', 'Try again')}
-                    </button>
+                    </BaseButton>
                 </>
             );
         }
@@ -115,9 +117,9 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
             return (
                 <>
                     <span className="mentions-empty-text">{localizeWithFallback('mentions.window.noresults', 'No mention matches.')}</span>
-                    <button type="button" className="mentions-filter is-active" onClick={clearFilters}>
+                    <BaseButton type="button" className="mentions-filter is-active" onClick={clearFilters}>
                         {localizeWithFallback('mentions.filter.clear', 'Clear the filters')}
-                    </button>
+                    </BaseButton>
                 </>
             );
         }
@@ -150,16 +152,16 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
                             const showCount = key === 'unread' && unreadCount > 0;
 
                             return (
-                                <button key={key} type="button" aria-pressed={active} className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
+                                <ToggleButton key={key} type="button" pressed={active} className={`mentions-filter ${active ? 'is-active' : ''}`} onClick={() => setFilter(key)}>
                                     {LocalizeText(label)}
                                     {showCount ? ` ${unreadCount}` : ''}
-                                </button>
+                                </ToggleButton>
                             );
                         })}
                     </div>
-                    <button type="button" className="mentions-refresh" disabled={isLoading} aria-busy={isLoading} onClick={requestMentions}>
+                    <BaseButton type="button" className="mentions-refresh" disabled={isLoading} aria-busy={isLoading} onClick={requestMentions}>
                         {localizeWithFallback('mentions.action.refresh', 'Refresh')}
-                    </button>
+                    </BaseButton>
                 </div>
                 <div className="mentions-list" role="list" aria-busy={isLoading}>
                     {!hasAny && (
@@ -178,6 +180,11 @@ export const MentionsView: FC<MentionsViewProps> = (props) => {
                             </div>
                         ))}
                 </div>
+                {hasMore && (
+                    <BaseButton type="button" className="mentions-refresh" disabled={loadingMore} aria-busy={loadingMore} onClick={requestMoreMentions}>
+                        {loadingMore ? localizeWithFallback('mentions.window.loadingmore', 'Loading...') : localizeWithFallback('mentions.window.loadmore', 'Load older mentions')}
+                    </BaseButton>
+                )}
                 {unreadCount > 0 && (
                     <Button variant="primary" onClick={markAll}>
                         {LocalizeText('mentions.window.markall')}

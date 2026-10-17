@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 interface WiredConditionActorIsWearingEffectViewProps {
     negative?: boolean;
@@ -45,13 +46,7 @@ export const WiredConditionActorIsWearingEffectView: FC<WiredConditionActorIsWea
                 <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                 {[0, 1].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={quantifier === value}
-                            className="form-check-input"
-                            name="effectQuantifier"
-                            type="radio"
-                            onChange={() => setQuantifier(value)}
-                        />
+                        <Radio checked={quantifier === value} name="effectQuantifier" onCheckedChange={() => setQuantifier(value)} />
                         <Text>{LocalizeText(`wiredfurni.params.quantifier.users${negative ? '.neg' : ''}.${value}`)}</Text>
                     </label>
                 ))}

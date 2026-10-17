@@ -62,6 +62,10 @@ import { ChestAppearanceFields, ChestSelect, ChestSettingsSection } from './Ches
 import { ChestFurniGroup, chestFurniDisplayName, groupStoredFurni } from './chestFurniGrouping';
 import { FurniChestGridItem } from './FurniChestGridItem';
 import { FurniChestSearchBar } from './FurniChestSearchBar';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 interface ChestLogRow {
     type: string;
@@ -559,27 +563,27 @@ export const FurnitureChestView: FC = () => {
                         </Text>
                         <div style={{ position: 'absolute', top: 7, right: 9, display: 'flex', gap: 5 }}>
                             {/* notification_settings_button 24x24, icon wired_chests_bell_icon 12x15; owner only (AIR var_774) */}
-                            {layout.showNotificationSettings && <button
+                            {layout.showNotificationSettings && <Hint content={LocalizeText('wiredchests.notifications.button')}><BaseButton aria-label={LocalizeText('wiredchests.notifications.button')}
                                 type="button"
                                 className="flex items-center justify-center cursor-pointer shrink-0"
                                 style={{ width: 24, height: 24, background: '#f1f0ee', border: '1px solid #cfcabc', borderRadius: 4, padding: 0 }}
                                 disabled={!isOwner}
                                 onClick={openNotifications}
-                                title={LocalizeText('wiredchests.notifications.button')}
+                               
                             >
                                 <img src={bellIcon} width={12} height={15} alt="" draggable={false} style={{ imageRendering: PIXEL_ART_RENDERING }} />
-                            </button>}
+                            </BaseButton></Hint>}
                             {/* settings_button 24x24, icon wired_chests_gear_icon 14x14; owner only */}
-                            {layout.showSettings && <button
+                            {layout.showSettings && <Hint content={LocalizeText('wiredchests.settings.button')}><BaseButton aria-label={LocalizeText('wiredchests.settings.button')}
                                 type="button"
                                 className="flex items-center justify-center cursor-pointer shrink-0"
                                 style={{ width: 24, height: 24, background: '#f1f0ee', border: '1px solid #cfcabc', borderRadius: 4, padding: 0 }}
                                 disabled={!isOwner}
                                 onClick={openSettings}
-                                title={LocalizeText('wiredchests.settings.button')}
+                               
                             >
                                 <img src={gearIcon} width={14} height={14} alt="" draggable={false} style={{ imageRendering: PIXEL_ART_RENDERING }} />
-                            </button>}
+                            </BaseButton></Hint>}
                         </div>
                     </div>
                     {/* ===== FURNI CHEST body (furni_chest_contents.xml) ===== */}
@@ -709,36 +713,24 @@ export const FurnitureChestView: FC = () => {
                     <div className="octane-chest__footer">
                         {layout.showLockingOptions && <div className="octane-chest__locking">
                             <label className="octane-chest__option">
-                                <input
-                                    type="checkbox"
-                                    className="form-check-input"
-                                    checked={stuff.locked}
-                                    disabled={!rights.canToggleLock}
-                                    onChange={(e) => setConfirmLock(e.target.checked)}
-                                />
+                                <Checkbox checked={stuff.locked} disabled={!rights.canToggleLock} onCheckedChange={(nextChecked) => setConfirmLock(nextChecked)} />
                                 <Text small>{localizeWithFallback('wiredchests.lock_chest', 'Lock this chest')}</Text>
                             </label>
                             <label className="octane-chest__option">
-                                <input
-                                    type="checkbox"
-                                    className="form-check-input"
-                                    checked={stuff.autoLock}
-                                    disabled={!isOwner}
-                                    onChange={(e) => saveOptions({ autoLock: e.target.checked })}
-                                />
+                                <Checkbox checked={stuff.autoLock} disabled={!isOwner} onCheckedChange={(nextChecked) => saveOptions({ autoLock: nextChecked })} />
                                 <Text small>{localizeWithFallback(
                                     'wiredchests.auto_lock_chest',
                                     'Lock the chest automatically when the owner leaves the room',
                                 )}</Text>
                             </label>
-                            <button
+                            <Hint content={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}><BaseButton aria-label={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}
                                 type="button"
                                 className="octane-chest__info-button"
-                                title={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}
+                               
                                 onClick={() => setShowLockInfo((v) => !v)}
                             >
                                 i
-                            </button>
+                            </BaseButton></Hint>
                         </div>}
                         {layout.showCapacityOptions && <>
                         <Flex alignItems="center" justifyContent="between" className="octane-chest__footer-capacity">
@@ -814,11 +806,11 @@ export const FurnitureChestView: FC = () => {
                         <Column gap={2}>
                             <ChestSettingsSection title={LocalizeText('wiredchests.settings.access')}>
                             <label className="flex items-center gap-2">
-                                <input type="checkbox" className="form-check-input" checked={accessOpen} onChange={(e) => setAccessOpen(e.target.checked)} />
+                                <Checkbox checked={accessOpen} onCheckedChange={(nextChecked) => setAccessOpen(nextChecked)} />
                                 <Text small>{LocalizeText('wiredchests.settings.access.open')}</Text>
                             </label>
                             <label className="flex items-center gap-2">
-                                <input type="checkbox" className="form-check-input" checked={accessDonate} onChange={(e) => setAccessDonate(e.target.checked)} />
+                                <Checkbox checked={accessDonate} onCheckedChange={(nextChecked) => setAccessDonate(nextChecked)} />
                                 <Text small>{LocalizeText('wiredchests.settings.access.donate')}</Text>
                             </label>
                             </ChestSettingsSection>
@@ -872,25 +864,25 @@ export const FurnitureChestView: FC = () => {
                             <ChestSettingsSection title={LocalizeText('wiredchests.notification_settings.enable_notifications')}>
                             <Text bold>{LocalizeText('wiredchests.notification_settings.enable_notifications.generic')}</Text>
                             <label className="flex items-center gap-2">
-                                <input type="checkbox" className="form-check-input" checked={notifyFull} onChange={(e) => setNotifyFull(e.target.checked)} />
+                                <Checkbox checked={notifyFull} onCheckedChange={(nextChecked) => setNotifyFull(nextChecked)} />
                                 <Text small>{LocalizeText('wiredchests.notification_settings.enable_notifications.generic.0')}</Text>
                             </label>
                             <label className="flex items-center gap-2">
-                                <input type="checkbox" className="form-check-input" checked={notifyDonation} onChange={(e) => setNotifyDonation(e.target.checked)} />
+                                <Checkbox checked={notifyDonation} onCheckedChange={(nextChecked) => setNotifyDonation(nextChecked)} />
                                 <Text small>{LocalizeText('wiredchests.notification_settings.enable_notifications.generic.1')}</Text>
                             </label>
                             <fieldset disabled={!stuff.wiredEnabled} className="octane-chest-settings__wired-notifications">
                             <Text bold>{LocalizeText('wiredchests.notification_settings.enable_notifications.wired')}</Text>
                             <label className="flex items-center gap-2">
-                                <input type="checkbox" className="form-check-input" checked={notifyWithdraw} onChange={(e) => setNotifyWithdraw(e.target.checked)} />
+                                <Checkbox checked={notifyWithdraw} onCheckedChange={(nextChecked) => setNotifyWithdraw(nextChecked)} />
                                 <Text small>{LocalizeText('wiredchests.notification_settings.enable_notifications.wired.0')}</Text>
                             </label>
                             <label className="flex items-center gap-2">
-                                <input type="checkbox" className="form-check-input" checked={notifyEmpty} onChange={(e) => setNotifyEmpty(e.target.checked)} />
+                                <Checkbox checked={notifyEmpty} onCheckedChange={(nextChecked) => setNotifyEmpty(nextChecked)} />
                                 <Text small>{LocalizeText('wiredchests.notification_settings.enable_notifications.wired.1')}</Text>
                             </label>
                             <label className="flex items-center gap-2">
-                                <input type="checkbox" className="form-check-input" checked={notifyWired} onChange={(e) => setNotifyWired(e.target.checked)} />
+                                <Checkbox checked={notifyWired} onCheckedChange={(nextChecked) => setNotifyWired(nextChecked)} />
                                 <Text small>{LocalizeText('wiredchests.notification_settings.enable_notifications.wired.2')}</Text>
                             </label>
                             </fieldset>
@@ -936,7 +928,7 @@ export const FurnitureChestView: FC = () => {
                             </Flex>
                             <Flex alignItems="center" gap={2}>
                                 <Text small>{LocalizeText('wiredchests.quantity')}</Text>
-                                <select
+                                <Select
                                     className="form-select form-select-sm"
                                     value={upgradeQty}
                                     onChange={(e) => setUpgradeQty(parseInt(e.target.value, 10))}
@@ -946,7 +938,7 @@ export const FurnitureChestView: FC = () => {
                                             {q}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </Flex>
                             <Flex alignItems="center" gap={1}>
                                 {COST_CREDITS > 0 && (

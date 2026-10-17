@@ -1,5 +1,5 @@
 import { AvatarDirectionAngle, GetAvatarRenderManager, IPartColor } from '@octane/renderer';
-import { FC, KeyboardEvent, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { AvatarEditorThumbnailsHelper } from '../../../api';
 import faceTabIcon from '../../../assets/images/wardrobe/hd.png';
 import headTabIcon from '../../../assets/images/wardrobe/head.png';
@@ -9,6 +9,9 @@ import { LayoutAvatarImageView } from '../../../common';
 import { InfiniteGrid } from '../../../layout';
 import { AvatarEditorIcon } from '../../avatar-editor/AvatarEditorIcon';
 import { t } from '../utils/i18n';
+import { TabBar, TabBarTab } from '../../../common/TabBar';
+import { BaseButton } from '../../../common/BaseButton';
+import { ToggleButton } from '../../../common/ToggleButton';
 
 type GenderKey = 'M' | 'F';
 type FigureSelection = Record<string, { partId: number; colors: number[] }>;
@@ -106,23 +109,13 @@ const WardrobePartItem: FC<WardrobePartItemProps> = ({ setType, partId, colorIds
         };
     }, [setType, partId, colorKey]);
 
-    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-        if (event.key !== 'Enter' && event.key !== ' ') return;
-        event.preventDefault();
-        onSelect();
-    };
-
     return (
         <InfiniteGrid.Item
             itemActive={selected}
             itemImage={partId >= 0 ? assetUrl || undefined : undefined}
             className={`registration-wardrobe-part wardrobe-part-${setType} avatar-parts${selected ? ' part-selected' : ''}${partId >= 0 && !assetUrl ? ' wardrobe-part-loading' : ''}`}
-            role="button"
-            tabIndex={0}
             aria-label={partId < 0 ? t('nitro.login.register.wardrobe.none', 'None') : `${label} ${partId}`}
-            aria-pressed={selected}
             onClick={onSelect}
-            onKeyDown={handleKeyDown}
         >
             {partId < 0 && <AvatarEditorIcon icon="clear" />}
         </InfiniteGrid.Item>
@@ -177,26 +170,24 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
 
     return (
         <div className="registration-avatar-wardrobe">
-            <div className="registration-wardrobe-tabs" role="tablist" aria-label={t('nitro.login.register.wardrobe.categories', 'Clothing categories')}>
+            <TabBar className="registration-wardrobe-tabs" aria-label={t('nitro.login.register.wardrobe.categories', 'Clothing categories')} value={activeGroup.key}>
                 {WARDROBE_GROUPS.map((group) => {
                     const active = group.key === activeGroup.key;
                     const label = t(group.labelKey, group.fallback);
                     return (
-                        <button
+                        <TabBarTab
                             key={group.key}
-                            type="button"
+                            value={group.key}
                             className={active ? 'active' : ''}
-                            role="tab"
-                            aria-selected={active}
                             aria-label={label}
                             title={label}
                             onClick={() => selectGroup(group)}
                         >
                             <img src={group.icon} alt="" draggable={false} />
-                        </button>
+                        </TabBarTab>
                     );
                 })}
-            </div>
+            </TabBar>
 
             <div className="registration-wardrobe-main">
                 <div className="avatar-preview-panel registration-wardrobe-preview">
@@ -205,48 +196,46 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
                         <div className="registration-avatar-shadow" />
                     </div>
                     <div className="registration-wardrobe-rotation">
-                        <button
+                        <BaseButton
                             type="button"
                             aria-label={t('nitro.login.register.wardrobe.rotate_left', 'Rotate left')}
                             title={t('nitro.login.register.wardrobe.rotate_left', 'Rotate left')}
                             onClick={() => rotateAvatar(1)}
                         >
                             <AvatarEditorIcon icon="arrow-left" />
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             aria-label={t('nitro.login.register.wardrobe.rotate_right', 'Rotate right')}
                             title={t('nitro.login.register.wardrobe.rotate_right', 'Rotate right')}
                             onClick={() => rotateAvatar(-1)}
                         >
                             <AvatarEditorIcon icon="arrow-right" />
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
 
                 <div className="registration-wardrobe-editor">
-                    <div className="registration-wardrobe-set-tabs" role="tablist" aria-label={t(activeGroup.labelKey, activeGroup.fallback)}>
+                    <TabBar className="registration-wardrobe-set-tabs" aria-label={t(activeGroup.labelKey, activeGroup.fallback)} value={activeSetType}>
                         {activeGroup.setTypes.length > 1 &&
                             activeGroup.setTypes.map((setType) => {
                                 const labelInfo = SET_TYPE_LABELS[setType];
                                 const label = t(labelInfo.key, labelInfo.fallback);
                                 const active = activeSetType === setType;
                                 return (
-                                    <button
+                                    <TabBarTab
                                         key={setType}
-                                        type="button"
+                                        value={setType}
                                         className={active ? 'active' : ''}
-                                        role="tab"
-                                        aria-selected={active}
                                         aria-label={label}
                                         title={label}
                                         onClick={() => setActiveSetType(setType)}
                                     >
                                         <AvatarEditorIcon icon={setType} selected={active} />
-                                    </button>
+                                    </TabBarTab>
                                 );
                             })}
-                    </div>
+                    </TabBar>
 
                     <div className="registration-wardrobe-section-title">{translatedSetTypeLabel}</div>
                     <div className="registration-wardrobe-parts">
@@ -277,13 +266,12 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
                     <div className="registration-wardrobe-section-title">{t('nitro.login.register.wardrobe.colors', 'Colors')}</div>
                     <div className="registration-wardrobe-palette">
                         {availableColors.map((color) => (
-                            <button
+                            <ToggleButton
                                 key={color.id}
                                 type="button"
                                 className={color.id === selectedColor ? 'active' : ''}
                                 style={{ backgroundColor: color.hex }}
-                                aria-label={`${t('nitro.login.register.wardrobe.color', 'Color')} ${color.id}`}
-                                aria-pressed={color.id === selectedColor}
+                                aria-label={`${t('nitro.login.register.wardrobe.color', 'Color')} ${color.id}`} pressed={color.id === selectedColor}
                                 disabled={selectedPart < 0}
                                 onClick={() => onSelectColor(activeSetType, color.id)}
                             />

@@ -31,7 +31,6 @@ export const SendMessageView: FC<SendMessageProps> = ({ userId, userName, settin
     const [message, setMessage] = useState(nativeCaption(input));
     const [isHint, setIsHint] = useState(true);
     const [inputActive, setInputActive] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(-1);
     const templates = settings.messageTemplates ?? [];
 
@@ -86,18 +85,15 @@ export const SendMessageView: FC<SendMessageProps> = ({ userId, userName, settin
                     caption={selectedTemplate >= 0 ? templates[selectedTemplate] : nativeCaption(findNativeNode(root, 'msgTemplatesSelect'))}
                     height={menu.height}
                     items={templates}
-                    open={menuOpen}
                     width={menu.width}
                     x={menu.x}
                     y={menu.y}
                     onSelect={(index) => {
                         setSelectedTemplate(index);
-                        setMenuOpen(false);
                         setMessage(templates[index]);
                         setIsHint(false);
                         setInputActive(true);
                     }}
-                    onToggle={() => setMenuOpen((value) => !value)}
                 />
             </Native0Frame>
         </NativeWindowShell>

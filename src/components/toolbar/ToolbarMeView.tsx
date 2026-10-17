@@ -5,6 +5,7 @@ import { Flex, LayoutItemCountView } from '../../common';
 import { GuideToolEvent } from '../../events';
 import { useDailyTasks, useRewardTracks } from '../../hooks';
 import { useGroupForumUnreadStore } from '../../state/groupForumUnreadStore';
+import { BaseButton } from '../../common/BaseButton';
 
 export const ToolbarMeView: FC<
     PropsWithChildren<{
@@ -51,58 +52,58 @@ export const ToolbarMeView: FC<
             innerRef={elementRef}
         >
             {GetConfigurationValue('guides.enabled') && useGuideTool && (
-                <div
+                <BaseButton type="button"
                     className="navigation-item relative octane-icon icon-me-helper-tool cursor-pointer"
                     onClick={(event) => DispatchUiEvent(new GuideToolEvent(GuideToolEvent.TOGGLE_GUIDE_TOOL))}
                 />
             )}
-            <div
+            <BaseButton type="button"
                 className="navigation-item relative octane-icon icon-me-achievements cursor-pointer"
                 onClick={(event) => CreateLinkEvent('achievements/toggle')}
             >
                 {unseenAchievementCount > 0 && <LayoutItemCountView count={unseenAchievementCount} />}
-            </div>
-            <div
+            </BaseButton>
+            <BaseButton type="button"
                 className="navigation-item relative icon-me-quests cursor-pointer"
                 title={localizeWithFallback('toolbar.me.quests', 'Quests')}
                 onClick={(event) => CreateLinkEvent('quests/toggle')}
             />
-            <div
+            <BaseButton type="button"
                 className="navigation-item relative icon-me-dailytasks cursor-pointer"
                 title={localizeWithFallback('toolbar.me.dailytasks', 'Daily rewards')}
                 onClick={(event) => CreateLinkEvent('dailytasks/toggle')}
             >
                 {unseenDailyTaskCount > 0 && <LayoutItemCountView count={unseenDailyTaskCount} />}
-            </div>
-            <div
+            </BaseButton>
+            <BaseButton type="button"
                 className="navigation-item relative icon-me-rewardtrack cursor-pointer"
                 title={localizeWithFallback('toolbar.me.rewardtrack', 'Reward track')}
                 onClick={(event) => CreateLinkEvent('reward_track/toggle')}
             >
                 {unseenRewardTrackCount > 0 && <LayoutItemCountView count={unseenRewardTrackCount} />}
-            </div>
-            <div
+            </BaseButton>
+            <BaseButton type="button"
                 className="navigation-item relative octane-icon icon-me-profile cursor-pointer"
                 onClick={(event) => GetUserProfile(GetSessionDataManager().userId)}
             />
-            <div
+            <BaseButton type="button"
                 className="navigation-item relative octane-icon icon-me-rooms cursor-pointer"
                 onClick={(event) => CreateLinkEvent('navigator/search/myworld_view')}
             />
-            <div className="navigation-item relative octane-icon icon-me-clothing cursor-pointer" onClick={(event) => CreateLinkEvent('avatar-editor/toggle')} />
-            <div
+            <BaseButton type="button" className="navigation-item relative octane-icon icon-me-clothing cursor-pointer" onClick={(event) => CreateLinkEvent('avatar-editor/toggle')} />
+            <BaseButton type="button"
                 className="navigation-item relative octane-icon icon-me-badge-creator cursor-pointer"
                 onClick={(event) => CreateLinkEvent('badge-creator/toggle')}
                 title={LocalizeText('toolbar.icon.label.badge_creator')}
             />
-            <div className="navigation-item relative octane-icon icon-me-settings cursor-pointer" onClick={(event) => CreateLinkEvent('user-settings/toggle')} />
-            <div
+            <BaseButton type="button" className="navigation-item relative octane-icon icon-me-settings cursor-pointer" onClick={(event) => CreateLinkEvent('user-settings/toggle')} />
+            <BaseButton type="button"
                 className="navigation-item relative octane-icon icon-me-forums cursor-pointer"
                 onClick={(event) => CreateLinkEvent('groupforum/toggle')}
                 title={LocalizeText('toolbar.icon.label.forums')}
             >
                 {unreadForumsCount > 0 && <LayoutItemCountView count={unreadForumsCount} />}
-            </div>
+            </BaseButton>
             {children}
         </Flex>
     );

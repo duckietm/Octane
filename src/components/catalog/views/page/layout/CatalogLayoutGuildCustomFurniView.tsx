@@ -12,6 +12,7 @@ import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView'
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
@@ -52,22 +53,22 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
             <Column fullHeight gap={1} overflow="hidden">
                 {!!currentOffer && (
                     <div className="relative shrink-0 overflow-hidden">
-                        <button
+                        <BaseButton
                             aria-label="Rotate preview"
                             className="octane-catalog-preview-btn octane-catalog-preview-rotate"
                             type="button"
                             onClick={() => roomPreviewer?.changeRoomObjectDirection()}
                         >
                             <FaSyncAlt />
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             aria-label="Change preview state"
                             className="octane-catalog-preview-btn octane-catalog-preview-state"
                             type="button"
                             onClick={() => roomPreviewer?.changeRoomObjectState()}
                         >
                             <FaExchangeAlt />
-                        </button>
+                        </BaseButton>
                         <CatalogViewProductWidgetView height={210} />
                         <div className="absolute bottom-1 left-1 z-10">
                             <CatalogGuildBadgeWidgetView />

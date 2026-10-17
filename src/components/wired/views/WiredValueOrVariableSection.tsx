@@ -20,6 +20,9 @@ import {
     WiredVariablePickerTarget,
     WiredVariablePickerUsage
 } from './WiredVariablePickerData';
+import { Radio } from '../../../common/Radio';
+import { NumberInput } from '../../../common/NumberInput';
+import { BaseButton } from '../../../common/BaseButton';
 
 /** Where an official value variable is read, with the official variable target ids. */
 export const WIRED_VALUE_TARGETS: Array<{ key: WiredVariablePickerTarget; value: number; icon: string }> = [
@@ -125,7 +128,7 @@ export const WiredValueOrVariableSection: FC<WiredValueOrVariableSectionProps> =
 
     const radio = (mode: boolean, label: string) => (
         <label className="flex items-center gap-1">
-            <input type="radio" className="form-check-input" name={ name } checked={ isVariable === mode } onChange={ () => props.onIsVariableChange(mode) } />
+            <Radio name={ name } checked={ isVariable === mode } onCheckedChange={() => props.onIsVariableChange(mode)} />
             <Text>{ label }</Text>
         </label>
     );
@@ -134,13 +137,13 @@ export const WiredValueOrVariableSection: FC<WiredValueOrVariableSectionProps> =
         <div className="flex flex-col gap-1">
             { radio(false, localizeWithFallback('wiredfurni.params.variables.reference_type.constant', 'Value')) }
             { !isVariable &&
-                <input type="number" className="form-control form-control-sm" style={ { width: 110 } } min={ min } value={ value } onChange={ event => props.onValueChange(event.target.value) } /> }
+                <NumberInput className="form-control form-control-sm" style={ { width: 110 } } min={ min } value={ value } onChange={ event => props.onValueChange(event.target.value) } /> }
             { radio(true, localizeWithFallback('wiredfurni.params.variables.reference_type.variable', 'Value of a variable')) }
             { isVariable &&
                 <>
                     <div className="octane-wired__give-var-targets">
                         { WIRED_VALUE_TARGETS.filter(entry => !targets || targets.includes(entry.value)).map(entry => (
-                            <button
+                            <BaseButton
                                 key={ entry.key }
                                 type="button"
                                 className={ `octane-wired__give-var-target octane-wired__give-var-target--${ entry.key } ${ target === entry.value ? 'is-active' : '' }` }
@@ -151,7 +154,7 @@ export const WiredValueOrVariableSection: FC<WiredValueOrVariableSectionProps> =
                                     props.onTokenChange('');
                                 } }>
                                 <img src={ entry.icon } alt={ entry.key } />
-                            </button>
+                            </BaseButton>
                         )) }
                     </div>
                     <WiredVariablePicker entries={ entries } recentScope="variable-references" selectedToken={ token } onSelect={ entry => props.onTokenChange(entry.token) } />

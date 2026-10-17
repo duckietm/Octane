@@ -1,4 +1,4 @@
-import { FC, FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { ElementType, FC, FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { FaBolt, FaChartLine, FaCircle, FaCrown, FaExclamationTriangle, FaHome, FaPaperPlane, FaServer, FaSync, FaTicketAlt, FaUsers } from 'react-icons/fa';
 import {
     formatCompactNumber,
@@ -14,6 +14,7 @@ import {
 import { useHousekeepingStore, useNotification } from '../../../../hooks';
 import { HousekeepingButton } from '../common/HousekeepingParts';
 import { HousekeepingStatsView } from './HousekeepingStatsView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const AUTO_REFRESH_MS = 30_000;
 const STALE_AFTER_MS = 60_000;
@@ -46,10 +47,12 @@ const TONE_ICON: Record<NonNullable<StatCardProps['tone']>, string> = {
 const StatCard: FC<StatCardProps> = ({ icon, label, value, subtle, tone = 'sky', onClick }) => {
     const interactive = !!onClick;
 
+    const Root: ElementType = interactive ? BaseButton : 'div';
+
     return (
-        <div
+        <Root
             onClick={onClick}
-            className={`flex items-center gap-2.5 rounded-lg p-2.5 border bg-gradient-to-br shadow-sm ${TONE_BG[tone]} ${interactive ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            className={`flex w-full items-center gap-2.5 rounded-lg p-2.5 border bg-gradient-to-br text-left shadow-sm ${TONE_BG[tone]} ${interactive ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
         >
             <div className={`${TONE_ICON[tone]} shrink-0 rounded-md p-1.5`}>{icon}</div>
             <div className="flex flex-col grow min-w-0">
@@ -57,7 +60,7 @@ const StatCard: FC<StatCardProps> = ({ icon, label, value, subtle, tone = 'sky',
                 <span className="text-xl font-bold leading-tight tabular-nums">{value}</span>
                 {subtle && <span className="text-[10px] text-zinc-500 truncate">{subtle}</span>}
             </div>
-        </div>
+        </Root>
     );
 };
 
@@ -292,7 +295,7 @@ export const HousekeepingDashboardTab: FC = () => {
                     </h4>
                     <div className="flex flex-wrap gap-1">
                         {recentLookups.map((entry, index) => (
-                            <button
+                            <BaseButton
                                 key={`${entry.kind}-${entry.id}-${index}`}
                                 type="button"
                                 onClick={() => onRecentClick(entry)}
@@ -301,7 +304,7 @@ export const HousekeepingDashboardTab: FC = () => {
                             >
                                 <span className="opacity-60 font-bold">{entry.kind === 'user' ? 'U' : 'R'}</span>
                                 <span className="font-medium">{entry.label}</span>
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>

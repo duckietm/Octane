@@ -14,6 +14,7 @@ import {
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
+import { Radio } from '../../../../common/Radio';
 
 interface IVariableDefinition {
     hasValue: boolean;
@@ -151,24 +152,11 @@ export const WiredExtraTextInputVariableView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.texts.variable_input_type')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={displayType === DISPLAY_NUMERIC}
-                            className="form-check-input"
-                            name="wiredTextInputVariableType"
-                            type="radio"
-                            onChange={() => setDisplayType(DISPLAY_NUMERIC)}
-                        />
+                        <Radio checked={displayType === DISPLAY_NUMERIC} name="wiredTextInputVariableType" onCheckedChange={() => setDisplayType(DISPLAY_NUMERIC)} />
                         <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.1')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={displayType === DISPLAY_TEXTUAL}
-                            className="form-check-input"
-                            disabled={!canUseTextDisplay}
-                            name="wiredTextInputVariableType"
-                            type="radio"
-                            onChange={() => setDisplayType(DISPLAY_TEXTUAL)}
-                        />
+                        <Radio checked={displayType === DISPLAY_TEXTUAL} disabled={!canUseTextDisplay} name="wiredTextInputVariableType" onCheckedChange={() => setDisplayType(DISPLAY_TEXTUAL)} />
                         <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.2')}</Text>
                     </label>
                     <Text small>{LocalizeText('wiredfurni.params.texts.variable_display_type.2.info')}</Text>

@@ -3,6 +3,8 @@ import { WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const WiredTriggerDiceRolledView: FC<{}> = () =>
 {
@@ -28,21 +30,11 @@ export const WiredTriggerDiceRolledView: FC<{}> = () =>
                 <Text bold>Dice rolled</Text>
                 <Text small>Fires when a dice is rolled. Leave unchecked to match any value.</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={ matchEnabled }
-                        className="form-check-input"
-                        id="diceMatchEnabled"
-                        type="checkbox"
-                        onChange={ event => setMatchEnabled(event.target.checked) } />
+                    <Checkbox checked={ matchEnabled } id="diceMatchEnabled" onCheckedChange={(nextChecked) => setMatchEnabled(nextChecked)} />
                     <Text>Only a specific rolled value</Text>
                 </div>
                 { matchEnabled &&
-                    <input
-                        className="form-control form-control-sm"
-                        type="number"
-                        min={ 1 }
-                        value={ requiredValue }
-                        onChange={ event => setRequiredValue(parseInt(event.target.value, 10) || 0) } /> }
+                    <NumberInput className="form-control form-control-sm" min={ 1 } value={ requiredValue } onChange={ event => setRequiredValue(parseInt(event.target.value, 10) || 0) } /> }
             </div>
         </WiredTriggerBaseView>
     );

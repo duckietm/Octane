@@ -18,6 +18,9 @@ import {
     WiredVariablePickerTarget
 } from '../WiredVariablePickerData';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -304,13 +307,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                 <div className="octane-wired__divider" />
 
                 <label className="flex items-center gap-2">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={selectByValue}
-                        disabled={!canSelectByValue}
-                        onChange={(event) => setSelectByValue(event.target.checked)}
-                    />
+                    <Checkbox checked={selectByValue} disabled={!canSelectByValue} onCheckedChange={(nextChecked) => setSelectByValue(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.variables.value_settings.select_by_value')}</Text>
                 </label>
 
@@ -321,13 +318,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                         <div className="flex flex-wrap items-center gap-2">
                             {COMPARISON_OPTIONS.map((option) => (
                                 <label key={option.value} className="flex items-center gap-1">
-                                    <input
-                                        checked={comparison === option.value}
-                                        className="form-check-input"
-                                        type="radio"
-                                        disabled={!selectByValue}
-                                        onChange={() => setComparison(option.value)}
-                                    />
+                                    <Radio checked={comparison === option.value} disabled={!selectByValue} onCheckedChange={() => setComparison(option.value)} />
                                     <Text>{option.label}</Text>
                                 </label>
                             ))}
@@ -338,12 +329,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                     <div className="octane-wired__give-var-section">
                         <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
                         <label className="octane-wired__change-var-radio">
-                            <input
-                                checked={referenceMode === 'constant'}
-                                type="radio"
-                                disabled={!selectByValue}
-                                onChange={() => setReferenceMode('constant')}
-                            />
+                            <Radio checked={referenceMode === 'constant'} disabled={!selectByValue} onCheckedChange={() => setReferenceMode('constant')} />
                             <Text>{LocalizeText('wiredfurni.params.operator.2')}</Text>
                             <OctaneInput
                                 className="octane-wired__give-var-number"
@@ -356,16 +342,11 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
 
                         <div className="octane-wired__change-var-reference-block">
                             <label className="octane-wired__change-var-radio">
-                                <input
-                                    checked={referenceMode === 'variable'}
-                                    type="radio"
-                                    disabled={!selectByValue}
-                                    onChange={() => setReferenceMode('variable')}
-                                />
+                                <Radio checked={referenceMode === 'variable'} disabled={!selectByValue} onCheckedChange={() => setReferenceMode('variable')} />
                                 <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                                 <div className="octane-wired__give-var-targets">
                                     {TARGET_BUTTONS.map((button) => (
-                                        <button
+                                        <BaseButton
                                             key={`reference-${button.key}`}
                                             type="button"
                                             disabled={button.disabled || !selectByValue || referenceMode !== 'variable'}
@@ -373,7 +354,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                                             onClick={() => handleReferenceTargetChange(button.key)}
                                         >
                                             <img src={button.icon} alt={button.key} />
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </label>
@@ -388,7 +369,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                             )}
                             {selectByValue && referenceMode === 'variable' && (
                                 <label className="octane-wired__give-var-checkbox">
-                                    <input checked={sameHolder} className="form-check-input" type="checkbox" onChange={(event) => setSameHolder(event.target.checked)} />
+                                    <Checkbox checked={sameHolder} onCheckedChange={(nextChecked) => setSameHolder(nextChecked)} />
                                     <Text>{localizeWithFallback('wiredfurni.params.variables.same_holder', 'Read it on each target itself')}</Text>
                                 </label>
                             )}
@@ -429,17 +410,12 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                 <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
 
                 <label className="flex items-center gap-2">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={filterExisting}
-                        onChange={(event) => setFilterExisting(event.target.checked)}
-                    />
+                    <Checkbox checked={filterExisting} onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
                 </label>
 
                 <label className="flex items-center gap-2">
-                    <input className="form-check-input" type="checkbox" checked={invert} onChange={(event) => setInvert(event.target.checked)} />
+                    <Checkbox checked={invert} onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
                 </label>
             </div>

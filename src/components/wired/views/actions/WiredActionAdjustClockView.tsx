@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const MINUTES_MIN = 0;
 const MINUTES_MAX = 99;
@@ -74,14 +75,7 @@ export const WiredActionAdjustClockView: FC<{}> = () => {
                 {OPERATOR_OPTIONS.map((option) => {
                     return (
                         <div key={option.value} className="flex items-center gap-1">
-                            <input
-                                checked={operator === option.value}
-                                className="form-check-input"
-                                id={`adjustClockOperator${option.value}`}
-                                name="adjustClockOperator"
-                                type="radio"
-                                onChange={() => setOperator(option.value)}
-                            />
+                            <Radio checked={operator === option.value} id={`adjustClockOperator${option.value}`} name="adjustClockOperator" onCheckedChange={() => setOperator(option.value)} />
                             <Text>{LocalizeText(option.label)}</Text>
                         </div>
                     );

@@ -37,6 +37,8 @@ import {
 import { LazyEmojiPicker } from '../../common/LazyEmojiPicker';
 import { LayoutCurrencyIcon } from '../../common/layout/LayoutCurrencyIcon';
 import { useMessageEvent } from '../../hooks';
+import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 type CustomizeTab = 'icons' | 'prefix' | 'settings';
 type PrefixSubTab = 'library' | 'custom';
@@ -377,7 +379,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                 Active
                                             </span>
                                         )}
-                                        <img className="h-auto max-h-[28px] w-auto object-contain" src={iconUrl} alt={item.iconKey} />
+                                        {iconUrl && <img className="h-auto max-h-[28px] w-auto object-contain" src={iconUrl} alt={item.iconKey} />}
                                         <div className="flex flex-col items-center gap-1 text-center text-[11px]">
                                             <span>{item.owned ? (item.active ? 'Owned - Active' : 'Owned') : 'Locked'}</span>
                                             <span className="max-w-[140px] truncate">{item.displayName || `Icon #${item.iconKey}`}</span>
@@ -402,20 +404,20 @@ export const CustomizeNickIconView: FC<{}> = () => {
                     <div className="flex flex-col gap-3">
                         <div className="rounded border border-black/10 bg-black/5 p-1">
                             <div className="flex items-center gap-2">
-                                <button
+                                <BaseButton
                                     className={`rounded px-3 py-1.5 text-[11px] font-bold transition-colors ${activePrefixSubTab === 'library' ? 'bg-[#418db0] text-white' : 'bg-white text-black'}`}
                                     type="button"
                                     onClick={() => setActivePrefixSubTab('library')}
                                 >
                                     Library
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     className={`rounded px-3 py-1.5 text-[11px] font-bold transition-colors ${activePrefixSubTab === 'custom' ? 'bg-[#418db0] text-white' : 'bg-white text-black'}`}
                                     type="button"
                                     onClick={() => setActivePrefixSubTab('custom')}
                                 >
                                     Custom
-                                </button>
+                                </BaseButton>
                             </div>
                         </div>
 
@@ -490,13 +492,13 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                         </span>
                                     </div>
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <button
+                                        <BaseButton
                                             className="rounded border border-black/10 bg-white px-3 py-2 text-sm"
                                             type="button"
                                             onClick={() => setShowEmojiPicker(true)}
                                         >
                                             {customPrefixIcon || 'Emoji'}
-                                        </button>
+                                        </BaseButton>
                                         {!!customPrefixIcon && <Button onClick={() => setCustomPrefixIcon('')}>Clear</Button>}
                                     </div>
                                     <div className="rounded border border-black/10 bg-white p-2">
@@ -505,7 +507,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                         </div>
                                         <div className="grid grid-cols-6 gap-2">
                                             {PRESET_COLORS.map((color) => (
-                                                <button
+                                                <BaseButton
                                                     key={color}
                                                     className={`flex h-[28px] items-center justify-center rounded border text-[10px] font-bold uppercase ${customPrefixColor === color ? 'border-[#418db0] ring-1 ring-[#418db0]' : 'border-black/10'}`}
                                                     style={{ backgroundColor: color }}
@@ -513,14 +515,14 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                     onClick={() => setCustomPrefixColor(color)}
                                                 >
                                                     {customPrefixColor === color ? 'ON' : ''}
-                                                </button>
+                                                </BaseButton>
                                             ))}
                                         </div>
                                     </div>
                                     <div className="rounded border border-black/10 bg-white p-2">
                                         <div className="mb-2 text-[11px] leading-4 text-black/70">Effect</div>
                                         <div className="flex items-center gap-2">
-                                            <select
+                                            <Select
                                                 className="flex-1 rounded border border-black/10 bg-white px-2 py-2 text-sm"
                                                 value={customPrefixEffect}
                                                 onChange={(event) => setCustomPrefixEffect(event.target.value)}
@@ -539,7 +541,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                         </option>
                                                     ))}
                                                 </optgroup>
-                                            </select>
+                                            </Select>
                                             <div className="min-w-[130px] rounded border border-black/10 bg-black/5 px-2 py-2 text-center text-[11px] font-bold">
                                                 {selectedEffectOption.icon} {selectedEffectOption.label}
                                                 <div className="mt-1 text-[9px] uppercase text-black/60">{selectedEffectOption.tier}</div>
@@ -549,7 +551,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                     <div className="rounded border border-black/10 bg-white p-2">
                                         <div className="mb-2 text-[11px] leading-4 text-black/70">Font</div>
                                         <div className="flex items-center gap-2">
-                                            <select
+                                            <Select
                                                 className="flex-1 rounded border border-black/10 bg-white px-2 py-2 text-sm"
                                                 value={customPrefixFont}
                                                 onChange={(event) => setCustomPrefixFont(event.target.value)}
@@ -568,7 +570,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                         </option>
                                                     ))}
                                                 </optgroup>
-                                            </select>
+                                            </Select>
                                             <div className="min-w-[130px] rounded border border-black/10 bg-black/5 px-2 py-2 text-center text-[11px] font-bold">
                                                 <span style={customPrefixFontStyle}>{selectedFontOption.label}</span>
                                                 <div className="mt-1 text-[9px] uppercase text-black/60">{selectedFontOption.tier}</div>

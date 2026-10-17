@@ -2,6 +2,8 @@ import { FC } from 'react';
 import { formatMentionTime, IMentionEntry, LocalizeText, localizeWithFallback, MentionType } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { MentionMessageView } from './MentionMessageView';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
 
 interface MentionRowViewProps {
     mention: IMentionEntry;
@@ -24,7 +26,7 @@ export const MentionRowView: FC<MentionRowViewProps> = (props) => {
     return (
         <div className={`mention-row ${mention.read ? '' : 'is-unread'}`} role="listitem">
             {!mention.read && <span className="mention-row-unread-dot" aria-hidden />}
-            <button type="button" className="mention-row-main" aria-label={`${mention.senderUsername}: ${mention.message}`} onClick={() => onOpen(mention)}>
+            <BaseButton type="button" className="mention-row-main" aria-label={`${mention.senderUsername}: ${mention.message}`} onClick={() => onOpen(mention)}>
                 <span className="mention-row-avatar">
                     <LayoutAvatarImageView headOnly compactHead compactHeadSize={40} compactHeadPadding={0} direction={2} figure={mention.senderFigure} />
                 </span>
@@ -38,19 +40,23 @@ export const MentionRowView: FC<MentionRowViewProps> = (props) => {
                     </span>
                     <MentionMessageView className="mention-row-msg" ownUsername={ownUsername} text={mention.message} />
                 </span>
-            </button>
+            </BaseButton>
             <div className="mention-row-meta">
                 {time.length > 0 && <span className="mention-row-time">{time}</span>}
                 <div className="mention-row-actions">
                     {onGoto && mention.roomId > 0 && (
-                        <button type="button" className="mention-row-action" title={gotoLabel} aria-label={gotoLabel} onClick={() => onGoto(mention)}>
-                            ›
-                        </button>
+                        <Hint content={gotoLabel}>
+                            <BaseButton type="button" className="mention-row-action" aria-label={gotoLabel} onClick={() => onGoto(mention)}>
+                                ›
+                            </BaseButton>
+                        </Hint>
                     )}
                     {onRemove && (
-                        <button type="button" className="mention-row-action is-remove" title={removeLabel} aria-label={removeLabel} onClick={() => onRemove(mention)}>
-                            ×
-                        </button>
+                        <Hint content={removeLabel}>
+                            <BaseButton type="button" className="mention-row-action is-remove" aria-label={removeLabel} onClick={() => onRemove(mention)}>
+                                ×
+                            </BaseButton>
+                        </Hint>
                     )}
                 </div>
             </div>

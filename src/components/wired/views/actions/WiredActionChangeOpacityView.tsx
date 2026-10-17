@@ -17,6 +17,10 @@ import {
     WIRED_OPACITY_VISIBILITY_SOURCE_USERS,
     WiredActionChangeOpacityState
 } from './WiredActionChangeOpacityState';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const EASING_FALLBACKS = ['Instant', 'Linear', 'Ease in', 'Ease out', 'Ease in and out'];
 
@@ -76,7 +80,7 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
     const choice = visibilityChoice(state.opacity);
     const radio = (value: VisibilityChoice, key: string, fallback: string) => (
         <label className="flex items-center gap-1">
-            <input checked={choice === value} className="form-check-input" name="wiredTransparency" type="radio" onChange={() => changeVisibility(value)} />
+            <Radio checked={choice === value} name="wiredTransparency" onCheckedChange={() => changeVisibility(value)} />
             <Text>{localizeWithFallback(key, fallback)}</Text>
         </label>
     );
@@ -92,11 +96,11 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
                     <Text bold>{localizeWithFallback('wiredfurni.params.sources.merged.title.target', 'Select target:')}</Text>
                     <div className="flex gap-3">
                         <label className="flex items-center gap-1">
-                            <input checked={!state.targetUsers} className="form-check-input" name="wiredTransparencyTarget" type="radio" onChange={() => update({ targetUsers: false })} />
+                            <Radio checked={!state.targetUsers} name="wiredTransparencyTarget" onCheckedChange={() => update({ targetUsers: false })} />
                             <Text>{localizeWithFallback('wiredfurni.params.sources.furni.title', 'Furni')}</Text>
                         </label>
                         <label className="flex items-center gap-1">
-                            <input checked={state.targetUsers} className="form-check-input" name="wiredTransparencyTarget" type="radio" onChange={() => update({ targetUsers: true })} />
+                            <Radio checked={state.targetUsers} name="wiredTransparencyTarget" onCheckedChange={() => update({ targetUsers: true })} />
                             <Text>{localizeWithFallback('wiredfurni.params.sources.users.title', 'Users')}</Text>
                         </label>
                     </div>
@@ -118,10 +122,10 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.furni_visualization.audience', 'Who should see the effect?')}</Text>
-                <select className="form-select form-select-sm" value={state.visibility} onChange={(event) => changeAudience(Number(event.target.value))}>
+                <Select className="form-select form-select-sm" value={state.visibility} onChange={(event) => changeAudience(Number(event.target.value))}>
                     <option value={WIRED_OPACITY_VISIBILITY_SOURCE_USERS}>{localizeWithFallback('wiredfurni.params.furni_visualization.audience.selected_users', 'Selected users')}</option>
                     <option value={WIRED_OPACITY_VISIBILITY_EVERYONE}>{localizeWithFallback('wiredfurni.params.furni_visualization.audience.everyone', 'Everyone, also users who enter later')}</option>
-                </select>
+                </Select>
             </div>
 
             <div className="flex flex-col gap-1">
@@ -146,32 +150,24 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_transparency.click_handling', 'Click handling:')}</Text>
                 <label className="flex items-center gap-1">
-                    <input checked={state.clickThrough} className="form-check-input" type="checkbox" onChange={(event) => update({ clickThrough: event.target.checked })} />
+                    <Checkbox checked={state.clickThrough} onCheckedChange={(nextChecked) => update({ clickThrough: nextChecked })} />
                     <Text>{localizeWithFallback('wiredfurni.params.set_furni_transparency.allow_click_through', 'The target cannot be clicked')}</Text>
                 </label>
             </div>
 
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_transparency.easing', 'Transition:')}</Text>
-                <select className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
+                <Select className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
                     {EASING_FALLBACKS.map((fallback, value) => (
                         <option key={value} value={value}>
                             {localizeWithFallback(`wiredfurni.params.set_furni_transparency.easing.${value}`, fallback)}
                         </option>
                     ))}
-                </select>
+                </Select>
                 {state.easing !== WIRED_OPACITY_EASING_INSTANT && (
                     <label className="flex items-center justify-between gap-2">
                         <Text>{localizeWithFallback('wiredfurni.params.variables.duration', 'Duration (seconds, 0 = default)')}</Text>
-                        <input
-                            aria-label="Transition duration in seconds, 0 uses the default transition"
-                            className="form-control form-control-sm max-w-[80px]"
-                            max={WIRED_OPACITY_MAXIMUM_DURATION}
-                            min={WIRED_OPACITY_DEFAULT_DURATION}
-                            type="number"
-                            value={state.duration}
-                            onChange={(event) => update({ duration: Number(event.target.value) })}
-                        />
+                        <NumberInput aria-label="Transition duration in seconds, 0 uses the default transition" className="form-control form-control-sm max-w-[80px]" max={WIRED_OPACITY_MAXIMUM_DURATION} min={WIRED_OPACITY_DEFAULT_DURATION} value={state.duration} onChange={(event) => update({ duration: Number(event.target.value) })} />
                     </label>
                 )}
             </div>

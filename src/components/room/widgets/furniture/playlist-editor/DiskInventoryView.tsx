@@ -2,6 +2,7 @@ import { CreateLinkEvent, GetSoundManager, IAdvancedMap, MusicPriorities } from 
 import { FC, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { CatalogPageName, GetConfigurationValue, GetDiskColor, LocalizeText, localizeWithFallback } from '../../../../../api';
 import { AutoGrid, Button, Flex, LayoutGridItem, Text } from '../../../../../common';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 export interface DiskInventoryViewProps {
     diskInventory: IAdvancedMap<number, number>;
@@ -70,6 +71,7 @@ export const DiskInventoryView: FC<DiskInventoryViewProps> = (props) =>
 
                             return (
                                 <LayoutGridItem
+                                    component="div"
                                     key={index}
                                     classNames={['text-black']}
                                     itemActive={selectedItem === index}
@@ -104,12 +106,12 @@ export const DiskInventoryView: FC<DiskInventoryViewProps> = (props) =>
                 <h5>{LocalizeText('playlist.editor.text.get.more.music')}</h5>
                 <div>{LocalizeText('playlist.editor.text.you.have.no.songdisks.available')}</div>
                 <div>{LocalizeText('playlist.editor.text.you.can.buy.some.from.the.catalogue')}</div>
-                <button className="btn btn-primary btn-sm" onClick={() => openCatalogPage()}>
+                <BaseButton className="btn btn-primary btn-sm" onClick={() => openCatalogPage()}>
                     {LocalizeText('playlist.editor.button.open.catalogue')}
-                </button>
-                <button className="mt-1 btn btn-primary btn-sm" onClick={() => CreateLinkEvent('trax-editor/show')}>
+                </BaseButton>
+                <BaseButton className="mt-1 btn btn-primary btn-sm" onClick={() => CreateLinkEvent('trax-editor/show')}>
                     {localizeWithFallback('trax.editor.open', 'Compose your own music')}
-                </button>
+                </BaseButton>
             </div>
             <img alt="" className="get-more" src={`${GetConfigurationValue('image.library.url')}playlist/background_get_more_music.gif`} />
         </>

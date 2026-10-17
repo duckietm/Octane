@@ -38,6 +38,8 @@ import { NavigatorRoomInfoPopupView } from './views/search/NavigatorRoomInfoPopu
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
 import { NavigatorSearchSavesResultView } from './views/search/NavigatorSearchSavesResultView';
 import { NavigatorSearchView } from './views/search/NavigatorSearchView';
+import { TabBar, TabBarTab } from '../../common/TabBar';
+import { BaseButton } from '../../common/BaseButton';
 
 const persistNavigatorBounds = (element: HTMLElement | null) => {
     if (!element) return;
@@ -279,7 +281,7 @@ export const NavigatorView: FC<{}> = () => {
                         <div className="octane-navigator-air__tab-shelf" aria-hidden="true" />
                         <div className="octane-navigator-air__caption">
                             <div className="octane-navigator-air__history">
-                                <button
+                                <BaseButton
                                     type="button"
                                     className="octane-navigator-air__history-button"
                                     aria-label={localizeWithFallback('navigator.back', 'back')}
@@ -288,8 +290,8 @@ export const NavigatorView: FC<{}> = () => {
                                     onClick={() => useNavigatorUiStore.getState().goBack()}
                                 >
                                     ‹
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     type="button"
                                     className="octane-navigator-air__history-button"
                                     aria-label={localizeWithFallback('navigator.forward', 'forward')}
@@ -298,23 +300,23 @@ export const NavigatorView: FC<{}> = () => {
                                     onClick={() => useNavigatorUiStore.getState().goForward()}
                                 >
                                     ›
-                                </button>
+                                </BaseButton>
                             </div>
                             <span className="octane-navigator-air__title">{headerText}</span>
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="octane-navigator-air__close octane-navigator-air__help"
                                 aria-label={LocalizeText('generic.help')}
                                 onClick={() => CreateLinkEvent('habbopages/navigator')}
                             />
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="octane-navigator-air__close"
                                 aria-label={LocalizeText('generic.close')}
                                 onClick={() => useNavigatorUiStore.getState().hide()}
                             />
                         </div>
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-navigator-air__quick-toggle"
                             aria-label={quickLinksToggleLabel}
@@ -322,19 +324,21 @@ export const NavigatorView: FC<{}> = () => {
                             onClick={onToggleQuickLinks}
                         >
                             <img src={quicklinkAdd} alt="" width={18} height={18} />
-                        </button>
-                        <div ref={tabsRef} className="octane-navigator-air__tabs" role="tablist">
+                        </BaseButton>
+                        <TabBar
+                            ref={tabsRef}
+                            className="octane-navigator-air__tabs"
+                            value={isCreatorOpen ? null : ((currentTabCode ? currentTabCode : topLevelContext?.code) ?? null)}
+                        >
                             {topLevelContexts &&
                                 topLevelContexts.length > 0 &&
                                 topLevelContexts.map((context) => {
                                     const active = (currentTabCode ? currentTabCode === context.code : topLevelContext === context) && !isCreatorOpen;
 
                                     return (
-                                        <button
+                                        <TabBarTab
                                             key={context.code}
-                                            type="button"
-                                            role="tab"
-                                            aria-selected={active}
+                                            value={context.code}
                                             className={`octane-navigator-air__tab${active ? ' is-active' : ''}`}
                                             onClick={() => {
                                                 useNavigatorRoomInfoPopupStore.getState().hide();
@@ -342,10 +346,10 @@ export const NavigatorView: FC<{}> = () => {
                                             }}
                                         >
                                             <span className="octane-navigator-air__tab-label">{LocalizeText('navigator.toplevelview.' + context.code)}</span>
-                                        </button>
+                                        </TabBarTab>
                                     );
                                 })}
-                        </div>
+                        </TabBar>
                         <div className="octane-navigator-air__body">
                             {!isCreatorOpen && (
                                 <div className="octane-navigator-air__workspace">
@@ -373,7 +377,7 @@ export const NavigatorView: FC<{}> = () => {
                                             )}
                                         </div>
                                         <div className="octane-navigator-air__actions">
-                                            <button
+                                            <BaseButton
                                                 type="button"
                                                 className="octane-navigator-air__action octane-navigator-air__action--create"
                                                 onClick={onCreateRoom}
@@ -383,9 +387,9 @@ export const NavigatorView: FC<{}> = () => {
                                                     <span>{localizeWithFallback('navigator.create.room', LocalizeText('navigator.createroom.create'))}</span>
                                                 </div>
                                                 <i className="octane-navigator-air__action-border" aria-hidden="true" />
-                                            </button>
+                                            </BaseButton>
                                             {!showPromote && (
-                                                <button
+                                                <BaseButton
                                                     type="button"
                                                     className="octane-navigator-air__action octane-navigator-air__action--random"
                                                     onClick={onRandomRoom}
@@ -395,10 +399,10 @@ export const NavigatorView: FC<{}> = () => {
                                                         <span>{LocalizeText('navigator.random.room')}</span>
                                                     </div>
                                                     <i className="octane-navigator-air__action-border" aria-hidden="true" />
-                                                </button>
+                                                </BaseButton>
                                             )}
                                             {showPromote && (
-                                                <button
+                                                <BaseButton
                                                     type="button"
                                                     className="octane-navigator-air__action octane-navigator-air__action--promote"
                                                     onClick={onPromoteRoom}
@@ -408,7 +412,7 @@ export const NavigatorView: FC<{}> = () => {
                                                         <span>{LocalizeText('navigator.promote.room')}</span>
                                                     </div>
                                                     <i className="octane-navigator-air__action-border" aria-hidden="true" />
-                                                </button>
+                                                </BaseButton>
                                             )}
                                         </div>
                                     </main>
@@ -420,7 +424,7 @@ export const NavigatorView: FC<{}> = () => {
                                 </WidgetErrorBoundary>
                             )}
                         </div>
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-navigator-air__resize"
                             aria-label={localizeWithFallback('navigator.resize', 'Resize Navigator')}

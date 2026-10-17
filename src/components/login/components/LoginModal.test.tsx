@@ -18,7 +18,7 @@ describe('LoginModal', () => {
     it('closes when Escape is pressed', () => {
         const { onClose } = renderModal();
 
-        fireEvent.keyDown(window, { key: 'Escape' });
+        fireEvent.keyDown(screen.getByRole('button', { name: 'Continue' }), { key: 'Escape' });
 
         expect(onClose).toHaveBeenCalledOnce();
     });
@@ -26,7 +26,7 @@ describe('LoginModal', () => {
     it('closes when the overlay itself is clicked', () => {
         const { onClose, dialog } = renderModal();
 
-        fireEvent.click(dialog.parentElement!);
+        fireEvent.click(dialog.closest('.octane-login-modal')!);
 
         expect(onClose).toHaveBeenCalledOnce();
     });

@@ -328,6 +328,7 @@
 
 .octane-quest-tracker-moreinfo {
     display: block;
+    width: 100%;
     margin-top: 4px;
     text-align: center;
     color: #23c5ff;
@@ -1105,6 +1106,8 @@
 
 .octane-reward-track-task {
     display: flex;
+    width: 100%;
+    text-align: left;
     align-items: center;
     gap: 8px;
     min-height: 61px;
@@ -1831,7 +1834,8 @@
 }
 
 .octane-reward-track-admin input:not([type="checkbox"]),
-.octane-reward-track-admin select {
+.octane-reward-track-admin select,
+.octane-reward-track-admin .octane-select-trigger {
     box-sizing: border-box;
     width: 100%;
     min-height: 24px;
@@ -1846,7 +1850,8 @@
 }
 
 .octane-reward-track-admin input:not([type="checkbox"]):focus,
-.octane-reward-track-admin select:focus {
+.octane-reward-track-admin select:focus,
+.octane-reward-track-admin .octane-select-trigger:focus {
     outline: none;
     border-color: var(--rta-blue);
     box-shadow: 0 0 0 2px rgba(99, 197, 233, 0.35);
@@ -1968,6 +1973,7 @@
 /* Inline validation, notes, reorder arrows. */
 .octane-reward-track-admin-field.has-error input:not([type="checkbox"]),
 .octane-reward-track-admin-field.has-error select,
+.octane-reward-track-admin-field.has-error .octane-select-trigger,
 .octane-reward-track-admin input[aria-invalid="true"] {
     border-color: var(--rta-danger) !important;
 }

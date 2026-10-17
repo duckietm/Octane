@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { GetUserProfile, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../api';
 import { Flex, LayoutAvatarImageView } from '../../common';
 import { useNotification } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 interface RelationshipsContainerViewProps {
     relationships: RelationshipStatusInfoMessageParser;
@@ -47,7 +48,7 @@ export const RelationshipsContainerView: FC<RelationshipsContainerViewProps> = (
                 </Flex>
                 <div className="octane-extended-profile__relationship-copy">
                     <div className="octane-extended-profile__relationship-box">
-                        <p
+                        <BaseButton
                             className="octane-extended-profile__relationship-name"
                             onClick={(event) =>
                                 relationshipInfo && relationshipInfo.randomFriendId >= 1
@@ -57,7 +58,7 @@ export const RelationshipsContainerView: FC<RelationshipsContainerViewProps> = (
                         >
                             {(!relationshipInfo || relationshipInfo.friendCount === 0) && LocalizeText('extendedprofile.add.friends')}
                             {relationshipInfo && relationshipInfo.friendCount >= 1 && relationshipInfo.randomFriendName}
-                        </p>
+                        </BaseButton>
                         {relationshipInfo && relationshipInfo.friendCount >= 1 && (
                             <div className="octane-extended-profile__relationship-head">
                                 {/* Official avatar_image:direction "southwest", which the AIR widget maps to 4. */}

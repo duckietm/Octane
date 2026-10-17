@@ -31,6 +31,9 @@ import { useWired, useWiredLeaderboardStore, useWiredTools } from '../../../../h
 import { OctaneInput } from '../../../../layout';
 import { withoutExecutionContextVariables } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const P = 'wiredfurni.params.variable_leaderboard';
 const SORT_FALLBACKS = [ 'Highest value first', 'Lowest value first', 'Oldest creation first', 'Latest creation first', 'Oldest update first', 'Latest update first' ];
@@ -165,9 +168,9 @@ export const WiredExtraVariableLeaderboardView: FC<{}> = () => {
     const select = (label: string, value: number | string, options: { value: number | string, label: string }[], onChange: (value: string) => void, testId?: string) => (
         <div className="flex items-center gap-2">
             {label && <Text>{label}</Text>}
-            <select className="form-select form-select-sm" data-testid={testId} value={value} onChange={(event) => onChange(event.target.value)}>
+            <Select className="form-select form-select-sm" data-testid={testId} value={value} onChange={(event) => onChange(event.target.value)}>
                 {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-            </select>
+            </Select>
         </div>
     );
 
@@ -188,13 +191,13 @@ export const WiredExtraVariableLeaderboardView: FC<{}> = () => {
                 {select(text('columns.count', 'Columns'), draft.columns.length, Array.from({ length: LEADERBOARD_MAX_COLUMNS }, (_, i) => ({ value: i + 1, label: String(i + 1) })), (value) => setColumnCount(toInt(value, 1)), 'leaderboard-column-count')}
                 {draft.columns.map((column, index) => (
                     <div key={index} className="flex items-center gap-1">
-                        <select className="form-select form-select-sm" disabled={index === 0} value={column.type} onChange={(event) => patchColumn(index, retypeColumn(column, toInt(event.target.value, column.type)))}>
+                        <Select className="form-select form-select-sm" disabled={index === 0} value={column.type} onChange={(event) => patchColumn(index, retypeColumn(column, toInt(event.target.value, column.type)))}>
                             {(index === 0 ? [ 0 ] : LEADERBOARD_COLUMN_MENU).map((type) => <option key={type} value={type}>{text(`column.${ LEADERBOARD_COLUMN_KEYS[type] }`, COLUMN_FALLBACKS[type])}</option>)}
-                        </select>
+                        </Select>
                         <OctaneInput inputSize="sm" maxLength={LEADERBOARD_LABEL_MAX} placeholder={text('column_name', LEADERBOARD_COLUMN_DEFAULT_LABELS[column.type])} value={column.label} onChange={(event) => patchColumn(index, { ...column, label: event.target.value.replace(/\t/g, ' ') })} />
-                        <select className="form-select form-select-sm" value={column.width} onChange={(event) => patchColumn(index, { ...column, width: toInt(event.target.value, 0) })}>
+                        <Select className="form-select form-select-sm" value={column.width} onChange={(event) => patchColumn(index, { ...column, width: toInt(event.target.value, 0) })}>
                             {LEADERBOARD_WIDTH_KEYS.map((key, width) => <option key={key} value={width}>{text(`column_width.${ key }`, WIDTH_FALLBACKS[width])}</option>)}
-                        </select>
+                        </Select>
                     </div>
                 ))}
                 {draft.columns.some((column) => column.type === 4 || column.type === 5) && <Text small>{text('column_type_info', 'Level needs a level-up box and text a text connector on the variable.')}</Text>}
@@ -210,35 +213,35 @@ export const WiredExtraVariableLeaderboardView: FC<{}> = () => {
                                 <OctaneInput inputSize="sm" maxLength={LEADERBOARD_OVERRIDE_MAX} value={names[choice.variableId] ?? ''} onChange={(event) => setNames({ ...names, [choice.variableId]: event.target.value.replace(/\t/g, ' ') })} />
                             </div>
                         ))}
-                        <button type="button" className="btn btn-sm btn-secondary self-start" onClick={() => setNames(Object.fromEntries(choices.map((choice) => [ choice.variableId, suggestLeaderboardName(choice.technicalName) ])))}>{text('suggest', 'Suggest')}</button>
+                        <BaseButton type="button" className="btn btn-sm btn-secondary self-start" onClick={() => setNames(Object.fromEntries(choices.map((choice) => [ choice.variableId, suggestLeaderboardName(choice.technicalName) ])))}>{text('suggest', 'Suggest')}</BaseButton>
                     </>
                 )}
 
                 <Text bold>{text('section.filter', 'Filter')}</Text>
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" data-testid="leaderboard-filter" checked={draft.filterEnabled} onChange={(event) => patch({ filterEnabled: event.target.checked })} />
+                    <Checkbox data-testid="leaderboard-filter" checked={draft.filterEnabled} onCheckedChange={(nextChecked) => patch({ filterEnabled: nextChecked })} />
                     <Text>{text('filter.enabled', 'Only list users who have a variable')}</Text>
                 </label>
                 {draft.filterEnabled && (
                     <div className="flex flex-col gap-1 pl-4">
                         {select(text('filter.variable', 'Variable'), draft.filterVariableId, [ { value: '0', label: '-' }, ...userVariableDefinitions.map((definition) => ({ value: String(definition.itemId), label: definition.name })) ], (value) => patch({ filterVariableId: value }))}
                         <label className="flex items-center gap-1">
-                            <input type="checkbox" disabled={!filterDefinition?.hasValue} checked={draft.compareEnabled && !!filterDefinition?.hasValue} onChange={(event) => patch({ compareEnabled: event.target.checked })} />
+                            <Checkbox disabled={!filterDefinition?.hasValue} checked={draft.compareEnabled && !!filterDefinition?.hasValue} onCheckedChange={(nextChecked) => patch({ compareEnabled: nextChecked })} />
                             <Text>{text('filter.compare', 'Whose value equals')}</Text>
                         </label>
                         {draft.compareEnabled && !!filterDefinition?.hasValue && (
                             <div className="flex items-center gap-1">
-                                <select className="form-select form-select-sm" value={draft.operandKind} onChange={(event) => patch({ operandKind: toInt(event.target.value, OPERAND_LITERAL) })}>
+                                <Select className="form-select form-select-sm" value={draft.operandKind} onChange={(event) => patch({ operandKind: toInt(event.target.value, OPERAND_LITERAL) })}>
                                     <option value={OPERAND_LITERAL}>{text('filter.operand.literal', 'Number')}</option>
                                     <option value={OPERAND_GLOBAL_VARIABLE}>{text('filter.operand.global', 'Global variable')}</option>
-                                </select>
+                                </Select>
                                 {draft.operandKind === OPERAND_LITERAL
                                     ? <OctaneInput type="number" inputSize="sm" value={draft.comparisonLiteral} onChange={(event) => patch({ comparisonLiteral: event.target.value })} />
                                     : (
-                                        <select className="form-select form-select-sm" value={draft.operandVariableId} onChange={(event) => patch({ operandVariableId: event.target.value })}>
+                                        <Select className="form-select form-select-sm" value={draft.operandVariableId} onChange={(event) => patch({ operandVariableId: event.target.value })}>
                                             <option value="0">-</option>
                                             {roomVariableDefinitions.map((definition) => <option key={definition.itemId} value={String(definition.itemId)}>{definition.name}</option>)}
-                                        </select>
+                                        </Select>
                                     )}
                             </div>
                         )}

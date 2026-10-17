@@ -2,6 +2,7 @@ import { RelationshipStatusEnum, RelationshipStatusInfo } from '@octane/renderer
 import { FC } from 'react';
 import { GetUserProfile, LocalizeText, localizeWithFallback } from '../../../../../api';
 import { Flex, Text } from '../../../../../common';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface InfoStandWidgetUserRelationshipsRelationshipItemViewProps {
     type: number;
@@ -19,7 +20,7 @@ export const InfoStandWidgetUserRelationshipsRelationshipItemView: FC<InfoStandW
         <div className="flex items-center gap-1">
             <i className={`octane-friends-spritesheet icon-${relationshipName}`} />
             <Flex alignItems="center" gap={0}>
-                <Text small variant="white" onClick={(event) => GetUserProfile(relationship.randomFriendId)}>
+                <Text component={BaseButton} type="button" small variant="white" onClick={(event) => GetUserProfile(relationship.randomFriendId)}>
                     <u>{relationship.randomFriendName}</u>
                     {relationship.friendCount > 1 &&
                         ' ' +

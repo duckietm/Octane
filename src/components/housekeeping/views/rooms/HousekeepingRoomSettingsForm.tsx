@@ -14,6 +14,8 @@ import {
 } from '../../../../api';
 import { useNavigatorData } from '../../../../hooks';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingField, HousekeepingSection } from '../common/HousekeepingParts';
+import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 interface HousekeepingRoomSettingsFormProps {
     room: IHousekeepingRoom;
@@ -82,7 +84,7 @@ export const HousekeepingRoomSettingsForm: FC<HousekeepingRoomSettingsFormProps>
                     />
                 </HousekeepingField>
                 <HousekeepingField label={LocalizeText('navigator.category')}>
-                    <select
+                    <Select
                         className={HOUSEKEEPING_INPUT_CLASS}
                         value={draft.categoryId}
                         onChange={(event) => update('categoryId', parseInt(event.target.value) || 0)}
@@ -97,20 +99,13 @@ export const HousekeepingRoomSettingsForm: FC<HousekeepingRoomSettingsFormProps>
                                 {LocalizeText(category.name)}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </HousekeepingField>
                 <HousekeepingField hint={`${HK_ROOM_MIN_USERS}-${HK_ROOM_MAX_USERS}`} label={LocalizeText('navigator.maxvisitors')}>
-                    <input
-                        className={`${HOUSEKEEPING_INPUT_CLASS} tabular-nums`}
-                        max={HK_ROOM_MAX_USERS}
-                        min={HK_ROOM_MIN_USERS}
-                        type="number"
-                        value={draft.maxUsers || ''}
-                        onChange={(event) => update('maxUsers', parseInt(event.target.value) || 0)}
-                    />
+                    <NumberInput className={`${HOUSEKEEPING_INPUT_CLASS} tabular-nums`} max={HK_ROOM_MAX_USERS} min={HK_ROOM_MIN_USERS} value={draft.maxUsers || ''} onChange={(event) => update('maxUsers', parseInt(event.target.value) || 0)} />
                 </HousekeepingField>
                 <HousekeepingField label={LocalizeText('navigator.tradesettings')}>
-                    <select
+                    <Select
                         className={HOUSEKEEPING_INPUT_CLASS}
                         value={draft.tradeMode}
                         onChange={(event) => update('tradeMode', parseInt(event.target.value) || 0)}
@@ -118,7 +113,7 @@ export const HousekeepingRoomSettingsForm: FC<HousekeepingRoomSettingsFormProps>
                         <option value={0}>{LocalizeText('navigator.roomsettings.trade_not_allowed')}</option>
                         <option value={1}>{LocalizeText('navigator.roomsettings.trade_not_with_Controller')}</option>
                         <option value={2}>{LocalizeText('navigator.roomsettings.trade_allowed')}</option>
-                    </select>
+                    </Select>
                 </HousekeepingField>
                 <HousekeepingField hint={LocalizeText('housekeeping.room.settings.tags_hint')} label={LocalizeText('housekeeping.room.settings.tags')}>
                     <input className={HOUSEKEEPING_INPUT_CLASS} value={draft.tags} onChange={(event) => update('tags', event.target.value)} />

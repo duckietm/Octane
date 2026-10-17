@@ -1,6 +1,7 @@
 import { createContext, FC, useContext } from 'react';
 import { OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { GroupText, GroupWindowTitle } from './GroupNativeLayout';
+import { BaseButton } from '../../../common/BaseButton';
 
 export interface GroupAlert {
     title: string;
@@ -26,8 +27,8 @@ export const GroupNativeAlertView: FC<{ alert: GroupAlert; onClose: () => void }
         <OctaneCardHeaderView headerText="" onCloseClick={onClose} />
         <GroupWindowTitle title={alert.title} width={278} />
         <GroupText height={57} text={alert.message} wrap width={210} x={33} y={39} />
-        <button autoFocus className="octane-group-native__button octane-group-alert__ok" type="button" onClick={onClose}>
+        <BaseButton autoFocus className="octane-group-native__button octane-group-alert__ok" type="button" onClick={onClose}>
             <GroupText blend="multiply" className="is-static" text="Ok" textStyle="u_bold" x={0} y={0} />
-        </button>
+        </BaseButton>
     </OctaneCardView>
 );

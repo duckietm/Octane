@@ -26,6 +26,7 @@ import {
     wiredArrayValueAsAddress
 } from '../arrays/WiredArrayValueField';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Select } from '../../../../common/Select';
 
 const OPERATION_FALLBACKS: Record<number, string> = {
     0: 'Add to the end',
@@ -109,7 +110,7 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
 
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.arrays.operation', 'What to do')}</Text>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={payload.operation}
                         onChange={(event) => setPayload({ ...payload, operation: parseInt(event.target.value, 10) })}
@@ -119,7 +120,7 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
                                 {localizeWithFallback(`wiredfurni.params.arrays.operation.${operation.code}`, OPERATION_FALLBACKS[operation.code])}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                     {definition && !operations.some((operation) => operation.code === payload.operation) && (
                         <Text small className="text-black/60">
                             {localizeWithFallback(
@@ -133,7 +134,7 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
                 {ownerSources.length > 0 && (
                     <div className="flex flex-col gap-1">
                         <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={payload.ownerSource}
                             onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
@@ -143,7 +144,7 @@ export const WiredActionModifyArrayView: FC<{}> = () => {
                                     {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                 )}
 

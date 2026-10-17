@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { NavigatorSearchResultList, NavigatorSearchSaveComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, localizeWithFallback, NavigatorSearchResultViewDisplayMode, SendMessageComposer } from '../../../../api';
@@ -10,6 +11,8 @@ import navViewThumbs from '../../../../assets/images/navigator/air/nav-view-thum
 import { LayoutSearchSavesView } from '../../../../common';
 import { useNavigatorData, useNavigatorUiStore } from '../../../../hooks';
 import { NavigatorSearchResultItemView } from './NavigatorSearchResultItemView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 export interface NavigatorSearchResultViewProps {
     searchResult: NavigatorSearchResultList;
@@ -70,50 +73,55 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
 
     return (
-        <section className={`octane-navigator-air__category${isExtended ? '' : ' is-collapsed'}`}>
+        <Collapsible.Root
+            render={<section />}
+            className={`octane-navigator-air__category${isExtended ? '' : ' is-collapsed'}`}
+            open={isExtended}
+            onOpenChange={() => useNavigatorUiStore.getState().setResultCollapsed(searchResult.code, isExtended)}
+        >
             <header className="octane-navigator-air__category-header">
-                <button
-                    type="button"
-                    className="octane-navigator-air__category-toggle"
-                    aria-label={resultTitle}
-                    aria-expanded={isExtended}
-                    onClick={() => useNavigatorUiStore.getState().setResultCollapsed(searchResult.code, isExtended)}
-                >
+                <Collapsible.Trigger className="octane-navigator-air__category-toggle" aria-label={resultTitle}>
                     <img src={isExtended ? categoryCollapse : categoryExpand} alt="" />
                     <span>{resultTitle}</span>
-                </button>
+                </Collapsible.Trigger>
                 <div className="octane-navigator-air__category-controls">
                     {isExtended && displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
-                        <button
-                            type="button"
-                            className="octane-navigator-air__icon-button"
-                            aria-label={tileViewLabel}
-                            title={tileViewLabel}
-                            onClick={toggleDisplayMode}
-                        >
-                            <img src={navViewThumbs} alt="" />
-                        </button>
+                        <Hint content={tileViewLabel}>
+                            <BaseButton
+                                type="button"
+                                className="octane-navigator-air__icon-button"
+                                aria-label={tileViewLabel}
+                                onClick={toggleDisplayMode}
+                            >
+                                <img src={navViewThumbs} alt="" />
+                            </BaseButton>
+                        </Hint>
                     )}
                     {isExtended && isTileMode && (
-                        <button
-                            type="button"
-                            className="octane-navigator-air__icon-button"
-                            aria-label={listViewLabel}
-                            title={listViewLabel}
-                            onClick={toggleDisplayMode}
-                        >
-                            <img src={navViewRow} alt="" />
-                        </button>
+                        <Hint content={listViewLabel}>
+                            <BaseButton
+                                type="button"
+                                className="octane-navigator-air__icon-button"
+                                aria-label={listViewLabel}
+                                onClick={toggleDisplayMode}
+                            >
+                                <img src={navViewRow} alt="" />
+                            </BaseButton>
+                        </Hint>
                     )}
                     {searchResult.action > 0 && searchResult.action === 1 && (
-                        <button type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.more.rooms')} onClick={showMore}>
-                            <img src={categoryShowMore} alt="" />
-                        </button>
+                        <Hint content={LocalizeText('navigator.more.rooms')}>
+                            <BaseButton aria-label={LocalizeText('navigator.more.rooms')} type="button" className="octane-navigator-air__icon-button" onClick={showMore}>
+                                <img src={categoryShowMore} alt="" />
+                            </BaseButton>
+                        </Hint>
                     )}
                     {searchResult.action > 0 && searchResult.action !== 1 && (
-                        <button type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.back')} onClick={showMore}>
-                            <img src={navViewMini} alt="" />
-                        </button>
+                        <Hint content={LocalizeText('navigator.back')}>
+                            <BaseButton aria-label={LocalizeText('navigator.back')} type="button" className="octane-navigator-air__icon-button" onClick={showMore}>
+                                <img src={navViewMini} alt="" />
+                            </BaseButton>
+                        </Hint>
                     )}
                     {!hideSave && (
                         <LayoutSearchSavesView
@@ -123,8 +131,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                     )}
                 </div>
             </header>
-            {isExtended && (
-                <div className={isTileMode ? 'octane-navigator-air__tiles' : 'octane-navigator-air__rows'}>
+            <Collapsible.Panel className={isTileMode ? 'octane-navigator-air__tiles' : 'octane-navigator-air__rows'}>
                     {searchResult.rooms.map((room, index) => (
                         <NavigatorSearchResultItemView
                             key={room.roomId || index}
@@ -134,8 +141,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                             stripe={isTileMode ? Math.floor(index / 3) % 2 === 1 : index % 2 === 1}
                         />
                     ))}
-                </div>
-            )}
-        </section>
+            </Collapsible.Panel>
+        </Collapsible.Root>
     );
 };

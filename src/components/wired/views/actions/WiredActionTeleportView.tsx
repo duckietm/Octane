@@ -6,6 +6,8 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource, slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 /**
  * Teleport (official [fast]), our walk to furni (laid out the same), move furni to user (official: no
@@ -66,7 +68,7 @@ export const WiredActionTeleportView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text bold>{LocalizeText('wiredfurni.params.teleport.options')}</Text>
                     <label className="flex items-center gap-1">
-                        <input checked={fastTeleport} className="form-check-input" type="checkbox" onChange={(event) => setFastTeleport(event.target.checked)} />
+                        <Checkbox checked={fastTeleport} onCheckedChange={(nextChecked) => setFastTeleport(nextChecked)} />
                         <Text>{LocalizeText('wiredfurni.params.teleport.options.0')}</Text>
                     </label>
                 </div>
@@ -76,7 +78,7 @@ export const WiredActionTeleportView: FC<{}> = () => {
                     <Text bold>{LocalizeText('wiredfurni.params.user_move.walkmode')}</Text>
                     {[0, 1, 2].map((option) => (
                         <label key={option} className="flex items-center gap-1 cursor-pointer">
-                            <input checked={walkMode === option} className="form-check-input" name="userWalkMode" type="radio" onChange={() => setWalkMode(option)} />
+                            <Radio checked={walkMode === option} name="userWalkMode" onCheckedChange={() => setWalkMode(option)} />
                             <Text>{LocalizeText(`wiredfurni.params.user_move.walkmode.${option}`)}</Text>
                         </label>
                     ))}

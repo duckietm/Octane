@@ -1,10 +1,10 @@
-import { MentionListItem, MentionReceivedEvent, MentionsListEvent } from '@octane/renderer';
+import { MentionListItem, MentionReceivedEvent, MentionsListEvent, MentionsPageEvent } from '@octane/renderer';
 import { useCallback, useEffect } from 'react';
 import { GetConfigurationValue, GetRoomSession, IMentionEntry, PlaySound } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification/useNotification';
 import { requestMentions } from './mentionsRequests';
-import { addMention, isMentionsPanelOpen, setMentions } from './mentionsStore';
+import { addMention, appendMentions, isMentionsPanelOpen, setMentions } from './mentionsStore';
 
 // Dedicated mention chime served from nitro-assets/sounds/<sample>.mp3.
 const MENTION_SOUND_SAMPLE = 'mentions_notification';
@@ -26,7 +26,21 @@ export const useMentionMessages = (): void => {
     const { showMentionBubble } = useNotification();
 
     const onMentionsList = useCallback((event: MentionsListEvent) => {
-        setMentions(event.getParser().mentions.map((mention) => toEntry(mention, mention.read)));
+        const parser = event.getParser();
+
+        setMentions(
+            parser.mentions.map((mention) => toEntry(mention, mention.read)),
+            parser.hasMore
+        );
+    }, []);
+
+    const onMentionsPage = useCallback((event: MentionsPageEvent) => {
+        const parser = event.getParser();
+
+        appendMentions(
+            parser.mentions.map((mention) => toEntry(mention, mention.read)),
+            parser.hasMore
+        );
     }, []);
 
     const onMentionReceived = useCallback(
@@ -51,6 +65,7 @@ export const useMentionMessages = (): void => {
     );
 
     useMessageEvent<MentionsListEvent>(MentionsListEvent, onMentionsList);
+    useMessageEvent<MentionsPageEvent>(MentionsPageEvent, onMentionsPage);
     useMessageEvent<MentionReceivedEvent>(MentionReceivedEvent, onMentionReceived);
 
     useEffect(() => {

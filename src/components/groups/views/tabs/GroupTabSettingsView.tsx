@@ -7,6 +7,7 @@ import groupTypeIcon2 from '../../../../assets/images/groups/native/grouptype_ic
 import { useNotification } from '../../../../hooks';
 import { GroupBox, GroupText } from '../GroupNativeLayout';
 import { GroupRichText } from '../GroupRichText';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const STATES: string[] = ['regular', 'exclusive', 'private'];
 const TYPE_ICONS: string[] = [groupTypeIcon0, groupTypeIcon1, groupTypeIcon2];
@@ -21,7 +22,7 @@ interface GroupTabSettingsViewProps {
 const STEP_Y = 111;
 
 const Check: FC<{ checked: boolean; kind: 'radio' | 'checkbox'; x: number; y: number; onSelect: () => void }> = ({ checked, kind, x, y, onSelect }) => (
-    <button aria-checked={checked} className={`octane-group-native__check is-${kind}${checked ? ' is-checked' : ''}`} role={kind} style={{ left: x, top: y }} type="button" onClick={onSelect} />
+    <BaseButton aria-checked={checked} className={`octane-group-native__check is-${kind}${checked ? ' is-checked' : ''}`} role={kind} style={{ left: x, top: y }} type="button" onClick={onSelect} />
 );
 
 export const GroupTabSettingsView: FC<GroupTabSettingsViewProps> = (props) => {

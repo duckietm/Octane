@@ -6,6 +6,10 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { CollapsibleSection } from '../../../../common/CollapsibleSection';
 
 export const CHEST_REWARD_MODE_AMOUNT = 0;
 export const CHEST_REWARD_MODE_EVERYTHING = 1;
@@ -96,7 +100,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                 <Text bold>{localizeWithFallback('wiredfurni.params.rewarding_mode', 'Rewarding mode')}</Text>
                 {[CHEST_REWARD_MODE_AMOUNT, CHEST_REWARD_MODE_EVERYTHING].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input type="radio" className="form-check-input" name="chestRewardMode" checked={mode === value} onChange={() => setMode(value)} />
+                        <Radio name="chestRewardMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
                         <Text>{localizeWithFallback(`wiredfurni.params.rewarding_mode.${value}`, value === 0 ? 'Give a specific amount' : 'Give everything')}</Text>
                     </label>
                 ))}
@@ -133,33 +137,30 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                     onChange={(event) => setPopupText(normalizeChestPopup(event.target.value))}
                 />
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={showByDefault} onChange={(event) => setShowByDefault(event.target.checked)} />
+                    <Checkbox checked={showByDefault} onCheckedChange={(nextChecked) => setShowByDefault(nextChecked)} />
                     <Text>{localizeWithFallback('wiredfurni.reward_contract.reward_popup.show_by_default', 'Show the popup by default')}</Text>
                 </label>
             </div>
-            <details>
-                <summary>
-                    <Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>
-                </summary>
+            <CollapsibleSection title={<Text bold>{localizeWithFallback(extra.titleKey, extra.title)}</Text>}>
                 <fieldset className="flex flex-col gap-1 pt-1" disabled={extraDisabled}>
                     {extra.dropdown ? (
-                        <select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
+                        <Select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
                             {extra.options.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {localizeWithFallback(option.key, option.label)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     ) : (
                         extra.options.map((option) => (
                             <label key={option.value} className="flex items-center gap-1">
-                                <input type="radio" className="form-check-input" name="chestRewardExtra" checked={extraValue === option.value} onChange={() => setExtraValue(option.value)} />
+                                <Radio name="chestRewardExtra" checked={extraValue === option.value} onCheckedChange={() => setExtraValue(option.value)} />
                                 <Text>{localizeWithFallback(option.key, option.label)}</Text>
                             </label>
                         ))
                     )}
                 </fieldset>
-            </details>
+            </CollapsibleSection>
         </WiredActionBaseView>
     );
 };

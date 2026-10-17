@@ -50,7 +50,7 @@ describe('reward track wired actions', () => {
         trigger = { stringData: '', intData: [] };
         render(<WiredActionProgressRewardTrackView />);
         expect(baseProps.validate()).toBe(false);
-        expect((screen.getByRole('checkbox') as HTMLInputElement).checked).toBe(false);
+        expect(screen.getByRole('checkbox')).not.toBeChecked();
 
         fireEvent.change(screen.getByLabelText('track'), { target: { value: 'season 1:x' } });
         fireEvent.change(screen.getByLabelText('task'), { target: { value: 'games' } });
@@ -69,7 +69,7 @@ describe('reward track wired actions', () => {
 
         expect((screen.getByLabelText('track') as HTMLInputElement).value).toBe('season_1');
         expect((screen.getByLabelText('task') as HTMLInputElement).value).toBe('games');
-        expect((screen.getByRole('checkbox') as HTMLInputElement).checked).toBe(false);
+        expect(screen.getByRole('checkbox')).not.toBeChecked();
         baseProps.save();
         expect(setIntParams).toHaveBeenCalledWith([0, 0, 25, -20]);
         expect(setSourceTypes).toHaveBeenCalledWith({ furni: [], users: [201] });

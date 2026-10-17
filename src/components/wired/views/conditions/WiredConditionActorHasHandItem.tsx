@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredHandItemField } from '../WiredHandItemField';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 interface WiredConditionActorHasHandItemViewProps {
     negative?: boolean;
@@ -39,13 +40,7 @@ export const WiredConditionActorHasHandItemView: FC<WiredConditionActorHasHandIt
                 <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                 {[0, 1].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={quantifier === value}
-                            className="form-check-input"
-                            name="handItemQuantifier"
-                            type="radio"
-                            onChange={() => setQuantifier(value)}
-                        />
+                        <Radio checked={quantifier === value} name="handItemQuantifier" onCheckedChange={() => setQuantifier(value)} />
                         <Text>{LocalizeText(`wiredfurni.params.quantifier.users${negative ? '.neg' : ''}.${value}`)}</Text>
                     </label>
                 ))}

@@ -1,5 +1,7 @@
 import { FC } from 'react';
 import quicklinkAdd from '../../assets/images/navigator/air/quicklink-add.png';
+import { BaseButton } from '../BaseButton';
+import { Hint } from '../Tooltip';
 
 export interface LayoutSearchSavesViewProps {
     title: string;
@@ -10,8 +12,10 @@ export const LayoutSearchSavesView: FC<LayoutSearchSavesViewProps> = (props) => 
     const { title = null, onClick = null } = props;
 
     return (
-        <button type="button" className="octane-navigator-search-save" title={title} onClick={onClick}>
-            <img src={quicklinkAdd} alt="" />
-        </button>
+        <Hint content={title}>
+            <BaseButton aria-label={title} type="button" className="octane-navigator-search-save" onClick={onClick}>
+                <img src={quicklinkAdd} alt="" />
+            </BaseButton>
+        </Hint>
     );
 };

@@ -5,6 +5,8 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 /** The official effect list; the box saves the index (wiredfurni.params.freeze.effect.0..4). */
 const EFFECT_OPTIONS = [218, 12, 11, 53, 163];
@@ -38,15 +40,15 @@ export const WiredActionFreezeView: FC<{}> = () => {
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.freeze.effect_selection', 'Effect')}</Text>
-                <select className="form-select form-select-sm" value={effectIndex} onChange={(event) => setEffectIndex(parseInt(event.target.value))}>
+                <Select className="form-select form-select-sm" value={effectIndex} onChange={(event) => setEffectIndex(parseInt(event.target.value))}>
                     {EFFECT_OPTIONS.map((effectId, index) => (
                         <option key={effectId} value={index}>
                             {localizeWithFallback(`wiredfurni.params.freeze.effect.${index}`, LocalizeText(`fx_${effectId}`))}
                         </option>
                     ))}
-                </select>
+                </Select>
                 <label className="flex items-center gap-1">
-                    <input checked={cancelOnTeleport} className="form-check-input" type="checkbox" onChange={(event) => setCancelOnTeleport(event.target.checked)} />
+                    <Checkbox checked={cancelOnTeleport} onCheckedChange={(nextChecked) => setCancelOnTeleport(nextChecked)} />
                     <Text>{LocalizeText('wiredfurni.params.freeze.cancel_on_teleport')}</Text>
                 </label>
             </div>

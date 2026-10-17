@@ -2,6 +2,7 @@ import { ISongInfo } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { GetConfigurationValue, GetDiskColor, LocalizeText } from '../../../../../api';
 import { Button, Text } from '../../../../../common';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 export interface SongPlaylistViewProps {
     furniId: number;
@@ -42,7 +43,7 @@ export const SongPlaylistView: FC<SongPlaylistViewProps> = (props) => {
                                     }
                                     onClick={() => setSelectedItem((prev) => (prev === index ? -1 : index))}
                                 >
-                                    <div
+                                    <BaseButton type="button"
                                         className={'disk-2 ' + (selectedItem === index ? 'selected-song' : '')}
                                         style={{ backgroundColor: selectedItem === index ? '' : GetDiskColor(songInfo.songData) }}
                                         onClick={() => action(index)}

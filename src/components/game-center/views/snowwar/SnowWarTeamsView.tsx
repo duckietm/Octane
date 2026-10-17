@@ -6,6 +6,8 @@ import { LayoutAvatarImageView } from '../../../../common';
 import { useSnowWar } from '../../../../hooks';
 import { SnowWarSkillStars } from './SnowWarSkillStars';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
+import { BaseButton } from '../../../../common/BaseButton';
+import { ToggleButton } from '../../../../common/ToggleButton';
 
 // Red = team 0, Blue = team 1 (matches the arena's TEAM_COLORS ordering).
 const TEAMS = [
@@ -82,9 +84,9 @@ export const SnowWarTeamsView: FC = () =>
         <div className="snowwar-teams snowwar-air-backdrop">
             {queueInfo?.canEdit && (
                 <div className="snowwar-teams__topbar">
-                    <button type="button" className="snowwar-button snowwar-button--edit" onClick={() => startEditing()}>
+                    <BaseButton type="button" className="snowwar-button snowwar-button--edit" onClick={() => startEditing()}>
                         {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
-                    </button>
+                    </BaseButton>
                 </div>
             )}
             <img className="snowwar-lobby__logo" src={snowStormLogo} alt="SnowStorm" />
@@ -109,17 +111,16 @@ export const SnowWarTeamsView: FC = () =>
                                 ? localizeWithFallback(`snowwar.field.name.${arena.id}`, localizeWithFallback(`gamecenter.snowwar.map.name.${arena.id}`, arena.name))
                                 : arena.name;
                             return (
-                                <button
+                                <ToggleButton
                                     key={arena.id}
                                     type="button"
                                     className={`snowwar-teams__arena${selected ? ' snowwar-teams__arena--selected' : ''}`}
-                                    disabled={!isLeader}
-                                    aria-pressed={selected}
+                                    disabled={!isLeader} pressed={selected}
                                     onClick={() => selectArena(arena.id)}>
                                     <img src={getArenaPreviewUrl(arena.id, arena.official)} alt="" />
                                     {!arena.official && <small>{localizeWithFallback('snowwar.arena.custom', 'Custom')}</small>}
                                     <span>{name}</span>
-                                </button>
+                                </ToggleButton>
                             );
                         })}
                     </div>
@@ -163,9 +164,9 @@ export const SnowWarTeamsView: FC = () =>
             {spinner && <img alt="" className="snowwar-teams__spinner" src={spinner} />}
 
             {((phase === 'queued') || (phase === 'lobby')) && (
-                <button type="button" className="snowwar-teams__cancel" onClick={() => leaveQueue()}>
+                <BaseButton type="button" className="snowwar-teams__cancel" onClick={() => leaveQueue()}>
                     {localizeWithFallback('generic.cancel', 'Cancel')}
-                </button>
+                </BaseButton>
             )}
         </div>
     );

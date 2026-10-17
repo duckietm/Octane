@@ -4,6 +4,7 @@ import { getActivityPointName, getCampaignImageUrl, getCampaignName, getQuestCom
 import { Button, DraggableWindowPosition } from '../../common';
 import { useQuests } from '../../hooks';
 import { OctaneCard } from '../../layout';
+import { BaseButton } from '../../common/BaseButton';
 
 /** The official dialog waits two seconds after the completion packet before it appears. */
 const SHOW_DELAY_MS = 2000;
@@ -89,9 +90,9 @@ export const QuestCompletedView: FC<{}> = () => {
                 </div>
                 <div className="octane-quest-completed-actions">
                     {!lastQuestInCampaign && rewardVisible && (
-                        <span className="octane-quest-link" onClick={onCatalog}>
+                        <BaseButton className="octane-quest-link" onClick={onCatalog}>
                             {localizeWithFallback('quests.completed.cataloglink', 'Spend your %currencyname%', ['currencyname'], [currencyName])}
-                        </span>
+                        </BaseButton>
                     )}
                     <div className="grow" />
                     {lastQuestInCampaign && (

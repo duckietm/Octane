@@ -4,6 +4,7 @@ import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { useMessageEvent } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { NameChangeLayoutViewProps } from './NameChangeView.types';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const AVAILABLE: number = 0;
 const TOO_SHORT: number = 2;
@@ -72,9 +73,9 @@ export const NameChangeInputView: FC<NameChangeLayoutViewProps> = (props) => {
             <div>{LocalizeText('tutorial.name_change.info.select')}</div>
             <div className="flex gap-2">
                 <OctaneInput type="text" value={newUsername} onChange={(event) => handleUsernameChange(event.target.value)} />
-                <button className="btn btn-primary" disabled={newUsername === '' || isChecking} onClick={check}>
+                <BaseButton className="btn btn-primary" disabled={newUsername === '' || isChecking} onClick={check}>
                     {LocalizeText('tutorial.name_change.check')}
-                </button>
+                </BaseButton>
             </div>
             {!errorCode && !canProceed && <div className="octane-card-panel p-2 text-center">{LocalizeText('help.tutorial.name.info')}</div>}
             {errorCode && (
@@ -86,19 +87,19 @@ export const NameChangeInputView: FC<NameChangeLayoutViewProps> = (props) => {
             {suggestions && (
                 <div className="flex flex-col gap-2">
                     {suggestions.map((suggestion, index) => (
-                        <div key={index} className="octane-card-row p-1 cursor-pointer col" onClick={() => handleUsernameChange(suggestion)}>
+                        <BaseButton key={index} className="octane-card-row p-1 cursor-pointer col w-full text-left" onClick={() => handleUsernameChange(suggestion)}>
                             {suggestion}
-                        </div>
+                        </BaseButton>
                     ))}
                 </div>
             )}
             <div className="flex gap-2">
-                <button className="w-full btn btn-success" disabled={!canProceed} onClick={() => onAction('confirmation', newUsername)}>
+                <BaseButton className="w-full btn btn-success" disabled={!canProceed} onClick={() => onAction('confirmation', newUsername)}>
                     {LocalizeText('tutorial.name_change.pick')}
-                </button>
-                <button className="w-full btn btn-danger" onClick={() => onAction('close')}>
+                </BaseButton>
+                <BaseButton className="w-full btn btn-danger" onClick={() => onAction('close')}>
                     {LocalizeText('cancel')}
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

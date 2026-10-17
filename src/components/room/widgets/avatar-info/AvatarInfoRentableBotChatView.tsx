@@ -4,6 +4,7 @@ import { BotSkillsEnum, GetRoomObjectBounds, GetRoomSession, LocalizeText, RoomW
 import { Button, Column, DraggableWindow, DraggableWindowPosition, Flex, Text } from '../../../../common';
 import { OctaneInput } from '../../../../layout';
 import { ContextMenuHeaderView } from '../context-menu/ContextMenuHeaderView';
+import { Checkbox } from '../../../../common/Checkbox';
 
 interface AvatarInfoRentableBotChatViewProps {
     chatEvent: RoomWidgetUpdateRentableBotChatEvent;
@@ -54,23 +55,13 @@ export const AvatarInfoRentableBotChatView: FC<AvatarInfoRentableBotChatViewProp
                             <Text fullWidth variant="white">
                                 {LocalizeText('bot.skill.chatter.configuration.automatic.chat')}
                             </Text>
-                            <input
-                                checked={automaticChat}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => setAutomaticChat(event.target.checked)}
-                            />
+                            <Checkbox checked={automaticChat} onCheckedChange={(nextChecked) => setAutomaticChat(nextChecked)} />
                         </Flex>
                         <Flex alignItems="center" gap={1} justifyContent="between">
                             <Text fullWidth variant="white">
                                 {LocalizeText('bot.skill.chatter.configuration.markov')}
                             </Text>
-                            <input
-                                checked={mixSentences}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => setMixSentences(event.target.checked)}
-                            />
+                            <Checkbox checked={mixSentences} onCheckedChange={(nextChecked) => setMixSentences(nextChecked)} />
                         </Flex>
                         <Flex alignItems="center" gap={1} justifyContent="between">
                             <Text fullWidth variant="white">

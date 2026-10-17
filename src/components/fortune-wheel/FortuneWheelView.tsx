@@ -7,6 +7,7 @@ import { OctaneCard } from '../../layout';
 import { FortuneWheelSettingsView } from './FortuneWheelSettingsView';
 import { WheelWinReveal } from './WheelWinReveal';
 import { renderPrizeIcon } from './wheelPrizeIcon';
+import { BaseButton } from '../../common/BaseButton';
 
 // Stock UI palette (white / light-blue / grey / black). Exposed as CSS custom
 // properties so a runtime theme can recolor the wheel without changing defaults
@@ -268,27 +269,27 @@ export const FortuneWheelView: FC<{}> = () => {
                                 {LocalizeText('wheel.extra', ['count'], [extraSpins.toString()])}
                             </Text>
                             <Flex gap={2} alignItems="center" className="flex-wrap justify-center">
-                                <button
+                                <BaseButton
                                     disabled={!canSpin}
                                     onClick={() => spin()}
                                     className="cursor-pointer rounded bg-[#3a7bb5] px-4 py-2 font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
                                 >
                                     {LocalizeText('wheel.spin')}
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     onClick={() => buySpin()}
                                     className="flex cursor-pointer items-center gap-1 rounded bg-[#6b7884] px-3 py-2 text-white hover:bg-[#5e6a75]"
                                 >
                                     {LocalizeText('wheel.buy')} {spinCost}
                                     <LayoutCurrencyIcon type={spinCostType} />
-                                </button>
+                                </BaseButton>
                                 {canManage && (
-                                    <button
+                                    <BaseButton
                                         onClick={() => setIsSettingsOpen(true)}
                                         className="cursor-pointer rounded bg-[#8a6b3a] px-3 py-2 font-bold text-white hover:bg-[#735730]"
                                     >
                                         {LocalizeText('wheel.settings')}
-                                    </button>
+                                    </BaseButton>
                                 )}
                             </Flex>
                         </Column>

@@ -4,6 +4,8 @@ import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 
 const MIN_ALTITUDE = 0;
@@ -176,9 +178,9 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
             footerCollapsible={false}
             footer={
                 <div className="flex flex-col gap-2">
-                    <button className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
                         {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </button>
+                    </BaseButton>
                     {showAdvanced && (
                         <>
                             <div className="flex flex-col gap-1">
@@ -186,14 +188,7 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
                                 {[0, 1].map((value) => {
                                     return (
                                         <div key={value} className="flex items-center gap-1">
-                                            <input
-                                                checked={quantifier === value}
-                                                className="form-check-input"
-                                                id={`altitudeQuantifier${value}`}
-                                                name="altitudeQuantifier"
-                                                type="radio"
-                                                onChange={() => setQuantifier(value)}
-                                            />
+                                            <Radio checked={quantifier === value} id={`altitudeQuantifier${value}`} name="altitudeQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                             <Text>{LocalizeText(`wiredfurni.params.quantifier.${spec.users ? 'users' : 'furni'}.${value}`)}</Text>
                                         </div>
                                     );
@@ -214,14 +209,7 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
                     {[0, 1, 2].map((value) => {
                         return (
                             <div key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={comparison === value}
-                                    className="form-check-input"
-                                    id={`altitudeComparison${value}`}
-                                    name="altitudeComparison"
-                                    type="radio"
-                                    onChange={() => setComparison(value)}
-                                />
+                                <Radio checked={comparison === value} id={`altitudeComparison${value}`} name="altitudeComparison" onCheckedChange={() => setComparison(value)} />
                                 <Text>
                                     {spec.value === 'radius'
                                         ? localizeWithFallback(RANGE_COMPARISON_LABELS[value].key, RANGE_COMPARISON_LABELS[value].fallback)

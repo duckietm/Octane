@@ -3,11 +3,13 @@ import { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const setSelectedPrefix = vi.fn();
+const createLinkEvent = vi.fn();
 const activatePrefix = vi.fn();
 const deactivatePrefix = vi.fn();
 const prefix = { id: 4, text: 'Boss', color: '#ff0000', icon: '', effect: '', font: '', active: false };
 const state = { prefixes: [prefix] as unknown[], selectedPrefix: null as unknown };
 
+vi.mock('@octane/renderer', () => ({ CreateLinkEvent: createLinkEvent }));
 vi.mock('../../../../api', () => ({
     getPrefixEffectStyle: () => ({}),
     getPrefixFontStyle: () => ({}),
@@ -24,7 +26,14 @@ vi.mock('../../../../layout', () => ({
         </button>
     )
 }));
-vi.mock('../InventoryCategoryEmptyView', () => ({ InventoryCategoryEmptyView: (props: { title: string }) => <div>{props.title}</div> }));
+vi.mock('../InventoryCategoryEmptyView', () => ({
+    InventoryCategoryEmptyView: (props: { title: string; actionLabel?: string; onAction?: () => void }) => (
+        <div>
+            {props.title}
+            {props.onAction && <button onClick={props.onAction}>{props.actionLabel}</button>}
+        </div>
+    )
+}));
 vi.mock('../../../../hooks', () => ({
     useInventoryPrefixes: () => ({
         prefixes: state.prefixes,
@@ -75,5 +84,13 @@ describe('InventoryPrefixView', () => {
         render(<InventoryPrefixView />);
 
         expect(screen.getByText('You have no prefixes')).toBeTruthy();
+    });
+
+    it('sends a user with no icons to the identity customizer, where they are bought', () => {
+        render(<InventoryPrefixView />);
+        fireEvent.click(screen.getByRole('tab', { name: 'Icons' }));
+        fireEvent.click(screen.getByText('Customize identity'));
+
+        expect(createLinkEvent).toHaveBeenCalledWith('customize/show');
     });
 });

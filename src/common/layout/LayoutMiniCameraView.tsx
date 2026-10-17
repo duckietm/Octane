@@ -2,6 +2,7 @@ import { GetRoomEngine, OctaneRectangle, OctaneTexture } from '@octane/renderer'
 import { FC, useEffect, useRef, useState } from 'react';
 import { blitRoomCanvasToViewfinder, getViewfinderRoomFrame, LocalizeText, PlaySound, SoundNames } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../card';
+import { BaseButton } from '../BaseButton';
 
 interface LayoutMiniCameraViewProps {
     roomId: number;
@@ -61,12 +62,12 @@ export const LayoutMiniCameraView: FC<LayoutMiniCameraViewProps> = (props) => {
                     <canvas ref={elementRef} className="octane-camera-viewfinder" width={110} height={110} />
                 </div>
                 <div className="octane-room-thumbnail-camera__buttons">
-                    <button type="button" disabled={isBusy} onClick={onClose}>
+                    <BaseButton type="button" disabled={isBusy} onClick={onClose}>
                         {LocalizeText('navigator.thumbnail.camera.title.cancel')}
-                    </button>
-                    <button type="button" disabled={isBusy} onClick={takePicture}>
+                    </BaseButton>
+                    <BaseButton type="button" disabled={isBusy} onClick={takePicture}>
                         {LocalizeText('navigator.thumbnail.camera.title.capture')}
-                    </button>
+                    </BaseButton>
                 </div>
             </OctaneCardContentView>
         </OctaneCardView>

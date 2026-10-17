@@ -48,7 +48,6 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
     const [message, setMessage] = useState(placeholder);
     const [isPlaceholder, setIsPlaceholder] = useState(true);
     const [inputActive, setInputActive] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(-1);
     const [kick, setKick] = useState(false);
     const [lock, setLock] = useState(false);
@@ -240,19 +239,16 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
                         caption={selectedTemplate >= 0 ? templates[selectedTemplate] : menuCaption}
                         height={menu.height}
                         items={templates}
-                        open={menuOpen}
                         width={menu.width}
                         x={0}
                         y={row.menu}
                         onSelect={(index) => {
                             // _rd853b7a3367fa7: choosing a template puts its text in the message field
                             setSelectedTemplate(index);
-                            setMenuOpen(false);
                             setMessage(templates[index]);
                             setIsPlaceholder(false);
                             setInputActive(true);
                         }}
-                        onToggle={() => setMenuOpen((value) => !value)}
                     />
                 </div>
             </Native0Frame>

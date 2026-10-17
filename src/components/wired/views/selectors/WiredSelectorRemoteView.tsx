@@ -3,6 +3,9 @@ import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MAX_PICK_COUNT = 20;
 
@@ -41,33 +44,25 @@ export const WiredSelectorRemoteView: FC<{}> = () => {
                 <Text bold>{localizeWithFallback('wiredfurni.params.remote_selection.type', 'Selection type')}</Text>
                 {[false, true].map((value) => (
                     <label key={String(value)} className="flex items-center gap-1">
-                        <input type="radio" className="form-check-input" name="remoteSelectionType" checked={intersect === value} onChange={() => setIntersect(value)} />
+                        <Radio name="remoteSelectionType" checked={intersect === value} onCheckedChange={() => setIntersect(value)} />
                         <Text>{localizeWithFallback(`wiredfurni.params.remote_selection.type.${value ? 1 : 0}`, value ? 'Intersection' : 'Union')}</Text>
                     </label>
                 ))}
 
                 <label className="flex items-center gap-2">
                     <Text>{localizeWithFallback('wiredfurni.params.remote_selection.filter', 'Use this many of the picked, at random (0 = all)')}</Text>
-                    <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        style={{ width: 64 }}
-                        min={0}
-                        max={MAX_PICK_COUNT}
-                        value={pickCount}
-                        onChange={(event) => setPickCount(Math.max(0, Math.min(MAX_PICK_COUNT, parseInt(event.target.value, 10) || 0)))}
-                    />
+                    <NumberInput className="form-control form-control-sm" style={{ width: 64 }} min={0} max={MAX_PICK_COUNT} value={pickCount} onChange={(event) => setPickCount(Math.max(0, Math.min(MAX_PICK_COUNT, parseInt(event.target.value, 10) || 0)))} />
                 </label>
 
                 <hr className="m-0 bg-dark" />
 
                 <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={filterExisting} onChange={(event) => setFilterExisting(event.target.checked)} />
+                    <Checkbox checked={filterExisting} onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
                 </label>
 
                 <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={invert} onChange={(event) => setInvert(event.target.checked)} />
+                    <Checkbox checked={invert} onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
                 </label>
             </div>

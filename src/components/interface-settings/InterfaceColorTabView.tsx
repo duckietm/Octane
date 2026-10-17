@@ -3,6 +3,8 @@ import { RgbaColor, RgbaColorPicker } from 'react-colorful';
 import { FaDownload, FaTrash, FaUndo, FaUpload } from 'react-icons/fa';
 import { LocalizeText, PRESET_COLORS, THEME_PRESETS, useUiSettings } from '../../api';
 import { Flex, Text } from '../../common';
+import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 const hexToRgba = (hex: string, a = 1): RgbaColor => {
     const num = parseInt(hex.replace('#', ''), 16);
@@ -143,53 +145,25 @@ export const InterfaceColorTabView: FC<{}> = () => {
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={color.r}
-                        onChange={(e) => onRgbInput('r', parseInt(e.target.value))}
-                        min={0}
-                        max={255}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={color.r} onChange={(e) => onRgbInput('r', parseInt(e.target.value))} min={0} max={255} />
                     <Text small className="text-black">
                         R
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={color.g}
-                        onChange={(e) => onRgbInput('g', parseInt(e.target.value))}
-                        min={0}
-                        max={255}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={color.g} onChange={(e) => onRgbInput('g', parseInt(e.target.value))} min={0} max={255} />
                     <Text small className="text-black">
                         G
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={color.b}
-                        onChange={(e) => onRgbInput('b', parseInt(e.target.value))}
-                        min={0}
-                        max={255}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={color.b} onChange={(e) => onRgbInput('b', parseInt(e.target.value))} min={0} max={255} />
                     <Text small className="text-black">
                         B
                     </Text>
                 </Flex>
                 <Flex column className="items-center">
-                    <input
-                        type="number"
-                        className="form-control form-control-sm text-center w-[45px]"
-                        value={alphaPercent}
-                        onChange={(e) => onAlphaInput(parseInt(e.target.value))}
-                        min={0}
-                        max={100}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center w-[45px]" value={alphaPercent} onChange={(e) => onAlphaInput(parseInt(e.target.value))} min={0} max={100} />
                     <Text small className="text-black">
                         A
                     </Text>
@@ -199,7 +173,8 @@ export const InterfaceColorTabView: FC<{}> = () => {
             {/* Preset colors */}
             <div className="grid grid-cols-10 gap-0.5 mt-1">
                 {PRESET_COLORS.map((presetHex, i) => (
-                    <div
+                    <BaseButton
+                        aria-label={presetHex}
                         key={i}
                         className={`w-[24px] h-[24px] rounded cursor-pointer border hover:scale-110 transition-transform ${hexColor.toUpperCase() === presetHex.toUpperCase() ? 'border-white border-2 scale-110' : 'border-black/20'}`}
                         style={{ backgroundColor: presetHex }}
@@ -214,7 +189,7 @@ export const InterfaceColorTabView: FC<{}> = () => {
             </Text>
             <div className="grid grid-cols-6 gap-1 w-full">
                 {THEME_PRESETS.map((theme) => (
-                    <div
+                    <BaseButton
                         key={theme.name}
                         className={`flex flex-col items-center gap-0.5 p-1 rounded cursor-pointer hover:bg-black/5 transition-colors ${hexColor.toUpperCase() === theme.color.toUpperCase() ? 'ring-2 ring-white' : ''}`}
                         onClick={() => onThemeClick(theme.color, theme.alpha)}
@@ -226,13 +201,13 @@ export const InterfaceColorTabView: FC<{}> = () => {
                         <Text small className="text-black text-[10px]">
                             {LocalizeText(`interface.settings.theme.${theme.name}`)}
                         </Text>
-                    </div>
+                    </BaseButton>
                 ))}
             </div>
 
             {/* Action buttons */}
             <Flex gap={1} className="w-full mt-2">
-                <button
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#5f9ea0' }}
                     onClick={onReset}
@@ -240,8 +215,8 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaUndo size={12} />
                     {LocalizeText('interface.settings.color.reset')}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#c0392b' }}
                     onClick={onDelete}
@@ -249,8 +224,8 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaTrash size={12} />
                     {LocalizeText('interface.settings.color.remove')}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#2980b9' }}
                     onClick={onExport}
@@ -258,8 +233,8 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaDownload size={12} />
                     {copyFeedback ? LocalizeText('interface.settings.color.copied') : LocalizeText('interface.settings.color.export')}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#27ae60' }}
                     onClick={() => setShowImport(!showImport)}
@@ -267,7 +242,7 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaUpload size={12} />
                     {LocalizeText('interface.settings.color.import')}
-                </button>
+                </BaseButton>
             </Flex>
 
             {/* Import panel */}
@@ -279,9 +254,9 @@ export const InterfaceColorTabView: FC<{}> = () => {
                         value={importValue}
                         onChange={(e) => setImportValue(e.target.value)}
                     />
-                    <button className="px-3 py-1 rounded cursor-pointer text-white text-xs" style={{ backgroundColor: '#27ae60' }} onClick={onImport}>
+                    <BaseButton className="px-3 py-1 rounded cursor-pointer text-white text-xs" style={{ backgroundColor: '#27ae60' }} onClick={onImport}>
                         OK
-                    </button>
+                    </BaseButton>
                 </Flex>
             )}
         </Flex>

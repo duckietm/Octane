@@ -19,6 +19,10 @@ import {
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { WiredActionDelaySection } from './WiredActionDelaySection';
 import { localizeWiredVariableOperation, WIRED_VARIABLE_ADVANCED_OPERATIONS, WIRED_VARIABLE_BASIC_OPERATIONS, WIRED_VARIABLE_UNARY_OPERATIONS } from './WiredVariableOperations';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Checkbox } from '../../../../common/Checkbox';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -398,7 +402,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
-                            <button
+                            <BaseButton
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
@@ -406,7 +410,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                                 onClick={() => handleDestinationTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>
@@ -422,7 +426,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
                 <div className="octane-wired__give-var-section">
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.operation')}</div>
-                    <select
+                    <Select
                         className="form-select form-select-sm octane-wired__give-var-select"
                         title={localizeWithFallback('wiredfurni.params.variables.operation.tooltip', '')}
                         value={operation}
@@ -440,7 +444,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                                 </option>
                             ))}
                         </optgroup>
-                    </select>
+                    </Select>
                 </div>
 
                 <div className="octane-wired__divider" />
@@ -448,7 +452,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                 <div className="octane-wired__give-var-section">
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
                     <label className="octane-wired__change-var-radio">
-                        <input checked={referenceMode === 'constant'} disabled={isUnaryOperation} type="radio" onChange={() => setReferenceMode('constant')} />
+                        <Radio checked={referenceMode === 'constant'} disabled={isUnaryOperation} onCheckedChange={() => setReferenceMode('constant')} />
                         <Text>{LocalizeText('wiredfurni.params.operator.2')}</Text>
                         <OctaneInput
                             className="octane-wired__give-var-number"
@@ -461,16 +465,11 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
                     <div className="octane-wired__change-var-reference-block">
                         <label className="octane-wired__change-var-radio">
-                            <input
-                                checked={referenceMode === 'variable'}
-                                disabled={isUnaryOperation}
-                                type="radio"
-                                onChange={() => setReferenceMode('variable')}
-                            />
+                            <Radio checked={referenceMode === 'variable'} disabled={isUnaryOperation} onCheckedChange={() => setReferenceMode('variable')} />
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                             <div className="octane-wired__give-var-targets">
                                 {TARGET_BUTTONS.map((button) => (
-                                    <button
+                                    <BaseButton
                                         key={`reference-${button.key}`}
                                         type="button"
                                         disabled={button.disabled || referenceMode !== 'variable'}
@@ -478,7 +477,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                                         onClick={() => handleReferenceTargetChange(button.key)}
                                     >
                                         <img src={button.icon} alt={button.key} />
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         </label>
@@ -493,13 +492,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                         )}
                         {referenceMode === 'variable' && (
                             <label className={`flex items-center gap-1 ${sameHolderAvailable ? '' : 'opacity-50'}`}>
-                                <input
-                                    checked={sameHolderActive}
-                                    className="form-check-input"
-                                    disabled={!sameHolderAvailable}
-                                    type="checkbox"
-                                    onChange={(event) => setReferenceSameHolder(event.target.checked)}
-                                />
+                                <Checkbox checked={sameHolderActive} disabled={!sameHolderAvailable} onCheckedChange={(nextChecked) => setReferenceSameHolder(nextChecked)} />
                                 <Text>{LocalizeText('wiredfurni.params.variables.reference_value.same_holder')}</Text>
                             </label>
                         )}

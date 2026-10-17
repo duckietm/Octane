@@ -5,6 +5,9 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const ENTITY_HABBO = 1;
 const ENTITY_PET = 2;
@@ -70,9 +73,9 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
             footerCollapsible={false}
             footer={
                 <div className="flex flex-col gap-2">
-                    <button className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
                         {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </button>
+                    </BaseButton>
                     {showAdvanced && (
                         <>
                             <div className="flex flex-col gap-1">
@@ -80,14 +83,7 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
                                 {[0, 1].map((value) => {
                                     return (
                                         <div key={value} className="flex items-center gap-1">
-                                            <input
-                                                checked={quantifier === value}
-                                                className="form-check-input"
-                                                id={`triggererMatchQuantifier${value}`}
-                                                name="triggererMatchQuantifier"
-                                                type="radio"
-                                                onChange={() => setQuantifier(value)}
-                                            />
+                                            <Radio checked={quantifier === value} id={`triggererMatchQuantifier${value}`} name="triggererMatchQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                             <Text>{LocalizeText(`${quantifierKeyPrefix}.${value}`)}</Text>
                                         </div>
                                     );
@@ -117,14 +113,7 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
                 {[ENTITY_HABBO, ENTITY_PET, ENTITY_BOT].map((value) => {
                     return (
                         <div key={value} className="flex items-center gap-1">
-                            <input
-                                checked={(entityType & value) !== 0}
-                                className="form-check-input"
-                                id={`triggererEntityType${value}`}
-                                name="triggererEntityType"
-                                type="checkbox"
-                                onChange={() => setEntityType((current) => current ^ value)}
-                            />
+                            <Checkbox checked={(entityType & value) !== 0} id={`triggererEntityType${value}`} name="triggererEntityType" onCheckedChange={() => setEntityType((current) => current ^ value)} />
                             <Text>{LocalizeText(`wiredfurni.params.usertype.${value}`)}</Text>
                         </div>
                     );
@@ -133,25 +122,11 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
             <div className="flex flex-col gap-1">
                 <Text bold>{LocalizeText('wiredfurni.params.picktriggerer')}</Text>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={avatarMode === AVATAR_MODE_ANY}
-                        className="form-check-input"
-                        id="triggererAvatarMode0"
-                        name="triggererAvatarMode"
-                        type="radio"
-                        onChange={() => setAvatarMode(AVATAR_MODE_ANY)}
-                    />
+                    <Radio checked={avatarMode === AVATAR_MODE_ANY} id="triggererAvatarMode0" name="triggererAvatarMode" onCheckedChange={() => setAvatarMode(AVATAR_MODE_ANY)} />
                     <Text>{LocalizeText('wiredfurni.params.anyavatar')}</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        checked={avatarMode === AVATAR_MODE_CERTAIN}
-                        className="form-check-input"
-                        id="triggererAvatarMode1"
-                        name="triggererAvatarMode"
-                        type="radio"
-                        onChange={() => setAvatarMode(AVATAR_MODE_CERTAIN)}
-                    />
+                    <Radio checked={avatarMode === AVATAR_MODE_CERTAIN} id="triggererAvatarMode1" name="triggererAvatarMode" onCheckedChange={() => setAvatarMode(AVATAR_MODE_CERTAIN)} />
                     <Text>{LocalizeText('wiredfurni.params.certainavatar')}</Text>
                 </div>
                 {needsUsername && <OctaneInput type="text" value={username} onChange={(event) => setUsername(event.target.value)} />}

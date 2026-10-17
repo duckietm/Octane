@@ -2,6 +2,8 @@ import { FriendCategoryData } from '@octane/renderer';
 import { FC, MouseEvent, useEffect, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 import { useFriendsActions } from '../../../../hooks';
 
 interface FriendsCategoryManagerViewProps {
@@ -78,23 +80,29 @@ export const FriendsCategoryManagerView: FC<FriendsCategoryManagerViewProps> = (
                             ) : (
                                 <>
                                     <span className="grow text-sm">{category.name}</span>
-                                    <span
-                                        className="cursor-pointer text-base leading-none select-none"
-                                        title={LocalizeText('generic.edit')}
-                                        onClick={() => {
-                                            setEditingId(category.id);
-                                            setEditingName(category.name);
-                                        }}
-                                    >
-                                        {'✎'}
-                                    </span>
-                                    <span
-                                        className="cursor-pointer text-base leading-none select-none"
-                                        title={LocalizeText('generic.delete')}
-                                        onClick={() => removeCategory(category.id)}
-                                    >
-                                        {'✕'}
-                                    </span>
+                                    <Hint content={LocalizeText('generic.edit')}>
+                                        <BaseButton
+                                            aria-label={LocalizeText('generic.edit')}
+                                            className="cursor-pointer border-0 bg-transparent p-0 text-base leading-none select-none"
+                                            type="button"
+                                            onClick={() => {
+                                                setEditingId(category.id);
+                                                setEditingName(category.name);
+                                            }}
+                                        >
+                                            {'✎'}
+                                        </BaseButton>
+                                    </Hint>
+                                    <Hint content={LocalizeText('generic.delete')}>
+                                        <BaseButton
+                                            aria-label={LocalizeText('generic.delete')}
+                                            className="cursor-pointer border-0 bg-transparent p-0 text-base leading-none select-none"
+                                            type="button"
+                                            onClick={() => removeCategory(category.id)}
+                                        >
+                                            {'✕'}
+                                        </BaseButton>
+                                    </Hint>
                                 </>
                             )}
                         </Flex>

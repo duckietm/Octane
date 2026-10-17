@@ -2,6 +2,7 @@ import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { GetConfigurationValue } from '../../api';
 import { Base } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
 
 export interface RoomWidgetViewProps {}
 
@@ -16,25 +17,25 @@ export const RoomWidgetView: FC<RoomWidgetViewProps> = (props) => {
 
     return (
         <>
-            <Base className="octane-hotel-view-rooftop position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopId)}>
+            <Base component={BaseButton} type="button" className="octane-hotel-view-rooftop position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="octane-hotel-view-rooftop-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopPoolId)}>
+            <Base component={BaseButton} type="button" className="octane-hotel-view-rooftop-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + rooftopPoolId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="octane-hotel-view-picnic position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + picnicId)}>
+            <Base component={BaseButton} type="button" className="octane-hotel-view-picnic position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + picnicId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="octane-hotel-view-infobus position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + infobusId)}>
+            <Base component={BaseButton} type="button" className="octane-hotel-view-infobus position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + infobusId)}>
                 <i className="arrow-infobus" />
             </Base>
-            <Base className="octane-hotel-view-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + poolId)}>
+            <Base component={BaseButton} type="button" className="octane-hotel-view-pool position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + poolId)}>
                 <i className="arrow-pool" />
             </Base>
-            <Base className="octane-hotel-view-lobby position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + lobbyId)}>
+            <Base component={BaseButton} type="button" className="octane-hotel-view-lobby position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + lobbyId)}>
                 <i className="arrow" />
             </Base>
-            <Base className="octane-hotel-view-peaceful position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + peacefulId)}>
+            <Base component={BaseButton} type="button" className="octane-hotel-view-peaceful position-absolute" onClick={(event) => CreateLinkEvent('navigator/goto/' + peacefulId)}>
                 <i className="arrow-peaceful" />
             </Base>
         </>

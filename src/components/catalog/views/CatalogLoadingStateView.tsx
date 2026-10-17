@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../api';
 import { LayoutLoadingSpinnerView } from '../../../common';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface CatalogLoadingStateViewProps {
     error?: 'timeout' | null;
@@ -19,9 +20,9 @@ export const CatalogLoadingStateView: FC<CatalogLoadingStateViewProps> = ({ erro
             <div aria-live="assertive" className="octane-catalog-loading-state is-error" role="alert">
                 <span>{localizedOrFallback('catalog.loading.timeout', 'The catalog page took too long to load.')}</span>
                 {!!onRetry && (
-                    <button className="octane-catalog-standard-button" type="button" onClick={onRetry}>
+                    <BaseButton className="octane-catalog-standard-button" type="button" onClick={onRetry}>
                         {localizedOrFallback('generic.retry', 'Retry')}
-                    </button>
+                    </BaseButton>
                 )}
             </div>
         );

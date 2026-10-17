@@ -70,7 +70,6 @@ export const VipGiftItem: FC<VipGiftItemViewProps> = (props) => {
             <Button
                 aria-disabled={!isAvailable}
                 disabled={!isAvailable}
-                role="button"
                 variant="secondary"
                 onClick={() => {
                     if (!isAvailable) return;

@@ -37,6 +37,9 @@ import {
     resolveCatalogAdminPageDropPosition
 } from './CatalogAdminDraftTree';
 import { CatalogAdminOfferPriceView } from './CatalogAdminOfferPriceView';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 type CatalogAdminOffer = Parameters<NonNullable<ReturnType<typeof useCatalogAdmin>>['setEditingOffer']>[0];
 type ManagerTab = 'catalog' | 'sql' | 'history';
@@ -390,7 +393,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                     <FaArrowsAlt className="octane-catalog-admin-tree-drag" title="Drag to reorder or reparent" />
                     <span className="octane-catalog-admin-tree-caret">
                         {hasChildren ? (
-                            <button
+                            <BaseButton
                                 aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${nodeName(node)}`}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -398,7 +401,7 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                                 }}
                             >
                                 {isOpen ? <FaChevronDown /> : <FaChevronRight />}
-                            </button>
+                            </BaseButton>
                         ) : (
                             <span className="octane-catalog-admin-tree-caret-spacer" />
                         )}
@@ -438,29 +441,29 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                 </div>
 
                 <div className="octane-catalog-admin-detail-actions">
-                    <button className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
+                    <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
                         <FaEdit /> <span>Edit page</span>
-                    </button>
-                    <button className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
+                    </BaseButton>
+                    <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
                         <FaPlus /> <span>Add sub-page</span>
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         className="octane-catalog-admin-btn"
                         onClick={() =>
                             catalogAdmin.togglePageVisible(selectedNode.pageId, isHidden, `${isHidden ? 'Showed' : 'Hidden'} page: ${nodeName(selectedNode)}`)
                         }
                     >
                         {isHidden ? <FaEye /> : <FaEyeSlash />} <span>{isHidden ? 'Show' : 'Hide'}</span>
-                    </button>
-                    <button className="octane-catalog-admin-btn" disabled={index <= 0} onClick={() => movePage(selectedNode, -1)}>
+                    </BaseButton>
+                    <BaseButton className="octane-catalog-admin-btn" disabled={index <= 0} onClick={() => movePage(selectedNode, -1)}>
                         <FaArrowUp /> <span>Move up</span>
-                    </button>
-                    <button className="octane-catalog-admin-btn" disabled={index < 0 || index >= siblings.length - 1} onClick={() => movePage(selectedNode, 1)}>
+                    </BaseButton>
+                    <BaseButton className="octane-catalog-admin-btn" disabled={index < 0 || index >= siblings.length - 1} onClick={() => movePage(selectedNode, 1)}>
                         <FaArrowDown /> <span>Move down</span>
-                    </button>
-                    <button className="octane-catalog-admin-btn is-danger" onClick={() => deletePage(selectedNode)}>
+                    </BaseButton>
+                    <BaseButton className="octane-catalog-admin-btn is-danger" onClick={() => deletePage(selectedNode)}>
                         <FaTrash /> <span>Delete</span>
-                    </button>
+                    </BaseButton>
                 </div>
 
                 <div className="octane-catalog-admin-offers">
@@ -473,9 +476,9 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                     <>
                     <div className="octane-catalog-admin-offers-head">
                         <span className="octane-catalog-admin-offers-title">Offers ({offers.length})</span>
-                        <button className="octane-catalog-admin-btn is-primary" disabled={!currentPage} onClick={newOffer}>
+                        <BaseButton className="octane-catalog-admin-btn is-primary" disabled={!currentPage} onClick={newOffer}>
                             <FaPlus /> <span>New offer</span>
-                        </button>
+                        </BaseButton>
                     </div>
                     <div className="octane-catalog-admin-offers-list">
                         {!currentPage && <div className="octane-catalog-admin-placeholder is-small">Loading offers…</div>}
@@ -512,12 +515,12 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                                         <FaArrowsAlt />
                                     </span>
                                     <div className="octane-catalog-admin-manager-reorder">
-                                        <button disabled={index === 0} title="Move up" onClick={() => moveOffer(index, -1)}>
+                                        <Hint content="Move up"><BaseButton aria-label="Move up" disabled={index === 0} onClick={() => moveOffer(index, -1)}>
                                             <FaArrowUp />
-                                        </button>
-                                        <button disabled={index === offers.length - 1} title="Move down" onClick={() => moveOffer(index, 1)}>
+                                        </BaseButton></Hint>
+                                        <Hint content="Move down"><BaseButton aria-label="Move down" disabled={index === offers.length - 1} onClick={() => moveOffer(index, 1)}>
                                             <FaArrowDown />
-                                        </button>
+                                        </BaseButton></Hint>
                                     </div>
                                     <span className="octane-catalog-admin-offer-icon">
                                         {iconUrl ? (
@@ -547,25 +550,29 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                                         {editableProducts.map((product, productIndex) => {
                                             const productLabel = product.furnitureData?.className || `#${product.productClassId}`;
 
-                                            return <button
-                                                key={`${product.productType}-${product.productClassId}-${productIndex}`}
-                                                aria-label={`Edit Furni ${productLabel}`}
-                                                title={`Edit Furni: ${productLabel}`}
-                                                onClick={() => window.dispatchEvent(new CustomEvent('furni-editor:open', {
-                                                    detail: { spriteId: product.productClassId }
-                                                }))}
-                                            >
-                                                <FaWrench />
-                                            </button>;
+                                            return <Hint key={`${product.productType}-${product.productClassId}-${productIndex}`} content={`Edit Furni: ${productLabel}`}>
+                                                <BaseButton
+                                                                                                aria-label={`Edit Furni ${productLabel}`}
+                                                                                                onClick={() => window.dispatchEvent(new CustomEvent('furni-editor:open', {
+                                                                                                    detail: { spriteId: product.productClassId }
+                                                                                                }))}
+                                                                                            >
+                                                                                                <FaWrench />
+                                                                                            </BaseButton>
+                                            </Hint>;
                                         })}
-                                        <button title="Edit offer" onClick={() => {
-                                            catalogAdmin.setEditingOffer(offer);
-                                        }}>
-                                            <FaEdit />
-                                        </button>
-                                        <button className="danger" title="Delete offer" onClick={() => deleteOffer(offer)}>
-                                            <FaTrash />
-                                        </button>
+                                        <Hint content="Edit offer">
+                                            <BaseButton aria-label="Edit offer" onClick={() => {
+                                                catalogAdmin.setEditingOffer(offer);
+                                            }}>
+                                                <FaEdit />
+                                            </BaseButton>
+                                        </Hint>
+                                        <Hint content="Delete offer">
+                                            <BaseButton aria-label="Delete offer" className="danger" onClick={() => deleteOffer(offer)}>
+                                                <FaTrash />
+                                            </BaseButton>
+                                        </Hint>
                                     </div>
                                 </div>
                             );
@@ -597,15 +604,15 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                     <div><dt>Revision</dt><dd>{studio.revision}</dd></div>
                 </dl>
                 <div className="octane-catalog-admin-inspector-actions">
-                    <button className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
+                    <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
                         <FaEdit /> Edit
-                    </button>
-                    <button className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
+                    </BaseButton>
+                    <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
                         <FaPlus /> Sub-page
-                    </button>
-                    <button className="octane-catalog-admin-btn" disabled={isReadOnlyPage} onClick={newOffer}>
+                    </BaseButton>
+                    <BaseButton className="octane-catalog-admin-btn" disabled={isReadOnlyPage} onClick={newOffer}>
                         <FaPlus /> Offer
-                    </button>
+                    </BaseButton>
                 </div>
             </aside>
         );
@@ -619,14 +626,13 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                         <FaSearch />
                         <input aria-label="Search catalog pages" placeholder="Search pages..." value={search} onChange={(event) => setSearch(event.target.value)} />
                     </span>
-                    <button
+                    <Hint content="New root category"><BaseButton aria-label="New root category"
                         className="octane-catalog-admin-add"
                         disabled={!managerRootNode}
-                        title="New root category"
                         onClick={() => managerRootNode && createCategory(managerRootNode)}
                     >
                         <FaPlus />
-                    </button>
+                    </BaseButton></Hint>
                 </div>
                 <div className="octane-catalog-admin-tree" role="tree" aria-label="Catalog pages">
                     <div
@@ -693,13 +699,12 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                         <span>{catalogAdmin.lastError}</span>
                     </div>
                 )}
-                <div className="octane-catalog-admin-tabs" role="tablist" aria-label="Catalog Studio sections">
+                <TabBar className="octane-catalog-admin-tabs" aria-label="Catalog Studio sections" value={activeTab}>
                     {tabs.map((tab) => (
-                        <button
+                        <TabBarTab
                             key={tab.id}
                             id={`catalog-studio-tab-${tab.id}`}
-                            role="tab"
-                            aria-selected={activeTab === tab.id}
+                            value={tab.id}
                             aria-controls="catalog-studio-active-panel"
                             className={`octane-catalog-admin-tab ${activeTab === tab.id ? 'is-active' : ''}`}
                             onClick={() => setActiveTab(tab.id)}
@@ -707,9 +712,9 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                             {tab.icon}
                             <span>{tab.label}</span>
                             {tab.count > 0 && <span className="octane-catalog-admin-tab-count">{tab.count}</span>}
-                        </button>
+                        </TabBarTab>
                     ))}
-                </div>
+                </TabBar>
 
                 <div id="catalog-studio-active-panel" className="octane-catalog-admin-panel" role="tabpanel" aria-labelledby={`catalog-studio-tab-${activeTab}`}>
                     {activeTab === 'catalog' && renderPagesTab()}

@@ -4,6 +4,7 @@ import { GetClubMemberLevel, GetRoomSession, LocalizeText, MannequinUtilities } 
 import { Button, Column, LayoutAvatarImageView, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFurnitureMannequinWidget, useHasPermission } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const MODE_NONE: number = -1;
 const MODE_CONTROLLER: number = 0;
@@ -118,7 +119,7 @@ export const FurnitureMannequinView: FC<{}> = (props) => {
                                     <Text wrap>{LocalizeText('mannequin.widget.savetext')}</Text>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <Text pointer underline onClick={(event) => setMode(MODE_CONTROLLER)}>
+                                    <Text component={BaseButton} type="button" pointer underline onClick={(event) => setMode(MODE_CONTROLLER)}>
                                         {LocalizeText('mannequin.widget.back')}
                                     </Text>
                                     <Button variant="success" onClick={saveFigure}>

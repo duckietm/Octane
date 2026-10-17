@@ -5,6 +5,8 @@ import { useWired } from '../../../../hooks';
 import { normalizeWiredComparison, WIRED_CMP_GREATER_EQUAL, WiredComparisonOperator } from '../WiredComparisonOperator';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MIN_RANK = 1;
 const MAX_RANK = 1000;
@@ -44,24 +46,11 @@ export const WiredConditionUserRankView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.rank', 'Rank')}</Text>
-                    <input
-                        type="number"
-                        min={MIN_RANK}
-                        max={MAX_RANK}
-                        className="form-control form-control-sm"
-                        style={{ maxWidth: 140 }}
-                        value={rank}
-                        onChange={(event) => setRank(clampRank(parseInt(event.target.value, 10)))}
-                    />
+                    <NumberInput min={MIN_RANK} max={MAX_RANK} className="form-control form-control-sm" style={{ maxWidth: 140 }} value={rank} onChange={(event) => setRank(clampRank(parseInt(event.target.value, 10)))} />
                 </div>
                 <WiredComparisonOperator name="wiredUserRankComparison" value={comparison} onChange={setComparison} />
                 <label className="flex items-center gap-1 cursor-pointer">
-                    <input
-                        checked={quantifier === QUANTIFIER_ANY}
-                        className="form-check-input"
-                        type="checkbox"
-                        onChange={(event) => setQuantifier(event.target.checked ? QUANTIFIER_ANY : QUANTIFIER_ALL)}
-                    />
+                    <Checkbox checked={quantifier === QUANTIFIER_ANY} onCheckedChange={(nextChecked) => setQuantifier(nextChecked ? QUANTIFIER_ANY : QUANTIFIER_ALL)} />
                     <Text>{localizeWithFallback('wiredfurni.params.level.any_user', 'One user is enough (otherwise every user must match)')}</Text>
                 </label>
             </div>

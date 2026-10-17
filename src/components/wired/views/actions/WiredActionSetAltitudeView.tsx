@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const MIN_ALTITUDE = 0;
 const MAX_ALTITUDE = 40;
@@ -119,14 +120,7 @@ export const WiredActionSetAltitudeView: FC<{}> = () => {
                 {OPERATOR_OPTIONS.map((option) => {
                     return (
                         <div key={option.value} className="flex items-center gap-1">
-                            <input
-                                checked={operator === option.value}
-                                className="form-check-input"
-                                id={`setAltitudeOperator${option.value}`}
-                                name="setAltitudeOperator"
-                                type="radio"
-                                onChange={() => setOperator(option.value)}
-                            />
+                            <Radio checked={operator === option.value} id={`setAltitudeOperator${option.value}`} name="setAltitudeOperator" onCheckedChange={() => setOperator(option.value)} />
                             <Text>{LocalizeText(option.label)}</Text>
                         </div>
                     );

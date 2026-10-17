@@ -9,7 +9,7 @@ import {
 } from '@octane/renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
+import { BaseButton, Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
 import { useFriends, useMessageEvent } from '../../../../hooks';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
@@ -119,7 +119,7 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
                                 return (
                                     <Flex key={`${id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
                                         <UserProfileIconView userId={id} />
-                                        <Text pointer grow onClick={() => guardedSend(`take_${id}`, new RoomTakeRightsComposer(id))}>
+                                        <Text pointer grow className="border-0 bg-transparent p-0 text-left" component={BaseButton} onClick={() => guardedSend(`take_${id}`, new RoomTakeRightsComposer(id))}>
                                             {name}
                                         </Text>
                                     </Flex>
@@ -154,7 +154,7 @@ export const NavigatorRoomSettingsRightsTabView: FC<NavigatorRoomSettingsTabView
                                 return (
                                     <Flex key={`${friend.id}-${index}`} shrink alignItems="center" gap={1} overflow="hidden">
                                         <UserProfileIconView userId={friend.id} />
-                                        <Text pointer grow onClick={() => guardedSend(`give_${friend.id}`, new RoomGiveRightsComposer(friend.id))}>
+                                        <Text pointer grow className="border-0 bg-transparent p-0 text-left" component={BaseButton} onClick={() => guardedSend(`give_${friend.id}`, new RoomGiveRightsComposer(friend.id))}>
                                             {friend.name}
                                         </Text>
                                     </Flex>

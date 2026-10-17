@@ -14,6 +14,7 @@ import {
     localizeWithFallback
 } from '../../api';
 import { Button, LayoutCurrencyIcon, Text } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
 
 interface QuestEntryViewProps {
     quest: QuestMessageData;
@@ -91,14 +92,14 @@ export const QuestEntryView: FC<QuestEntryViewProps> = (props) => {
                             </Button>
                         )}
                         {accepted && (
-                            <span className="octane-quest-link" onClick={() => onReject && onReject(quest)}>
+                            <BaseButton className="octane-quest-link" onClick={() => onReject && onReject(quest)}>
                                 {localizeWithFallback('quests.list.reject', 'Cancel quest')}
-                            </span>
+                            </BaseButton>
                         )}
                         {onDetails && !showHint && (
-                            <span className="octane-quest-link" onClick={() => onDetails(quest)}>
+                            <BaseButton className="octane-quest-link" onClick={() => onDetails(quest)}>
                                 {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
-                            </span>
+                            </BaseButton>
                         )}
                     </div>
                 </div>

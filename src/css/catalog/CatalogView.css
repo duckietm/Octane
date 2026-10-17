@@ -232,7 +232,7 @@
     color: inherit;
 }
 
-.octane-catalog-admin-modal :where(input, select, textarea) {
+.octane-catalog-admin-modal :where(input, select, .octane-select-trigger, textarea) {
     min-height: 24px;
     background: #fffdf4 !important;
     border-color: var(--catalog-admin-border-dark) !important;
@@ -240,7 +240,7 @@
     box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.55) !important;
 }
 
-.octane-catalog-admin-modal :where(input:focus, select:focus, textarea:focus) {
+.octane-catalog-admin-modal :where(input:focus, select:focus, .octane-select-trigger:focus, textarea:focus) {
     border-color: var(--catalog-admin-blue) !important;
     box-shadow: 0 0 0 2px rgba(99, 197, 233, 0.35), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
 }
@@ -469,13 +469,15 @@
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.octane-catalog-admin-form-toggle:has(input:checked) {
+.octane-catalog-admin-form-toggle:has(input:checked),
+.octane-catalog-admin-form-toggle:has(.octane-checkbox[data-checked]) {
     border-color: var(--catalog-admin-blue);
     background: rgba(65, 141, 176, 0.12);
     color: var(--catalog-admin-blue-dark);
 }
 
-.octane-catalog-admin-form-toggle input[type="checkbox"] {
+.octane-catalog-admin-form-toggle input[type="checkbox"],
+.octane-catalog-admin-form-toggle .octane-checkbox {
     pointer-events: none;
 }
 
@@ -816,7 +818,7 @@
     color: var(--catalog-standard-blue-dark) !important;
 }
 
-.octane-catalog-window :where(input, select, textarea) {
+.octane-catalog-window :where(input, select, .octane-select-trigger, textarea) {
     min-height: 22px;
     border: 1px solid var(--catalog-standard-border-dark) !important;
     border-radius: 3px !important;
@@ -826,7 +828,7 @@
     font-size: 11px !important;
 }
 
-.octane-catalog-window :where(input:focus, select:focus, textarea:focus) {
+.octane-catalog-window :where(input:focus, select:focus, .octane-select-trigger:focus, textarea:focus) {
     border-color: var(--catalog-standard-blue) !important;
     box-shadow: 0 0 0 2px rgba(99, 197, 233, 0.32), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
 }
@@ -3436,7 +3438,8 @@
 
 .octane-catalog-admin-manager button,
 .octane-catalog-admin-manager input,
-.octane-catalog-admin-manager select {
+.octane-catalog-admin-manager select,
+.octane-catalog-admin-manager .octane-select-trigger {
     font-family: Ubuntu, Arial, sans-serif;
 }
 
@@ -3467,9 +3470,12 @@
 }
 
 .octane-catalog-admin-preview-persona input[type="number"],
+.octane-catalog-admin-preview-persona .octane-number-input,
 .octane-catalog-admin-bulk-grid input:not([type="checkbox"]),
 .octane-catalog-admin-bulk-grid select,
-.octane-catalog-admin-import-toolbar select {
+.octane-catalog-admin-bulk-grid .octane-select-trigger,
+.octane-catalog-admin-import-toolbar select,
+.octane-catalog-admin-import-toolbar .octane-select-trigger {
     height: 25px;
     min-width: 74px;
     padding: 2px 7px;
@@ -3484,7 +3490,9 @@
 .octane-catalog-admin-preview-persona input:focus,
 .octane-catalog-admin-bulk-grid input:focus,
 .octane-catalog-admin-bulk-grid select:focus,
+.octane-catalog-admin-bulk-grid .octane-select-trigger:focus,
 .octane-catalog-admin-import-toolbar select:focus,
+.octane-catalog-admin-import-toolbar .octane-select-trigger:focus,
 .octane-catalog-admin-import-export textarea:focus {
     border-color: #3e83b5;
     box-shadow: 0 0 0 2px rgba(62, 131, 181, .18);

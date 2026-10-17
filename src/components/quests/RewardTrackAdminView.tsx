@@ -1,9 +1,15 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { RewardTrackAdminPrize, RewardTrackAdminTask, RewardTrackAdminTrack } from '@octane/renderer';
 import { FC, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { localizeWithFallback, reorderRewardTrackEntries, RewardTrackFieldErrors, validateRewardTrackInput, validateRewardTrackPrizeInput, validateRewardTrackTaskInput } from '../../api';
 import { Button, LayoutFurniIconImageView } from '../../common';
 import { RewardTrackAdminEntity, RewardTrackAdminPrizeInput, RewardTrackAdminTaskInput, RewardTrackAdminTrackInput, useRewardTrackAdmin } from '../../hooks';
 import { RewardTrackAdminModalView } from './RewardTrackAdminModalView';
+import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
+import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
 
 const text = (key: string, fallback: string) => localizeWithFallback(`reward_track.admin.${key}`, fallback);
 
@@ -160,7 +166,7 @@ const Field: FC<{ label: string; error?: string; children: ReactNode; span?: num
 
 const Toggle: FC<{ label: string; checked: boolean; onChange: (checked: boolean) => void }> = ({ label, checked, onChange }) => (
     <label className="octane-reward-track-admin-toggle-field">
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        <Checkbox checked={checked} onCheckedChange={(nextChecked) => onChange(nextChecked)} />
         <span>{label}</span>
     </label>
 );
@@ -192,12 +198,21 @@ const Panel: FC<{ title: ReactNode; summary?: ReactNode; actions?: ReactNode; ch
     const [collapsed, setCollapsed] = useState(!!collapseKey);
 
     return (
-        <section className={`octane-reward-track-admin-panel ${className}${collapsed ? ' is-collapsed' : ''}`.trim()}>
-            <header className={`octane-reward-track-admin-panel-head${collapseKey ? ' is-toggle' : ''}`} onClick={collapseKey ? () => setCollapsed((value) => !value) : undefined}>
+        <Collapsible.Root
+            render={<section />}
+            className={`octane-reward-track-admin-panel ${className}${collapsed ? ' is-collapsed' : ''}`.trim()}
+            open={!collapsed}
+            onOpenChange={(open) => setCollapsed(!open)}
+        >
+            <header
+                className={`octane-reward-track-admin-panel-head${collapseKey ? ' is-toggle' : ''}`}
+                // The whole head folds the panel; the chevron is the Collapsible trigger, so its own click is not counted twice.
+                onClick={collapseKey ? (event) => !(event.target as HTMLElement).closest('.octane-reward-track-admin-chevron') && setCollapsed((value) => !value) : undefined}
+            >
                 {collapseKey && (
-                    <button type="button" className="octane-reward-track-admin-chevron" aria-expanded={!collapsed} data-testid={`rt-admin-collapse-${collapseKey}`}>
+                    <Collapsible.Trigger className="octane-reward-track-admin-chevron" data-testid={`rt-admin-collapse-${collapseKey}`}>
                         {collapsed ? '▸' : '▾'}
-                    </button>
+                    </Collapsible.Trigger>
                 )}
                 <span className="octane-reward-track-admin-panel-title">{title}</span>
                 {collapsed && summary && <span className="octane-reward-track-admin-panel-summary">{summary}</span>}
@@ -207,8 +222,8 @@ const Panel: FC<{ title: ReactNode; summary?: ReactNode; actions?: ReactNode; ch
                     </span>
                 )}
             </header>
-            {!collapsed && children}
-        </section>
+            <Collapsible.Panel className="contents">{children}</Collapsible.Panel>
+        </Collapsible.Root>
     );
 };
 
@@ -264,10 +279,10 @@ const FurniPicker: FC<{ value: string; results: { query: string; matches: { name
             {matches.length > 0 && (
                 <div className="octane-reward-track-admin-furni-results">
                     {matches.map((match) => (
-                        <button key={match.name} type="button" className={`octane-reward-track-admin-furni-match${match.name === value ? ' is-picked' : ''}`} onClick={() => onPick(match.name)} data-testid="rt-admin-furni-match">
+                        <BaseButton key={match.name} type="button" className={`octane-reward-track-admin-furni-match${match.name === value ? ' is-picked' : ''}`} onClick={() => onPick(match.name)} data-testid="rt-admin-furni-match">
                             <LayoutFurniIconImageView productType={match.typeCode} productClassId={match.spriteId} className="octane-reward-track-admin-furni-icon" />
                             <span>{match.name}</span>
-                        </button>
+                        </BaseButton>
                     ))}
                 </div>
             )}
@@ -422,9 +437,9 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                 >
                     <div className="octane-reward-track-admin-filters" data-testid="rt-admin-filters">
                         {FILTERS.map((entry) => (
-                            <button key={entry} type="button" className={`octane-reward-track-admin-filter${filter === entry ? ' is-active' : ''}`} onClick={() => setFilter(entry)}>
+                            <BaseButton key={entry} type="button" className={`octane-reward-track-admin-filter${filter === entry ? ' is-active' : ''}`} onClick={() => setFilter(entry)}>
                                 {text(`filter.${entry}`, entry)}
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                     <div className="octane-reward-track-admin-track-list">
@@ -432,7 +447,7 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                         {loaded && !tracks.length && <span className="octane-reward-track-admin-muted">{text('empty', 'No reward track yet.')}</span>}
                         {loaded && tracks.length > 0 && !visibleTracks.length && <span className="octane-reward-track-admin-muted">{text('filter.empty', 'No track in this state.')}</span>}
                         {visibleTracks.map((track) => (
-                            <button
+                            <BaseButton
                                 key={track.id}
                                 type="button"
                                 className={`octane-reward-track-admin-track${track.id === selectedTrackId ? ' is-active' : ''}${track.enabled ? '' : ' is-disabled'}`}
@@ -447,7 +462,7 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                     </span>
                                 </span>
                                 <StateTag state={getRewardTrackAdminState(track)} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </Panel>
@@ -476,7 +491,7 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                         <input value={trackForm.theme} maxLength={64} placeholder="blue" onChange={(e) => setTrackForm({ ...trackForm, theme: e.target.value })} />
                                     </Field>
                                     <Field label={text('sort', 'Sort order')}>
-                                        <input type="number" value={trackForm.sortOrder} onChange={(e) => setTrackForm({ ...trackForm, sortOrder: toInt(e.target.value) })} />
+                                        <NumberInput value={trackForm.sortOrder} onChange={(e) => setTrackForm({ ...trackForm, sortOrder: toInt(e.target.value) })} />
                                     </Field>
                                     <Field label={text('track.starts', 'Starts')}>
                                         <input type="datetime-local" value={unixToLocalInput(trackForm.startsAt)} onChange={(e) => setTrackForm({ ...trackForm, startsAt: localInputToUnix(e.target.value) })} />
@@ -494,16 +509,16 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                         <div className="octane-reward-track-admin-subtitle">{text('track.premium.section', 'Premium pass')}</div>
                                         <div className="octane-reward-track-admin-grid">
                                             <Field label={text('track.boost', 'Task points boost (%)')} error={trackErrors.premiumBoostPercent}>
-                                                <input type="number" min={0} value={trackForm.premiumBoostPercent} onChange={(e) => setTrackForm({ ...trackForm, premiumBoostPercent: toInt(e.target.value) })} />
+                                                <NumberInput min={0} value={trackForm.premiumBoostPercent} onChange={(e) => setTrackForm({ ...trackForm, premiumBoostPercent: toInt(e.target.value) })} />
                                             </Field>
                                             <Field label={text('track.instant', 'Instant points')} error={trackErrors.premiumInstantPoints}>
-                                                <input type="number" min={0} value={trackForm.premiumInstantPoints} onChange={(e) => setTrackForm({ ...trackForm, premiumInstantPoints: toInt(e.target.value) })} />
+                                                <NumberInput min={0} value={trackForm.premiumInstantPoints} onChange={(e) => setTrackForm({ ...trackForm, premiumInstantPoints: toInt(e.target.value) })} />
                                             </Field>
                                             <Field label={text('track.diamonds', 'Cost in diamonds')} error={trackErrors.premiumCostDiamonds}>
-                                                <input type="number" min={0} value={trackForm.premiumCostDiamonds} onChange={(e) => setTrackForm({ ...trackForm, premiumCostDiamonds: toInt(e.target.value) })} />
+                                                <NumberInput min={0} value={trackForm.premiumCostDiamonds} onChange={(e) => setTrackForm({ ...trackForm, premiumCostDiamonds: toInt(e.target.value) })} />
                                             </Field>
                                             <Field label={text('track.credits', 'Cost in credits')} error={trackErrors.premiumCostCredits}>
-                                                <input type="number" min={0} value={trackForm.premiumCostCredits} onChange={(e) => setTrackForm({ ...trackForm, premiumCostCredits: toInt(e.target.value) })} />
+                                                <NumberInput min={0} value={trackForm.premiumCostCredits} onChange={(e) => setTrackForm({ ...trackForm, premiumCostCredits: toInt(e.target.value) })} />
                                             </Field>
                                         </div>
                                     </>
@@ -617,19 +632,18 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                             {selectedTrack.tasks.map((task, index) => (
                                                 <tr key={task.id} data-testid="rt-admin-task-row">
                                                     <td className="octane-reward-track-admin-order">
-                                                        <button type="button" className="octane-reward-track-admin-arrow" disabled={pending || index === 0} title={text('move.up', 'Move up')} data-testid="rt-admin-task-up" onClick={() => moveTask(index, -1)}>
+                                                        <Hint content={text('move.up', 'Move up')}><BaseButton aria-label={text('move.up', 'Move up')} type="button" className="octane-reward-track-admin-arrow" disabled={pending || index === 0} data-testid="rt-admin-task-up" onClick={() => moveTask(index, -1)}>
                                                             ▲
-                                                        </button>
-                                                        <button
+                                                        </BaseButton></Hint>
+                                                        <Hint content={text('move.down', 'Move down')}><BaseButton aria-label={text('move.down', 'Move down')}
                                                             type="button"
                                                             className="octane-reward-track-admin-arrow"
                                                             disabled={pending || index === selectedTrack.tasks.length - 1}
-                                                            title={text('move.down', 'Move down')}
                                                             data-testid="rt-admin-task-down"
                                                             onClick={() => moveTask(index, 1)}
                                                         >
                                                             ▼
-                                                        </button>
+                                                        </BaseButton></Hint>
                                                     </td>
                                                     <td>
                                                         <b>{task.id}</b>
@@ -677,19 +691,19 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                 <input value={taskForm.id} maxLength={64} placeholder="talk" onChange={(e) => setTaskForm({ ...taskForm, id: e.target.value })} />
                                             </Field>
                                             <Field label={text('task.action', 'Action')} error={taskErrors.actionType}>
-                                                <select value={taskForm.actionType} onChange={(e) => setTaskForm({ ...taskForm, actionType: e.target.value })}>
+                                                <Select value={taskForm.actionType} onChange={(e) => setTaskForm({ ...taskForm, actionType: e.target.value })}>
                                                     {actionTypes.map((actionType) => (
                                                         <option key={actionType} value={actionType}>
                                                             {actionType}
                                                         </option>
                                                     ))}
-                                                </select>
+                                                </Select>
                                             </Field>
                                             <Field label={text('task.parameter', 'Parameter')} error={taskErrors.parameter}>
                                                 <input value={taskForm.parameter} maxLength={255} onChange={(e) => setTaskForm({ ...taskForm, parameter: e.target.value })} />
                                             </Field>
                                             <Field label={text('sort', 'Sort order')}>
-                                                <input type="number" value={taskForm.sortOrder} onChange={(e) => setTaskForm({ ...taskForm, sortOrder: toInt(e.target.value) })} />
+                                                <NumberInput value={taskForm.sortOrder} onChange={(e) => setTaskForm({ ...taskForm, sortOrder: toInt(e.target.value) })} />
                                             </Field>
                                         </div>
                                         <div className="octane-reward-track-admin-toggles">
@@ -714,22 +728,15 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                     <tr key={index} data-testid="rt-admin-level-row">
                                                         <td className="octane-reward-track-admin-muted">{index + 1}</td>
                                                         <td>
-                                                            <input
-                                                                type="number"
-                                                                min={1}
-                                                                value={level.requiredCount}
-                                                                aria-invalid={!!taskErrors[`level.${index}.requiredCount`]}
-                                                                title={taskErrors[`level.${index}.requiredCount`]}
-                                                                onChange={(e) => updateLevel(index, { requiredCount: toInt(e.target.value, 1) })}
-                                                            />
+                                                            <NumberInput min={1} value={level.requiredCount} aria-invalid={!!taskErrors[`level.${index}.requiredCount`]} title={taskErrors[`level.${index}.requiredCount`]} onChange={(e) => updateLevel(index, { requiredCount: toInt(e.target.value, 1) })} />
                                                             {taskErrors[`level.${index}.requiredCount`] && <span className="octane-reward-track-admin-field-error">{taskErrors[`level.${index}.requiredCount`]}</span>}
                                                         </td>
                                                         <td>
-                                                            <input type="number" min={0} value={level.pointsReward} aria-invalid={!!taskErrors[`level.${index}.pointsReward`]} onChange={(e) => updateLevel(index, { pointsReward: toInt(e.target.value) })} />
+                                                            <NumberInput min={0} value={level.pointsReward} aria-invalid={!!taskErrors[`level.${index}.pointsReward`]} onChange={(e) => updateLevel(index, { pointsReward: toInt(e.target.value) })} />
                                                             {taskErrors[`level.${index}.pointsReward`] && <span className="octane-reward-track-admin-field-error">{taskErrors[`level.${index}.pointsReward`]}</span>}
                                                         </td>
                                                         <td>
-                                                            <input type="checkbox" checked={level.premium} onChange={(e) => updateLevel(index, { premium: e.target.checked })} />
+                                                            <Checkbox checked={level.premium} onCheckedChange={(nextChecked) => updateLevel(index, { premium: nextChecked })} />
                                                         </td>
                                                         <td className="octane-reward-track-admin-row-actions">
                                                             <Button
@@ -836,19 +843,19 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                 <input value={prizeForm.id} maxLength={64} placeholder="p1" onChange={(e) => setPrizeForm({ ...prizeForm, id: e.target.value })} />
                                             </Field>
                                             <Field label={text('prize.required', 'Required points')} error={prizeErrors.requiredPoints}>
-                                                <input type="number" min={0} value={prizeForm.requiredPoints} onChange={(e) => setPrizeForm({ ...prizeForm, requiredPoints: toInt(e.target.value) })} />
+                                                <NumberInput min={0} value={prizeForm.requiredPoints} onChange={(e) => setPrizeForm({ ...prizeForm, requiredPoints: toInt(e.target.value) })} />
                                             </Field>
                                             <Field label={text('prize.type', 'Reward type')} error={prizeErrors.rewardType}>
-                                                <select value={prizeForm.rewardType} onChange={(e) => setPrizeForm({ ...prizeForm, rewardType: e.target.value })}>
+                                                <Select value={prizeForm.rewardType} onChange={(e) => setPrizeForm({ ...prizeForm, rewardType: e.target.value })}>
                                                     {rewardTypes.map((rewardType) => (
                                                         <option key={rewardType} value={rewardType}>
                                                             {rewardType}
                                                         </option>
                                                     ))}
-                                                </select>
+                                                </Select>
                                             </Field>
                                             <Field label={text('prize.amount', 'Amount')} error={prizeErrors.rewardAmount}>
-                                                <input type="number" min={0} value={prizeForm.rewardAmount} onChange={(e) => setPrizeForm({ ...prizeForm, rewardAmount: toInt(e.target.value) })} />
+                                                <NumberInput min={0} value={prizeForm.rewardAmount} onChange={(e) => setPrizeForm({ ...prizeForm, rewardAmount: toInt(e.target.value) })} />
                                             </Field>
                                             <Field
                                                 label={prizeForm.rewardType === 'furni' ? text('prize.extra.furni', 'Furni name (items_base.item_name)') : text('prize.extra', 'Extra (badge code)')}
@@ -863,10 +870,10 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                 />
                                             </Field>
                                             <Field label={text('prize.product', 'Product type id')} error={prizeErrors.productItemTypeId}>
-                                                <input type="number" min={0} max={32767} value={prizeForm.productItemTypeId} onChange={(e) => setPrizeForm({ ...prizeForm, productItemTypeId: toInt(e.target.value) })} />
+                                                <NumberInput min={0} max={32767} value={prizeForm.productItemTypeId} onChange={(e) => setPrizeForm({ ...prizeForm, productItemTypeId: toInt(e.target.value) })} />
                                             </Field>
                                             <Field label={text('sort', 'Sort order')}>
-                                                <input type="number" value={prizeForm.sortOrder} onChange={(e) => setPrizeForm({ ...prizeForm, sortOrder: toInt(e.target.value) })} />
+                                                <NumberInput value={prizeForm.sortOrder} onChange={(e) => setPrizeForm({ ...prizeForm, sortOrder: toInt(e.target.value) })} />
                                             </Field>
                                         </div>
                                         {prizeForm.rewardType === 'furni' && searchFurni && (

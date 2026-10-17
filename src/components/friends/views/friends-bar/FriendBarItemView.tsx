@@ -12,6 +12,7 @@ import { LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common'
 import { useFriends } from '../../../../hooks';
 import { isStaffChatIdentity } from '../../staffChatIdentity';
 import { StaffChatFrankIconView } from '../../StaffChatFrankIconView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
     const { friend = null } = props;
@@ -34,7 +35,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
     if (!friend) {
         return (
             <div ref={elementRef} className={`friend-bar-find-friends ${isVisible ? 'is-selected' : ''}`}>
-                <button
+                <BaseButton
                     type="button"
                     className="friend-bar-item friend-bar-search find-friends"
                     aria-expanded={isVisible}
@@ -42,7 +43,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                 >
                     <img className="friend-bar-search-icon" src={searchFriendsIcon} alt="" />
                     <span className="friend-bar-text">{LocalizeText('friend.bar.find.title')}</span>
-                </button>
+                </BaseButton>
 
                 <AnimatePresence>
                     {isVisible && (
@@ -58,7 +59,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                                 <span>{LocalizeText('friend.bar.find.title')}</span>
                             </div>
                             <div className="friend-bar-find-friends-copy">{LocalizeText('friend.bar.find.text')}</div>
-                            <button
+                            <BaseButton
                                 className="friend-bar-find-friends-button"
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -67,7 +68,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = (props) => {
                                 }}
                             >
                                 {LocalizeText('friend.bar.find.button')}
-                            </button>
+                            </BaseButton>
                         </motion.div>
                     )}
                 </AnimatePresence>

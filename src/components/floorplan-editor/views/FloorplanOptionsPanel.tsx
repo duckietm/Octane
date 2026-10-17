@@ -4,6 +4,7 @@ import { LocalizeText } from '../../../api';
 import { localizeOr } from '../state/localize';
 import { Base } from '../../../common';
 import { EntryDir, FloorplanAction, FloorplanState, ThicknessLevel } from '../state/types';
+import { BaseButton } from '../../../common/BaseButton';
 
 type Props = {
     state: FloorplanState;
@@ -25,17 +26,17 @@ export const FloorplanOptionsPanel: FC<Props> = ({ state, dispatch }) => {
             <div className="fp-control-group is-centered" data-testid="floorplan-orientation">
                 <div className="fp-group-label">{LocalizeText('floor.plan.editor.enter.direction')}</div>
                 <div className="fp-orientation">
-                    <Base data-testid="entry-dir-prev" pointer title="Rotate left" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, -1))}>
+                    <Base component={BaseButton} type="button" data-testid="entry-dir-prev" pointer title="Rotate left" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, -1))}>
                         <FaChevronLeft size={11} />
                     </Base>
-                    <Base
+                    <Base component={BaseButton} type="button"
                         data-testid="entry-dir"
                         pointer
                         title={`Direction ${state.door.dir}/7 (click to rotate)`}
                         className={`octane-icon icon-door-direction-${state.door.dir}`}
                         onClick={() => setDir(rotateDir(state.door.dir, 1))}
                     />
-                    <Base data-testid="entry-dir-next" pointer title="Rotate right" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, 1))}>
+                    <Base component={BaseButton} type="button" data-testid="entry-dir-next" pointer title="Rotate right" className="fp-orientation-step" onClick={() => setDir(rotateDir(state.door.dir, 1))}>
                         <FaChevronRight size={11} />
                     </Base>
                 </div>
@@ -66,20 +67,26 @@ const ThicknessStepper: FC<StepperProps> = ({ value, onChange, testIdPrefix, lab
 
     return (
         <div className="fp-select" data-testid={testIdPrefix} data-value={value} title={label}>
-            <span data-testid={`${testIdPrefix}-label`} onClick={() => onChange(thicker ?? THICKNESS_LEVELS[0])}>
+            <BaseButton className="cursor-pointer" data-testid={`${testIdPrefix}-label`} type="button" onClick={() => onChange(thicker ?? THICKNESS_LEVELS[0])}>
                 {label}
-            </span>
+            </BaseButton>
             <div className="fp-select-arrows">
-                <span
+                <BaseButton
+                    aria-disabled={thicker === null}
+                    aria-label="Thicker"
                     data-testid={`${testIdPrefix}-up`}
                     className={`fp-select-arrow is-up ${thicker === null ? 'is-disabled' : ''}`}
                     title="Thicker"
+                    type="button"
                     onClick={() => thicker !== null && onChange(thicker)}
                 />
-                <span
+                <BaseButton
+                    aria-disabled={thinner === null}
+                    aria-label="Thinner"
                     data-testid={`${testIdPrefix}-down`}
                     className={`fp-select-arrow is-down ${thinner === null ? 'is-disabled' : ''}`}
                     title="Thinner"
+                    type="button"
                     onClick={() => thinner !== null && onChange(thinner)}
                 />
             </div>

@@ -1,6 +1,9 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { FC, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronRight, FaExclamationTriangle, FaHistory, FaSyncAlt, FaUndo } from 'react-icons/fa';
 import { CatalogStudioHistoryGroup, CatalogStudioValidationIssue } from './CatalogStudioTypes';
+import { InlineDialog } from '../../../../common/InlineDialog';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface CatalogStudioProblemsHistoryPanelProps {
     issues: CatalogStudioValidationIssue[];
@@ -87,7 +90,7 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                 Current catalog problems
                 <span className="octane-catalog-admin-validation-meta">
                     {checkedAt ? `checked at ${formatTime(checkedAt)}` : 'not checked yet'}
-                    {revalidate && <button
+                    {revalidate && <BaseButton
                         className="octane-catalog-admin-btn is-small"
                         type="button"
                         disabled={loading}
@@ -95,27 +98,22 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                         aria-label="Check the catalog again"
                     >
                         <FaSyncAlt /> Recheck
-                    </button>}
+                    </BaseButton>}
                 </span>
             </div>
             {!issues.length && <div className="octane-catalog-admin-placeholder is-small">No structural problems found.</div>}
             {ruleGroups.map(group => {
                 const isOpen = expandedRules.includes(group.code);
 
-                return <div key={group.code} className="octane-catalog-admin-validation-group">
-                    <button
-                        className="octane-catalog-admin-validation-group-head"
-                        type="button"
-                        aria-expanded={isOpen}
-                        onClick={() => toggleRule(group.code)}
-                    >
+                return <Collapsible.Root key={group.code} className="octane-catalog-admin-validation-group" open={isOpen} onOpenChange={() => toggleRule(group.code)}>
+                    <Collapsible.Trigger className="octane-catalog-admin-validation-group-head">
                         {isOpen ? <FaChevronDown /> : <FaChevronRight />}
                         <FaExclamationTriangle />
                         <strong>{group.label}</strong>
                         <span className="octane-catalog-admin-validation-count">{group.issues.length}</span>
-                    </button>
-                    {isOpen && <div className="octane-catalog-admin-validation-group-body">
-                        {group.issues.slice(0, MAX_ROWS_PER_RULE).map((issue, index) => <button
+                    </Collapsible.Trigger>
+                    <Collapsible.Panel className="octane-catalog-admin-validation-group-body">
+                        {group.issues.slice(0, MAX_ROWS_PER_RULE).map((issue, index) => <BaseButton
                             key={`${issue.entityType}-${issue.entityId}-${issue.field}-${index}`}
                             className="octane-catalog-admin-validation-row"
                             type="button"
@@ -126,12 +124,12 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                                 <strong>{issue.entityType} #{issue.entityId}</strong>
                                 <span>{issue.field} &middot; {issue.message}</span>
                             </div>
-                        </button>)}
+                        </BaseButton>)}
                         {group.issues.length > MAX_ROWS_PER_RULE && <div className="octane-catalog-admin-placeholder is-small">
                             {group.issues.length - MAX_ROWS_PER_RULE} more not listed
                         </div>}
-                    </div>}
-                </div>;
+                    </Collapsible.Panel>
+                </Collapsible.Root>;
             })}
         </div>
 
@@ -143,27 +141,27 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                     <strong>{group.summary}</strong>
                     <span>{group.entries.length} affected item(s) &middot; {group.actorName || `User #${group.actorId}`}</span>
                 </div>
-                <button
+                <BaseButton
                     className="octane-catalog-admin-btn is-small"
                     disabled={loading}
                     aria-label={`Undo ${group.summary}`}
                     onClick={() => setUndoCandidate(group)}
                 >
                     <FaUndo /> Undo
-                </button>
+                </BaseButton>
             </div>)}
         </div>
 
-        {undoCandidate && <div className="octane-catalog-admin-publish-confirmation" role="dialog" aria-modal="true" aria-label="Confirm operation undo">
+        {undoCandidate && <InlineDialog className="octane-catalog-admin-publish-confirmation" aria-modal="true" aria-label="Confirm operation undo" onClose={() => setUndoCandidate(null)}>
             <FaUndo />
             <div>
                 <strong>Undo &ldquo;{undoCandidate.summary}&rdquo;?</strong>
                 <span>The complete live operation will be reversed and recorded in history.</span>
             </div>
             <div className="octane-catalog-admin-publish-actions">
-                <button className="octane-catalog-admin-btn" onClick={() => setUndoCandidate(null)}>Cancel</button>
-                <button className="octane-catalog-admin-btn is-publish" onClick={undoNow}>Undo operation</button>
+                <BaseButton className="octane-catalog-admin-btn" onClick={() => setUndoCandidate(null)}>Cancel</BaseButton>
+                <BaseButton className="octane-catalog-admin-btn is-publish" onClick={undoNow}>Undo operation</BaseButton>
             </div>
-        </div>}
+        </InlineDialog>}
     </div>;
 };

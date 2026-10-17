@@ -20,6 +20,7 @@ import { ClassicScrollAreaView } from '../../../../common';
 import { useHelp, useMessageEvent } from '../../../../hooks';
 import { flatText, GroupText } from '../GroupNativeLayout';
 import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, ForumPager } from './GroupForumLayout';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // Thread states: 1 visible, 10 hidden by a group administrator, 20 deleted by Hotel staff.
 export const THREAD_HIDDEN_BY_ADMIN = 10;
@@ -150,7 +151,7 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ fo
                                     vertical item list, so a pin without a lock moves up. */}
                                 <div className="octane-forum__thread-flags" style={{ background: rowColor }}>
                                     {(canManage || thread.isLocked) && (
-                                        <button
+                                        <BaseButton
                                             className="octane-forum__flag"
                                             disabled={!canManage}
                                             style={{ top: 0 }}
@@ -158,10 +159,10 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ fo
                                             onClick={() => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, !thread.isLocked, thread.isPinned))}
                                         >
                                             <img alt="" draggable={false} src={thread.isLocked ? lockedIcon : unlockedIcon} style={{ left: 3, top: 1 }} />
-                                        </button>
+                                        </BaseButton>
                                     )}
                                     {(canManage || thread.isPinned) && (
-                                        <button
+                                        <BaseButton
                                             className="octane-forum__flag"
                                             disabled={!canManage}
                                             style={{ top: canManage || thread.isLocked ? 20 : 0 }}
@@ -169,16 +170,16 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ fo
                                             onClick={() => SendMessageComposer(new UpdateThreadMessageComposer(groupId, thread.threadId, thread.isLocked, !thread.isPinned))}
                                         >
                                             <img alt="" draggable={false} src={thread.isPinned ? pinnedIcon : unpinnedIcon} style={{ left: 3, top: 2 }} />
-                                        </button>
+                                        </BaseButton>
                                     )}
                                 </div>
                                 <div className="octane-forum__thread-body" style={{ left: 21, width: textsWidth, background: rowColor }}>
                                     <GroupText background={background} overrides={isUnread ? { bold: true } : undefined} text={header} x={0} y={0} />
                                     <GroupText background={background} overrides={flatText(10)} text={details} x={0} y={16} />
                                     {/* header_region and unread_region go to the first unread message (onGoToFirstUnread). */}
-                                    <div className="octane-forum__thread-header" role="button" onClick={() => onOpenThread(thread)} />
+                                    <BaseButton className="octane-forum__thread-header" type="button" onClick={() => onOpenThread(thread)} />
                                 </div>
-                                <div className="octane-forum__thread-counts" role="button" style={{ left: 21 + textsWidth + 1, background: rowColor }} onClick={() => onOpenThread(thread)}>
+                                <BaseButton className="octane-forum__thread-counts" type="button" style={{ left: 21 + textsWidth + 1, background: rowColor }} onClick={() => onOpenThread(thread)}>
                                     <GroupText
                                         background={background}
                                         overrides={flatText(10, { bold: isUnread })}
@@ -193,18 +194,18 @@ export const GroupForumThreadListView: FC<GroupForumThreadListViewProps> = ({ fo
                                         x={0}
                                         y={15}
                                     />
-                                </div>
+                                </BaseButton>
                                 {buttonCount > 0 && (
                                     <div className="octane-forum__thread-actions" style={{ left: ROW_WIDTH - buttonsWidth, width: buttonsWidth }}>
                                         {hideAction && (
-                                            <button className="octane-forum__action is-hide" type="button" onClick={() => moderate(thread, hideAction)}>
+                                            <BaseButton className="octane-forum__action is-hide" type="button" onClick={() => moderate(thread, hideAction)}>
                                                 <img alt="" draggable={false} src={hideAction === 'unhide' ? unhideIcon : hideIcon} style={{ left: 5, top: 11 }} />
-                                            </button>
+                                            </BaseButton>
                                         )}
                                         {canReport && (
-                                            <button className="octane-forum__action is-report" style={{ left: hideAction ? BUTTON_WIDTH : 0 }} type="button" onClick={() => report(ReportType.THREAD, { groupId, threadId: thread.threadId })}>
+                                            <BaseButton className="octane-forum__action is-report" style={{ left: hideAction ? BUTTON_WIDTH : 0 }} type="button" onClick={() => report(ReportType.THREAD, { groupId, threadId: thread.threadId })}>
                                                 <img alt="" draggable={false} src={reportIcon} style={{ left: 4, top: 12 }} />
-                                            </button>
+                                            </BaseButton>
                                         )}
                                     </div>
                                 )}

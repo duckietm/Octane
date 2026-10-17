@@ -401,6 +401,7 @@
 }
 
 .octane-catalog-pet-breed-selector select,
+.octane-catalog-pet-breed-selector .octane-select-trigger,
 .octane-catalog-pet-name-field input {
     width: 100%;
     height: 25px;
@@ -413,7 +414,8 @@
     line-height: 23px;
 }
 
-.octane-catalog-pet-breed-selector select {
+.octane-catalog-pet-breed-selector select,
+.octane-catalog-pet-breed-selector .octane-select-trigger {
     min-width: 0;
     padding: 0 5px;
 }
@@ -1218,7 +1220,8 @@
     line-height: 17px;
 }
 
-.octane-catalog-purchase-confirm-disclaimer input {
+.octane-catalog-purchase-confirm-disclaimer input,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox {
     position: absolute;
     top: 0;
     left: 13px;
@@ -1233,11 +1236,13 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.octane-catalog-purchase-confirm-disclaimer input:checked {
+.octane-catalog-purchase-confirm-disclaimer input:checked,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox[data-checked] {
     background-image: url("../../assets/images/catalog/air/gift/checkbox-selected.png");
 }
 
-.octane-catalog-purchase-confirm-disclaimer input:focus-visible {
+.octane-catalog-purchase-confirm-disclaimer input:focus-visible,
+.octane-catalog-purchase-confirm-disclaimer .octane-checkbox:focus-visible {
     outline: 1px solid #000000;
     outline-offset: 1px;
 }

@@ -3,6 +3,7 @@ import { localizeHabbiconName, localizeWithFallback, useHabbiconCatalog } from '
 import { DraggableWindowPosition, LayoutCurrencyIcon, LayoutHabbiconImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { usePurse } from '../../../../hooks/purse/usePurse';
 import { HabbiconPrice } from './HabbiconHubView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const HabbiconPurchaseView: FC = () => {
     const catalog = useHabbiconCatalog();
@@ -102,12 +103,12 @@ export const HabbiconPurchaseView: FC = () => {
                 )}
                 {catalog.error && <p role="alert">{catalog.error}</p>}
                 <div className="habbicon-purchase-actions">
-                    <button type="button" className="habbicon-action" disabled={!affordable || !!pending || missing.length === 0} onClick={catalog.buy}>
+                    <BaseButton type="button" className="habbicon-action" disabled={!affordable || !!pending || missing.length === 0} onClick={catalog.buy}>
                         {localizeWithFallback(pending ? 'generic.loading' : 'generic.buy', pending ? 'Buying…' : 'Buy')}
-                    </button>
-                    <button type="button" className="habbicon-cancel" disabled={!!pending} onClick={close}>
+                    </BaseButton>
+                    <BaseButton type="button" className="habbicon-cancel" disabled={!!pending} onClick={close}>
                         {localizeWithFallback('generic.cancel', 'Cancel')}
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
         </OctaneCardView>

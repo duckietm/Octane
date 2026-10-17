@@ -3,6 +3,8 @@ import { FC, useMemo, useState } from 'react';
 import { FaReply } from 'react-icons/fa';
 import { getHousekeepingTicketReplies, LocalizeText, localizeTicketReply, SendMessageComposer } from '../../../../api';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton } from '../common/HousekeepingParts';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 const REPLY_MAX = 500;
 
@@ -33,7 +35,7 @@ export const HousekeepingTicketReplyView: FC<{ ticket: IssueMessageData }> = ({ 
                 <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
                     {LocalizeText('housekeeping.support.reply.label', ['user'], [ticket.reporterUserName])}
                 </span>
-                <select
+                <Select
                     className="ml-auto rounded border border-zinc-300 bg-white px-1 py-0.5 text-[11px]"
                     value=""
                     onChange={(event) => {
@@ -48,7 +50,7 @@ export const HousekeepingTicketReplyView: FC<{ ticket: IssueMessageData }> = ({ 
                             {localizeTicketReply(reply)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
             <textarea
                 className={`${HOUSEKEEPING_INPUT_CLASS} min-h-[48px] resize-y`}
@@ -62,7 +64,7 @@ export const HousekeepingTicketReplyView: FC<{ ticket: IssueMessageData }> = ({ 
             />
             <div className="flex items-center gap-1.5">
                 <label className="flex items-center gap-1 text-[10px] text-zinc-600">
-                    <input checked={closeAfter} type="checkbox" onChange={(event) => setCloseAfter(event.target.checked)} />
+                    <Checkbox checked={closeAfter} onCheckedChange={(nextChecked) => setCloseAfter(nextChecked)} />
                     {LocalizeText('housekeeping.support.reply.close_after')}
                 </label>
                 {sent && <span className="text-[10px] text-emerald-700">{LocalizeText('housekeeping.support.reply.sent')}</span>}

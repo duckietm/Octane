@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const MODE_ALL = 0;
 const MODE_AT_LEAST_ONE = 1;
@@ -106,13 +107,7 @@ export const WiredExtraOrEvalView: FC<{}> = () => {
                 {MODE_OPTIONS.map((mode) => {
                     return (
                         <label key={mode} className="flex items-center gap-1 cursor-pointer">
-                            <input
-                                checked={evaluationMode === mode}
-                                className="form-check-input"
-                                name="wiredExtraOrEvalMode"
-                                type="radio"
-                                onChange={() => setEvaluationMode(mode)}
-                            />
+                            <Radio checked={evaluationMode === mode} name="wiredExtraOrEvalMode" onCheckedChange={() => setEvaluationMode(mode)} />
                             <Text>{LocalizeText(`wiredfurni.params.eval_mode.${mode}`)}</Text>
                         </label>
                     );
@@ -122,13 +117,7 @@ export const WiredExtraOrEvalView: FC<{}> = () => {
 
                     return (
                         <label key={mode} className="flex items-center gap-2 cursor-pointer">
-                            <input
-                                checked={isSelected}
-                                className="form-check-input"
-                                name="wiredExtraOrEvalMode"
-                                type="radio"
-                                onChange={() => setEvaluationMode(mode)}
-                            />
+                            <Radio checked={isSelected} name="wiredExtraOrEvalMode" onCheckedChange={() => setEvaluationMode(mode)} />
                             <Text>{LocalizeText(`wiredfurni.params.eval_mode.cmp.${mode - MODE_LESS_THAN}`)}</Text>
                             <input
                                 className="form-control form-control-sm w-16"

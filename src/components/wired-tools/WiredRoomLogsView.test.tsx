@@ -3,6 +3,8 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../test-utils/selectOption';
+import { MONITOR_ERROR_INFO, MONITOR_LOG_ORDER } from './WiredCreatorTools.constants';
 
 const mocks = vi.hoisted(() => ({
     send: vi.fn(),
@@ -102,17 +104,17 @@ describe('WiredRoomLogsView', () => {
         mocks.send.mockClear();
         vi.advanceTimersByTime(400);
 
-        const [sourceSelect, levelSelect] = screen.getAllByRole('combobox') as HTMLSelectElement[];
+        const [sourceSelect, levelSelect] = screen.getAllByRole('combobox');
 
-        fireEvent.change(levelSelect, { target: { value: '1' } });
+        selectOption(levelSelect, 'INFO');
 
         expect(mocks.send).toHaveBeenCalledTimes(1);
         expect(mocks.send.mock.calls[0][0].getMessageArray()).toEqual([1, 50, 1, -1, '']);
 
         deliverPage({ totalEntries: 1, currentPage: 1, entries: [entry(3, 1, 0, 'cap hit')], logLevelFilter: 1, logSourceFilter: 3 });
 
-        expect(levelSelect.value).toBe('1');
-        expect(sourceSelect.value).toBe('3');
+        expect(levelSelect).toHaveTextContent('INFO');
+        expect(sourceSelect).toHaveTextContent(MONITOR_ERROR_INFO[MONITOR_LOG_ORDER[3]]?.title ?? MONITOR_LOG_ORDER[3]);
     });
 
     it('auto refresh re-asks for the shown page with its own filters every 2.5 s and stops when unticked', () => {
@@ -135,14 +137,14 @@ describe('WiredRoomLogsView', () => {
         mocks.send.mockClear();
         vi.advanceTimersByTime(400);
 
-        fireEvent.click(screen.getByTitle('Next page'));
-        fireEvent.click(screen.getByTitle('Last page'));
+        fireEvent.click(screen.getByLabelText('Next page'));
+        fireEvent.click(screen.getByLabelText('Last page'));
 
         expect(mocks.send).toHaveBeenCalledTimes(1);
         expect(mocks.send.mock.calls[0][0].getMessageArray()[0]).toBe(2);
 
         vi.advanceTimersByTime(400);
-        fireEvent.click(screen.getByTitle('Last page'));
+        fireEvent.click(screen.getByLabelText('Last page'));
         expect(mocks.send).toHaveBeenCalledTimes(2);
         expect(mocks.send.mock.calls[1][0].getMessageArray()[0]).toBe(3);
     });

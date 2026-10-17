@@ -1,6 +1,7 @@
 import { PressKeybindComposer } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { SendMessageComposer } from '../../../api';
+import { isTextEntryTarget } from '../../../hooks/rooms/useRoomKeyboardMovement';
 
 /**
  * Captures in-room key presses and forwards the pressed key code to the server (outgoing header 9311),
@@ -25,13 +26,7 @@ export const RoomKeybindView: FC<{}> = () =>
         {
             if (event.repeat) return;
 
-            const active = document.activeElement;
-
-            if ((active instanceof HTMLInputElement) || (active instanceof HTMLTextAreaElement) ||
-                ((active instanceof HTMLElement) && active.isContentEditable))
-            {
-                return;
-            }
+            if (isTextEntryTarget(document.activeElement)) return;
 
             switch (event.key)
             {

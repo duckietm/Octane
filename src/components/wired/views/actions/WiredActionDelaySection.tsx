@@ -12,6 +12,8 @@ import {
 import delayPreciseIcon from '../../../../assets/images/wired/delay/delay_precise.png';
 import delayStandardIcon from '../../../../assets/images/wired/delay/delay_standard.png';
 import { Slider, Text } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 interface WiredActionDelaySectionProps {
     /** The delay as sent: pulses, or a negative number of milliseconds in precise mode. */
@@ -65,22 +67,23 @@ export const WiredActionDelaySection: FC<WiredActionDelaySectionProps> = ({ valu
                     }}
                 />
                 <div className="octane-wired__delay-mode">
-                    <button
-                        type="button"
-                        className="octane-wired__delay-mode-button"
-                        title={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}
-                        onClick={() => setMenuOpen((open) => !open)}
-                    >
-                        <img src={precise ? delayPreciseIcon : delayStandardIcon} alt="" />
-                    </button>
+                    <Hint content={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}>
+                        <BaseButton aria-label={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}
+                            type="button"
+                            className="octane-wired__delay-mode-button"
+                            onClick={() => setMenuOpen((open) => !open)}
+                        >
+                            <img src={precise ? delayPreciseIcon : delayStandardIcon} alt="" />
+                        </BaseButton>
+                    </Hint>
                     {menuOpen && (
                         <div className="octane-wired__delay-mode-menu">
-                            <button type="button" className={!precise ? 'is-active' : ''} onClick={() => selectMode(false)}>
+                            <BaseButton type="button" className={!precise ? 'is-active' : ''} onClick={() => selectMode(false)}>
                                 {LocalizeText('wiredfurni.params.delay.mode.standard')}
-                            </button>
-                            <button type="button" className={precise ? 'is-active' : ''} onClick={() => selectMode(true)}>
+                            </BaseButton>
+                            <BaseButton type="button" className={precise ? 'is-active' : ''} onClick={() => selectMode(true)}>
                                 {LocalizeText('wiredfurni.params.delay.mode.precise')}
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                 </div>

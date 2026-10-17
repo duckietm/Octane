@@ -13,6 +13,8 @@ import {
 } from '../../api/badges';
 import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useNotification } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
 
 const t = (key: string, fallback: string, params?: string[], replacements?: string[]): string => {
     try {
@@ -529,63 +531,64 @@ export const BadgeCreatorView: FC<{}> = () => {
                                     const isTransparent = color === TRANSPARENT;
                                     const isSelected = color === selectedColor;
                                     return (
-                                        <button
-                                            key={idx}
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedColor(color);
-                                                setTool('paint');
-                                            }}
-                                            title={isTransparent ? 'Transparent' : argbToCss(color)}
-                                            style={{
-                                                width: 22,
-                                                height: 22,
-                                                border: isSelected ? '2px solid #000' : '1px solid #888',
-                                                background: isTransparent
-                                                    ? 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px'
-                                                    : argbToCss(color),
-                                                cursor: 'pointer',
-                                                padding: 0
-                                            }}
-                                        />
+                                        <Hint key={idx} content={isTransparent ? 'Transparent' : argbToCss(color)}>
+                                            <BaseButton aria-label={isTransparent ? 'Transparent' : argbToCss(color)}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedColor(color);
+                                                    setTool('paint');
+                                                }}
+                                                style={{
+                                                    width: 22,
+                                                    height: 22,
+                                                    border: isSelected ? '2px solid #000' : '1px solid #888',
+                                                    background: isTransparent
+                                                        ? 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px'
+                                                        : argbToCss(color),
+                                                    cursor: 'pointer',
+                                                    padding: 0
+                                                }}
+                                            />
+                                        </Hint>
                                     );
                                 })}
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
-                                <button
-                                    type="button"
-                                    onClick={openColorPicker}
-                                    title={t('badgecreator.color.custom', 'Pick a custom colour')}
-                                    style={{
-                                        width: 28,
-                                        height: 26,
-                                        padding: 2,
-                                        border: '1px solid #888',
-                                        background: '#f3f3f3',
-                                        cursor: 'pointer',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}
-                                >
-                                    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path
-                                            d="M4.5 14.5 12 7l5 5-7.5 7.5a2 2 0 0 1-2.83 0l-2.17-2.17a2 2 0 0 1 0-2.83Z"
-                                            fill="#d3d3d3"
-                                            stroke="#222"
-                                            strokeWidth="1.4"
-                                            strokeLinejoin="round"
-                                        />
-                                        <path d="m12 7-2-2 2-2 2 2" stroke="#222" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path
-                                            d="M18 14c0 1.5 1.4 2.5 1.4 4a1.4 1.4 0 1 1-2.8 0c0-1.5 1.4-2.5 1.4-4Z"
-                                            fill="#ffb74d"
-                                            stroke="#222"
-                                            strokeWidth="1.2"
-                                        />
-                                    </svg>
-                                </button>
-                                <div
+                                <Hint content={t('badgecreator.color.custom', 'Pick a custom colour')}>
+                                    <BaseButton aria-label={t('badgecreator.color.custom', 'Pick a custom colour')}
+                                        type="button"
+                                        onClick={openColorPicker}
+                                        style={{
+                                            width: 28,
+                                            height: 26,
+                                            padding: 2,
+                                            border: '1px solid #888',
+                                            background: '#f3f3f3',
+                                            cursor: 'pointer',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path
+                                                d="M4.5 14.5 12 7l5 5-7.5 7.5a2 2 0 0 1-2.83 0l-2.17-2.17a2 2 0 0 1 0-2.83Z"
+                                                fill="#d3d3d3"
+                                                stroke="#222"
+                                                strokeWidth="1.4"
+                                                strokeLinejoin="round"
+                                            />
+                                            <path d="m12 7-2-2 2-2 2 2" stroke="#222" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path
+                                                d="M18 14c0 1.5 1.4 2.5 1.4 4a1.4 1.4 0 1 1-2.8 0c0-1.5 1.4-2.5 1.4-4Z"
+                                                fill="#ffb74d"
+                                                stroke="#222"
+                                                strokeWidth="1.2"
+                                            />
+                                        </svg>
+                                    </BaseButton>
+                                </Hint>
+                                <BaseButton aria-label={argbToHex(selectedColor)}
                                     onClick={openColorPicker}
                                     title={argbToHex(selectedColor)}
                                     style={{

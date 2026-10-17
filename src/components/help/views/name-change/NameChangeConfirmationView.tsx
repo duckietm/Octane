@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { useMessageEvent } from '../../../../hooks';
 import { NameChangeLayoutViewProps } from './NameChangeView.types';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const NameChangeConfirmationView: FC<NameChangeLayoutViewProps> = (props) => {
     const { username = '', onAction = null } = props;
@@ -33,12 +34,12 @@ export const NameChangeConfirmationView: FC<NameChangeLayoutViewProps> = (props)
                 <div className="font-bold	">{username}</div>
             </div>
             <div className="flex gap-2">
-                <button className="btn btn-success w-full" disabled={isConfirming} onClick={confirm}>
+                <BaseButton className="btn btn-success w-full" disabled={isConfirming} onClick={confirm}>
                     {LocalizeText('generic.ok')}
-                </button>
-                <button className="btn btn-danger w-full" onClick={() => onAction('close')}>
+                </BaseButton>
+                <BaseButton className="btn btn-danger w-full" onClick={() => onAction('close')}>
                     {LocalizeText('cancel')}
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

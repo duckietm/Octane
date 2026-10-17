@@ -698,6 +698,13 @@ textarea.octane-group-native__input {
     image-rendering: pixelated;
 }
 
+.octane-group-native__dropmenu-root > .octane-group-native__dropmenu {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .octane-group-native__dropmenu:focus-visible {
     outline: 0;
 }
@@ -714,10 +721,13 @@ textarea.octane-group-native__input {
     display: block;
 }
 
+.octane-group-native__dropmenu-positioner {
+    z-index: 9999;
+}
+
 .octane-group-native__dropmenu-list {
-    position: absolute;
-    z-index: 5;
     box-sizing: border-box;
+    width: var(--anchor-width);
     max-height: 168px;
     margin: 0;
     padding: 0;
@@ -741,11 +751,13 @@ textarea.octane-group-native__input {
 }
 
 .octane-group-native__dropmenu-item:hover,
+.octane-group-native__dropmenu-item[data-highlighted],
+.octane-group-native__dropmenu-item[data-selected],
 .octane-group-native__dropmenu-item.is-selected {
     background: #d2e8ef;
 }
 
-.octane-group-native__dropmenu-item > .octane-group-native__text {
+.octane-group-native__dropmenu-item .octane-group-native__text {
     position: static;
 }
 

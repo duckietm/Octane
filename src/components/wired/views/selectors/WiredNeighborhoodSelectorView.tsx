@@ -20,6 +20,9 @@ import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSourcesSelector';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // Official source values (InputSourcesConf): 0 trigger, 11 clicked user, 100 picks, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -273,34 +276,20 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () =>
 
                 <div className="flex items-center justify-end gap-2">
                     <Text small>x:</Text>
-                    <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        style={ { width: 56 } }
-                        min={ -NEIGHBORHOOD_MAX_ROOT }
-                        max={ NEIGHBORHOOD_MAX_ROOT }
-                        value={ root.x }
-                        onChange={ event => setRoot({ x: clampRoot(parseInt(event.target.value)), y: root.y }) } />
+                    <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.x } onChange={ event => setRoot({ x: clampRoot(parseInt(event.target.value)), y: root.y }) } />
                     <Text small>y:</Text>
-                    <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        style={ { width: 56 } }
-                        min={ -NEIGHBORHOOD_MAX_ROOT }
-                        max={ NEIGHBORHOOD_MAX_ROOT }
-                        value={ root.y }
-                        onChange={ event => setRoot({ x: root.x, y: clampRoot(parseInt(event.target.value)) }) } />
+                    <NumberInput className="form-control form-control-sm" style={ { width: 56 } } min={ -NEIGHBORHOOD_MAX_ROOT } max={ NEIGHBORHOOD_MAX_ROOT } value={ root.y } onChange={ event => setRoot({ x: root.x, y: clampRoot(parseInt(event.target.value)) }) } />
                 </div>
 
                 <hr className="m-0 bg-dark" />
 
                 <Text bold>{ LocalizeText('wiredfurni.params.selector_options_selector') }</Text>
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={ filterExisting } onChange={ event => setFilterExisting(event.target.checked) } />
+                    <Checkbox checked={ filterExisting } onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{ LocalizeText('wiredfurni.params.selector_option.0') }</Text>
                 </label>
                 <label className="flex items-center gap-1">
-                    <input type="checkbox" className="form-check-input" checked={ invert } onChange={ event => setInvert(event.target.checked) } />
+                    <Checkbox checked={ invert } onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{ LocalizeText('wiredfurni.params.selector_option.1') }</Text>
                 </label>
 
@@ -319,13 +308,13 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () =>
                     headerContent={
                         <div className="octane-wired__give-var-targets">
                             { SOURCE_GROUP_BUTTONS.map(button => (
-                                <button
+                                <BaseButton
                                     key={ button.key }
                                     type="button"
                                     className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ isUser === button.isUser ? 'is-active' : '' }` }
                                     onClick={ () => setIsUser(button.isUser) }>
                                     <img src={ button.icon } alt={ button.key } />
-                                </button>
+                                </BaseButton>
                             )) }
                         </div>
                     }

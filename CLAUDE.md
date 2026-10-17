@@ -108,6 +108,33 @@ login/WebGL, so they're not usable for in-game verification.
 - React 19.2.5, `react-dom` 19.2.5, `@types/react` 19.2.x.
 - TypeScript: TS 6 for build, **TS 7 native preview** (`@typescript/native-preview`,
   invoked via `tsgo`) for the `typecheck` script.
+- UI primitives: Base UI (`@base-ui/react`, imported per subpath). Radix UI is no longer a
+  dependency. Use the `src/common/` wrappers instead of native controls or hand-rolled
+  ARIA widgets:
+  `Checkbox`, `Radio` (a controlled one-item `RadioGroup`, drop-in for
+  `<input type="radio" checked onChange>`), `Select` (drop-in for `<select>` + `<option>`,
+  change event keeps `target.value`), `NumberInput` (drop-in for `type="number"`, event keeps
+  `target.value` / `target.valueAsNumber`, role spinbutton, hover/focus up-down overlay), `Slider`, `FloatingPopover`,
+  `TabBar`, `InlineDialog` (dialog mounted inline; `modal="trap-focus"` for the catalog confirms), `CollapsibleSection`, `Tooltip`,
+  `ToggleButton` (every `aria-pressed` two-state button, incl. `InfiniteGrid.Item`), `ListSelect` (Base UI Select with the
+  caller's own trigger/classes, for custom drop menus), `SuggestInput` (text input + Autocomplete list, replaces `<datalist>`),
+  `Slider` with `orientation="vertical"`. `Hint` (in `common/Tooltip.tsx`) gives an icon-only control a tooltip without a
+  wrapper element: use it instead of a `title` attribute and keep an `aria-label`. A `div role="button"` is never right:
+  use `BaseButton` / `ToggleButton` (unless the region contains its own button).
+  Radios that share a `name` keep native group behaviour (arrow keys, one tab stop).
+  `<button>` is `BaseButton` (Base UI Button, still a native `<button>`; it sets `type="button"` unless a
+  `type` is passed, so form submit buttons need an explicit `type="submit"`). Deliberately native: text
+  `<input>` and `<textarea>` (Base UI `Input` is a plain input; there is no textarea primitive), and the
+  draggable-window dialogs (`UserSettingsView`, `LayoutMiniCameraView`: Dialog.Popup needs a Dialog.Portal,
+  which mounts one render late, but `DraggableWindow` looks up its handle and measures its size once at
+  mount, and the camera preview effect needs its canvas at mount).
+  Skin them through the `octane-*` classes (`.octane-checkbox[data-checked]`,
+  `.octane-radio`, `.octane-select-trigger`, `.octane-number-input`): CSS written for
+  `input[type=...]` / `select` must be mirrored onto those classes. Base UI roots render as
+  `<i>` so a window's generic `span` / `input` rules do not hit them. In tests, read
+  `aria-checked` / `aria-disabled` (not `.checked` / `.disabled`), pick options with
+  `src/test-utils/selectOption.ts`, and use `getByRole('checkbox'|'radio', { name })` rather
+  than `getByLabelText` for wrapped boxes (the label also matches the hidden input).
 - Vite 8 + `@vitejs/plugin-react` 6 + `babel-plugin-react-compiler` 1.0.
 - ESLint 10 + `typescript-eslint` 8 + `eslint-plugin-react-hooks@7` +
   `eslint-plugin-react-compiler`.

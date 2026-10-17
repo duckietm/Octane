@@ -16,6 +16,7 @@ import {
 } from '../../../../api';
 import { Button, LayoutColorSwatchView, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useFurnitureRecolorWidget } from '../../../../hooks';
+import { Select } from '../../../../common/Select';
 
 const WHITE = 0xffffff;
 
@@ -120,13 +121,13 @@ export const FurnitureRecolorView: FC = () =>
                     {localizeWithFallback('furniture.recolor.scope', 'Apply to:')}
                 </Text>
                 <div className="flex items-center gap-2">
-                    <select className="form-select form-select-sm grow" value={scope} onChange={(event) => setScope(Number(event.target.value))}>
+                    <Select className="form-select form-select-sm grow" value={scope} onChange={(event) => setScope(Number(event.target.value))}>
                         {RECOLOR_SCOPES.map((value) => (
                             <option key={value} value={value}>
                                 {localizeWithFallback(`furniture.recolor.scope.${value}`, SCOPE_FALLBACKS[value])}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                     <Button disabled={target === NO_RECOLOR || (target === current && scope === RECOLOR_SCOPE_THIS)} variant="success" onClick={apply}>
                         {localizeWithFallback('furniture.recolor.apply', 'Apply')}
                     </Button>

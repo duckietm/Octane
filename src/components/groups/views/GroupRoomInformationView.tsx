@@ -13,6 +13,7 @@ import { GetGroupInformation, GetGroupManager, GroupMembershipType, GroupType, L
 import groupBaseIcon from '../../../assets/images/groups/swf/group_base_icon.png';
 import { Button, Flex, LayoutBadgeImageView, Text } from '../../../common';
 import { useGroupLeave, useMessageEvent } from '../../../hooks';
+import { BaseButton } from '../../../common/BaseButton';
 
 export const GroupRoomInformationView: FC<{}> = (props) => {
     const expectedGroupIdRef = useRef<number>(0);
@@ -144,15 +145,15 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
 
     return (
         <div className={`octane-group-room-info pointer-events-auto ml-auto mt-[6px] overflow-hidden ${isOpen ? 'is-open' : 'is-closed'}`}>
-            <div className="octane-group-room-info__contracted" onClick={() => setIsOpen((value) => !value)}>
+            <BaseButton type="button" className="octane-group-room-info__contracted" onClick={() => setIsOpen((value) => !value)}>
                 <img src={groupBaseIcon} alt="" className="octane-group-room-info__base-icon" draggable={false} />
                 <Text variant="white" className="octane-group-room-info__title">
                     {LocalizeText('group.homeroominfo.title')}
                 </Text>
                 <span className="octane-group-room-info__toggle" />
-            </div>
+            </BaseButton>
             <div className="octane-group-room-info__content">
-                <Flex pointer alignItems="center" className="octane-group-room-info__main" onClick={() => GetGroupInformation(groupInformation.id)}>
+                <Flex component={BaseButton} type="button" pointer alignItems="center" className="octane-group-room-info__main" onClick={() => GetGroupInformation(groupInformation.id)}>
                     <div className="octane-group-room-info__badge">
                         <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} />
                     </div>

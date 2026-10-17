@@ -4,6 +4,7 @@ import settingsIcon from '../../../../assets/images/groups/native/pursearea_sett
 import { MessageData } from '@octane/renderer';
 import { DraggableWindowPosition, LayoutBadgeImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { flatText, GroupText, GroupWindowTitle } from '../GroupNativeLayout';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const FORUM_PAGE_SIZE = 20;
 
@@ -79,7 +80,7 @@ export const ForumFrame: FC<ForumFrameProps> = ({ uniqueKey, className, title, w
         uniqueKey={uniqueKey}
     >
         <OctaneCardHeaderView headerText="" onCloseClick={onClose}>
-            {onHelp && <button aria-label={LocalizeText('help.button.tooltip')} className="octane-forum__help" type="button" onClick={onHelp} onMouseDown={(event) => event.stopPropagation()} />}
+            {onHelp && <BaseButton aria-label={LocalizeText('help.button.tooltip')} className="octane-forum__help" type="button" onClick={onHelp} onMouseDown={(event) => event.stopPropagation()} />}
         </OctaneCardHeaderView>
         <GroupWindowTitle title={title} width={width} />
         <div className="octane-forum__client">{children}</div>
@@ -101,7 +102,7 @@ interface ForumHeaderProps {
 /** top_part: 550x80 band, a 80x80 black icon cell, the headline, the description and the optional Settings pill. */
 export const ForumHeader: FC<ForumHeaderProps> = ({ title, description, badge, icon, descriptionWidth = 456, canChangeSettings = false, onSettings, onClick }) => (
     <div className="octane-forum__header">
-        <div className="octane-forum__header-click" onClick={onClick} />
+        <BaseButton type="button" aria-label={title} className="octane-forum__header-click" onClick={onClick} />
         <div className="octane-forum__header-icon">
             {badge !== undefined && (
                 <div className="octane-forum__header-badge">
@@ -113,10 +114,10 @@ export const ForumHeader: FC<ForumHeaderProps> = ({ title, description, badge, i
         <GroupText background={FORUM_HEADER} height={30} overrides={{ size: 24, color: 0xffffff }} text={title} textStyle="u_headline_big" width={460} x={90} y={10} />
         <GroupText background={FORUM_HEADER} height={40} overrides={flatText(12, { color: 0xffffff })} text={description} width={descriptionWidth} wrap x={90} y={40} />
         {canChangeSettings && (
-            <button className="octane-forum__settings" type="button" onClick={onSettings}>
+            <BaseButton className="octane-forum__settings" type="button" onClick={onSettings}>
                 <img alt="" draggable={false} src={settingsIcon} />
                 <GroupText background={0x000000} overrides={flatText(11, { bold: true, color: 0xffffff, thickness: 15 })} text={LocalizeText('groupforum.view.settings.header')} x={17} y={1} />
-            </button>
+            </BaseButton>
         )}
     </div>
 );
@@ -143,9 +144,9 @@ export const ForumShortcuts: FC<ForumShortcutsProps> = ({ unreadCount = 0, onOpe
 };
 
 const ForumShortcutLink: FC<{ text: string; onClick: () => void }> = ({ text, onClick }) => (
-    <button className="octane-forum__shortcut" type="button" onClick={onClick}>
+    <BaseButton className="octane-forum__shortcut" type="button" onClick={onClick}>
         <GroupText background={0xffffff} className="is-static" overrides={flatText(11, { color: 0x1b79ab, underline: true })} text={text} x={0} y={0} />
-    </button>
+    </BaseButton>
 );
 
 interface ForumButtonProps {
@@ -163,7 +164,7 @@ interface ForumButtonProps {
 
 /** container_button: shiny thick skin tinted 0xdddddd (grey) or 0x0a9bc5 (blue). */
 export const ForumButton: FC<ForumButtonProps> = ({ label, x, right, y = 0, width, height = 30, tint = 'grey', disabled = false, onClick }) => (
-    <button className={`octane-forum__button is-${tint}`} disabled={disabled} style={{ left: right === undefined ? x : undefined, right, top: y, width, height }} type="button" onClick={onClick}>
+    <BaseButton className={`octane-forum__button is-${tint}`} disabled={disabled} style={{ left: right === undefined ? x : undefined, right, top: y, width, height }} type="button" onClick={onClick}>
         <GroupText
             blend={tint === 'blue' ? 'screen' : 'multiply'}
             className="is-static"
@@ -173,7 +174,7 @@ export const ForumButton: FC<ForumButtonProps> = ({ label, x, right, y = 0, widt
             x={0}
             y={0}
         />
-    </button>
+    </BaseButton>
 );
 
 interface ForumPagerProps {
@@ -201,9 +202,9 @@ export const ForumPager: FC<ForumPagerProps> = ({ pageIndex, pageCount, onPage }
     return (
         <div className="octane-forum__pager">
             {buttons.map(([label, x, target, isDisabled]) => (
-                <button key={label} className="octane-forum__button is-plain" disabled={isDisabled} style={{ left: x, top: 0, width: 25, height: 30 }} type="button" onClick={() => onPage(target)}>
+                <BaseButton key={label} className="octane-forum__button is-plain" disabled={isDisabled} style={{ left: x, top: 0, width: 25, height: 30 }} type="button" onClick={() => onPage(target)}>
                     <GroupText blend="multiply" className="is-static" text={label} textStyle="u_bold" x={0} y={0} />
-                </button>
+                </BaseButton>
             ))}
             <GroupText align="center" background={FORUM_SURFACE} overrides={flatText(12, { color: 0x949491 })} text={`${pageIndex + 1} / ${pageCount}`} width={50} x={58} y={5} />
         </div>

@@ -3,6 +3,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Flex } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useUserGroups } from '../../../../../hooks';
+import { Select } from '../../../../../common/Select';
 
 interface CatalogGuildSelectorWidgetViewProps {
     /** GuildForumSelectorCatalogWidget: the selector of the group forum page (layout guild_forum). */
@@ -103,13 +104,13 @@ export const CatalogGuildSelectorWidgetView: FC<CatalogGuildSelectorWidgetViewPr
                     <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorB }} />
                 </Flex>
             )}
-            <select className="form-select form-select-sm" value={selectedIndex} onChange={(event) => setPickedIndex(parseInt(event.target.value))}>
+            <Select className="form-select form-select-sm" value={selectedIndex} onChange={(event) => setPickedIndex(parseInt(event.target.value))}>
                 {groups.map((group, index) => (
                     <option key={group.groupId} value={index}>
                         {group.groupName}
                     </option>
                 ))}
-            </select>
+            </Select>
         </div>
     );
 };

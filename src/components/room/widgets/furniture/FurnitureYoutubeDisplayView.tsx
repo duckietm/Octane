@@ -3,6 +3,7 @@ import { LocalizeText, YoutubeVideoPlaybackStateEnum } from '../../../../api';
 import { AutoGrid, AutoGridProps, LayoutGridItem, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useFurnitureYoutubeWidget } from '../../../../hooks';
 import ReactPlayer from '../../../youtube/YoutubeReactPlayer';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface FurnitureYoutubeDisplayViewProps extends AutoGridProps {}
 
@@ -70,15 +71,15 @@ export const FurnitureYoutubeDisplayView: FC<{}> = (FurnitureYoutubeDisplayViewP
                     </div>
                     <div className="playlist-container col-span-3 flex flex-col">
                         <span className="playlist-controls justify-center flex">
-                            <i className="icon icon-youtube-prev cursor-pointer" onClick={previous} />
-                            <i className="icon icon-youtube-next cursor-pointer" onClick={next} />
+                            <BaseButton type="button" className="icon icon-youtube-prev cursor-pointer" onClick={previous} />
+                            <BaseButton type="button" className="icon icon-youtube-next cursor-pointer" onClick={next} />
                         </span>
                         <div className="mb-1">{LocalizeText('widget.furni.video_viewer.playlists')}</div>
                         <AutoGrid className="mb-1" columnCount={1} columnMinHeight={100} columnMinWidth={80} overflow="auto">
                             {playlists &&
                                 playlists.map((entry, index) => {
                                     return (
-                                        <LayoutGridItem key={index} itemActive={entry.video === selectedVideo} onClick={(event) => selectVideo(entry.video)}>
+                                        <LayoutGridItem component={BaseButton} type="button" key={index} itemActive={entry.video === selectedVideo} onClick={(event) => selectVideo(entry.video)}>
                                             <b>{entry.title}</b>
                                         </LayoutGridItem>
                                     );

@@ -1,5 +1,6 @@
 import { FC, KeyboardEvent } from 'react';
 import { LocalizeText } from '../../../../api';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const FurniChestSearchBar: FC<{
     draft: string;
@@ -30,9 +31,9 @@ export const FurniChestSearchBar: FC<{
                 onKeyDown={onKeyDown}
             />
             {draft.length > 0 && (
-                <button type="button" className="octane-chest__search-clear" onClick={onClear} aria-label="Clear">
+                <BaseButton type="button" className="octane-chest__search-clear" onClick={onClear} aria-label="Clear">
                     ×
-                </button>
+                </BaseButton>
             )}
         </div>
     );

@@ -48,7 +48,6 @@ export const FurnitureBackgroundColorView: FC<{}> = (props) => {
                                 thumbClassName="bgcolor-widget-slider-thumb"
                                 trackClassName="bgcolor-widget-slider-track"
                                 value={hue}
-                                renderThumb={(props) => <div {...props} />}
                                 onChange={(value) => setHue(value as number)}
                             />
                         </div>
@@ -66,7 +65,6 @@ export const FurnitureBackgroundColorView: FC<{}> = (props) => {
                                 thumbClassName="bgcolor-widget-slider-thumb"
                                 trackClassName="bgcolor-widget-slider-track"
                                 value={saturation}
-                                renderThumb={(props) => <div {...props} />}
                                 onChange={(value) => setSaturation(value as number)}
                             />
                         </div>
@@ -84,7 +82,6 @@ export const FurnitureBackgroundColorView: FC<{}> = (props) => {
                                 thumbClassName="bgcolor-widget-slider-thumb"
                                 trackClassName="bgcolor-widget-slider-track"
                                 value={lightness}
-                                renderThumb={(props) => <div {...props} />}
                                 onChange={(value) => setLightness(value as number)}
                             />
                         </div>

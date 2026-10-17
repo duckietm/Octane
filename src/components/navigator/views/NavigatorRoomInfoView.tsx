@@ -28,6 +28,8 @@ import {
 import { RoomWidgetThumbnailEvent } from '../../../events';
 import { useHasPermission, useHelp, useNavigatorData, useNavigatorFavourite, useRoom } from '../../../hooks';
 import { classNames } from '../../../layout';
+import { BaseButton } from '../../../common/BaseButton';
+import { Hint } from '../../../common/Tooltip';
 
 export interface NavigatorRoomInfoViewProps {
     onCloseClick: () => void;
@@ -147,15 +149,16 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
             <OctaneCardContentView className="octane-room-info__content text-black max-h-[calc(100vh-72px)]" overflow="auto">
                 <div className="octane-room-info__heading">
                     <Text bold>{navigatorData.enteredGuestRoom.roomName}</Text>
-                    <button
-                        type="button"
-                        className={classNames(
-                            'octane-room-info__home shrink-0',
-                            navigatorData.homeRoomId === navigatorData.enteredGuestRoom.roomId && 'is-home'
-                        )}
-                        title={LocalizeText('navigator.room.popup.room.info.home')}
-                        onClick={() => processAction('set_home_room')}
-                    />
+                    <Hint content={LocalizeText('navigator.room.popup.room.info.home')}>
+                        <BaseButton aria-label={LocalizeText('navigator.room.popup.room.info.home')}
+                            type="button"
+                            className={classNames(
+                                'octane-room-info__home shrink-0',
+                                navigatorData.homeRoomId === navigatorData.enteredGuestRoom.roomId && 'is-home'
+                            )}
+                            onClick={() => processAction('set_home_room')}
+                        />
+                    </Hint>
                 </div>
                 {navigatorData.enteredGuestRoom.showOwner && (
                     <Flex alignItems="center" gap={1} className="octane-room-info__meta">
@@ -175,77 +178,83 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = (props) => 
                     roomId={navigatorData.enteredGuestRoom.roomId}
                 >
                     {hasPermission('settings') && canUseRoomThumbnailCamera && (
-                        <button
-                            type="button"
-                            className="octane-room-info__camera octane-icon icon-camera-small absolute bottom-0 right-0 m-1"
-                            aria-label={LocalizeText('navigator.thumbnail.camera.title')}
-                            title={LocalizeText('navigator.thumbnail.camera.title')}
-                            onClick={() => processAction('open_room_thumbnail_camera')}
-                        />
+                        <Hint content={LocalizeText('navigator.thumbnail.camera.title')}>
+                            <BaseButton
+                                type="button"
+                                className="octane-room-info__camera octane-icon icon-camera-small absolute bottom-0 right-0 m-1"
+                                aria-label={LocalizeText('navigator.thumbnail.camera.title')}
+                                onClick={() => processAction('open_room_thumbnail_camera')}
+                            />
+                        </Hint>
                     )}
                 </LayoutRoomThumbnailView>
                 <Flex className="octane-room-info__quick-actions" gap={1} justifyContent="center">
                     {GetSessionDataManager().userId !== navigatorData.enteredGuestRoom.ownerId && (
-                        <i
-                            className={classNames('octane-icon cursor-pointer', isRoomInFavouritesList ? 'icon-group-favorite' : 'icon-group-not-favorite')}
-                            title={LocalizeText('navigator.room.popup.room.info.favorite')}
-                            onClick={() => processAction('room_favourite')}
-                        />
+                        <Hint content={LocalizeText('navigator.room.popup.room.info.favorite')}>
+                            <BaseButton
+                                aria-label={LocalizeText('navigator.room.popup.room.info.favorite')}
+                                aria-pressed={isRoomInFavouritesList}
+                                className={classNames('octane-icon cursor-pointer border-0 bg-transparent p-0', isRoomInFavouritesList ? 'icon-group-favorite' : 'icon-group-not-favorite')}
+                                type="button"
+                                onClick={() => processAction('room_favourite')}
+                            />
+                        </Hint>
                     )}
                     {hasPermission('guest') && (
-                        <button
-                            type="button"
-                            className="border-0 bg-transparent p-0 cursor-pointer"
-                            title={LocalizeText('navigator.roominfo.removerights.tooltip')}
-                            onClick={() => processAction('remove_rights')}
-                        >
-                            <img src={removeRightsIcon} alt="" width={17} height={22} />
-                        </button>
+                        <Hint content={LocalizeText('navigator.roominfo.removerights.tooltip')}>
+                            <BaseButton aria-label={LocalizeText('navigator.roominfo.removerights.tooltip')}
+                                type="button"
+                                className="border-0 bg-transparent p-0 cursor-pointer"
+                                onClick={() => processAction('remove_rights')}
+                            >
+                                <img src={removeRightsIcon} alt="" width={17} height={22} />
+                            </BaseButton>
+                        </Hint>
                     )}
                 </Flex>
-                <Flex pointer alignItems="center" gap={1} className="octane-room-info__room-link" onClick={() => processAction('toggle_room_link')}>
+                <Flex pointer alignItems="center" component={BaseButton} gap={1} className="octane-room-info__room-link border-0 bg-transparent p-0 text-left" onClick={() => processAction('toggle_room_link')}>
                     <img src={weblinkIcon} alt="" />
                     <Text small underline>{LocalizeText('navigator.embed.caption')}</Text>
                 </Flex>
                 {navigatorData.enteredGuestRoom.habboGroupId > 0 && (
-                    <Flex pointer alignItems="center" gap={1} className="octane-room-info__group" onClick={() => processAction('open_group_info')}>
+                    <Flex pointer alignItems="center" component={BaseButton} gap={1} className="octane-room-info__group border-0 bg-transparent p-0 text-left" onClick={() => processAction('open_group_info')}>
                         <LayoutBadgeImageView badgeCode={navigatorData.enteredGuestRoom.groupBadgeCode} className="flex-none" isGroup={true} />
                         <Text small underline>{LocalizeText('navigator.guildbase', ['groupName'], [navigatorData.enteredGuestRoom.groupName])}</Text>
                     </Flex>
                 )}
                 <div className="octane-room-info__actions">
                     {hasPermission('settings') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_room_settings')}>
+                        <BaseButton type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_room_settings')}>
                             {LocalizeText('navigator.roomsettings')}
-                        </button>
+                        </BaseButton>
                     )}
                     {hasPermission('settings') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('room_filter')}>
+                        <BaseButton type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('room_filter')}>
                             {LocalizeText('navigator.roomsettings.roomfilter')}
-                        </button>
+                        </BaseButton>
                     )}
                     {(hasPermission('settings') || hasPermission('floor')) && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_floorplan_editor')}>
+                        <BaseButton type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('open_floorplan_editor')}>
                             {LocalizeText('open.floor.plan.editor')}
-                        </button>
+                        </BaseButton>
                     )}
                     {hasPermission('staff_pick') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_pick')}>
+                        <BaseButton type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_pick')}>
                             {LocalizeText(isRoomPicked ? 'navigator.staffpicks.unpick' : 'navigator.staffpicks.pick')}
-                        </button>
+                        </BaseButton>
                     )}
-                    <button type="button" className="octane-room-info__action habbo-btn-danger" onClick={() => processAction('report_room')}>
+                    <BaseButton type="button" className="octane-room-info__action habbo-btn-danger" onClick={() => processAction('report_room')}>
                         {LocalizeText('help.emergency.main.report.room')}
-                    </button>
+                    </BaseButton>
                     {hasPermission('settings') && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_mute')}>
+                        <BaseButton type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => processAction('toggle_mute')}>
                             {LocalizeText(isRoomMuted ? 'navigator.muteall_on' : 'navigator.muteall_off')}
-                        </button>
+                        </BaseButton>
                     )}
                     {canOpenHousekeeping && enteredRoomId > 0 && (
-                        <button type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => CreateLinkEvent(`housekeeping/room/${enteredRoomId}`)}>
+                        <BaseButton type="button" className="octane-room-info__action habbo-btn-primary" onClick={() => CreateLinkEvent(`housekeeping/room/${enteredRoomId}`)}>
                             {LocalizeText('housekeeping.menu.open_room')}
-                        </button>
+                        </BaseButton>
                     )}
                 </div>
             </OctaneCardContentView>

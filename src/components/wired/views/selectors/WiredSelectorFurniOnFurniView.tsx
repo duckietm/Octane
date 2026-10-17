@@ -4,6 +4,8 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
 
 export const WiredSelectorFurniOnFurniView: FC<{}> = () => {
     // Official layout: [selection type], the furni in the official source slot, filter / invert in the official fields.
@@ -42,13 +44,7 @@ export const WiredSelectorFurniOnFurniView: FC<{}> = () => {
                     {[0, 1, 2, 3].map((value) => {
                         return (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={selectionType === value}
-                                    className="form-check-input"
-                                    name="furniOnFurniSelectionType"
-                                    type="radio"
-                                    onChange={() => setSelectionType(value)}
-                                />
+                                <Radio checked={selectionType === value} name="furniOnFurniSelectionType" onCheckedChange={() => setSelectionType(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.onfurni.${value}`)}</Text>
                             </label>
                         );
@@ -60,17 +56,12 @@ export const WiredSelectorFurniOnFurniView: FC<{}> = () => {
                 <Text bold>{LocalizeText('wiredfurni.params.selector_options_selector')}</Text>
 
                 <label className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        className="form-check-input"
-                        checked={filterExisting}
-                        onChange={(event) => setFilterExisting(event.target.checked)}
-                    />
+                    <Checkbox checked={filterExisting} onCheckedChange={(nextChecked) => setFilterExisting(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.0')}</Text>
                 </label>
 
                 <label className="flex items-center gap-2">
-                    <input type="checkbox" className="form-check-input" checked={invert} onChange={(event) => setInvert(event.target.checked)} />
+                    <Checkbox checked={invert} onCheckedChange={(nextChecked) => setInvert(nextChecked)} />
                     <Text small>{LocalizeText('wiredfurni.params.selector_option.1')}</Text>
                 </label>
             </div>

@@ -3,6 +3,7 @@ import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const WiredActionSetRollerSpeedView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null } = useWired();
@@ -21,14 +22,7 @@ export const WiredActionSetRollerSpeedView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.roller_speed', 'Roller speed')}</Text>
                 <Text small>{localizeWithFallback('wiredfurni.params.roller_speed.info', '-1 = rollers off, 0 = fastest, higher = slower (max 10)')}</Text>
-                <input
-                    className="form-control form-control-sm"
-                    type="number"
-                    min={-1}
-                    max={10}
-                    value={speed}
-                    onChange={(event) => setSpeed(parseInt(event.target.value, 10) || 0)}
-                />
+                <NumberInput className="form-control form-control-sm" min={-1} max={10} value={speed} onChange={(event) => setSpeed(parseInt(event.target.value, 10) || 0)} />
             </div>
         </WiredActionBaseView>
     );

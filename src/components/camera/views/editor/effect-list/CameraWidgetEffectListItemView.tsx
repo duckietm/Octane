@@ -2,6 +2,8 @@ import { IRoomCameraWidgetEffect } from '@octane/renderer';
 import { FC } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { LocalizeText } from '../../../../../api';
+import { BaseButton } from '../../../../../common/BaseButton';
+import { ToggleButton } from '../../../../../common/ToggleButton';
 
 export interface CameraWidgetEffectListItemViewProps {
     effect: IRoomCameraWidgetEffect;
@@ -29,18 +31,18 @@ export const CameraWidgetEffectListItemView: FC<CameraWidgetEffectListItemViewPr
                 .join(' ')}
             title={title}
         >
-            <button type="button" className="octane-camera-effect__select" disabled={isLocked} aria-label={title} aria-pressed={isActive} onClick={selectEffect}>
+            <ToggleButton type="button" className="octane-camera-effect__select" disabled={isLocked} aria-label={title} pressed={isActive} onClick={selectEffect}>
                 {!isLocked && thumbnailUrl && <img alt="" src={thumbnailUrl} />}
                 {isLocked && (
                     <span className="octane-camera-effect__lock" aria-hidden="true">
                         ?
                     </span>
                 )}
-            </button>
+            </ToggleButton>
             {isActive && (
-                <button type="button" className="octane-camera-effect__remove" aria-label={LocalizeText('camera.delete.button.text')} onClick={removeEffect}>
+                <BaseButton type="button" className="octane-camera-effect__remove" aria-label={LocalizeText('camera.delete.button.text')} onClick={removeEffect}>
                     <FaTimes aria-hidden="true" />
-                </button>
+                </BaseButton>
             )}
         </div>
     );

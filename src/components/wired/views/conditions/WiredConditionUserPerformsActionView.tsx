@@ -5,6 +5,8 @@ import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredUserActionSection } from '../WiredUserActionSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 
 const USER_ACTION_SOURCES: WiredSourceOption[] = [
@@ -50,9 +52,9 @@ export const WiredConditionUserPerformsActionView: FC<WiredConditionUserPerforms
             footerCollapsible={false}
             footer={
                 <div className="flex flex-col gap-2">
-                    <button className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
                         {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </button>
+                    </BaseButton>
                     {showAdvanced && (
                         <>
                             <div className="flex flex-col gap-1">
@@ -60,14 +62,7 @@ export const WiredConditionUserPerformsActionView: FC<WiredConditionUserPerforms
                                 {[0, 1].map((value) => {
                                     return (
                                         <div key={value} className="flex items-center gap-1">
-                                            <input
-                                                checked={quantifier === value}
-                                                className="form-check-input"
-                                                id={`userActionQuantifier${value}`}
-                                                name="userActionQuantifier"
-                                                type="radio"
-                                                onChange={() => setQuantifier(value)}
-                                            />
+                                            <Radio checked={quantifier === value} id={`userActionQuantifier${value}`} name="userActionQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                             <Text>{LocalizeText(`${quantifierKeyPrefix}.${value}`)}</Text>
                                         </div>
                                     );

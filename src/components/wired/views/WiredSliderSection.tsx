@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Slider, Text } from '../../../common';
+import { NumberInput } from '../../../common/NumberInput';
 
 interface WiredSliderSectionProps {
     /** The section title, already localized (the official %param% already filled in). */
@@ -41,16 +42,7 @@ export const WiredSliderSection: FC<WiredSliderSectionProps> = props => {
             <div className="flex items-center justify-between gap-2">
                 <Text bold>{title}</Text>
                 {numberInput && (
-                    <input
-                        className="form-control form-control-sm text-center"
-                        step={displayStep}
-                        style={{ width: 64 }}
-                        type="number"
-                        value={typed}
-                        onBlur={event => commit(event.target.value)}
-                        onChange={event => setTyped(event.target.value)}
-                        onKeyDown={event => event.key === 'Enter' && commit((event.target as HTMLInputElement).value)}
-                    />
+                    <NumberInput className="form-control form-control-sm text-center" step={displayStep} style={{ width: 64 }} value={typed} onBlur={event => commit(event.target.value)} onChange={event => setTyped(event.target.value)} onKeyDown={event => event.key === 'Enter' && commit((event.target as HTMLInputElement).value)} />
                 )}
             </div>
             <Slider max={max} min={min} step={step} value={value} onChange={next => onChange(clamp(Array.isArray(next) ? next[0] : Number(next)))} />

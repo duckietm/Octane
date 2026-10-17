@@ -1,5 +1,6 @@
 import { FC, MouseEvent, useMemo } from 'react';
 import { Flex, FlexProps } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ContextMenuListItemViewProps extends FlexProps {
     disabled?: boolean;
@@ -27,5 +28,5 @@ export const ContextMenuListItemView: FC<ContextMenuListItemViewProps> = (props)
         return newClassNames;
     }, [disabled, classNames]);
 
-    return <Flex alignItems={alignItems} classNames={getClassNames} fullWidth={fullWidth} justifyContent={justifyContent} onClick={handleClick} {...rest} />;
+    return <Flex component={BaseButton} type="button" aria-disabled={disabled || undefined} alignItems={alignItems} classNames={getClassNames} fullWidth={fullWidth} justifyContent={justifyContent} onClick={handleClick} {...rest} />;
 };

@@ -11,6 +11,10 @@ import { claimCatalogAdminHydration } from './CatalogAdminFormHydration';
 import { CatalogAdminModalView } from './CatalogAdminModalView';
 import { createCatalogAdminPageDetailsFromSnapshot } from './CatalogAdminPageState';
 import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const MODE_OPTIONS = [
     { value: 'NORMAL', label: 'Normal' },
@@ -426,37 +430,19 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.min.rank', 'Min rank')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={1}
-                                        type="number"
-                                        value={minRank}
-                                        onChange={(e) => setMinRank(parseInt(e.target.value) || 1)}
-                                    />
+                                    <NumberInput className={inputClass} min={1} value={minRank} onChange={(e) => setMinRank(parseInt(e.target.value) || 1)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.icon.image', 'Icon image')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={iconImage}
-                                        onChange={(e) => setIconImage(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={iconImage} onChange={(e) => setIconImage(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.icon.color', 'Icon color')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={iconColor}
-                                        onChange={(e) => setIconColor(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={iconColor} onChange={(e) => setIconColor(parseInt(e.target.value) || 0)} />
                                 </div>
                             </div>
                         </section>
@@ -466,39 +452,33 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                             <div className="octane-catalog-admin-form-grid is-3col">
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.mode', 'Mode')}</label>
-                                    <select className={inputClass} value={catalogMode} onChange={(e) => setCatalogMode(e.target.value)}>
+                                    <Select className={inputClass} value={catalogMode} onChange={(e) => setCatalogMode(e.target.value)}>
                                         {MODE_OPTIONS.map((option) => (
                                             <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.layout', 'Layout')}</label>
-                                    <select className={inputClass} value={pageLayout} onChange={(e) => setPageLayout(e.target.value)}>
+                                    <Select className={inputClass} value={pageLayout} onChange={(e) => setPageLayout(e.target.value)}>
                                         {CATALOG_STUDIO_LAYOUT_CODES.map((l) => (
                                             <option key={l} value={l}>
                                                 {l}
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
-                                    <input className={inputClass} type="number" value={orderNum} onChange={(e) => setOrderNum(parseInt(e.target.value) || 0)} />
+                                    <NumberInput className={inputClass} value={orderNum} onChange={(e) => setOrderNum(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.parent.id', 'Parent ID')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        disabled={isRoot}
-                                        type="number"
-                                        value={parentId}
-                                        onChange={(e) => setParentId(parseInt(e.target.value) || -1)}
-                                    />
+                                    <NumberInput className={inputClass} disabled={isRoot} value={parentId} onChange={(e) => setParentId(parseInt(e.target.value) || -1)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field is-span-2">
                                     <label className="octane-catalog-admin-label is-field">
@@ -506,19 +486,19 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     </label>
                                     <div className="octane-catalog-admin-form-toggles">
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={visible === '1'} type="checkbox" onChange={(e) => setVisible(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={visible === '1'} onCheckedChange={(nextChecked) => setVisible(nextChecked ? '1' : '0')} />
                                             {LocalizeText('catalog.admin.visible')}
                                         </label>
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={enabled === '1'} type="checkbox" onChange={(e) => setEnabled(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={enabled === '1'} onCheckedChange={(nextChecked) => setEnabled(nextChecked ? '1' : '0')} />
                                             {LocalizeText('catalog.admin.enabled')}
                                         </label>
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={clubOnly === '1'} type="checkbox" onChange={(e) => setClubOnly(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={clubOnly === '1'} onCheckedChange={(nextChecked) => setClubOnly(nextChecked ? '1' : '0')} />
                                             {localizeWithFallback('catalog.admin.page.club.only', 'HC only')}
                                         </label>
                                         <label className="octane-catalog-admin-form-toggle">
-                                            <input checked={vipOnly === '1'} type="checkbox" onChange={(e) => setVipOnly(e.target.checked ? '1' : '0')} />
+                                            <Checkbox checked={vipOnly === '1'} onCheckedChange={(nextChecked) => setVipOnly(nextChecked ? '1' : '0')} />
                                             {localizeWithFallback('catalog.admin.page.vip.only', 'VIP only')}
                                         </label>
                                     </div>
@@ -527,13 +507,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.room.id', 'Room ID')}
                                     </label>
-                                    <input
-                                        className={inputClass}
-                                        min={0}
-                                        type="number"
-                                        value={roomId}
-                                        onChange={(e) => setRoomId(parseInt(e.target.value) || 0)}
-                                    />
+                                    <NumberInput className={inputClass} min={0} value={roomId} onChange={(e) => setRoomId(parseInt(e.target.value) || 0)} />
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">
@@ -571,7 +545,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.text.1', 'Page text')}
                                     </label>
-                                    <button
+                                    <BaseButton
                                         className="octane-catalog-admin-button is-ghost is-compact"
                                         disabled={isTranslating || !pageText1.trim().length}
                                         title={localizeWithFallback('catalog.admin.translate.title', 'Translate via Google Translate')}
@@ -580,11 +554,11 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     >
                                         {isTranslating ? <FaSpinner className="text-[8px] animate-spin" /> : <FaLanguage className="text-[10px]" />}
                                         {localizeWithFallback('catalog.admin.translate.action', 'Translate')}
-                                    </button>
+                                    </BaseButton>
                                 </div>
                                 {showTranslate && (
                                     <div className="octane-catalog-admin-translate-bar">
-                                        <select
+                                        <Select
                                             className={`${inputClass} flex-1 min-w-[120px]`}
                                             disabled={isTranslating || languagesLoading}
                                             value={translateTargetLanguage}
@@ -600,8 +574,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                                     {lang.name} ({lang.code})
                                                 </option>
                                             ))}
-                                        </select>
-                                        <button
+                                        </Select>
+                                        <BaseButton
                                             className="octane-catalog-admin-button is-primary"
                                             disabled={isTranslating || !translateTargetLanguage || !pageText1.trim().length}
                                             type="button"
@@ -612,8 +586,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                             ) : (
                                                 localizeWithFallback('catalog.admin.translate.apply', 'Apply')
                                             )}
-                                        </button>
-                                        <button
+                                        </BaseButton>
+                                        <BaseButton
                                             className="octane-catalog-admin-button is-muted"
                                             disabled={isTranslating}
                                             type="button"
@@ -623,7 +597,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                             }}
                                         >
                                             {localizeWithFallback('catalog.admin.cancel', 'Cancel')}
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 )}
                                 {translateError && <span className="octane-catalog-admin-translate-error">{translateError}</span>}
@@ -665,25 +639,25 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                         </div>
                         <div className="octane-catalog-admin-savebar-actions">
                             {!isRoot && !isNewPage && (
-                                <button className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
+                                <BaseButton className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
                                     <FaTrash className="text-[8px]" /> {LocalizeText('catalog.admin.delete')}
-                                </button>
+                                </BaseButton>
                             )}
-                            <button
+                            <BaseButton
                                 className="octane-catalog-admin-button is-muted"
                                 disabled={!smartSave.isDirty || !!smartSave.inFlight}
                                 type="button"
                                 onClick={smartSave.reset}
                             >
                                 <FaUndo className="text-[8px]" /> Reset
-                            </button>
-                            <button className="octane-catalog-admin-button is-muted" disabled={!canSubmit} type="button" onClick={() => handleSave(true)}>
+                            </BaseButton>
+                            <BaseButton className="octane-catalog-admin-button is-muted" disabled={!canSubmit} type="button" onClick={() => handleSave(true)}>
                                 Save and close
-                            </button>
-                            <button className="octane-catalog-admin-button is-primary" disabled={!canSubmit} type="button" onClick={() => handleSave(false)}>
+                            </BaseButton>
+                            <BaseButton className="octane-catalog-admin-button is-primary" disabled={!canSubmit} type="button" onClick={() => handleSave(false)}>
                                 {smartSave.status === 'saving' ? <FaSpinner className="text-[8px] animate-spin" /> : <FaSave className="text-[8px]" />}{' '}
                                 {isNewPage ? LocalizeText('catalog.admin.create') : LocalizeText('catalog.admin.save')}
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
                 </div>

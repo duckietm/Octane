@@ -106,11 +106,11 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
+.octane-badge-leaderboard__category-positioner {
+    z-index: 9999;
+}
+
 .octane-badge-leaderboard__category-menu {
-    position: absolute;
-    top: calc(100% - 2px);
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     width: 154px;
@@ -119,7 +119,6 @@
     border-radius: 6px;
     background: #ffffff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-    z-index: 6;
 }
 
 .octane-badge-leaderboard__category-option {
@@ -132,9 +131,12 @@
     text-align: left;
     cursor: pointer;
     border-radius: 4px;
+    outline: 0;
 }
 
 .octane-badge-leaderboard__category-option:hover,
+.octane-badge-leaderboard__category-option[data-highlighted],
+.octane-badge-leaderboard__category-option[data-selected],
 .octane-badge-leaderboard__category-option.is-active {
     background: rgba(117, 170, 207, 0.28);
 }

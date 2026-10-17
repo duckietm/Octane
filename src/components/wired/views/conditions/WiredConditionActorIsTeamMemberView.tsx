@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // 0 is "in any team", as officially.
 const teamIds: number[] = [0, 1, 2, 3, 4];
@@ -41,13 +42,7 @@ export const WiredConditionActorIsTeamMemberView: FC<WiredConditionActorIsTeamMe
                 <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                 {[0, 1].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={quantifier === value}
-                            className="form-check-input"
-                            name="teamMemberQuantifier"
-                            type="radio"
-                            onChange={() => setQuantifier(value)}
-                        />
+                        <Radio checked={quantifier === value} name="teamMemberQuantifier" onCheckedChange={() => setQuantifier(value)} />
                         <Text>{LocalizeText(`wiredfurni.params.quantifier.users${negative ? '.neg' : ''}.${value}`)}</Text>
                     </label>
                 ))}
@@ -57,14 +52,7 @@ export const WiredConditionActorIsTeamMemberView: FC<WiredConditionActorIsTeamMe
                 {teamIds.map((value) => {
                     return (
                         <div key={value} className="items-center gap-1">
-                            <input
-                                checked={selectedTeam === value}
-                                className="form-check-input"
-                                id={`selectedTeam${value}`}
-                                name="selectedTeam"
-                                type="radio"
-                                onChange={(event) => setSelectedTeam(value)}
-                            />
+                            <Radio checked={selectedTeam === value} id={`selectedTeam${value}`} name="selectedTeam" onCheckedChange={() => setSelectedTeam(value)} />
                             <Text>{value === 0 ? localizeWithFallback('wiredfurni.params.team.0', 'Any team') : LocalizeText(`wiredfurni.params.team.${value}`)}</Text>
                         </div>
                     );

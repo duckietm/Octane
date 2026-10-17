@@ -20,6 +20,8 @@ import {
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 
@@ -338,7 +340,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
-                            <button
+                            <BaseButton
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
@@ -346,7 +348,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                                 onClick={() => handleTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>
@@ -361,24 +363,11 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                 <div className="octane-wired__give-var-section">
                     <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={displayType === DISPLAY_NUMERIC}
-                            className="form-check-input"
-                            name="wiredTextOutputVariableDisplayType"
-                            type="radio"
-                            onChange={() => setDisplayType(DISPLAY_NUMERIC)}
-                        />
+                        <Radio checked={displayType === DISPLAY_NUMERIC} name="wiredTextOutputVariableDisplayType" onCheckedChange={() => setDisplayType(DISPLAY_NUMERIC)} />
                         <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.1')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={displayType === DISPLAY_TEXTUAL}
-                            className="form-check-input"
-                            disabled={!textDisplayAllowed}
-                            name="wiredTextOutputVariableDisplayType"
-                            type="radio"
-                            onChange={() => setDisplayType(DISPLAY_TEXTUAL)}
-                        />
+                        <Radio checked={displayType === DISPLAY_TEXTUAL} disabled={!textDisplayAllowed} name="wiredTextOutputVariableDisplayType" onCheckedChange={() => setDisplayType(DISPLAY_TEXTUAL)} />
                         <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.2')}</Text>
                     </label>
                     <Text small>{LocalizeText('wiredfurni.params.texts.variable_display_type.2.info')}</Text>
@@ -387,24 +376,11 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={placeholderType === TYPE_SINGLE}
-                            className="form-check-input"
-                            name="wiredTextOutputVariablePlaceholderType"
-                            type="radio"
-                            onChange={() => setPlaceholderType(TYPE_SINGLE)}
-                        />
+                        <Radio checked={placeholderType === TYPE_SINGLE} name="wiredTextOutputVariablePlaceholderType" onCheckedChange={() => setPlaceholderType(TYPE_SINGLE)} />
                         <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.1')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={placeholderType === TYPE_MULTIPLE}
-                            className="form-check-input"
-                            disabled={isSingleValueTarget(targetType)}
-                            name="wiredTextOutputVariablePlaceholderType"
-                            type="radio"
-                            onChange={() => setPlaceholderType(TYPE_MULTIPLE)}
-                        />
+                        <Radio checked={placeholderType === TYPE_MULTIPLE} disabled={isSingleValueTarget(targetType)} name="wiredTextOutputVariablePlaceholderType" onCheckedChange={() => setPlaceholderType(TYPE_MULTIPLE)} />
                         <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.2')}</Text>
                     </label>
                 </div>

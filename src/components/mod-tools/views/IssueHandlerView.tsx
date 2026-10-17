@@ -9,6 +9,7 @@ import { Native0Button, Native0Checkbox, Native0Frame, Native0Rows, Native0Scrol
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { EvidenceChatlogList, useEvidence } from './EvidenceChatlogList';
 import { UserInfoPanel } from './UserInfoPanel';
+import { BaseButton } from '../../../common/BaseButton';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -91,7 +92,6 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
     // the last list height (>= 1) a resize left the messages list with: its first row stays where that height put it
     const [messagesLatch, setMessagesLatch] = useState<number>(null);
     const [chosenTopic, setChosenTopic] = useState(-1);
-    const [menuOpen, setMenuOpen] = useState(false);
     const [messageOffset, setMessageOffset] = useState(0);
     const issues = bundle ? [...bundle.issues.values()] : [];
     const primary = bundle?.primary ?? null;
@@ -242,7 +242,7 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
                 <div className="native0-list" style={{ left: 0, top: yIssues, width: 280, height: rows.issues, willChange: 'transform' }}>
                     <div style={{ position: 'absolute', left: 0, top: 0, width: 280, height: Math.max(rows.issues, issues.length * 16) }}>
                         {issues.map((tracked, index) => (
-                            <div key={tracked.issue.issueId} style={{ position: 'absolute', left: 0, top: index * 16, width: 280, height: 16, cursor: 'pointer' }} onClick={() => {
+                            <BaseButton type="button" key={tracked.issue.issueId} style={{ position: 'absolute', left: 0, top: index * 16, width: 280, height: 16, cursor: 'pointer' }} onClick={() => {
                                 setSelectedIssueId(tracked.issue.issueId);
 
                                 if (tracked.issue.reporterUserId !== 0) setEvidenceIssueId(tracked.issue.issueId);
@@ -251,7 +251,7 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
                                 <Native0Text bold={tracked.issue.issueId === primary?.issue.issueId && issues.length > 1} clip height={13} text={categoryOf(tracked.issue.reportedCategoryId)} width={110} x={itemX(region, 'category').x} y={0} />
                                 <Native0Text clip height={13} text={sourceOf(tracked)} width={60} x={itemX(region, 'type').x} y={0} />
                                 <Native0Text height={13} text={issueOpenTime(tracked)} width={32} x={itemX(region, 'time_open').x} y={0} />
-                            </div>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>
@@ -339,7 +339,7 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
                     caption={topicIndex >= 0 ? topicNames[topicIndex] : nativeCaption(findNativeNode(root, 'cfh_topics'))}
                     height={menu.height}
                     items={topicNames}
-                    open={menuOpen && categoryId !== CATEGORY_NO_TOPIC}
+                    disabled={categoryId === CATEGORY_NO_TOPIC}
                     selectedIndex={topicIndex}
                     width={menu.width}
                     x={menu.x}
@@ -347,9 +347,7 @@ export const IssueHandlerView: FC<IssueHandlerProps> = ({
                     onSelect={(index) => {
                         // the classic client asks for the default sanction of the topic here (My(issueId, -1, topic)); that lookup is held, so only the choice is kept
                         setChosenTopic(index);
-                        setMenuOpen(false);
                     }}
-                    onToggle={() => categoryId !== CATEGORY_NO_TOPIC && setMenuOpen((value) => !value)}
                 />
             </Native0Frame>
         </NativeWindowShell>

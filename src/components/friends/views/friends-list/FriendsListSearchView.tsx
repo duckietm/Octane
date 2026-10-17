@@ -5,6 +5,7 @@ import { LayoutAvatarImageView, UserProfileIconView } from '../../../../common';
 import { useFriends, useMessageEvent } from '../../../../hooks';
 import { resolveAvatarFigure } from './resolveAvatarFigure';
 import { resolveAvatarGender } from './resolveAvatarGender';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const FriendsSearchView: FC<{ className?: string }> = ({ className = '' }) => {
     const [searchValue, setSearchValue] = useState('');
@@ -40,8 +41,8 @@ export const FriendsSearchView: FC<{ className?: string }> = ({ className = '' }
                 <span className="hfl-search-profile"><UserProfileIconView userId={result.avatarId} /></span>
                 <span className="hfl-search-name">{result.avatarName}</span>
             <div className="hfl-search-actions">
-                {!other && result.isAvatarOnline && <button type="button" className="hfl-action chat" onClick={() => OpenMessengerChat(result.avatarId)} />}
-                {other && canRequestFriend(result.avatarId) && <button type="button" className="hfl-action add" onClick={() => requestFriend(result.avatarId, result.avatarName)} />}
+                {!other && result.isAvatarOnline && <BaseButton type="button" className="hfl-action chat" onClick={() => OpenMessengerChat(result.avatarId)} />}
+                {other && canRequestFriend(result.avatarId) && <BaseButton type="button" className="hfl-action add" onClick={() => requestFriend(result.avatarId, result.avatarName)} />}
             </div>
         </div>;
     };
@@ -53,7 +54,7 @@ export const FriendsSearchView: FC<{ className?: string }> = ({ className = '' }
         </div>
         <form className="hfl-search-form" onSubmit={submitSearch}>
             <input maxLength={50} value={searchValue} onChange={(event) => setSearchValue(event.target.value)} />
-            <button type="submit"><span />{LocalizeText('generic.search')}</button>
+            <BaseButton type="submit"><span />{LocalizeText('generic.search')}</BaseButton>
         </form>
     </div>;
 };

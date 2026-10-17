@@ -12,6 +12,7 @@ import roomToolIcon from '../../../assets/mod-tools/images/roomtools_history_ope
 import chatlogIcon from '../../../assets/mod-tools/images/roomtools_chat_history.png';
 import userIcon from '../../../assets/mod-tools/images/placeholder_avatar_small_head_cropped_png.png';
 import ticketIcon from '../../../assets/mod-tools/images/tools_file_icon.png';
+import { BaseButton } from '../../../common/BaseButton';
 
 const IMAGES: Record<string, string> = {
     roomtools_history_open_icon: roomToolIcon,
@@ -107,9 +108,9 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
                 )}
                 {selectedUser && <span className={`native-start-panel__presence${selectedUser.present ? ' is-present' : ''}`} style={{ left: 20, top: userTop + 19 }} />}
                 {selectedUser && (
-                    <button aria-label="Clear" className="native-start-panel__clear" style={{ left: 141, top: userTop + 9 }} type="button" onClick={onClearUser}>
+                    <BaseButton aria-label="Clear" className="native-start-panel__clear" style={{ left: 141, top: userTop + 9 }} type="button" onClick={onClearUser}>
                         ×
-                    </button>
+                    </BaseButton>
                 )}
                 <div className="native-start-panel__search" style={{ left: 0, top: SEARCH_TOP, width: 155 }}>
                     <input placeholder={searchPlaceholder} spellCheck={false} type="text" value={searchQuery} onChange={(event) => onSearchQuery(event.target.value)} />
@@ -121,12 +122,12 @@ export const StartPanelView: FC<StartPanelProps> = (props) => {
                                 </div>
                             )}
                             {searchResults.slice(0, 12).map((result, index) => (
-                                <div key={result.avatarId} className="native-start-panel__result" style={{ top: 2 + index * RESULT_HEIGHT }} onClick={() => onPickUser(result)}>
+                                <BaseButton type="button" key={result.avatarId} className="native-start-panel__result" style={{ top: 2 + index * RESULT_HEIGHT }} onClick={() => onPickUser(result)}>
                                     <span className={`native-start-panel__presence${result.isAvatarOnline ? ' is-present' : ''}`} style={{ left: 3, top: 5 }} />
                                     <div style={{ position: 'absolute', left: 12, top: 1 }}>
                                         <NativeText background={0xffffff} text={result.avatarName} textStyle="il_regular" />
                                     </div>
-                                </div>
+                                </BaseButton>
                             ))}
                         </div>
                     )}

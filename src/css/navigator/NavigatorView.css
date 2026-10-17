@@ -29,7 +29,8 @@
 
 .octane-navigator-air button,
 .octane-navigator-air input,
-.octane-navigator-air select {
+.octane-navigator-air select,
+.octane-navigator-air .octane-select-trigger {
     appearance: none;
     font-family: inherit;
     -webkit-appearance: none;
@@ -607,10 +608,7 @@
 }
 
 .octane-navigator-air__filter-list {
-    position: absolute;
-    top: 23px;
-    left: 0;
-    z-index: 8;
+    position: relative;
     box-sizing: border-box;
     width: 116px;
     margin: 0;
@@ -627,7 +625,8 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.octane-navigator-air__filter-list button {
+.octane-navigator-air__filter-list button,
+.octane-navigator-air__filter-option {
     display: block;
     box-sizing: border-box;
     width: 100%;
@@ -645,7 +644,9 @@
 }
 
 .octane-navigator-air__filter-list button:hover,
-.octane-navigator-air__filter-list button.is-selected {
+.octane-navigator-air__filter-list button.is-selected,
+.octane-navigator-air__filter-option[data-highlighted],
+.octane-navigator-air__filter-option[data-selected] {
     background: #d6eeff !important;
 }
 
@@ -1885,10 +1886,7 @@
 }
 
 .octane-room-creator-air__dropmenu-list {
-    position: absolute;
-    top: 20px;
-    left: 0;
-    z-index: 9;
+    position: relative;
     box-sizing: border-box;
     width: 240px;
     max-height: 160px;
@@ -1907,7 +1905,8 @@
     image-rendering: var(--octane-pixel-art, pixelated);
 }
 
-.octane-room-creator-air__dropmenu-list button {
+.octane-room-creator-air__dropmenu-list button,
+.octane-room-creator-air__dropmenu-option {
     display: block;
     box-sizing: border-box;
     width: 100%;
@@ -1926,7 +1925,9 @@
 }
 
 .octane-room-creator-air__dropmenu-list button:hover,
-.octane-room-creator-air__dropmenu-list button.is-selected {
+.octane-room-creator-air__dropmenu-list button.is-selected,
+.octane-room-creator-air__dropmenu-option[data-highlighted],
+.octane-room-creator-air__dropmenu-option[data-selected] {
     background: #d6eeff !important;
 }
 

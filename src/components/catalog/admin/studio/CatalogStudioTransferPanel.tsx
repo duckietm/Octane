@@ -1,6 +1,7 @@
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { FaDownload, FaFileImport, FaUpload } from 'react-icons/fa';
 import { useCatalogStudio } from './useCatalogStudio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const CATALOG_FILE_NAME = 'catalog-studio.sql';
 
@@ -63,23 +64,23 @@ export const CatalogStudioTransferPanel: FC = () => {
                 aria-label="Import catalog SQL file"
                 onChange={importFile}
             />
-            <button className="octane-catalog-admin-btn" disabled={studio.loading} onClick={requestDownload}>
+            <BaseButton className="octane-catalog-admin-btn" disabled={studio.loading} onClick={requestDownload}>
                 <FaDownload /> Download full catalog
-            </button>
-            <button
+            </BaseButton>
+            <BaseButton
                 className="octane-catalog-admin-btn"
                 disabled={studio.loading || !document.trim()}
                 onClick={() => studio.dryRunDocument('SQL', document)}
             >
                 Validate and dry-run
-            </button>
-            <button
+            </BaseButton>
+            <BaseButton
                 className="octane-catalog-admin-btn is-publish"
                 disabled={studio.loading || result?.code !== 'DRY_RUN_READY' || result.changedEntities === 0}
                 onClick={() => result && studio.applyDocument('SQL', document, result.fingerprint, 'Import catalog SQL file')}
             >
                 <FaUpload /> Apply {result?.changedEntities ?? 0} changes
-            </button>
+            </BaseButton>
         </div>
         <textarea
             value={document}

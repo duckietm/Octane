@@ -12,6 +12,7 @@ import {
     OctaneCardView
 } from '../../../../common';
 import { useFurnitureCraftingWidget, useRoom } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const FurnitureCraftingView: FC<{}> = (props) => {
     const {
@@ -73,7 +74,7 @@ export const FurnitureCraftingView: FC<{}> = (props) => {
                             <AutoGrid columnCount={5}>
                                 {recipes.length > 0 &&
                                     recipes.map((item) => (
-                                        <LayoutGridItem
+                                        <LayoutGridItem component={BaseButton} type="button"
                                             key={item.name}
                                             itemActive={selectedRecipe && selectedRecipe.name === item.name}
                                             itemImage={item.iconUrl}

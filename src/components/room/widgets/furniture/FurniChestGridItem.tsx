@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { ProductImageUtility } from '../../../../api';
 import { LayoutLimitedEditionStyledNumberView, LayoutRarityLevelView, PIXEL_ART_RENDERING } from '../../../../common';
 import { ChestFurniGroup } from './chestFurniGrouping';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const BORDER_IDLE = '#cbcbcb';
 const BORDER_HOVER = '#d69586';
@@ -20,7 +21,7 @@ export const FurniChestGridItem: FC<{
     const isRarity = group.specialType === 19;
 
     return (
-        <div
+        <BaseButton type="button"
             className="octane-chest__grid-cell"
             title={title}
             onClick={onSelect}
@@ -66,6 +67,6 @@ export const FurniChestGridItem: FC<{
                     </div>
                 )}
             </div>
-        </div>
+        </BaseButton>
     );
 };

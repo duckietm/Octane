@@ -1,5 +1,8 @@
 import { KeyboardEvent, ReactNode } from 'react';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
+import { Select } from '../../common/Select';
+import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 export interface WiredHolderPanelEntry {
     id: string;
@@ -165,7 +168,7 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                             <td className="px-2 py-1">
                                                 {!entry.hasValue && <span className="text-[#8a8476]">/</span>}
                                                 {!!entry.hasValue && !isEditing && (
-                                                    <button
+                                                    <BaseButton
                                                         className={`rounded px-1 py-[1px] ${isEditable ? 'text-[#1b57b2] underline underline-offset-2' : 'text-[#222]'}`}
                                                         disabled={!isEditable}
                                                         type="button"
@@ -178,19 +181,10 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                                         }}
                                                     >
                                                         {entry.value ?? 0}
-                                                    </button>
+                                                    </BaseButton>
                                                 )}
                                                 {!!entry.hasValue && isEditing && (
-                                                    <input
-                                                        autoFocus
-                                                        className="w-[72px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                                                        type="number"
-                                                        value={editingValue}
-                                                        onBlur={onEditBlur}
-                                                        onChange={(event) => onEditingValueChange(event.target.value)}
-                                                        onClick={(event) => event.stopPropagation()}
-                                                        onKeyDownCapture={onEditKeyDown}
-                                                    />
+                                                    <NumberInput autoFocus className="w-[72px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={editingValue} onBlur={onEditBlur} onChange={(event) => onEditingValueChange(event.target.value)} onClick={(event) => event.stopPropagation()} onKeyDownCapture={onEditKeyDown} />
                                                 )}
                                             </td>
                                         </tr>
@@ -205,7 +199,7 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                     {isGiveOpen && (
                         <div className="absolute right-0 bottom-full mb-2 w-[210px] rounded border border-[#8d887a] bg-[#efede5] p-3 shadow-[0_2px_8px_rgba(0,0,0,.25)] z-10 flex flex-col gap-2">
                             <Text bold>Variable:</Text>
-                            <select
+                            <Select
                                 className="rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
                                 value={selectedGiveOption?.id ?? ''}
                                 onChange={(event) => onGiveSelect(event.target.value)}
@@ -216,15 +210,9 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                         {option.name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                             <Text bold>Value:</Text>
-                            <input
-                                className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60"
-                                disabled={!selectedGiveOption?.hasValue}
-                                type="number"
-                                value={giveValue}
-                                onChange={(event) => onGiveValueChange(event.target.value)}
-                            />
+                            <NumberInput className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60" disabled={!selectedGiveOption?.hasValue} value={giveValue} onChange={(event) => onGiveValueChange(event.target.value)} />
                             <Button disabled={!canGive} variant="secondary" onClick={onGive}>
                                 Create
                             </Button>

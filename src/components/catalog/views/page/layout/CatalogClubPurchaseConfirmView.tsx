@@ -1,7 +1,10 @@
 import { ClubOfferData } from '@octane/renderer';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
+import { Checkbox } from '../../../../../common/Checkbox';
+import { InlineDialog } from '../../../../../common/InlineDialog';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface CatalogClubPurchaseConfirmViewProps {
     offer: ClubOfferData;
@@ -22,14 +25,14 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
     const title = LocalizeText('catalog.club.buy.confirm');
 
     return (
-        <OctaneCardView
+        <InlineDialog
             aria-label={title}
             aria-modal="true"
-            classNames={['octane-club-purchase-confirm']}
-            frameStyle={3}
-            isResizable={false}
-            role="dialog"
-            theme="primary-slim"
+            modal="trap-focus"
+            render={({ ref, ...popupProps }) => (
+                <OctaneCardView {...popupProps} innerRef={ref as MutableRefObject<HTMLDivElement>} classNames={['octane-club-purchase-confirm']} frameStyle={3} isResizable={false} theme="primary-slim" />
+            )}
+            onClose={onCancel}
         >
             <OctaneCardHeaderView headerText={title} onCloseClick={onCancel} />
             <OctaneCardContentView
@@ -63,20 +66,20 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
 
                 {disclaimerEnabled && (
                     <label className="octane-club-purchase-confirm-disclaimer">
-                        <input checked={disclaimerAccepted} type="checkbox" onChange={(event) => setDisclaimerAccepted(event.target.checked)} />
+                        <Checkbox checked={disclaimerAccepted} onCheckedChange={(nextChecked) => setDisclaimerAccepted(nextChecked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}
 
                 <div className="octane-club-purchase-confirm-actions">
-                    <button className="octane-club-purchase-confirm-cancel" type="button" onClick={onCancel}>
+                    <BaseButton className="octane-club-purchase-confirm-cancel" type="button" onClick={onCancel}>
                         {LocalizeText('cancel')}
-                    </button>
-                    <button className="octane-club-purchase-confirm-submit" disabled={!disclaimerAccepted} type="button" onClick={onConfirm}>
+                    </BaseButton>
+                    <BaseButton className="octane-club-purchase-confirm-submit" disabled={!disclaimerAccepted} type="button" onClick={onConfirm}>
                         {LocalizeText('catalog.club.buy.subscribe')}
-                    </button>
+                    </BaseButton>
                 </div>
             </OctaneCardContentView>
-        </OctaneCardView>
+        </InlineDialog>
     );
 };

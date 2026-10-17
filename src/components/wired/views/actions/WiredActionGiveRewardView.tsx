@@ -7,6 +7,8 @@ import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 type RewardType = 'badge' | 'credits' | 'pixels' | 'diamonds' | 'points' | 'furni' | 'respect';
 
@@ -209,13 +211,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
             footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
         >
             <div className="flex items-center gap-1">
-                <input
-                    checked={limitEnabled}
-                    className="form-check-input"
-                    id="limitEnabled"
-                    type="checkbox"
-                    onChange={(event) => setLimitEnabled(event.target.checked)}
-                />
+                <Checkbox checked={limitEnabled} id="limitEnabled" onCheckedChange={(nextChecked) => setLimitEnabled(nextChecked)} />
                 <Text>{LocalizeText('wiredfurni.params.prizelimit', ['amount'], [limitEnabled ? rewardsLimit.toString() : ''])}</Text>
             </div>
             {!limitEnabled && (
@@ -228,12 +224,12 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
             <div className="flex flex-col gap-1">
                 <Text bold>How often can a user be rewarded?</Text>
                 <div className="flex gap-1">
-                    <select className="w-full form-select form-select-sm" value={rewardTime} onChange={(e) => setRewardTime(Number(e.target.value))}>
+                    <Select className="w-full form-select form-select-sm" value={rewardTime} onChange={(e) => setRewardTime(Number(e.target.value))}>
                         <option value="0">Once</option>
                         <option value="3">Once every {limitationInterval} minutes</option>
                         <option value="2">Once every {limitationInterval} hours</option>
                         <option value="1">Once every {limitationInterval} days</option>
-                    </select>
+                    </Select>
                     {rewardTime > 0 && (
                         <OctaneInput type="number" value={limitationInterval} onChange={(event) => setLimitationInterval(Number(event.target.value))} />
                     )}
@@ -241,13 +237,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
             </div>
             <hr className="m-0 bg-dark" />
             <div className="flex items-center gap-1">
-                <input
-                    checked={uniqueRewards}
-                    className="form-check-input"
-                    id="uniqueRewards"
-                    type="checkbox"
-                    onChange={(e) => setUniqueRewards(e.target.checked)}
-                />
+                <Checkbox checked={uniqueRewards} id="uniqueRewards" onCheckedChange={(nextChecked) => setUniqueRewards(nextChecked)} />
                 <Text>{localizeWithFallback('wiredfurni.params.reward.unique', 'Unique rewards')}</Text>
             </div>
             <Text center small className="p-1 rounded bg-muted">
@@ -271,7 +261,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                         return (
                             <div key={index} className="flex flex-col gap-1 p-1 rounded bg-muted">
                                 <div className="flex items-center gap-1">
-                                    <select
+                                    <Select
                                         aria-label="Reward type"
                                         className="min-w-0 grow form-select form-select-sm"
                                         value={reward.rewardType}
@@ -284,7 +274,7 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
                                                 {localizeWithFallback(entry.key, entry.label)}
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                     {index > 0 && (
                                         <Button variant="danger" onClick={() => removeReward(index)}>
                                             <FaTrash className="fa-icon" />

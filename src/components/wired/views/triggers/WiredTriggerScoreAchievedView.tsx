@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const TEAM_TYPES = [0, 1, 2, 3, 4];
 
@@ -28,13 +29,7 @@ export const WiredTriggeScoreAchievedView: FC<{}> = () => {
                     <div className="grid grid-cols-2 gap-1">
                         {TEAM_TYPES.map((value) => (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={teamType === value}
-                                    className="form-check-input"
-                                    name="scoreAchievedTeamType"
-                                    type="radio"
-                                    onChange={() => setTeamType(value)}
-                                />
+                                <Radio checked={teamType === value} name="scoreAchievedTeamType" onCheckedChange={() => setTeamType(value)} />
                                 <Text>{LocalizeText(value === 0 ? 'wiredfurni.params.team.any' : `wiredfurni.params.team.${value}`)}</Text>
                             </label>
                         ))}

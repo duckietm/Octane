@@ -189,6 +189,9 @@ describe('Messenger avatar heads', () => {
 
         expect(document.querySelector('.messenger-window')).not.toBeNull();
         expect(document.querySelectorAll('.messenger-avatar-tab')).toHaveLength(7);
+        expect(document.querySelectorAll('.messenger-avatar-tab[role="tab"]')).toHaveLength(7);
+        expect(document.querySelectorAll('.messenger-avatar-bar[role="tablist"]')).toHaveLength(1);
+        expect(document.querySelectorAll('.messenger-avatar-tab[aria-selected="true"]')).toHaveLength(1);
         expect(document.querySelector<HTMLButtonElement>('[data-action="scroll-left"]')).toBeDisabled();
         expect(document.querySelector<HTMLButtonElement>('[data-action="scroll-right"]')).not.toBeDisabled();
 

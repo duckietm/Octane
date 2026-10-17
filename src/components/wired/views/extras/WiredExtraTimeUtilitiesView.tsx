@@ -17,6 +17,9 @@ import {
     timeUtilTimestampName
 } from './timeUtilitiesParams';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const MODE_FALLBACKS = ['Variable value', 'Creation time', 'Last update time'];
 const SUB_VARIABLE_KEY = 'wiredfurni.params.time_util.subvariable.';
@@ -47,12 +50,7 @@ export const WiredExtraTimeUtilitiesView: FC<{}> = () => {
             {subVariables.map((subVariable) => (
                 <div key={subVariable.id} className="octane-wired__levelup-subvariable-row">
                     <label className="octane-wired__levelup-subvariable-label">
-                        <input
-                            checked={isTimeUtilSubVariableSelected(mask, subVariable.id)}
-                            className="form-check-input"
-                            type="checkbox"
-                            onChange={(event) => setMask((value) => setTimeUtilSubVariableSelected(value, subVariable.id, event.target.checked))}
-                        />
+                        <Checkbox checked={isTimeUtilSubVariableSelected(mask, subVariable.id)} onCheckedChange={(nextChecked) => setMask((value) => setTimeUtilSubVariableSelected(value, subVariable.id, nextChecked))} />
                         <Text>{localizeWithFallback(`${SUB_VARIABLE_KEY}${subVariable.id}`, subVariable.label)}</Text>
                     </label>
                     <input className="octane-wired__levelup-subvariable-token" readOnly tabIndex={-1} type="text" value={timeUtilPartName(mode, subVariable.name)} />
@@ -69,13 +67,7 @@ export const WiredExtraTimeUtilitiesView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         {TIME_UTIL_MODES.map((option) => (
                             <label key={option} className="flex items-center gap-2">
-                                <input
-                                    checked={mode === option}
-                                    className="form-check-input"
-                                    name="wiredTimeUtilMode"
-                                    type="radio"
-                                    onChange={() => setMode(option)}
-                                />
+                                <Radio checked={mode === option} name="wiredTimeUtilMode" onCheckedChange={() => setMode(option)} />
                                 <Text>{localizeWithFallback(`wiredfurni.params.time_util.mode.${option}`, MODE_FALLBACKS[option])}</Text>
                             </label>
                         ))}
@@ -96,20 +88,20 @@ export const WiredExtraTimeUtilitiesView: FC<{}> = () => {
                 <div className="octane-wired__divider" />
 
                 <div className="octane-wired__levelup-section">
-                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsCalendarOpen((value) => !value)}>
+                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsCalendarOpen((value) => !value)}>
                         <Text bold>{localizeWithFallback('wiredfurni.params.create_subvariables', 'Create sub-variables:')}</Text>
                         <span className={`octane-wired__levelup-chevron ${isCalendarOpen ? 'is-open' : ''}`}>^</span>
-                    </button>
+                    </BaseButton>
                     {isCalendarOpen && renderSubVariables(TIME_UTIL_SUB_VARIABLES)}
                 </div>
 
                 <div className="octane-wired__divider" />
 
                 <div className="octane-wired__levelup-section">
-                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsAdvancedOpen((value) => !value)}>
+                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsAdvancedOpen((value) => !value)}>
                         <Text bold>{localizeWithFallback('wiredfurni.params.create_subvariables.advanced', 'Advanced sub-variables:')}</Text>
                         <span className={`octane-wired__levelup-chevron ${isAdvancedOpen ? 'is-open' : ''}`}>^</span>
-                    </button>
+                    </BaseButton>
                     {isAdvancedOpen && (
                         <>
                             <Text small>

@@ -52,7 +52,7 @@ describe('VariablesExplorerConnectView', () => {
 
         expect(screen.getByText('Connect to a room')).toBeInTheDocument();
         expect(screen.getByText('Browse and manage variables and variable holders in your room, making use of the Variables Web API.')).toBeInTheDocument();
-        expect(screen.getByRole('option', { name: 'Main hotel' })).toBeInTheDocument();
+        expect(screen.getByRole('combobox')).toHaveTextContent('Main hotel');
     });
 
     it('does not call the hotel while the form is incomplete', () => {

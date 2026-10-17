@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Select } from '../../../../common/Select';
 
 const DANCE_TYPES = [
     { value: 0, key: null, label: 'Stop dancing' },
@@ -44,14 +45,14 @@ export const WiredActionBotDanceView: FC<{}> = props =>
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>Dance</Text>
-                <select
+                <Select
                     className="form-select form-select-sm"
                     value={ danceType }
                     onChange={ event => setDanceType(parseInt(event.target.value, 10) || 0) }>
                     { DANCE_TYPES.map(option => (
                         <option key={ option.value } value={ option.value }>{ option.key ? localizeWithFallback(option.key, option.label) : option.label }</option>
                     )) }
-                </select>
+                </Select>
             </div>
         </WiredActionBaseView>
     );

@@ -7,6 +7,7 @@ import borderSunkXml from '../../../assets/mod-tools/skins/border-sunk.xml?raw';
 import { nativeCaption, nativeNumber, NativeNode } from './NativeLayout';
 import { parseNativeSkin } from './NativeSkin';
 import { NativeSkinView } from './NativeSkinView';
+import { BaseButton } from '../../../common/BaseButton';
 
 export interface NativeNodeState {
     visible?: boolean;
@@ -169,7 +170,7 @@ export const NativeFrameView: FC<NativeFrameProps> = ({ node, height, title, sta
                     <NativeText background={context.background} text={title ?? nativeCaption(node)} textStyle="il_frame_title" />
                 </h2>
             </div>
-            <button aria-label="Close" className="native-frame__close" name="header_button_close" onClick={onClose} type="button" />
+            <BaseButton aria-label="Close" className="native-frame__close" name="header_button_close" onClick={onClose} type="button" />
             <div className="native-frame__client" style={{ left: marginLeft, top: marginTop }}>
                 <NativeChildren node={node} context={context} />
                 {children}

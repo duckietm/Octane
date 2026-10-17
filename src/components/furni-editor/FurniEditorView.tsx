@@ -6,6 +6,7 @@ import { useFurniEditor } from '../../hooks/furni-editor';
 import { FurniEditorEditView } from './views/FurniEditorEditView';
 import { FurniEditorSearchView } from './views/FurniEditorSearchView';
 import { lineQueryFor } from './furniEditorSuggestions';
+import { BaseButton } from '../../common/BaseButton';
 
 const TAB_SEARCH = 0;
 const TAB_EDIT = 1;
@@ -149,9 +150,9 @@ export const FurniEditorView: FC<{}> = () => {
                 {error && (
                     <div className="bg-[#f8d7da] border border-[#f5c6cb] rounded p-2 text-[#721c24] text-xs mb-1 flex justify-between items-center">
                         <span>{error}</span>
-                        <span className="cursor-pointer font-bold" onClick={clearError}>
+                        <BaseButton aria-label="dismiss error" className="cursor-pointer font-bold" onClick={clearError}>
                             x
-                        </span>
+                        </BaseButton>
                     </div>
                 )}
 

@@ -1,6 +1,7 @@
 import { FC, PropsWithChildren } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Text } from '../../../../common';
+import { Select } from '../../../../common/Select';
 
 /** Ubuntu Wired BorderSection; chest settings use this style, not the Illumina stack editor. */
 export const ChestSettingsSection: FC<PropsWithChildren<{ title: string }>> = ({ title, children }) => <fieldset className="octane-chest-settings__section"><legend>{title}</legend>{children}</fieldset>;
@@ -20,14 +21,14 @@ interface ChestSelectProps<T extends number> {
 
 /** The chest windows' drop menus, on the client's own select. */
 export const ChestSelect = <T extends number>({ label, value, options, onSelect, disabled = false }: ChestSelectProps<T>) =>
-    <select
+    <Select
         aria-label={label}
         className="form-select form-select-sm"
         disabled={disabled}
         value={value}
         onChange={(event) => onSelect(Number(event.target.value) as T)}>
         {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-    </select>;
+    </Select>;
 
 interface ChestAppearanceFieldsProps {
     isFurni: boolean;

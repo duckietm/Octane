@@ -5,6 +5,7 @@ import hcIconSrc from '../../assets/images/avatareditor/air/wardrobe-hc.png';
 import emptySlotSrc from '../../assets/images/avatareditor/wardrobe-empty-slot.png';
 import { LayoutAvatarImageView } from '../../common';
 import { useAvatarEditor } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const SLOTS_PER_COL = 7;
 const HC_SLOT_LIMIT = 5;
@@ -89,7 +90,7 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
                                 <div className={`octane-avatar-editor-wardrobe-slot${enabled ? '' : ' is-locked'}`} key={`wardrobe-slot-${index}`}>
                                     <div className="octane-avatar-editor-wardrobe-slot-shade" />
                                     {enabled && (
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             className="octane-avatar-editor-wardrobe-slot-set"
                                             aria-label={LocalizeText('avatareditor.wardrobe.save')}
@@ -97,14 +98,14 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
                                         />
                                     )}
                                     {enabled && figureContainer && (
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             className="octane-avatar-editor-wardrobe-slot-get"
                                             aria-label={LocalizeText('widget.generic_usable.button.use')}
                                             onClick={() => wearFigureAtIndex(index)}
                                         />
                                     )}
-                                    <button
+                                    <BaseButton
                                         type="button"
                                         className="octane-avatar-editor-wardrobe-slot-figure"
                                         disabled={!enabled || !figureContainer}
@@ -116,7 +117,7 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
                                         ) : (
                                             <img src={emptySlotSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-empty" />
                                         )}
-                                    </button>
+                                    </BaseButton>
                                 </div>
                             );
                         })}

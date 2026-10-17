@@ -15,6 +15,8 @@ import {
 } from '../../../../common';
 import { useFurnitureDimmerWidget, useOctaneEvent } from '../../../../hooks';
 import { classNames } from '../../../../layout';
+import { Checkbox } from '../../../../common/Checkbox';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const FurnitureDimmerView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -93,7 +95,7 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
                                 <Grid columnCount={7} gap={1}>
                                     {FurnitureDimmerUtilities.AVAILABLE_COLORS.map((color, index) => {
                                         return (
-                                            <Column
+                                            <Column component={BaseButton} type="button"
                                                 key={index}
                                                 fullWidth
                                                 pointer
@@ -111,19 +113,14 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
                             <Slider
                                 max={FurnitureDimmerUtilities.MAX_BRIGHTNESS}
                                 min={FurnitureDimmerUtilities.MIN_BRIGHTNESS}
-                                renderThumb={(props, state) => <div {...props}>{FurnitureDimmerUtilities.scaleBrightness(state.valueNow)}</div>}
+                                renderThumbContent={(state) => FurnitureDimmerUtilities.scaleBrightness(state.valueNow)}
                                 thumbClassName={'thumb percent'}
                                 value={selectedBrightness}
                                 onChange={(value) => setSelectedBrightness(value)}
                             />
                         </div>
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={selectedEffectId === 2}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => setSelectedEffectId(event.target.checked ? 2 : 1)}
-                            />
+                            <Checkbox checked={selectedEffectId === 2} onCheckedChange={(nextChecked) => setSelectedEffectId(nextChecked ? 2 : 1)} />
                             <Text>{LocalizeText('widget.dimmer.type.checkbox')}</Text>
                         </div>
                         <div className="flex gap-1">

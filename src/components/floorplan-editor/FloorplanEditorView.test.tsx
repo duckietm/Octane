@@ -47,7 +47,7 @@ import { FloorplanEditorView } from './FloorplanEditorView';
 // Find a clickable element by its exact trimmed text content in the portal.
 const findByExactText = (text: string): Element | undefined => {
     const container = document.getElementById('draggable-windows-container') ?? document.body;
-    return Array.from(container.querySelectorAll('div')).find((el: Element) => el.textContent?.trim() === text);
+    return Array.from(container.querySelectorAll('button, div')).find((el: Element) => el.textContent?.trim() === text);
 };
 
 describe('FloorplanEditorView container', () => {
@@ -100,7 +100,7 @@ describe('FloorplanEditorView container', () => {
         const rvsHandler = messageHandlers.get(RoomVisualizationSettingsEvent);
         act(() => rvsHandler!({ getParser: () => ({ thicknessWall: 1, thicknessFloor: 1 }) }));
         // With LocalizeText mocked to identity, the button text is literally the i18n key.
-        // Button renders as <div> (not <button>) — use findByExactText.
+        // findByExactText matches by exact label, whatever element renders it.
         const saveBtn = findByExactText('floor.plan.editor.save');
         expect(saveBtn).toBeTruthy();
         sendMessageComposer.mockClear();

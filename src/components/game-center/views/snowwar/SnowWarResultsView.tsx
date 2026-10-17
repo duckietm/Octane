@@ -19,6 +19,7 @@ import type { SnowWarResultPlayer } from '../../../../hooks/game-center/useSnowW
 import { getSnowWarFigure } from './SnowWarAvatarView';
 import { SnowWarSkillStars } from './SnowWarSkillStars';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -203,16 +204,16 @@ export const SnowWarResultsView: FC = () => {
                 )}
 
                 <div className="snowwar-results__buttons">
-                    <button type="button" className="snowwar-button" disabled={rematch.kind === 'please_wait'} onClick={onRematch}>
+                    <BaseButton type="button" className="snowwar-button" disabled={rematch.kind === 'please_wait'} onClick={onRematch}>
                         {rematch.kind === 'join_hc'
                             ? localizeWithFallback('catalog.vip.buy.title', 'Join HC!')
                             : localizeWithFallback(rematch.textKey, rematch.kind === 'rematch' ? 'Rematch (%seconds%)' : 'Please wait (%seconds%)').replace(
                                   '%seconds%',
                                   rematch.seconds.toString()
                               )}
-                    </button>
+                    </BaseButton>
                     {gamesLeft.showCounter && (
-                        <button type="button" className="snowwar-results__status" onClick={openClubCenter}>
+                        <BaseButton type="button" className="snowwar-results__status" onClick={openClubCenter}>
                             <span>
                                 {localizeWithFallback('snowwar.results.games_left', 'Total Games Left:')}{' '}
                                 <span className={`snowwar-results__games-left snowwar-results__games-left--${gamesLeft.counterTone}`}>
@@ -222,13 +223,13 @@ export const SnowWarResultsView: FC = () => {
                             <span className="snowwar-results__status-vip">
                                 {localizeWithFallback('snowwar.results.get_more_games', 'Become a HC member for additional free daily games')}
                             </span>
-                        </button>
+                        </BaseButton>
                     )}
                 </div>
 
-                <button type="button" className="snowwar-results__leave" onClick={() => exitGame()}>
+                <BaseButton type="button" className="snowwar-results__leave" onClick={() => exitGame()}>
                     {localizeWithFallback('snowwar.exit.yes', 'Leave game')}
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

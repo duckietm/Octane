@@ -27,6 +27,9 @@ import {
     wiredArrayValueAsAddress
 } from '../arrays/WiredArrayValueField';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const DIRECTION_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'the first match', value: WIRED_ARRAY_CAPTURE_DIRECTION_FIRST },
@@ -92,7 +95,7 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                 {ownerSources.length > 0 && (
                     <div className="flex flex-col gap-1">
                         <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={payload.ownerSource}
                             onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
@@ -102,29 +105,17 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                                     {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                 )}
 
                 <div className="flex gap-2">
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={!isFind}
-                            className="form-check-input"
-                            name="wiredArrayCaptureMode"
-                            type="radio"
-                            onChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_INDEX })}
-                        />
+                        <Radio checked={!isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_INDEX })} />
                         <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.index', 'By index')}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={isFind}
-                            className="form-check-input"
-                            name="wiredArrayCaptureMode"
-                            type="radio"
-                            onChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_FIND })}
-                        />
+                        <Radio checked={isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_FIND })} />
                         <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.find', 'By search')}</Text>
                     </label>
                 </div>
@@ -147,17 +138,12 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                             onChange={(criteria) => setPayload({ ...payload, criteria })}
                         />
                         <label className="flex items-center gap-1 cursor-pointer">
-                            <input
-                                checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY}
-                                className="form-check-input"
-                                type="checkbox"
-                                onChange={(event) => setPayload({ ...payload, criteriaMode: event.target.checked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })}
-                            />
+                            <Checkbox checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY} onCheckedChange={(nextChecked) => setPayload({ ...payload, criteriaMode: nextChecked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })} />
                             <Text>{localizeWithFallback('wiredfurni.params.arrays.criteria.any', 'An entry counts if any rule fits')}</Text>
                         </label>
                         <div className="flex flex-col gap-1">
                             <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.direction', 'Take')}</Text>
-                            <select
+                            <Select
                                 className="form-select form-select-sm"
                                 value={payload.findDirection}
                                 onChange={(event) => setPayload({ ...payload, findDirection: parseInt(event.target.value, 10) })}
@@ -167,14 +153,14 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                                         {localizeWithFallback(`wiredfurni.params.arrays.capture.direction.${option.value}`, option.fallback)}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                     </>
                 )}
 
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.into', 'Store it in')}</Text>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={payload.contextVariableItemId}
                         onChange={(event) => setPayload({ ...payload, contextVariableItemId: parseInt(event.target.value, 10) })}
@@ -185,7 +171,7 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                                 {entry.name}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                     {!contextTargets.length && (
                         <Text small className="text-black/60">
                             {localizeWithFallback(

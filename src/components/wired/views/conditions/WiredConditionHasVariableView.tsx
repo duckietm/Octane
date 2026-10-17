@@ -15,6 +15,8 @@ import {
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface WiredConditionHasVariableViewProps {
     negative?: boolean;
@@ -189,13 +191,7 @@ export const WiredConditionHasVariableView: FC<WiredConditionHasVariableViewProp
                         <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                         {[QUANTIFIER_ALL, QUANTIFIER_ANY].map((value) => (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={quantifier === value}
-                                    className="form-check-input"
-                                    name={`wiredConditionHasVariableQuantifier-${negative ? 'neg' : 'pos'}`}
-                                    type="radio"
-                                    onChange={() => setQuantifier(value)}
-                                />
+                                <Radio checked={quantifier === value} name={`wiredConditionHasVariableQuantifier-${negative ? 'neg' : 'pos'}`} onCheckedChange={() => setQuantifier(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.quantifier.variables.${value}`)}</Text>
                             </label>
                         ))}
@@ -231,7 +227,7 @@ export const WiredConditionHasVariableView: FC<WiredConditionHasVariableViewProp
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
-                            <button
+                            <BaseButton
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
@@ -239,7 +235,7 @@ export const WiredConditionHasVariableView: FC<WiredConditionHasVariableViewProp
                                 onClick={() => handleTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>

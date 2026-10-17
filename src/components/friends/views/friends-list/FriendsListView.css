@@ -424,11 +424,11 @@
     background: url("@/assets/images/friends/swf/arrow_down_black.png") no-repeat;
 }
 
+.hfl-relationship-positioner {
+    z-index: 9999;
+}
+
 .hfl-relationship-menu {
-    position: absolute;
-    top: 18px;
-    right: 32px;
-    z-index: 70;
     width: 30px;
     height: 72px;
     padding: 2px;

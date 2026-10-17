@@ -113,12 +113,16 @@ describe('CatalogGuildSelectorWidgetView', () => {
         withGroups([group(3), group(1, { hasForum: true }), group(2, { ownerId: 1, favourite: true })]);
         render(<CatalogGuildSelectorWidgetView forumSelector />);
 
+        fireEvent.click(screen.getByRole('combobox'));
         expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(['Group 1', 'Group 2']);
         expect(purchaseOptions.extraParamRequired).toBe(true);
         expect(purchaseOptions.extraData).toBe('2');
         expect(purchaseOptions.previewStuffData.getValue(2)).toBe('b2');
 
-        fireEvent.change(screen.getByRole('combobox'), { target: { value: '0' } });
+        const first = screen.getByRole('option', { name: 'Group 1' });
+
+        fireEvent.pointerDown(first);
+        fireEvent.click(first);
         expect(purchaseOptions.extraData).toBe('1');
     });
 

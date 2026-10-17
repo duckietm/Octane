@@ -6,6 +6,7 @@ import { useMessageEvent } from '../../../../hooks';
 import { flatText, GroupInput, GroupText } from '../GroupNativeLayout';
 import { FORUM_HEADER, FORUM_SURFACE, ForumButton, ForumFrame, stripTags } from './GroupForumLayout';
 import { forumPermissionText } from './GroupForumThreadListView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // ComposeMessageView.validateInputs: a subject or a message of 10 characters or fewer is refused, and a post follows the last one by at least 30 seconds.
 const MIN_LENGTH = 10;
@@ -158,9 +159,9 @@ export const GroupForumComposeView: FC<GroupForumComposeViewProps> = ({ compose,
             )}
             <div className="octane-forum__compose-bar" style={{ top: 145 }}>
                 <GroupText background={0x227aad} overrides={flatText(12, { color: 0xeeeeee })} text={LocalizeText('groupforum.compose.message')} x={1} y={1} />
-                <button className="octane-forum__help-link" type="button" onClick={() => CreateLinkEvent('habbopages/forums/formatting')}>
+                <BaseButton className="octane-forum__help-link" type="button" onClick={() => CreateLinkEvent('habbopages/forums/formatting')}>
                     <GroupText background={0x227aad} className="is-static" overrides={flatText(12, { color: 0xffffff, underline: true })} text={stripTags(LocalizeText('groupforum.compose.formatting_help'))} x={0} y={0} />
-                </button>
+                </BaseButton>
             </div>
             <GroupInput fontSize={12} height={200} inset={4} label={LocalizeText('groupforum.compose.message')} maxLength={4000} multiline plain value={message} width={444} x={0} y={165} onChange={(value) =>
             {

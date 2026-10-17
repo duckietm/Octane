@@ -1,6 +1,7 @@
 import { Triggerable } from '@octane/renderer';
 import { FC } from 'react';
 import { localizeWithFallback } from '../../../api';
+import { Select } from '../../../common/Select';
 
 /** The official text-placeholder context of a message box (wired context type 7). */
 const TEXT_PLACEHOLDERS_CONTEXT = 7;
@@ -27,7 +28,7 @@ export const WiredPlaceholderInsert: FC<WiredPlaceholderInsertProps> = ({ trigge
     const names = getWiredPlaceholderNames(trigger);
 
     return (
-        <select
+        <Select
             aria-label="add placeholder"
             className="form-select form-select-sm"
             disabled={!names.length}
@@ -42,6 +43,6 @@ export const WiredPlaceholderInsert: FC<WiredPlaceholderInsertProps> = ({ trigge
                     {name}
                 </option>
             ))}
-        </select>
+        </Select>
     );
 };

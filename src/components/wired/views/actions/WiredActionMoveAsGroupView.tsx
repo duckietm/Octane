@@ -7,6 +7,9 @@ import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 // Official source values: 0 trigger, 11 clicked user, 100 picks, 200 selector, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -76,14 +79,7 @@ export const WiredActionMoveAsGroupView: FC<{}> = () =>
     const offsetInput = (label: string, value: number, onChange: (value: number) => void) => (
         <div className="flex items-center gap-1">
             <Text small>{ label }</Text>
-            <input
-                type="number"
-                className="form-control form-control-sm"
-                style={ { width: 64 } }
-                min={ -MAX_OFFSET }
-                max={ MAX_OFFSET }
-                value={ value }
-                onChange={ event => onChange(clampOffset(parseInt(event.target.value, 10))) } />
+            <NumberInput className="form-control form-control-sm" style={ { width: 64 } } min={ -MAX_OFFSET } max={ MAX_OFFSET } value={ value } onChange={ event => onChange(clampOffset(parseInt(event.target.value, 10))) } />
         </div>
     );
 
@@ -120,14 +116,14 @@ export const WiredActionMoveAsGroupView: FC<{}> = () =>
                     headerContent={
                         <div className="octane-wired__give-var-targets">
                             { [ { key: 'furni', icon: sourceFurniIcon, isUser: false }, { key: 'user', icon: sourceUserIcon, isUser: true } ].map(button => (
-                                <button
-                                    key={ button.key }
-                                    type="button"
-                                    title={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }
-                                    className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ targetIsUser === button.isUser ? 'is-active' : '' }` }
-                                    onClick={ () => setTargetIsUser(button.isUser) }>
-                                    <img src={ button.icon } alt={ button.key } />
-                                </button>
+                                <Hint key={ button.key } content={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }>
+                                    <BaseButton aria-label={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }
+                                        type="button"
+                                        className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ targetIsUser === button.isUser ? 'is-active' : '' }` }
+                                        onClick={ () => setTargetIsUser(button.isUser) }>
+                                        <img src={ button.icon } alt={ button.key } />
+                                    </BaseButton>
+                                </Hint>
                             )) }
                         </div>
                     }

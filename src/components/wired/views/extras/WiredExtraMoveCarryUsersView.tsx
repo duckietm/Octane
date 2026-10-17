@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const CARRY_MODE_DIRECT = 0;
 const CARRY_MODE_SAME_TILE = 1;
@@ -57,23 +58,11 @@ export const WiredExtraMoveCarryUsersView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <Text bold>{LocalizeText('wiredfurni.params.carry_mode')}</Text>
                 <label className="flex items-center gap-1 cursor-pointer">
-                    <input
-                        checked={carryMode === CARRY_MODE_DIRECT}
-                        className="form-check-input"
-                        name="wiredCarryMode"
-                        type="radio"
-                        onChange={() => setCarryMode(CARRY_MODE_DIRECT)}
-                    />
+                    <Radio checked={carryMode === CARRY_MODE_DIRECT} name="wiredCarryMode" onCheckedChange={() => setCarryMode(CARRY_MODE_DIRECT)} />
                     <Text>{LocalizeText('wiredfurni.params.carry_mode.0')}</Text>
                 </label>
                 <label className="flex items-center gap-1 cursor-pointer">
-                    <input
-                        checked={carryMode === CARRY_MODE_SAME_TILE}
-                        className="form-check-input"
-                        name="wiredCarryMode"
-                        type="radio"
-                        onChange={() => setCarryMode(CARRY_MODE_SAME_TILE)}
-                    />
+                    <Radio checked={carryMode === CARRY_MODE_SAME_TILE} name="wiredCarryMode" onCheckedChange={() => setCarryMode(CARRY_MODE_SAME_TILE)} />
                     <Text>{LocalizeText('wiredfurni.params.carry_mode.1')}</Text>
                 </label>
             </div>

@@ -6,6 +6,7 @@ import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 /**
  * Puts the selected furni at a height you type, or hands them back their stacking height.
@@ -64,7 +65,7 @@ export const WiredActionOverrideHeightView: FC<{}> = () => {
                 <Text bold>{localizeWithFallback('wiredfurni.params.override_height.type', 'Height')}</Text>
                 {[MODE_SET, MODE_RELEASE].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input checked={mode === value} className="form-check-input" name="overrideHeightMode" type="radio" onChange={() => setMode(value)} />
+                        <Radio checked={mode === value} name="overrideHeightMode" onCheckedChange={() => setMode(value)} />
                         <Text>{localizeWithFallback(MODE_LABELS[value].key, MODE_LABELS[value].fallback)}</Text>
                     </label>
                 ))}

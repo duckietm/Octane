@@ -18,6 +18,9 @@ import {
 } from '../WiredVariablePickerData';
 import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 
@@ -253,13 +256,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                         <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                         {[QUANTIFIER_ALL, QUANTIFIER_ANY].map((value) => (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={quantifier === value}
-                                    className="form-check-input"
-                                    name="wiredConditionVariableAgeQuantifier"
-                                    type="radio"
-                                    onChange={() => setQuantifier(value)}
-                                />
+                                <Radio checked={quantifier === value} name="wiredConditionVariableAgeQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.quantifier.variables.${value}`)}</Text>
                             </label>
                         ))}
@@ -294,7 +291,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
-                            <button
+                            <BaseButton
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
@@ -302,7 +299,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                                 onClick={() => handleTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>
@@ -320,14 +317,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.compare_value')}</div>
                     {COMPARE_VALUE_OPTIONS.map((value) => (
                         <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={compareValue === value}
-                                className="form-check-input"
-                                disabled={targetType === 'global' && value === COMPARE_VALUE_CREATED}
-                                name="wiredConditionVariableAgeCompareValue"
-                                type="radio"
-                                onChange={() => setCompareValue(value)}
-                            />
+                            <Radio checked={compareValue === value} disabled={targetType === 'global' && value === COMPARE_VALUE_CREATED} name="wiredConditionVariableAgeCompareValue" onCheckedChange={() => setCompareValue(value)} />
                             <Text>{LocalizeText(`wiredfurni.params.variables.compare_value.${value}`)}</Text>
                         </label>
                     ))}
@@ -339,13 +329,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.choose_type')}</div>
                     {COMPARISON_OPTIONS.map((value) => (
                         <label key={value} className="flex items-center gap-1">
-                            <input
-                                checked={comparison === value}
-                                className="form-check-input"
-                                name="wiredConditionVariableAgeComparison"
-                                type="radio"
-                                onChange={() => setComparison(value)}
-                            />
+                            <Radio checked={comparison === value} name="wiredConditionVariableAgeComparison" onCheckedChange={() => setComparison(value)} />
                             <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
                         </label>
                     ))}
@@ -374,7 +358,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     />
                     <div className="flex items-center gap-2">
                         <Text>{localizeWithFallback('wiredfurni.params.variables.duration.unit', LocalizeText('wiredfurni.params.variables.duration'))}</Text>
-                        <select
+                        <Select
                             className="min-w-0 flex-1 rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
                             value={durationUnit}
                             onChange={(event) => setDurationUnit(Number(event.target.value))}
@@ -384,7 +368,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                                     {LocalizeText(`wiredfurni.params.variables.duration.${unit}`)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                 </div>
             </div>

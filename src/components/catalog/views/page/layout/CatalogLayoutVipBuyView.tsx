@@ -18,6 +18,7 @@ import {
 import { CatalogClubPurchaseConfirmView } from './CatalogClubPurchaseConfirmView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import { getClubMembershipSummary, groupClubOffers, isVipPurchaseLayout } from './clubPurchase.helpers';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 const CLUB_WINDOW_ID = 1;
 
@@ -385,9 +386,9 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = ({ page = null })
                         <section className="octane-club-vip-column">{offerGroups.vip.map(renderOffer)}</section>
                     </div>
                     {membership.active && <div className="octane-club-remaining">{LocalizeText(remainingKey, ['days'], [membership.totalDays.toString()])}</div>}
-                    <button className="octane-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
+                    <BaseButton className="octane-club-center-link" type="button" onClick={() => CreateLinkEvent('habboUI/open/hccenter')}>
                         {LocalizeText('catalog.club.buy.link')}
-                    </button>
+                    </BaseButton>
                 </>
             )}
 

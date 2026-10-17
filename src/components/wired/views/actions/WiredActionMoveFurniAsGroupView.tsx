@@ -6,6 +6,7 @@ import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon'
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // Server WiredEffectMoveFurniAsGroup: intParams = [direction (0-7, N/NE/E/SE/S/SW/W/NW), furniSource].
 // directionDeltaX/Y handle all 8 compass points, so expose the full grid (was only 0/2/4/6).
@@ -46,14 +47,7 @@ export const WiredActionMoveFurniAsGroupView: FC<{}> = () => {
 
                             return (
                                 <label key={`group-dir-${value}`} className="flex items-center justify-center gap-[2px] cursor-pointer">
-                                    <input
-                                        checked={direction === value}
-                                        className="form-check-input"
-                                        id={`groupdir${value}`}
-                                        name="groupdir"
-                                        type="radio"
-                                        onChange={() => setDirection(value)}
-                                    />
+                                    <Radio checked={direction === value} id={`groupdir${value}`} name="groupdir" onCheckedChange={() => setDirection(value)} />
                                     <span className="inline-flex items-center justify-center">
                                         <WiredDirectionIcon direction={value} selected={direction === value} />
                                     </span>

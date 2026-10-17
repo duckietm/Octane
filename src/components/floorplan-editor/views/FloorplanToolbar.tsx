@@ -3,6 +3,7 @@ import { FaRedo, FaUndo } from 'react-icons/fa';
 import { LocalizeText } from '../../../api';
 import { Base } from '../../../common';
 import { FloorActionMode, FloorplanAction, FloorplanState } from '../state/types';
+import { BaseButton } from '../../../common/BaseButton';
 
 type Props = {
     state: FloorplanState;
@@ -39,7 +40,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                     const active = state.brush.action === b.mode && !panMode;
 
                     return (
-                        <Base
+                        <Base component={BaseButton} type="button"
                             key={b.id}
                             pointer
                             data-testid={b.id}
@@ -54,7 +55,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                         </Base>
                     );
                 })}
-                <Base
+                <Base component={BaseButton} type="button"
                     pointer
                     data-testid="tool-select-all"
                     className="fp-tool is-gap"
@@ -67,7 +68,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                 >
                     <span className={`octane-icon ${state.brush.action === 'UNSET' ? 'icon-set-deselect' : 'icon-set-select'}`} />
                 </Base>
-                <Base
+                <Base component={BaseButton} type="button"
                     pointer
                     data-testid="tool-square-select"
                     data-active={state.squareSelect && !panMode ? 'true' : 'false'}
@@ -85,7 +86,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                     <span className="octane-icon icon-set-squaresselect" />
                 </Base>
                 {setPanMode && (
-                    <Base
+                    <Base component={BaseButton} type="button"
                         pointer
                         data-testid="tool-pan"
                         data-active={panMode ? 'true' : 'false'}
@@ -98,7 +99,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                 )}
                 {(onUndo || onRedo) && (
                     <>
-                        <Base
+                        <Base component={BaseButton} type="button"
                             pointer={Boolean(canUndo)}
                             data-testid="tool-undo"
                             title="Undo (Ctrl+Z)"
@@ -107,7 +108,7 @@ export const FloorplanToolbar: FC<Props> = ({ state, dispatch, canUndo, canRedo,
                         >
                             <FaUndo size={16} />
                         </Base>
-                        <Base
+                        <Base component={BaseButton} type="button"
                             pointer={Boolean(canRedo)}
                             data-testid="tool-redo"
                             title="Redo (Ctrl+Shift+Z)"

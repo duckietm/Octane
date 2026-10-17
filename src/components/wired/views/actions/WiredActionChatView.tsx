@@ -9,6 +9,9 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { WiredPlaceholderInsert } from '../WiredPlaceholderInsert';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { CollapsibleSection } from '../../../../common/CollapsibleSection';
 
 const SHOW_MESSAGE_STYLE_IDS = [34, 200, 201, 202, 210, 211, 212, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 250, 251, 252];
 const DEFAULT_SHOW_MESSAGE_STYLE_ID = 34;
@@ -106,54 +109,33 @@ export const WiredActionChatView: FC<{}> = (props) => {
             </div>
             {isChat && (
                 <>
-                    <details className="flex flex-col gap-1">
-                        <summary className="cursor-pointer">
-                            <Text bold>{LocalizeText('wiredfurni.params.show_message.visibility_selection.title')}</Text>
-                        </summary>
+                    <CollapsibleSection className="flex flex-col gap-1" title={<Text bold>{LocalizeText('wiredfurni.params.show_message.visibility_selection.title')}</Text>}>
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={visibilitySelection === 0}
-                                className="form-check-input"
-                                name="showMessageVisibilitySelection"
-                                type="radio"
-                                onChange={() => setVisibilitySelection(0)}
-                            />
+                            <Radio checked={visibilitySelection === 0} name="showMessageVisibilitySelection" onCheckedChange={() => setVisibilitySelection(0)} />
                             <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.0')}</Text>
                         </div>
                         <div className="flex items-center gap-1">
-                            <input
-                                checked={visibilitySelection === 1}
-                                className="form-check-input"
-                                name="showMessageVisibilitySelection"
-                                type="radio"
-                                onChange={() => setVisibilitySelection(1)}
-                            />
+                            <Radio checked={visibilitySelection === 1} name="showMessageVisibilitySelection" onCheckedChange={() => setVisibilitySelection(1)} />
                             <Text>{LocalizeText('wiredfurni.params.show_message.visibility_selection.1')}</Text>
                         </div>
-                    </details>
-                    <details className="flex flex-col gap-1">
-                        <summary className="cursor-pointer">
-                            <Text bold>{LocalizeText('wiredfurni.params.show_message.style_selection.title')}</Text>
-                        </summary>
+                    </CollapsibleSection>
+                    <CollapsibleSection className="flex flex-col gap-1" title={<Text bold>{LocalizeText('wiredfurni.params.show_message.style_selection.title')}</Text>}>
                         <div className="flex items-center gap-2">
                             <div className="bubble-container relative w-[50px] shrink-0">
                                 <div className={`relative min-h-[26px] chat-bubble bubble-${bubbleStyle}`} />
                             </div>
-                            <select className="form-select form-select-sm" value={bubbleStyle} onChange={(event) => setBubbleStyle(Number(event.target.value))}>
+                            <Select className="form-select form-select-sm" value={bubbleStyle} onChange={(event) => setBubbleStyle(Number(event.target.value))}>
                                 {bubbleStyleIds.map((styleId) => (
                                     <option key={styleId} value={styleId}>
                                         {LocalizeText(`wiredfurni.params.show_message.style_selection.${styleId}`)}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
-                    </details>
-                    <details>
-                        <summary className="cursor-pointer">
-                            <Text bold>{LocalizeText('wiredfurni.params.show_message.bubble_width.title')}</Text>
-                        </summary>
+                    </CollapsibleSection>
+                    <CollapsibleSection title={<Text bold>{LocalizeText('wiredfurni.params.show_message.bubble_width.title')}</Text>}>
                         <WiredBubbleWidthSelect value={bubbleWidth} onChange={setBubbleWidth} />
-                    </details>
+                    </CollapsibleSection>
                 </>
             )}
         </WiredActionBaseView>

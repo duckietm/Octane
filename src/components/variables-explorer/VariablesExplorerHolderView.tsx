@@ -6,6 +6,7 @@ import { Button, LayoutAvatarImageView, LayoutPetImageView, LayoutRoomObjectImag
 import { useVariablesExplorerProfile } from '../../hooks/variables-explorer/useVariablesExplorerProfile';
 import { WiredVariableHolderPanelView } from '../wired-tools/WiredVariableHolderPanelView';
 import { EXPLORER_VARIABLE_ELEMENTS, ExplorerHolderTarget, holderInfoLines, holderPanelTitle, resolvedEntityId } from './VariablesExplorer.helpers';
+import { NumberInput } from '../../common/NumberInput';
 
 export interface VariablesExplorerHolderViewProps {
     client: VariablesWebApiClient;
@@ -229,13 +230,7 @@ export const VariablesExplorerHolderView: FC<VariablesExplorerHolderViewProps> =
                 canWrite && selectedEntry?.hasValue ? (
                     <div className="flex items-center justify-end gap-2 text-[12px]">
                         <span>Add to {selectedEntry.name}:</span>
-                        <input
-                            aria-label="Amount to add"
-                            className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                            type="number"
-                            value={addValue}
-                            onChange={(event) => setAddValue(event.target.value)}
-                        />
+                        <NumberInput aria-label="Amount to add" className="w-[80px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={addValue} onChange={(event) => setAddValue(event.target.value)} />
                         <Button disabled={busy || !holderReady} variant="secondary" onClick={addToSelected}>
                             Add
                         </Button>

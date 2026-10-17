@@ -9,6 +9,7 @@ import { WIRED_DIRECTION_GRID, WiredDirectionIcon } from '../WiredDirectionIcon'
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 // The official turn values (ours on the server are 8 and 9; the server converts).
 const ROTATION_CLOCKWISE = 9;
@@ -36,7 +37,7 @@ const DirectionPicker: FC<DirectionPickerProps> = (props) => {
         <div className="flex flex-col gap-2">
             <Text bold>{title}</Text>
             <label className="flex items-center gap-2 text-[12px]">
-                <input checked={value === -1} className="form-check-input" name={name} type="radio" onChange={() => onChange(-1)} />
+                <Radio checked={value === -1} name={name} onCheckedChange={() => onChange(-1)} />
                 <span>{noneLabel}</span>
             </label>
             <div className="grid grid-cols-4 gap-2 max-w-[240px]">
@@ -50,7 +51,7 @@ const DirectionPicker: FC<DirectionPickerProps> = (props) => {
 
                         return (
                             <label key={`${name}-${direction}`} className="flex items-center justify-center gap-[2px] cursor-pointer">
-                                <input checked={selected} className="form-check-input" name={name} type="radio" onChange={() => onChange(direction)} />
+                                <Radio checked={selected} name={name} onCheckedChange={() => onChange(direction)} />
                                 <span className="inline-flex items-center justify-center">
                                     <WiredDirectionIcon direction={direction} selected={selected} />
                                 </span>
@@ -63,13 +64,7 @@ const DirectionPicker: FC<DirectionPickerProps> = (props) => {
                 <div className="flex flex-wrap gap-3">
                     {extraOptions.map((option) => (
                         <label key={`${name}-extra-${option.value}`} className="flex items-center gap-[2px] cursor-pointer" title={option.label}>
-                            <input
-                                checked={value === option.value}
-                                className="form-check-input"
-                                name={name}
-                                type="radio"
-                                onChange={() => onChange(option.value)}
-                            />
+                            <Radio checked={value === option.value} name={name} onCheckedChange={() => onChange(option.value)} />
                             <img alt="" className="h-auto w-auto object-contain" draggable={false} src={option.icon} />
                         </label>
                     ))}

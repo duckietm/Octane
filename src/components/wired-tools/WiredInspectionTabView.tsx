@@ -4,6 +4,11 @@ import { Button, LayoutAvatarImageView, LayoutPetImageView, LayoutRoomObjectImag
 import { INSPECTION_ELEMENTS } from './WiredCreatorTools.constants';
 import { InspectionFurniSelection, InspectionUserSelection, InspectionVariable } from './WiredCreatorTools.types';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
+import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
+import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
+import { Hint } from '../../common/Tooltip';
 
 /**
  * Structural shape we need from the renderer's variable-definition
@@ -101,15 +106,15 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                     <Text bold>Element type:</Text>
                     <div className="flex gap-1">
                         {INSPECTION_ELEMENTS.map((element) => (
-                            <button
-                                key={element.key}
-                                type="button"
-                                className={`w-[42px] h-[38px] rounded border flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,.7)] ${inspectionType === element.key ? 'border-[#222] bg-[#d9d6cf]' : 'border-[#7f7f7f] bg-[#ece9e1]'}`}
-                                onClick={() => setInspectionType(element.key)}
-                                title={element.label}
-                            >
-                                <img alt={element.label} className="w-auto h-auto max-w-[22px] max-h-[22px] object-contain" src={element.icon} />
-                            </button>
+                            <Hint key={element.key} content={element.label}>
+                                <BaseButton aria-label={element.label}
+                                    type="button"
+                                    className={`w-[42px] h-[38px] rounded border flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,.7)] ${inspectionType === element.key ? 'border-[#222] bg-[#d9d6cf]' : 'border-[#7f7f7f] bg-[#ece9e1]'}`}
+                                    onClick={() => setInspectionType(element.key)}
+                                >
+                                    <img alt={element.label} className="w-auto h-auto max-w-[22px] max-h-[22px] object-contain" src={element.icon} />
+                                </BaseButton>
+                            </Hint>
                         ))}
                     </div>
                 </div>
@@ -150,12 +155,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                     </div>
                 </div>
                 <label className="flex items-center gap-2 text-[12px] text-[#111]">
-                    <input
-                        checked={keepSelected}
-                        className="form-check-input mt-0"
-                        type="checkbox"
-                        onChange={(event) => onKeepSelectedChange(event.target.checked)}
-                    />
+                    <Checkbox checked={keepSelected} className="mt-0" onCheckedChange={(nextChecked) => onKeepSelectedChange(nextChecked)} />
                     <span>Keep selected</span>
                 </label>
             </div>
@@ -201,7 +201,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                                                         <span className={variable.valueClassName}>{variable.label ? `${variable.value} (${variable.label})` : variable.value}</span>
                                                     )}
                                                     {editingVariable !== variable.key && variable.editable && (
-                                                        <button
+                                                        <BaseButton
                                                             className={`w-full cursor-pointer rounded px-1 text-right text-[#1b57b2] hover:underline ${variable.valueClassName ?? ''}`}
                                                             type="button"
                                                             onClick={(event) => {
@@ -210,7 +210,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                                                             }}
                                                         >
                                                             {variable.label ? `${variable.value} (${variable.label})` : variable.value}
-                                                        </button>
+                                                        </BaseButton>
                                                     )}
                                                 </td>
                                             </tr>
@@ -225,7 +225,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                     {isInspectionGiveOpen && (
                         <div className="absolute right-0 bottom-full mb-2 w-[210px] rounded border border-[#8d887a] bg-[#efede5] p-3 shadow-[0_2px_8px_rgba(0,0,0,.25)] z-10 flex flex-col gap-2">
                             <Text bold>Variable:</Text>
-                            <select
+                            <Select
                                 className="rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
                                 value={selectedInspectionGiveDefinition?.itemId ?? 0}
                                 onChange={(event) => onSelectGiveVariable(Number(event.target.value))}
@@ -236,15 +236,9 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                                         {definition.name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                             <Text bold>Value:</Text>
-                            <input
-                                className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60"
-                                disabled={!selectedInspectionGiveDefinition?.hasValue}
-                                type="number"
-                                value={inspectionGiveValue}
-                                onChange={(event) => onInspectionGiveValueChange(event.target.value)}
-                            />
+                            <NumberInput className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60" disabled={!selectedInspectionGiveDefinition?.hasValue} value={inspectionGiveValue} onChange={(event) => onInspectionGiveValueChange(event.target.value)} />
                             <Button disabled={!canGiveInspectionVariable} variant="secondary" onClick={onGiveInspectionVariable}>
                                 Create
                             </Button>

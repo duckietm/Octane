@@ -10,6 +10,7 @@ import {
     resolveHousekeepingTarget
 } from '../../../../api';
 import { useHousekeepingStore } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 /** The full record behind one audit row, with a jump to the user or room it acted on. */
 export const HousekeepingAuditEntryDetails: FC<{ entry: IHousekeepingActionLogEntry }> = ({ entry }) => {
@@ -69,14 +70,14 @@ export const HousekeepingAuditEntryDetails: FC<{ entry: IHousekeepingActionLogEn
                 </table>
             )}
             {(roomId > 0 || userId > 0) && (
-                <button
+                <BaseButton
                     className="flex items-center gap-1 self-start rounded border border-sky-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 hover:bg-sky-50"
                     type="button"
                     onClick={open}
                 >
                     <FaExternalLinkAlt size={8} />
                     {LocalizeText(roomId > 0 ? 'housekeeping.audit.detail.open_room' : 'housekeeping.audit.detail.open_user')}
-                </button>
+                </BaseButton>
             )}
         </div>
     );

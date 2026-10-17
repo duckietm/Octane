@@ -1,8 +1,14 @@
-import { CSSProperties, DetailedHTMLProps, FC, HTMLAttributes, MutableRefObject, ReactNode, useMemo } from 'react';
+import { CSSProperties, DetailedHTMLProps, ElementType, FC, HTMLAttributes, MutableRefObject, ReactNode, useMemo } from 'react';
 import { ColorVariantType, DisplayType, FloatType, OverflowType, PositionType } from './types';
 
 export interface BaseProps<T = HTMLElement> extends DetailedHTMLProps<HTMLAttributes<T>, T> {
     innerRef?: MutableRefObject<T>;
+    /** The element or component to render: a `div` unless told otherwise (`Button` renders a Base UI button). */
+    component?: ElementType;
+    /** Only meaningful when `component` is a button. */
+    disabled?: boolean;
+    /** Only meaningful when `component` is a button. */
+    type?: string | number;
     display?: DisplayType;
     fit?: boolean;
     fitV?: boolean;
@@ -24,6 +30,7 @@ export const Base: FC<BaseProps<HTMLDivElement>> = (props) => {
     const {
         ref = null,
         innerRef = null,
+        component: Component = 'div',
         display = null,
         fit = false,
         fitV = false,
@@ -95,8 +102,8 @@ export const Base: FC<BaseProps<HTMLDivElement>> = (props) => {
     }, [style]);
 
     return (
-        <div ref={innerRef} className={getClassName} style={getStyle} {...rest}>
+        <Component ref={innerRef} className={getClassName} style={getStyle} {...rest}>
             {children}
-        </div>
+        </Component>
     );
 };

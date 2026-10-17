@@ -4,6 +4,7 @@ import { GetGroupInformation, LocalizeText } from '../../../../api';
 import { ClassicScrollAreaView, LayoutBadgeImageView } from '../../../../common';
 import { flatText, GroupText } from '../GroupNativeLayout';
 import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, ForumPager } from './GroupForumLayout';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const ROW_WIDTH = 532;
 
@@ -55,17 +56,17 @@ export const GroupForumListView: FC<GroupForumListViewProps> = ({ list, onMarkAs
                         return (
                             <div key={forum.groupId} className="octane-forum__forum">
                                 {/* group_icon: a group badge widget, its click asks for the group details (GetHabboGroupDetails, open). */}
-                                <div className="octane-forum__forum-badge" style={{ background: rowColor }} onClick={() => GetGroupInformation(forum.groupId)}>
+                                <BaseButton type="button" className="octane-forum__forum-badge" style={{ background: rowColor }} onClick={() => GetGroupInformation(forum.groupId)}>
                                     <LayoutBadgeImageView badgeCode={forum.icon} isGroup={true} />
-                                </div>
+                                </BaseButton>
                                 <div className="octane-forum__forum-body" style={{ left: 42, width: ROW_WIDTH - 42 - 1 - 100, background: rowColor }}>
                                     <GroupText background={background} overrides={isUnread ? { bold: true } : undefined} text={forum.name} x={0} y={0} />
                                     <GroupText background={background} overrides={flatText(10)} text={details} x={0} y={16} />
                                     {/* header_region: the 280x17 strip over the group name opens the forum. */}
-                                    <div className="octane-forum__forum-header" role="button" onClick={() => onOpenForum(forum.groupId)} />
+                                    <BaseButton className="octane-forum__forum-header" type="button" onClick={() => onOpenForum(forum.groupId)} />
                                 </div>
                                 {/* unread_region: the message counts open the forum too. */}
-                                <div className="octane-forum__forum-counts" role="button" style={{ left: ROW_WIDTH - 100, background: rowColor }} onClick={() => onOpenForum(forum.groupId)}>
+                                <BaseButton className="octane-forum__forum-counts" type="button" style={{ left: ROW_WIDTH - 100, background: rowColor }} onClick={() => onOpenForum(forum.groupId)}>
                                     <GroupText
                                         background={background}
                                         overrides={flatText(10, { bold: isUnread })}
@@ -80,7 +81,7 @@ export const GroupForumListView: FC<GroupForumListViewProps> = ({ list, onMarkAs
                                         x={0}
                                         y={15}
                                     />
-                                </div>
+                                </BaseButton>
                             </div>
                         );
                     })}

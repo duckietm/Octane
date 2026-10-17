@@ -117,8 +117,7 @@
 }
 
 .octane-inventory-filter-menu {
-    position: fixed;
-    z-index: 100000;
+    position: relative;
     box-sizing: border-box;
     width: max-content;
     min-width: 119px;
@@ -160,6 +159,7 @@
 }
 
 .octane-inventory-filter-option.is-active,
+.octane-inventory-filter-option[data-highlighted],
 .octane-inventory-filter-option:hover {
     background: #d9d9d9;
 }

@@ -12,6 +12,8 @@ import {
 } from '../../../../api';
 import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingEmptyState, HousekeepingPill, HousekeepingSection } from '../common/HousekeepingParts';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 /**
  * Every permission against every rank. A cell saves on change and the server reloads the
@@ -105,7 +107,7 @@ export const HousekeepingPermissionsTab: FC = () => {
                     onChange={(event) => setSearch(event.target.value)}
                 />
                 <label className="flex shrink-0 items-center gap-1 text-[10px] text-zinc-600">
-                    <input checked={onlyMixed} type="checkbox" onChange={(event) => setOnlyMixed(event.target.checked)} />
+                    <Checkbox checked={onlyMixed} onCheckedChange={(nextChecked) => setOnlyMixed(nextChecked)} />
                     {LocalizeText('housekeeping.permissions.only_mixed')}
                 </label>
                 {matrix && <HousekeepingPill>{rows.length}</HousekeepingPill>}
@@ -155,15 +157,9 @@ export const HousekeepingPermissionsTab: FC = () => {
                                         return (
                                             <td key={rank.id} className={`px-1 py-0.5 text-center ${rank.own ? 'bg-amber-50/60' : ''}`}>
                                                 {row.max <= 1 ? (
-                                                    <input
-                                                        aria-label={label}
-                                                        checked={value > 0}
-                                                        disabled={disabled}
-                                                        type="checkbox"
-                                                        onChange={(event) => change(row.key, rank, rankIndex, value, event.target.checked ? 1 : 0)}
-                                                    />
+                                                    <Checkbox aria-label={label} checked={value > 0} disabled={disabled} onCheckedChange={(nextChecked) => change(row.key, rank, rankIndex, value, nextChecked ? 1 : 0)} />
                                                 ) : (
-                                                    <select
+                                                    <Select
                                                         aria-label={label}
                                                         className="rounded border border-zinc-300 bg-white px-0.5 text-[11px] disabled:opacity-50"
                                                         disabled={disabled}
@@ -175,7 +171,7 @@ export const HousekeepingPermissionsTab: FC = () => {
                                                                 {option}
                                                             </option>
                                                         ))}
-                                                    </select>
+                                                    </Select>
                                                 )}
                                             </td>
                                         );

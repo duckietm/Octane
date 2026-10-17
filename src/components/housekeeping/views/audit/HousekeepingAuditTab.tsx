@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { FC, useMemo, useState } from 'react';
 import { FaCaretDown, FaCaretRight, FaCheck, FaExclamationCircle, FaFilter, FaInfoCircle, FaStopwatch, FaSync, FaTrash } from 'react-icons/fa';
 import {
@@ -12,6 +13,7 @@ import {
 import { useHousekeepingStore, useLocalStorage } from '../../../../hooks';
 import { HousekeepingAuditEntryDetails } from '../common/HousekeepingAuditEntryDetails';
 import { HousekeepingButton } from '../common/HousekeepingParts';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type TargetFilter = 'all' | 'user' | 'room' | 'hotel';
 type SuccessFilter = 'all' | 'success' | 'failure';
@@ -96,7 +98,7 @@ export const HousekeepingAuditTab: FC = () => {
             {/* Filter row */}
             <div className="flex flex-wrap gap-1 items-center rounded-md border border-zinc-200 bg-zinc-50/50 px-1.5 py-1">
                 {(Object.keys(FILTER_LABELS) as TargetFilter[]).map((filter) => (
-                    <button
+                    <BaseButton
                         key={filter}
                         className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
                             targetFilter === filter
@@ -106,10 +108,10 @@ export const HousekeepingAuditTab: FC = () => {
                         onClick={() => setTargetFilter(filter)}
                     >
                         {LocalizeText(FILTER_LABELS[filter])}
-                    </button>
+                    </BaseButton>
                 ))}
                 <span className="mx-1 h-3 w-px bg-zinc-300" />
-                <button
+                <BaseButton
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
                         successFilter === 'success'
                             ? 'bg-emerald-100 border-emerald-300 text-emerald-800 shadow-sm'
@@ -119,8 +121,8 @@ export const HousekeepingAuditTab: FC = () => {
                 >
                     <FaCheck size={7} />
                     ok
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
                         successFilter === 'failure'
                             ? 'bg-rose-100 border-rose-300 text-rose-800 shadow-sm'
@@ -130,7 +132,7 @@ export const HousekeepingAuditTab: FC = () => {
                 >
                     <FaExclamationCircle size={7} />
                     err
-                </button>
+                </BaseButton>
             </div>
 
             <input
@@ -148,11 +150,14 @@ export const HousekeepingAuditTab: FC = () => {
             ) : (
                 <ul className="flex flex-col gap-0.5 max-h-[300px] overflow-y-auto pr-1">
                     {filtered.map((entry) => (
-                        <li
+                        <Collapsible.Root
                             key={entry.id}
+                            render={<li />}
                             className={`flex flex-col text-[11px] px-2 py-1 rounded border transition-colors ${
                                 entry.success ? 'border-zinc-200 bg-white hover:bg-zinc-50' : 'border-rose-200 bg-rose-50/60 hover:bg-rose-50'
                             }`}
+                            open={expandedId === entry.id}
+                            onOpenChange={(open) => setExpandedId(open ? entry.id : null)}
                         >
                             <div className="flex items-center gap-2">
                                 <span className="text-zinc-400 tabular-nums w-14 shrink-0">{formatRelativePast(entry.timestamp)}</span>
@@ -173,35 +178,31 @@ export const HousekeepingAuditTab: FC = () => {
                                 >
                                     {localizeHousekeepingAction(entry.action)}
                                 </span>
-                                <button
-                                    aria-expanded={expandedId === entry.id}
+                                <Collapsible.Trigger
                                     className={`shrink-0 rounded p-0.5 transition-colors ${expandedId === entry.id ? 'bg-sky-100 text-sky-700' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700'}`}
                                     title={LocalizeText('housekeeping.audit.detail.toggle')}
-                                    type="button"
-                                    onClick={() => setExpandedId((current) => (current === entry.id ? null : entry.id))}
                                 >
                                     <FaInfoCircle size={11} />
-                                </button>
+                                </Collapsible.Trigger>
                             </div>
-                            {expandedId === entry.id && <HousekeepingAuditEntryDetails entry={entry} />}
-                        </li>
+                            <Collapsible.Panel>
+                                <HousekeepingAuditEntryDetails entry={entry} />
+                            </Collapsible.Panel>
+                        </Collapsible.Root>
                     ))}
                 </ul>
             )}
 
             {telemetryEnabled && (
-                <div className="rounded border border-zinc-200 bg-zinc-50">
-                    <button
-                        className="w-full flex items-center gap-1.5 px-2 py-1 text-[11px] uppercase font-semibold opacity-70 hover:bg-zinc-100"
-                        onClick={() => setIsTelemetryExpanded((value) => !value)}
-                    >
+                <Collapsible.Root className="rounded border border-zinc-200 bg-zinc-50" open={isTelemetryExpanded} onOpenChange={setIsTelemetryExpanded}>
+                    <Collapsible.Trigger className="w-full flex items-center gap-1.5 px-2 py-1 text-[11px] uppercase font-semibold opacity-70 hover:bg-zinc-100">
                         {isTelemetryExpanded ? <FaCaretDown size={10} /> : <FaCaretRight size={10} />}
                         <FaStopwatch size={10} />
                         <span className="grow text-left">{LocalizeText('housekeeping.telemetry.title')}</span>
                         <span className="text-zinc-500 tabular-nums">{metricsByAction.size}</span>
-                    </button>
-                    {isTelemetryExpanded && (
-                        <div className="px-2 py-1 border-t border-zinc-200">
+                    </Collapsible.Trigger>
+                    <Collapsible.Panel className="px-2 py-1 border-t border-zinc-200">
+                        <div>
                             {metricsByAction.size === 0 ? (
                                 <div className="text-[10px] text-zinc-500 italic py-1">{LocalizeText('housekeeping.telemetry.empty')}</div>
                             ) : (
@@ -238,14 +239,14 @@ export const HousekeepingAuditTab: FC = () => {
                                 </table>
                             )}
                             <div className="flex items-center justify-end pt-1">
-                                <button className="inline-flex items-center gap-1 text-[10px] text-zinc-500 hover:text-rose-700" onClick={resetActionMetrics}>
+                                <BaseButton className="inline-flex items-center gap-1 text-[10px] text-zinc-500 hover:text-rose-700" onClick={resetActionMetrics}>
                                     <FaTrash size={8} />
                                     {LocalizeText('housekeeping.telemetry.reset')}
-                                </button>
+                                </BaseButton>
                             </div>
                         </div>
-                    )}
-                </div>
+                    </Collapsible.Panel>
+                </Collapsible.Root>
             )}
         </div>
     );

@@ -1,11 +1,14 @@
 import { FC } from 'react';
 import { NotificationAlertType, NotificationConfirmItem } from '../../../../api';
 import { Button, Flex, LayoutNotificationAlertView, LayoutNotificationAlertViewProps, Text } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export interface NotificationDefaultConfirmViewProps extends LayoutNotificationAlertViewProps {
     item: NotificationConfirmItem;
 }
 
+/* Official habbo_window_confirm: the text, then "cancel" as an underlined link on the left and the
+   one confirm button on the right. */
 export const NotificationDefaultConfirmView: FC<NotificationDefaultConfirmViewProps> = (props) => {
     const { item = null, onClose = null, ...rest } = props;
     const { message = null, onConfirm = null, onCancel = null, confirmText = null, cancelText = null, title = null } = item;
@@ -27,13 +30,11 @@ export const NotificationDefaultConfirmView: FC<NotificationDefaultConfirmViewPr
             <Flex center grow>
                 <Text className="whitespace-pre-line">{message}</Text>
             </Flex>
-            <div className="flex gap-1">
-                <Button fullWidth variant="danger" onClick={cancel}>
+            <div className="octane-confirm-actions">
+                <BaseButton className="octane-confirm-actions__cancel" type="button" onClick={cancel}>
                     {cancelText}
-                </Button>
-                <Button fullWidth onClick={confirm}>
-                    {confirmText}
-                </Button>
+                </BaseButton>
+                <Button onClick={confirm}>{confirmText}</Button>
             </div>
         </LayoutNotificationAlertView>
     );

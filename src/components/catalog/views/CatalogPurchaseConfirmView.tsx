@@ -1,7 +1,10 @@
-import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { FC, MutableRefObject, useState } from 'react';
 import { GetConfigurationValue, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../api';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
 import { LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
+import { Checkbox } from '../../../common/Checkbox';
+import { InlineDialog } from '../../../common/InlineDialog';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface CatalogPurchaseConfirmViewProps {
     offer: IPurchasableOffer;
@@ -15,53 +18,8 @@ interface CatalogPurchaseConfirmViewProps {
 
 export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (props) => {
     const { offer = null, quantity = 1, bundleDiscountRuleset = null, isGift = false, isSubmitting = false, onConfirm = null, onCancel = null } = props;
-    const dialogRef = useRef<HTMLDivElement>(null);
     const spendingDisclaimerEnabled = GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false) === true;
     const [spendingDisclaimerAccepted, setSpendingDisclaimerAccepted] = useState(!spendingDisclaimerEnabled);
-
-    useEffect(() => {
-        const previousActiveElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-        dialogRef.current?.focus();
-
-        return () => {
-            if (previousActiveElement?.isConnected) previousActiveElement.focus();
-        };
-    }, []);
-
-    const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-        if (event.key === 'Escape') {
-            event.preventDefault();
-            onCancel?.();
-
-            return;
-        }
-
-        if (event.key !== 'Tab' || !dialogRef.current) return;
-
-        const focusableElements = Array.from(
-            dialogRef.current.querySelectorAll<HTMLElement>(
-                'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-            )
-        );
-
-        if (!focusableElements.length) {
-            event.preventDefault();
-
-            return;
-        }
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (event.shiftKey && document.activeElement === firstElement) {
-            event.preventDefault();
-            lastElement.focus();
-        } else if (!event.shiftKey && document.activeElement === lastElement) {
-            event.preventDefault();
-            firstElement.focus();
-        }
-    };
 
     if (!offer) return null;
 
@@ -81,17 +39,14 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
     ].filter(Boolean);
 
     return (
-        <OctaneCardView
-            innerRef={dialogRef}
+        <InlineDialog
             aria-label={title}
             aria-modal="true"
-            classNames={['octane-catalog-purchase-confirm']}
-            frameStyle={3}
-            isResizable={false}
-            role="dialog"
-            tabIndex={-1}
-            theme="primary-slim"
-            onKeyDown={onKeyDown}
+            modal="trap-focus"
+            render={({ ref, ...popupProps }) => (
+                <OctaneCardView {...popupProps} innerRef={ref as MutableRefObject<HTMLDivElement>} classNames={['octane-catalog-purchase-confirm']} frameStyle={3} isResizable={false} theme="primary-slim" />
+            )}
+            onClose={onCancel}
         >
             <OctaneCardHeaderView headerText={title} onCloseClick={onCancel} />
             <OctaneCardContentView classNames={contentClassNames} overflow="hidden">
@@ -144,7 +99,7 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                 </div>
                 {spendingDisclaimerEnabled && (
                     <label className="octane-catalog-purchase-confirm-disclaimer">
-                        <input checked={spendingDisclaimerAccepted} type="checkbox" onChange={(event) => setSpendingDisclaimerAccepted(event.target.checked)} />
+                        <Checkbox checked={spendingDisclaimerAccepted} onCheckedChange={(nextChecked) => setSpendingDisclaimerAccepted(nextChecked)} />
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}
@@ -158,19 +113,19 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                     </div>
                 )}
                 <div className="octane-catalog-purchase-confirm-actions">
-                    <button className="octane-catalog-purchase-confirm-button is-cancel" disabled={isSubmitting} type="button" onClick={onCancel}>
+                    <BaseButton className="octane-catalog-purchase-confirm-button is-cancel" disabled={isSubmitting} type="button" onClick={onCancel}>
                         {LocalizeText('catalog.purchase_confirmation.cancel')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         className="octane-catalog-purchase-confirm-button is-buy"
                         disabled={isSubmitting || !spendingDisclaimerAccepted}
                         type="button"
                         onClick={onConfirm}
                     >
                         {LocalizeText(isGift ? 'catalog.purchase_confirmation.gift' : `catalog.purchase_confirmation.${offer.isRentOffer ? 'rent' : 'buy'}`)}
-                    </button>
+                    </BaseButton>
                 </div>
             </OctaneCardContentView>
-        </OctaneCardView>
+        </InlineDialog>
     );
 };

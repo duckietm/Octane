@@ -29,6 +29,7 @@ import { BackgroundsView } from '../../../../backgrounds/BackgroundsView';
 import { InfoStandBadgeSlotView } from './InfoStandBadgeSlotView';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface InfoStandWidgetUserViewProps {
     avatarInfo: AvatarInfoUser;
@@ -205,17 +206,17 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
         <>
             <div className={`octane-infostand pointer-events-auto z-30 profile-card-background ${infostandCardBackgroundClass}`}>
                 {borderId ? <Base className={`infostand-border ${infostandBorderClass}`} /> : null}
-                <button type="button" className="octane-infostand__close" aria-label="Close" onClick={onClose} />
+                <BaseButton type="button" className="octane-infostand__close" aria-label="Close" onClick={onClose} />
                 <div className="octane-infostand__header">
-                    <button
+                    <BaseButton
                         type="button"
                         className="octane-infostand__home"
                         aria-label={LocalizeText('infostand.profile.link.tooltip')}
                         onClick={handleProfileClick}
                     >
                         <img src={homeIcon} alt="" draggable={false} />
-                    </button>
-                    <button type="button" className="octane-infostand__profile-link" onClick={handleProfileClick}>
+                    </BaseButton>
+                    <BaseButton type="button" className="octane-infostand__profile-link" onClick={handleProfileClick}>
                         <UserIdentityView
                             className="octane-infostand__identity"
                             displayOrder={avatarInfo.displayOrder}
@@ -228,18 +229,18 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             prefixText={avatarInfo.prefixText}
                             username={avatarInfo.name}
                         />
-                    </button>
+                    </BaseButton>
                     {isBlocked && <span className="text-[11px] italic opacity-80">{localizeWithFallback('infostand.blocked_user', 'Blocked user')}</span>}
                 </div>
                 <div className="octane-infostand__rule" />
                 <div className="octane-infostand__figure-row">
-                    <div className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
+                    <BaseButton type="button" className={`octane-infostand__avatar-well profile-background ${infostandBackgroundClass}`} onClick={handleProfileClick}>
                         <Base position="absolute" className={`profile-stand ${infostandStandClass}`} />
                         <LayoutAvatarImageView direction={2} figure={avatarInfo.figure} />
                         <Base position="absolute" className={`profile-overlay ${infostandOverlayClass}`} />
-                    </div>
+                    </BaseButton>
                     {avatarInfo.type === AvatarInfoUser.OWN_USER && (
-                        <Base
+                        <Base component={BaseButton} type="button"
                             className="background-edit-icon background-edit-position"
                             style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                             onClick={handleEditClick}
@@ -254,7 +255,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                             items.push(<InfoStandBadgeSlotView key={0} slotIndex={0} badgeCode={avatarInfo.badges[0]} isOwnUser={isOwnUser} />);
                             if (showGroup) {
                                 items.push(
-                                    <Flex
+                                    <Flex component={BaseButton} type="button" disabled={avatarInfo.groupId <= 0}
                                         key="group"
                                         center
                                         className="relative h-[42px] w-[42px] bg-no-repeat bg-center"
@@ -291,7 +292,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                         </Text>
                     )}
                     {isOwnUser && !isEditingMotto && (
-                        <Text
+                        <Text component={BaseButton} type="button" align="start"
                             fullWidth
                             pointer
                             textBreak
@@ -325,14 +326,14 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                     <>
                         <div className="octane-infostand__rule" />
                         {isOwnUser ? (
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="octane-infostand__score octane-infostand__score-link"
                                 title={localizeWithFallback('achievements.title', 'Achievements')}
                                 onClick={() => CreateLinkEvent('achievements/show')}
                             >
                                 {LocalizeText('infostand.text.achievement_score')} {avatarInfo.achievementScore}
-                            </button>
+                            </BaseButton>
                         ) : (
                             <div className="octane-infostand__score">
                                 {LocalizeText('infostand.text.achievement_score')} {avatarInfo.achievementScore}
@@ -343,13 +344,13 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = (props)
                 {shownBadgesRank > 0 && (
                     <>
                         <div className="octane-infostand__rule" />
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-infostand__score octane-infostand__score-link"
                             onClick={() => CreateLinkEvent('badge-leaderboard/show')}
                         >
                             {localizeWithFallback('infostand.text.badges_rank', `Badges rank: #${shownBadgesRank}`, ['rank'], [`#${shownBadgesRank}`])}
-                        </button>
+                        </BaseButton>
                     </>
                 )}
                 {avatarInfo.carryItem > 0 && (

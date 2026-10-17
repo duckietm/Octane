@@ -6,6 +6,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
+import { Radio } from '../../../../common/Radio';
 
 const TYPE_SINGLE = 1;
 const TYPE_MULTIPLE = 2;
@@ -101,23 +102,11 @@ export const WiredExtraTextOutputFurniNameView: FC<{}> = () => {
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type')}</Text>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={placeholderType === TYPE_SINGLE}
-                            className="form-check-input"
-                            name="wiredTextOutputFurniNameType"
-                            type="radio"
-                            onChange={() => setPlaceholderType(TYPE_SINGLE)}
-                        />
+                        <Radio checked={placeholderType === TYPE_SINGLE} name="wiredTextOutputFurniNameType" onCheckedChange={() => setPlaceholderType(TYPE_SINGLE)} />
                         <Text>{localizeWithFallback('wiredfurni.params.texts.placeholder_type.furni.1', LocalizeText('wiredfurni.params.texts.placeholder_type.1'))}</Text>
                     </label>
                     <label className="flex items-center gap-1 cursor-pointer">
-                        <input
-                            checked={placeholderType === TYPE_MULTIPLE}
-                            className="form-check-input"
-                            name="wiredTextOutputFurniNameType"
-                            type="radio"
-                            onChange={() => setPlaceholderType(TYPE_MULTIPLE)}
-                        />
+                        <Radio checked={placeholderType === TYPE_MULTIPLE} name="wiredTextOutputFurniNameType" onCheckedChange={() => setPlaceholderType(TYPE_MULTIPLE)} />
                         <Text>{localizeWithFallback('wiredfurni.params.texts.placeholder_type.furni.2', LocalizeText('wiredfurni.params.texts.placeholder_type.2'))}</Text>
                     </label>
                 </div>

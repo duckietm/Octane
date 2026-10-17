@@ -21,6 +21,8 @@ import { useHelp, useMessageEvent } from '../../../../hooks';
 import { flatText, GroupText } from '../GroupNativeLayout';
 import { FORUM_PAGE_SIZE, FORUM_SURFACE, stripTags, ForumButton, forumAge, forumQuote, ForumPager } from './GroupForumLayout';
 import { forumPermissionText } from './GroupForumThreadListView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 // Message states: 0 and 1 are visible, 10 is hidden by a group administrator, 20 deleted by Hotel staff.
 const MESSAGE_VISIBLE = 1;
@@ -194,18 +196,18 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
                                     />
                                     <div className="octane-forum__message-actions" style={{ width: actionsWidth }}>
                                         {hideAction && (
-                                            <button className="octane-forum__action is-hide" type="button" onClick={() => moderate(message, hideAction)}>
+                                            <BaseButton className="octane-forum__action is-hide" type="button" onClick={() => moderate(message, hideAction)}>
                                                 <img alt="" draggable={false} src={hideAction === 'unhide' ? unhideIcon : hideIcon} style={{ left: 4, top: 5 }} />
-                                            </button>
+                                            </BaseButton>
                                         )}
                                         {canReport && (
-                                            <button className="octane-forum__action is-report" type="button" onClick={() => report(ReportType.MESSAGE, { groupId, threadId, messageId: message.messageId })}>
+                                            <BaseButton className="octane-forum__action is-report" type="button" onClick={() => report(ReportType.MESSAGE, { groupId, threadId, messageId: message.messageId })}>
                                                 <img alt="" draggable={false} src={reportIcon} style={{ left: 2, top: 6 }} />
-                                            </button>
+                                            </BaseButton>
                                         )}
-                                        <button className="octane-forum__action is-reply" disabled={!canReply} type="button" onClick={() => onReply(subject, quoteOf(message))}>
+                                        <BaseButton className="octane-forum__action is-reply" disabled={!canReply} type="button" onClick={() => onReply(subject, quoteOf(message))}>
                                             <img alt="" draggable={false} src={replyIcon} style={{ left: 2, top: 6 }} />
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 </div>
                                 <div className="octane-forum__message-body">
@@ -217,9 +219,9 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = ({ forumData,
                                             x={2}
                                             y={23}
                                         />
-                                        <div className="octane-forum__message-avatar" role="button" title={message.authorName} onClick={() => GetUserProfile(message.authorId)}>
+                                        <Hint content={message.authorName}><BaseButton aria-label={message.authorName} className="octane-forum__message-avatar" type="button" onClick={() => GetUserProfile(message.authorId)}>
                                             <LayoutAvatarImageView direction={2} figure={message.authorFigure} />
-                                        </div>
+                                        </BaseButton></Hint>
                                     </div>
                                     <div className="octane-forum__message-text" style={{ background: '#' + textColor.toString(16).padStart(6, '0') }}>
                                         {showText && (

@@ -7,6 +7,8 @@ import { useWiredPageRequests } from '../../hooks/wired-tools/useWiredPageReques
 import { MONITOR_ERROR_INFO, MONITOR_LOG_ORDER } from './WiredCreatorTools.constants';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
+import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 /** Rows per page, as the official log list shows them. */
 export const WIRED_ROOM_LOGS_PAGE_SIZE = 50;
@@ -184,7 +186,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                         ).replace(/\\n/g, '\n')}
                     </Text>
                     <label className="flex items-center gap-1 text-[12px] whitespace-nowrap">
-                        <input type="checkbox" checked={autoRefresh} onChange={(event) => setAutoRefresh(event.target.checked)} />
+                        <Checkbox checked={autoRefresh} onCheckedChange={(nextChecked) => setAutoRefresh(nextChecked)} />
                         {localizeWithFallback('wiredmenu.logs_overview.auto_refresh', 'Auto refresh')}
                     </label>
                     <Button variant="secondary" onClick={() => requests.refresh()}>
@@ -210,7 +212,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                     </label>
                     <label className="flex items-center gap-2">
                         <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_source', 'Log source:')}</Text>
-                        <select
+                        <Select
                             className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                             value={source}
                             onChange={(event) => {
@@ -226,11 +228,11 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                                     {sourceLabel(index)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </label>
                     <label className="flex items-center gap-2">
                         <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_level', 'Log level:')}</Text>
-                        <select
+                        <Select
                             className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                             value={level}
                             onChange={(event) => {
@@ -246,7 +248,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                                     {name}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </label>
                 </div>
                 <WiredPagedTable

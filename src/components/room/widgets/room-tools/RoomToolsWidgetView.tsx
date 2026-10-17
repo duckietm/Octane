@@ -8,6 +8,8 @@ import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, use
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { applyRoomZoom } from './roomZoom.helpers';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 interface RoomHistoryEntry {
     roomId: number;
@@ -278,58 +280,57 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
 
     return (
         <div className={classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')}>
-            <button className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
+            <BaseButton className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
                 {isToolsOpen ? '‹' : '›'}
-            </button>
+            </BaseButton>
             {isToolsOpen && (
                 <div className="octane-room-tools">
                     <div className="room-tools-zoom-row">
                         <span>{LocalizeText('room.zoom.text', ['zoom_level'], [getZoomText(zoomScale)])}</span>
-                        <button className="room-tools-zoom-button" type="button" title={LocalizeText('room.zoom.zoom_in.tooltip')} disabled={!canZoomIn} onClick={() => handleToolClick('zoom_in')}>
+                        <Hint content={LocalizeText('room.zoom.zoom_in.tooltip')}><BaseButton aria-label={LocalizeText('room.zoom.zoom_in.tooltip')} className="room-tools-zoom-button" type="button" disabled={!canZoomIn} onClick={() => handleToolClick('zoom_in')}>
                             +
-                        </button>
-                        <button className="room-tools-zoom-button" type="button" title={LocalizeText('room.zoom.zoom_out.tooltip')} disabled={!canZoomOut} onClick={() => handleToolClick('zoom_out')}>
+                        </BaseButton></Hint>
+                        <Hint content={LocalizeText('room.zoom.zoom_out.tooltip')}><BaseButton aria-label={LocalizeText('room.zoom.zoom_out.tooltip')} className="room-tools-zoom-button" type="button" disabled={!canZoomOut} onClick={() => handleToolClick('zoom_out')}>
                             -
-                        </button>
+                        </BaseButton></Hint>
                     </div>
                     {tools.map((tool) => (
-                        <div
+                        <Hint content={tool.label}><BaseButton aria-label={tool.label} type="button"
                             key={tool.action}
                             className={classNames('room-tool-row', tool.disabled && 'is-disabled')}
-                            title={tool.label}
+                            aria-disabled={tool.disabled || undefined}
                             onClick={() => !tool.disabled && handleToolClick(tool.action)}
                         >
                             <div className={classNames('octane-icon', tool.icon)} />
                             <span className="room-tool-label">{tool.label}</span>
-                        </div>
+                        </BaseButton></Hint>
                     ))}
                     {plugins.map((plugin) => (
-                        <div
+                        <Hint content={plugin.label}><BaseButton aria-label={plugin.label} type="button"
                             key={plugin.name}
                             className="room-tool-row"
-                            title={plugin.label}
                             onClick={() => plugin.onOpen()}
                         >
                             <div className={classNames('octane-icon', plugin.icon || 'icon-cog')} />
                             <span className="room-tool-label">{plugin.label}</span>
-                        </div>
+                        </BaseButton></Hint>
                     ))}
                     <div className="room-history-controls">
-                        <div
+                        <Hint content={LocalizeText('room.history.button.back.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.back.tooltip')} type="button"
                             className={classNames('octane-icon', canGoBack ? 'cursor-pointer icon-room-history-back-enabled' : 'icon-room-history-back-disabled')}
-                            title={LocalizeText('room.history.button.back.tooltip')}
+                            aria-disabled={!canGoBack}
                             onClick={() => canGoBack && handleToolClick('room_history_back')}
-                        />
-                        <div
+                        /></Hint>
+                        <Hint content={LocalizeText('room.history.button.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.tooltip')} type="button"
                             className={classNames('octane-icon', hasHistory ? 'cursor-pointer icon-room-history-enabled' : 'icon-room-history-disabled')}
-                            title={LocalizeText('room.history.button.tooltip')}
+                            aria-disabled={!hasHistory}
                             onClick={() => hasHistory && handleToolClick('room_history')}
-                        />
-                        <div
+                        /></Hint>
+                        <Hint content={LocalizeText('room.history.button.forward.tooltip')}><BaseButton aria-label={LocalizeText('room.history.button.forward.tooltip')} type="button"
                             className={classNames('octane-icon', canGoNext ? 'cursor-pointer icon-room-history-next-enabled' : 'icon-room-history-next-disabled')}
-                            title={LocalizeText('room.history.button.forward.tooltip')}
+                            aria-disabled={!canGoNext}
                             onClick={() => canGoNext && handleToolClick('room_history_next')}
-                        />
+                        /></Hint>
                     </div>
                 </div>
             )}
@@ -351,7 +352,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                         {roomEnterInfo.tags.length > 0 && (
                             <div className="flex gap-2 mt-1">
                                 {roomEnterInfo.tags.map((tag) => (
-                                    <button
+                                    <BaseButton
                                         key={tag}
                                         className="text-[12px] text-[#1b79ab] hover:text-[#47a8e6] bg-transparent border-0 p-0 cursor-pointer"
                                         type="button"
@@ -361,7 +362,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                                         }}
                                     >
                                         #{trimRoomTag(tag)}
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         )}
@@ -379,7 +380,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                     >
                         <div className="flex flex-col px-3 py-2 rounded octane-room-history">
                             {roomHistory.map((history) => (
-                                <Text
+                                <Text component={BaseButton} type="button"
                                     key={history.roomId}
                                     bold={history.roomId === navigatorData.currentRoomId}
                                     variant="white"

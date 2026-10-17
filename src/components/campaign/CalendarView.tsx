@@ -3,6 +3,7 @@ import { CalendarItemState, ICalendarItem, LocalizeText } from '../../api';
 import { Button, Column, Grid, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useHasPermission } from '../../hooks';
 import { CalendarItemView } from './CalendarItemView';
+import { BaseButton } from '../../common/BaseButton';
 
 interface CalendarViewProps {
     onClose(): void;
@@ -121,7 +122,7 @@ export const CalendarView: FC<CalendarViewProps> = (props) => {
                 </Grid>
                 <div className="flex h-full gap-2">
                     <div className="flex items-center justify-center">
-                        <div className="campaign-spritesheet prev cursor-pointer" onClick={onClickPrev} />
+                        <BaseButton aria-label="previous" className="campaign-spritesheet prev cursor-pointer" onClick={onClickPrev} />
                     </div>
                     <Column center fullWidth>
                         <Grid fit columnCount={TOTAL_SHOWN_ITEMS} gap={1}>
@@ -143,7 +144,7 @@ export const CalendarView: FC<CalendarViewProps> = (props) => {
                         </Grid>
                     </Column>
                     <div className="flex items-center justify-center">
-                        <div className="campaign-spritesheet next cursor-pointer" onClick={onClickNext} />
+                        <BaseButton aria-label="next" className="campaign-spritesheet next cursor-pointer" onClick={onClickNext} />
                     </div>
                 </div>
             </OctaneCardContentView>

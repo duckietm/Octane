@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Text } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface WiredPlaceholderPreviewProps {
     previewHtml: string;
@@ -57,8 +58,8 @@ export const WiredPlaceholderPreview: FC<WiredPlaceholderPreviewProps> = (props)
     };
 
     return (
-        <button type="button" className={`octane-wired__placeholder-preview ${copied ? 'is-copied' : ''}`} onClick={handleCopy}>
+        <BaseButton type="button" className={`octane-wired__placeholder-preview ${copied ? 'is-copied' : ''}`} onClick={handleCopy}>
             <Text dangerouslySetInnerHTML={{ __html: previewHtml }} />
-        </button>
+        </BaseButton>
     );
 };

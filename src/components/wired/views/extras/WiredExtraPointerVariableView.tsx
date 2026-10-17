@@ -1,4 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
+import { BaseButton } from '../../../../common/BaseButton';
 import {
     isPointerAccessorCandidate,
     LocalizeText,
@@ -88,7 +89,7 @@ export const WiredExtraPointerVariableView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <div className="octane-wired__give-var-targets" role="radiogroup">
                     {SOURCE_BUTTONS.map((button) => (
-                        <button
+                        <BaseButton
                             key={button.key}
                             type="button"
                             aria-checked={sourceType === button.value}
@@ -98,7 +99,7 @@ export const WiredExtraPointerVariableView: FC<{}> = () => {
                             onClick={() => setSourceType(button.value)}
                         >
                             <img src={button.icon} alt={button.key} />
-                        </button>
+                        </BaseButton>
                     ))}
                 </div>
                 <Text small className="whitespace-pre-line">{LocalizeText('wiredfurni.params.variables.pointer.usage_info').replace(/\\n/g, '\n')}</Text>

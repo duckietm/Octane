@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 /**
  * What the text field holds. The badge, tag and motto conditions all store a string plus the same
@@ -57,13 +58,7 @@ export const WiredConditionActorIsWearingBadgeView: FC<WiredConditionActorIsWear
                 <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                 {[0, 1].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input
-                            checked={quantifier === value}
-                            className="form-check-input"
-                            name="badgeQuantifier"
-                            type="radio"
-                            onChange={() => setQuantifier(value)}
-                        />
+                        <Radio checked={quantifier === value} name="badgeQuantifier" onCheckedChange={() => setQuantifier(value)} />
                         <Text>{LocalizeText(`wiredfurni.params.quantifier.users${negative ? '.neg' : ''}.${value}`)}</Text>
                     </label>
                 ))}

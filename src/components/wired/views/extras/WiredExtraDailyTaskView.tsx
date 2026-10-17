@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MAX_TARGET = 2147483647;
 
@@ -40,13 +41,7 @@ export const WiredExtraDailyTaskView: FC<{}> = () => {
                 </div>
                 <div className="flex flex-col gap-1">
                     <Text>{localizeWithFallback('wiredfurni.params.variables.daily_task.target', 'Daily goal (value to reach)')}</Text>
-                    <input
-                        type="number"
-                        min={0}
-                        className="form-control form-control-sm"
-                        value={target}
-                        onChange={(event) => setTarget(Math.min(MAX_TARGET, Math.max(0, parseInt(event.target.value, 10) || 0)))}
-                    />
+                    <NumberInput min={0} className="form-control form-control-sm" value={target} onChange={(event) => setTarget(Math.min(MAX_TARGET, Math.max(0, parseInt(event.target.value, 10) || 0)))} />
                 </div>
                 <Text small>
                     {localizeWithFallback(

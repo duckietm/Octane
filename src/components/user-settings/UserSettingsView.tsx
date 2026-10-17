@@ -31,6 +31,10 @@ import {
 import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
 import { SoundboardVolumeControl } from './SoundboardVolumeControl';
 import { WordFilterSettingsView } from './WordFilterSettingsView';
+import { Checkbox } from '../../common/Checkbox';
+import { Radio } from '../../common/Radio';
+import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -54,9 +58,9 @@ const AirSettingsFrame: FC<AirSettingsFrameProps> = ({ backLabel, children, onBa
             <h2 className="air-settings-window__title">{title}</h2>
             <div aria-hidden="true" className="air-settings-window__divider" />
             {children}
-            <button className="air-settings-button air-settings-window__back" onClick={onBack} type="button">
+            <BaseButton className="air-settings-button air-settings-window__back" onClick={onBack} type="button">
                 {backLabel}
-            </button>
+            </BaseButton>
         </section>
     </DraggableWindow>
 );
@@ -265,10 +269,10 @@ export const UserSettingsView: FC<{}> = () => {
         return (
             <AirSettingsFrame backLabel={backLabel} onBack={closeView} title={localizeWithFallback('widget.memenu.settings', 'Settings')} variant="menu">
                 <div className="air-settings-menu__items">
-                    <button className="air-settings-button" onClick={() => openMenuSection('audio')} type="button">
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('audio')} type="button">
                         {localizeWithFallback('widget.memenu.settings.audio', 'Sound settings')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         className="air-settings-button"
                         onClick={() => {
                             CreateLinkEvent('avatar-editor/show');
@@ -277,19 +281,19 @@ export const UserSettingsView: FC<{}> = () => {
                         type="button"
                     >
                         {localizeWithFallback('widget.memenu.settings.character', 'Character settings')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => openMenuSection('chat')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('chat')} type="button">
                         {localizeWithFallback('widget.memenu.settings.chat', 'Chat settings')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => openMenuSection('other')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('other')} type="button">
                         {localizeWithFallback('widget.memenu.settings.other', 'Other settings')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => openMenuSection('privacy')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('privacy')} type="button">
                         {localizeWithFallback('privacy.settings.title', 'Game Privacy')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => CreateLinkEvent('user-account-settings/show')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => CreateLinkEvent('user-account-settings/show')} type="button">
                         {localizeWithFallback('usersettings.open.title', 'User Settings')}
-                    </button>
+                    </BaseButton>
                 </div>
             </AirSettingsFrame>
         );
@@ -353,37 +357,27 @@ export const UserSettingsView: FC<{}> = () => {
                 <p className="air-settings-chat__info">{localizeWithFallback('toolbar.chat.settings.info', 'Choose how chat appears for you.')}</p>
                 <div className="air-settings-chat__list">
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.oldChat}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('oldchat', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.oldChat} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('oldchat', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.chat.prefer.old.chat', 'Prefer old chat')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={chatWindowEnabled}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setChatWindowEnabled(event.target.checked)}
-                        />
+                        <Checkbox checked={chatWindowEnabled} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setChatWindowEnabled(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.enable.chat.window', 'Enable chat window')}</span>
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}
                             value={userSettings.chatMode === RoomChatSettings.CHAT_MODE_LINE_BY_LINE ? RoomChatSettings.CHAT_MODE_LINE_BY_LINE : RoomChatSettings.CHAT_MODE_FREE_FLOW}
                             onChange={(event) => processAction('chat_mode', Number(event.target.value))}
                         >
                             <option value={RoomChatSettings.CHAT_MODE_FREE_FLOW}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
                             <option value={RoomChatSettings.CHAT_MODE_LINE_BY_LINE}>{localizeWithFallback('navigator.roomsettings.chat.mode.line.by.line', 'Line-by-Line Mode')}</option>
-                        </select>
+                        </Select>
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}
                             value={userSettings.chatBubbleWidth}
                             onChange={(event) => processAction('chat_bubble_width', Number(event.target.value))}
@@ -391,11 +385,11 @@ export const UserSettingsView: FC<{}> = () => {
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_THIN}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.thin', 'Thin')}</option>
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_WIDE}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.wide', 'Wide')}</option>
-                        </select>
+                        </Select>
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}
                             value={userSettings.chatScrollSpeed}
                             onChange={(event) => processAction('chat_scroll_speed', Number(event.target.value))}
@@ -403,11 +397,11 @@ export const UserSettingsView: FC<{}> = () => {
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_SLOW}>{localizeWithFallback('navigator.roomsettings.chat.speed.slow', 'Slow')}</option>
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_FAST}>{localizeWithFallback('navigator.roomsettings.chat.speed.fast', 'Fast')}</option>
-                        </select>
+                        </Select>
                     </label>
-                    <button className="air-settings-button" onClick={() => setSection('wordfilter')} type="button">
+                    <BaseButton className="air-settings-button" onClick={() => setSection('wordfilter')} type="button">
                         {localizeWithFallback('memenu.settings.wordfilter', 'Word filter')}
-                    </button>
+                    </BaseButton>
                 </div>
             </AirSettingsFrame>
         );
@@ -436,53 +430,28 @@ export const UserSettingsView: FC<{}> = () => {
             >
                 <div className="air-settings-other__list">
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.roomInvites}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('room_invites', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.roomInvites} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('room_invites', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.ignore.room.invites', 'Ignore room invites')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.cameraFollow}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('camera_follow', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.cameraFollow} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('camera_follow', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.disable.room.camera.follow', "Don't focus on own avatar")}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.wiredWhisperDisabled}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('wired_whisper_disabled', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.wiredWhisperDisabled} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('wired_whisper_disabled', nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.disable.wired.whisper', 'Hide wired whisper messages')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={catalogPlaceMultipleObjects}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setCatalogPlaceMultipleObjects(event.target.checked)}
-                        />
+                        <Checkbox checked={catalogPlaceMultipleObjects} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setCatalogPlaceMultipleObjects(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.place.multiple.objects', 'Place multiple catalog items')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={catalogSkipPurchaseConfirmation}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setCatalogSkipPurchaseConfirmation(event.target.checked)}
-                        />
+                        <Checkbox checked={catalogSkipPurchaseConfirmation} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setCatalogSkipPurchaseConfirmation(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.skip.purchase.confirmation', 'Skip catalog purchase confirmation')}</span>
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('memenu.settings.other.catalog.grid.density', 'Catalog item size')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('memenu.settings.other.catalog.grid.density', 'Catalog item size')}
                             value={catalogGridDensity}
                             onChange={(event) => setCatalogGridDensity(event.target.value as 'compact' | 'standard' | 'large')}
@@ -490,24 +459,14 @@ export const UserSettingsView: FC<{}> = () => {
                             <option value="compact">{localizeWithFallback('generic.compact', 'Compact')}</option>
                             <option value="standard">{localizeWithFallback('generic.standard', 'Standard')}</option>
                             <option value="large">{localizeWithFallback('generic.large', 'Large')}</option>
-                        </select>
+                        </Select>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={showTilePrices}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setShowTilePrices(event.target.checked)}
-                        />
+                        <Checkbox checked={showTilePrices} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setShowTilePrices(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.catalog.show.prices', 'Show prices on catalog items')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={keyboardMovement}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => setKeyboardMovement(event.target.checked)}
-                        />
+                        <Checkbox checked={keyboardMovement} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setKeyboardMovement(nextChecked)} />
                         <span>{localizeWithFallback('memenu.settings.other.keyboard.movement', 'Move with the arrow keys')}</span>
                     </label>
                 </div>
@@ -522,47 +481,25 @@ export const UserSettingsView: FC<{}> = () => {
                     <legend>{localizeWithFallback('privacy.settings.online.title', 'Online status')}</legend>
                     <p>{localizeWithFallback('settings.privacy.online_status_description', 'Who can see your online status:')}</p>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.onlineStatusVisible}
-                            className="air-settings-radio"
-                            name="online-status-visibility"
-                            type="radio"
-                            onChange={() => processAction('online_status_visible', true)}
-                        />
+                        <Radio checked={userSettings.onlineStatusVisible} className="air-settings-radio" name="online-status-visibility" onCheckedChange={() => processAction('online_status_visible', true)} />
                         <span>{localizeWithFallback('settings.privacy.everyone', 'Everyone')}</span>
                     </label>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={!userSettings.onlineStatusVisible}
-                            className="air-settings-radio"
-                            name="online-status-visibility"
-                            type="radio"
-                            onChange={() => processAction('online_status_visible', false)}
-                        />
+                        <Radio checked={!userSettings.onlineStatusVisible} className="air-settings-radio" name="online-status-visibility" onCheckedChange={() => processAction('online_status_visible', false)} />
                         <span>{localizeWithFallback('settings.privacy.noone', 'Nobody')}</span>
                     </label>
                 </fieldset>
                 <fieldset>
                     <legend>{localizeWithFallback('privacy.settings.follow.title', 'Follow settings')}</legend>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.friendsCanFollow}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('friends_can_follow', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.friendsCanFollow} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('friends_can_follow', nextChecked)} />
                         <span>{localizeWithFallback('settings.privacy.follow_description', 'My friends can follow me from one room to another')}</span>
                     </label>
                 </fieldset>
                 <fieldset>
                     <legend>{localizeWithFallback('privacy.settings.friend_requests.title', 'Friend requests')}</legend>
                     <label className="air-settings-check-row">
-                        <input
-                            checked={userSettings.friendRequestsAllowed}
-                            className="air-settings-checkbox"
-                            type="checkbox"
-                            onChange={(event) => processAction('friend_requests_allowed', event.target.checked)}
-                        />
+                        <Checkbox checked={userSettings.friendRequestsAllowed} className="air-settings-checkbox" onCheckedChange={(nextChecked) => processAction('friend_requests_allowed', nextChecked)} />
                         <span>{localizeWithFallback('settings.privacy.friend_requests_description', 'Other Habbos can send me a friend request')}</span>
                     </label>
                 </fieldset>

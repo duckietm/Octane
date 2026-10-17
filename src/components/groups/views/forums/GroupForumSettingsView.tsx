@@ -4,6 +4,7 @@ import { CreateLinkEvent, LocalizeText, SendMessageComposer } from '../../../../
 import { LayoutBadgeImageView } from '../../../../common';
 import { flatText, GroupText } from '../GroupNativeLayout';
 import { FORUM_HEADER, ForumButton, ForumFrame } from './GroupForumLayout';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // Permission levels: 0 everybody, 1 group members, 2 group administrators, 3 the owner.
 const OPTION_KEYS = [
@@ -82,7 +83,7 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = ({ forumD
                     <GroupText text={LocalizeText(section.labelKey)} x={0} y={0} />
                     {section.levels.map((level, row) => (
                         <div key={level}>
-                            <button
+                            <BaseButton
                                 aria-checked={levels[sectionIndex] === level}
                                 className={`octane-group-native__check is-radio${levels[sectionIndex] === level ? ' is-checked' : ''}`}
                                 role="radio"

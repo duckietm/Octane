@@ -27,6 +27,7 @@ import {
     Text
 } from '../../common';
 import { useInventoryBadges, useMessageEvent, usePurse, useSessionInfo } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 export const HcCenterView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -147,12 +148,12 @@ export const HcCenterView: FC<{}> = (props) => {
                     ]
                 )}
             </div>
-            <div
+            <BaseButton type="button"
                 className="btn btn-link text-primary p-0"
                 onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['payday.habbopage'])}
             >
                 {LocalizeText('hccenter.special.infolink')}
-            </div>
+            </BaseButton>
         </>
     );
 
@@ -188,12 +189,12 @@ export const HcCenterView: FC<{}> = (props) => {
                                 {LocalizeText('hccenter.special.info')}
                             </Text>
                             <div className="mt-auto">
-                                <span
+                                <BaseButton type="button"
                                     className="text-white/90 text-sm cursor-pointer hover:underline"
                                     onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['payday.habbopage'])}
                                 >
                                     {LocalizeText('hccenter.special.infolink')}
-                                </span>
+                                </BaseButton>
                             </div>
                         </Column>
                         <Column
@@ -216,12 +217,12 @@ export const HcCenterView: FC<{}> = (props) => {
                                     <Text bold className="text-center">
                                         {getHcPaydayAmount()}
                                     </Text>
-                                    <span
+                                    <BaseButton type="button"
                                         className="text-primary text-sm cursor-pointer hover:underline self-end"
                                         onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['payday.habbopage'])}
                                     >
                                         {LocalizeText('hccenter.breakdown.infolink')}
-                                    </span>
+                                    </BaseButton>
                                 </Column>
                             )}
                         </Column>
@@ -263,12 +264,12 @@ export const HcCenterView: FC<{}> = (props) => {
                             {LocalizeText('hccenter.general.title')}
                         </Text>
                         <Text small className="text-gray-700" dangerouslySetInnerHTML={{ __html: LocalizeText('hccenter.general.info') }} />
-                        <span
+                        <BaseButton type="button"
                             className="text-primary text-sm cursor-pointer hover:underline mt-1"
                             onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationValue('hc.center')['benefits.habbopage'])}
                         >
                             {LocalizeText('hccenter.general.infolink')}
-                        </span>
+                        </BaseButton>
                     </Column>
                 )}
             </OctaneCardContentView>

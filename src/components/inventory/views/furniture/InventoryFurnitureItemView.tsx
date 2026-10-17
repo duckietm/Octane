@@ -48,7 +48,7 @@ export const InventoryFurnitureItemView: FC<{
         >
             {groupItem.stuffData.uniqueNumber <= 0 && (
                 <div className="octane-inventory-thumb-image">
-                    <img src={groupItem.iconUrl} alt="" draggable={false} />
+                    {groupItem.iconUrl && <img src={groupItem.iconUrl} alt="" draggable={false} />}
                 </div>
             )}
         </InfiniteGrid.Item>

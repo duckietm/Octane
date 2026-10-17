@@ -1,8 +1,8 @@
 import { OctaneEventType } from '@octane/renderer';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { AvatarEditorThumbnailsHelper, GetClubMemberLevel, GetConfigurationValue, IAvatarEditorCategoryPartItem } from '../../../api';
 import hcSmallSrc from '../../../assets/images/avatareditor/air/hc-small.png';
-import { LayoutCurrencyIcon, LayoutGridItemProps } from '../../../common';
+import { LayoutCurrencyIcon } from '../../../common';
 import { useAvatarEditor } from '../../../hooks';
 import { useOctaneEvent } from '../../../hooks/events';
 import { InfiniteGrid } from '../../../layout';
@@ -13,7 +13,8 @@ export const AvatarEditorFigureSetItemView: FC<
         setType: string;
         partItem: IAvatarEditorCategoryPartItem;
         isSelected: boolean;
-    } & LayoutGridItemProps
+        onClick?: MouseEventHandler<HTMLButtonElement>;
+    }
 > = (props) => {
     const { setType = null, partItem = null, isSelected = false, ...rest } = props;
     const partKey = `${setType}:${partItem?.id ?? -1}`;

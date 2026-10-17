@@ -2,7 +2,7 @@ import { ColorConverter } from '@octane/renderer';
 import { FC, useMemo, useState } from 'react';
 import { FaFillDrip } from 'react-icons/fa';
 import { CatalogType, IPurchasableOffer, SanitizeHtml } from '../../../../../api';
-import { AutoGrid, Button, Column, LayoutGridItem, Text } from '../../../../../common';
+import { AutoGrid, BaseButton, Button, Column, LayoutGridItem, Text } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useInventoryFurni } from '../../../../../hooks';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
@@ -146,8 +146,11 @@ const CatalogLayoutColorGroupingGridView: FC<CatalogLayoutColorGroupViewProps> =
                         {colorableItems.get(currentOffer.product.furnitureData.className).map((color, index) => (
                             <LayoutGridItem
                                 key={index}
+                                aria-label={ColorConverter.int2rgb(color)}
+                                aria-pressed={currentOffer.product.furnitureData.colorIndex === index}
                                 itemHighlight
                                 className="clear-bg"
+                                component={BaseButton}
                                 itemActive={currentOffer.product.furnitureData.colorIndex === index}
                                 itemColor={ColorConverter.int2rgb(color)}
                                 onClick={(event) => selectColor(index, currentOffer.product.furnitureData.className)}

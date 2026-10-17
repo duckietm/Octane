@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 const setIntParams = vi.fn();
 const setStringParam = vi.fn();
@@ -82,18 +83,22 @@ describe('WiredExtraProjectileView', () => {
 
         render(<WiredExtraProjectileView />);
 
-        fireEvent.change(screen.getByRole('combobox', { name: 'System:' }), { target: { value: '1' } });
-        fireEvent.click(screen.getByLabelText("Visually change the shooter's direction"));
-        fireEvent.click(screen.getByLabelText('Do a little hop when shooting sideways'));
-        fireEvent.change(screen.getByRole('combobox', { name: 'Shooter:' }), { target: { value: '200' } });
+        selectOption(screen.getByRole('combobox', { name: 'System:' }), '8 directions, diffuse');
+        fireEvent.click(screen.getByRole('checkbox', { name: "Visually change the shooter's direction" }));
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Do a little hop when shooting sideways' }));
+        // The source labels are localization keys that resolve to '' in tests, so the option is picked by position.
+        fireEvent.click(screen.getByRole('combobox', { name: 'Shooter:' }));
+        const shooterOption = screen.getAllByRole('option')[1];
+        fireEvent.pointerDown(shooterOption);
+        fireEvent.click(shooterOption);
 
         fireEvent.click(screen.getByRole('button', { name: /Animation trajectory/ }));
-        fireEvent.click(screen.getByLabelText('Fly past the target'));
+        fireEvent.click(screen.getByRole('radio', { name: 'Fly past the target' }));
         fireEvent.change(screen.getByRole('spinbutton', { name: 'Tiles:' }), { target: { value: '-99' } });
 
         fireEvent.click(screen.getByRole('button', { name: /internal variables/ }));
-        fireEvent.click(screen.getByLabelText('@projectile.animation.position.y'));
-        fireEvent.click(screen.getByLabelText('@projectile.animation.user_collisions'));
+        fireEvent.click(screen.getByRole('checkbox', { name: '@projectile.animation.position.y' }));
+        fireEvent.click(screen.getByRole('checkbox', { name: '@projectile.animation.user_collisions' }));
 
         baseProps.save();
 
@@ -106,13 +111,13 @@ describe('WiredExtraProjectileView', () => {
         const { container } = render(<WiredExtraProjectileView />);
 
         fireEvent.click(screen.getByRole('button', { name: /Animation time/ }));
-        fireEvent.click(screen.getByLabelText('Scale the animation time with the distance'));
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Scale the animation time with the distance' }));
         fireEvent.change(screen.getByRole('spinbutton', { name: 'Time per tile (ms):' }), { target: { value: '0' } });
         fireEvent.click(container.querySelectorAll('input[name="projectileTimeValue"]')[1]);
 
         expect(baseProps.validate()).toBe(false);
 
-        fireEvent.change(screen.getByRole('combobox', { name: 'Time per tile (ms): variable type' }), { target: { value: '3' } });
+        selectOption(screen.getByRole('combobox', { name: 'Time per tile (ms): variable type' }), 'Global');
         fireEvent.click(screen.getByRole('button', { name: 'custom:500' }));
 
         expect(baseProps.validate()).toBe(true);

@@ -10,6 +10,11 @@ import { WiredVariablePicker } from '../WiredVariablePicker';
 import { flattenWiredVariablePickerEntries, getCustomVariableItemId } from '../WiredVariablePickerData';
 import { customVariablePickerEntries, normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Checkbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_PICKED = 100;
@@ -130,14 +135,14 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
     const sourceButtons = (isUser: boolean, onChange: (isUser: boolean) => void) => (
         <div className="octane-wired__give-var-targets">
             { [ { key: 'furni', icon: sourceFurniIcon, isUser: false }, { key: 'user', icon: sourceUserIcon, isUser: true } ].map(button => (
-                <button
-                    key={ button.key }
-                    type="button"
-                    title={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }
-                    className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ isUser === button.isUser ? 'is-active' : '' }` }
-                    onClick={ () => onChange(button.isUser) }>
-                    <img src={ button.icon } alt={ button.key } />
-                </button>
+                <Hint key={ button.key } content={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }>
+                    <BaseButton aria-label={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }
+                        type="button"
+                        className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ isUser === button.isUser ? 'is-active' : '' }` }
+                        onClick={ () => onChange(button.isUser) }>
+                        <img src={ button.icon } alt={ button.key } />
+                    </BaseButton>
+                </Hint>
             )) }
         </div>
     );
@@ -145,7 +150,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
     const customTargetUsed = location === 1 || altitude === 2;
     const radio = (name: string, value: number, current: number, onChange: (value: number) => void, label: string, info?: string) => (
         <label key={ `${ name }${ value }` } className="flex items-start gap-1">
-            <input type="radio" className="form-check-input" name={ name } checked={ current === value } onChange={ () => onChange(value) } />
+            <Radio name={ name } checked={ current === value } onCheckedChange={() => onChange(value)} />
             <span className="flex flex-col">
                 <Text>{ label }</Text>
                 { info && <Text small className="text-muted">{ info }</Text> }
@@ -155,7 +160,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
     const offsetInput = (label: string, value: number, bound: number, onChange: (value: number) => void) => (
         <div className="flex items-center gap-1">
             <Text small>{ label }</Text>
-            <input type="number" className="form-control form-control-sm" style={ { width: 72 } } min={ -bound } max={ bound } value={ value } onChange={ event => onChange(clamp(parseInt(event.target.value, 10), bound)) } />
+            <NumberInput className="form-control form-control-sm" style={ { width: 72 } } min={ -bound } max={ bound } value={ value } onChange={ event => onChange(clamp(parseInt(event.target.value, 10), bound)) } />
         </div>
     );
 
@@ -176,9 +181,9 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
                 </div>
 
                 <div className="flex flex-col gap-1">
-                    <button type="button" className="btn btn-link p-0 align-self-start" onClick={ () => setShowOffsets(value => !value) }>
+                    <BaseButton type="button" className="btn btn-link p-0 align-self-start" onClick={ () => setShowOffsets(value => !value) }>
                         <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.offsets', 'Offsets') }</Text>
-                    </button>
+                    </BaseButton>
                     { showOffsets &&
                         <div className="flex flex-wrap items-center gap-3">
                             { offsetInput(localizeWithFallback('wiredfurni.params.place_furni.offsets.x', 'x:'), offsetX, MAX_OFFSET, setOffsetX) }
@@ -191,7 +196,7 @@ export const WiredActionPlaceTemporaryFurniView: FC<{}> = () =>
 
                 <div className="flex flex-col gap-1">
                     <label className="flex items-center gap-1">
-                        <input type="checkbox" className="form-check-input" checked={ spawnWithVariable } onChange={ event => setSpawnWithVariable(event.target.checked) } />
+                        <Checkbox checked={ spawnWithVariable } onCheckedChange={(nextChecked) => setSpawnWithVariable(nextChecked)} />
                         <Text bold>{ localizeWithFallback('wiredfurni.params.place_furni.spawn_with_variable', 'Spawn with variable') }</Text>
                     </label>
                     { spawnWithVariable &&

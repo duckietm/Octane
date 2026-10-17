@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HousekeepingSoundboardTab } from './HousekeepingSoundboardTab';
+import { selectOption } from '../../../../test-utils/selectOption';
 
 const mocks = vi.hoisted(() => ({
     playSoundboardPreview: vi.fn().mockResolvedValue(true),
@@ -59,7 +60,7 @@ vi.mock('../../../../hooks', () => ({
     useSoundboardManifest: () => ({
         manifest: { categories: [], byClassname: new Map() },
         manifestRef: { current: { categories: [], byClassname: new Map() } },
-        classnames: [],
+        classnames: ['snd_alpha', 'snd_beta'],
         loaded: true
     })
 }));
@@ -83,7 +84,7 @@ describe('HousekeepingSoundboardTab', () => {
         expect(container.textContent).toContain('Applauso');
         expect(container.textContent).not.toContain('Campanella');
 
-        fireEvent.change(screen.getByRole('combobox', { name: 'Filter sounds' }), { target: { value: 'enabled' } });
+        selectOption(screen.getByRole('combobox', { name: 'Filter sounds' }), 'Enabled');
         expect(container.textContent).not.toContain('Applauso');
 
         fireEvent.change(screen.getByRole('searchbox', { name: 'Search sounds' }), { target: { value: '' } });
@@ -105,6 +106,26 @@ describe('HousekeepingSoundboardTab', () => {
         expect(mocks.playSoundboardPreview).toHaveBeenCalledWith('https://assets.example.test/sounds/fanfare.mp3');
         fireEvent.click(screen.getByRole('button', { name: 'Save sound' }));
         expect(mocks.upsert).toHaveBeenCalledWith(expect.objectContaining({ id: 0, name: 'Fanfara', enabled: true }));
+    });
+
+    it('suggests the known class names but keeps whatever is typed', () => {
+        render(<HousekeepingSoundboardTab />);
+        fireEvent.click(screen.getByRole('button', { name: 'New sound' }));
+        fireEvent.change(screen.getByRole('textbox', { name: 'Name' }), { target: { value: 'Fanfara' } });
+        fireEvent.change(screen.getByRole('textbox', { name: 'URL' }), { target: { value: 'sounds/fanfare.mp3' } });
+        fireEvent.change(screen.getByRole('spinbutton', { name: 'Minimum rank' }), { target: { value: '1' } });
+
+        const classname = screen.getByRole('combobox', { name: /class/i });
+        fireEvent.change(classname, { target: { value: 'snd_b' } });
+        fireEvent.click(screen.getByRole('option', { name: 'snd_beta' }));
+        expect(classname).toHaveValue('snd_beta');
+
+        fireEvent.change(classname, { target: { value: 'my_own_class' } });
+        expect(classname).toHaveValue('my_own_class');
+        expect(screen.queryAllByRole('option')).toHaveLength(0);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Save sound' }));
+        expect(mocks.upsert).toHaveBeenCalledWith(expect.objectContaining({ classname: 'my_own_class' }));
     });
 
     it('adopts the server id after creation so a second save updates the same sound', () => {
@@ -146,7 +167,7 @@ describe('HousekeepingSoundboardTab', () => {
         expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
         expect(screen.getByRole('textbox', { name: 'URL' })).toBeDisabled();
         expect(screen.getByRole('spinbutton', { name: 'Minimum rank' })).toBeDisabled();
-        expect(screen.getByRole('checkbox', { name: 'Enabled' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Enabled' })).toHaveAttribute('aria-disabled', 'true');
         expect(screen.getByRole('button', { name: 'New sound' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Edit Campanella' })).toBeDisabled();
     });

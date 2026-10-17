@@ -10,6 +10,7 @@ import {
 } from '../../../../api';
 import { useHousekeeping } from '../../../../hooks';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingField, HousekeepingNumberField, HousekeepingSection } from '../common/HousekeepingParts';
+import { Select } from '../../../../common/Select';
 
 export interface HousekeepingSanctionDraft {
     templateId: string;
@@ -94,14 +95,14 @@ export const HousekeepingUserSanctionsView: FC<HousekeepingUserSanctionsViewProp
             <HousekeepingSection icon={<FaGavel className="text-rose-500" size={9} />} title={LocalizeText('housekeeping.user.section.sanctions')}>
                 <div className="grid grid-cols-[180px_1fr] gap-1.5">
                     <HousekeepingField label={LocalizeText('housekeeping.field.template')}>
-                        <select className={HOUSEKEEPING_INPUT_CLASS} value={draft.templateId} onChange={(event) => applyTemplate(event.target.value)}>
+                        <Select className={HOUSEKEEPING_INPUT_CLASS} value={draft.templateId} onChange={(event) => applyTemplate(event.target.value)}>
                             <option value="">{LocalizeText('housekeeping.field.template.none')}</option>
                             {templates.map((template) => (
                                 <option key={template.id} value={template.id}>
                                     {localizeSanctionTemplate(template).name}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </HousekeepingField>
                     <HousekeepingField label={LocalizeText('housekeeping.field.reason')}>
                         <input

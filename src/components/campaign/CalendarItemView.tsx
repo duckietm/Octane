@@ -2,6 +2,7 @@ import { GetRoomEngine, GetSessionDataManager } from '@octane/renderer';
 import { FC } from 'react';
 import { CalendarItemState, GetConfigurationValue, ICalendarItem } from '../../api';
 import { Column, Flex, LayoutImage } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
 
 interface CalendarItemViewProps {
     itemId: number;
@@ -31,6 +32,7 @@ export const CalendarItemView: FC<CalendarItemViewProps> = (props) => {
     return (
         <Column
             center
+            component={BaseButton}
             fit
             pointer
             className={`campaign-spritesheet campaign-day-generic-bg rounded calendar-item ${active ? 'active' : ''}`}

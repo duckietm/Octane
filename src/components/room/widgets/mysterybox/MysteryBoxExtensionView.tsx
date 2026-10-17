@@ -4,6 +4,7 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { ColorUtils, LocalizeText } from '../../../../api';
 import { Flex, LayoutGridItem, Text } from '../../../../common';
 import { useOctaneEvent } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const colorMap = {
     purple: 9452386,
@@ -37,7 +38,7 @@ export const MysteryBoxExtensionView: FC<{}> = (props) => {
     return (
         <div className="px-[5px] py-[6px] [box-shadow:inset_0_5px_#22222799,inset_0_-4px_#12121599]  text-sm bg-[#1c1c20f2] rounded mysterybox-extension">
             <div className="flex flex-col">
-                <Flex pointer alignItems="center" justifyContent="between" onClick={(event) => setIsOpen((value) => !value)}>
+                <Flex component={BaseButton} type="button" pointer alignItems="center" justifyContent="between" onClick={(event) => setIsOpen((value) => !value)}>
                     <Text variant="white">{LocalizeText('mysterybox.tracker.title')}</Text>
                     {isOpen && <FaChevronUp className="fa-icon" />}
                     {!isOpen && <FaChevronDown className="fa-icon" />}

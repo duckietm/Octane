@@ -9,9 +9,12 @@ import {
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CameraEditorTabs, CameraPicture, CameraPictureThumbnail, LocalizeText } from '../../../../api';
 import { OctaneCardView, Slider } from '../../../../common';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { CAMERA_BOX_COLOR, CameraCenteredText, CameraNativeText } from '../CameraNativeText';
 import { CameraSkinButton } from '../CameraSkinButton';
 import { CameraWidgetEffectListView } from './effect-list';
+import { BaseButton } from '../../../../common/BaseButton';
+import { ToggleButton } from '../../../../common/ToggleButton';
 
 export interface CameraWidgetEditorViewProps {
     picture: CameraPicture;
@@ -251,25 +254,23 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                         width={584}
                     />
                 </span>
-                <button aria-label={LocalizeText('generic.help')} className="octane-camera-editor__help" type="button" onClick={() => CreateLinkEvent('habbopages/camera')} />
-                <button aria-label={LocalizeText('generic.close')} className="octane-card-close-button" type="button" onClick={() => processAction('close')} />
+                <BaseButton aria-label={LocalizeText('generic.help')} className="octane-camera-editor__help" type="button" onClick={() => CreateLinkEvent('habbopages/camera')} />
+                <BaseButton aria-label={LocalizeText('generic.close')} className="octane-card-close-button" type="button" onClick={() => processAction('close')} />
             </div>
             <div className="octane-camera-editor__layout">
-                <div className="octane-camera-editor__effect-tabs" role="tablist">
+                <TabBar className="octane-camera-editor__effect-tabs" value={currentTab}>
                     {TABS.map((tab) => (
-                        <button
-                            type="button"
+                        <TabBarTab
                             key={tab}
-                            role="tab"
-                            aria-selected={currentTab === tab}
+                            value={tab}
                             className={`octane-camera-editor__effect-tab${currentTab === tab ? ' octane-camera-editor__effect-tab--active' : ''}`}
                             title={LocalizeText(`camera.effect.category.${tab}`)}
                             onClick={() => processAction('change_tab', tab)}
                         >
                             <i className={`octane-icon icon-camera-${tab}`} />
-                        </button>
+                        </TabBarTab>
                     ))}
-                </div>
+                </TabBar>
 
                 <div className="octane-camera-editor__effect-grid-frame has-classic-scrollbar">
                     <CameraWidgetEffectListView
@@ -306,26 +307,24 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                             step={1}
                             value={Math.round(currentEffect.strength * 100)}
                             onChange={(value) => setSelectedEffectAlpha(value / 100)}
-                            renderThumb={({ key, ...thumbProps }) => (
-                                <div key={key} {...thumbProps} aria-label={LocalizeText(`camera.effect.name.${currentEffect.effect.name}`)} />
-                            )}
+                            thumbAriaLabel={LocalizeText(`camera.effect.name.${currentEffect.effect.name}`)}
                         />
                     </div>
                 )}
 
-                <button type="button" className="octane-camera-editor__tool octane-camera-editor__tool--save" onClick={() => processAction('download')}>
+                <BaseButton type="button" className="octane-camera-editor__tool octane-camera-editor__tool--save" onClick={() => processAction('download')}>
                     <span className="octane-camera-editor__tool-icon" aria-hidden="true" />
                     <CameraNativeText background={CAMERA_BOX_COLOR} color={0x000000} size={11} text={LocalizeText('floor.plan.editor.save')} textStyle="u_button_tab" underline />
-                </button>
-                <button
+                </BaseButton>
+                <ToggleButton
                     type="button"
                     className="octane-camera-editor__tool octane-camera-editor__tool--zoom"
-                    aria-pressed={isZoomed}
+                    pressed={isZoomed}
                     onClick={() => processAction('zoom')}
                 >
                     <span className="octane-camera-editor__tool-icon" aria-hidden="true" />
                     <CameraNativeText background={CAMERA_BOX_COLOR} color={0x000000} size={11} text={LocalizeText('room.zoom.button.text')} textStyle="u_button_tab" underline />
-                </button>
+                </ToggleButton>
 
                 <div className="octane-camera-editor__button-separator" />
                 <CameraSkinButton className="octane-camera-editor__cancel" label={LocalizeText('catalog.purchase_confirmation.cancel')} labelWidth={152} variant="gray-dark" onClick={() => processAction('cancel')} />

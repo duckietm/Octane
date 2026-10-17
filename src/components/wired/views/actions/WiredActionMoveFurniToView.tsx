@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredSliderSection } from '../WiredSliderSection';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 const directionOptions: { value: number; icon: string }[] = [
     {
@@ -61,13 +62,7 @@ export const WiredActionMoveFurniToView: FC<{}> = (props) => {
                 <div className="flex flex-col gap-1">
                     {directionOptions.map((value) => (
                         <label key={value.value} className="flex items-center gap-1">
-                            <input
-                                checked={movement === value.value}
-                                className="form-check-input"
-                                name="movement"
-                                type="radio"
-                                onChange={() => setMovement(value.value)}
-                            />
+                            <Radio checked={movement === value.value} name="movement" onCheckedChange={() => setMovement(value.value)} />
                             <i className={`icon icon-${value.icon}`} />
                             <Text>{localizeWithFallback(`wiredfurni.params.movefurni.${value.value}`, value.icon.toUpperCase())}</Text>
                         </label>

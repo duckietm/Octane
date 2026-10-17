@@ -1,4 +1,5 @@
 import { FC, useMemo } from 'react';
+import { BaseButton } from './BaseButton';
 import { Flex, FlexProps } from './Flex';
 import { ButtonSizeType, ColorVariantType } from './types';
 
@@ -52,5 +53,5 @@ export const Button: FC<ButtonProps> = (props) => {
         return newClassNames;
     }, [variant, size, active, disabled, classNames]);
 
-    return <Flex center display="inline-flex" classNames={getClassNames} {...rest} />;
+    return <Flex center component={BaseButton} disabled={disabled} display="inline-flex" classNames={getClassNames} {...rest} />;
 };

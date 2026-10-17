@@ -11,6 +11,7 @@ import {
     getCachedEmuStats
 } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
 
 type EmuStatsSection = 'overview' | 'system' | 'wiredInsights' | 'users' | 'rooms' | 'wired';
 
@@ -553,7 +554,7 @@ export const EmuStatsView: FC<{}> = () => {
                         </div>
                         <nav className="octane-emustats__nav">
                             {navItems.map((item) => (
-                                <button
+                                <BaseButton
                                     key={item.key}
                                     className={`octane-emustats__nav-button ${section === item.key ? 'is-active' : ''}`}
                                     onClick={() => setSection(item.key)}
@@ -561,13 +562,13 @@ export const EmuStatsView: FC<{}> = () => {
                                 >
                                     <span>{item.label}</span>
                                     {typeof item.count === 'number' && <strong>{item.count}</strong>}
-                                </button>
+                                </BaseButton>
                             ))}
                         </nav>
                         <div className="octane-emustats__sidebar-footer">
-                            <button className="octane-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
+                            <BaseButton className="octane-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
                                 Refresh now
-                            </button>
+                            </BaseButton>
                             <p>Auto refresh every {REFRESH_INTERVAL_MS / 1000}s</p>
                         </div>
                     </aside>

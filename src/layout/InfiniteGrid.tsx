@@ -1,5 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { DetailedHTMLProps, Fragment, HTMLAttributes, ReactElement, Ref, RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ComponentPropsWithoutRef, CSSProperties, Fragment, ReactElement, ReactNode, Ref, RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ToggleButton } from '../common/ToggleButton';
 import { ClassicScrollAreaView } from '../common/scroll-area/ClassicScrollAreaView';
 import { classNames } from './classNames';
 import { OctaneLimitedEditionStyledNumberView } from './limited-edition';
@@ -241,8 +242,11 @@ type InfiniteGridItemProps = {
     itemUnseen?: boolean;
     itemHighlight?: boolean;
     disabled?: boolean;
-    ref?: Ref<HTMLDivElement>;
-} & DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+    ref?: Ref<HTMLButtonElement>;
+    className?: string;
+    style?: CSSProperties;
+    children?: ReactNode;
+} & Omit<ComponentPropsWithoutRef<typeof ToggleButton>, 'className' | 'style' | 'children' | 'disabled' | 'pressed' | 'defaultPressed'>;
 
 const InfiniteGridItem = ({
     ref,
@@ -291,8 +295,9 @@ const InfiniteGridItem = ({
     }, []);
 
     return (
-        <div
+        <ToggleButton
             ref={ref}
+            pressed={itemActive}
             className={classNames(
                 'flex flex-col items-center justify-center cursor-pointer overflow-hidden relative bg-center bg-no-repeat w-full rounded-md border-2',
                 itemImage && (!backgroundImageUrl || !backgroundImageUrl.length) && 'octane-icon icon-loading',
@@ -340,7 +345,7 @@ const InfiniteGridItem = ({
                 </>
             )}
             {children}
-        </div>
+        </ToggleButton>
     );
 };
 

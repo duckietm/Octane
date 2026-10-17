@@ -24,6 +24,8 @@ import { useMessageEvent, useNotification, usePurse } from '../../../hooks';
 import { joinCameraPhotoUrl } from '../CameraAirUtilities';
 import { CAMERA_BOX_COLOR, CAMERA_COMPETITION_COLOR, CameraCenteredText, CameraNativeText } from './CameraNativeText';
 import { CameraSkinButton } from './CameraSkinButton';
+import { Checkbox } from '../../../common/Checkbox';
+import { BaseButton } from '../../../common/BaseButton';
 
 export interface CameraWidgetCheckoutViewProps {
     base64Url: string;
@@ -368,7 +370,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                 <span className="octane-card-title">
                     <CameraCenteredText background={0x484949} color={0xffffff} text={LocalizeText('camera.confirm_phase.title')} textStyle="u_frame_title" width={340} />
                 </span>
-                <button aria-label={LocalizeText('generic.close')} className="octane-card-close-button" type="button" onClick={() => processAction('close')} />
+                <BaseButton aria-label={LocalizeText('generic.close')} className="octane-card-close-button" type="button" onClick={() => processAction('close')} />
             </div>
             <div className="octane-camera-checkout__list">
                 <div ref={productImageContainerRef} className={`octane-camera-checkout__image${hasRenderingFailed ? ' is-failed' : ''}`}>
@@ -440,9 +442,9 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
                         <div className="octane-camera-checkout__inventory-row">
                             <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={LocalizeText('camera.purchase.count.info')} textStyle="u_bold" />
                             <CameraNativeText background={CAMERA_BOX_COLOR} size={14} text={String(picturesBought)} />
-                            <button className="octane-camera-checkout__link" type="button" onClick={() => CreateLinkEvent('inventory/show/furni')}>
+                            <BaseButton className="octane-camera-checkout__link" type="button" onClick={() => CreateLinkEvent('inventory/show/furni')}>
                                 <CameraNativeText background={CAMERA_BOX_COLOR} text={LocalizeText('camera.open.inventory')} underline />
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     {renderButton(
@@ -496,7 +498,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = (prop
 
                 {spendingDisclaimerEnabled && (
                     <label className="octane-camera-checkout__spending">
-                        <input checked={disclaimerAccepted} type="checkbox" onChange={(event) => setDisclaimerAccepted(event.target.checked)} />
+                        <Checkbox checked={disclaimerAccepted} onCheckedChange={(nextChecked) => setDisclaimerAccepted(nextChecked)} />
                         <span className="octane-camera-checkout__spending-text">
                             <CameraNativeText maxWidth={278} text={LocalizeText('disclaimer.credit_spending')} />
                         </span>

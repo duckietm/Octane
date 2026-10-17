@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { FC, PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import {
@@ -54,6 +55,10 @@ import {
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredProjectileDirectionGrid } from './WiredProjectileDirectionGrid';
+import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
+import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -117,13 +122,13 @@ const ProjectileSection: FC<PropsWithChildren<{ title: string; open: boolean; fi
     return (
         <>
             {!first && <div className="octane-wired__divider" />}
-            <div className="octane-wired__projectile-section">
-                <button aria-expanded={open} className="octane-wired__projectile-section-header" type="button" onClick={onToggle}>
+            <Collapsible.Root className="octane-wired__projectile-section" open={open} onOpenChange={() => onToggle()}>
+                <Collapsible.Trigger className="octane-wired__projectile-section-header">
                     <Text bold>{title}</Text>
                     {open ? <FaChevronUp className="octane-wired__projectile-chevron" /> : <FaChevronDown className="octane-wired__projectile-chevron" />}
-                </button>
-                {open && <div className="octane-wired__projectile-section-body">{children}</div>}
-            </div>
+                </Collapsible.Trigger>
+                <Collapsible.Panel className="octane-wired__projectile-section-body">{children}</Collapsible.Panel>
+            </Collapsible.Root>
         </>
     );
 };
@@ -133,7 +138,7 @@ const Checkbox: FC<{ checked: boolean; disabled?: boolean; label: string; onChan
 
     return (
         <label className={`flex items-center gap-1 ${disabled ? 'opacity-50' : 'cursor-pointer'}`}>
-            <input checked={checked} className="form-check-input" disabled={disabled} type="checkbox" onChange={(event) => onChange(event.target.checked)} />
+            <BaseCheckbox checked={checked} disabled={disabled} onCheckedChange={onChange} />
             <Text small>{label}</Text>
         </label>
     );
@@ -142,26 +147,20 @@ const Checkbox: FC<{ checked: boolean; disabled?: boolean; label: string; onChan
 const NumberField: FC<{ disabled?: boolean; label: string; value: number; onChange: (value: number) => void }> = ({ disabled = false, label, value, onChange }) => (
     <label className={`flex items-center justify-between gap-2 ${disabled ? 'opacity-50' : ''}`}>
         <Text small>{label}</Text>
-        <input
-            className="form-control form-control-sm octane-wired__projectile-number"
-            disabled={disabled}
-            type="number"
-            value={value}
-            onChange={(event) => onChange(parseInt(event.target.value, 10))}
-        />
+        <NumberInput className="form-control form-control-sm octane-wired__projectile-number" disabled={disabled} value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))} />
     </label>
 );
 
 const SourceSelect: FC<{ label: string; options: WiredSourceOption[]; value: number; onChange: (value: number) => void }> = ({ label, options, value, onChange }) => (
     <label className="flex items-center justify-between gap-2">
         <Text small>{label}</Text>
-        <select aria-label={label} className="form-select form-select-sm" value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))}>
+        <Select aria-label={label} className="form-select form-select-sm" value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))}>
             {options.map((option) => (
                 <option key={option.value} value={option.value}>
                     {LocalizeText(option.label)}
                 </option>
             ))}
-        </select>
+        </Select>
     </label>
 );
 
@@ -210,24 +209,17 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
     return (
         <div className="flex flex-col gap-1">
             <label className="flex items-center gap-1 cursor-pointer">
-                <input checked={!fromVariable} className="form-check-input" name={name} type="radio" onChange={() => props.onFromVariable(false)} />
+                <Radio checked={!fromVariable} name={name} onCheckedChange={() => props.onFromVariable(false)} />
                 <Text small>{label}</Text>
-                <input
-                    aria-label={label}
-                    className="form-control form-control-sm octane-wired__projectile-number ms-auto"
-                    disabled={fromVariable}
-                    type="number"
-                    value={value}
-                    onChange={(event) => props.onValue(parseInt(event.target.value, 10))}
-                />
+                <NumberInput aria-label={label} className="form-control form-control-sm octane-wired__projectile-number ms-auto" disabled={fromVariable} value={value} onChange={(event) => props.onValue(parseInt(event.target.value, 10))} />
             </label>
             <label className="flex items-center gap-1 cursor-pointer">
-                <input checked={fromVariable} className="form-check-input" name={name} type="radio" onChange={() => props.onFromVariable(true)} />
+                <Radio checked={fromVariable} name={name} onCheckedChange={() => props.onFromVariable(true)} />
                 <Text small>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
             </label>
             {fromVariable && (
                 <div className="flex flex-col gap-1 octane-wired__projectile-indent">
-                    <select
+                    <Select
                         aria-label={`${label} variable type`}
                         className="form-select form-select-sm"
                         value={target}
@@ -241,7 +233,7 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
                                 {text(`variable_target.${option.key}`, option.fallback)}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                     <WiredVariablePicker entries={entries} recentScope="projectile-reference" selectedToken={token} onSelect={(entry) => props.onToken(entry.token)} />
                     {targetKey === 'user' && (
                         <SourceSelect label={text('variable_source', 'Read it from:')} options={userSources} value={userSource} onChange={props.onUserSource} />
@@ -319,7 +311,7 @@ export const WiredExtraProjectileView: FC<{}> = () => {
                     />
                     <div className="flex flex-col gap-1">
                         <Text small>{text('system', 'System:')}</Text>
-                        <select
+                        <Select
                             aria-label={text('system', 'System:')}
                             className="form-select form-select-sm"
                             disabled={!rotates && !changesShooter}
@@ -331,7 +323,7 @@ export const WiredExtraProjectileView: FC<{}> = () => {
                                     {text(`system.${system.value}`, system.fallback)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                     <WiredProjectileDirectionGrid disabled={!rotates && !changesShooter} system={params[PROJECTILE_PARAM_DIRECTIONAL_SYSTEM]} />
                     <Checkbox
@@ -361,13 +353,7 @@ export const WiredExtraProjectileView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         {DISTANCE_MODES.map((mode) => (
                             <label key={mode.value} className="flex items-center gap-1 cursor-pointer">
-                                <input
-                                    checked={distanceMode === mode.value}
-                                    className="form-check-input"
-                                    name="projectileDistanceMode"
-                                    type="radio"
-                                    onChange={() => setParam(PROJECTILE_PARAM_DISTANCE_MODE, mode.value)}
-                                />
+                                <Radio checked={distanceMode === mode.value} name="projectileDistanceMode" onCheckedChange={() => setParam(PROJECTILE_PARAM_DISTANCE_MODE, mode.value)} />
                                 <Text small>{text(`distance.${mode.key}`, mode.fallback)}</Text>
                             </label>
                         ))}

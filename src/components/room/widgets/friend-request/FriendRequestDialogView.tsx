@@ -2,6 +2,7 @@ import { RoomObjectCategory } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, MessengerRequest } from '../../../../api';
 import { ObjectLocationView } from '../object-location/ObjectLocationView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 /**
  * The friend request over the head of the sender, drawn like the classic instant request: a yellow
@@ -23,24 +24,24 @@ export const FriendRequestDialogView: FC<{
                     <path d="M1.5 14c0-3.4 2.7-5.5 6-5.5s6 2.1 6 5.5z" />
                 </svg>
                 <div className="octane-friend-request__text">{LocalizeText('widget.friendrequest.from', ['username'], [request.name])}</div>
-                <button
+                <BaseButton
                     aria-label={LocalizeText('generic.close')}
                     className="octane-friend-request__close"
                     type="button"
                     onClick={() => hideFriendRequest(request.requesterUserId)}
                 >
                     ×
-                </button>
+                </BaseButton>
                 <div className="octane-friend-request__actions">
-                    <button className="octane-friend-request__decline" type="button" onClick={() => requestResponse(request.requesterUserId, false)}>
+                    <BaseButton className="octane-friend-request__decline" type="button" onClick={() => requestResponse(request.requesterUserId, false)}>
                         {LocalizeText('widget.friendrequest.decline')}
-                    </button>
-                    <button className="octane-friend-request__accept" type="button" onClick={() => requestResponse(request.requesterUserId, true)}>
+                    </BaseButton>
+                    <BaseButton className="octane-friend-request__accept" type="button" onClick={() => requestResponse(request.requesterUserId, true)}>
                         <span aria-hidden="true" className="octane-friend-request__check">
                             ✓
                         </span>
                         {LocalizeText('widget.friendrequest.accept')}
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
         </ObjectLocationView>

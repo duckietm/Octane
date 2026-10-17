@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
+import { Radio } from '../../../../common/Radio';
 
 interface WiredConditionActorIsOnFurniViewProps {
     negative?: boolean;
@@ -44,13 +45,7 @@ export const WiredConditionActorIsOnFurniView: FC<WiredConditionActorIsOnFurniVi
                         <Text bold>{LocalizeText('wiredfurni.params.quantifier_selection')}</Text>
                         {[0, 1].map((value) => (
                             <label key={value} className="flex items-center gap-1">
-                                <input
-                                    checked={quantifier === value}
-                                    className="form-check-input"
-                                    name="triggerOnFurniQuantifier"
-                                    type="radio"
-                                    onChange={() => setQuantifier(value)}
-                                />
+                                <Radio checked={quantifier === value} name="triggerOnFurniQuantifier" onCheckedChange={() => setQuantifier(value)} />
                                 <Text>{LocalizeText(`wiredfurni.params.quantifier.users${negative ? '.neg' : ''}.${value}`)}</Text>
                             </label>
                         ))}

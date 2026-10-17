@@ -3,6 +3,8 @@ import { FC, useState } from 'react';
 import { formatCameraPhotoDate, GetAllowedCameraPhotoUrl, GetUserProfile, LocalizeText, ReportType } from '../../../../api';
 import { DraggableWindow } from '../../../../common';
 import { getPhotoCreator, useFurnitureExternalImageWidget, useHelp, useNotification, useRoom } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 // Official stories_image_widget: the photo in a 1px black outline on a translucent panel, browse arrows
 // either side, date and creator under it, and report / remove / close at the top right.
@@ -76,15 +78,15 @@ export const FurnitureExternalImageView: FC<{}> = (props) => {
                 </div>
                 {canBrowse && (
                     <>
-                        <button type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--previous" onClick={() => browse(-1)} />
-                        <button type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--next" onClick={() => browse(1)} />
+                        <BaseButton type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--previous" onClick={() => browse(-1)} />
+                        <BaseButton type="button" className="octane-photo-viewer__browse octane-photo-viewer__browse--next" onClick={() => browse(1)} />
                     </>
                 )}
                 {creationDate && <span className="octane-photo-viewer__date">{creationDate}</span>}
                 {creator.name && (
-                    <button type="button" className="octane-photo-viewer__creator" onClick={() => creator.id > 0 && GetUserProfile(creator.id)}>
+                    <BaseButton type="button" className="octane-photo-viewer__creator" onClick={() => creator.id > 0 && GetUserProfile(creator.id)}>
                         {creator.name}
-                    </button>
+                    </BaseButton>
                 )}
                 {caption && (
                     <div className="octane-photo-viewer__caption" title={caption}>
@@ -92,21 +94,25 @@ export const FurnitureExternalImageView: FC<{}> = (props) => {
                     </div>
                 )}
                 <div className="octane-photo-viewer__buttons">
-                    <button
-                        type="button"
-                        className="octane-photo-viewer__button octane-photo-viewer__button--report"
-                        title={LocalizeText('help.report.photo.button')}
-                        onClick={onReport}
-                    />
-                    {canRemove && (
-                        <button
+                    <Hint content={LocalizeText('help.report.photo.button')}>
+                        <BaseButton aria-label={LocalizeText('help.report.photo.button')}
                             type="button"
-                            className="octane-photo-viewer__button octane-photo-viewer__button--remove"
-                            title={LocalizeText('inventory.remove.external_image_wallitem_delete')}
-                            onClick={onRemove}
+                            className="octane-photo-viewer__button octane-photo-viewer__button--report"
+                            onClick={onReport}
                         />
+                    </Hint>
+                    {canRemove && (
+                        <Hint content={LocalizeText('inventory.remove.external_image_wallitem_delete')}>
+                            <BaseButton aria-label={LocalizeText('inventory.remove.external_image_wallitem_delete')}
+                                type="button"
+                                className="octane-photo-viewer__button octane-photo-viewer__button--remove"
+                                onClick={onRemove}
+                            />
+                        </Hint>
                     )}
-                    <button type="button" className="octane-photo-viewer__close" title={LocalizeText('generic.close')} onClick={onClose} />
+                    <Hint content={LocalizeText('generic.close')}>
+                        <BaseButton aria-label={LocalizeText('generic.close')} type="button" className="octane-photo-viewer__close" onClick={onClose} />
+                    </Hint>
                 </div>
             </div>
         </DraggableWindow>

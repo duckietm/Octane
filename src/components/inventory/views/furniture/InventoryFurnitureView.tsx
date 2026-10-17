@@ -18,6 +18,8 @@ import { useInventoryFurni, useInventoryUnseenTracker } from '../../../../hooks'
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
+import { BaseButton } from '../../../../common/BaseButton';
+import { Hint } from '../../../../common/Tooltip';
 
 const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
     const item = groupItem.getLastItem();
@@ -140,9 +142,9 @@ export const InventoryFurnitureView: FC<{
                 {pageCount > 1 && (
                     <div className="octane-inventory-pages">
                         {Array.from({ length: pageCount }, (_, index) => (
-                            <button key={index} type="button" aria-current={index === currentPage ? 'page' : undefined} onClick={() => setPage(index)}>
+                            <BaseButton key={index} type="button" aria-current={index === currentPage ? 'page' : undefined} onClick={() => setPage(index)}>
                                 {index}
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 )}
@@ -188,19 +190,20 @@ export const InventoryFurnitureView: FC<{
                         </div>
                     )}
                     {selectedItem && (
-                        <button
-                            type="button"
-                            className="octane-inventory-preview-delete"
-                            aria-label={LocalizeText('generic.delete')}
-                            title={LocalizeText('generic.delete')}
-                            onPointerDown={(event) => event.stopPropagation()}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                attemptDeleteItem(selectedItem);
-                            }}
-                        >
-                            <FaTrashAlt aria-hidden="true" />
-                        </button>
+                        <Hint content={LocalizeText('generic.delete')}>
+                            <BaseButton
+                                type="button"
+                                className="octane-inventory-preview-delete"
+                                aria-label={LocalizeText('generic.delete')}
+                                onPointerDown={(event) => event.stopPropagation()}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    attemptDeleteItem(selectedItem);
+                                }}
+                            >
+                                <FaTrashAlt aria-hidden="true" />
+                            </BaseButton>
+                        </Hint>
                     )}
                     {selectedItem && selectedItem.stuffData.isUnique && (
                         <LayoutLimitedEditionCompactPlateView
@@ -227,12 +230,12 @@ export const InventoryFurnitureView: FC<{
                                 {LocalizeText('inventory.furni.placetoroom')}
                             </OctaneButton>
                             <div className="octane-inventory-preview-controls">
-                                <button type="button" onClick={() => roomPreviewer?.changeRoomObjectDirection()}>
+                                <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectDirection()}>
                                     {localizeWithFallback('widget.furniture.button.rotate', 'Rotate')}
-                                </button>
-                                <button type="button" onClick={() => roomPreviewer?.changeRoomObjectState()}>
+                                </BaseButton>
+                                <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectState()}>
                                     {localizeWithFallback('widget.furniture.button.use', 'Use')}
-                                </button>
+                                </BaseButton>
                             </div>
                             {selectedItem.isSellable && (
                                 <OctaneButton className="octane-inventory-btn-sell" onClick={() => attemptPlaceMarketplaceOffer(selectedItem)}>

@@ -5,6 +5,8 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 const MODE_GIVE = 0;
 const MODE_TAKE = 1;
@@ -41,40 +43,19 @@ export const WiredActionGiveOrTakeFurniView: FC<{}> = props =>
             footer={ <WiredSourcesSelector showUsers={ true } userSource={ userSource } onChangeUsers={ setUserSource } /> }>
             <div className="flex flex-col gap-1">
                 <Text bold>{ localizeWithFallback('wiredfurni.params.base_item_id', 'Base item ID') }</Text>
-                <input
-                    className="form-control form-control-sm"
-                    type="number"
-                    min={ 1 }
-                    value={ baseItemId }
-                    onChange={ event => setBaseItemId(parseInt(event.target.value, 10) || 0) } />
+                <NumberInput className="form-control form-control-sm" min={ 1 } value={ baseItemId } onChange={ event => setBaseItemId(parseInt(event.target.value, 10) || 0) } />
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{ localizeWithFallback('wiredfurni.params.count', 'Quantity', [ 'count' ], [ quantity.toString() ]) }</Text>
-                <input
-                    className="form-control form-control-sm"
-                    type="number"
-                    min={ 1 }
-                    max={ 100 }
-                    value={ quantity }
-                    onChange={ event => setQuantity(parseInt(event.target.value, 10) || 0) } />
+                <NumberInput className="form-control form-control-sm" min={ 1 } max={ 100 } value={ quantity } onChange={ event => setQuantity(parseInt(event.target.value, 10) || 0) } />
             </div>
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="giveOrTake"
-                        checked={ giveOrTake === MODE_GIVE }
-                        onChange={ () => setGiveOrTake(MODE_GIVE) } />
+                    <Radio name="giveOrTake" checked={ giveOrTake === MODE_GIVE } onCheckedChange={() => setGiveOrTake(MODE_GIVE)} />
                     <Text>{ localizeWithFallback('wiredfurni.params.give', 'Give') }</Text>
                 </div>
                 <div className="flex items-center gap-1">
-                    <input
-                        className="form-check-input"
-                        type="radio"
-                        name="giveOrTake"
-                        checked={ giveOrTake === MODE_TAKE }
-                        onChange={ () => setGiveOrTake(MODE_TAKE) } />
+                    <Radio name="giveOrTake" checked={ giveOrTake === MODE_TAKE } onCheckedChange={() => setGiveOrTake(MODE_TAKE)} />
                     <Text>{ localizeWithFallback('wiredfurni.params.take', 'Take') }</Text>
                 </div>
             </div>

@@ -7,6 +7,8 @@ import { buildHeightmapInstances, cameraEye, clampCamera, fitCamera, OrbitCamera
 import { mat4LookAt, mat4Multiply, mat4Perspective } from '../scene3d/mat4';
 import { cameraRay, pickTile, TileHit } from '../scene3d/picking';
 import { FloorplanAction, FloorplanState } from '../state/types';
+import { BaseButton } from '../../../common/BaseButton';
+import { Hint } from '../../../common/Tooltip';
 
 type Props = {
     state: FloorplanState;
@@ -343,42 +345,40 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                 </div>
             )}
             <div className="fp-stage-buttons" onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
-                <button type="button" data-testid="view3d-reset" title={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`} className="fp-round-btn is-small" disabled={status !== 'ready'} onClick={resetView}>
+                <Hint content={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`}><BaseButton aria-label={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`} type="button" data-testid="view3d-reset" className="fp-round-btn is-small" disabled={status !== 'ready'} onClick={resetView}>
                     <FaExpand size={10} />
-                </button>
-                <button type="button" data-testid="view3d-zoom-in" title="Zoom in (wheel)" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(1 / ZOOM_STEP)}>
+                </BaseButton></Hint>
+                <Hint content="Zoom in (wheel)"><BaseButton aria-label="Zoom in (wheel)" type="button" data-testid="view3d-zoom-in" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(1 / ZOOM_STEP)}>
                     <FaPlus size={13} />
-                </button>
-                <button type="button" data-testid="view3d-zoom-out" title="Zoom out (wheel)" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(ZOOM_STEP)}>
+                </BaseButton></Hint>
+                <Hint content="Zoom out (wheel)"><BaseButton aria-label="Zoom out (wheel)" type="button" data-testid="view3d-zoom-out" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(ZOOM_STEP)}>
                     <FaMinus size={13} />
-                </button>
+                </BaseButton></Hint>
             </div>
             <div className="fp-stage-toggles" onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
-                <button type="button" data-testid="view3d-walls" data-active={showWalls ? 'true' : 'false'} title="Show the room walls" className={`fp-pill ${showWalls ? 'is-on' : ''}`} onClick={() => setShowWalls((value) => !value)}>
+                <Hint content="Show the room walls"><BaseButton aria-label="Show the room walls" type="button" data-testid="view3d-walls" data-active={showWalls ? 'true' : 'false'} className={`fp-pill ${showWalls ? 'is-on' : ''}`} onClick={() => setShowWalls((value) => !value)}>
                     Walls
-                </button>
-                <button
+                </BaseButton></Hint>
+                <Hint content="Draw floor and wall patterns instead of the height colours"><BaseButton aria-label="Draw floor and wall patterns instead of the height colours"
                     type="button"
                     data-testid="view3d-textures"
                     data-active={textured ? 'true' : 'false'}
-                    title="Draw floor and wall patterns instead of the height colours"
                     className={`fp-pill ${textured ? 'is-on' : ''}`}
                     onClick={() => setTextured((value) => !value)}
                 >
                     Textures
-                </button>
-                <button
+                </BaseButton></Hint>
+                <Hint content="Turn the room around 360°"><BaseButton aria-label="Turn the room around 360°"
                     type="button"
                     data-testid="view3d-rotate"
                     data-active={autoRotate ? 'true' : 'false'}
-                    title="Turn the room around 360°"
                     className={`fp-pill inline-flex items-center gap-1 ${autoRotate ? 'is-on' : ''}`}
                     disabled={status !== 'ready'}
                     onClick={() => setAutoRotate((value) => !value)}
                 >
                     <FaSyncAlt size={10} className={autoRotate ? 'animate-spin' : ''} style={autoRotate ? { animationDuration: '3s' } : undefined} />
                     360°
-                </button>
+                </BaseButton></Hint>
             </div>
             <div className="fp-stage-hint">
                 {panMode ? 'Drag to rotate · Shift-drag to pan · Wheel to zoom' : 'Click or drag to edit · Right-drag to rotate · Shift-drag to pan · Wheel to zoom'}

@@ -2,6 +2,7 @@ import { CreateLinkEvent, NavigatorSearchComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { SendMessageComposer } from '../../../../../api';
 import { Flex, Text } from '../../../../../common';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface InfoStandWidgetUserTagsViewProps {
     tags: string[];
@@ -24,7 +25,7 @@ export const InfoStandWidgetUserTagsView: FC<InfoStandWidgetUserTagsViewProps> =
                 {tags &&
                     tags.length > 0 &&
                     tags.map((tag, index) => (
-                        <Text key={index} className="text-tags" variant="white" onClick={(event) => processAction(tag)}>
+                        <Text component={BaseButton} type="button" key={index} className="text-tags" variant="white" onClick={(event) => processAction(tag)}>
                             {tag}
                         </Text>
                     ))}

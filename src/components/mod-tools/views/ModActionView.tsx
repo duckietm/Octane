@@ -98,7 +98,6 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
     const topicMap = useMemo(readTopicSanctionMap, []);
     const [topicIndex, setTopicIndex] = useState(-1);
     const [sanctionIndex, setSanctionIndex] = useState(-1);
-    const [openMenu, setOpenMenu] = useState<'topic' | 'sanction' | 'template' | null>(null);
     const [message, setMessage] = useState('');
     const [inputActive, setInputActive] = useState(false);
     const [defaultLabel, setDefaultLabel] = useState(nativeCaption(findNativeNode(root, 'default_sanction_label')));
@@ -134,7 +133,6 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
         if (!sanctionId) sanctionId = topicMap.get(0) ?? 0;
 
         setTopicIndex(index);
-        setOpenMenu(null);
 
         if (sanctionId) setSanctionIndex(SANCTIONS.findIndex((sanction) => sanction.actionId === sanctionId));
     };
@@ -263,44 +261,36 @@ export const ModActionView: FC<ModActionProps> = ({ userId, userName, settings, 
                         caption="Select from message templates"
                         height={20}
                         items={templates.map((template) => (template.length > 50 ? `${template.slice(0, 47)}...` : template))}
-                        open={openMenu === 'template'}
                         width={210}
                         x={custom.x + 110}
                         y={custom.y}
                         onSelect={(index) => {
                             setMessage(templates[index]);
                             setInputActive(true);
-                            setOpenMenu(null);
                         }}
-                        onToggle={() => setOpenMenu((value) => (value === 'template' ? null : 'template'))}
                     />
                 )}
                 <Native100Dropmenu
                     caption={sanctionIndex >= 0 ? SANCTIONS[sanctionIndex].name : nativeCaption(findNativeNode(root, 'sanction_type'))}
                     height={sanctionMenu.height}
                     items={SANCTIONS.map((sanction) => sanction.name)}
-                    open={openMenu === 'sanction'}
                     selectedIndex={sanctionIndex}
                     width={sanctionMenu.width}
                     x={sanctionMenu.x}
                     y={sanctionMenu.y}
                     onSelect={(index) => {
                         setSanctionIndex(index);
-                        setOpenMenu(null);
                     }}
-                    onToggle={() => setOpenMenu((value) => (value === 'sanction' ? null : 'sanction'))}
                 />
                 <Native100Dropmenu
                     caption={topicIndex >= 0 ? topicNames[topicIndex] : nativeCaption(findNativeNode(root, 'cfh_topics'))}
                     height={topicMenu.height}
                     items={topicNames}
-                    open={openMenu === 'topic'}
                     selectedIndex={topicIndex}
                     width={topicMenu.width}
                     x={topicMenu.x}
                     y={topicMenu.y}
                     onSelect={selectTopic}
-                    onToggle={() => setOpenMenu((value) => (value === 'topic' ? null : 'topic'))}
                 />
             </Native0Frame>
         </NativeWindowShell>

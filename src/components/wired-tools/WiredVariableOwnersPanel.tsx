@@ -5,6 +5,8 @@ import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeade
 import { WiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests';
 import { VariablesElementType } from './WiredCreatorTools.types';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
+import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 /** The server's holder kinds (`entityType`). */
 export const HOLDER_TYPE_ROOM = 0;
@@ -115,9 +117,9 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                 return holder.entityType === HOLDER_TYPE_USER && holder.entityId > 0 && onOpenUserProfile
                     ? {
                           content: (
-                              <button className={LINK_CLASS} type="button" onClick={() => onOpenUserProfile(holder.entityId)}>
+                              <BaseButton className={LINK_CLASS} type="button" onClick={() => onOpenUserProfile(holder.entityId)}>
                                   {description.entityName}
-                              </button>
+                              </BaseButton>
                           ),
                           title: description.entityName
                       }
@@ -132,13 +134,13 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                 return {
                     content: (
                         <span className="flex gap-2">
-                            <button className={LINK_CLASS} type="button" onClick={() => onManage(holder)}>
+                            <BaseButton className={LINK_CLASS} type="button" onClick={() => onManage(holder)}>
                                 {localizeWithFallback('wiredmenu.variable_management.manage', 'Manage')}
-                            </button>
+                            </BaseButton>
                             {!!onDelete && (
-                                <button className="text-[#a32a2a] underline underline-offset-2" type="button" onClick={() => onDelete(holder)}>
+                                <BaseButton className="text-[#a32a2a] underline underline-offset-2" type="button" onClick={() => onDelete(holder)}>
                                     {localizeWithFallback('wiredmenu.variable_management.delete', 'Delete')}
-                                </button>
+                                </BaseButton>
                             )}
                         </span>
                     )
@@ -180,7 +182,7 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                     {filters.map((filter) => (
                         <label key={filter.id} className="flex items-center gap-2">
                             <Text>{filter.label}</Text>
-                            <select
+                            <Select
                                 className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                                 value={filter.value}
                                 onChange={(event) => filter.onChange(event.target.value)}
@@ -190,7 +192,7 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                                         {option.label}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </label>
                     ))}
                 </div>

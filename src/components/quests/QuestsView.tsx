@@ -12,6 +12,7 @@ import { Button, DraggableWindowPosition, Text } from '../../common';
 import { useQuests } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { QuestEntryView } from './QuestEntryView';
+import { BaseButton } from '../../common/BaseButton';
 
 /**
  * The official Quests window (512x448): one row per campaign with the current quest, plus the HC
@@ -142,9 +143,9 @@ export const QuestsView: FC<{}> = () => {
                     <OctaneCard.Content className="octane-quest-details-content">
                         <QuestEntryView quest={detailsQuest} showHint onAccept={onAccept} onReject={onReject} />
                         {detailsQuest.catalogPageName && detailsQuest.catalogPageName.length > 0 && (
-                            <span className="octane-quest-link" onClick={() => CreateLinkEvent(`catalog/open/${detailsQuest.catalogPageName}`)}>
+                            <BaseButton className="octane-quest-link" onClick={() => CreateLinkEvent(`catalog/open/${detailsQuest.catalogPageName}`)}>
                                 {localizeWithFallback('quests.list.opencatalog', 'Open the catalogue')}
-                            </span>
+                            </BaseButton>
                         )}
                     </OctaneCard.Content>
                 </OctaneCard>

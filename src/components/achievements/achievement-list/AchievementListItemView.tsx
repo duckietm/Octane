@@ -3,6 +3,7 @@ import { CSSProperties, FC } from 'react';
 import { AchievementUtilities } from '../../../api';
 import { useAchievements } from '../../../hooks';
 import { AchievementBadgeView } from '../AchievementBadgeView';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface AchievementListItemViewProps {
     achievement: AchievementData | null;
@@ -29,7 +30,7 @@ export const AchievementListItemView: FC<AchievementListItemViewProps> = (props)
     const isSelected = selectedAchievement === achievement;
 
     return (
-        <button
+        <BaseButton
             type="button"
             className={`air-achievement-tile${isSelected ? ' is-selected' : ''}${achievement.unseen > 0 ? ' is-unseen' : ''}`}
             style={
@@ -42,6 +43,6 @@ export const AchievementListItemView: FC<AchievementListItemViewProps> = (props)
             onClick={() => setSelectedAchievementId(achievement.achievementId)}
         >
             <AchievementBadgeView achievement={achievement} className="air-achievement-tile-badge" />
-        </button>
+        </BaseButton>
     );
 };

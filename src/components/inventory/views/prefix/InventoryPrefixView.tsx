@@ -1,3 +1,4 @@
+import { CreateLinkEvent } from '@octane/renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { getPrefixEffectStyle, getPrefixFontStyle, IPrefixItem, localizeWithFallback, LocalizeText, parsePrefixColors } from '../../../../api';
 import { GetNickIconUrl } from '../../../../assets/images/user_custom/nick_icons';
@@ -5,6 +6,8 @@ import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScr
 import { useInventoryNickIcons, useInventoryPrefixes, useNotification } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type InventoryIdentityTab = 'prefixes' | 'icons';
 
@@ -112,20 +115,18 @@ export const InventoryPrefixView: FC<{}> = () => {
 
     return (
         <div className="octane-inventory-identity">
-            <div className="octane-inventory-identity-tabs" role="tablist">
+            <TabBar className="octane-inventory-identity-tabs" value={activeTab}>
                 {tabs.map((tab) => (
-                    <button
+                    <TabBarTab
                         key={tab.id}
-                        aria-selected={activeTab === tab.id}
                         className={`octane-inventory-identity-tab${activeTab === tab.id ? ' is-active' : ''}`}
-                        role="tab"
-                        type="button"
+                        value={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                     >
                         {tab.label}
-                    </button>
+                    </TabBarTab>
                 ))}
-            </div>
+            </TabBar>
 
             {activeTab === 'prefixes' &&
                 (prefixes.length === 0 ? (
@@ -139,14 +140,14 @@ export const InventoryPrefixView: FC<{}> = () => {
                             <ClassicScrollAreaView className="size-full">
                                 <div className="octane-inventory-animal-cells">
                                     {prefixes.map((prefix: IPrefixItem) => (
-                                        <button
+                                        <BaseButton
                                             key={prefix.id}
                                             className={cellClass(selectedPrefix?.id === prefix.id, !!prefix.active)}
                                             type="button"
                                             onClick={() => setSelectedPrefix(prefix)}
                                         >
                                             <PrefixPreview color={prefix.color} effect={prefix.effect} font={prefix.font} icon={prefix.icon} text={prefix.text} />
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </ClassicScrollAreaView>
@@ -191,7 +192,9 @@ export const InventoryPrefixView: FC<{}> = () => {
             {activeTab === 'icons' &&
                 (nickIcons.length === 0 ? (
                     <InventoryCategoryEmptyView
-                        desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons you buy show up here.')}
+                        actionLabel={localizeWithFallback('inventory.empty.nickicons.action', 'Customize identity')}
+                        desc={localizeWithFallback('inventory.empty.nickicons.desc', 'Icons are bought in the identity customizer.')}
+                        onAction={() => CreateLinkEvent('customize/show')}
                         title={localizeWithFallback('inventory.empty.nickicons.title', 'You have no icons')}
                     />
                 ) : (
@@ -200,14 +203,14 @@ export const InventoryPrefixView: FC<{}> = () => {
                             <ClassicScrollAreaView className="size-full">
                                 <div className="octane-inventory-animal-cells">
                                     {nickIcons.map((icon) => (
-                                        <button
+                                        <BaseButton
                                             key={icon.id}
                                             className={cellClass(selectedNickIcon?.id === icon.id, !!icon.active)}
                                             type="button"
                                             onClick={() => setSelectedNickIcon(icon)}
                                         >
-                                            <img alt={icon.displayName || icon.iconKey} className="octane-inventory-identity-icon" src={GetNickIconUrl(icon.iconKey)} />
-                                        </button>
+                                            {GetNickIconUrl(icon.iconKey) && <img alt={icon.displayName || icon.iconKey} className="octane-inventory-identity-icon" src={GetNickIconUrl(icon.iconKey)} />}
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </ClassicScrollAreaView>
@@ -215,7 +218,7 @@ export const InventoryPrefixView: FC<{}> = () => {
                         <div className="octane-inventory-animal-preview">
                             <div className="octane-inventory-animal-name">{selectedNickIcon ? selectedNickIcon.displayName || selectedNickIcon.iconKey : ''}</div>
                             <div className="octane-inventory-animal-image">
-                                {selectedNickIcon && (
+                                {selectedNickIcon && selectedIconUrl && (
                                     <img alt={selectedNickIcon.displayName || selectedNickIcon.iconKey} className="octane-inventory-identity-icon is-large" src={selectedIconUrl} />
                                 )}
                             </div>

@@ -8,6 +8,7 @@ import thickXml from '../../../assets/mod-tools/skins/skin-button_shiny_thick.xm
 import '../../../css/mod-tools/NativeWindow3.css';
 import { parseNativeSkin } from './NativeSkin';
 import { NativeSkinView } from './NativeSkinView';
+import { BaseButton } from '../../../common/BaseButton';
 
 // Window-manager style 3 (the Ubuntu skin): frame_3 coloured 0xff418db0, close button, shiny thick button, Ubuntu text styles.
 const SKINS = { frame: parseNativeSkin(frameXml), close: parseNativeSkin(closeXml), thick: parseNativeSkin(thickXml) };
@@ -36,10 +37,10 @@ export const Native3Frame: FC<Native3FrameProps> = ({ width, height, title, onCl
             <div className="native3-title" style={{ left: 0, top: 4, width, height: 27 }}>
                 <NativeText background={FRAME3_TITLE_COLOR} overrides={{ color: 0xffffff }} text={title} textStyle="u_frame_title" />
             </div>
-            <div
+            <BaseButton
                 aria-label="Close"
                 className="native3-close"
-                role="button"
+                type="button"
                 style={rect(width - 29, 8, 19, 20)}
                 onClick={onClose}
                 onPointerDown={() => setCloseState('pressed')}
@@ -48,7 +49,7 @@ export const Native3Frame: FC<Native3FrameProps> = ({ width, height, title, onCl
                 onPointerUp={() => setCloseState('hovering')}
             >
                 <NativeSkinView atlas={ubuntuAtlas} height={20} layout="button_close_3" skin={SKINS.close} state={closeState} width={19} />
-            </div>
+            </BaseButton>
             <div className="native3-client" style={{ left: 6, top: 25 }}>
                 {children}
             </div>
@@ -99,7 +100,7 @@ export const Native3ThickButton: FC<Native3ThickButtonProps> = ({ x, y, width, h
     }, [label, width, height]);
 
     return (
-        <div
+        <BaseButton type="button"
             className="native3-box native3-button"
             style={rect(x, y, width, height)}
             onClick={onClick}
@@ -122,6 +123,6 @@ export const Native3ThickButton: FC<Native3ThickButtonProps> = ({ x, y, width, h
                     </div>
                 </div>
             ))}
-        </div>
+        </BaseButton>
     );
 };

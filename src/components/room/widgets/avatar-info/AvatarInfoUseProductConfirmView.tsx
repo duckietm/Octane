@@ -12,6 +12,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText, UseProductItem } from '../../../../api';
 import { Button, Column, Flex, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useRoom } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface AvatarInfoUseProductConfirmViewProps {
     item: UseProductItem;
@@ -260,9 +261,9 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
             <OctaneCardContentView center>
                 <Flex gap={2} overflow="hidden">
                     <div className="flex flex-col">
-                        <div className="product-preview cursor-pointer" onClick={selectRoomObject}>
+                        <BaseButton type="button" className="product-preview cursor-pointer" onClick={selectRoomObject}>
                             {getPetImage}
-                        </div>
+                        </BaseButton>
                     </div>
                     <Column justifyContent="between" overflow="auto">
                         <Column gap={2}>

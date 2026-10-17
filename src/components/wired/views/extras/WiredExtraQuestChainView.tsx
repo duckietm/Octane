@@ -3,6 +3,7 @@ import { WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { NumberInput } from '../../../../common/NumberInput';
 
 // Quest Chain box: place it on the SAME stack as a "current step" counter variable. Config = total steps.
 // Designers bump the step counter as each sub-quest completes. Exposes derived read-only vars:
@@ -26,13 +27,7 @@ export const WiredExtraQuestChainView: FC<{}> = () => {
             <div className="flex flex-col gap-2">
                 <Text bold>Place this on the same tile as a "current step" counter variable.</Text>
                 <Text bold>Total steps</Text>
-                <input
-                    type="number"
-                    min={0}
-                    className="form-control form-control-sm"
-                    value={totalSteps}
-                    onChange={(event) => setTotalSteps(Math.max(0, parseInt(event.target.value, 10) || 0))}
-                />
+                <NumberInput min={0} className="form-control form-control-sm" value={totalSteps} onChange={(event) => setTotalSteps(Math.max(0, parseInt(event.target.value, 10) || 0))} />
                 <Text small>Exposes: current_step, total_steps, is_complete, percent. Bump the step counter when each sub-quest completes.</Text>
             </div>
         </WiredExtraBaseView>

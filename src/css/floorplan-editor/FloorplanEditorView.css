@@ -443,10 +443,19 @@
     user-select: none;
 }
 
+/* The control spans the rung centres (half a rung in from the 6px inset), the track the full ladder. */
+.fp-slider .octane-slider-vertical-control {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(6px + (100% - 12px) / var(--fp-count) / 2);
+    bottom: calc(6px + (100% - 12px) / var(--fp-count) / 2);
+}
+
 .fp-slider-track {
     position: absolute;
-    top: 6px;
-    bottom: 6px;
+    top: calc(-100% / (2 * (var(--fp-count) - 1)));
+    bottom: calc(-100% / (2 * (var(--fp-count) - 1)));
     left: 22px;
     width: 14px;
     cursor: pointer;
@@ -464,16 +473,20 @@
 }
 
 .fp-slider-thumb {
-    position: absolute;
     left: 2px;
     width: 22px;
     height: 20px;
-    transform: translateY(-50%);
-    pointer-events: none;
+    translate: 0 50% !important;
     background: #d4d4d4;
     border: 2px solid #1a1a1a;
     border-radius: 2px;
     box-sizing: border-box;
+    cursor: pointer;
+}
+
+.fp-slider-thumb:focus-within {
+    outline: 2px solid #1e90ff;
+    outline-offset: 1px;
 }
 
 .fp-slider-thumb::before {
@@ -500,7 +513,7 @@
     border-left: 8px solid #1a1a1a;
 }
 
-.fp-slider.is-dragging .fp-slider-thumb,
+.fp-slider[data-dragging] .fp-slider-thumb,
 .fp-slider:hover .fp-slider-thumb {
     background: #ffffff;
 }

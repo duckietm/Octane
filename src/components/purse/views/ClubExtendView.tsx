@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../api';
 import { Button, LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { useMessageEvent, usePurse } from '../../../hooks';
+import { BaseButton } from '../../../common/BaseButton';
 
 const PriceRow: FC<{ label: string; credits: number; points: number; pointsType: number; bold?: boolean }> = ({ label, credits, points, pointsType, bold = false }) => (
     <div className="flex items-center justify-between gap-2">
@@ -84,7 +85,7 @@ export const ClubExtendView: FC = () => {
                 </Text>
                 {error && <Text small className="text-[#a81a12]">{error}</Text>}
                 <div className="flex items-center justify-between mt-auto">
-                    <Text pointer small underline onClick={() => setOffer(null)}>
+                    <Text component={BaseButton} pointer small underline onClick={() => setOffer(null)}>
                         {localizeWithFallback('catalog.club.extend.later.link', 'Ask Later')}
                     </Text>
                     <Button variant="success" onClick={buy}>

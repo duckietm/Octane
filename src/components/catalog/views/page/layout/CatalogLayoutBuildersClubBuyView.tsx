@@ -1,7 +1,7 @@
 import { ClubOfferData, PurchaseFromCatalogComposer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CatalogPurchaseState, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../../../../api';
-import { Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, LayoutLoadingSpinnerView, Text } from '../../../../../common';
+import { BaseButton, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, LayoutLoadingSpinnerView, Text } from '../../../../../common';
 import { CatalogEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
 import { useCatalogData, useCatalogSkipPurchaseConfirmation, useClubOffers, usePurse, useUiEvent } from '../../../../../hooks';
 import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
@@ -160,8 +160,10 @@ export const CatalogLayoutBuildersClubBuyView: FC<CatalogLayoutProps> = () => {
                                     <LayoutGridItem
                                         key={index}
                                         alignItems="center"
+                                        aria-pressed={pendingOffer?.offerId === offer.offerId}
                                         center={false}
-                                        className="p-2"
+                                        className="p-2 text-left"
+                                        component={BaseButton}
                                         column={false}
                                         itemActive={pendingOffer?.offerId === offer.offerId}
                                         justifyContent="between"

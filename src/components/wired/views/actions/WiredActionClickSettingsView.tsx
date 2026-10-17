@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Select } from '../../../../common/Select';
 
 /** What a click on another avatar does, as the server and the renderer number it. */
 const USER_OPTIONS = [
@@ -52,23 +53,23 @@ export const WiredActionClickSettingsView: FC<{}> = () => {
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.click_settings.user', 'Clicking a user')}</Text>
-                <select className="form-select form-select-sm" value={userOption} onChange={(event) => setUserOption(Number(event.target.value))}>
+                <Select className="form-select form-select-sm" value={userOption} onChange={(event) => setUserOption(Number(event.target.value))}>
                     {USER_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
                             {localizeWithFallback(option.key, option.fallback)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.click_settings.furni', 'Clicking a furni')}</Text>
-                <select className="form-select form-select-sm" value={furniOption} onChange={(event) => setFurniOption(Number(event.target.value))}>
+                <Select className="form-select form-select-sm" value={furniOption} onChange={(event) => setFurniOption(Number(event.target.value))}>
                     {FURNI_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
                             {localizeWithFallback(option.key, option.fallback)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
         </WiredActionBaseView>
     );

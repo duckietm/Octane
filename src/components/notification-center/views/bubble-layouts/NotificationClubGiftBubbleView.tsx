@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { LocalizeText, NotificationBubbleItem, OpenUrl } from '../../../../api';
 import clubIcon from '../../../../assets/images/notifications/club_icon_square.png';
 import { LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export interface NotificationClubGiftBubbleViewProps extends LayoutNotificationBubbleViewProps {
     item: NotificationBubbleItem;
@@ -17,7 +18,7 @@ export const NotificationClubGiftBubbleView: FC<NotificationClubGiftBubbleViewPr
             <div className="octane-club-gift-notification__border" />
             <img alt="" className="octane-club-gift-notification__icon" src={clubIcon} draggable={false} />
             <div className="octane-club-gift-notification__text">{LocalizeText('notifications.text.club_gift')}</div>
-            <button
+            <BaseButton
                 className="octane-club-gift-notification__button"
                 type="button"
                 onClick={() => {
@@ -26,10 +27,10 @@ export const NotificationClubGiftBubbleView: FC<NotificationClubGiftBubbleViewPr
                 }}
             >
                 {LocalizeText('notifications.button.show_gift_list')}
-            </button>
-            <button className="octane-club-gift-notification__later" type="button" onClick={() => onClose()}>
+            </BaseButton>
+            <BaseButton className="octane-club-gift-notification__later" type="button" onClick={() => onClose()}>
                 {LocalizeText('notifications.button.later')}
-            </button>
+            </BaseButton>
         </LayoutNotificationBubbleView>
     );
 };

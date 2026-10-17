@@ -10,6 +10,7 @@ import positionPicker from '../../../assets/images/groups/native/position_picker
 import { ClassicScrollAreaView, LayoutBadgeImageView } from '../../../common';
 import { useGroup } from '../../../hooks';
 import { GroupBox, GroupText } from './GroupNativeLayout';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface GroupBadgeCreatorViewProps {
     badgeParts: GroupBadgePart[];
@@ -22,11 +23,11 @@ const LIST_Y = 29;
 const ROW_PITCH = 51;
 
 export const GroupColorChip: FC<{ color: string; selected: boolean; onSelect: () => void }> = ({ color, selected, onSelect }) => (
-    <button className="octane-group-native__color" style={{ '--group-color': '#' + color } as CSSProperties} type="button" onClick={onSelect}>
+    <BaseButton className="octane-group-native__color" style={{ '--group-color': '#' + color } as CSSProperties} type="button" onClick={onSelect}>
         <img alt="" draggable={false} src={colorChooserBg} />
         <span className="octane-group-native__color-fill" />
         {selected && <img alt="" draggable={false} src={colorChooserSelected} />}
-    </button>
+    </BaseButton>
 );
 
 export const GroupBadgeCreatorView: FC<GroupBadgeCreatorViewProps> = (props) => {
@@ -72,7 +73,7 @@ export const GroupBadgeCreatorView: FC<GroupBadgeCreatorViewProps> = (props) => 
         return (
             <div key={partIndex} className="octane-group-native__layer" style={{ left: EDIT_X, top: y }}>
                 <GroupBox height={49} kind="dark" width={247} x={0} y={0} />
-                <button className="octane-group-native__layer-part" type="button" onClick={() => setSelectedIndex(partIndex)}>
+                <BaseButton className="octane-group-native__layer-part" type="button" onClick={() => setSelectedIndex(partIndex)}>
                     {part.previewCode ? (
                         <div className="octane-group-native__badge">
                             <LayoutBadgeImageView badgeCode={part.previewCode} isGroup={true} />
@@ -80,7 +81,7 @@ export const GroupBadgeCreatorView: FC<GroupBadgeCreatorViewProps> = (props) => 
                     ) : (
                         <img alt="" className="octane-group-native__badge" draggable={false} src={badgePartAdd} />
                     )}
-                </button>
+                </BaseButton>
                 {!isBase && (
                     <div className="octane-group-native__layer-position" onPointerDown={(event) => selectPosition(partIndex, event)}>
                         <img alt="" draggable={false} src={positionGrid} />
@@ -114,14 +115,14 @@ export const GroupBadgeCreatorView: FC<GroupBadgeCreatorViewProps> = (props) => 
                         <ClassicScrollAreaView className="octane-group-native__part-scroll" contentClassName="octane-group-native__part-scroll-content" minThumbSize={26} scrollStep={43}>
                             <div className="octane-group-native__part-grid">
                                 {isSymbol && (
-                                    <button className="octane-group-native__part-item" type="button" onClick={() => setPartProperty(selectedIndex, 'key', 0)}>
+                                    <BaseButton className="octane-group-native__part-item" type="button" onClick={() => setPartProperty(selectedIndex, 'key', 0)}>
                                         <GroupBox height={41} kind="tan" width={41} x={0} y={0} />
                                         <img alt="" src={badgePartEmpty} style={{ left: 2, top: 2 }} />
                                         {selected.key === 0 && <img alt="" className="octane-group-native__part-selected" src={badgePartPicker} />}
-                                    </button>
+                                    </BaseButton>
                                 )}
                                 {items.map((item) => (
-                                    <button key={item.id} className="octane-group-native__part-item" type="button" onClick={() => setPartProperty(selectedIndex, 'key', item.id)}>
+                                    <BaseButton key={item.id} className="octane-group-native__part-item" type="button" onClick={() => setPartProperty(selectedIndex, 'key', item.id)}>
                                         <GroupBox height={41} kind="tan" width={41} x={0} y={0} />
                                         <div className="octane-group-native__part-clip">
                                             <div className="octane-group-native__badge">
@@ -129,7 +130,7 @@ export const GroupBadgeCreatorView: FC<GroupBadgeCreatorViewProps> = (props) => 
                                             </div>
                                         </div>
                                         {selected.key === item.id && <img alt="" className="octane-group-native__part-selected" src={badgePartPicker} />}
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         </ClassicScrollAreaView>

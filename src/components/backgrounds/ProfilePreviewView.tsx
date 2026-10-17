@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Base, LayoutAvatarImageView } from '../../common';
+import { ToggleButton } from '../../common/ToggleButton';
 
 interface ProfilePreviewViewProps {
     figure: string;
@@ -12,7 +13,7 @@ interface ProfilePreviewViewProps {
 
 /** The profile picture as it looks in the info panel, for one choice in the picker. */
 export const ProfilePreviewView: FC<ProfilePreviewViewProps> = ({ figure, backgroundId, standId, overlayId, selected = false, onClick }) => (
-    <div
+    <ToggleButton pressed={selected}
         className={`profile-preview profile-background background-${backgroundId ?? 'default'}${selected ? ' is-selected' : ''}`}
         data-testid="profile-preview"
         onClick={onClick}
@@ -20,5 +21,5 @@ export const ProfilePreviewView: FC<ProfilePreviewViewProps> = ({ figure, backgr
         <Base position="absolute" className={`profile-stand stand-${standId ?? 'default'}`} />
         <LayoutAvatarImageView direction={2} figure={figure} />
         <Base position="absolute" className={`profile-overlay overlay-${overlayId ?? 'default'}`} />
-    </div>
+    </ToggleButton>
 );

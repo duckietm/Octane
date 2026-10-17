@@ -5,6 +5,8 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Radio } from '../../../../common/Radio';
+import { NumberInput } from '../../../../common/NumberInput';
 
 export const GIVE_EFFECT_MAX_ID = 10000;
 const DEFAULT_EFFECT_ID = 13;
@@ -45,16 +47,7 @@ export const WiredActionGiveEffectView: FC<{}> = () => {
     const numberSection = (label: string, fallback: string, value: string, max: number, onChange: (value: string) => void) => (
         <div className="flex flex-col gap-1">
             <Text bold>{localizeWithFallback(label, fallback)}</Text>
-            <input
-                aria-label={fallback}
-                className="form-control form-control-sm"
-                max={max}
-                min={0}
-                style={{ maxWidth: 110 }}
-                type="number"
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-            />
+            <NumberInput aria-label={fallback} className="form-control form-control-sm" max={max} min={0} style={{ maxWidth: 110 }} value={value} onChange={(event) => onChange(event.target.value)} />
         </div>
     );
 
@@ -72,7 +65,7 @@ export const WiredActionGiveEffectView: FC<{}> = () => {
                 <div className="grid grid-cols-2 gap-1">
                     {[0, 1].map((value) => (
                         <label key={value} className="flex items-center gap-1">
-                            <input type="radio" className="form-check-input" name="giveEffectType" checked={effectType === value} onChange={() => setEffectType(value)} />
+                            <Radio name="giveEffectType" checked={effectType === value} onCheckedChange={() => setEffectType(value)} />
                             <Text>{localizeWithFallback(`wiredfurni.params.give_effect.type.${value}`, `Type ${value + 1}`)}</Text>
                         </label>
                     ))}
