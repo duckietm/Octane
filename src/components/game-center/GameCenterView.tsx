@@ -5,6 +5,7 @@ import { useGameCenter } from '../../hooks';
 import { GameStageView } from './views/GameStageView';
 import { GameTileView } from './views/GameTileView';
 import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
+import { BaseButton } from '../../common/BaseButton';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {

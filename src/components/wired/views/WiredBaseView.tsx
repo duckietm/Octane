@@ -35,6 +35,7 @@ import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Te
 import { useNotification, useWired, useWiredTools } from '../../../hooks';
 import { WiredFurniSelectorView } from './WiredFurniSelectorView';
 import { finalizeWiredVariablePickers } from './WiredVariablePickerHistory';
+import { BaseButton } from '../../../common/BaseButton';
 
 export interface WiredBaseViewProps {
     wiredType: string;
