@@ -77,6 +77,39 @@ describe('NumberInput', () => {
         expect(onValue).toHaveBeenLastCalledWith(6);
     });
 
+    it('shows up / down buttons on hover and steps with them', () => {
+        const onValue = vi.fn();
+
+        render(<Demo onValue={onValue} max={7} />);
+
+        expect(screen.queryByRole('button', { name: /increase/i })).toBeNull();
+
+        fireEvent.mouseEnter(screen.getByRole('spinbutton'));
+
+        const up = screen.getByRole('button', { name: /increase/i });
+        const down = screen.getByRole('button', { name: /decrease/i });
+
+        fireEvent.click(up);
+        expect(onValue).toHaveBeenLastCalledWith(6);
+
+        fireEvent.click(down);
+        expect(onValue).toHaveBeenLastCalledWith(5);
+    });
+
+    it('shows the buttons while focused and never when disabled or read-only', () => {
+        const { rerender } = render(<NumberInput aria-label="Focus" value={1} onChange={() => undefined} />);
+
+        fireEvent.focus(screen.getByRole('spinbutton'));
+        expect(screen.getByRole('button', { name: /increase/i })).toBeTruthy();
+
+        fireEvent.blur(screen.getByRole('spinbutton'));
+        expect(screen.queryByRole('button', { name: /increase/i })).toBeNull();
+
+        rerender(<NumberInput disabled aria-label="Focus" value={1} onChange={() => undefined} />);
+        fireEvent.mouseEnter(screen.getByRole('spinbutton'));
+        expect(screen.queryByRole('button', { name: /increase/i })).toBeNull();
+    });
+
     it('is disabled and read-only on request', () => {
         render(<NumberInput disabled aria-label="Off" value={1} onChange={() => undefined} />);
 

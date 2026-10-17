@@ -12,6 +12,7 @@ const Pair = ({ onPick }: { onPick?: (value: number) => void }) => {
         <div>
             <label>
                 <Radio
+                    name="pair"
                     checked={value === 1}
                     onCheckedChange={() => {
                         setValue(1);
@@ -22,6 +23,7 @@ const Pair = ({ onPick }: { onPick?: (value: number) => void }) => {
             </label>
             <label>
                 <Radio
+                    name="pair"
                     checked={value === 2}
                     onCheckedChange={() => {
                         setValue(2);
@@ -80,6 +82,40 @@ describe('Radio', () => {
         fireEvent.click(screen.getByText('Two'));
 
         expect(onPick).toHaveBeenCalledWith(2);
+    });
+
+    it('moves the selection with the arrow keys between radios of the same name', () => {
+        const onPick = vi.fn();
+
+        render(<Pair onPick={onPick} />);
+
+        const [one, two] = screen.getAllByRole('radio');
+
+        one.focus();
+        fireEvent.keyDown(one, { key: 'ArrowRight' });
+
+        expect(onPick).toHaveBeenLastCalledWith(2);
+        expect(two).toBeChecked();
+        expect(document.activeElement).toBe(two);
+
+        fireEvent.keyDown(two, { key: 'ArrowRight' });
+
+        expect(onPick).toHaveBeenLastCalledWith(1);
+        expect(one).toBeChecked();
+    });
+
+    it('keeps only the checked radio of a named group in the tab order', () => {
+        render(<Pair />);
+
+        const [one, two] = screen.getAllByRole('radio');
+
+        expect(one.getAttribute('tabindex')).toBe('0');
+        expect(two.getAttribute('tabindex')).toBe('-1');
+
+        fireEvent.click(two);
+
+        expect(one.getAttribute('tabindex')).toBe('-1');
+        expect(two.getAttribute('tabindex')).toBe('0');
     });
 
     it('does not fire when disabled', () => {

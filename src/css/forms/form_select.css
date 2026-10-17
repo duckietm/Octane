@@ -153,3 +153,54 @@
 .octane-inline-dialog-host {
     display: contents;
 }
+
+/* Up / down buttons of common/NumberInput.tsx: a portaled overlay on the input's right edge. */
+.octane-number-steppers {
+    position: fixed;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border-left: 1px solid rgba(0, 0, 0, 0.25);
+    background: #f1f1f1;
+}
+
+.octane-number-step {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-number-step:hover {
+    background: #d5d5d5;
+}
+
+.octane-number-step[data-disabled] {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.octane-number-step::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translate(-50%, -50%);
+    border-right: 3px solid transparent;
+    border-left: 3px solid transparent;
+}
+
+.octane-number-step--up::before {
+    border-bottom: 4px solid #333;
+}
+
+.octane-number-step--down::before {
+    border-top: 4px solid #333;
+}

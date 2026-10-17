@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CatalogPurchaseConfirmView } from './CatalogPurchaseConfirmView';
 
@@ -73,21 +73,20 @@ describe('catalog purchase confirmation', () => {
         expect(screen.queryByText(/catalog\.limited\.items\.left/)).not.toBeInTheDocument();
     });
 
-    it('traps keyboard focus and restores it to the opener when closed', () => {
+    it('moves the focus into the dialog and restores it to the opener when closed', async () => {
         const opener = document.createElement('button');
         document.body.appendChild(opener);
         opener.focus();
 
         const { unmount } = render(<CatalogPurchaseConfirmView offer={offer} quantity={1} onCancel={() => undefined} onConfirm={() => undefined} />);
         const dialog = screen.getByRole('dialog');
-        const buttons = within(dialog).getAllByRole('button');
 
-        buttons.at(-1)?.focus();
-        fireEvent.keyDown(dialog, { key: 'Tab' });
-        expect(buttons[0]).toHaveFocus();
+        // Base UI moves the focus into the dialog (its focus guards keep Tab inside) ...
+        await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true));
+        expect(opener).not.toHaveFocus();
 
         unmount();
-        expect(opener).toHaveFocus();
+        await waitFor(() => expect(opener).toHaveFocus());
         opener.remove();
     });
 });

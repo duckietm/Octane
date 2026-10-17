@@ -1,8 +1,9 @@
 import { ClubOfferData } from '@octane/renderer';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeText } from '../../../../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 import { Checkbox } from '../../../../../common/Checkbox';
+import { InlineDialog } from '../../../../../common/InlineDialog';
 
 interface CatalogClubPurchaseConfirmViewProps {
     offer: ClubOfferData;
@@ -23,14 +24,14 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
     const title = LocalizeText('catalog.club.buy.confirm');
 
     return (
-        <OctaneCardView
+        <InlineDialog
             aria-label={title}
             aria-modal="true"
-            classNames={['octane-club-purchase-confirm']}
-            frameStyle={3}
-            isResizable={false}
-            role="dialog"
-            theme="primary-slim"
+            modal="trap-focus"
+            render={({ ref, ...popupProps }) => (
+                <OctaneCardView {...popupProps} innerRef={ref as MutableRefObject<HTMLDivElement>} classNames={['octane-club-purchase-confirm']} frameStyle={3} isResizable={false} theme="primary-slim" />
+            )}
+            onClose={onCancel}
         >
             <OctaneCardHeaderView headerText={title} onCloseClick={onCancel} />
             <OctaneCardContentView
@@ -78,6 +79,6 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
                     </button>
                 </div>
             </OctaneCardContentView>
-        </OctaneCardView>
+        </InlineDialog>
     );
 };
