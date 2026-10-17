@@ -120,7 +120,7 @@ login/WebGL, so they're not usable for in-game verification.
   Deliberately native: `<button>` (Base UI Button defaults to `type="button"`, which would break
   forms relying on the implicit submit), text `<input>` and `<textarea>` (no behaviour to gain),
   and the draggable-window dialogs (`UserSettingsView`, `LayoutMiniCameraView`: `DraggableWindow`
-  looks up its handle once at mount) plus the habbicon hub popup (bespoke click-positioned popover).
+  looks up its handle once at mount).
   Skin them through the `octane-*` classes (`.octane-checkbox[data-checked]`,
   `.octane-radio`, `.octane-select-trigger`, `.octane-number-input`): CSS written for
   `input[type=...]` / `select` must be mirrored onto those classes. Base UI roots render as
