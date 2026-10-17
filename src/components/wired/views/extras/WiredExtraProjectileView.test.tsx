@@ -86,7 +86,11 @@ describe('WiredExtraProjectileView', () => {
         selectOption(screen.getByRole('combobox', { name: 'System:' }), '8 directions, diffuse');
         fireEvent.click(screen.getByRole('checkbox', { name: "Visually change the shooter's direction" }));
         fireEvent.click(screen.getByRole('checkbox', { name: 'Do a little hop when shooting sideways' }));
-        selectOption(screen.getByRole('combobox', { name: 'Shooter:' }), /200/);
+        // The source labels are localization keys that resolve to '' in tests, so the option is picked by position.
+        fireEvent.click(screen.getByRole('combobox', { name: 'Shooter:' }));
+        const shooterOption = screen.getAllByRole('option')[1];
+        fireEvent.pointerDown(shooterOption);
+        fireEvent.click(shooterOption);
 
         fireEvent.click(screen.getByRole('button', { name: /Animation trajectory/ }));
         fireEvent.click(screen.getByRole('radio', { name: 'Fly past the target' }));
