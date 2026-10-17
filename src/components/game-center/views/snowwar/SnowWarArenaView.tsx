@@ -1,5 +1,16 @@
-import { FC, MouseEvent, PointerEvent as ReactPointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetConfigurationValue, GetSessionDataManager, LocalizeText } from '../../../../api';
+import { CSSProperties, FC, MouseEvent, PointerEvent as ReactPointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    getCountdownFrame,
+    GetConfigurationValue,
+    getExplosionAssetName,
+    getLoopFrame,
+    getPingPongFrame,
+    getScoreFlashFrame,
+    GetSessionDataManager,
+    LocalizeText,
+    SNOWWAR_EXPLOSION_OFFSETS
+} from '../../../../api';
+import { SNOWWAR_AIR_ASSETS } from '../../../../assets/images/snowstorm/air';
 import {
     INITIAL_SNOWBALL_COUNT,
     LONG_LOB_MAX_RANGE_WORLD,
@@ -22,9 +33,10 @@ import {
 } from '../../../../api/snowwar';
 import snowballPileImage from '../../../../assets/images/snowstorm/original/snst_ballpile.png';
 import { LayoutAvatarImageView, LayoutFurniImageView } from '../../../../common';
-import { useSnowWar } from '../../../../hooks';
+import { useNotification, useSnowWar } from '../../../../hooks';
 import { FloorplanEditorView } from '../../../floorplan-editor/FloorplanEditorView';
 import { SnowWarAvatarView } from './SnowWarAvatarView';
+import { SnowWarStrokeText } from './SnowWarStrokeText';
 import {
     canPlaceSnowWarEditorItem,
     getSnowWarEditorArea,
@@ -167,6 +179,10 @@ const getOfficialSnowWarAssetUrl = (fileName: string): string =>
     const baseUrl = imageLibraryUrl && !imageLibraryUrl.endsWith('/') ? `${imageLibraryUrl}/` : imageLibraryUrl;
     return `${baseUrl}snowstorm_client/official/${fileName}?v=air-room-2`;
 };
+
+// HUD bitmaps are bundled (AIR habbo-games-com); the image library copy is
+// only a fallback for a name that is not bundled.
+const getHudAssetUrl = (name: string): string => SNOWWAR_AIR_ASSETS[name] ?? getOfficialSnowWarAssetUrl(`${ name }.png`);
 
 const getOfficialSnowWarSprite = (name: string, rotation: number): OfficialSnowWarSprite | null =>
 {
@@ -502,6 +518,7 @@ export const SnowWarArenaView: FC = () =>
         levelData,
         secondsLeft,
         preparingSeconds,
+        preparingEndsAt,
         chatMessages,
         simulation,
         editing,
@@ -516,6 +533,23 @@ export const SnowWarArenaView: FC = () =>
         sendChat,
         requestFullStatus,
     } = useSnowWar();
+    const { showConfirm = null } = useNotification();
+
+    // Official client asks before leaving a running match (losing it and the
+    // short block on new games are explained in the dialog).
+    const confirmExitGame = useCallback(() =>
+    {
+        if(!showConfirm) return exitGame();
+
+        showConfirm(
+            localizeWithFallback('snowwar.exit.confirmation', 'If you leave the game you lose and get no points.'),
+            () => exitGame(),
+            null,
+            localizeWithFallback('snowwar.exit.yes', 'Leave game'),
+            localizeWithFallback('snowwar.exit.no', 'Cancel'),
+            localizeWithFallback('snowwar.exit.title', 'Leave game?')
+        );
+    }, [ showConfirm, exitGame ]);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     // Classic props (trees/blocks/fences/floor tiles) draw on their own canvas
@@ -529,6 +563,29 @@ export const SnowWarArenaView: FC = () =>
     // Wall-clock of the last animation frame; doubles as the re-render tick.
     const [frameNow, setFrameNow] = useState(0);
     const [chatInput, setChatInput] = useState('');
+    const chatInputRef = useRef<HTMLInputElement>(null);
+
+    // Enter starts typing a chat line; other keys stay with the arena (movement).
+    useEffect(() =>
+    {
+        if (editing) return;
+
+        const onKeyDown = (event: KeyboardEvent) =>
+        {
+            if ((event.key !== 'Enter') && (event.key !== 'NumpadEnter')) return;
+
+            const target = event.target as HTMLElement | null;
+
+            if (target && (target.isContentEditable || (target.tagName === 'INPUT') || (target.tagName === 'TEXTAREA') || (target.tagName === 'SELECT'))) return;
+
+            event.preventDefault();
+            chatInputRef.current?.focus();
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [ editing ]);
     const zoom = ZOOM;
     const [arcticBackdropRatio, setArcticBackdropRatio] = useState(ARCTIC_BACKDROP_DEFAULT_RATIO);
     const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
@@ -847,9 +904,18 @@ export const SnowWarArenaView: FC = () =>
         };
 
         rafId = requestAnimationFrame(loop);
+
+        // Back from a hidden tab: skip the backlog instead of replaying it.
+        const onVisibilityChange = () =>
+        {
+            if (!document.hidden) simulation.catchUp();
+        };
+        document.addEventListener('visibilitychange', onVisibilityChange);
+
         return () =>
         {
             running = false;
+            document.removeEventListener('visibilitychange', onVisibilityChange);
             cancelAnimationFrame(rafId);
         };
     }, [simulation]);
@@ -1206,6 +1272,26 @@ export const SnowWarArenaView: FC = () =>
     const ownAvatar = simulation.getAvatarByUserId(ownUserId);
     const alpha = simulation.interpolationAlpha;
 
+    // AIR SnowWarEngine.registerHit -> SnowWarUI.flashOwnScore: the own-stats
+    // panel flashes minus when this player is hit and plus when their ball
+    // hits someone (the only things that lower health / raise the score).
+    const ownHealth = ownAvatar?.health ?? null;
+    const ownScore = ownAvatar?.score ?? null;
+    const lastOwnStatsRef = useRef<{ health: number; score: number }>(null);
+    const [scoreFlash, setScoreFlash] = useState<{ plus: boolean; at: number }>(null);
+
+    useEffect(() =>
+    {
+        const last = lastOwnStatsRef.current;
+        lastOwnStatsRef.current = (ownHealth === null) ? null : { health: ownHealth, score: ownScore };
+
+        if (!last || (ownHealth === null) || (phase !== 'playing')) return;
+
+        const flash = (ownHealth < last.health) ? { plus: false, at: Date.now() } : (ownScore > last.score) ? { plus: true, at: Date.now() } : null;
+
+        if (flash) setTimeout(() => setScoreFlash(flash), 0);
+    }, [ ownHealth, ownScore, phase ]);
+
     // AIR supports arrows and the isometric QWE/AD/ZXC cluster. While a key is
     // held it sends a target two tiles away once per 300 ms game turn.
     useEffect(() =>
@@ -1519,6 +1605,8 @@ export const SnowWarArenaView: FC = () =>
     const redScore = teamScores.find(([teamId]) => teamId === 0)?.[1] ?? 0;
     const blueScore = teamScores.find(([teamId]) => teamId === 1)?.[1] ?? 0;
     const healthFrame = Math.max(0, Math.min(5, ownAvatar?.health ?? 0));
+    const scoreFlashFrame = scoreFlash ? getScoreFlashFrame(frameNow - scoreFlash.at) : 0;
+    const countdownFrame = getCountdownFrame(frameNow, preparingEndsAt);
     const visibleChatMessages = chatMessages
         .filter(message => (frameNow - message.receivedAt) < 10000)
         .slice(-8)
@@ -1541,7 +1629,7 @@ export const SnowWarArenaView: FC = () =>
     {
         return (
             <div className="snowwar-arena snowwar-arena--loading">
-                <div className="snowwar-banner">{localizeWithFallback('snowwar.loading', 'Loading arena...')}</div>
+                <div className="snowwar-banner">{localizeWithFallback('snowwar.loading_arena', 'Going to the arena...')}</div>
             </div>
         );
     }
@@ -1570,13 +1658,15 @@ export const SnowWarArenaView: FC = () =>
                 </div>
             ) : (
                 <div className="snowwar-official-hud">
+                    {/* AIR snowwar_exit: the ui_exit_up / ui_exit_down bitmap button, no caption. */}
                     <button
-                        type="button"
+                        aria-label={localizeWithFallback('snowwar.exit.title', 'Leave game?')}
                         className="snowwar-official-hud__quit"
-                        onClick={() => exitGame()}
-                    >
-                        {localizeWithFallback('snowwar.leave', 'Quit Menu')}
-                    </button>
+                        style={{ '--exit-up': `url(${getHudAssetUrl('ui_exit_up')})`, '--exit-down': `url(${getHudAssetUrl('ui_exit_down')})` } as CSSProperties}
+                        title={localizeWithFallback('snowwar.exit.title', 'Leave game?')}
+                        type="button"
+                        onClick={confirmExitGame}
+                    />
 
                     {ownAvatar && (
                         <>
@@ -1588,7 +1678,7 @@ export const SnowWarArenaView: FC = () =>
                                     alt=""
                                     className="snowwar-official-hud__ammo-bg"
                                     draggable={false}
-                                    src={getOfficialSnowWarAssetUrl('ui_ball_indicator_bg.png')}
+                                    src={getHudAssetUrl('ui_ball_indicator_bg')}
                                 />
                                 {Array.from({ length: INITIAL_SNOWBALL_COUNT }, (_, index) => (
                                     <img
@@ -1596,10 +1686,27 @@ export const SnowWarArenaView: FC = () =>
                                         alt=""
                                         className="snowwar-official-hud__ammo-ball"
                                         draggable={false}
-                                        src={getOfficialSnowWarAssetUrl('ui_ball.png')}
+                                        src={getHudAssetUrl('ui_ball')}
                                         style={{ top: 10 + (index * 37), visibility: index < ownAvatar.snowballCount ? 'visible' : 'hidden' }}
                                     />
                                 ))}
+                                {/* AIR SnowWarUI: ui_no_balls_ flashes while empty, load_ spins while making a ball. */}
+                                {(ownAvatar.snowballCount === 0) && (ownAvatar.activityState !== SNOWWAR_STATE_CREATING) && (
+                                    <img
+                                        alt=""
+                                        className="snowwar-official-hud__ammo-empty"
+                                        draggable={false}
+                                        src={getHudAssetUrl(`ui_no_balls_${getPingPongFrame(frameNow, 4, 75)}`)}
+                                    />
+                                )}
+                                {(ownAvatar.activityState === SNOWWAR_STATE_CREATING) && (
+                                    <img
+                                        alt=""
+                                        className="snowwar-official-hud__ammo-loading"
+                                        draggable={false}
+                                        src={getHudAssetUrl(`load_${getLoopFrame(frameNow, 8)}`)}
+                                    />
+                                )}
                                 <button
                                     type="button"
                                     className="snowwar-official-hud__make-ball"
@@ -1617,13 +1724,13 @@ export const SnowWarArenaView: FC = () =>
                                     alt=""
                                     className="snowwar-official-hud__personal-bg"
                                     draggable={false}
-                                    src={getOfficialSnowWarAssetUrl('ui_me_bg.png')}
+                                    src={getHudAssetUrl('ui_me_bg')}
                                 />
                                 <img
                                     alt=""
                                     className="snowwar-official-hud__health"
                                     draggable={false}
-                                    src={getOfficialSnowWarAssetUrl(`ui_me_health_${healthFrame}.png`)}
+                                    src={getHudAssetUrl(`ui_me_health_${healthFrame}`)}
                                 />
                                 <div className="snowwar-official-hud__head">
                                     <LayoutAvatarImageView
@@ -1636,6 +1743,14 @@ export const SnowWarArenaView: FC = () =>
                                         headOnly
                                     />
                                 </div>
+                                {(scoreFlashFrame > 0) && (
+                                    <img
+                                        alt=""
+                                        className="snowwar-official-hud__score-flash"
+                                        draggable={false}
+                                        src={getHudAssetUrl(`${scoreFlash.plus ? 'ui_me_plus_' : 'ui_me_minus_'}${scoreFlashFrame}`)}
+                                    />
+                                )}
                                 <div className="snowwar-official-hud__personal-score">{ownAvatar.score}</div>
                             </div>
                         </>
@@ -1646,11 +1761,12 @@ export const SnowWarArenaView: FC = () =>
                             alt=""
                             className="snowwar-official-hud__scores-bg"
                             draggable={false}
-                            src={getOfficialSnowWarAssetUrl('ui_timer_and_points.png')}
+                            src={getHudAssetUrl('ui_timer_and_points')}
                         />
-                        <div className="snowwar-official-hud__score snowwar-official-hud__score--blue">{blueScore}</div>
-                        <div className="snowwar-official-hud__score snowwar-official-hud__score--red">{redScore}</div>
-                        <div className="snowwar-official-hud__timer">{formatClock(secondsLeft)}</div>
+                        {/* AIR snowwar_team_scores / snowwar_timer: white over UbuntuThick strokes. */}
+                        <div className="snowwar-official-hud__score snowwar-official-hud__score--blue"><SnowWarStrokeText stroke="#1077ac" text={blueScore} /></div>
+                        <div className="snowwar-official-hud__score snowwar-official-hud__score--red"><SnowWarStrokeText stroke="#fd6859" text={redScore} /></div>
+                        <div className="snowwar-official-hud__timer"><SnowWarStrokeText stroke="#1077ac" text={formatClock(secondsLeft)} /></div>
                         <div className="snowwar-official-hud__time-label">{localizeWithFallback('snowwar.hud.time_left', 'Time left')}</div>
                     </div>
 
@@ -1842,9 +1958,20 @@ export const SnowWarArenaView: FC = () =>
                 </div>
             )}
 
-            {phase === 'preparing' && !editing && (
+            {phase === 'preparing' && !editing && (countdownFrame === 0) && (
                 <div className="snowwar-banner snowwar-banner--countdown">
-                    {localizeWithFallback('snowwar.get_ready', 'Get ready!')} {preparingSeconds > 0 ? preparingSeconds : ''}
+                    {localizeWithFallback('snowwar.loading.title', 'Get ready!')} {preparingSeconds > 0 ? preparingSeconds : ''}
+                </div>
+            )}
+            {/* AIR counter: digits 5..1, then the explosion as the match starts. */}
+            {!editing && (countdownFrame > 0) && (
+                <div className="snowwar-countdown" aria-hidden="true">
+                    <img
+                        alt=""
+                        draggable={false}
+                        src={getHudAssetUrl(getExplosionAssetName(countdownFrame))}
+                        style={{ left: -SNOWWAR_EXPLOSION_OFFSETS[countdownFrame][0], top: -SNOWWAR_EXPLOSION_OFFSETS[countdownFrame][1] }}
+                    />
                 </div>
             )}
             {(frameNow - rangeWarningAt) < 2000 && rangeWarningAt > 0 && (
@@ -2011,7 +2138,7 @@ export const SnowWarArenaView: FC = () =>
                                 data-snowwar-y={item.y}
                                 data-snowwar-count={pile?.snowballCount}
                                 style={{ left: front.x, top: front.y + (TILE_HALF_H * 2) - altitudePx, zIndex }}
-                                title={pile ? localizeWithFallback('snowwar.pile.hint', `${pile.snowballCount} snowballs left`) : undefined}
+                                title={pile ? localizeWithFallback('snowwar.pile.hint', '%count% snowballs left').replace('%count%', pile.snowballCount.toString()) : undefined}
                                 onClick={pile ? event =>
                                 {
                                     event.stopPropagation();
@@ -2408,27 +2535,44 @@ export const SnowWarArenaView: FC = () =>
             ))}
 
             {!editing && (
-            <form
-                className="snowwar-chat"
-                onSubmit={event =>
-                {
-                    event.preventDefault();
-                    submitChat();
-                }}
-            >
-                <input
-                    type="text"
-                    className="snowwar-chat__input"
-                    value={chatInput}
-                    maxLength={100}
-                    aria-label={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
-                    placeholder={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
-                    onChange={event => setChatInput(event.target.value)}
-                />
-                <button type="submit" className="snowwar-chat__send">
-                    {localizeWithFallback('widgets.chatinput.say', 'Say')}
-                </button>
-            </form>
+                // AIR keeps the room chat input in a game session (RoomChatInputView,
+                // centred at desktop height - 104, no style menu) and sends its text as
+                // Game2GameChat. Same skin as the room chat bar; the style button is inert.
+                // Typing does not grab focus here, so the QWEADZXC movement keys keep working.
+                <div className="snowwar-chat-input">
+                    <div className="octane-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible">
+                        <div aria-hidden="true" className="swf-chat-style-trigger flex items-center select-none">
+                            <svg className="swf-chat-style-arrow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} />
+                            </svg>
+                            <div className="swf-chat-style-icon" />
+                        </div>
+                        <div className="flex-1 items-center input-sizer swf-chat-input-sizer" data-value={chatInput}>
+                            <input
+                                ref={chatInputRef}
+                                aria-label={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
+                                className="swf-chat-input-field w-full border-none bg-transparent"
+                                maxLength={100}
+                                placeholder={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
+                                type="text"
+                                value={chatInput}
+                                onChange={event => setChatInput(event.target.value)}
+                                onKeyDown={event =>
+                                {
+                                    if ((event.key === 'Enter') || (event.key === 'NumpadEnter'))
+                                    {
+                                        event.preventDefault();
+                                        submitChat();
+                                    }
+                                    else if (event.key === 'Escape')
+                                    {
+                                        event.currentTarget.blur();
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
             )}
 
             <div className="snowwar-help">

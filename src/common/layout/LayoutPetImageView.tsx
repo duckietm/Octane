@@ -3,6 +3,8 @@ import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Base, BaseProps } from '../Base';
 import { PIXEL_ART_RENDERING } from './PixelArtRendering';
 
+const EMPTY_CUSTOM_PARTS: IPetCustomPart[] = [];
+
 interface LayoutPetImageViewProps extends BaseProps<HTMLDivElement> {
     figure?: string;
     typeId?: number;
@@ -21,7 +23,7 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
         typeId = -1,
         paletteId = -1,
         petColor = 0xffffff,
-        customParts = [],
+        customParts = EMPTY_CUSTOM_PARTS,
         posture = 'std',
         headOnly = false,
         direction = 0,
@@ -57,7 +59,6 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
     useEffect(() => {
         const generation = ++imageRequestGeneration.current;
         const isCurrentRequest = () => !isDisposed.current && imageRequestGeneration.current === generation;
-        let url = null;
 
         let petTypeId = typeId;
         let petPaletteId = paletteId;
@@ -84,7 +85,10 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
             64,
             {
                 imageReady: async (result) => {
-                    if (!isCurrentRequest()) return;
+                    if (!isCurrentRequest()) {
+                        result.dispose();
+                        return;
+                    }
 
                     const { image, data: texture } = result;
 
@@ -138,8 +142,6 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = (props) => {
             isDisposed.current = true;
         };
     }, []);
-
-    const url = `url('${petUrl}')`;
 
     return <Base classNames={['pet-image']} style={getStyle} {...rest} />;
 };

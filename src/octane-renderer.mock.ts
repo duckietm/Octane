@@ -463,6 +463,9 @@ export class HabboWebTools extends StubClass {
 
 // Composers — symbol-only constructors; only their identity matters in the
 // codebase ("did the SUT call SendMessageComposer(new FooComposer(args))").
+export class JoinQueueMessageComposer extends StubClass {}
+export class PurchaseSnowWarGameTokensOfferComposer extends StubClass {}
+export class Game2GetAccountGameStatusMessageComposer extends StubClass {}
 export class AddFavouriteRoomMessageComposer extends StubClass {}
 export class AvatarEffectActivatedComposer extends StubClass {}
 export class AvatarEffectSelectedComposer extends StubClass {}
@@ -1126,4 +1129,15 @@ export class ProductOfferEvent extends MessageEvent {}
 export class PurchaseFromCatalogComposer extends StubClass {}
 export class RoomEngineObjectPlacedEvent extends StubClass {
     static PLACED = 'REOPE_PLACED';
+}
+
+/** The real RoomId (packages/utils/src/RoomId.ts): preview rooms live at 0x7FFF0000 and up. */
+export class RoomId {
+    public static makeRoomPreviewerId(roomId: number): number {
+        return (roomId & 0xffff) + 0x7fff0000;
+    }
+
+    public static isRoomPreviewerId(roomId: number): boolean {
+        return roomId >= 0x7fff0000;
+    }
 }

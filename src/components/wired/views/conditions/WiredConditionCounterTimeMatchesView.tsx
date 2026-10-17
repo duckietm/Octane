@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { LocalizeText, WiredFurniType, WIRED_CLOCK_FURNI_TYPES } from '../../../../api';
+import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -34,7 +34,7 @@ const formatSeconds = (halfSeconds: number) => {
 
 export const WiredConditionCounterTimeMatchesView: FC<{}> = () => {
     // Official layout: [seconds, minutes, half second, comparison, our quantifier], the counters in the official source slot.
-    const { trigger = null, setIntParams = null, setSourceTypes = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
     const [comparison, setComparison] = useState(1);
     const [furniSource, setFurniSource] = useState<number>(() => trigger?.furniSourceTypes?.[0] ?? ((trigger?.selectedItems?.length ?? 0) > 0 ? 100 : 0));
     const [minutes, setMinutes] = useState(0);
@@ -59,16 +59,6 @@ export const WiredConditionCounterTimeMatchesView: FC<{}> = () => {
         setFurniSource(trigger.furniSourceTypes?.[0] ?? ((trigger.selectedItems?.length ?? 0) > 0 ? 100 : 0));
         setQuantifier(trigger.intData.length > 4 ? (trigger.intData[4] === 1 ? 1 : 0) : 1);
     }, [trigger]);
-
-    useEffect(() => {
-        setAllowedInteractionTypes(WIRED_CLOCK_FURNI_TYPES);
-        setAllowedInteractionErrorKey('wiredfurni.error.require_counter_furni');
-
-        return () => {
-            setAllowedInteractionTypes(null);
-            setAllowedInteractionErrorKey(null);
-        };
-    }, [setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
 
     return (
         <WiredConditionBaseView

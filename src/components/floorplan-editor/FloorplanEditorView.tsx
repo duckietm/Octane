@@ -9,6 +9,7 @@ import {
     RemoveLinkEventTracker,
     RoomEngineEvent,
     RoomEntryTileMessageEvent,
+    RoomId,
     RoomOccupiedTilesMessageEvent,
     RoomVisualizationSettingsEvent,
     UpdateFloorPropertiesMessageComposer
@@ -84,7 +85,9 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
 
     const { setBaseline, mergeBaseline, revert: revertLivePreview } = useFloorplanLiveSync({ enabled: !isExternal && liveSync && isVisible, state });
 
-    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, () => {
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, (event) => {
+        // A closed inventory/catalog preview disposes its own room; only leaving the real room hides the editor.
+        if (RoomId.isRoomPreviewerId(event.roomId)) return;
         if (!isExternal) setRoomVisible(false);
     });
 

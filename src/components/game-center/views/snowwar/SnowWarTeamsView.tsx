@@ -1,8 +1,11 @@
-import { FC } from 'react';
-import { GetConfigurationValue, GetSessionDataManager, LocalizeText } from '../../../../api';
+import { FC, useEffect, useState } from 'react';
+import { applySnowWarPlural, GetConfigurationValue, getLoopFrame, getOfficialTeamReference, GetSessionDataManager, LocalizeText } from '../../../../api';
+import { SNOWWAR_AIR_ASSETS } from '../../../../assets/images/snowstorm/air';
 import snowStormLogo from '../../../../assets/images/snowstorm/original/snowstorm_logo.png';
 import { LayoutAvatarImageView } from '../../../../common';
 import { useSnowWar } from '../../../../hooks';
+import { SnowWarSkillStars } from './SnowWarSkillStars';
+import { SnowWarStrokeText } from './SnowWarStrokeText';
 
 // Red = team 0, Blue = team 1 (matches the arena's TEAM_COLORS ordering).
 const TEAMS = [
@@ -16,8 +19,16 @@ const localizeWithFallback = (key: string, fallback: string) =>
     return text && text !== key ? text : fallback;
 };
 
+// AIR status texts with their plural / position parameters.
+const localizeSnowWarCount = (key: string, parameter: string, value: number, fallback: string) =>
+    applySnowWarPlural(localizeWithFallback(key, fallback), parameter, value);
+
+// Official arenas use the bundled AIR arena_N_preview; the rest the image library.
 const getArenaPreviewUrl = (arenaId: number, official: boolean) =>
 {
+    const bundled = official ? SNOWWAR_AIR_ASSETS[`arena_${arenaId}_preview`] : null;
+    if (bundled) return bundled;
+
     const imageLibraryUrl = GetConfigurationValue<string>('image.library.url', '');
     const baseUrl = imageLibraryUrl && !imageLibraryUrl.endsWith('/') ? `${imageLibraryUrl}/` : imageLibraryUrl;
     return `${baseUrl}snowstorm_client/arena_${official ? arenaId : 1}_preview.png`;
@@ -31,27 +42,44 @@ const getArenaPreviewUrl = (arenaId: number, official: boolean) =>
  */
 export const SnowWarTeamsView: FC = () =>
 {
-    const { phase, lobbyTeams, lobbySeconds, queueSize, queueInfo, leaveQueue, selectArena, startEditing } = useSnowWar();
+    const { phase, lobbyTeams, lobbySeconds, queuePosition, queueSize, queueInfo, arenaQueuePosition, leaveQueue, selectArena, startEditing } = useSnowWar();
+    const [now, setNow] = useState(() => Date.now());
+
+    // AIR load_ spinner clock (100 ms per frame).
+    useEffect(() =>
+    {
+        const interval = setInterval(() => setNow(Date.now()), 100);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const spinner = SNOWWAR_AIR_ASSETS[`load_${getLoopFrame(now, 8)}`];
 
     const players = lobbyTeams?.players ?? [];
     const minPlayers = queueInfo?.minPlayers ?? 0;
     const ownUserId = GetSessionDataManager()?.userId ?? 0;
     const isLeader = lobbyTeams?.leaderUserId === ownUserId;
 
-    // Status line: still waiting for players (below the minimum), or the lobby
-    // countdown once enough have joined and the match is forming.
+    const inLineUp = players.some(player => player.userId === ownUserId);
+
+    // AIR GameLobbyWindowCtrl.updateDialog: the lobby countdown, else the
+    // queue position when this player is not in the forming match, else
+    // "waiting for more players" (with our X/min count below the minimum).
     const status = (phase === 'lobby')
         ? (lobbySeconds > 0
-            ? localizeWithFallback('snowwar.lobby.starting', 'Game starts in %seconds%s...').replace('%seconds%', lobbySeconds.toString())
-            : localizeWithFallback('snowwar.lobby.going', 'Going to the arena...'))
-        : (minPlayers > 1 && queueSize < minPlayers)
-            ? localizeWithFallback('snowwar.queue.awaiting', 'Waiting for players: %count%/%min%')
-                .replace('%count%', queueSize.toString())
-                .replace('%min%', minPlayers.toString())
-            : localizeWithFallback('snowwar.queue.waiting', 'Waiting for players...');
+            ? localizeSnowWarCount('snowwar.lobby_game_start_countdown', 'seconds', lobbySeconds, '%seconds% seconds until the Storm!')
+            : localizeWithFallback('snowwar.loading_arena', 'Going to the arena...'))
+        : (arenaQueuePosition > 0)
+            // Every arena is busy (AIR Game2InArenaQueue): full matches ahead.
+            ? localizeSnowWarCount('snowwar.lobby_arena_queue_position', 'position', arenaQueuePosition, 'Position in queue: %position%')
+        : (!inLineUp && (queuePosition > 0) && players.length)
+            ? localizeSnowWarCount('snowwar.lobby_arena_queue_position', 'position', queuePosition, 'Position in queue: %position%')
+            : (minPlayers > 1 && queueSize < minPlayers)
+                ? `${localizeWithFallback('snowwar.lobby_waiting_for_more_players', 'Waiting for more players...')} (${queueSize}/${minPlayers})`
+                : localizeWithFallback('snowwar.lobby_waiting_for_more_players', 'Waiting for more players...');
 
     return (
-        <div className="snowwar-teams">
+        <div className="snowwar-teams snowwar-air-backdrop">
             {queueInfo?.canEdit && (
                 <div className="snowwar-teams__topbar">
                     <button type="button" className="snowwar-button snowwar-button--edit" onClick={() => startEditing()}>
@@ -63,7 +91,8 @@ export const SnowWarTeamsView: FC = () =>
             <div className="snowwar-teams__title">
                 {localizeWithFallback('snowwar.teams.assembling', 'Assembling teams...')}
             </div>
-            <div className="snowwar-teams__countdown">{status}</div>
+            {/* AIR wait_text over wait_text_stroke (UbuntuThick, 0x1077ac). */}
+            <div className="snowwar-teams__countdown"><SnowWarStrokeText text={status} /></div>
 
             {!!lobbyTeams?.arenas.length && (
                 <div className="snowwar-teams__arenas">
@@ -77,7 +106,7 @@ export const SnowWarTeamsView: FC = () =>
                         {
                             const selected = lobbyTeams.selectedArenaId === arena.id;
                             const name = arena.official
-                                ? localizeWithFallback(`gamecenter.snowwar.map.name.${arena.id}`, arena.name)
+                                ? localizeWithFallback(`snowwar.field.name.${arena.id}`, localizeWithFallback(`gamecenter.snowwar.map.name.${arena.id}`, arena.name))
                                 : arena.name;
                             return (
                                 <button
@@ -110,15 +139,19 @@ export const SnowWarTeamsView: FC = () =>
                             <div className="snowwar-teams__roster">
                                 {roster.length === 0 && (
                                     <div className="snowwar-teams__empty">
-                                        {localizeWithFallback('snowwar.teams.waiting', 'Waiting for players...')}
+                                        {spinner && <img alt="" src={spinner} />}
+                                        <span>{localizeWithFallback('snowwar.waiting_players', 'Waiting for players')}</span>
                                     </div>
                                 )}
                                 {roster.map(player => (
-                                    <div key={player.userId} className="snowwar-teams__player">
+                                    <div key={player.userId} className={`snowwar-teams__player${(player.userId === ownUserId) ? ' snowwar-teams__player--own' : ''}`}>
                                         <div className="snowwar-teams__avatar">
                                             <LayoutAvatarImageView figure={player.figure} gender={player.gender} direction={team.dir} scale={0.5} />
                                         </div>
-                                        <div className="snowwar-teams__name">{player.name}</div>
+                                        <div className="snowwar-teams__player-data">
+                                            <div className="snowwar-teams__name">{player.name}</div>
+                                            {(player.skillLevel !== undefined) && <SnowWarSkillStars skillLevel={player.skillLevel} teamReference={getOfficialTeamReference(team.id)} />}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -127,11 +160,11 @@ export const SnowWarTeamsView: FC = () =>
                 })}
             </div>
 
-            <div className="snowwar-lobby__spinner" />
+            {spinner && <img alt="" className="snowwar-teams__spinner" src={spinner} />}
 
-            {(phase === 'queued') && (
-                <button type="button" className="snowwar-button snowwar-button--danger snowwar-teams__leave" onClick={() => leaveQueue()}>
-                    {localizeWithFallback('snowwar.queue.leave', 'Leave queue')}
+            {((phase === 'queued') || (phase === 'lobby')) && (
+                <button type="button" className="snowwar-teams__cancel" onClick={() => leaveQueue()}>
+                    {localizeWithFallback('generic.cancel', 'Cancel')}
                 </button>
             )}
         </div>

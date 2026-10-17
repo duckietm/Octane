@@ -60,13 +60,12 @@ describe('SnowWar official arena artwork', () => {
     });
 
     it('builds the weekly and all-time leaderboard from the official AIR artwork', () => {
-        expect(leaderboard).toContain("getAssetUrl('leaderboard_bg')");
-        expect(leaderboard).toContain("getAssetUrl('leaderboard_highlighter')");
-        expect(leaderboard).toContain("getAssetUrl('leaderboard_divider')");
-        expect(leaderboard).toContain("'left_blue' : 'left_black'");
-        expect(leaderboard).toContain("'right_blue' : 'right_black'");
-        expect(leaderboard).toContain('requestLeaderboard(true, leaderboard.friendsOnly');
-        expect(leaderboard).toContain('requestLeaderboard(false, leaderboard.friendsOnly');
+        // Bundled AIR bitmaps; the selected tab is the black one (AIR enableThisWeekButton / enableAllTimeButton).
+        expect(leaderboard).toContain("asset('leaderboard_bg')");
+        expect(leaderboard).toContain("asset('leaderboard_highlighter')");
+        expect(leaderboard).toContain("'left_black' : 'left_blue'");
+        expect(leaderboard).toContain("'right_black' : 'right_blue'");
+        expect(leaderboard).toContain('getLeaderboardTarget(action, leaderboard)');
         expect(gameTile).toContain("GetConfigurationValue<boolean>('games.highscores.enabled', true)");
     });
 });

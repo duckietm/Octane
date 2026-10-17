@@ -2893,6 +2893,14 @@
     pointer-events: none;
 }
 
+/* Firefox has no mask-box-image, so the slot drew as a plain green square. These steps are the 3px
+   corner alpha of the 7px discount slot. */
+@supports not (-webkit-mask-box-image-source: none) {
+    .octane-catalog-standard-spinner-discount::before {
+        clip-path: polygon(2px 0, calc(100% - 2px) 0, calc(100% - 2px) 1px, calc(100% - 1px) 1px, calc(100% - 1px) 2px, 100% 2px, 100% calc(100% - 2px), calc(100% - 1px) calc(100% - 2px), calc(100% - 1px) calc(100% - 1px), calc(100% - 2px) calc(100% - 1px), calc(100% - 2px) 100%, 2px 100%, 2px calc(100% - 1px), 1px calc(100% - 1px), 1px calc(100% - 2px), 0 calc(100% - 2px), 0 2px, 1px 2px, 1px 1px, 2px 1px);
+    }
+}
+
 .octane-catalog-standard-spinner-discount-copy {
     /* Keep the localized "+ N free!" visible between the requested plus
        control and AIR's fixed x=173 bonus star. */

@@ -202,6 +202,13 @@ const useWiredState = () => {
 
         if (objectId <= 0) return;
 
+        // Official: wall items are picked only when the box allows wall furni. A box the server sends no input
+        // sources conf for keeps accepting them.
+        const inputSources = trigger.inputSourcesConf;
+        const hasInputSourcesConf = !!(inputSources?.furniAllowed?.length || inputSources?.userAllowed?.length);
+
+        if (category === RoomObjectCategory.WALL && hasInputSourcesConf && !trigger.allowWallFurni) return;
+
         const getInteractionTypeName = (furniData: any): string => {
             if (!furniData) return null;
 

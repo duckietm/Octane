@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { LocalizeText, localizeWithFallback, WiredFurniType, WIRED_CLOCK_FURNI_TYPES } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -34,7 +34,7 @@ const formatSeconds = (halfSeconds: number) => {
 };
 
 export const WiredActionAdjustClockView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setSourceTypes = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
     const [operator, setOperator] = useState(2);
     const [furniSource, setFurniSource] = useState<number>(() => slotFurniSource(trigger));
     const [minutes, setMinutes] = useState(0);
@@ -54,16 +54,6 @@ export const WiredActionAdjustClockView: FC<{}> = () => {
         setOperator(normalizeOperator(d[3] ?? 2));
         setFurniSource(slotFurniSource(trigger));
     }, [trigger]);
-
-    useEffect(() => {
-        setAllowedInteractionTypes(WIRED_CLOCK_FURNI_TYPES);
-        setAllowedInteractionErrorKey('wiredfurni.error.require_counter_furni');
-
-        return () => {
-            setAllowedInteractionTypes(null);
-            setAllowedInteractionErrorKey(null);
-        };
-    }, [setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
 
     const save = () => {
         const value = normalizeHalfSeconds(halfSeconds);

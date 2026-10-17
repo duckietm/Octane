@@ -8,7 +8,7 @@ import {
     RoomObjectVariable
 } from '@octane/renderer';
 import { useState } from 'react';
-import { IsOwnerOfFurniture, TryJoinGroup, TryVisitRoom } from '../../../../api';
+import { CreateLinkEvent, IsOwnerOfFurniture, TryJoinGroup, TryVisitRoom } from '../../../../api';
 import { useMessageEvent, useOctaneEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
 
@@ -70,6 +70,10 @@ const useFurnitureContextMenuWidgetState = () => {
                     return;
                 case 'go_to_group_homeroom':
                     if (groupData) TryVisitRoom(groupData.guildHomeRoomId);
+                    break;
+                case 'open_forum':
+                    // The "Open forum" button on group furni was drawn but did nothing.
+                    if (groupData) CreateLinkEvent('groupforum/' + groupData.guildId);
                     break;
             }
         }

@@ -23,7 +23,8 @@ export const SnowWarView: FC = () =>
         if (queueExpired) setGameCenterVisible(true);
     }, [queueExpired, setGameCenterVisible]);
 
-    if (leaderboard.isOpen) return <SnowWarLeaderboardView />;
+    // Never over a match: from loading on the arena owns the screen.
+    if (leaderboard.isOpen && (phase === 'idle' || phase === 'queued' || phase === 'lobby')) return <SnowWarLeaderboardView />;
 
     if (queueExpired)
     {
@@ -53,8 +54,10 @@ export const SnowWarView: FC = () =>
         );
     }
 
-    // Match found: full-screen "Get ready!" splash until the arena takes over.
-    if (phase === 'loading' || phase === 'preparing')
+    // Match found: the AIR loading window while the arena loads. From the
+    // stage start (preparing) the arena itself shows, with the AIR counter,
+    // as GameArenaView does.
+    if (phase === 'loading')
     {
         return (
             <div className="snowwar-overlay">

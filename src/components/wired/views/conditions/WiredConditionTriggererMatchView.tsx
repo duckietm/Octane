@@ -102,6 +102,7 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
                             />
                             <WiredSourcesSelector
                                 showUsers={true}
+                                userSlot={1}
                                 userSource={compareUserSource}
                                 userSources={COMPARE_USER_SOURCES}
                                 usersTitle="wiredfurni.params.sources.users.title.match.1"

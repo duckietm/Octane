@@ -110,13 +110,13 @@ setBootDebug('boot: secure fetch installed');
 
 const search = new URLSearchParams(window.location.search);
 const clientMode = getClientMode();
-const petConfig = await loadPetConfig();
+// The pet list, the configuration files and the UI bundle download together.
+const petConfigLoad = loadPetConfig();
 
 (window as any).OctaneSecureApiUrl = clientMode.apiBaseUrl || window.location.origin;
 (window as any).OctaneClientMode = clientMode;
 (window as any).OctaneConfig = {
     'config.urls': [configFileUrl('renderer-config.json', true), configFileUrl('ui-config.json', true)],
-    ...(petConfig ?? {}),
     'sso.ticket': search.get('sso') || null,
     'forward.type': search.get('room') ? 2 : -1,
     'forward.id': search.get('room') || 0,
@@ -141,20 +141,39 @@ if (search.has('sso')) {
 
 setBootDebug('boot: OctaneConfig assigned');
 
+const appModule = import('./index');
+
+appModule.catch(() => undefined);
+
 // Load renderer-config.json + ui-config.json BEFORE rendering React. Otherwise
 // the first paint triggers a flood of "Missing configuration key" warnings for
-// every key components read synchronously (asset.url, login.endpoint, …) until
-// prepare()'s deferred init() finally lands. Doing it here makes the config
-// already populated by the time index.tsx mounts <App/>.
+// every key components read synchronously (asset.url, login.endpoint, …).
+// The UI bundle is already downloading meanwhile; it only mounts below.
+const configLoad = GetConfiguration().init();
+
+configLoad.catch(() => undefined);
+
+const petConfig = await petConfigLoad;
+
+// As part of OctaneConfig the pet values win over the configuration files. A load still under way
+// re-reads OctaneConfig when its files are in; one that already finished gets them applied below.
+if (petConfig) Object.assign((window as any).OctaneConfig, petConfig);
+
 try {
-    await GetConfiguration().init();
+    await configLoad;
+
+    if (petConfig) GetConfiguration().parseConfiguration(petConfig, true);
+
     setBootDebug('boot: configuration init done');
 } catch (error) {
     setBootDebug(`boot: configuration init failed ${error?.message || error}`);
 }
 
-import('./index')
-    .then(() => setBootDebug('boot: app bundle imported'))
+appModule
+    .then(({ mountApp }) => {
+        mountApp();
+        setBootDebug('boot: app bundle imported');
+    })
     .catch((error) => {
         setBootDebug(`boot: import failed ${error?.message || error}`);
         throw error;

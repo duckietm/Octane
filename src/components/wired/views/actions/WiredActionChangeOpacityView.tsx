@@ -70,7 +70,7 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
 
         setIntParams(wire.intParams);
         setSourceTypes({ furni: wire.furniSources, users: wire.userSources });
-        if (state.furniSource !== WIRED_OPACITY_SELECTED_FURNI_SOURCE) setFurniIds?.([]);
+        if (state.targetUsers || state.furniSource !== WIRED_OPACITY_SELECTED_FURNI_SOURCE) setFurniIds?.([]);
     };
 
     const choice = visibilityChoice(state.opacity);
@@ -84,17 +84,35 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
     return (
         <WiredActionBaseView
             hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+            requiresFurni={state.targetUsers ? WiredFurniType.STUFF_SELECTION_OPTION_NONE : WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
             save={save}
             footer={
-                <WiredSourcesSelector
-                    showFurni={true}
-                    showUsers={state.visibility === WIRED_OPACITY_VISIBILITY_SOURCE_USERS}
-                    furniSource={state.furniSource}
-                    userSource={state.userSource}
-                    onChangeFurni={(furniSource) => update({ furniSource })}
-                    onChangeUsers={(userSource) => update({ userSource })}
-                />
+                <div className="flex flex-col gap-2">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.sources.merged.title.target', 'Select target:')}</Text>
+                    <div className="flex gap-3">
+                        <label className="flex items-center gap-1">
+                            <input checked={!state.targetUsers} className="form-check-input" name="wiredTransparencyTarget" type="radio" onChange={() => update({ targetUsers: false })} />
+                            <Text>{localizeWithFallback('wiredfurni.params.sources.furni.title', 'Furni')}</Text>
+                        </label>
+                        <label className="flex items-center gap-1">
+                            <input checked={state.targetUsers} className="form-check-input" name="wiredTransparencyTarget" type="radio" onChange={() => update({ targetUsers: true })} />
+                            <Text>{localizeWithFallback('wiredfurni.params.sources.users.title', 'Users')}</Text>
+                        </label>
+                    </div>
+                    {state.targetUsers ? (
+                        <WiredSourcesSelector showUsers={true} userSlot={1} userSource={state.targetUserSource} onChangeUsers={(targetUserSource) => update({ targetUserSource })} />
+                    ) : (
+                        <WiredSourcesSelector showFurni={true} furniSource={state.furniSource} onChangeFurni={(furniSource) => update({ furniSource })} />
+                    )}
+                    {state.visibility === WIRED_OPACITY_VISIBILITY_SOURCE_USERS && (
+                        <WiredSourcesSelector
+                            showUsers={true}
+                            usersTitle="wiredfurni.params.visualization.visibility_audience"
+                            userSource={state.userSource}
+                            onChangeUsers={(userSource) => update({ userSource })}
+                        />
+                    )}
+                </div>
             }
         >
             <div className="flex flex-col gap-1">

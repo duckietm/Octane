@@ -1,4 +1,11 @@
-import { RoomEngineEvent, RoomObjectCategory, RoomSessionEvent, WiredLabelsEvent, WiredLabelsUpdateEvent } from '@octane/renderer';
+import {
+    RoomEngineEvent,
+    RoomId,
+    RoomObjectCategory,
+    RoomSessionEvent,
+    WiredLabelsEvent,
+    WiredLabelsUpdateEvent
+} from '@octane/renderer';
 import { useFurniRemovedEvent, useObjectRollOutEvent, useObjectRollOverEvent, useObjectSelectedEvent } from '../rooms/engine';
 import { useMessageEvent, useOctaneEvent } from '../events';
 import { useWiredLabelStore } from './wiredLabelStore';
@@ -43,5 +50,8 @@ export const useWiredLabelEvents = () => {
     });
 
     useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, () => clear());
-    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, () => clear());
+    // A closed inventory/catalog preview disposes its own room; only the real room clears.
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, (event) => {
+        if (!RoomId.isRoomPreviewerId(event.roomId)) clear();
+    });
 };

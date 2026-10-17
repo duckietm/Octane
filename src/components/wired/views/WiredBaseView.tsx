@@ -33,6 +33,7 @@ import wiredBgRight from '../../../assets/images/wired/wired_bg_right.png';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
 import { useNotification, useWired, useWiredTools } from '../../../hooks';
 import { WiredFurniSelectorView } from './WiredFurniSelectorView';
+import { finalizeWiredVariablePickers } from './WiredVariablePickerHistory';
 
 export interface WiredBaseViewProps {
     wiredType: string;
@@ -50,6 +51,8 @@ export interface WiredBaseViewProps {
     widthModifier?: number;
     /** Official: the action delay comes after the furni picks. */
     delaySection?: ReactNode;
+    /** A save that must be confirmed first (a box that would lose stored data): the confirmation's texts, or null. */
+    confirmSave?: () => { title: string; body: string } | null;
 }
 
 /** The official frame width (Illumina and Volter templates). */
@@ -79,7 +82,8 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
         selectionPreview = null,
         showSelection = true,
         widthModifier = 1,
-        delaySection = null
+        delaySection = null,
+        confirmSave = null
     } = props;
     const WIRED_CARD_WIDTH = Math.round(WIRED_FRAME_WIDTH * (widthModifier > 0 ? widthModifier : 1));
     const [wiredName, setWiredName] = useState<string>(null);
@@ -155,9 +159,18 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
         if (save) save();
 
         const proceed = () => {
+            // A saved selection enters the variable picker's recent tab.
+            finalizeWiredVariablePickers();
             setKeepOpenOnSave(keepOpen);
             setNeedsSave(true);
         };
+        const confirmation = confirmSave ? confirmSave() : null;
+
+        if (confirmation && showConfirm) {
+            showConfirm(confirmation.body, proceed, null, null, null, confirmation.title);
+            return;
+        }
+
         const options = wiredType === 'selector' ? getSelectorOptions?.() : null;
 
         // Official: inverting without filtering selects everything that does NOT match, which can be

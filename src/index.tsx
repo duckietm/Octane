@@ -103,7 +103,9 @@ import './css/common/ClassicScrollbar.css';
 
 document.documentElement.classList.add('has-classic-scrollbar');
 
-createRoot(document.getElementById('root')).render(
+// Mounted by bootstrap once the configuration is in; importing this module only loads the UI.
+export const mountApp = (): void => {
+    createRoot(document.getElementById('root')).render(
     <StrictMode>
         <QueryClientProvider client={queryClient}>
             <ErrorBoundary
@@ -120,3 +122,4 @@ createRoot(document.getElementById('root')).render(
         </QueryClientProvider>
     </StrictMode>
 );
+};

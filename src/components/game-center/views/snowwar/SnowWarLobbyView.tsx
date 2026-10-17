@@ -1,11 +1,17 @@
 import { GetRoomEngine, Vector3d } from '@octane/renderer';
-import { FC, useEffect, useRef } from 'react';
-import { GetSessionDataManager, LocalizeText } from '../../../../api';
-import snowStormLogo from '../../../../assets/images/snowstorm/original/snowstorm_logo.png';
+import { FC, useEffect, useRef, useState } from 'react';
+import { getLoopFrame, getOfficialTeamReference, GetSessionDataManager, LocalizeText } from '../../../../api';
+import { SNOWWAR_AIR_ASSETS } from '../../../../assets/images/snowstorm/air';
 import { LayoutAvatarImageView } from '../../../../common';
 import { useSnowWar } from '../../../../hooks';
+import { getSnowWarFigure } from './SnowWarAvatarView';
+import { SnowWarSkillStars } from './SnowWarSkillStars';
+import { SnowWarStrokeText } from './SnowWarStrokeText';
 
 const TEAM_COLORS = ['#e64545', '#4577e6', '#3fb550', '#e6c245'];
+
+// AIR ships arena_N_preview bitmaps for the official arenas.
+const OFFICIAL_PREVIEWS = new Set([ 8, 9, 10, 11, 12 ]);
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -14,26 +20,39 @@ const localizeWithFallback = (key: string, fallback: string) =>
 };
 
 /**
- * "Get ready!" pre-match splash: the SnowStorm logo, both teams' players, a
- * mini arena preview showing where everyone spawns, and a spinner. Shown from
- * the lobby countdown until the arena takes over (phase 'playing').
+ * AIR GameLoadingViewController: the snowwar_ending window over the sky
+ * backdrop with "Get ready!", the arena preview and name, both teams' rows
+ * (team-shirted avatar, name, skill stars, a load_ spinner each; your own row
+ * on green_square) and "Going to the arena..." with the main spinner, plus
+ * the leave link. Custom arenas have no AIR preview, so they keep our mini
+ * map of the floor and spawns. Shown while the arena loads (phase 'loading').
  */
 export const SnowWarLobbyView: FC = () =>
 {
-    const { phase, levelData, lobbySeconds, simulation } = useSnowWar();
+    const { phase, levelData, lobbyTeams, simulation, exitGame } = useSnowWar();
     const previewRef = useRef<HTMLCanvasElement>(null);
+    const [ now, setNow ] = useState(() => Date.now());
 
-    const players = levelData?.players ?? [];
-    const teamCount = Math.max(levelData?.teamCount ?? 2, 2);
-    // Players grouped by team; team 0 sits on the left column, 1 on the right,
-    // extra teams alternate sides.
-    const teams: { players: typeof players; side: 'left' | 'right' }[] = [];
-    for (let t = 0; t < teamCount; t++)
+    // Spinner clock (AIR SnowWarAnimatedWindowElement, 100 ms per frame).
+    useEffect(() =>
     {
-        teams.push({ players: players.filter(player => player.teamId === t), side: t % 2 === 0 ? 'left' : 'right' });
-    }
-    const leftTeams = teams.filter(team => team.side === 'left');
-    const rightTeams = teams.filter(team => team.side === 'right');
+        const interval = setInterval(() => setNow(Date.now()), 100);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // The level data only arrives with the stage start; until then the lobby
+    // line-up is the match roster (same players, same index % 2 team split).
+    const players: { key: number; userId: number; teamId: number; name: string; figure: string; gender: string }[] = levelData?.players?.length
+        ? levelData.players.map(player => ({ key: player.objectId, userId: player.userId, teamId: player.teamId, name: player.name, figure: player.figure, gender: player.gender }))
+        : (lobbyTeams?.players ?? []).map(player => ({ key: player.userId, userId: player.userId, teamId: player.teamId, name: player.name, figure: player.figure, gender: player.gender }));
+    const mapId = levelData?.mapId ?? lobbyTeams?.selectedArenaId ?? 0;
+    const lobbyArena = lobbyTeams?.arenas?.find(arena => arena.id === mapId);
+    const ownUserId = GetSessionDataManager()?.userId ?? 0;
+    const skillLevels = new Map((lobbyTeams?.players ?? []).map(player => [ player.userId, player.skillLevel ]));
+    const officialPreview = OFFICIAL_PREVIEWS.has(mapId) && (lobbyArena?.official ?? true) ? (SNOWWAR_AIR_ASSETS[`arena_${ mapId }_preview`] ?? null) : null;
+    // AIR lays team 1 (blue) on the left and team 2 (red) on the right.
+    const teamIds = [ ...new Set(players.map(player => player.teamId)) ].sort((a, b) => getOfficialTeamReference(a) - getOfficialTeamReference(b));
 
     // Mini top-down arena preview: draw the heightmap tiles, then a coloured dot
     // per avatar at its spawn tile so players see where they'll start.
@@ -123,7 +142,7 @@ export const SnowWarLobbyView: FC = () =>
             ctx.lineWidth = 1.5;
             ctx.stroke();
         }
-    }, [levelData, phase, simulation]);
+    }, [levelData, phase, simulation, officialPreview]);
 
     // Warm the renderer's furni cache during the splash: every hotel-furni type
     // in the arena is loaded now so it renders instantly the moment the arena
@@ -156,47 +175,66 @@ export const SnowWarLobbyView: FC = () =>
         }
     }, [levelData]);
 
-    const arenaName = levelData
-        ? localizeWithFallback(`gamecenter.snowwar.map.name.${levelData.mapId}`, `Arena ${levelData.mapId}`)
-        : '';
+    const arenaName = !mapId
+        ? ''
+        : (lobbyArena && !lobbyArena.official)
+            ? lobbyArena.name
+            : localizeWithFallback(`snowwar.field.name.${ mapId }`, localizeWithFallback(`gamecenter.snowwar.map.name.${ mapId }`, lobbyArena?.name ?? `Arena ${ mapId }`));
+    const spinner = SNOWWAR_AIR_ASSETS[`load_${ getLoopFrame(now, 8) }`];
 
-    const renderPlayer = (player: typeof players[number], side: 'left' | 'right') => (
-        <div key={player.objectId} className="snowwar-lobby__player" style={{ borderColor: TEAM_COLORS[player.teamId % TEAM_COLORS.length] }}>
-            <div className="snowwar-lobby__avatar">
-                <LayoutAvatarImageView figure={player.figure} gender={player.gender} direction={side === 'left' ? 4 : 2} scale={0.5} />
+    const renderPlayer = (player: typeof players[number]) =>
+    {
+        const teamReference = getOfficialTeamReference(player.teamId);
+        const own = (player.userId === ownUserId);
+        const skillLevel = skillLevels.get(player.userId);
+
+        return (
+            <div key={ player.key } className={ `snowwar-results__player snowwar-results__player--team-${ teamReference }` }>
+                <div className={ `snowwar-results__player-image snowwar-results__player-image--team-${ teamReference }${ own ? ' snowwar-results__player-image--own' : '' }` }>
+                    <LayoutAvatarImageView direction={ (teamReference === 1) ? 2 : 4 } figure={ getSnowWarFigure(player.figure, player.teamId) } gender={ player.gender } scale={ 0.5 } />
+                </div>
+                <div className="snowwar-results__player-data">
+                    <div className="snowwar-results__player-name">{ player.name }</div>
+                    { (skillLevel !== undefined) && <SnowWarSkillStars skillLevel={ skillLevel } teamReference={ teamReference } /> }
+                </div>
+                <div className="snowwar-results__player-score">
+                    { spinner && <img alt="" className="snowwar-loading__spinner" src={ spinner } /> }
+                </div>
             </div>
-            <div className="snowwar-lobby__name" style={{ color: TEAM_COLORS[player.teamId % TEAM_COLORS.length] }}>{player.name}</div>
-        </div>
-    );
+        );
+    };
 
     return (
-        <div className="snowwar-lobby">
-            <img className="snowwar-lobby__logo" src={snowStormLogo} alt="SnowStorm" />
-            <div className="snowwar-lobby__ready">{localizeWithFallback('snowwar.lobby.ready', 'Get ready!')}</div>
+        <div className="snowwar-lobby snowwar-air-backdrop">
+            <div className="snowwar-results__card snowwar-loading">
+                <div className="snowwar-results__title snowwar-loading__title"><SnowWarStrokeText text={ localizeWithFallback('snowwar.loading.title', 'Get ready!') } /></div>
 
-            <div className="snowwar-lobby__stage">
-                <div className="snowwar-lobby__column snowwar-lobby__column--left">
-                    {leftTeams.flatMap(team => team.players).map(player => renderPlayer(player, 'left'))}
-                </div>
-
-                <div className="snowwar-lobby__center">
-                    <div className="snowwar-lobby__status">
-                        {phase === 'lobby' && lobbySeconds > 0
-                            ? localizeWithFallback('snowwar.lobby.starting', 'Game starts in %seconds%s...').replace('%seconds%', lobbySeconds.toString())
-                            : localizeWithFallback('snowwar.lobby.going', 'Going to the arena...')}
+                { !!mapId && (
+                    <div className="snowwar-loading__arena">
+                        { officialPreview && <img alt="" className="snowwar-loading__preview" src={ officialPreview } /> }
+                        { !officialPreview && levelData && <canvas ref={ previewRef } className="snowwar-lobby__preview" height={ 120 } width={ 220 } /> }
+                        <div className="snowwar-loading__arena-name">{ arenaName }</div>
                     </div>
-                    {levelData && (
-                        <>
-                            <canvas ref={previewRef} className="snowwar-lobby__preview" width={340} height={200} />
-                            <div className="snowwar-lobby__arena-name">{arenaName}</div>
-                        </>
-                    )}
-                    <div className="snowwar-lobby__spinner" />
+                ) }
+
+                <div className="snowwar-results__teams">
+                    { teamIds.map(teamId => (
+                        <div key={ teamId } className={ `snowwar-results__team snowwar-results__team--${ getOfficialTeamReference(teamId) }` }>
+                            <div className="snowwar-results__team-list">
+                                { players.filter(player => player.teamId === teamId).map(renderPlayer) }
+                            </div>
+                        </div>
+                    )) }
                 </div>
 
-                <div className="snowwar-lobby__column snowwar-lobby__column--right">
-                    {rightTeams.flatMap(team => team.players).map(player => renderPlayer(player, 'right'))}
+                <div className="snowwar-loading__status">
+                    { spinner && <img alt="" src={ spinner } /> }
+                    <SnowWarStrokeText text={ localizeWithFallback('snowwar.loading_arena', 'Going to the arena...') } />
                 </div>
+
+                <button className="snowwar-results__leave" type="button" onClick={ () => exitGame() }>
+                    { localizeWithFallback('snowwar.leave_game', 'Leave game') }
+                </button>
             </div>
         </div>
     );

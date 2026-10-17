@@ -1,4 +1,4 @@
-import { AvatarScaleType, AvatarSetType, GetAvatarRenderManager } from '@octane/renderer';
+import { AvatarScaleType, AvatarSetType, GetAvatarRenderManager, IAvatarImageListener } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Base, BaseProps } from '../Base';
 import { cropAirMeMenuFaceImageUrl, cropOpaqueBoundsImageUrl, cropTransparentImageUrl, dataUrlToBlob } from './avatarImageCrop';
@@ -108,16 +108,29 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
 
         if (AVATAR_IMAGE_CACHE.has(figureKey)) {
             applyImage(AVATAR_IMAGE_CACHE.get(figureKey));
-        } else {
-            const resetFigure = async (_figure: string) => {
-                if (isDisposed.current || requestIdRef.current !== requestId) return;
 
-                const avatarImage = GetAvatarRenderManager().createAvatarImage(_figure, (small && fit) ? AvatarScaleType.SMALL : AvatarScaleType.LARGE, gender, {
-                    resetFigure: (figure: string) => resetFigure(figure),
-                    dispose: null,
-                    disposed: false
-                });
+            return;
+        }
 
+        // One listener per request: the download manager keeps it until the
+        // figure's assets arrive, and skips it once disposed, so a view that
+        // changed figure or unmounted never renders a late download again.
+        const listener: IAvatarImageListener = {
+            resetFigure: null,
+            disposed: false,
+            dispose: () => {
+                listener.disposed = true;
+            }
+        };
+
+        const resetFigure = async (_figure: string) => {
+            if (listener.disposed || isDisposed.current || requestIdRef.current !== requestId) return;
+
+            const avatarImage = GetAvatarRenderManager().createAvatarImage(_figure, (small && fit) ? AvatarScaleType.SMALL : AvatarScaleType.LARGE, gender, listener);
+
+            if (!avatarImage) return;
+
+            try {
                 let setType = AvatarSetType.FULL;
 
                 if (headOnly && !airMeMenu) setType = AvatarSetType.HEAD;
@@ -138,7 +151,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
                 // tiny and drifts sideways inside the tile.
                 if (imageUrl && fit && !nativeCroppedHead) imageUrl = await cropOpaqueBoundsImageUrl(imageUrl);
 
-                if (imageUrl && !isDisposed.current && requestIdRef.current === requestId) {
+                if (imageUrl && !listener.disposed && !isDisposed.current && requestIdRef.current === requestId) {
                     const blob = dataUrlToBlob(imageUrl);
 
                     if (blob && !avatarImage.isPlaceholder()) {
@@ -152,12 +165,20 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = (props) => 
 
                     applyImage(blob ?? imageUrl);
                 }
-
+            } finally {
                 avatarImage.dispose();
-            };
+            }
+        };
 
-            resetFigure(figure);
-        }
+        listener.resetFigure = (figure: string) => void resetFigure(figure);
+
+        void resetFigure(figure);
+
+        return () => {
+            listener.dispose();
+
+            if (requestIdRef.current === requestId) requestIdRef.current++;
+        };
     }, [figure, gender, direction, headOnly, compactHead, compactHeadSize, compactHeadPadding, fit, small, airMeMenu, nativeCroppedHead, isReady]);
 
     useEffect(() => {

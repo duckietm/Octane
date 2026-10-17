@@ -4,7 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredHandItemField } from '../WiredHandItemField';
-import { CLICKED_USER_SOURCE_VALUE, WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
+import { CLICKED_USER_SOURCE_VALUE, REACHED_USER_SOURCE_VALUE, WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -22,7 +22,7 @@ const BOT_SOURCE_OPTIONS: WiredSourceOption[] = [
 ];
 
 const normalizeUserSource = (value: number) =>
-    value === CLICKED_USER_SOURCE_VALUE || USER_SOURCE_OPTIONS.some((option) => option.value === value) ? value : 0;
+    value === CLICKED_USER_SOURCE_VALUE || value === REACHED_USER_SOURCE_VALUE || USER_SOURCE_OPTIONS.some((option) => option.value === value) ? value : 0;
 const normalizeBotSource = (value: number, hasBotName = false) => (BOT_SOURCE_OPTIONS.some((option) => option.value === value) ? value : hasBotName ? 100 : 0);
 
 export const WiredActionBotGiveHandItemView: FC<{}> = (props) => {
@@ -56,7 +56,7 @@ export const WiredActionBotGiveHandItemView: FC<{}> = (props) => {
             save={save}
             footer={
                 <div className="flex flex-col gap-2">
-                    <WiredSourcesSelector showUsers={true} userSource={userSource} userSources={USER_SOURCE_OPTIONS} onChangeUsers={setUserSource} />
+                    <WiredSourcesSelector showUsers={true} userSlot={1} userSource={userSource} userSources={USER_SOURCE_OPTIONS} onChangeUsers={setUserSource} />
                     <hr className="m-0 bg-dark" />
                     <WiredSourcesSelector
                         showUsers={true}

@@ -29,7 +29,7 @@ describe('AIR room thumbnail viewfinder', () => {
         const textureReceiver = vi.fn(() => new Promise<void>(() => undefined));
         render(<LayoutMiniCameraView roomId={42} textureReceiver={textureReceiver} onClose={vi.fn()} />);
 
-        const saveButton = screen.getByRole('button', { name: 'navigator.thumbeditor.save' });
+        const saveButton = screen.getByRole('button', { name: 'navigator.thumbnail.camera.title.capture' });
         fireEvent.click(saveButton);
         fireEvent.click(saveButton);
 

@@ -4,6 +4,7 @@ import { LocalizeText, SendMessageComposer } from '../../api';
 import { useGameCenter } from '../../hooks';
 import { GameStageView } from './views/GameStageView';
 import { GameTileView } from './views/GameTileView';
+import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -12,7 +13,7 @@ const localizeWithFallback = (key: string, fallback: string) =>
 };
 
 export const GameCenterView = () => {
-    const { isVisible, setIsVisible, games, selectedGame, accountStatus } = useGameCenter();
+    const { isVisible, setIsVisible, games, selectedGame, accountStatus, instructionsOpen } = useGameCenter();
 
     useEffect(() => {
         const toggleGameCenter = () => {
@@ -52,9 +53,13 @@ export const GameCenterView = () => {
                 <div className="game-center-header__title">{localizeWithFallback('gamecenter.game_list_title', 'Choose a game')}</div>
                 <button className="game-center-header__close" type="button" onClick={() => setIsVisible(false)}>&times;</button>
             </div>
-            <div className="game-tile-grid">
-                {games.map((game) => <GameTileView key={game.gameId} game={game} />)}
-            </div>
+            {instructionsOpen
+                ? <SnowWarInstructionsView />
+                : (
+                    <div className="game-tile-grid">
+                        {games.map((game) => <GameTileView key={game.gameId} game={game} />)}
+                    </div>
+                )}
             <GameStageView />
         </div>
     );

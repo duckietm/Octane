@@ -253,10 +253,8 @@ export const InventoryView: FC<{}> = () => {
         previewer.backgroundColor = null;
         setRoomPreviewer(previewer);
         return () => {
-            setRoomPreviewer((prevValue) => {
-                prevValue.dispose();
-                return null;
-            });
+            previewer.dispose();
+            setRoomPreviewer(null);
         };
     }, []);
 

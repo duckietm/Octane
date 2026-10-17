@@ -3,7 +3,7 @@ import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
-import { CLICKED_USER_SOURCE_VALUE, WiredSourcesSelector } from '../WiredSourcesSelector';
+import { CLICKED_USER_SOURCE_VALUE, REACHED_USER_SOURCE_VALUE, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
 
@@ -16,7 +16,7 @@ const MAX_DELIMITER_LENGTH = 16;
 const PLACEHOLDER_WRAPPER_PATTERN = /^\$\((.*)\)$/;
 
 const normalizePlaceholderType = (value: number) => (value === TYPE_MULTIPLE ? TYPE_MULTIPLE : TYPE_SINGLE);
-const normalizeUserSource = (value: number) => (value === 0 || value === 200 || value === 201 || value === CLICKED_USER_SOURCE_VALUE ? value : 0);
+const normalizeUserSource = (value: number) => (value === 0 || value === 200 || value === 201 || value === CLICKED_USER_SOURCE_VALUE || value === REACHED_USER_SOURCE_VALUE ? value : 0);
 const normalizePlaceholderName = (value: string) => {
     let normalizedValue = (value ?? '').trim().replace(/[\t\r\n]/g, '');
 

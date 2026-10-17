@@ -22,7 +22,7 @@ import {
     RoomVariableEnum,
     Vector3d
 } from '@octane/renderer';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     CanManipulateFurniture,
@@ -36,6 +36,7 @@ import {
     StartRoomSession
 } from '../../api';
 import { useMessageEvent, useOctaneEvent, useUiEvent } from '../events';
+import { RoomTintTarget, updateRoomTint } from './updateRoomTint';
 import { useWiredFurniOpacity } from './useWiredFurniOpacity';
 
 const getViewportSize = () => {
@@ -52,6 +53,7 @@ const useRoomState = () => {
     const [isHandItemBlocked, setIsHandItemBlocked] = useState(false);
     const [roomBackground, setRoomBackground] = useState<OctaneSprite>(null);
     const [roomFilter, setRoomFilter] = useState<OctaneAdjustmentFilter>(null);
+    const roomMasterRef = useRef<RoomTintTarget>(null);
     const [originalRoomBackgroundColor, setOriginalRoomBackgroundColor] = useState(0);
 
     useWiredFurniOpacity(roomSession?.roomId ?? 0);
@@ -73,14 +75,7 @@ const useRoomState = () => {
     const updateRoomFilter = (color: number) => {
         if (!roomFilter) return;
 
-        const r = (color >> 16) & 0xff;
-        const g = (color >> 8) & 0xff;
-        const b = color & 0xff;
-
-        roomFilter.red = r / 255;
-        roomFilter.green = g / 255;
-        roomFilter.blue = b / 255;
-        roomFilter.enabled = (color & 0xffffff) !== 0xffffff;
+        updateRoomTint(roomMasterRef.current, roomFilter, color);
     };
 
     useUiEvent<RoomWidgetUpdateBackgroundColorPreviewEvent>(RoomWidgetUpdateBackgroundColorPreviewEvent.PREVIEW, (event) =>
@@ -293,7 +288,6 @@ const useRoomState = () => {
         const background = new OctaneSprite(OctaneTexture.WHITE);
         const filter = new OctaneAdjustmentFilter();
 
-        filter.enabled = false;
         const master = canvas.master;
 
         background.tint = 0;
@@ -301,7 +295,8 @@ const useRoomState = () => {
         background.height = height;
 
         master.addChildAt(background, 0);
-        master.filters = [filter];
+        // A white tint is an identity; the filter is attached only while the mood light changes it.
+        roomMasterRef.current = master;
 
         setRoomBackground(background);
         setRoomFilter(filter);
@@ -356,6 +351,9 @@ const useRoomState = () => {
         return () => {
             setRoomBackground(null);
             setRoomFilter(null);
+            updateRoomTint(master, filter, 0xffffff);
+            roomMasterRef.current = null;
+            filter.destroy();
             setOriginalRoomBackgroundColor(0);
 
             window.removeEventListener('resize', resize);

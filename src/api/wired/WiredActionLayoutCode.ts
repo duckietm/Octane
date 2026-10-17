@@ -62,6 +62,7 @@ export class WiredActionLayoutCode {
     public static PROGRESS_REWARD_TRACK: number = 58;
     public static RESET_REWARD_TRACK: number = 59;
     public static CHANGE_OPACITY: number = 61;
+    public static SET_FURNI_HIGHLIGHT: number = 62;
 
     // Ours.
     public static SET_ROLLER_SPEED: number = 1088;

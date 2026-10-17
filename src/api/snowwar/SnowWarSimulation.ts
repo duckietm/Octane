@@ -201,6 +201,9 @@ export class SnowWarSimulation
     private _mapHeight = 0;
 
     private _pendingSubturns: SnowWarSimEvent[][] = [];
+    // Leavers removed once the subturns buffered before their exit have played
+    // (atSubturn = subturnCount at which the removal is due).
+    private _pendingRemovals: { objectId: number; atSubturn: number }[] = [];
     private _subturnClock = 0; // ms accumulated toward the next subturn
     private _subturnCount = 0; // total subturns processed (monotonic)
     private _lastAdvanceAt: number | null = null;
@@ -243,6 +246,7 @@ export class SnowWarSimulation
         this.piles.clear();
         this._impacts = [];
         this._pendingSubturns = [];
+        this._pendingRemovals = [];
         this._subturnClock = 0;
         this._subturnCount = 0;
         this._lastAdvanceAt = null;
@@ -308,6 +312,7 @@ export class SnowWarSimulation
         this.piles.clear();
         this._impacts = [];
         this._pendingSubturns = [];
+        this._pendingRemovals = [];
 
         for (const object of objects)
         {
@@ -402,11 +407,48 @@ export class SnowWarSimulation
         // consume projectile subturns here: queueGameStatus runs between
         // paints, so a short throw could otherwise be launched, flown and
         // deleted without ever reaching the DOM.
+        // A hidden tab paints nothing (requestAnimationFrame stops), so there
+        // the backlog is collapsed even with projectiles in flight; otherwise
+        // it would grow for as long as the tab stays hidden and replay slowly
+        // once it is shown again.
+        const hidden = this.isPageHidden();
+
         while (this._pendingSubturns.length > SnowWarSimulation.MAX_BUFFERED_SUBTURNS)
         {
-            if (this.snowballs.size > 0 || this.nextSubturnTouchesProjectile()) break;
+            if (!hidden && (this.snowballs.size > 0 || this.nextSubturnTouchesProjectile())) break;
             this.advanceSubturn();
         }
+    }
+
+    /** Overridable for tests. */
+    public isPageHidden: () => boolean = () => (typeof document !== 'undefined') && !!document.hidden;
+
+    /**
+     * Back from a hidden tab: drop the buffered backlog down to the normal
+     * target at once, and the splashes queued while nothing was painted.
+     */
+    public catchUp(): void
+    {
+        while (this._pendingSubturns.length > SnowWarSimulation.TARGET_BUFFER_SUBTURNS) this.advanceSubturn();
+
+        this._impacts = [];
+        this._lastAdvanceAt = null;
+    }
+
+    /**
+     * A player left the arena: remove their avatar after the subturns already
+     * buffered (which still carry their last moves, throws and hits) have
+     * played, instead of at once.
+     */
+    public removeAvatarAfterBuffer(objectId: number): void
+    {
+        if (this._pendingSubturns.length === 0)
+        {
+            this.avatars.delete(objectId);
+            return;
+        }
+
+        this._pendingRemovals.push({ objectId, atSubturn: this._subturnCount + this._pendingSubturns.length });
     }
 
     /** Advance real time; processes queued subturns at the AIR 50ms cadence. */
@@ -487,6 +529,16 @@ export class SnowWarSimulation
 
         for (const avatar of this.avatars.values()) this.stepAvatar(avatar);
         for (const ball of [...this.snowballs.values()]) this.stepSnowball(ball);
+
+        if (this._pendingRemovals.length)
+        {
+            this._pendingRemovals = this._pendingRemovals.filter(removal =>
+            {
+                if (removal.atSubturn > this._subturnCount) return true;
+                this.avatars.delete(removal.objectId);
+                return false;
+            });
+        }
     }
 
     private applyEvent(event: SnowWarSimEvent): void

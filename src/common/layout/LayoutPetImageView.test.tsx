@@ -33,6 +33,15 @@ beforeEach(() => {
 });
 
 describe('LayoutPetImageView', () => {
+    it('keeps the default parts stable across parent renders', async () => {
+        const { rerender } = render(<LayoutPetImageView typeId={1} />);
+
+        rerender(<LayoutPetImageView typeId={1} className="selected" />);
+        await act(async () => pendingImages[0].resolve(createImage('pet.png')));
+
+        expect(pendingImages).toHaveLength(1);
+    });
+
     it('ignores an older image request that completes after the selected pet changes', async () => {
         const { container, rerender } = render(<LayoutPetImageView paletteId={1} typeId={1} />);
 

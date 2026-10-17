@@ -265,7 +265,8 @@ export default defineConfig({
         }
     },
     build: {
-        assetsInlineLimit: 102400,
+        // Only tiny icons inline; bigger artwork as base64 in the JS chunks slows every cold boot.
+        assetsInlineLimit: 4096,
         chunkSizeWarningLimit: 200000,
         manifest: true,
         rollupOptions: {

@@ -7,6 +7,12 @@ export interface IWiredVariableDefinitionLike {
     isReadOnly?: boolean;
     itemId: number;
     name: string;
+    /** AIR WiredVariable.variableType: 0 user, 1 internal, 2 user derived, 3 smart. */
+    variableType?: number;
+    /** AIR WiredVariable.isInvisible: hidden from the picker unless it is the stored selection. */
+    isInvisible?: boolean;
+    /** AIR WiredVariable.requiresExecutionContext: the variable only exists while a stack runs. */
+    requiresExecutionContext?: boolean;
 }
 
 export interface IWiredVariablePickerEntry {
@@ -18,11 +24,19 @@ export interface IWiredVariablePickerEntry {
     selectable: boolean;
     hasValue: boolean;
     kind: 'internal' | 'custom';
-    /** A smart variable: one derived from a property of the thing it is read on, named with a leading `~`. */
-    smart?: boolean;
+    /** AIR WiredVariable.variableType, which decides the picker tab the variable is listed under. */
+    variableType?: number;
+    isInvisible?: boolean;
     target: WiredVariablePickerTarget;
+    /** Older callers may still hand the picker pre-grouped entries; the picker reads leaves only. */
     children?: IWiredVariablePickerEntry[];
 }
+
+/** AIR variable types (WiredVariable.variableType). */
+export const WIRED_VARIABLE_TYPE_USER = 0;
+export const WIRED_VARIABLE_TYPE_INTERNAL = 1;
+export const WIRED_VARIABLE_TYPE_USER_DERIVED = 2;
+export const WIRED_VARIABLE_TYPE_DYNAMIC = 3;
 
 interface IInternalVariableMeta {
     key: string;
@@ -48,7 +62,6 @@ const INTERNAL_VARIABLE_ALIASES: Record<string, string> = {
 
 const CUSTOM_TOKEN_PREFIX = 'custom:';
 const INTERNAL_TOKEN_PREFIX = 'internal:';
-const GROUP_TOKEN_PREFIX = 'group:';
 
 const createInternalMeta = (key: string, canUseAsDestination = false, canUseAsReference = false): IInternalVariableMeta => ({
     key,
@@ -62,6 +75,8 @@ const createInternalMeta = (key: string, canUseAsDestination = false, canUseAsRe
  * property of the furni (`~teleport.target_id`, `~recolorable_furni.color.rgb`) start with `~`.
  */
 export const isSmartVariableKey = (key: string) => !!key && key.trim().startsWith('~');
+
+const internalVariableType = (key: string) => (isSmartVariableKey(key) ? WIRED_VARIABLE_TYPE_DYNAMIC : WIRED_VARIABLE_TYPE_INTERNAL);
 
 export const normalizeInternalVariableKey = (key: string) => {
     const normalizedKey = key?.trim();
@@ -174,10 +189,6 @@ const INTERNAL_VARIABLES: Record<'user' | 'furni' | 'global' | 'context', IInter
     ]
 };
 
-const sortEntries = (left: IWiredVariablePickerEntry, right: IWiredVariablePickerEntry) => {
-    return left.displayLabel.localeCompare(right.displayLabel, undefined, { sensitivity: 'base' });
-};
-
 const getNormalizedInternalTarget = (target: WiredVariablePickerTarget): 'user' | 'furni' | 'global' | 'context' => {
     if (target === 'furni') return 'furni';
     if (target === 'user') return 'user';
@@ -186,14 +197,15 @@ const getNormalizedInternalTarget = (target: WiredVariablePickerTarget): 'user' 
     return 'global';
 };
 
-const getInternalSelectable = (usage: WiredVariablePickerUsage, meta: IInternalVariableMeta) => {
+const getInternalSelectable = (usage: WiredVariablePickerUsage, meta: IInternalVariableMeta, target: WiredVariablePickerTarget) => {
     switch (usage) {
         case 'condition':
             return true;
         case 'filter-main':
             return meta.canUseAsReference;
         case 'echo':
-            return true;
+            // Official echo filter: any variable that can be read outside a running stack; context ones cannot.
+            return target !== 'context';
         case 'change-destination':
             return meta.canUseAsDestination;
         case 'change-reference':
@@ -203,13 +215,13 @@ const getInternalSelectable = (usage: WiredVariablePickerUsage, meta: IInternalV
     }
 };
 
-const getCustomSelectable = (usage: WiredVariablePickerUsage, definition: IWiredVariableDefinitionLike) => {
+const getCustomSelectable = (usage: WiredVariablePickerUsage, definition: IWiredVariableDefinitionLike, target: WiredVariablePickerTarget) => {
     switch (usage) {
         case 'condition':
         case 'filter-main':
             return true;
         case 'echo':
-            return definition.name.includes('.');
+            return target !== 'context' && !definition.requiresExecutionContext;
         case 'change-reference':
             return !!definition.hasValue;
         case 'change-destination':
@@ -219,24 +231,16 @@ const getCustomSelectable = (usage: WiredVariablePickerUsage, definition: IWired
     }
 };
 
-const getRootKey = (key: string) => {
-    const separatorIndex = key.indexOf('.');
-
-    if (separatorIndex < 0) return null;
-
-    return key.slice(0, separatorIndex);
-};
-
 const createInternalEntry = (target: WiredVariablePickerTarget, usage: WiredVariablePickerUsage, meta: IInternalVariableMeta): IWiredVariablePickerEntry => ({
     id: `${INTERNAL_TOKEN_PREFIX}${meta.key}`,
     token: `${INTERNAL_TOKEN_PREFIX}${meta.key}`,
     label: meta.key,
     displayLabel: meta.key,
     searchableText: meta.key,
-    selectable: getInternalSelectable(usage, meta),
+    selectable: getInternalSelectable(usage, meta, target),
     hasValue: meta.canUseAsReference,
     kind: 'internal',
-    smart: isSmartVariableKey(meta.key),
+    variableType: internalVariableType(meta.key),
     target
 });
 
@@ -250,92 +254,13 @@ const createCustomEntry = (
     label: definition.name,
     displayLabel: definition.name,
     searchableText: definition.name,
-    selectable: getCustomSelectable(usage, definition),
+    selectable: getCustomSelectable(usage, definition, target),
     hasValue: !!definition.hasValue,
     kind: 'custom',
+    variableType: definition.variableType ?? WIRED_VARIABLE_TYPE_USER,
+    isInvisible: !!definition.isInvisible,
     target
 });
-
-const groupEntries = (entries: IWiredVariablePickerEntry[]) => {
-    const groupedParents = new Map<string, { exact?: IWiredVariablePickerEntry; children: IWiredVariablePickerEntry[] }>();
-
-    for (const entry of entries) {
-        const displayLabel = entry.displayLabel?.trim();
-
-        if (!displayLabel?.length) {
-            continue;
-        }
-
-        const rootKey = getRootKey(displayLabel) || displayLabel;
-        let group = groupedParents.get(rootKey);
-
-        if (!group) {
-            group = { children: [] };
-            groupedParents.set(rootKey, group);
-        }
-
-        if (displayLabel === rootKey) {
-            group.exact = {
-                ...entry,
-                label: displayLabel,
-                displayLabel,
-                searchableText: displayLabel
-            };
-            continue;
-        }
-
-        const childLabel = displayLabel.slice(rootKey.length + 1).trim();
-
-        if (!childLabel.length) continue;
-
-        group.children.push({
-            ...entry,
-            label: childLabel,
-            displayLabel,
-            searchableText: `${displayLabel} ${childLabel}`
-        });
-    }
-
-    const groupedEntries: IWiredVariablePickerEntry[] = [];
-
-    for (const [rootKey, group] of groupedParents) {
-        const sortedChildren = [...group.children]
-            .sort(sortEntries)
-            .filter((child, index, collection) => collection.findIndex((entry) => entry.token === child.token) === index);
-        const shouldGroup = !!sortedChildren.length && (sortedChildren.length > 1 || !!group.exact);
-
-        if (!shouldGroup) {
-            if (group.exact) groupedEntries.push(group.exact);
-            groupedEntries.push(...sortedChildren.map((child) => ({ ...child, label: child.displayLabel })));
-            continue;
-        }
-
-        groupedEntries.push({
-            ...(group.exact || {
-                id: `${GROUP_TOKEN_PREFIX}${rootKey}`,
-                token: `${GROUP_TOKEN_PREFIX}${rootKey}`,
-                label: rootKey,
-                displayLabel: rootKey,
-                searchableText: rootKey,
-                selectable: false,
-                hasValue: false,
-                kind: sortedChildren[0]?.kind || 'custom',
-                // A group made only of smart variables is one itself, so it leaves the Internal tab with them.
-                smart: sortedChildren.every((child) => child.smart),
-                target: sortedChildren[0]?.target || 'user'
-            }),
-            label: rootKey,
-            displayLabel: rootKey,
-            searchableText: `${rootKey} ${sortedChildren.map((child) => child.displayLabel).join(' ')}`,
-            children: sortedChildren
-        });
-    }
-
-    return groupedEntries
-        .filter((entry) => entry.displayLabel?.trim().length)
-        .sort(sortEntries)
-        .filter((entry, index, collection) => collection.findIndex((currentEntry) => currentEntry.token === entry.token) === index);
-};
 
 export const createCustomVariableToken = (itemId: number) => (itemId > 0 ? `${CUSTOM_TOKEN_PREFIX}${itemId}` : '');
 export const createInternalVariableToken = (key: string) => {
@@ -378,6 +303,7 @@ export const createFallbackVariableEntry = (target: WiredVariablePickerTarget, t
             selectable: true,
             hasValue: false,
             kind: 'custom',
+            variableType: WIRED_VARIABLE_TYPE_USER,
             target
         };
     }
@@ -396,7 +322,7 @@ export const createFallbackVariableEntry = (target: WiredVariablePickerTarget, t
             selectable: false,
             hasValue: false,
             kind: 'internal',
-            smart: isSmartVariableKey(key),
+            variableType: internalVariableType(key),
             target
         };
     }
@@ -404,16 +330,30 @@ export const createFallbackVariableEntry = (target: WiredVariablePickerTarget, t
     return null;
 };
 
+/**
+ * One entry per variable, in catalogue order: the room's own variables as the server lists them, then the built-in
+ * ones. AIR keeps the server order and builds its '.' tree in insertion order, so nothing is sorted or grouped here;
+ * the picker builds the tree itself.
+ */
 export const buildWiredVariablePickerEntries = (
     target: WiredVariablePickerTarget,
     usage: WiredVariablePickerUsage,
     customDefinitions: IWiredVariableDefinitionLike[]
 ) => {
     const internalTarget = getNormalizedInternalTarget(target);
-    const customEntries = groupEntries([...(customDefinitions || [])].map((definition) => createCustomEntry(target, usage, definition)).sort(sortEntries));
-    const internalEntries = groupEntries(INTERNAL_VARIABLES[internalTarget].map((meta) => createInternalEntry(target, usage, meta)));
+    const entries = [
+        ...(customDefinitions || []).map((definition) => createCustomEntry(target, usage, definition)),
+        ...INTERNAL_VARIABLES[internalTarget].map((meta) => createInternalEntry(target, usage, meta))
+    ];
+    const seen = new Set<string>();
 
-    return [...customEntries, ...internalEntries];
+    return entries.filter((entry) => {
+        if (!entry.displayLabel?.trim() || seen.has(entry.token)) return false;
+
+        seen.add(entry.token);
+
+        return true;
+    });
 };
 
 export const flattenWiredVariablePickerEntries = (entries: IWiredVariablePickerEntry[]): IWiredVariablePickerEntry[] => {
@@ -422,64 +362,81 @@ export const flattenWiredVariablePickerEntries = (entries: IWiredVariablePickerE
     for (const entry of entries) {
         flattened.push(entry);
 
-        if (entry.children?.length) flattened.push(...entry.children);
+        if (entry.children?.length) flattened.push(...flattenWiredVariablePickerEntries(entry.children));
     }
 
     return flattened;
 };
 
-export type WiredVariablePickerMode = 'all' | 'recent' | 'usermade' | 'smart' | 'internal' | 'search';
+/** One node of the picker tree: a name segment, the variable it ends (if any) and its child segments. */
+export interface IWiredVariableNode {
+    name: string;
+    entry: IWiredVariablePickerEntry | null;
+    children: Map<string, IWiredVariableNode>;
+}
+
+const createNode = (entry: IWiredVariablePickerEntry | null, name: string): IWiredVariableNode => ({ name, entry, children: new Map() });
+
+export const splitWiredVariableName = (name: string) => name.split('.');
 
 /**
- * What each tab of the picker shows. "Smart" holds the `~` variables and "Internal" the other
- * server-owned ones, so a variable is never listed under both.
+ * A node without a variable whose only child flattens to a leaf takes that leaf's variable and drops its children.
+ * With `useFullName` a resulting leaf shows the variable's full name.
  */
-export const filterWiredVariablePickerEntriesByMode = (
-    entries: IWiredVariablePickerEntry[],
-    mode: WiredVariablePickerMode,
-    recentTokens: string[]
-): IWiredVariablePickerEntry[] => {
-    const recentSet = new Set(recentTokens);
+export const flattenWiredVariableNode = (node: IWiredVariableNode, useFullName = false): boolean => {
+    if (node.children.size === 1 && node.entry === null) {
+        const onlyChild = node.children.values().next().value as IWiredVariableNode;
 
-    const filterEntries = (items: IWiredVariablePickerEntry[]): IWiredVariablePickerEntry[] => {
-        const filtered: IWiredVariablePickerEntry[] = [];
-
-        for (const entry of items) {
-            const nextChildren = entry.children?.length ? filterEntries(entry.children) : [];
-            const childVisible = !!nextChildren.length;
-            const selfVisible = (() => {
-                switch (mode) {
-                    case 'recent':
-                        return recentSet.has(entry.token);
-                    case 'usermade':
-                        return entry.kind === 'custom';
-                    case 'smart':
-                        return !!entry.smart;
-                    case 'internal':
-                        return entry.kind === 'internal' && !entry.smart;
-                    case 'search':
-                    case 'all':
-                    default:
-                        return true;
-                }
-            })();
-
-            if (!selfVisible && !childVisible) continue;
-
-            filtered.push(childVisible ? { ...entry, children: nextChildren } : entry);
+        if (flattenWiredVariableNode(onlyChild)) {
+            node.entry = onlyChild.entry;
+            node.children = new Map();
         }
-
-        return filtered;
-    };
-
-    if (mode === 'recent') {
-        const flatEntries = flattenWiredVariablePickerEntries(entries)
-            .filter((entry) => recentSet.has(entry.token))
-            .sort((left, right) => recentTokens.indexOf(left.token) - recentTokens.indexOf(right.token))
-            .map((entry) => ({ ...entry, label: entry.displayLabel }));
-
-        return flatEntries.filter((entry) => !entry.children?.length);
     }
 
-    return filterEntries(entries);
+    const isLeaf = node.entry !== null && node.children.size === 0;
+
+    if (useFullName && isLeaf) node.name = node.entry.displayLabel;
+
+    return isLeaf;
+};
+
+/**
+ * One node per name segment, nested to any depth, in the order the variables come in. Only the last segment carries
+ * the variable and an existing node is reused as it is. With `flatten` every root child is flattened with full names
+ * (the recent and search tabs).
+ */
+export const buildWiredVariableNodes = (entries: IWiredVariablePickerEntry[], flatten = false): IWiredVariableNode => {
+    const root = createNode(null, null);
+
+    for (const entry of entries) {
+        const segments = splitWiredVariableName(entry.displayLabel);
+        let parent = root;
+
+        segments.forEach((segment, index) => {
+            let node = parent.children.get(segment);
+
+            if (!node) {
+                node = createNode(index === segments.length - 1 ? entry : null, segment);
+                parent.children.set(segment, node);
+            }
+
+            parent = node;
+        });
+    }
+
+    if (flatten) for (const child of root.children.values()) flattenWiredVariableNode(child, true);
+
+    return root;
+};
+
+/** A node can be picked when it ends a variable the editor accepts. */
+export const canSelectWiredVariableNode = (node: IWiredVariableNode) => !!node.entry && node.entry.selectable;
+
+/** A node is drawn disabled when neither it nor any descendant can be picked. */
+export const isWiredVariableNodeDisabled = (node: IWiredVariableNode): boolean => {
+    if (canSelectWiredVariableNode(node)) return false;
+
+    for (const child of node.children.values()) if (!isWiredVariableNodeDisabled(child)) return false;
+
+    return true;
 };

@@ -8,6 +8,10 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
 const AVAILABILITY_ROOM = 0;
 const AVAILABILITY_PERMANENT = 10;
 const AVAILABILITY_SHARED = 11;
+
+/** Permanent and shared user variables keep their values in the database. */
+const isStoredAvailability = (availability: number) => (availability === AVAILABILITY_PERMANENT) || (availability === AVAILABILITY_SHARED);
+
 const MAX_NAME_LENGTH = 40;
 
 const normalizeVariableName = (value: string) =>
@@ -88,8 +92,25 @@ export const WiredExtraVariableView: FC<WiredExtraVariableViewProps> = props =>
         setIntParams([ hasValue ? 1 : 0, normalizeAvailability(availability) ]);
     };
 
+    // Official (user variables only): a stored variable switched to one that is not stored loses its data, so the
+    // save asks first.
+    const confirmSave = () =>
+    {
+        if(!props.showSharedAvailability || !trigger) return null;
+
+        const saved = normalizeAvailability((trigger.intData.length > 1) ? trigger.intData[1] : props.availabilityRoomValue);
+        const next = normalizeAvailability(availability);
+
+        if(!isStoredAvailability(saved) || isStoredAvailability(next)) return null;
+
+        return {
+            title: LocalizeText('wiredfurni.variables.availability_change.title'),
+            body: LocalizeText('wiredfurni.variables.availability_change.body')
+        };
+    };
+
     return (
-        <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save } cardStyle={ { width: 400 } }>
+        <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save } confirmSave={ confirmSave } cardStyle={ { width: 400 } }>
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                     <Text>{ LocalizeText('wiredfurni.params.variables.variable_name') }</Text>

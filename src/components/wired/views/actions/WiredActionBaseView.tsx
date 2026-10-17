@@ -1,9 +1,9 @@
 import { WiredActionDefinition } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect } from 'react';
-import { GetWiredTimeLocale, WIRED_ACTION_DELAY_MAX_PULSES, LocalizeText, WiredFurniType } from '../../../../api';
-import { Slider, Text } from '../../../../common';
+import { WiredFurniType } from '../../../../api';
 import { useWired } from '../../../../hooks';
 import { WiredBaseView } from '../WiredBaseView';
+import { WiredActionDelaySection } from './WiredActionDelaySection';
 
 export interface WiredActionBaseViewProps {
     hasSpecialInput: boolean;
@@ -54,10 +54,7 @@ export const WiredActionBaseView: FC<PropsWithChildren<WiredActionBaseViewProps>
             delaySection={
                 hideDelay ? null : (
                     // Official: the delay comes after the furni picks.
-                    <div className="flex flex-col octane-wired__section octane-wired__section--delay">
-                        <Text bold>{LocalizeText('wiredfurni.params.delay', ['seconds'], [GetWiredTimeLocale(actionDelay)])}</Text>
-                        <Slider max={WIRED_ACTION_DELAY_MAX_PULSES} min={0} value={actionDelay} onChange={(event) => setActionDelay(event)} />
-                    </div>
+                    <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
                 )
             }
         >

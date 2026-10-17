@@ -1,10 +1,10 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { GetWiredTimeLocale, WIRED_ACTION_DELAY_MAX_PULSES, LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import contextVariableIcon from '../../../../assets/images/wired/var/icon_source_context_clean.png';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
-import { Button, Slider, Text } from '../../../../common';
+import { Button, Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
@@ -16,6 +16,7 @@ import {
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { WiredActionDelaySection } from './WiredActionDelaySection';
 
 type VariableTargetType = 'user' | 'furni' | 'context';
 
@@ -211,12 +212,7 @@ export const WiredActionRemoveVariableView: FC<{}> = () => {
 
                 <div className="octane-wired__divider" />
 
-                <div className="octane-wired__give-var-section">
-                    <div className="octane-wired__give-var-section-title">
-                        {LocalizeText('wiredfurni.params.delay', ['seconds'], [GetWiredTimeLocale(actionDelay)])}
-                    </div>
-                    <Slider max={WIRED_ACTION_DELAY_MAX_PULSES} min={0} value={actionDelay} onChange={(event) => setActionDelay(event)} />
-                </div>
+                <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
 
                 {selectedTargetType !== 'context' && (
                     <>

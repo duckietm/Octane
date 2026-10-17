@@ -54,6 +54,7 @@ import { WiredActionBotTeleportView } from './WiredActionBotTeleportView';
 import { WiredActionCallAnotherStackView } from './WiredActionCallAnotherStackView';
 import { WiredActionCancelTransactionView } from './WiredActionCancelTransactionView';
 import { WiredActionChangeOpacityView } from './WiredActionChangeOpacityView';
+import { WiredActionSetHighlightView } from './WiredActionSetHighlightView';
 import { WiredActionChangeVariableValueView } from './WiredActionChangeVariableValueView';
 import { WiredActionChaseView } from './WiredActionChaseView';
 import { WiredActionChatView } from './WiredActionChatView';
@@ -263,6 +264,8 @@ export const WiredActionLayoutView = (code: number) => {
             return <WiredActionRemoveFurniView />;
         case WiredActionLayoutCode.CHANGE_OPACITY:
             return <WiredActionChangeOpacityView />;
+        case WiredActionLayoutCode.SET_FURNI_HIGHLIGHT:
+            return <WiredActionSetHighlightView />;
     }
 
     return null;

@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { fromOfficialVariableTarget, LocalizeText, localizeWithFallback, toOfficialVariableTarget, WiredFurniType } from '../../../../api';
 import contextVariableIcon from '../../../../assets/images/wired/var/icon_source_context_clean.png';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
@@ -8,7 +8,7 @@ import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
-import { CLICKED_USER_SOURCE_VALUE, WiredSourcesSelector } from '../WiredSourcesSelector';
+import { CLICKED_USER_SOURCE_VALUE, REACHED_USER_SOURCE_VALUE, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import {
     buildWiredVariablePickerEntries,
@@ -81,7 +81,7 @@ const getTargetValue = (value: VariableTargetType) => {
 
 const normalizeDisplayType = (value: number) => (value === DISPLAY_TEXTUAL ? DISPLAY_TEXTUAL : DISPLAY_NUMERIC);
 const normalizePlaceholderType = (value: number) => (value === TYPE_MULTIPLE ? TYPE_MULTIPLE : TYPE_SINGLE);
-const normalizeUserSource = (value: number) => (value === 0 || value === 200 || value === 201 || value === CLICKED_USER_SOURCE_VALUE ? value : 0);
+const normalizeUserSource = (value: number) => (value === 0 || value === 200 || value === 201 || value === CLICKED_USER_SOURCE_VALUE || value === REACHED_USER_SOURCE_VALUE ? value : 0);
 const normalizeFurniSource = (value: number) => (value === 0 || value === 100 || value === 200 || value === 201 ? value : 0);
 const normalizePlaceholderName = (value: string) => {
     let normalizedValue = (value ?? '').trim().replace(/[\t\r\n]/g, '');
@@ -109,6 +109,12 @@ const splitStringData = (value: string) => {
 
     return [parts[0], parts[1], parts[2]];
 };
+
+/** The placeholder name Habbo suggests for a variable: no `@`/`~` prefix, dots as underscores. */
+const flatVariableName = (name: string) => (name ?? '').replace('@', '').replace('~', '').replace(/\./g, '_');
+
+/** Global and context variables have one value, so they have no "multiple" placeholder. */
+const isSingleValueTarget = (target: VariableTargetType) => target === 'global' || target === 'context';
 
 const escapeHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
@@ -145,6 +151,8 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     const [delimiter, setDelimiter] = useState(DEFAULT_DELIMITER);
     const [userSource, setUserSource] = useState(0);
     const [furniSource, setFurniSource] = useState(0);
+    // Each variable target remembers the variable last chosen on it while the editor is open.
+    const selectionByTarget = useRef<Partial<Record<VariableTargetType, string>>>({});
 
     const targetDefinitions = useMemo(
         () => getTargetDefinitions(targetType, userVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions, contextVariableDefinitions),
@@ -169,6 +177,15 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     }, [targetDefinitions, variableToken]);
 
     const canUseTextDisplay = !!selectedCustomDefinition?.isTextConnected;
+    // A stored custom variable whose definition has not arrived yet: keep its saved display mode.
+    const definitionPending = isCustomVariableToken(variableToken) && !selectedCustomDefinition;
+    const textDisplayAllowed = canUseTextDisplay || definitionPending;
+
+    const variableName = (token: string) => {
+        if (!token) return '';
+
+        return flattenWiredVariablePickerEntries(resolvedVariableEntries).find((entry) => entry.token === token)?.displayLabel ?? '';
+    };
 
     useEffect(() => {
         if (!trigger) return;
@@ -186,13 +203,18 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
         setPlaceholderName(normalizePlaceholderName(nextPlaceholderName));
         setDelimiter(normalizeDelimiter(nextDelimiter));
         setFurniIds([...(trigger.selectedItems ?? [])]);
+        selectionByTarget.current = {};
     }, [setFurniIds, trigger]);
 
     useEffect(() => {
-        if (canUseTextDisplay || displayType !== DISPLAY_TEXTUAL) return;
+        if (textDisplayAllowed || displayType !== DISPLAY_TEXTUAL) return;
 
         setDisplayType(DISPLAY_NUMERIC);
-    }, [canUseTextDisplay, displayType]);
+    }, [textDisplayAllowed, displayType]);
+
+    useEffect(() => {
+        if (isSingleValueTarget(targetType) && placeholderType === TYPE_MULTIPLE) setPlaceholderType(TYPE_SINGLE);
+    }, [placeholderType, targetType]);
 
     const previewToken = useMemo(() => {
         const effectiveName = normalizePlaceholderName(placeholderName) || 'placeholder';
@@ -206,7 +228,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
         setIntParams([
             normalizePlaceholderType(placeholderType) === TYPE_MULTIPLE ? 1 : 0,
             toOfficialVariableTarget(getTargetValue(targetType)),
-            canUseTextDisplay && normalizeDisplayType(displayType) === DISPLAY_TEXTUAL ? 1 : 0
+            textDisplayAllowed && normalizeDisplayType(displayType) === DISPLAY_TEXTUAL ? 1 : 0
         ]);
         setSourceTypes({ furni: [normalizeFurniSource(furniSource)], users: [normalizeUserSource(userSource)] });
         setStringParam(serializeStringData(variableToken, placeholderName, delimiter));
@@ -269,8 +291,22 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     const handleTargetChange = (nextTargetType: VariableTargetType) => {
         if (nextTargetType === targetType) return;
 
+        selectionByTarget.current[targetType] = variableToken;
         setTargetType(nextTargetType);
-        setVariableToken('');
+        setVariableToken(selectionByTarget.current[nextTargetType] ?? '');
+    };
+
+    // Habbo's rule: the name follows the chosen variable while it is empty or still the name it
+    // suggested for the previous variable; a name the user typed stays.
+    const handleVariableSelect = (token: string) => {
+        const previousName = variableName(variableToken);
+        const currentName = normalizePlaceholderName(placeholderName);
+
+        if (!currentName.length || (previousName && normalizePlaceholderName(flatVariableName(previousName)) === currentName)) {
+            setPlaceholderName(normalizePlaceholderName(flatVariableName(variableName(token))));
+        }
+
+        setVariableToken(token);
     };
 
     return (
@@ -318,7 +354,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                     entries={resolvedVariableEntries}
                     recentScope="variable-text-output"
                     selectedToken={variableToken}
-                    onSelect={(entry) => setVariableToken(entry.token)}
+                    onSelect={(entry) => handleVariableSelect(entry.token)}
                 />
 
                 <div className="octane-wired__give-var-section">
@@ -337,7 +373,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                         <input
                             checked={displayType === DISPLAY_TEXTUAL}
                             className="form-check-input"
-                            disabled={!canUseTextDisplay}
+                            disabled={!textDisplayAllowed}
                             name="wiredTextOutputVariableDisplayType"
                             type="radio"
                             onChange={() => setDisplayType(DISPLAY_TEXTUAL)}
@@ -363,6 +399,7 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
                         <input
                             checked={placeholderType === TYPE_MULTIPLE}
                             className="form-check-input"
+                            disabled={isSingleValueTarget(targetType)}
                             name="wiredTextOutputVariablePlaceholderType"
                             type="radio"
                             onChange={() => setPlaceholderType(TYPE_MULTIPLE)}

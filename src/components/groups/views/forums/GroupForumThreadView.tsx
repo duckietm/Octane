@@ -187,6 +187,7 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
     };
 
     const canModerate = forumData && forumData.hasModeratePermissionError;
+    const isStaff = !!forumData?.isStaf;
     const canPost = forumData && forumData.hasPostMessagePermissionError;
     const isLocked = threadInfo ? threadInfo.isLocked : false;
 
@@ -225,9 +226,12 @@ export const GroupForumThreadView: FC<GroupForumThreadViewProps> = (props) => {
                         >
                             {LocalizeText('groupforum.thread.hide')}
                         </Button>
-                        <Button variant="danger" className="btn-sm" onClick={deleteThread}>
-                            {LocalizeText('groupforum.thread.delete')}
-                        </Button>
+                        {/* Official: only staff hide with state 20; a group admin hides with 10. */}
+                        {isStaff && (
+                            <Button variant="danger" className="btn-sm" onClick={deleteThread}>
+                                {LocalizeText('groupforum.thread.delete')}
+                            </Button>
+                        )}
                     </Flex>
                 )}
             </Flex>

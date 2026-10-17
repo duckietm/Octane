@@ -10,11 +10,17 @@ const THROW_FRAME_COUNT = 9;
 // figure|gender|direction -> official SnowWar movement/action frames.
 const POSE_CACHE: Map<string, { stand: string; walk: string[]; pick: string; throwFrames: string[]; dieBack: string[] }> = new Map();
 const POSE_CACHE_MAX = 64;
+// A failed first render (avatar render manager or figure assets not ready)
+// tries again, so a player doesn't keep the static fallback all match.
+const RENDER_RETRY_MS = 500;
+const RENDER_RETRY_MAX = 40;
 
 export const getSnowWarFigure = (figure: string, teamId: number): string =>
 {
     const parts = figure.split('.').filter(part => part && !part.startsWith('cc-'));
-    const chest = `ch-${teamId === 1 ? 20001 : 20000}-1`;
+    // AIR GameArenaView: blue (AIR team 1, our teamId 1) wears ch-20000,
+    // red (AIR team 2, our teamId 0) ch-20001.
+    const chest = `ch-${teamId === 1 ? 20000 : 20001}-1`;
     const chestIndex = parts.findIndex(part => part.startsWith('ch-'));
 
     if (chestIndex === -1) parts.push(chest);
@@ -74,6 +80,20 @@ export const SnowWarAvatarView: FC<SnowWarAvatarViewProps> = (props) =>
         // Same reset/retry contract as LayoutAvatarImageView: the first pass
         // may render placeholders while figure assets download; resetFigure
         // fires again once they land and the real frames replace them.
+        let retries = 0;
+        let retryTimer: ReturnType<typeof setTimeout> = null;
+
+        const retry = (renderFigure: string) =>
+        {
+            if (retryTimer || retries >= RENDER_RETRY_MAX) return;
+            retries++;
+            retryTimer = setTimeout(() =>
+            {
+                retryTimer = null;
+                renderFrames(renderFigure);
+            }, RENDER_RETRY_MS);
+        };
+
         const renderFrames = (renderFigure: string) =>
         {
             if (isDisposed.current || (requestIdRef.current !== requestId)) return;
@@ -84,7 +104,7 @@ export const SnowWarAvatarView: FC<SnowWarAvatarViewProps> = (props) =>
                 disposed: false
             });
 
-            if (!avatarImage) return;
+            if (!avatarImage) return retry(renderFigure);
 
             const renderPose = (posture: string): string =>
             {
@@ -120,7 +140,7 @@ export const SnowWarAvatarView: FC<SnowWarAvatarViewProps> = (props) =>
             avatarImage.dispose();
 
             if (isDisposed.current || (requestIdRef.current !== requestId)) return;
-            if (!stand || !pick || walk.some(url => !url) || dieBack.some(url => !url) || throwFrames.some(url => !url)) return;
+            if (!stand || !pick || walk.some(url => !url) || dieBack.some(url => !url) || throwFrames.some(url => !url)) return retry(renderFigure);
 
             const rendered = { stand, walk, pick, throwFrames, dieBack };
 
@@ -143,6 +163,7 @@ export const SnowWarAvatarView: FC<SnowWarAvatarViewProps> = (props) =>
         return () =>
         {
             isDisposed.current = true;
+            if (retryTimer) clearTimeout(retryTimer);
         };
     }, [snowWarFigure, gender, direction]);
 

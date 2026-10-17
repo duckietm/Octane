@@ -25,3 +25,4 @@ export * from './SanitizeHtml';
 export * from './SetLocalStorage';
 export * from './SoundNames';
 export * from './WindowSaveOptions';
+export * from './createBootSteps';

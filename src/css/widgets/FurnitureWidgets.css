@@ -206,30 +206,179 @@
     }
 }
 
-.octane-external-image-widget {
-    width: min(340px, calc(100vw - 16px));
-    min-width: 0;
-    max-width: calc(100vw - 16px);
-    max-height: calc(100vh - 16px);
+/* AIR stories_image_widget at a 320px photo: ExternalImageWidget.drawImage geometry. */
+.octane-photo-viewer {
+    position: relative;
+    width: 490px;
+    height: 464px;
+    color: #ffffff;
+    /* id_regular / id_link_regular: Ubuntu 11, white, no filters. */
+    font-family: HabboAirUbuntu, UbuntuRegular, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 16px;
+    text-shadow: none;
+    user-select: none;
+    image-rendering: var(--octane-pixel-art, pixelated);
 
-    .picture-preview {
-        width: min(320px, calc(100vw - 36px));
-        height: auto;
-        aspect-ratio: 1;
+    button {
+        padding: 0;
+        border: 0;
+        background-color: transparent;
+        cursor: pointer;
     }
-    
-    .picture-preview-buttons {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        color: gray;
+}
+
+.octane-photo-viewer__panel {
+    position: absolute;
+    inset: 0;
+    border: 6px solid transparent;
+    border-image: url('@/assets/images/camera/photo-viewer/panel.png') 6 fill / 6px stretch;
+    opacity: 0.65;
+}
+
+/* drawImage paints the photo black at four 1px offsets, leaving the corner pixels clear. */
+.octane-photo-viewer__photo {
+    position: absolute;
+    top: 71px;
+    left: 84px;
+    width: 322px;
+    height: 322px;
+    background:
+        linear-gradient(#000000, #000000) 1px 0 / 320px 322px no-repeat,
+        linear-gradient(#000000, #000000) 0 1px / 322px 320px no-repeat;
+
+    img {
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        width: 320px;
+        height: 320px;
+    }
+}
+
+/* updateWindowPosition centres the arrows on the panel, or on the stage when the panel is taller. */
+.octane-photo-viewer__browse {
+    position: absolute;
+    top: min(200px, calc(50vh - 32px));
+    width: 64px;
+    height: 64px;
+    background: url('@/assets/images/camera/photo-viewer/browse-ffwd.png') 0 0 / 64px 64px no-repeat !important;
+}
+
+.octane-photo-viewer__browse--previous {
+    left: 10px;
+    transform: scaleX(-1);
+}
+
+.octane-photo-viewer__browse--next {
+    left: 416px;
+}
+
+.octane-photo-viewer__date,
+.octane-photo-viewer__creator {
+    position: absolute;
+    padding: 4px;
+    color: #ffffff;
+    font: inherit;
+    line-height: 16px;
+    white-space: nowrap;
+}
+
+.octane-photo-viewer__date {
+    top: 393px;
+    left: 87px;
+}
+
+/* senderName is right-aligned in a 129px region ending 3px inside the photo. */
+.octane-photo-viewer__creator {
+    top: 395px;
+    right: 87px;
+    text-decoration: underline;
+}
+
+/* Caption `m` under the date line, at most two lines across the photo width. */
+.octane-photo-viewer__caption {
+    position: absolute;
+    top: 419px;
+    left: 88px;
+    width: 314px;
+    max-height: 32px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 16px;
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+
+/* buttonContainer boxsizer: padding 8/5, spacing 5, pinned to the panel's top right. */
+.octane-photo-viewer__buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 5px 8px 0;
+}
+
+.octane-photo-viewer__button {
+    position: relative;
+    width: 19px;
+    height: 20px;
+    border: 5px solid transparent !important;
+    border-image: url('@/assets/images/camera/photo-viewer/report-button-default.png') 5 fill / 5px stretch !important;
+
+    &:hover {
+        border-image-source: url('@/assets/images/camera/photo-viewer/report-button-hover.png') !important;
     }
 
-    .picture-preview-buttons-previous,
-    .picture-preview-buttons-next {
-        color: #222;
-        padding: 10px;
-        border-radius: 50%;
+    &:active {
+        border-image-source: url('@/assets/images/camera/photo-viewer/report-button-pressed.png') !important;
+    }
+
+    &::after {
+        position: absolute;
+        content: '';
+    }
+}
+
+/* reportButtonContainer is 20px wide around the 19px button. */
+.octane-photo-viewer__button--report {
+    margin-right: 1px;
+
+    &::after {
+        top: -1px;
+        left: -1px;
+        width: 11px;
+        height: 13px;
+        background: url('@/assets/images/camera/photo-viewer/flag.png') no-repeat;
+    }
+}
+
+/* common_trashcan_small with the #icon etching: 0x48000000 one pixel above. */
+.octane-photo-viewer__button--remove::after {
+    top: -1px;
+    left: 0;
+    width: 9px;
+    height: 10px;
+    background: url('@/assets/images/camera/photo-viewer/trashcan.png') no-repeat;
+    filter: drop-shadow(0 -1px 0 rgb(0 0 0 / 0.282));
+}
+
+.octane-photo-viewer__close {
+    width: 19px;
+    height: 20px;
+    background: url('@/assets/images/habbo-skin/slices/close-3-default.png') 0 0 / 19px 20px no-repeat !important;
+
+    &:hover {
+        background-image: url('@/assets/images/habbo-skin/slices/close-3-hover.png') !important;
+    }
+
+    &:active {
+        background-image: url('@/assets/images/habbo-skin/slices/close-3-pressed.png') !important;
     }
 }
 

@@ -18,6 +18,9 @@ export const ObjectLocationView: FC<ObjectLocationViewProps> = (props) => {
 
         const getObjectLocation = () => {
             const roomSession = GetRoomSession();
+
+            if (!roomSession) return null;
+
             const objectBounds = GetRoomObjectBounds(roomSession.roomId, objectId, category, 1);
 
             return objectBounds;
@@ -28,10 +31,11 @@ export const ObjectLocationView: FC<ObjectLocationViewProps> = (props) => {
 
             if (!bounds || !elementRef.current) return;
 
-            setPos({
-                x: Math.round(bounds.left + bounds.width / 2 - elementRef.current.offsetWidth / 2),
-                y: Math.round(bounds.top - elementRef.current.offsetHeight + 10)
-            });
+            const x = Math.round(bounds.left + bounds.width / 2 - elementRef.current.offsetWidth / 2);
+            const y = Math.round(bounds.top - elementRef.current.offsetHeight + 10);
+
+            // Runs every ticker frame: keep the old object when nothing moved so React skips the render.
+            setPos((previous) => (previous.x === x && previous.y === y ? previous : { x, y }));
         };
 
         if (noFollow) {

@@ -21,7 +21,7 @@ import {
     PrepareRenderer
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react';
-import { ClearRememberLogin, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, persistAccessTokenFromPayload, SetRememberLogin, StoreRememberLoginFromPayload } from './api';
+import { ClearRememberLogin, createBootSteps, exchangeSsoTicketForAccessToken, GetRememberLogin, GetUIVersion, persistAccessTokenFromPayload, SetRememberLogin, StoreRememberLoginFromPayload } from './api';
 import { Base } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { LoginView } from './components/login/LoginView';
@@ -45,20 +45,6 @@ const syncViewportCssVars = () => {
 
     document.documentElement.style.setProperty('--octane-app-width', `${width}px`);
     document.documentElement.style.setProperty('--octane-app-height', `${height}px`);
-};
-
-const preloadUrl = async (url: string): Promise<void> => {
-    if (!url) return;
-
-    // Split gamedata URLs are directories (end with '/'); fetching them as a
-    // file just 404s and wastes a connection at startup. The real split loader
-    // handles those — only warm up actual file URLs here.
-    if (url.split('?')[0].split('#')[0].endsWith('/')) return;
-
-    try {
-        const response = await fetch(url, { cache: 'force-cache' });
-        await response.arrayBuffer();
-    } catch {}
 };
 
 const preloadImage = (url: string): void => {
@@ -112,9 +98,12 @@ export const App: FC<{}> = (props) => {
         setLoadingProgress((prev) => (value > prev ? value : prev));
         if (task !== undefined) setLoadingTask(task);
     }, []);
-    const warmupPromiseRef = useRef<Promise<void>>(null);
-    const rendererPromiseRef = useRef<Promise<any>>(null);
-    const gameInitPromiseRef = useRef<Promise<void> | null>(null);
+    // Each boot step runs once and is shared; a step that failed is dropped, so the next login retries it.
+    const [runBootStep] = useState(createBootSteps);
+    // The latest prepare() run; an older run that a new login replaced ends without touching the UI.
+    const prepareRunRef = useRef(0);
+    // Settles when the base texts are in: furnidata writes its names over them, so session data waits for it.
+    const localizationReadyRef = useRef<{ promise: Promise<void>; resolve: () => void }>(null);
     const bootstrapDoneRef = useRef(false);
     const lastPrepareTriggerRef = useRef<number | null>(null);
     const tickersStartedRef = useRef(false);
@@ -315,13 +304,12 @@ export const App: FC<{}> = (props) => {
         LegacyExternalInterface.callGame('showGame', parser.url);
     });
 
-    const startRenderer = useCallback((width: number, height: number) => {
-        if (rendererPromiseRef.current) return rendererPromiseRef.current;
+    const startRenderer = useCallback((width: number, height: number): Promise<any> => runBootStep('renderer', () => {
 
         const rawUseBackBuffer = window.OctaneConfig?.['renderer.useBackBuffer'];
         const useBackBuffer = rawUseBackBuffer === undefined ? true : rawUseBackBuffer === true || rawUseBackBuffer === 'true';
 
-        rendererPromiseRef.current = PrepareRenderer({
+        return PrepareRenderer({
             width: Math.floor(width),
             height: Math.floor(height),
             resolution: GetDesiredResolution(),
@@ -333,15 +321,22 @@ export const App: FC<{}> = (props) => {
             roundPixels: true,
             useBackBuffer
         });
+    }), [runBootStep]);
 
-        return rendererPromiseRef.current;
+    const getLocalizationReady = useCallback(() => {
+        if (!localizationReadyRef.current) {
+            let resolve: () => void = null;
+            const promise = new Promise<void>((done) => (resolve = done));
+
+            localizationReadyRef.current = { promise, resolve };
+        }
+
+        return localizationReadyRef.current;
     }, []);
 
     const startWarmup = useCallback(
         (width: number, height: number) => {
-            if (warmupPromiseRef.current) return warmupPromiseRef.current;
-
-            warmupPromiseRef.current = (async () => {
+            return runBootStep('warmup', async () => {
                 await GetConfiguration().init();
                 bumpProgress(25, taskLabel('loader.waiting', 'Loading content...'));
 
@@ -361,12 +356,6 @@ export const App: FC<{}> = (props) => {
 
                 const interpolate = (value: string) => GetConfiguration().interpolate(value);
                 const assetUrls = asStringArray(GetConfiguration().getValue<unknown>('preload.assets.urls')).map(interpolate);
-                const gamedataUrls = [
-                    ...asStringArray(GetConfiguration().getValue<unknown>('external.texts.url')).map(interpolate),
-                    ...['furnidata.url', 'productdata.url', 'avatar.actions.url', 'avatar.figuredata.url', 'avatar.figuremap.url', 'avatar.effectmap.url']
-                        .map((key) => interpolate(GetConfiguration().getValue<string>(key, '')))
-                        .filter(Boolean)
-                ];
                 const loginImages = (GetConfiguration().getValue<Record<string, unknown>>('loginview', {})?.images as Record<string, string>) ?? {};
                 const loginImageUrls = [
                     loginImages.background,
@@ -380,13 +369,15 @@ export const App: FC<{}> = (props) => {
                     .map(interpolate);
 
                 loginImageUrls.forEach(preloadImage);
-                gamedataUrls.forEach((url) => preloadUrl(url));
 
                 const warmupTasks: { promise: Promise<any>; label: string }[] = [
-                    { promise: GetAssetManager().downloadAssets(assetUrls), label: taskLabel('loading.task.assets', 'Loading game assets...') },
-                    { promise: GetLocalizationManager().init(), label: taskLabel('loading.task.localization', 'Loading translations...') },
-                    { promise: GetAvatarRenderManager().init(), label: taskLabel('loading.task.avatar', 'Loading wardrobe...') },
-                    { promise: GetSoundManager().init(), label: taskLabel('loading.task.sounds', 'Loading sounds...') }
+                    { promise: runBootStep('assets', () => GetAssetManager().downloadAssets(assetUrls)), label: taskLabel('loading.task.assets', 'Loading game assets...') },
+                    {
+                        promise: runBootStep('localization', () => GetLocalizationManager().init().then(() => getLocalizationReady().resolve())),
+                        label: taskLabel('loading.task.localization', 'Loading translations...')
+                    },
+                    { promise: runBootStep('avatars', () => GetAvatarRenderManager().init()), label: taskLabel('loading.task.avatar', 'Loading wardrobe...') },
+                    { promise: runBootStep('sounds', () => GetSoundManager().init()), label: taskLabel('loading.task.sounds', 'Loading sounds...') }
                 ];
                 let warmupDone = 0;
                 const warmupStart = 25;
@@ -400,11 +391,9 @@ export const App: FC<{}> = (props) => {
                         })
                     )
                 );
-            })();
-
-            return warmupPromiseRef.current;
+            });
         },
-        [startRenderer, bumpProgress, taskLabel]
+        [runBootStep, startRenderer, bumpProgress, taskLabel, getLocalizationReady]
     );
 
     useEffect(() => {
@@ -429,6 +418,8 @@ export const App: FC<{}> = (props) => {
 
     useEffect(() => {
         const prepare = async (width: number, height: number) => {
+            const run = ++prepareRunRef.current;
+
             console.warn('[App] prepare() start', {
                 hasOctaneConfig: !!window.OctaneConfig,
                 ssoTicketInConfig: !!window.OctaneConfig?.['sso.ticket'],
@@ -512,26 +503,37 @@ export const App: FC<{}> = (props) => {
                     }
                 }
 
-                const renderer = await startRenderer(width, height);
+                // Log in while the hotel loads. Messages after the login stay held by the connection
+                // until MainView has mounted and calls ready(), so no handler misses its packets.
+                // A login that failed is replaced by this one; finished boot steps are kept.
+                const connected = GetCommunication().init();
+
+                connected.catch(() => undefined);
+
+                await startRenderer(width, height);
                 bumpProgress(20, taskLabel('loading.task.renderer', 'Initializing renderer...'));
+
+                const sessionData = runBootStep('session-data', async () => {
+                    await getLocalizationReady().promise;
+                    await GetSessionDataManager().init();
+                });
+
+                sessionData.catch(() => undefined);
 
                 await startWarmup(width, height);
                 bumpProgress(70, taskLabel('loading.task.startsession', 'Starting session...'));
+                await sessionData;
+                bumpProgress(78, taskLabel('loading.task.userdata', 'Loading user data...'));
+                await runBootStep('room-sessions', () => GetRoomSessionManager().init());
+                bumpProgress(85, taskLabel('loading.task.rooms', 'Loading rooms...'));
+                await runBootStep('room-engine', () => GetRoomEngine().init());
+                bumpProgress(92, taskLabel('loading.task.engine', 'Loading graphics engine...'));
+                await connected;
+                bumpProgress(98, taskLabel('generic.reconnecting', 'Connecting to server...'));
 
-                if (!gameInitPromiseRef.current) {
-                    gameInitPromiseRef.current = (async () => {
-                        await GetSessionDataManager().init();
-                        bumpProgress(78, taskLabel('loading.task.userdata', 'Loading user data...'));
-                        await GetRoomSessionManager().init();
-                        bumpProgress(85, taskLabel('loading.task.rooms', 'Loading rooms...'));
-                        await GetRoomEngine().init();
-                        bumpProgress(92, taskLabel('loading.task.engine', 'Loading graphics engine...'));
-                        await GetCommunication().init();
-                        bumpProgress(98, taskLabel('generic.reconnecting', 'Connecting to server...'));
-                    })();
-                }
+                if (run !== prepareRunRef.current) return;
 
-                await gameInitPromiseRef.current;
+                const renderer = await startRenderer(width, height);
 
                 if (!bootstrapDoneRef.current) {
                     bootstrapDoneRef.current = true;
@@ -560,6 +562,9 @@ export const App: FC<{}> = (props) => {
                 setShowLogin(false);
                 setIsEnteringHotel(false);
             } catch (err) {
+                // A newer login replaced this run (and its connection attempt): that one owns the screen now.
+                if (run !== prepareRunRef.current) return;
+
                 OctaneLogger.error('[App] Initialization failed — falling back to login', err);
                 onInitFailure();
             }
@@ -576,7 +581,7 @@ export const App: FC<{}> = (props) => {
             if (heartbeatIntervalRef.current !== null) window.clearInterval(heartbeatIntervalRef.current);
             if (rememberRotateIntervalRef.current !== null) window.clearInterval(rememberRotateIntervalRef.current);
         };
-    }, [prepareTrigger, startWarmup, startRenderer, tryRememberLogin, applySsoTicket, rotateRememberLogin, bumpProgress, taskLabel]);
+    }, [prepareTrigger, runBootStep, startWarmup, startRenderer, getLocalizationReady, tryRememberLogin, applySsoTicket, rotateRememberLogin, bumpProgress, taskLabel]);
 
     return (
         <Base fit overflow="hidden" className={`octane-app-root ${!(devicePixelRatio % 1) ? 'image-rendering-pixelated' : ''}`}>

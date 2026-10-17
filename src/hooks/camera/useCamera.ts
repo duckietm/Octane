@@ -10,6 +10,8 @@ import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { CameraPicture, SendMessageComposer } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
 
+const CAMERA_EFFECTS_LOAD_DELAY_MS = 10000;
+
 const useCameraState = () => {
     const [availableEffects, setAvailableEffects] = useState<IRoomCameraWidgetEffect[]>([]);
     // AIR keeps five stable slots for the lifetime of the camera. Empty slots
@@ -31,11 +33,37 @@ const useCameraState = () => {
     });
 
     useEffect(() => {
-        if (GetRoomCameraWidgetManager().isLoaded) return;
+        const manager = GetRoomCameraWidgetManager();
+        let delayHandle: number | null = null;
+        let idleHandle: number | null = null;
 
-        GetRoomCameraWidgetManager().init();
+        if (manager.isLoaded) {
+            setAvailableEffects(Array.from(manager.effects.values()));
+        } else {
+            // The effect textures are only needed in the photo editor, so they load once
+            // the hotel has booted and the browser is idle (or when the editor opens first).
+            const load = () => {
+                idleHandle = null;
+
+                if (!manager.isLoaded) void manager.init();
+            };
+
+            delayHandle = window.setTimeout(() => {
+                delayHandle = null;
+                idleHandle = window.requestIdleCallback ? window.requestIdleCallback(load, { timeout: 5000 }) : window.setTimeout(load, 0);
+            }, CAMERA_EFFECTS_LOAD_DELAY_MS);
+        }
 
         SendMessageComposer(new RequestCameraConfigurationComposer());
+
+        return () => {
+            if (delayHandle !== null) window.clearTimeout(delayHandle);
+
+            if (idleHandle !== null) {
+                if (window.cancelIdleCallback) window.cancelIdleCallback(idleHandle);
+                else window.clearTimeout(idleHandle);
+            }
+        };
     }, []);
 
     return {

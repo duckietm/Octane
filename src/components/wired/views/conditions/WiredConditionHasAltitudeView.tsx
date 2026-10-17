@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, localizeWithFallback, WiredFurniType, WIRED_CLOCK_FURNI_TYPES } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -77,7 +77,7 @@ interface WiredConditionHasAltitudeViewProps {
 export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProps> = ({ variant = 'altitude' }) => {
     const spec = VARIANTS[variant];
 
-    const { trigger = null, setIntParams = null, setStringParam = null, setSourceTypes = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
+    const { trigger = null, setIntParams = null, setStringParam = null, setSourceTypes = null } = useWired();
     // The official has-altitude box: [altitude in hundredths, comparison, our quantifier], the furni in the
     // official source slot. Our range / property variants keep their own layout.
     const official = variant === 'altitude';
@@ -90,18 +90,6 @@ export const WiredConditionHasAltitudeView: FC<WiredConditionHasAltitudeViewProp
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [altitude, setAltitude] = useState(0);
     const [altitudeInput, setAltitudeInput] = useState('0');
-
-    useEffect(() => {
-        if (!spec.counterOnly) return;
-
-        setAllowedInteractionTypes(WIRED_CLOCK_FURNI_TYPES);
-        setAllowedInteractionErrorKey('wiredfurni.error.require_counter_furni');
-
-        return () => {
-            setAllowedInteractionTypes(null);
-            setAllowedInteractionErrorKey(null);
-        };
-    }, [spec.counterOnly, setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
 
     useEffect(() => {
         if (!trigger) return;

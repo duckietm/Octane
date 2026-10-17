@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { LocalizeText, WiredFurniType, WIRED_CLOCK_FURNI_TYPES } from '../../../../api';
+import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -7,7 +7,6 @@ import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
 // Game timers and the football, Banzai and Freeze counters as well as the clock counter.
-const CONTROLLABLE_CLOCK_TYPES = [...WIRED_CLOCK_FURNI_TYPES, 'game_timer', 'fball_counter', 'bb_counter', 'es_counter'];
 
 const CONTROL_OPTIONS = [
     { value: 0, label: 'wiredfurni.params.clock_control.0' },
@@ -24,7 +23,7 @@ const normalizeControl = (value: number) => {
 };
 
 export const WiredActionControlClockView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setSourceTypes = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
     const [control, setControl] = useState(0);
     const [furniSource, setFurniSource] = useState<number>(() => slotFurniSource(trigger));
 
@@ -40,16 +39,6 @@ export const WiredActionControlClockView: FC<{}> = () => {
         setControl(trigger.intData.length > 0 ? normalizeControl(trigger.intData[0]) : 0);
         setFurniSource(slotFurniSource(trigger));
     }, [trigger]);
-
-    useEffect(() => {
-        setAllowedInteractionTypes(CONTROLLABLE_CLOCK_TYPES);
-        setAllowedInteractionErrorKey('wiredfurni.error.require_counter_furni');
-
-        return () => {
-            setAllowedInteractionTypes(null);
-            setAllowedInteractionErrorKey(null);
-        };
-    }, [setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
 
     return (
         <WiredActionBaseView

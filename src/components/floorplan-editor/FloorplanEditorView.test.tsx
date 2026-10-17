@@ -181,6 +181,15 @@ describe('FloorplanEditorView container', () => {
         expect(document.body.textContent).not.toContain('floor.plan.editor.title');
     });
 
+    it('a closed inventory or catalog preview does not hide the editor', () => {
+        render(<FloorplanEditorView />);
+        const tracker = (AddLinkEventTracker as ReturnType<typeof vi.fn>).mock.calls[0][0];
+        act(() => tracker.linkReceived('floor-editor/show'));
+        const disposeHandler = octaneHandlers.get(RoomEngineEvent.DISPOSED);
+        act(() => disposeHandler!({ roomId: 0x7fff0001 }));
+        expect(document.body.textContent).toContain('floor.plan.editor.title');
+    });
+
     it('cleans up the link tracker on unmount', () => {
         const { unmount } = render(<FloorplanEditorView />);
         expect(RemoveLinkEventTracker).not.toHaveBeenCalled();

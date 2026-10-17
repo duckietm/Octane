@@ -14,7 +14,7 @@ import {
 import { FC, useState } from 'react';
 import { DispatchUiEvent, LocalizeText, localizeWithFallback, NotificationAlertType, RoomWidgetUpdateRoomObjectEvent } from '../../../api';
 import { WidgetErrorBoundary } from '../../../common';
-import { useOctaneEvent, useNotification, usePollSubscriptions, useRoom } from '../../../hooks';
+import { useObjectRemoveConfirm, useOctaneEvent, useNotification, usePollSubscriptions, useRoom } from '../../../hooks';
 import { AvatarInfoWidgetView } from './avatar-info/AvatarInfoWidgetView';
 import { BuildHeightWidgetView } from './BuildHeightWidgetView';
 import { ChatWidgetView } from './chat/ChatWidgetView';
@@ -41,6 +41,8 @@ import { WordQuizWidgetView } from './word-quiz/WordQuizWidgetView';
 const MAX_ZOOM_SHIFT = 3;
 
 export const RoomWidgetsView: FC<{}> = (props) => {
+    useObjectRemoveConfirm();
+
     const { roomSession = null } = useRoom();
     const { simpleAlert = null } = useNotification();
     const [adTooltip, setAdTooltip] = useState<{ objectId: number; text: string }>(null);

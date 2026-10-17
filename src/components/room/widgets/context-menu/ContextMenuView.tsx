@@ -102,7 +102,7 @@ export const ContextMenuView: FC<ContextMenuViewProps> = ({
             x = Math.max(SPACE_AROUND_EDGES, Math.min(x, maxLeft));
             y = Math.max(SPACE_AROUND_EDGES, Math.min(y, maxTop));
 
-            setPos({ x, y });
+            setPos((previous) => (previous.x === x && previous.y === y ? previous : { x, y }));
             forcePositionUpdateRef.current = false;
         },
         [freezePositionOnHover, maximumVerticalLeadRatio, tallAvatarOffset, userType]

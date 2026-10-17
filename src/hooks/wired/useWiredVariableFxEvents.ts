@@ -1,5 +1,6 @@
 import {
     RoomEngineEvent,
+    RoomId,
     RoomSessionEvent,
     WiredVariableFxConfigsEvent,
     WiredVariableFxConfigsRemovedEvent,
@@ -42,5 +43,8 @@ export const useWiredVariableFxEvents = () => {
     });
 
     useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, () => clear());
-    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, () => clear());
+    // A closed inventory/catalog preview disposes its own room; only the real room clears.
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, (event) => {
+        if (!RoomId.isRoomPreviewerId(event.roomId)) clear();
+    });
 };

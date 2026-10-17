@@ -8,6 +8,7 @@ import { WiredBubbleWidthSelect } from '../WiredBubbleWidthSelect';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { WiredPlaceholderInsert } from '../WiredPlaceholderInsert';
 
 const SHOW_MESSAGE_STYLE_IDS = [34, 200, 201, 202, 210, 211, 212, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 250, 251, 252];
 const DEFAULT_SHOW_MESSAGE_STYLE_ID = 34;
@@ -91,6 +92,7 @@ export const WiredActionChatView: FC<{}> = (props) => {
                             onChange={(event) => setMessage(clampShowMessage(event.target.value))}
                         />
                         <WiredTextCounter maxLength={maxMessageLength} value={message} />
+                        {isChat && <WiredPlaceholderInsert trigger={trigger} onInsert={(token) => setMessage((current) => clampShowMessage(current + token))} />}
                         {isChat && <WiredTextFormattingHelp />}
                     </>
                 ) : (

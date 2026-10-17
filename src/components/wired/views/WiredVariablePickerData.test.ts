@@ -1,10 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
+    buildWiredVariableNodes,
     buildWiredVariablePickerEntries,
-    filterWiredVariablePickerEntriesByMode,
     flattenWiredVariablePickerEntries,
-    isSmartVariableKey
+    isSmartVariableKey,
+    isWiredVariableNodeDisabled,
+    IWiredVariableNode,
+    WIRED_VARIABLE_TYPE_DYNAMIC,
+    WIRED_VARIABLE_TYPE_INTERNAL,
+    WIRED_VARIABLE_TYPE_USER
 } from './WiredVariablePickerData';
+
+const variable = (itemId: number, name: string, hasValue = true) => ({ itemId, name, availability: 0, hasValue, isReadOnly: false });
+const names = (node: IWiredVariableNode) => [...node.children.values()].map((child) => child.name);
+const child = (node: IWiredVariableNode, ...path: string[]) => path.reduce((current, name) => current.children.get(name), node);
 
 describe('Wired variable picker internal furniture variables', () => {
     it('offers gravity as both a reference and destination without changing custom variables', () => {
@@ -16,51 +25,95 @@ describe('Wired variable picker internal furniture variables', () => {
     });
 });
 
-describe('Wired variable picker smart variables', () => {
-    const furni = () => buildWiredVariablePickerEntries('furni', 'change-reference', []);
-    const labels = (entries: ReturnType<typeof furni>) => flattenWiredVariablePickerEntries(entries).map((entry) => entry.label);
+describe('Wired variable picker types', () => {
+    const furni = () => buildWiredVariablePickerEntries('furni', 'change-reference', [variable(7, 'score')]);
 
-    it('marks the variables named with a leading ~ as smart and leaves the @ ones alone', () => {
-        const flat = flattenWiredVariablePickerEntries(furni());
+    it('files ~ variables as smart, @ variables as internal and room variables as user made', () => {
+        const entries = furni();
 
         expect(isSmartVariableKey('~teleport.target_id')).toBe(true);
         expect(isSmartVariableKey('@id')).toBe(false);
-        expect(flat.find((entry) => entry.label === '~teleport.target_id')?.smart).toBe(true);
-        expect(flat.find((entry) => entry.label === '@id')?.smart).toBe(false);
+        expect(entries.find((entry) => entry.label === '~teleport.target_id')?.variableType).toBe(WIRED_VARIABLE_TYPE_DYNAMIC);
+        expect(entries.find((entry) => entry.label === '@id')?.variableType).toBe(WIRED_VARIABLE_TYPE_INTERNAL);
+        expect(entries.find((entry) => entry.label === 'score')?.variableType).toBe(WIRED_VARIABLE_TYPE_USER);
     });
 
-    it('lists them under Smart and keeps them out of Internal', () => {
-        const smart = labels(filterWiredVariablePickerEntriesByMode(furni(), 'smart', []));
-        const internal = labels(filterWiredVariablePickerEntriesByMode(furni(), 'internal', []));
+    it('keeps the server type and the invisible flag of a room variable', () => {
+        const [entry] = buildWiredVariablePickerEntries('user', 'condition', [{ ...variable(3, 'hidden'), variableType: 2, isInvisible: true }]);
 
-        expect(smart).toContain('~teleport.target_id');
-        expect(smart).not.toContain('@id');
-        expect(internal).toContain('@id');
-        expect(internal).not.toContain('~teleport.target_id');
+        expect(entry.variableType).toBe(2);
+        expect(entry.isInvisible).toBe(true);
+    });
+});
+
+describe('Wired variable picker tree', () => {
+    const catalog = [
+        variable(1, 'event.transaction_complete.deposit.furni_count'),
+        variable(2, 'event.transaction_complete.deposit.credits'),
+        variable(3, 'event.transaction_complete.withdraw.furni_count'),
+        variable(4, 'event.variable_update.old_value'),
+        variable(5, 'event.variable_update.new_value'),
+        variable(6, 'score')
+    ];
+    const entries = buildWiredVariablePickerEntries('context', 'change-reference', catalog);
+
+    it('keeps one entry per variable in catalogue order, room variables first', () => {
+        expect(entries.slice(0, catalog.length).map((entry) => entry.displayLabel)).toEqual(catalog.map((definition) => definition.name));
+        expect(entries.every((entry) => !entry.children)).toBe(true);
     });
 
-    it('still lists everything under All and Search', () => {
-        for (const mode of ['all', 'search'] as const) {
-            const all = labels(filterWiredVariablePickerEntriesByMode(furni(), mode, []));
+    it('nests on every dot, to any depth, with segment names', () => {
+        const root = buildWiredVariableNodes(entries.slice(0, catalog.length));
 
-            expect(all).toContain('~teleport.target_id');
-            expect(all).toContain('@id');
-        }
+        expect(names(root)).toEqual(['event', 'score']);
+        expect(names(child(root, 'event'))).toEqual(['transaction_complete', 'variable_update']);
+        expect(names(child(root, 'event', 'transaction_complete'))).toEqual(['deposit', 'withdraw']);
+        expect(names(child(root, 'event', 'transaction_complete', 'deposit'))).toEqual(['furni_count', 'credits']);
+        expect(child(root, 'event', 'transaction_complete', 'deposit', 'furni_count').entry?.token).toBe(entries[0].token);
+        expect(child(root, 'event').entry).toBeNull();
     });
 
-    it('shows nothing under Smart when no variable is smart', () => {
-        const entries = buildWiredVariablePickerEntries('user', 'change-reference', []);
+    it('flattens single-child chains to a full-name leaf for the search and recent tabs', () => {
+        const root = buildWiredVariableNodes([entries[2], entries[5]], true);
 
-        expect(flattenWiredVariablePickerEntries(entries).some((entry) => entry.smart)).toBe(false);
-        expect(filterWiredVariablePickerEntriesByMode(entries, 'smart', [])).toEqual([]);
+        expect(names(root)).toEqual(['event.transaction_complete.withdraw.furni_count', 'score']);
+        expect(child(root, 'event').entry?.token).toBe(entries[2].token);
+        expect(child(root, 'event').children.size).toBe(0);
     });
 
-    it('keeps the Recent and User made tabs as they were', () => {
-        const recent = filterWiredVariablePickerEntriesByMode(furni(), 'recent', ['internal:~teleport.target_id']);
-        const custom = [{ itemId: 7, name: 'score', hasValue: true, availability: 0 }];
-        const userMade = filterWiredVariablePickerEntriesByMode(buildWiredVariablePickerEntries('furni', 'change-reference', custom), 'usermade', []);
+    it('does not flatten a branch with several children', () => {
+        const root = buildWiredVariableNodes(entries.slice(0, 2), true);
 
-        expect(recent.map((entry) => entry.label)).toEqual(['~teleport.target_id']);
-        expect(userMade.map((entry) => entry.label)).toEqual(['score']);
+        expect(names(root)).toEqual(['event']);
+        expect(names(child(root, 'event', 'transaction_complete', 'deposit'))).toEqual(['furni_count', 'credits']);
+    });
+
+    it('reuses an existing branch node without giving it the later variable', () => {
+        const root = buildWiredVariableNodes(buildWiredVariablePickerEntries('user', 'condition', [variable(10, 'team.score'), variable(11, 'team')]));
+
+        expect(child(root, 'team').entry).toBeNull();
+        expect(names(child(root, 'team'))).toEqual(['score']);
+    });
+
+    it('greys a branch only when nothing below it can be selected', () => {
+        const references = buildWiredVariablePickerEntries('context', 'change-reference', [variable(20, 'a.b', false), variable(21, 'a.c', true), variable(22, 'd.e', false)]);
+        const root = buildWiredVariableNodes(references.slice(0, 3));
+
+        expect(isWiredVariableNodeDisabled(child(root, 'a'))).toBe(false);
+        expect(isWiredVariableNodeDisabled(child(root, 'a', 'b'))).toBe(true);
+        expect(isWiredVariableNodeDisabled(child(root, 'd'))).toBe(true);
+    });
+});
+
+describe('Wired variable picker echo filter', () => {
+    it('offers any variable that exists outside a running stack', () => {
+        const user = buildWiredVariablePickerEntries('user', 'echo', [variable(1, 'score'), variable(2, 'level.xp'), { ...variable(3, 'temp'), requiresExecutionContext: true }]);
+        const context = buildWiredVariablePickerEntries('context', 'echo', [variable(4, 'turn')]);
+
+        expect(user.find((entry) => entry.label === 'score')?.selectable).toBe(true);
+        expect(user.find((entry) => entry.label === 'level.xp')?.selectable).toBe(true);
+        expect(user.find((entry) => entry.label === 'temp')?.selectable).toBe(false);
+        expect(user.find((entry) => entry.label === '@index')?.selectable).toBe(true);
+        expect(context.every((entry) => !entry.selectable)).toBe(true);
     });
 });

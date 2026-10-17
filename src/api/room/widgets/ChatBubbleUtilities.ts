@@ -10,11 +10,12 @@ import {
 } from '@octane/renderer';
 
 export class ChatBubbleUtilities {
-    private static MAX_CACHE_SIZE: number = 200;
+    private static MAX_CACHE_SIZE: number = 1024;
 
     public static AVATAR_COLOR_CACHE: Map<string, number> = new Map();
     public static AVATAR_IMAGE_CACHE: Map<string, string> = new Map();
     public static PET_IMAGE_CACHE: Map<string, string> = new Map();
+    private static AVATAR_IMAGE_PENDING_CACHE: Map<string, Promise<string>> = new Map();
     private static PET_IMAGE_PENDING_CACHE: Map<string, Promise<string>> = new Map();
 
     private static placeHolderImageUrl: string = '';
@@ -30,6 +31,17 @@ export class ChatBubbleUtilities {
         }
     }
 
+    private static touch<T>(cache: Map<string, T>, key: string): T {
+        const value = cache.get(key);
+
+        if (value === undefined) return undefined;
+
+        cache.delete(key);
+        cache.set(key, value);
+
+        return value;
+    }
+
     public static async setFigureImage(figure: string): Promise<string> {
         const avatarImage = GetAvatarRenderManager().createAvatarImage(figure, AvatarScaleType.LARGE, null, {
             resetFigure: (figure) => this.setFigureImage(figure),
@@ -39,39 +51,65 @@ export class ChatBubbleUtilities {
 
         if (!avatarImage) return null;
 
-        const isPlaceholder = avatarImage.isPlaceholder();
+        try {
+            const isPlaceholder = avatarImage.isPlaceholder();
 
-        if (isPlaceholder && this.placeHolderImageUrl?.length) return this.placeHolderImageUrl;
+            if (isPlaceholder && this.placeHolderImageUrl?.length) return this.placeHolderImageUrl;
 
-        figure = avatarImage.getFigure().getFigureString();
+            const imageUrl = avatarImage.processAsImageUrl(AvatarSetType.HEAD);
 
-        const imageUrl = avatarImage.processAsImageUrl(AvatarSetType.HEAD);
-        const color = avatarImage.getPartColor(AvatarFigurePartType.CHEST);
+            // A placeholder head is never cached for the figure: the download
+            // listener calls back here once the real parts are in.
+            if (isPlaceholder) {
+                this.placeHolderImageUrl = imageUrl;
 
-        if (isPlaceholder) this.placeHolderImageUrl = imageUrl;
+                return imageUrl;
+            }
 
-        this.AVATAR_COLOR_CACHE.set(figure, (color && color.rgb) || 16777215);
-        this.AVATAR_IMAGE_CACHE.set(figure, imageUrl);
+            const color = avatarImage.getPartColor(AvatarFigurePartType.CHEST);
 
-        this.pruneCache(this.AVATAR_COLOR_CACHE);
-        this.pruneCache(this.AVATAR_IMAGE_CACHE);
+            // Keyed by the figure the caller asked for, which is what the chat
+            // widget looks the colour up with afterwards.
+            this.AVATAR_COLOR_CACHE.set(figure, (color && color.rgb) || 16777215);
+            this.AVATAR_IMAGE_CACHE.set(figure, imageUrl);
 
-        avatarImage.dispose();
+            this.pruneCache(this.AVATAR_COLOR_CACHE);
+            this.pruneCache(this.AVATAR_IMAGE_CACHE);
 
-        return imageUrl;
+            return imageUrl;
+        } finally {
+            avatarImage.dispose();
+        }
     }
 
     public static async getUserImage(figure: string): Promise<string> {
-        let existing = this.AVATAR_IMAGE_CACHE.get(figure);
+        const existing = this.touch(this.AVATAR_IMAGE_CACHE, figure);
 
-        if (!existing) existing = await this.setFigureImage(figure);
+        if (existing) {
+            // A busy speaker keeps both head and colour at the young end.
+            this.touch(this.AVATAR_COLOR_CACHE, figure);
 
-        return existing;
+            return existing;
+        }
+
+        const pending = this.AVATAR_IMAGE_PENDING_CACHE.get(figure);
+
+        if (pending) return pending;
+
+        const request = this.setFigureImage(figure);
+
+        this.AVATAR_IMAGE_PENDING_CACHE.set(figure, request);
+
+        try {
+            return await request;
+        } finally {
+            if (this.AVATAR_IMAGE_PENDING_CACHE.get(figure) === request) this.AVATAR_IMAGE_PENDING_CACHE.delete(figure);
+        }
     }
 
     public static async getPetImage(figure: string, direction: number, _arg_3: boolean, scale: number = 64, posture: string = null) {
         const cacheKey = `${figure}-${posture || 'std'}-${direction}-${scale}`;
-        let existing = this.PET_IMAGE_CACHE.get(cacheKey);
+        let existing = this.touch(this.PET_IMAGE_CACHE, cacheKey);
 
         if (existing) return existing;
 

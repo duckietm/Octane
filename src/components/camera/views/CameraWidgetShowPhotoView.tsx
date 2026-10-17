@@ -1,5 +1,5 @@
 import { GetRoomEngine, RoomObjectCategory, RoomObjectVariable } from '@octane/renderer';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { GetUserProfile, IPhotoData, LocalizeText } from '../../../api';
 import { Flex, Grid, Text } from '../../../common';
@@ -8,33 +8,19 @@ export interface CameraWidgetShowPhotoViewProps {
     currentIndex: number;
     currentPhotos: IPhotoData[];
     onClick?: () => void;
+    /** The viewer owns the index, so report and remove act on the photo that is shown. */
+    onIndexChange?: (index: number) => void;
 }
 
 export const CameraWidgetShowPhotoView: FC<CameraWidgetShowPhotoViewProps> = (props) => {
-    const { currentIndex = -1, currentPhotos = null, onClick = null } = props;
-    const [imageIndex, setImageIndex] = useState(0);
+    const { currentIndex = -1, currentPhotos = null, onClick = null, onIndexChange = null } = props;
+    const imageIndex = Math.max(0, currentIndex);
 
-    const currentImage = currentPhotos && currentPhotos.length ? currentPhotos[imageIndex] : null;
+    const currentImage = currentPhotos && currentPhotos.length ? (currentPhotos[imageIndex] ?? null) : null;
 
-    const next = () => {
-        setImageIndex((prevValue) => {
-            let newIndex = prevValue + 1;
-            if (newIndex >= currentPhotos.length) newIndex = 0;
-            return newIndex;
-        });
-    };
+    const next = () => onIndexChange?.(imageIndex + 1 >= currentPhotos.length ? 0 : imageIndex + 1);
 
-    const previous = () => {
-        setImageIndex((prevValue) => {
-            let newIndex = prevValue - 1;
-            if (newIndex < 0) newIndex = currentPhotos.length - 1;
-            return newIndex;
-        });
-    };
-
-    useEffect(() => {
-        setImageIndex(currentIndex);
-    }, [currentIndex]);
+    const previous = () => onIndexChange?.(imageIndex - 1 < 0 ? currentPhotos.length - 1 : imageIndex - 1);
 
     if (!currentImage) return null;
 

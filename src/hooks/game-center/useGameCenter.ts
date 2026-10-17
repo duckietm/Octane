@@ -1,16 +1,22 @@
 import {
     Game2AccountGameStatusMessageEvent,
     Game2AccountGameStatusMessageParser,
+    Game2CheckGameDirectoryStatusMessageComposer,
+    Game2GameDirectoryStatusMessageEvent,
+    Game2UserBlockedMessageEvent,
     GameConfigurationData,
     GameListMessageEvent,
     GameStatusMessageEvent,
     GetGameListMessageComposer,
+    GetSnowWarGameTokensOfferComposer,
+    SnowWarGameTokenOffer,
+    SnowWarGameTokensMessageEvent,
     LoadGameUrlEvent,
     RoomEnterEvent
 } from '@octane/renderer';
 import { useCallback, useEffect, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { GetRoomSession, SendMessageComposer, setSnowWarReturnRoom, VisitDesktop } from '../../api';
+import { GetRoomSession, SendMessageComposer, setSnowWarReturnRoom, snowWarBlockDeadline, VisitDesktop } from '../../api';
 import { useMessageEvent } from '../events';
 
 const useGameCenterState = () => {
@@ -20,6 +26,38 @@ const useGameCenterState = () => {
     const [accountStatus, setAccountStatus] = useState<Game2AccountGameStatusMessageParser>(null);
     const [gameOffline, setGameOffline] = useState<boolean>(false);
     const [gameURL, setGameURL] = useState<string>(null);
+    // Wall-clock end of the leave block (0 = not blocked).
+    const [blockedUntil, setBlockedUntil] = useState<number>(0);
+    // AIR games_main "How To Play" pages replace the tile grid while open.
+    const [instructionsOpen, setInstructionsOpen] = useState<boolean>(false);
+    // The "get more games" token offers (GetSnowWarGameTokensOffer).
+    const [tokenOffers, setTokenOffers] = useState<SnowWarGameTokenOffer[]>([]);
+
+    useMessageEvent<SnowWarGameTokensMessageEvent>(SnowWarGameTokensMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setTokenOffers(parser.offers ?? []);
+    });
+
+    // Leaving a running match blocks starting a new one; the hub shows the
+    // countdown on the play button.
+    useMessageEvent<Game2UserBlockedMessageEvent>(Game2UserBlockedMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setBlockedUntil(snowWarBlockDeadline(parser.playerBlockLength, Date.now()));
+    });
+
+    useMessageEvent<Game2GameDirectoryStatusMessageEvent>(Game2GameDirectoryStatusMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser) return;
+
+        setBlockedUntil(snowWarBlockDeadline(parser.blockLength, Date.now()));
+    });
 
     useMessageEvent<GameListMessageEvent>(GameListMessageEvent, (event) => {
         let parser = event.getParser();
@@ -77,9 +115,11 @@ const useGameCenterState = () => {
             // stale value (null when we open the hub from outside a room).
             setSnowWarReturnRoom(GetRoomSession()?.roomId ?? null);
             SendMessageComposer(new GetGameListMessageComposer());
+            SendMessageComposer(new Game2CheckGameDirectoryStatusMessageComposer());
+            SendMessageComposer(new GetSnowWarGameTokensOfferComposer());
             VisitDesktop();
         } else {
-            // dispose or wtv
+            setInstructionsOpen(false);
         }
     }, [isVisible]);
 
@@ -92,7 +132,11 @@ const useGameCenterState = () => {
         setSelectedGame,
         gameOffline,
         gameURL,
-        setGameURL
+        setGameURL,
+        blockedUntil,
+        instructionsOpen,
+        setInstructionsOpen,
+        tokenOffers
     };
 };
 

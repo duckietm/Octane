@@ -73,15 +73,10 @@ describe('WiredActionTeleportToRoomView', () => {
         expect(baseProps.validate()).toBe(true);
     });
 
-    it('only lets teleporters and room links be picked', () => {
+    it('leaves the room-linker check to the server, as the official editor does', () => {
         trigger = { stringData: '', intData: [] };
         render(<WiredActionTeleportToRoomView />);
 
-        const check = setAllowedFurniCheck.mock.calls.find((call) => typeof call[0] === 'function')[0];
-        const object = (data: Record<string, string>) => ({ model: { getValue: () => data } });
-
-        expect(check(object({ internalLink: '5' }), { className: 'poster' })).toBe(true);
-        expect(check(object({}), { className: 'door' })).toBe(true);
-        expect(check(object({}), { className: 'chair_plasto' })).toBe(false);
+        expect(setAllowedFurniCheck.mock.calls.some((call) => typeof call[0] === 'function')).toBe(false);
     });
 });

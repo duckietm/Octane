@@ -16,6 +16,7 @@ export interface WiredExtraBaseViewProps {
     /** Official: some elements open wider. */
     widthModifier?: number;
     showSelection?: boolean;
+    confirmSave?: () => { title: string; body: string } | null;
 }
 
 export const WiredExtraBaseView: FC<PropsWithChildren<WiredExtraBaseViewProps>> = (props) => {
@@ -30,7 +31,8 @@ export const WiredExtraBaseView: FC<PropsWithChildren<WiredExtraBaseViewProps>> 
         footerCollapsible = true,
         selectionPreview = null,
         widthModifier = 1,
-        showSelection = true
+        showSelection = true,
+        confirmSave = null
     } = props;
     const { trigger = null, setActionDelay = null } = useWired();
 
@@ -51,6 +53,7 @@ export const WiredExtraBaseView: FC<PropsWithChildren<WiredExtraBaseViewProps>> 
             selectionPreview={selectionPreview}
             widthModifier={widthModifier}
             showSelection={showSelection}
+            confirmSave={confirmSave}
         >
             {children}
         </WiredBaseView>

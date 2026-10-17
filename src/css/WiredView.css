@@ -590,218 +590,6 @@
         min-height: 23px;
     }
 
-    .octane-wired__variable-picker {
-        position: relative;
-        width: 100%;
-    }
-
-    .octane-wired__variable-picker-trigger {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        min-height: 23px;
-        padding: 0 22px 0 8px;
-        border: 1px solid #8e8e8e;
-        border-radius: 4px;
-        background: linear-gradient(180deg, #ffffff 0%, #ededed 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        font-size: 11px;
-        text-align: left;
-        position: relative;
-    }
-
-    .octane-wired__variable-picker-trigger::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 8px;
-        width: 0;
-        height: 0;
-        margin-top: -2px;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 5px solid #555;
-    }
-
-    .octane-wired__variable-picker-placeholder {
-        color: #7a7a7a;
-    }
-
-    .octane-wired__variable-picker-panel {
-        position: absolute;
-        top: calc(100% + 2px);
-        left: 0;
-        z-index: 30;
-        width: 202px;
-        padding: 4px;
-        border: 1px solid #8e8e8e;
-        border-radius: 4px;
-        background: #f5f5f5;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        overflow: visible;
-    }
-
-    .octane-wired__variable-picker-panel.is-portal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 5001;
-        margin: 0;
-        pointer-events: auto;
-    }
-
-    .octane-wired__variable-picker-toolbar {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding-bottom: 4px;
-        border-bottom: 1px solid #d0d0d0;
-    }
-
-    .octane-wired__variable-picker-mode {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        padding: 0;
-        border: 1px solid transparent;
-        border-radius: 3px;
-        background: transparent;
-    }
-
-    .octane-wired__variable-picker-mode.is-active {
-        border-color: #8e8e8e;
-        background: linear-gradient(180deg, #f3cc58 0%, #d2a93a 100%);
-    }
-
-    .octane-wired__variable-picker-mode img {
-        width: auto;
-        height: auto;
-        max-width: 13px;
-        max-height: 13px;
-        image-rendering: var(--octane-pixel-art, pixelated);
-    }
-
-    .octane-wired__variable-picker-search {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        min-height: 24px;
-        padding: 0 4px;
-        margin-top: 4px;
-        border: 1px solid #c4c4c4;
-        border-radius: 3px;
-        background: #fff;
-    }
-
-    .octane-wired__variable-picker-search-icon {
-        width: auto;
-        height: auto;
-        max-width: 10px;
-        max-height: 10px;
-        opacity: 0.75;
-        image-rendering: var(--octane-pixel-art, pixelated);
-    }
-
-    .octane-wired__variable-picker-search-input {
-        flex: 1 1 auto;
-        min-width: 0;
-        border: 0;
-        background: transparent;
-        font-size: 11px;
-        line-height: 1;
-        outline: none;
-    }
-
-    .octane-wired__variable-picker-clear {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 14px;
-        height: 14px;
-        padding: 0;
-        border: 0;
-        background: transparent;
-    }
-
-    .octane-wired__variable-picker-clear img {
-        width: auto;
-        height: auto;
-        max-width: 10px;
-        max-height: 10px;
-        image-rendering: var(--octane-pixel-art, pixelated);
-    }
-
-    .octane-wired__variable-picker-list,
-    .octane-wired__variable-picker-submenu {
-        display: flex;
-        flex-direction: column;
-        max-height: 140px;
-        margin-top: 4px;
-        overflow-y: auto;
-        border: 1px solid #c8c8c8;
-        border-radius: 3px;
-        background: #fff;
-    }
-
-    .octane-wired__variable-picker-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 6px;
-        min-height: 20px;
-        padding: 0 6px;
-        border: 0;
-        background: transparent;
-        font-size: 11px;
-        text-align: left;
-    }
-
-    .octane-wired__variable-picker-row:nth-child(even) {
-        background: #f3f3f3;
-    }
-
-    .octane-wired__variable-picker-row:hover {
-        background: #dfe8f6;
-    }
-
-    .octane-wired__variable-picker-row.is-selected {
-        background: #d7dfea;
-    }
-
-    .octane-wired__variable-picker-row.is-disabled {
-        color: #7b7b7b;
-    }
-
-    .octane-wired__variable-picker-row-label {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .octane-wired__variable-picker-row-arrow {
-        flex: 0 0 auto;
-        font-size: 9px;
-    }
-
-    .octane-wired__variable-picker-empty {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 86px;
-        color: #8a8a8a;
-    }
-
-    .octane-wired__variable-picker-submenu {
-        position: fixed;
-        width: 120px;
-        margin-top: 0;
-        z-index: 5000;
-        pointer-events: auto;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
-    }
-
     .octane-wired__give-var-checkbox {
         display: flex;
         align-items: center;
@@ -1166,6 +954,193 @@
     box-shadow: none !important;
 }
 
+
+/*
+ * AIR variable picker (WIN63-202610131318-860371703, uibuilder/presets/newvariablepicker). Colours, tab widths and the
+ * 300px list cap come from the classes; the scrollbar is the interface's classic one. The search_tree_dropdown layout is not indexed, so the
+ * frame, field, font and spacing are measured from the live AIR client at 1x (hhus, 2026-10-16).
+ */
+.octane-wired__vpicker {
+    position: relative;
+    width: 100%;
+}
+
+.octane-wired__vpicker-collapsed {
+    height: 21px;
+}
+
+.octane-wired__vpicker-input-region {
+    position: relative;
+    box-sizing: border-box;
+    cursor: text;
+    background: #fff;
+}
+
+/* Collapsed: a 21px white field, 1px #848484 rounded frame and a 10x5 drop-down triangle 8px from the right. */
+.octane-wired__vpicker-collapsed .octane-wired__vpicker-input-region {
+    height: 21px;
+    border: 1px solid #848484;
+    border-radius: 4px;
+}
+
+.octane-wired__vpicker-collapsed .octane-wired__vpicker-input-region::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 7px;
+    border-top: 5px solid #555;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    pointer-events: none;
+}
+
+/* Expanded: a plain 20px field under the tabs, a #ddd line and 4px of white before the list. */
+.octane-wired__vpicker-search .octane-wired__vpicker-input-region {
+    height: 21px;
+    border-bottom: 1px solid #ddd;
+}
+
+.octane-wired .octane-wired__vpicker-input-region .octane-wired__vpicker-input,
+.octane-wired__vpicker-input-region .octane-wired__vpicker-input {
+    position: absolute;
+    left: 8px;
+    top: 0;
+    width: calc(100% - 30px);
+    height: 19px;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #555 !important;
+    font: 9px/19px Volter, sans-serif !important;
+    outline: 0;
+}
+
+.octane-wired__vpicker-input::placeholder {
+    color: #808080;
+    opacity: 1;
+}
+
+.octane-wired__vpicker-cancel {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-wired__vpicker-cancel img {
+    image-rendering: pixelated;
+}
+
+.octane-wired__vpicker-expanded {
+    position: fixed;
+    box-sizing: border-box;
+    padding-bottom: 1px;
+    pointer-events: auto;
+    border: 1px solid #848484;
+    border-radius: 3px;
+    background: #fff;
+    color: #555;
+    font: 9px Volter, sans-serif;
+    overflow: visible;
+}
+
+.octane-wired__vpicker-tabs {
+    display: flex;
+}
+
+.octane-wired__vpicker-tab {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    box-sizing: content-box;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.octane-wired__vpicker-tabs .octane-wired__vpicker-tab:first-child {
+    border-top-left-radius: 2px;
+}
+
+.octane-wired__vpicker-tab img {
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.octane-wired__vpicker-content {
+    position: relative;
+    margin-top: 4px;
+}
+
+.octane-wired__vpicker-list {
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.octane-wired__vpicker-list.is-sublist {
+    z-index: 1;
+    padding: 2px 0 2px;
+    pointer-events: auto;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: inset -1px -1px 0 #ccc;
+    color: #555;
+    font: 9px Volter, sans-serif;
+}
+
+.octane-wired__vpicker-node {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 10px 0 9px;
+    cursor: default;
+    white-space: nowrap;
+    line-height: 20px;
+}
+
+.octane-wired__vpicker-node.is-selectable {
+    cursor: pointer;
+}
+
+.octane-wired__vpicker-node-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+/* right_triangle_icon (VariableNodeView.as:339-342), only on nodes with children: 5x10, #767676 on live AIR. */
+.octane-wired__vpicker-node-arrow {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid #767676;
+}
+
+.octane-wired__vpicker-empty {
+    padding: 4px 9px 5px;
+    color: #555;
+}
+
+
 /*
  * Official wired window skins, colour for colour from the AIR client's wired_style_*.xml layouts:
  * volter (dark), ubuntu (light warm) and volter_blue (the yellow one; that is its name). "default"
@@ -1394,4 +1369,64 @@
         background: linear-gradient(180deg, #ffeda5 0%, #f8e28a 46%, #f0cf55 47%, #f4d763 100%) !important;
         color: #222 !important;
     }
+}
+
+/* Delay section: title, seconds field and the Standard / Precise mode button (AIR ActionDelaySection). */
+.octane-wired__delay-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.octane-wired__delay-input {
+    width: 40px;
+    height: 18px;
+    padding: 0 3px;
+    font-size: 11px;
+    text-align: right;
+}
+
+.octane-wired__delay-mode {
+    position: relative;
+    margin-left: auto;
+}
+
+.octane-wired__delay-mode-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 21px;
+    height: 19px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.octane-wired__delay-mode-button img {
+    image-rendering: pixelated;
+}
+
+.octane-wired__delay-mode-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    padding: 2px;
+    background: #fff;
+    border: 1px solid #000;
+}
+
+.octane-wired__delay-mode-menu button {
+    padding: 2px 6px;
+    text-align: left;
+    font-size: 11px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.octane-wired__delay-mode-menu button.is-active,
+.octane-wired__delay-mode-menu button:hover {
+    background: #c3dfeb;
 }

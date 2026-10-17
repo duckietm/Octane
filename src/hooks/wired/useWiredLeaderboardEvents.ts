@@ -1,6 +1,7 @@
 import {
     RoomEngineEvent,
     RoomEntryInfoMessageEvent,
+    RoomId,
     RoomSessionEvent,
     WiredLeaderboardChunkEvent,
     WiredLeaderboardSnapshotEvent,
@@ -78,5 +79,8 @@ export const useWiredLeaderboardEvents = (roomId: number) => {
     }, [panels, snapshotSeq, keepChunks]);
 
     useOctaneEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, () => clear());
-    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, () => clear());
+    // A closed inventory/catalog preview disposes its own room; only the real room clears.
+    useOctaneEvent<RoomEngineEvent>(RoomEngineEvent.DISPOSED, (event) => {
+        if (!RoomId.isRoomPreviewerId(event.roomId)) clear();
+    });
 };

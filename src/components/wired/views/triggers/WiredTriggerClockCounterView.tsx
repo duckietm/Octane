@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { LocalizeText, WiredFurniType, WIRED_CLOCK_FURNI_TYPES } from '../../../../api';
+import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -26,7 +26,7 @@ const formatSeconds = (halfSeconds: number) => {
 };
 
 export const WiredTriggerClockCounterView: FC<{}> = () => {
-    const { trigger = null, setIntParams = null, setSourceTypes = null, setAllowedInteractionTypes = null, setAllowedInteractionErrorKey = null } = useWired();
+    const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
     const [furniSource, setFurniSource] = useState<number>(() => normalizeFurniSource(trigger?.furniSourceTypes?.[0] ?? 100));
     const [minutes, setMinutes] = useState(0);
     const [halfSeconds, setHalfSeconds] = useState(0);
@@ -50,16 +50,6 @@ export const WiredTriggerClockCounterView: FC<{}> = () => {
         setMinutes(normalizeMinutes(d[1] ?? 0));
         setFurniSource(normalizeFurniSource(trigger.furniSourceTypes?.[0] ?? 100));
     }, [trigger]);
-
-    useEffect(() => {
-        setAllowedInteractionTypes(WIRED_CLOCK_FURNI_TYPES);
-        setAllowedInteractionErrorKey('wiredfurni.error.require_counter_furni');
-
-        return () => {
-            setAllowedInteractionTypes(null);
-            setAllowedInteractionErrorKey(null);
-        };
-    }, [setAllowedInteractionErrorKey, setAllowedInteractionTypes]);
 
     return (
         <WiredTriggerBaseView

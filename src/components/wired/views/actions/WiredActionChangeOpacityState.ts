@@ -62,7 +62,6 @@ export const normalizeWiredActionChangeOpacity = (
     duration: normalizeDuration(intData[5] ?? WIRED_OPACITY_DEFAULT_DURATION),
     furniSource: hasSource(FURNI_SOURCES, furniSources[0]) ? furniSources[0] : WIRED_OPACITY_SELECTED_FURNI_SOURCE,
     userSource: hasSource(USER_SOURCES, userSources[0]) ? userSources[0] : WIRED_OPACITY_TRIGGER_USER_SOURCE,
-    // Stored only (avatars are not made transparent yet): passed through as the box sent it.
     targetUserSource: Number.isInteger(userSources[1]) ? userSources[1] : WIRED_OPACITY_TRIGGER_USER_SOURCE
 });
 

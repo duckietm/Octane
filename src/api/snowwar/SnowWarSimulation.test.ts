@@ -388,4 +388,60 @@ describe('SnowWarSimulation', () =>
         }
         expect(sim.subturnCount).toBe(45);
     });
+
+    const emptyTurn = () => Array.from({ length: SUBTURNS_PER_TICK }, (): SnowWarSimEvent[] => []);
+
+    it('collapses the backlog in a hidden tab even with a snowball in flight', () =>
+    {
+        sim.isPageHidden = () => true;
+        sim.queueGameStatus([[event(SNOWWAR_EVENT_LAUNCH_SNOWBALL, 99, 1, tileToWorld(10), tileToWorld(5), 2)], [], []]);
+        for (let i = 0; i < 20; i++) sim.queueGameStatus(emptyTurn());
+
+        // 63 subturns queued, the buffer is capped at 18.
+        expect(sim.subturnCount).toBe(45);
+    });
+
+    it('keeps a projectile backlog while visible and skips it on catchUp', () =>
+    {
+        sim.isPageHidden = () => false;
+        sim.queueGameStatus([[event(SNOWWAR_EVENT_LAUNCH_SNOWBALL, 99, 1, tileToWorld(10), tileToWorld(5), 2)], [], []]);
+        for (let i = 0; i < 20; i++) sim.queueGameStatus(emptyTurn());
+        const before = sim.subturnCount;
+        expect(before).toBeLessThan(45);
+
+        sim.catchUp();
+
+        expect(sim.subturnCount).toBe(63 - 2);
+        expect(sim.drainImpacts()).toEqual([]);
+    });
+
+    it('removes a leaver only after the subturns buffered before the exit', () =>
+    {
+        sim.queueGameStatus([[event(SNOWWAR_EVENT_MOVE, 1, tileToWorld(6), tileToWorld(5))], [], []]);
+        sim.removeAvatarAfterBuffer(1);
+        expect(sim.avatars.has(1)).toBe(true);
+
+        sim.queueGameStatus(emptyTurn());
+        let guard = 0;
+        while (sim.subturnCount < SUBTURNS_PER_TICK - 1 && guard++ < 100)
+        {
+            clock += SUBTURN_MS;
+            sim.update(clock);
+        }
+        expect(sim.avatars.has(1)).toBe(true);
+
+        while (sim.subturnCount < SUBTURNS_PER_TICK && guard++ < 100)
+        {
+            clock += SUBTURN_MS;
+            sim.update(clock);
+        }
+        expect(sim.avatars.has(1)).toBe(false);
+        expect(sim.avatars.has(2)).toBe(true);
+    });
+
+    it('removes a leaver at once when nothing is buffered', () =>
+    {
+        sim.removeAvatarAfterBuffer(2);
+        expect(sim.avatars.has(2)).toBe(false);
+    });
 });

@@ -1,10 +1,10 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetWiredTimeLocale, WIRED_ACTION_DELAY_MAX_PULSES, LocalizeText, localizeWithFallback, WiredFurniType, WiredSelectionVisualizer } from '../../../../api';
+import { LocalizeText, localizeWithFallback, WiredFurniType, WiredSelectionVisualizer } from '../../../../api';
 import contextVariableIcon from '../../../../assets/images/wired/var/icon_source_context_clean.png';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
 import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_global.png';
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
-import { Slider, Text } from '../../../../common';
+import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
@@ -17,6 +17,7 @@ import {
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { WiredActionDelaySection } from './WiredActionDelaySection';
 import { localizeWiredVariableOperation, WIRED_VARIABLE_ADVANCED_OPERATIONS, WIRED_VARIABLE_BASIC_OPERATIONS, WIRED_VARIABLE_UNARY_OPERATIONS } from './WiredVariableOperations';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
@@ -163,6 +164,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
     const [destinationFurniSource, setDestinationFurniSource] = useState(SOURCE_TRIGGER);
     const [referenceUserSource, setReferenceUserSource] = useState(SOURCE_TRIGGER);
     const [referenceFurniSource, setReferenceFurniSource] = useState(SOURCE_TRIGGER);
+    const [referenceSameHolder, setReferenceSameHolder] = useState(false);
     const [destinationFurniIds, setDestinationFurniIds] = useState<number[]>([]);
     const [referenceFurniIds, setReferenceFurniIds] = useState<number[]>([]);
     const [selectionMode, setSelectionMode] = useState<SelectionMode>('destination');
@@ -290,6 +292,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
         setDestinationFurniSource(trigger.intData.length > 6 ? trigger.intData[6] : nextDestinationFurniIds.length ? SOURCE_SELECTED : SOURCE_TRIGGER);
         setReferenceUserSource(trigger.intData.length > 7 ? trigger.intData[7] : SOURCE_TRIGGER);
         setReferenceFurniSource(trigger.intData.length > 8 ? trigger.intData[8] : nextReferenceFurniIds.length ? SOURCE_SECONDARY_SELECTED : SOURCE_TRIGGER);
+        setReferenceSameHolder(trigger.intData.length > 9 && trigger.intData[9] === 1);
         setDestinationFurniIds(nextDestinationFurniIds);
         setReferenceFurniIds(nextReferenceFurniIds);
         setSelectionMode('destination');
@@ -329,6 +332,12 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
         };
     }, []);
 
+    // Official: "use the same furni or user as the target variable" only exists for a variable reference on the
+    // destination's own kind of holder, and then the reference source row is locked.
+    const sameHolderAvailable =
+        referenceMode === 'variable' && referenceTargetType === destinationTargetType && (destinationTargetType === 'user' || isFurniTarget(destinationTargetType));
+    const sameHolderActive = sameHolderAvailable && referenceSameHolder;
+
     const save = () => {
         const nextDestinationFurniIds = selectionMode === 'destination' ? [...furniIds] : [...destinationFurniIds];
         const nextReferenceFurniIds = selectionMode === 'reference' ? [...furniIds] : [...referenceFurniIds];
@@ -346,7 +355,8 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
             destinationUserSource,
             destinationFurniSource,
             referenceUserSource,
-            referenceFurniSource
+            referenceFurniSource,
+            sameHolderActive ? 1 : 0
         ]);
         setFurniIds(isFurniTarget(destinationTargetType) && destinationFurniSource === SOURCE_SELECTED ? [...nextDestinationFurniIds] : []);
     };
@@ -481,17 +491,24 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                                 onSelect={(entry) => setReferenceVariableToken(entry.token)}
                             />
                         )}
+                        {referenceMode === 'variable' && (
+                            <label className={`flex items-center gap-1 ${sameHolderAvailable ? '' : 'opacity-50'}`}>
+                                <input
+                                    checked={sameHolderActive}
+                                    className="form-check-input"
+                                    disabled={!sameHolderAvailable}
+                                    type="checkbox"
+                                    onChange={(event) => setReferenceSameHolder(event.target.checked)}
+                                />
+                                <Text>{LocalizeText('wiredfurni.params.variables.reference_value.same_holder')}</Text>
+                            </label>
+                        )}
                     </div>
                 </div>
 
                 <div className="octane-wired__divider" />
 
-                <div className="octane-wired__give-var-section">
-                    <div className="octane-wired__give-var-section-title">
-                        {LocalizeText('wiredfurni.params.delay', ['seconds'], [GetWiredTimeLocale(actionDelay)])}
-                    </div>
-                    <Slider max={WIRED_ACTION_DELAY_MAX_PULSES} min={0} value={actionDelay} onChange={(event) => setActionDelay(event)} />
-                </div>
+                <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
 
                 <div className="octane-wired__divider" />
 
@@ -521,7 +538,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                 {referenceMode === 'variable' && (
                     <>
                         <div className="octane-wired__divider" />
-                        <div className="octane-wired__give-var-section">
+                        <div className={`octane-wired__give-var-section ${sameHolderActive ? 'opacity-50 pointer-events-none' : ''}`} aria-disabled={sameHolderActive}>
                             <WiredFurniSelectionSourceRow
                                 title="wiredfurni.params.sources.merged.title.variables_reference"
                                 options={referenceSourceOptions}
