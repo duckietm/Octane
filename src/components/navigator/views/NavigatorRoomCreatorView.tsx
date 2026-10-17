@@ -1,5 +1,5 @@
 import { CreateFlatMessageComposer } from '@octane/renderer';
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useMemo, useRef, useState } from 'react';
 import { CreateLinkEvent, GetConfigurationValue, IRoomModel, LocalizeText, SendMessageComposer } from '../../../api';
 import dropmenuArrow from '../../../assets/images/habbo-skin/slices/dropmenu-default-arrow.png';
 import vipIconBig from '../../../assets/images/navigator/air/icon-vip-big.png';
@@ -11,6 +11,7 @@ import { DraggableWindow } from '../../../common';
 import { useNavigatorData, useNavigatorUiStore, useUserDataSnapshot, useUserPermissions } from '../../../hooks';
 import { useRoomCreatorStore } from './navigatorRoomCreatorStore';
 import { BaseButton } from '../../../common/BaseButton';
+import { ListSelect } from '../../../common/ListSelect';
 
 const AIR_TRADE_KEYS = ['navigator.roomsettings.trade_not_allowed', 'navigator.roomsettings.trade_not_with_Controller', 'navigator.roomsettings.trade_allowed'];
 
@@ -38,58 +39,26 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
     const [open, setOpen] = useState(false);
     const rootRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (!open) return;
-
-        const onPointerDown = (event: PointerEvent) => {
-            if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-        };
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') setOpen(false);
-        };
-
-        document.addEventListener('pointerdown', onPointerDown);
-        document.addEventListener('keydown', onKeyDown);
-
-        return () => {
-            document.removeEventListener('pointerdown', onPointerDown);
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, [open]);
-
     return (
         <div ref={rootRef} className={`octane-room-creator-air__dropmenu ${className}${open ? ' is-open' : ''}`}>
-            <BaseButton
-                type="button"
-                className="octane-room-creator-air__dropmenu-button"
-                aria-haspopup="listbox"
-                aria-expanded={open}
+            <ListSelect
                 aria-label={label}
-                onClick={() => setOpen((currentOpen) => !currentOpen)}
-            >
-                <span>{options[value] ?? ''}</span>
-                <img src={dropmenuArrow} alt="" width={16} height={16} />
-            </BaseButton>
-            {open && (
-                <ul className="octane-room-creator-air__dropmenu-list" role="listbox">
-                    {options.map((option, index) => (
-                        <li key={`${index}-${option}`}>
-                            <BaseButton
-                                type="button"
-                                role="option"
-                                aria-selected={index === value}
-                                className={index === value ? 'is-selected' : undefined}
-                                onClick={() => {
-                                    onChange(index);
-                                    setOpen(false);
-                                }}
-                            >
-                                {option}
-                            </BaseButton>
-                        </li>
-                    ))}
-                </ul>
-            )}
+                container={rootRef}
+                itemClassName="octane-room-creator-air__dropmenu-option"
+                options={options.map((option, index) => ({ value: String(index), label: option }))}
+                popupClassName="octane-room-creator-air__dropmenu-list"
+                sideOffset={-1}
+                triggerClassName="octane-room-creator-air__dropmenu-button"
+                value={String(value)}
+                renderTrigger={(current) => (
+                    <>
+                        <span>{current?.label ?? ''}</span>
+                        <img src={dropmenuArrow} alt="" width={16} height={16} />
+                    </>
+                )}
+                onOpenChange={setOpen}
+                onValueChange={(next) => onChange(Number(next))}
+            />
         </div>
     );
 };

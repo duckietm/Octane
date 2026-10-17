@@ -1,3 +1,4 @@
+import { Autocomplete } from '@base-ui/react/autocomplete';
 import { Dialog } from '@base-ui/react/dialog';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -194,12 +195,16 @@ interface InteractionTypePickerProps {
 const InteractionTypePicker: FC<InteractionTypePickerProps> = ({ id, value, options, className, onChange }) => {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState<string | null>(null);
+    // The row the arrow keys / pointer put the highlight on; Enter takes it, else the first match.
+    const highlighted = useRef<string | undefined>(undefined);
     const shown = query ?? value;
     const needle = shown.trim().toLowerCase();
     const matches = useMemo(() => {
         const list = needle ? options.filter((type) => type.toLowerCase().includes(needle)) : options;
         return list.slice(0, 12);
     }, [options, needle]);
+    // '' is the "none" row: only offered while nothing is typed.
+    const items = useMemo(() => (needle ? matches : ['', ...matches]), [matches, needle]);
 
     const pick = (type: string) => {
         onChange(type);
@@ -209,73 +214,73 @@ const InteractionTypePicker: FC<InteractionTypePickerProps> = ({ id, value, opti
 
     return (
         <div className="relative">
-            <input
-                id={id}
-                role="combobox"
-                aria-label={FIELD_LABELS.interactionType}
-                aria-expanded={open}
-                aria-autocomplete="list"
-                aria-controls={`${id}-list`}
-                className={`${className} font-mono pr-7`}
+            <Autocomplete.Root
+                filter={null}
+                items={items}
+                mode="list"
+                open={open}
                 value={shown}
-                placeholder="none"
-                spellCheck={false}
-                onFocus={() => setOpen(true)}
-                onBlur={() => {
-                    if (query !== null) onChange(query.trim());
-                    setQuery(null);
-                    setOpen(false);
+                onItemHighlighted={(item) => {
+                    highlighted.current = item;
                 }}
-                onChange={(e) => {
-                    setQuery(e.target.value);
+                onOpenChange={setOpen}
+                onValueChange={(next, details) => {
+                    if (details.reason === 'item-press') {
+                        pick(next);
+                        return;
+                    }
+
+                    setQuery(next);
                     setOpen(true);
                 }}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' && matches.length && open) {
-                        e.preventDefault();
-                        pick(matches[0]);
-                    } else if (e.key === 'Escape' && open) {
-                        e.stopPropagation();
+            >
+                <Autocomplete.Input
+                    id={id}
+                    aria-label={FIELD_LABELS.interactionType}
+                    className={`${className} font-mono pr-7`}
+                    placeholder="none"
+                    spellCheck={false}
+                    onFocus={() => setOpen(true)}
+                    onBlur={() => {
+                        if (query !== null) onChange(query.trim());
                         setQuery(null);
                         setOpen(false);
-                    }
-                }}
-            />
-            <span aria-hidden="true" className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none">
-                ▾
-            </span>
-            {open && (
-                <ul
-                    id={`${id}-list`}
-                    role="listbox"
-                    className="absolute z-20 mt-0.5 left-0 right-0 max-h-40 overflow-y-auto rounded-lg border border-slate-200 bg-[#ffffff] shadow-lg text-[11px] font-mono py-0.5"
-                >
-                    {!needle && (
-                        <li
-                            role="option"
-                            aria-selected={value === ''}
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => pick('')}
-                            className="px-2 py-1 text-slate-400 hover:bg-slate-100 cursor-pointer"
-                        >
-                            none (default behaviour)
-                        </li>
-                    )}
-                    {matches.map((type) => (
-                        <li
-                            key={type}
-                            role="option"
-                            aria-selected={type === value}
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => pick(type)}
-                            className={`px-2 py-1 cursor-pointer hover:bg-slate-100 ${type === value ? 'text-primary font-semibold' : 'text-slate-700'}`}
-                        >
-                            {type}
-                        </li>
-                    ))}
-                    {needle && matches.length === 0 && <li className="px-2 py-1 text-amber-700">No registered type matches</li>}
-                </ul>
-            )}
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && open && matches.length && highlighted.current === undefined) {
+                            e.preventDefault();
+                            pick(matches[0]);
+                        } else if (e.key === 'Escape' && open) {
+                            e.stopPropagation();
+                            setQuery(null);
+                            setOpen(false);
+                        }
+                    }}
+                />
+                <span aria-hidden="true" className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none">
+                    ▾
+                </span>
+                <Autocomplete.Portal>
+                    <Autocomplete.Positioner align="start" className="octane-select-positioner" sideOffset={2}>
+                        <Autocomplete.Popup className="w-[var(--anchor-width)] max-h-40 overflow-y-auto rounded-lg border border-slate-200 bg-[#ffffff] shadow-lg text-[11px] font-mono py-0.5">
+                            <Autocomplete.List>
+                                {(type: string) => (
+                                    <Autocomplete.Item
+                                        key={type || 'none'}
+                                        className={`px-2 py-1 cursor-pointer data-[highlighted]:bg-slate-100 ${type === '' ? 'text-slate-400' : type === value ? 'text-primary font-semibold' : 'text-slate-700'}`}
+                                        value={type}
+                                    >
+                                        {type === '' ? 'none (default behaviour)' : type}
+                                    </Autocomplete.Item>
+                                )}
+                            </Autocomplete.List>
+                            <Autocomplete.Empty>
+                                <div className="px-2 py-1 text-amber-700">No registered type matches</div>
+                            </Autocomplete.Empty>
+                        </Autocomplete.Popup>
+                    </Autocomplete.Positioner>
+                </Autocomplete.Portal>
+            </Autocomplete.Root>
         </div>
     );
 };

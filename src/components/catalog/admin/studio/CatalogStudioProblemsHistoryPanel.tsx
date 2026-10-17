@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { FC, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronRight, FaExclamationTriangle, FaHistory, FaSyncAlt, FaUndo } from 'react-icons/fa';
 import { CatalogStudioHistoryGroup, CatalogStudioValidationIssue } from './CatalogStudioTypes';
@@ -104,19 +105,14 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
             {ruleGroups.map(group => {
                 const isOpen = expandedRules.includes(group.code);
 
-                return <div key={group.code} className="octane-catalog-admin-validation-group">
-                    <BaseButton
-                        className="octane-catalog-admin-validation-group-head"
-                        type="button"
-                        aria-expanded={isOpen}
-                        onClick={() => toggleRule(group.code)}
-                    >
+                return <Collapsible.Root key={group.code} className="octane-catalog-admin-validation-group" open={isOpen} onOpenChange={() => toggleRule(group.code)}>
+                    <Collapsible.Trigger className="octane-catalog-admin-validation-group-head">
                         {isOpen ? <FaChevronDown /> : <FaChevronRight />}
                         <FaExclamationTriangle />
                         <strong>{group.label}</strong>
                         <span className="octane-catalog-admin-validation-count">{group.issues.length}</span>
-                    </BaseButton>
-                    {isOpen && <div className="octane-catalog-admin-validation-group-body">
+                    </Collapsible.Trigger>
+                    <Collapsible.Panel className="octane-catalog-admin-validation-group-body">
                         {group.issues.slice(0, MAX_ROWS_PER_RULE).map((issue, index) => <BaseButton
                             key={`${issue.entityType}-${issue.entityId}-${issue.field}-${index}`}
                             className="octane-catalog-admin-validation-row"
@@ -132,8 +128,8 @@ export const CatalogStudioProblemsHistoryPanel: FC<CatalogStudioProblemsHistoryP
                         {group.issues.length > MAX_ROWS_PER_RULE && <div className="octane-catalog-admin-placeholder is-small">
                             {group.issues.length - MAX_ROWS_PER_RULE} more not listed
                         </div>}
-                    </div>}
-                </div>;
+                    </Collapsible.Panel>
+                </Collapsible.Root>;
             })}
         </div>
 

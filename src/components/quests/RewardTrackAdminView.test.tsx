@@ -91,6 +91,23 @@ describe('RewardTrackAdminView', () => {
         expect(screen.getAllByTestId('rt-admin-prize-row')).toHaveLength(1);
     });
 
+    it('folds a panel from its chevron and from the rest of its head, once per click', () => {
+        render(<RewardTrackAdminView onClose={() => null} />);
+
+        const chevron = screen.getByTestId('rt-admin-collapse-tasks');
+
+        expect(chevron.getAttribute('aria-expanded')).toBe('false');
+
+        fireEvent.click(chevron);
+        expect(chevron.getAttribute('aria-expanded')).toBe('true');
+        expect(screen.getAllByTestId('rt-admin-task-row')).toHaveLength(2);
+
+        // The head (not only the chevron) folds the panel too.
+        fireEvent.click(chevron.parentElement as HTMLElement);
+        expect(chevron.getAttribute('aria-expanded')).toBe('false');
+        expect(screen.queryAllByTestId('rt-admin-task-row')).toHaveLength(0);
+    });
+
     it('edits a task, adds a level and sends the whole task back', () => {
         renderOpen();
 

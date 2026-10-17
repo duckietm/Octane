@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { AddLinkEventTracker, ILinkEventTracker, RemoveFriendComposer, RemoveLinkEventTracker, SendRoomInviteComposer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { CreateLinkEvent, filterFriendsByCategory, LocalizeText, MessengerFriend, SendMessageComposer } from '../../../../api';
@@ -194,12 +195,8 @@ export const FriendsListView: FC<{}> = (props) => {
                             )}
                             {activePanel === 'friends' && (
                                 <>
-                                    <section className="hfl-section">
-                                        <BaseButton
-                                            type="button"
-                                            className={`hfl-section-header${isOnlineExpanded ? '' : ' collapsed'}`}
-                                            onClick={() => setIsOnlineExpanded((value) => !value)}
-                                        >
+                                    <Collapsible.Root render={<section />} className="hfl-section" open={isOnlineExpanded} onOpenChange={setIsOnlineExpanded}>
+                                        <Collapsible.Trigger className={`hfl-section-header${isOnlineExpanded ? '' : ' collapsed'}`}>
                                             <span>{LocalizeText('friendlist.friends') + ` (${filteredOnlineFriends.length})`}</span>
                                             <span
                                                 className="hfl-select-all"
@@ -213,35 +210,27 @@ export const FriendsListView: FC<{}> = (props) => {
                                                     ? LocalizeText('friendlist.unselect_all')
                                                     : LocalizeText('friendlist.select_all')}
                                             </span>
-                                        </BaseButton>
-                                        {isOnlineExpanded && (
-                                            <div className="hfl-list">
-                                                <FriendsListGroupView
-                                                    list={filteredOnlineFriends}
-                                                    selectedFriendsIds={selectedFriendsIds}
-                                                    selectFriend={selectFriend}
-                                                />
-                                            </div>
-                                        )}
-                                    </section>
-                                    <section className="hfl-section">
-                                        <BaseButton
-                                            type="button"
-                                            className={`hfl-section-header${isOfflineExpanded ? '' : ' collapsed'}`}
-                                            onClick={() => setIsOfflineExpanded((value) => !value)}
-                                        >
+                                        </Collapsible.Trigger>
+                                        <Collapsible.Panel className="hfl-list">
+                                            <FriendsListGroupView
+                                                list={filteredOnlineFriends}
+                                                selectedFriendsIds={selectedFriendsIds}
+                                                selectFriend={selectFriend}
+                                            />
+                                        </Collapsible.Panel>
+                                    </Collapsible.Root>
+                                    <Collapsible.Root render={<section />} className="hfl-section" open={isOfflineExpanded} onOpenChange={setIsOfflineExpanded}>
+                                        <Collapsible.Trigger className={`hfl-section-header${isOfflineExpanded ? '' : ' collapsed'}`}>
                                             <span>{LocalizeText('friendlist.friends.offlinecaption') + ` (${filteredOfflineFriends.length})`}</span>
-                                        </BaseButton>
-                                        {isOfflineExpanded && (
-                                            <div className="hfl-list">
-                                                <FriendsListGroupView
-                                                    list={filteredOfflineFriends}
-                                                    selectedFriendsIds={selectedFriendsIds}
-                                                    selectFriend={selectFriend}
-                                                />
-                                            </div>
-                                        )}
-                                    </section>
+                                        </Collapsible.Trigger>
+                                        <Collapsible.Panel className="hfl-list">
+                                            <FriendsListGroupView
+                                                list={filteredOfflineFriends}
+                                                selectedFriendsIds={selectedFriendsIds}
+                                                selectFriend={selectFriend}
+                                            />
+                                        </Collapsible.Panel>
+                                    </Collapsible.Root>
                                 </>
                             )}
                         </div>

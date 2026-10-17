@@ -282,6 +282,33 @@ describe('FurniEditorEditView', () => {
         expect(screen.getByRole('button', { name: 'Save (1)' })).toBeEnabled();
     });
 
+    it('picks a registered type with a click and closes the list', () => {
+        renderView({ interactions: ['default', 'gate', 'teleport'] });
+
+        const picker = screen.getByLabelText('Interaction type');
+        fireEvent.focus(picker);
+        fireEvent.change(picker, { target: { value: 'tele' } });
+
+        const option = within(screen.getByRole('listbox')).getByRole('option', { name: 'teleport' });
+        fireEvent.pointerDown(option);
+        fireEvent.click(option);
+
+        expect(picker).toHaveValue('teleport');
+        expect(screen.queryByRole('listbox')).toBeNull();
+    });
+
+    it('closes the list on Escape without keeping the typed text', () => {
+        renderView({ item: { ...item, interactionType: 'gate' }, interactions: ['default', 'gate'] });
+
+        const picker = screen.getByLabelText('Interaction type');
+        fireEvent.focus(picker);
+        fireEvent.change(picker, { target: { value: 'xyz' } });
+        fireEvent.keyDown(picker, { key: 'Escape' });
+
+        expect(screen.queryByRole('listbox')).toBeNull();
+        expect(picker).toHaveValue('gate');
+    });
+
     it('offers what furnidata says about footprint and flags, one click each or all at once', () => {
         renderView({
             furniDataEntry: {

@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { FC, PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import {
@@ -58,7 +59,6 @@ import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
-import { BaseButton } from '../../../../common/BaseButton';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -122,13 +122,13 @@ const ProjectileSection: FC<PropsWithChildren<{ title: string; open: boolean; fi
     return (
         <>
             {!first && <div className="octane-wired__divider" />}
-            <div className="octane-wired__projectile-section">
-                <BaseButton aria-expanded={open} className="octane-wired__projectile-section-header" type="button" onClick={onToggle}>
+            <Collapsible.Root className="octane-wired__projectile-section" open={open} onOpenChange={() => onToggle()}>
+                <Collapsible.Trigger className="octane-wired__projectile-section-header">
                     <Text bold>{title}</Text>
                     {open ? <FaChevronUp className="octane-wired__projectile-chevron" /> : <FaChevronDown className="octane-wired__projectile-chevron" />}
-                </BaseButton>
-                {open && <div className="octane-wired__projectile-section-body">{children}</div>}
-            </div>
+                </Collapsible.Trigger>
+                <Collapsible.Panel className="octane-wired__projectile-section-body">{children}</Collapsible.Panel>
+            </Collapsible.Root>
         </>
     );
 };

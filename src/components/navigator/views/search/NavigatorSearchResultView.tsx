@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { NavigatorSearchResultList, NavigatorSearchSaveComposer } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText, localizeWithFallback, NavigatorSearchResultViewDisplayMode, SendMessageComposer } from '../../../../api';
@@ -71,18 +72,17 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     const eventTitle = isEventView(searchResult.code) || isEventView(parentCode);
 
     return (
-        <section className={`octane-navigator-air__category${isExtended ? '' : ' is-collapsed'}`}>
+        <Collapsible.Root
+            render={<section />}
+            className={`octane-navigator-air__category${isExtended ? '' : ' is-collapsed'}`}
+            open={isExtended}
+            onOpenChange={() => useNavigatorUiStore.getState().setResultCollapsed(searchResult.code, isExtended)}
+        >
             <header className="octane-navigator-air__category-header">
-                <BaseButton
-                    type="button"
-                    className="octane-navigator-air__category-toggle"
-                    aria-label={resultTitle}
-                    aria-expanded={isExtended}
-                    onClick={() => useNavigatorUiStore.getState().setResultCollapsed(searchResult.code, isExtended)}
-                >
+                <Collapsible.Trigger className="octane-navigator-air__category-toggle" aria-label={resultTitle}>
                     <img src={isExtended ? categoryCollapse : categoryExpand} alt="" />
                     <span>{resultTitle}</span>
-                </BaseButton>
+                </Collapsible.Trigger>
                 <div className="octane-navigator-air__category-controls">
                     {isExtended && displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
                         <BaseButton
@@ -124,8 +124,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                     )}
                 </div>
             </header>
-            {isExtended && (
-                <div className={isTileMode ? 'octane-navigator-air__tiles' : 'octane-navigator-air__rows'}>
+            <Collapsible.Panel className={isTileMode ? 'octane-navigator-air__tiles' : 'octane-navigator-air__rows'}>
                     {searchResult.rooms.map((room, index) => (
                         <NavigatorSearchResultItemView
                             key={room.roomId || index}
@@ -135,8 +134,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                             stripe={isTileMode ? Math.floor(index / 3) % 2 === 1 : index % 2 === 1}
                         />
                     ))}
-                </div>
-            )}
-        </section>
+            </Collapsible.Panel>
+        </Collapsible.Root>
     );
 };

@@ -1,3 +1,4 @@
+import { Progress } from '@base-ui/react/progress';
 import { FC, useEffect, useRef, useState } from 'react';
 
 type HabbiconProgressBarProps = {
@@ -78,10 +79,17 @@ export const HabbiconProgressBarView: FC<HabbiconProgressBarProps> = ({ complete
     const fillWidth = clipWidth >= width - 4 ? width : clipWidth + 4;
 
     return (
-        <div className={`habbicon-progress-bar habbicon-progress-bar-${variant}`} data-complete={ratio >= 1}>
+        // Root gives the bar its progressbar semantics; the clip / fill are drawn from the animated ratio, so they stay plain divs.
+        <Progress.Root
+            className={`habbicon-progress-bar habbicon-progress-bar-${variant}`}
+            data-complete={ratio >= 1}
+            max={Math.max(total, 1)}
+            min={0}
+            value={Math.max(0, Math.min(completed, Math.max(total, 1)))}
+        >
             <div className="habbicon-progress-clip" style={{ width: clipWidth }}>
                 <div className="habbicon-progress-fill" style={{ width: fillWidth }} />
             </div>
-        </div>
+        </Progress.Root>
     );
 };

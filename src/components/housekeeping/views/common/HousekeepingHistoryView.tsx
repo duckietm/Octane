@@ -1,10 +1,10 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { FC, useState } from 'react';
 import { FaHistory, FaInfoCircle, FaSync } from 'react-icons/fa';
 import { formatRelativePast, IHousekeepingActionLogEntry, localizeHousekeepingAction, LocalizeText } from '../../../../api';
 import { useHousekeepingStore } from '../../../../hooks';
 import { HousekeepingAuditEntryDetails } from './HousekeepingAuditEntryDetails';
 import { HousekeepingButton, HousekeepingEmptyState } from './HousekeepingParts';
-import { BaseButton } from '../../../../common/BaseButton';
 
 /**
  * Staff actions on one user or one room, read from the loaded action log.
@@ -28,9 +28,12 @@ export const HousekeepingHistoryView: FC<{ entries: IHousekeepingActionLogEntry[
             ) : (
                 <ul className="m-0 flex max-h-[260px] list-none flex-col gap-0.5 overflow-y-auto p-0 pr-1">
                     {entries.map((entry) => (
-                        <li
+                        <Collapsible.Root
                             key={entry.id}
+                            render={<li />}
                             className={`flex flex-col rounded border px-2 py-1 text-[11px] ${entry.success ? 'border-zinc-200 bg-white' : 'border-rose-200 bg-rose-50/60'}`}
+                            open={expandedId === entry.id}
+                            onOpenChange={(open) => setExpandedId(open ? entry.id : null)}
                         >
                             <div className="flex items-center gap-2">
                                 <span className="w-16 shrink-0 tabular-nums text-zinc-400">{formatRelativePast(entry.timestamp)}</span>
@@ -39,18 +42,17 @@ export const HousekeepingHistoryView: FC<{ entries: IHousekeepingActionLogEntry[
                                     {localizeHousekeepingAction(entry.action)}
                                 </span>
                                 <span className="grow truncate text-zinc-500">{entry.detail}</span>
-                                <BaseButton
-                                    aria-expanded={expandedId === entry.id}
+                                <Collapsible.Trigger
                                     className={`shrink-0 rounded p-0.5 transition-colors ${expandedId === entry.id ? 'bg-sky-100 text-sky-700' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700'}`}
                                     title={LocalizeText('housekeeping.audit.detail.toggle')}
-                                    type="button"
-                                    onClick={() => setExpandedId((current) => (current === entry.id ? null : entry.id))}
                                 >
                                     <FaInfoCircle size={11} />
-                                </BaseButton>
+                                </Collapsible.Trigger>
                             </div>
-                            {expandedId === entry.id && <HousekeepingAuditEntryDetails entry={entry} />}
-                        </li>
+                            <Collapsible.Panel>
+                                <HousekeepingAuditEntryDetails entry={entry} />
+                            </Collapsible.Panel>
+                        </Collapsible.Root>
                     ))}
                 </ul>
             )}

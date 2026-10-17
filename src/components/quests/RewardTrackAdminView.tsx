@@ -1,3 +1,4 @@
+import { Collapsible } from '@base-ui/react/collapsible';
 import { RewardTrackAdminPrize, RewardTrackAdminTask, RewardTrackAdminTrack } from '@octane/renderer';
 import { FC, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { localizeWithFallback, reorderRewardTrackEntries, RewardTrackFieldErrors, validateRewardTrackInput, validateRewardTrackPrizeInput, validateRewardTrackTaskInput } from '../../api';
@@ -196,12 +197,21 @@ const Panel: FC<{ title: ReactNode; summary?: ReactNode; actions?: ReactNode; ch
     const [collapsed, setCollapsed] = useState(!!collapseKey);
 
     return (
-        <section className={`octane-reward-track-admin-panel ${className}${collapsed ? ' is-collapsed' : ''}`.trim()}>
-            <header className={`octane-reward-track-admin-panel-head${collapseKey ? ' is-toggle' : ''}`} onClick={collapseKey ? () => setCollapsed((value) => !value) : undefined}>
+        <Collapsible.Root
+            render={<section />}
+            className={`octane-reward-track-admin-panel ${className}${collapsed ? ' is-collapsed' : ''}`.trim()}
+            open={!collapsed}
+            onOpenChange={(open) => setCollapsed(!open)}
+        >
+            <header
+                className={`octane-reward-track-admin-panel-head${collapseKey ? ' is-toggle' : ''}`}
+                // The whole head folds the panel; the chevron is the Collapsible trigger, so its own click is not counted twice.
+                onClick={collapseKey ? (event) => !(event.target as HTMLElement).closest('.octane-reward-track-admin-chevron') && setCollapsed((value) => !value) : undefined}
+            >
                 {collapseKey && (
-                    <BaseButton type="button" className="octane-reward-track-admin-chevron" aria-expanded={!collapsed} data-testid={`rt-admin-collapse-${collapseKey}`}>
+                    <Collapsible.Trigger className="octane-reward-track-admin-chevron" data-testid={`rt-admin-collapse-${collapseKey}`}>
                         {collapsed ? '▸' : '▾'}
-                    </BaseButton>
+                    </Collapsible.Trigger>
                 )}
                 <span className="octane-reward-track-admin-panel-title">{title}</span>
                 {collapsed && summary && <span className="octane-reward-track-admin-panel-summary">{summary}</span>}
@@ -211,8 +221,8 @@ const Panel: FC<{ title: ReactNode; summary?: ReactNode; actions?: ReactNode; ch
                     </span>
                 )}
             </header>
-            {!collapsed && children}
-        </section>
+            <Collapsible.Panel className="contents">{children}</Collapsible.Panel>
+        </Collapsible.Root>
     );
 };
 

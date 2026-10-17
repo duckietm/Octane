@@ -1,3 +1,4 @@
+import { Autocomplete } from '@base-ui/react/autocomplete';
 import {
     GetSessionDataManager,
     GiftReceiverNotFoundEvent,
@@ -6,7 +7,7 @@ import {
     PurchaseFromCatalogAsGiftComposer,
     SecurityLevel
 } from '@octane/renderer';
-import { ChangeEvent, CSSProperties, FC, KeyboardEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, FC, KeyboardEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ColorUtils,
     GetConfigurationValue,
@@ -70,7 +71,9 @@ export const CatalogGiftView: FC = () => {
     const [selectedColorId, setSelectedColorId] = useState(0);
     const [suggestions, setSuggestions] = useState<MessengerFriend[]>([]);
     const [isAutocompleteVisible, setIsAutocompleteVisible] = useState(false);
-    const [highlightedSuggestionIndex, setHighlightedSuggestionIndex] = useState(0);
+    // The row the arrow keys / pointer highlight; Enter takes it, otherwise the first suggestion.
+    const highlightedSuggestionRef = useRef<string | undefined>(undefined);
+    const suggestionsHostRef = useRef<HTMLDivElement>(null);
     const recipientInputRef = useRef<HTMLInputElement>(null);
     const messageInputRef = useRef<HTMLTextAreaElement>(null);
     const shouldFocusMessageRef = useRef(false);
@@ -121,7 +124,6 @@ export const CatalogGiftView: FC = () => {
         setSelectedColorId(0);
         setSuggestions([]);
         setIsAutocompleteVisible(false);
-        setHighlightedSuggestionIndex(0);
         shouldFocusMessageRef.current = false;
     }, []);
 
@@ -199,19 +201,16 @@ export const CatalogGiftView: FC = () => {
         setReceiverName(friendName);
         setSuggestions([]);
         setIsAutocompleteVisible(false);
-        setHighlightedSuggestionIndex(0);
         messageInputRef.current?.focus();
     }, []);
 
     const onReceiverChanged = useCallback(
-        (event: ChangeEvent<HTMLInputElement>) => {
-            const value = event.target.value;
+        (value: string) => {
             const nextSuggestions = filterGiftRecipients(allFriends, value);
 
             setReceiverName(value);
             setSuggestions(nextSuggestions);
             setIsAutocompleteVisible(nextSuggestions.length > 0);
-            setHighlightedSuggestionIndex(0);
         },
         [allFriends]
     );
@@ -229,33 +228,20 @@ export const CatalogGiftView: FC = () => {
                 if (nextSuggestions.length) {
                     event.preventDefault();
                     setSuggestions(nextSuggestions);
-                    setHighlightedSuggestionIndex(0);
                     setIsAutocompleteVisible(true);
                 }
 
                 return;
             }
 
-            if (!suggestions.length) return;
-
-            switch (event.key) {
-                case 'ArrowUp':
-                    event.preventDefault();
-                    setHighlightedSuggestionIndex((value) => wrapGiftSelectionIndex(value, -1, suggestions.length));
-                    return;
-                case 'ArrowDown':
-                    event.preventDefault();
-                    setHighlightedSuggestionIndex((value) => wrapGiftSelectionIndex(value, 1, suggestions.length));
-                    return;
-                case 'Enter':
-                    if (!isAutocompleteVisible) return;
-
-                    event.preventDefault();
-                    selectReceiverName(suggestions[highlightedSuggestionIndex]?.name ?? '');
-                    return;
+            // Arrow keys and Enter on a highlighted row belong to the Base UI list; Enter with
+            // nothing highlighted still takes the first suggestion, like before.
+            if (event.key === 'Enter' && isAutocompleteVisible && suggestions.length && highlightedSuggestionRef.current === undefined) {
+                event.preventDefault();
+                selectReceiverName(suggestions[0].name);
             }
         },
-        [allFriends, highlightedSuggestionIndex, isAutocompleteVisible, receiverName.length, selectReceiverName, suggestions]
+        [allFriends, isAutocompleteVisible, receiverName.length, selectReceiverName, suggestions]
     );
 
     const onBuyGift = useCallback(() => {
@@ -487,41 +473,51 @@ export const CatalogGiftView: FC = () => {
         <OctaneCardView classNames={['octane-catalog-gift']} frameStyle={3} isResizable={false} theme="primary-slim">
             <OctaneCardHeaderView headerText={LocalizeText('catalog.gift_wrapping.title')} onCloseClick={onClose} />
             <OctaneCardContentView classNames={['octane-catalog-gift-content']} overflow="hidden">
-                <div className="octane-catalog-gift-name-border">
-                    <input
-                        aria-label={LocalizeText('catalog.gift_wrapping_new.name_hint')}
-                        className="octane-catalog-gift-name-input"
-                        maxLength={32}
-                        placeholder={LocalizeText('catalog.gift_wrapping_new.name_hint')}
-                        ref={recipientInputRef}
-                        type="text"
-                        value={receiverName}
-                        onChange={onReceiverChanged}
-                        onKeyDown={onReceiverKeyDown}
-                        onMouseDown={() => setIsAutocompleteVisible(false)}
-                    />
-                </div>
-                <img alt="" className="octane-catalog-gift-pen" draggable={false} src={giftSmallPenImage} />
-
-                {isAutocompleteVisible && suggestions.length > 0 && (
-                    <div className="octane-catalog-gift-suggestions" role="listbox">
-                        {suggestions.map((friend, index) => (
-                            <div
-                                aria-selected={index === highlightedSuggestionIndex}
-                                className={index === highlightedSuggestionIndex ? 'is-highlighted' : ''}
-                                key={friend.id}
-                                role="option"
-                                onMouseDown={(event: MouseEvent<HTMLDivElement>) => {
-                                    event.preventDefault();
-                                    selectReceiverName(friend.name);
-                                }}
-                                onMouseEnter={() => setHighlightedSuggestionIndex(index)}
-                            >
-                                {renderSuggestionName(friend.name)}
-                            </div>
-                        ))}
+                <div ref={suggestionsHostRef} className="octane-catalog-gift-suggestions-host" />
+                <Autocomplete.Root
+                    filter={null}
+                    items={suggestions.map((friend) => friend.name)}
+                    mode="list"
+                    open={isAutocompleteVisible && suggestions.length > 0}
+                    value={receiverName}
+                    onItemHighlighted={(item) => {
+                        highlightedSuggestionRef.current = item;
+                    }}
+                    onOpenChange={(open) => {
+                        if (!open) setIsAutocompleteVisible(false);
+                    }}
+                    onValueChange={(next, details) => {
+                        if (details.reason === 'item-press') selectReceiverName(next);
+                        else onReceiverChanged(next);
+                    }}
+                >
+                    <div className="octane-catalog-gift-name-border">
+                        <Autocomplete.Input
+                            aria-label={LocalizeText('catalog.gift_wrapping_new.name_hint')}
+                            className="octane-catalog-gift-name-input"
+                            maxLength={32}
+                            placeholder={LocalizeText('catalog.gift_wrapping_new.name_hint')}
+                            ref={recipientInputRef}
+                            onKeyDown={onReceiverKeyDown}
+                            onMouseDown={() => setIsAutocompleteVisible(false)}
+                        />
                     </div>
-                )}
+                    <img alt="" className="octane-catalog-gift-pen" draggable={false} src={giftSmallPenImage} />
+
+                    <Autocomplete.Portal container={suggestionsHostRef}>
+                        <Autocomplete.Positioner className="octane-catalog-gift-suggestions-positioner">
+                            <Autocomplete.Popup>
+                                <Autocomplete.List className="octane-catalog-gift-suggestions">
+                                    {(name: string) => (
+                                        <Autocomplete.Item key={name} value={name}>
+                                            {renderSuggestionName(name)}
+                                        </Autocomplete.Item>
+                                    )}
+                                </Autocomplete.List>
+                            </Autocomplete.Popup>
+                        </Autocomplete.Positioner>
+                    </Autocomplete.Portal>
+                </Autocomplete.Root>
 
                 <img alt="" className="octane-catalog-gift-card" draggable={false} src={giftCardImage} />
                 <div className="octane-catalog-gift-avatar">
