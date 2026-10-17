@@ -136,7 +136,7 @@ describe('Messenger avatar heads', () => {
 
         expect(avatar).not.toBeNull();
         expect(avatar).toHaveClass('compact-head');
-        expect(avatar).toHaveStyle({ backgroundSize: '35px 35px', backgroundPosition: 'center' });
+        expect(avatar).toHaveStyle({ backgroundSize: '35px 35px', backgroundPosition: '50% 50%' });
     });
 
     it('uses the AIR avatar crop on the right side of incoming messages', () => {

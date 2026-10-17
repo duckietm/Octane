@@ -41,7 +41,7 @@ describe('Friends list compact avatar cascade', () => {
         expect(computed.width).toBe('20px');
         expect(computed.height).toBe('20px');
         expect(computed.backgroundSize).toBe('20px 20px');
-        expect(computed.backgroundPosition).toBe('center center');
+        expect(computed.backgroundPosition).toBe('50% 50%');
         expect(computed.imageRendering).toBe('auto');
     });
 });
