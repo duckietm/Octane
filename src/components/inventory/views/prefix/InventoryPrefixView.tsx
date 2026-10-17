@@ -5,6 +5,7 @@ import { ClassicScrollAreaView } from '../../../../common/scroll-area/ClassicScr
 import { useInventoryNickIcons, useInventoryPrefixes, useNotification } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
 
 type InventoryIdentityTab = 'prefixes' | 'icons';
 
@@ -112,20 +113,18 @@ export const InventoryPrefixView: FC<{}> = () => {
 
     return (
         <div className="octane-inventory-identity">
-            <div className="octane-inventory-identity-tabs" role="tablist">
+            <TabBar className="octane-inventory-identity-tabs" value={activeTab}>
                 {tabs.map((tab) => (
-                    <button
+                    <TabBarTab
                         key={tab.id}
-                        aria-selected={activeTab === tab.id}
                         className={`octane-inventory-identity-tab${activeTab === tab.id ? ' is-active' : ''}`}
-                        role="tab"
-                        type="button"
+                        value={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                     >
                         {tab.label}
-                    </button>
+                    </TabBarTab>
                 ))}
-            </div>
+            </TabBar>
 
             {activeTab === 'prefixes' &&
                 (prefixes.length === 0 ? (

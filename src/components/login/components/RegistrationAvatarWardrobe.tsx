@@ -9,6 +9,7 @@ import { LayoutAvatarImageView } from '../../../common';
 import { InfiniteGrid } from '../../../layout';
 import { AvatarEditorIcon } from '../../avatar-editor/AvatarEditorIcon';
 import { t } from '../utils/i18n';
+import { TabBar, TabBarTab } from '../../../common/TabBar';
 
 type GenderKey = 'M' | 'F';
 type FigureSelection = Record<string, { partId: number; colors: number[] }>;
@@ -177,26 +178,24 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
 
     return (
         <div className="registration-avatar-wardrobe">
-            <div className="registration-wardrobe-tabs" role="tablist" aria-label={t('nitro.login.register.wardrobe.categories', 'Clothing categories')}>
+            <TabBar className="registration-wardrobe-tabs" aria-label={t('nitro.login.register.wardrobe.categories', 'Clothing categories')} value={activeGroup.key}>
                 {WARDROBE_GROUPS.map((group) => {
                     const active = group.key === activeGroup.key;
                     const label = t(group.labelKey, group.fallback);
                     return (
-                        <button
+                        <TabBarTab
                             key={group.key}
-                            type="button"
+                            value={group.key}
                             className={active ? 'active' : ''}
-                            role="tab"
-                            aria-selected={active}
                             aria-label={label}
                             title={label}
                             onClick={() => selectGroup(group)}
                         >
                             <img src={group.icon} alt="" draggable={false} />
-                        </button>
+                        </TabBarTab>
                     );
                 })}
-            </div>
+            </TabBar>
 
             <div className="registration-wardrobe-main">
                 <div className="avatar-preview-panel registration-wardrobe-preview">
@@ -225,28 +224,26 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
                 </div>
 
                 <div className="registration-wardrobe-editor">
-                    <div className="registration-wardrobe-set-tabs" role="tablist" aria-label={t(activeGroup.labelKey, activeGroup.fallback)}>
+                    <TabBar className="registration-wardrobe-set-tabs" aria-label={t(activeGroup.labelKey, activeGroup.fallback)} value={activeSetType}>
                         {activeGroup.setTypes.length > 1 &&
                             activeGroup.setTypes.map((setType) => {
                                 const labelInfo = SET_TYPE_LABELS[setType];
                                 const label = t(labelInfo.key, labelInfo.fallback);
                                 const active = activeSetType === setType;
                                 return (
-                                    <button
+                                    <TabBarTab
                                         key={setType}
-                                        type="button"
+                                        value={setType}
                                         className={active ? 'active' : ''}
-                                        role="tab"
-                                        aria-selected={active}
                                         aria-label={label}
                                         title={label}
                                         onClick={() => setActiveSetType(setType)}
                                     >
                                         <AvatarEditorIcon icon={setType} selected={active} />
-                                    </button>
+                                    </TabBarTab>
                                 );
                             })}
-                    </div>
+                    </TabBar>
 
                     <div className="registration-wardrobe-section-title">{translatedSetTypeLabel}</div>
                     <div className="registration-wardrobe-parts">

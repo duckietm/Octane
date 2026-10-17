@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
 
 export interface HousekeepingSubTab<T extends string> {
     id: T;
@@ -23,25 +24,23 @@ export const HousekeepingSubTabs = <T extends string>({
     onChange: (id: T) => void;
     compact?: boolean;
 }) => (
-    <div className={`hk-segmented${compact ? ' hk-segmented--compact' : ''}`} role="tablist">
+    <TabBar className={`hk-segmented${compact ? ' hk-segmented--compact' : ''}`} value={active}>
         {tabs.map((tab) => {
             const isActive = tab.id === active;
 
             return (
-                <button
+                <TabBarTab
                     key={tab.id}
-                    aria-selected={isActive}
                     className={`hk-segmented__item${isActive ? ' is-active' : ''}`}
-                    role="tab"
                     title={tab.label}
-                    type="button"
+                    value={tab.id}
                     onClick={() => onChange(tab.id)}
                 >
                     {tab.icon}
                     <span className="truncate">{tab.label}</span>
                     {tab.count !== undefined && tab.count > 0 && <span className="hk-segmented__count">{tab.count}</span>}
-                </button>
+                </TabBarTab>
             );
         })}
-    </div>
+    </TabBar>
 );

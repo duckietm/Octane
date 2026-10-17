@@ -4,6 +4,7 @@ import { HabbiconFavorite, HabbiconHeaderPattern, HabbiconsLogo } from '../../..
 import { DraggableWindowPosition, LayoutCurrencyIcon, LayoutHabbiconImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { HabbiconProgressBarView } from './HabbiconProgressBarView';
 import { HabbiconPurchaseView } from './HabbiconPurchaseView';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
 
 export const HabbiconPrice: FC<{ priceCredits: number; priceActivityPoints: number; activityPointType: number }> = ({
     priceCredits,
@@ -134,23 +135,21 @@ export const HabbiconHubView: FC = () => {
                         </div>
                     </div>
 
-                    <div className="habbicon-hub-tabs" role="tablist">
+                    <TabBar className="habbicon-hub-tabs" value={tab}>
                         {['all_sets', 'owned', 'favourited'].map((value, index) => (
-                            <button
-                                role="tab"
-                                aria-selected={tab === value}
+                            <TabBarTab
                                 className={tab === value ? 'active' : ''}
-                                type="button"
                                 key={value}
+                                value={value}
                                 onClick={() => {
                                     setTab(value);
                                     setPopup(null);
                                 }}
                             >
                                 {localizeWithFallback(`habbicon_book.tab.${value}`, ['All sets', 'Owned', 'Favourited'][index])}
-                            </button>
+                            </TabBarTab>
                         ))}
-                    </div>
+                    </TabBar>
 
                     {(!catalog.loaded || catalog.assetError) && (
                         <div className="habbicon-hub-empty" role="status">

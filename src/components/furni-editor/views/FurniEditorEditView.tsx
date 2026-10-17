@@ -1,3 +1,4 @@
+import { Dialog } from '@base-ui/react/dialog';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CopyToClipboard } from '../../../api';
@@ -17,6 +18,7 @@ import {
     suggestInteractionType
 } from '../furniEditorSuggestions';
 import { NumberInput } from '../../../common/NumberInput';
+import { TabBar, TabBarTab } from '../../../common/TabBar';
 
 interface FurniEditorEditViewProps {
     item: FurniDetail;
@@ -375,22 +377,33 @@ const ConfirmModal: FC<ConfirmModalProps> = ({ title, confirmLabel, confirmVaria
     }, [onCancel]);
 
     return (
-        <div className="fixed inset-0 bg-[#00000080] flex items-center justify-center z-[60]" onClick={onCancel}>
-            <div role="dialog" aria-label={title} className="bg-[#ffffff] rounded-lg shadow-xl p-4 w-[340px]" onClick={(e) => e.stopPropagation()}>
-                <Text bold className="text-[14px] mb-2 block">
-                    {title}
-                </Text>
-                <div className="mb-3">{children}</div>
-                <Flex gap={1} justifyContent="end">
-                    <Button variant="secondary" onClick={onCancel}>
-                        Cancel
-                    </Button>
-                    <Button variant={confirmVariant} onClick={onConfirm}>
-                        {confirmLabel}
-                    </Button>
-                </Flex>
-            </div>
-        </div>
+        <Dialog.Root
+            open
+            onOpenChange={(open) => {
+                if (!open) onCancel();
+            }}
+        >
+            <Dialog.Portal>
+                <Dialog.Backdrop className="fixed inset-0 bg-[#00000080] z-[60]" />
+                <Dialog.Popup
+                    aria-label={title}
+                    className="fixed left-1/2 top-1/2 z-[61] -translate-x-1/2 -translate-y-1/2 bg-[#ffffff] rounded-lg shadow-xl p-4 w-[340px]"
+                >
+                    <Text bold className="text-[14px] mb-2 block">
+                        {title}
+                    </Text>
+                    <div className="mb-3">{children}</div>
+                    <Flex gap={1} justifyContent="end">
+                        <Button variant="secondary" onClick={onCancel}>
+                            Cancel
+                        </Button>
+                        <Button variant={confirmVariant} onClick={onConfirm}>
+                            {confirmLabel}
+                        </Button>
+                    </Flex>
+                </Dialog.Popup>
+            </Dialog.Portal>
+        </Dialog.Root>
     );
 };
 
@@ -1073,20 +1086,14 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
             {/* Field groups: one at a time, chips carry a dot when a group holds unsaved changes. */}
             <div className="min-h-0 flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                    <div
-                        className="inline-flex items-center gap-0.5 rounded-lg bg-slate-100 border border-slate-200 p-0.5"
-                        role="tablist"
-                        aria-label="Field groups"
-                    >
+                    <TabBar className="inline-flex items-center gap-0.5 rounded-lg bg-slate-100 border border-slate-200 p-0.5" aria-label="Field groups" value={group}>
                         {GROUPS.map(({ id, label }) => {
                             const changed = changedByGroup[id];
                             const invalid = invalidByGroup[id];
                             return (
-                                <button
+                                <TabBarTab
                                     key={id}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={group === id}
+                                    value={id}
                                     onClick={() => setGroup(id)}
                                     className={`relative inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-md transition ${group === id ? 'bg-[#ffffff] text-slate-800 font-semibold shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/60'}`}
                                 >
@@ -1097,10 +1104,10 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                             className={`w-1.5 h-1.5 rounded-full ring-2 ring-[#ffffff] ${invalid ? 'bg-[#ef4444]' : 'bg-[#f59e0b]'}`}
                                         />
                                     )}
-                                </button>
+                                </TabBarTab>
                             );
                         })}
-                    </div>
+                    </TabBar>
                     <input
                         list="furni-editor-fields"
                         value={jumpQuery}

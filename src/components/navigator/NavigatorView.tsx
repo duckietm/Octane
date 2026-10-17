@@ -38,6 +38,7 @@ import { NavigatorRoomInfoPopupView } from './views/search/NavigatorRoomInfoPopu
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
 import { NavigatorSearchSavesResultView } from './views/search/NavigatorSearchSavesResultView';
 import { NavigatorSearchView } from './views/search/NavigatorSearchView';
+import { TabBar, TabBarTab } from '../../common/TabBar';
 
 const persistNavigatorBounds = (element: HTMLElement | null) => {
     if (!element) return;
@@ -323,18 +324,20 @@ export const NavigatorView: FC<{}> = () => {
                         >
                             <img src={quicklinkAdd} alt="" width={18} height={18} />
                         </button>
-                        <div ref={tabsRef} className="octane-navigator-air__tabs" role="tablist">
+                        <TabBar
+                            ref={tabsRef}
+                            className="octane-navigator-air__tabs"
+                            value={isCreatorOpen ? null : ((currentTabCode ? currentTabCode : topLevelContext?.code) ?? null)}
+                        >
                             {topLevelContexts &&
                                 topLevelContexts.length > 0 &&
                                 topLevelContexts.map((context) => {
                                     const active = (currentTabCode ? currentTabCode === context.code : topLevelContext === context) && !isCreatorOpen;
 
                                     return (
-                                        <button
+                                        <TabBarTab
                                             key={context.code}
-                                            type="button"
-                                            role="tab"
-                                            aria-selected={active}
+                                            value={context.code}
                                             className={`octane-navigator-air__tab${active ? ' is-active' : ''}`}
                                             onClick={() => {
                                                 useNavigatorRoomInfoPopupStore.getState().hide();
@@ -342,10 +345,10 @@ export const NavigatorView: FC<{}> = () => {
                                             }}
                                         >
                                             <span className="octane-navigator-air__tab-label">{LocalizeText('navigator.toplevelview.' + context.code)}</span>
-                                        </button>
+                                        </TabBarTab>
                                     );
                                 })}
-                        </div>
+                        </TabBar>
                         <div className="octane-navigator-air__body">
                             {!isCreatorOpen && (
                                 <div className="octane-navigator-air__workspace">

@@ -9,6 +9,7 @@ import {
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CameraEditorTabs, CameraPicture, CameraPictureThumbnail, LocalizeText } from '../../../../api';
 import { OctaneCardView, Slider } from '../../../../common';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { CameraCenteredText, CameraNativeText } from '../CameraNativeText';
 import { CameraSkinButton } from '../CameraSkinButton';
 import { CameraWidgetEffectListView } from './effect-list';
@@ -253,21 +254,19 @@ export const CameraWidgetEditorView: FC<CameraWidgetEditorViewProps> = (props) =
                 <button aria-label={LocalizeText('generic.close')} className="octane-card-close-button" type="button" onClick={() => processAction('close')} />
             </div>
             <div className="octane-camera-editor__layout">
-                <div className="octane-camera-editor__effect-tabs" role="tablist">
+                <TabBar className="octane-camera-editor__effect-tabs" value={currentTab}>
                     {TABS.map((tab) => (
-                        <button
-                            type="button"
+                        <TabBarTab
                             key={tab}
-                            role="tab"
-                            aria-selected={currentTab === tab}
+                            value={tab}
                             className={`octane-camera-editor__effect-tab${currentTab === tab ? ' octane-camera-editor__effect-tab--active' : ''}`}
                             title={LocalizeText(`camera.effect.category.${tab}`)}
                             onClick={() => processAction('change_tab', tab)}
                         >
                             <i className={`octane-icon icon-camera-${tab}`} />
-                        </button>
+                        </TabBarTab>
                     ))}
-                </div>
+                </TabBar>
 
                 <div className="octane-camera-editor__effect-grid-frame has-classic-scrollbar">
                     <CameraWidgetEffectListView

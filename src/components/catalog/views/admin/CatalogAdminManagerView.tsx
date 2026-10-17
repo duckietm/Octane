@@ -37,6 +37,7 @@ import {
     resolveCatalogAdminPageDropPosition
 } from './CatalogAdminDraftTree';
 import { CatalogAdminOfferPriceView } from './CatalogAdminOfferPriceView';
+import { TabBar, TabBarTab } from '../../../../common/TabBar';
 
 type CatalogAdminOffer = Parameters<NonNullable<ReturnType<typeof useCatalogAdmin>>['setEditingOffer']>[0];
 type ManagerTab = 'catalog' | 'sql' | 'history';
@@ -693,13 +694,12 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                         <span>{catalogAdmin.lastError}</span>
                     </div>
                 )}
-                <div className="octane-catalog-admin-tabs" role="tablist" aria-label="Catalog Studio sections">
+                <TabBar className="octane-catalog-admin-tabs" aria-label="Catalog Studio sections" value={activeTab}>
                     {tabs.map((tab) => (
-                        <button
+                        <TabBarTab
                             key={tab.id}
                             id={`catalog-studio-tab-${tab.id}`}
-                            role="tab"
-                            aria-selected={activeTab === tab.id}
+                            value={tab.id}
                             aria-controls="catalog-studio-active-panel"
                             className={`octane-catalog-admin-tab ${activeTab === tab.id ? 'is-active' : ''}`}
                             onClick={() => setActiveTab(tab.id)}
@@ -707,9 +707,9 @@ export const CatalogAdminManagerView: FC<{}> = () => {
                             {tab.icon}
                             <span>{tab.label}</span>
                             {tab.count > 0 && <span className="octane-catalog-admin-tab-count">{tab.count}</span>}
-                        </button>
+                        </TabBarTab>
                     ))}
-                </div>
+                </TabBar>
 
                 <div id="catalog-studio-active-panel" className="octane-catalog-admin-panel" role="tabpanel" aria-labelledby={`catalog-studio-tab-${activeTab}`}>
                     {activeTab === 'catalog' && renderPagesTab()}
