@@ -6,6 +6,7 @@ import { useHousekeepingStore, useModTools } from '../../../../hooks';
 import { HousekeepingButton, HousekeepingEmptyState, HousekeepingPill, HousekeepingSection } from '../common/HousekeepingParts';
 import { HousekeepingTicketEscalationView } from './HousekeepingTicketEscalationView';
 import { HousekeepingTicketReplyView } from './HousekeepingTicketReplyView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type TicketGroup = 'open' | 'mine' | 'others';
 
@@ -27,15 +28,15 @@ const TicketCard: FC<{ ticket: IssueMessageData; group: TicketGroup; onOpenUser:
                 )}
             </div>
             <div className="flex flex-wrap items-center gap-2 text-zinc-600">
-                <button className="flex items-center gap-1 hover:text-sky-700" type="button" onClick={() => onOpenUser(ticket.reporterUserId)}>
+                <BaseButton className="flex items-center gap-1 hover:text-sky-700" type="button" onClick={() => onOpenUser(ticket.reporterUserId)}>
                     <FaUser size={8} />
                     {LocalizeText('housekeeping.support.reporter')}: <span className="font-semibold">{ticket.reporterUserName}</span>
-                </button>
+                </BaseButton>
                 {ticket.reportedUserId > 0 && (
-                    <button className="flex items-center gap-1 hover:text-rose-700" type="button" onClick={() => onOpenUser(ticket.reportedUserId)}>
+                    <BaseButton className="flex items-center gap-1 hover:text-rose-700" type="button" onClick={() => onOpenUser(ticket.reportedUserId)}>
                         <FaUser size={8} />
                         {LocalizeText('housekeeping.support.reported')}: <span className="font-semibold">{ticket.reportedUserName}</span>
-                    </button>
+                    </BaseButton>
                 )}
             </div>
             {ticket.message && <p className="m-0 whitespace-pre-wrap break-words rounded bg-zinc-50 px-1.5 py-1 text-zinc-800">{ticket.message}</p>}

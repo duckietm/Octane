@@ -7,6 +7,7 @@ import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const ENTITY_HABBO = 1;
 const ENTITY_PET = 2;
@@ -72,9 +73,9 @@ export const WiredConditionTriggererMatchView: FC<WiredConditionTriggererMatchVi
             footerCollapsible={false}
             footer={
                 <div className="flex flex-col gap-2">
-                    <button className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
                         {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </button>
+                    </BaseButton>
                     {showAdvanced && (
                         <>
                             <div className="flex flex-col gap-1">

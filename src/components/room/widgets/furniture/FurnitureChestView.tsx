@@ -42,6 +42,7 @@ import { FurniChestSearchBar } from './FurniChestSearchBar';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ChestEntry {
     currencyType: number;
@@ -486,7 +487,7 @@ export const FurnitureChestView: FC = () => {
                         </Text>
                         <div style={{ position: 'absolute', top: 7, right: 9, display: 'flex', gap: 5 }}>
                             {/* notification_settings_button 24x24, icon wired_chests_bell_icon 12x15 */}
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="flex items-center justify-center cursor-pointer shrink-0"
                                 style={{ width: 24, height: 24, background: '#f1f0ee', border: '1px solid #cfcabc', borderRadius: 4, padding: 0 }}
@@ -494,9 +495,9 @@ export const FurnitureChestView: FC = () => {
                                 title={LocalizeText('wiredchests.notifications.button')}
                             >
                                 <img src={bellIcon} width={12} height={15} alt="" draggable={false} style={{ imageRendering: PIXEL_ART_RENDERING }} />
-                            </button>
+                            </BaseButton>
                             {/* settings_button 24x24, icon wired_chests_gear_icon 14x14 */}
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="flex items-center justify-center cursor-pointer shrink-0"
                                 style={{ width: 24, height: 24, background: '#f1f0ee', border: '1px solid #cfcabc', borderRadius: 4, padding: 0 }}
@@ -504,7 +505,7 @@ export const FurnitureChestView: FC = () => {
                                 title={LocalizeText('wiredchests.settings.button')}
                             >
                                 <img src={gearIcon} width={14} height={14} alt="" draggable={false} style={{ imageRendering: PIXEL_ART_RENDERING }} />
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
                     {/* ===== FURNI CHEST body (furni_chest_contents.xml) ===== */}
@@ -652,14 +653,14 @@ export const FurnitureChestView: FC = () => {
                                     'Lock the chest automatically when the owner leaves the room',
                                 )}</Text>
                             </label>
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="octane-chest__info-button"
                                 title={localizeWithFallback('wiredchests.lock_info.title', 'About locking')}
                                 onClick={() => setShowLockInfo((v) => !v)}
                             >
                                 i
-                            </button>
+                            </BaseButton>
                         </div>
                         <Flex alignItems="center" justifyContent="between" className="octane-chest__footer-capacity">
                             <Flex alignItems="center" gap={1}>

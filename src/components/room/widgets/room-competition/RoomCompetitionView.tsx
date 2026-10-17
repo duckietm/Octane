@@ -10,6 +10,7 @@ import {
 import { FC, useState } from 'react';
 import { localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { useMessageEvent, useRoom } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type CompetitionMode = 'submit' | 'vote';
 
@@ -144,13 +145,13 @@ export const RoomCompetitionView: FC = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <button
+                            <BaseButton
                                 className="mt-1 underline bg-transparent border-0 p-0 text-white cursor-pointer text-[11px]"
                                 type="button"
                                 onClick={() => SendMessageComposer(new SubmitRoomToCompetitionMessageComposer(state.goalCode, 0))}
                             >
                                 {localizeWithFallback('generic.refresh', 'Refresh')}
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     {state.mode === 'vote' && state.canVote && (
@@ -159,18 +160,18 @@ export const RoomCompetitionView: FC = () => {
                         </div>
                     )}
                 </div>
-                <button className="bg-transparent border-0 text-white opacity-70 hover:opacity-100 cursor-pointer" type="button" aria-label={localizeWithFallback('generic.close', 'Close')} onClick={() => close(false)}>
+                <BaseButton className="bg-transparent border-0 text-white opacity-70 hover:opacity-100 cursor-pointer" type="button" aria-label={localizeWithFallback('generic.close', 'Close')} onClick={() => close(false)}>
                     ✕
-                </button>
+                </BaseButton>
             </div>
             <div className="flex items-center justify-between mt-2 gap-2">
-                <button className="bg-transparent border-0 p-0 text-[11px] underline text-white opacity-70 hover:opacity-100 cursor-pointer" type="button" onClick={() => close(true)}>
+                <BaseButton className="bg-transparent border-0 p-0 text-[11px] underline text-white opacity-70 hover:opacity-100 cursor-pointer" type="button" onClick={() => close(true)}>
                     {localizeWithFallback('roomcompetition.dontshowagain.dontshow', 'Don\'t show me this again today')}
-                </button>
+                </BaseButton>
                 {showButton && (
-                    <button className="rounded bg-[#3c8a1e] hover:bg-[#4aa526] px-3 py-1 text-[12px] font-bold text-white border-0 cursor-pointer" type="button" onClick={onAction}>
+                    <BaseButton className="rounded bg-[#3c8a1e] hover:bg-[#4aa526] px-3 py-1 text-[12px] font-bold text-white border-0 cursor-pointer" type="button" onClick={onAction}>
                         {buttonText}
-                    </button>
+                    </BaseButton>
                 )}
             </div>
         </div>

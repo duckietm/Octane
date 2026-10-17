@@ -7,6 +7,7 @@ import { LocalizeText, localizeWithFallback } from '../../api';
 import { DraggableWindow, DraggableWindowPosition, LayoutImage } from '../../common';
 import { RadioStation, useRadio } from '../../hooks';
 import { Slider } from '../../common/Slider';
+import { BaseButton } from '../../common/BaseButton';
 
 export const RadioView: FC<{}> = () => {
     const { stations, currentId, isPlaying, volume, loadError, play, stop, setVolume } = useRadio();
@@ -71,20 +72,20 @@ export const RadioView: FC<{}> = () => {
                     >
                         {collapsed ? <FaChevronDown className="text-[9px]" /> : <FaChevronUp className="text-[9px]" />}
                     </Collapsible.Trigger>
-                    <button
+                    <BaseButton
                         type="button"
                         onClick={onClose}
                         title={localizeWithFallback('radio.close', 'Close')}
                         className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-white/8 text-white/60 transition-colors hover:bg-white/15 hover:text-white"
                     >
                         <FaTimes className="text-[9px]" />
-                    </button>
+                    </BaseButton>
                 </div>
 
                 <Collapsible.Panel>
                     <Collapsible.Root open={open} onOpenChange={setOpen} className="contents">
                         <div className="flex items-center gap-2.5 px-3 py-2.5">
-                            <button
+                            <BaseButton
                                 type="button"
                                 onClick={onPlayToggle}
                                 disabled={!selected}
@@ -92,7 +93,7 @@ export const RadioView: FC<{}> = () => {
                                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-xs text-white shadow-inner transition-all hover:bg-emerald-400 disabled:opacity-40"
                             >
                                 {selectedPlaying ? <FaStop /> : <FaPlay className="translate-x-px" />}
-                            </button>
+                            </BaseButton>
                             <div className="min-w-0 grow">
                                 <div className="truncate text-sm font-bold leading-tight">{selected ? selected.name : LocalizeText('radio.title')}</div>
                                 <div className="mt-0.5 flex items-center gap-1.5">

@@ -6,6 +6,7 @@ import searchCloseIcon from '../../../../assets/images/navigator/air/search-clos
 import searchPenIcon from '../../../../assets/images/navigator/air/search-pen.png';
 import { useNavigatorData, useNavigatorUiStore } from '../../../../hooks';
 import { NavigatorFilterChipsView } from './NavigatorFilterChipsView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface NavigatorSearchViewProps {
     searchResult: NavigatorSearchResultSet | null;
@@ -81,19 +82,19 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
                     value={inputText}
                     onChange={(event) => setInputText(event.target.value)}
                 />
-                <button
+                <BaseButton
                     type={hasQuery ? 'button' : 'submit'}
                     className="octane-navigator-air__search-clear"
                     aria-label={hasQuery ? LocalizeText('generic.clear') : placeholder}
                     onClick={hasQuery ? clearSearch : undefined}
                 >
                     <img src={hasQuery ? searchCloseIcon : searchPenIcon} alt="" />
-                </button>
+                </BaseButton>
             </div>
             {hasQuery && (
-                <button type="button" className="octane-navigator-air__search-refresh" aria-label={LocalizeText('generic.refresh')} onClick={refreshSearch}>
+                <BaseButton type="button" className="octane-navigator-air__search-refresh" aria-label={LocalizeText('generic.refresh')} onClick={refreshSearch}>
                     <img src={refreshIcon} alt="" />
-                </button>
+                </BaseButton>
             )}
         </form>
     );

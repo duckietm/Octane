@@ -19,6 +19,7 @@ import { useMessageEvent, useRoomUserListSnapshot } from '../../../../hooks';
 import { ModToolsUserModActionView } from './ModToolsUserModActionView';
 import { ModToolsUserRoomVisitsView } from './ModToolsUserRoomVisitsView';
 import { ModToolsUserSendMessageView } from './ModToolsUserSendMessageView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ModToolsUserViewProps {
     userId: number;
@@ -169,13 +170,13 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = (props) => {
                             <span className={`inline-block w-2 h-2 rounded-full ${presenceDotClass}`} />
                             {presenceLabel}
                         </span>
-                        <button
+                        <BaseButton
                             className="octane-mod-tools-refresh"
                             onClick={refresh}
                             title={LocalizeText('modtools.userinfo.refresh')}
                         >
                             {LocalizeText('modtools.userinfo.refresh')}
-                        </button>
+                        </BaseButton>
                     </div>
 
                     {/* Moderation stat strip */}

@@ -13,6 +13,7 @@ import {
 } from '../../api/badges';
 import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useNotification } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const t = (key: string, fallback: string, params?: string[], replacements?: string[]): string => {
     try {
@@ -529,7 +530,7 @@ export const BadgeCreatorView: FC<{}> = () => {
                                     const isTransparent = color === TRANSPARENT;
                                     const isSelected = color === selectedColor;
                                     return (
-                                        <button
+                                        <BaseButton
                                             key={idx}
                                             type="button"
                                             onClick={() => {
@@ -552,7 +553,7 @@ export const BadgeCreatorView: FC<{}> = () => {
                                 })}
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
-                                <button
+                                <BaseButton
                                     type="button"
                                     onClick={openColorPicker}
                                     title={t('badgecreator.color.custom', 'Pick a custom colour')}
@@ -584,7 +585,7 @@ export const BadgeCreatorView: FC<{}> = () => {
                                             strokeWidth="1.2"
                                         />
                                     </svg>
-                                </button>
+                                </BaseButton>
                                 <div
                                     onClick={openColorPicker}
                                     title={argbToHex(selectedColor)}

@@ -20,6 +20,7 @@ import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSec
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 
@@ -290,7 +291,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
-                            <button
+                            <BaseButton
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
@@ -298,7 +299,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                                 onClick={() => handleTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>

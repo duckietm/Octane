@@ -1,6 +1,7 @@
 import wiredMonitorImage from '../../assets/images/wiredtools/wired_monitor.png';
 import { Button, Text } from '../../common';
 import { MonitorLog, MonitorLogDetails, MonitorStat } from './WiredCreatorTools.types';
+import { BaseButton } from '../../common/BaseButton';
 
 export interface WiredMonitorTabViewProps {
     monitorStats: MonitorStat[];
@@ -35,13 +36,13 @@ export const WiredMonitorTabView = (props: WiredMonitorTabViewProps) => {
                 <div className="bg-white rounded border border-[#b9b3a5] p-2 flex flex-col gap-1">
                     <div className="flex items-center justify-between gap-2">
                         <Text bold>Statistics:</Text>
-                        <button
+                        <BaseButton
                             className="rounded border border-[#7f7f7f] bg-[#ece9e1] px-2 py-[2px] text-[11px] text-[#333] hover:bg-[#e3ded2]"
                             type="button"
                             onClick={onOpenMonitorInfo}
                         >
                             Info
-                        </button>
+                        </BaseButton>
                     </div>
                     {monitorStats.map((stat) => (
                         <div key={stat.label} className="flex justify-between gap-2 text-[12px]">

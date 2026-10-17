@@ -1,6 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { LocalizeText, SearchFilterOptions } from '../../../../api';
 import dropmenuArrow from '../../../../assets/images/habbo-skin/slices/dropmenu-default-arrow.png';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface NavigatorFilterChipsViewProps {
     value: number;
@@ -34,7 +35,7 @@ export const NavigatorFilterChipsView: FC<NavigatorFilterChipsViewProps> = (prop
 
     return (
         <div ref={rootRef} className={`octane-navigator-air__filter${open ? ' is-open' : ''}`}>
-            <button
+            <BaseButton
                 type="button"
                 className="octane-navigator-air__filter-button"
                 aria-haspopup="listbox"
@@ -44,12 +45,12 @@ export const NavigatorFilterChipsView: FC<NavigatorFilterChipsViewProps> = (prop
             >
                 <span>{LocalizeText('navigator.filter.' + current.name)}</span>
                 <img src={dropmenuArrow} alt="" width={16} height={16} />
-            </button>
+            </BaseButton>
             {open && (
                 <ul className="octane-navigator-air__filter-list" role="listbox">
                     {SearchFilterOptions.map((filter, index) => (
                         <li key={filter.name}>
-                            <button
+                            <BaseButton
                                 type="button"
                                 role="option"
                                 aria-selected={index === value}
@@ -60,7 +61,7 @@ export const NavigatorFilterChipsView: FC<NavigatorFilterChipsViewProps> = (prop
                                 }}
                             >
                                 {LocalizeText('navigator.filter.' + filter.name)}
-                            </button>
+                            </BaseButton>
                         </li>
                     ))}
                 </ul>

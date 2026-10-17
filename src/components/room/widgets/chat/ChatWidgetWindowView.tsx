@@ -5,6 +5,7 @@ import { DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, O
 import { useChatHistory, useChatWindow, useOnClickChat } from '../../../../hooks';
 import { useRoom } from '../../../../hooks/rooms';
 import { Checkbox } from '../../../../common/Checkbox';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const BOTTOM_SCROLL_THRESHOLD = 20;
 
@@ -102,14 +103,14 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                         <Checkbox checked={hideAvatars} onCheckedChange={(nextChecked) => setHideAvatars(nextChecked)} />
                         <span>{LocalizeText('widget.room.chat.hide_avatars')}</span>
                     </label>
-                    <button
+                    <BaseButton
                         className="ml-auto px-1 py-0.5 rounded border border-black/30 bg-white/70 text-[11px] text-black hover:bg-white"
                         onClick={() => setHideBalloons((value) => !value)}
                         type="button"
                     >
                         {hideBalloons ? LocalizeText('widget.room.chat.show_balloon') : LocalizeText('widget.room.chat.hide_balloon')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         className="px-1 py-0.5 rounded border border-black/30 bg-white/70 text-[11px] text-black hover:bg-white"
                         onClick={() => {
                             if (clearChatHistory) clearChatHistory();
@@ -117,7 +118,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                         type="button"
                     >
                         {LocalizeText('widget.room.chat.clear_history')}
-                    </button>
+                    </BaseButton>
                     <div>
                         <input
                             className="h-[20px] px-1 rounded border border-black/30 bg-white/70 text-[11px] text-black"
@@ -234,7 +235,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                     })}
                 </div>
                 {!isAutoScrollEnabled && (
-                    <button
+                    <BaseButton
                         className="absolute bottom-2 right-2 px-2 py-1 text-white text-[11px] rounded bg-black/45 hover:bg-black/60"
                         onClick={() => {
                             setIsAutoScrollEnabled(true);
@@ -243,7 +244,7 @@ export const ChatWidgetWindowView: FC<{}> = () => {
                         type="button"
                     >
                         Go to latest message
-                    </button>
+                    </BaseButton>
                 )}
             </OctaneCardContentView>
         </OctaneCardView>

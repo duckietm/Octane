@@ -14,6 +14,7 @@ import { BottomDockLayout, resolveBottomDockLayout } from './bottomDockLayout';
 import { ToolbarItemView } from './ToolbarItemView';
 import { ToolbarMeView } from './ToolbarMeView';
 import { YouTubePlayerView } from './YouTubePlayerView';
+import { BaseButton } from '../../common/BaseButton';
 
 const containerVariants: Variants = {
     hidden: { transition: { staggerChildren: 0.015, staggerDirection: -1 } },
@@ -366,13 +367,13 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 variants={ leftNavVariants }
                 transition={ NAV_TRANSITION }
                 className={ `tb-nav-clip absolute bottom-0 left-0 z-[71] h-[46px] ${ railMaxWidthClass } items-center ${ desktopFlexClasses }` }>
-                <button
+                <BaseButton
                     type="button"
                     onClick={ () => setLeftCollapsed(value => !value) }
                     aria-label={ localizeWithFallback('toolbar.icons.toggle', 'Show/hide icons') }
                     className="tb-collapse pointer-events-auto">
                     <img src={ leftCollapsed ? collapseRightImg : collapseLeftImg } alt="" />
-                </button>
+                </BaseButton>
                 <motion.div
                     variants={ containerVariants }
                     className="tb-open-shell flex h-[46px] max-w-full items-start overflow-visible bg-transparent">
@@ -507,13 +508,13 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     <div className={ `h-full shrink-0 ${ desktopBlockClasses }` } id="toolbar-friend-bar-container-desktop" />
                     </>) }
                 </motion.div>
-                <button
+                <BaseButton
                     type="button"
                     onClick={ () => setRightCollapsed(value => !value) }
                     aria-label={ localizeWithFallback('toolbar.icons.toggle', 'Show/hide icons') }
                     className="tb-collapse pointer-events-auto">
                     <img src={ rightCollapsed ? collapseLeftImg : collapseRightImg } alt="" />
-                </button>
+                </BaseButton>
             </motion.div>
             <motion.div
                 initial="visible"

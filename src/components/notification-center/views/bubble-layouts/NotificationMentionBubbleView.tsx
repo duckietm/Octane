@@ -5,6 +5,7 @@ import mentionIcon from '../../../../assets/images/mentions/mentions-16.png';
 import { LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps } from '../../../../common';
 import { useUserDataSnapshot } from '../../../../hooks/session/useSessionSnapshots';
 import { MentionMessageView } from '../../../mentions/MentionMessageView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export interface NotificationMentionBubbleViewProps extends LayoutNotificationBubbleViewProps {
     item: MentionNotificationBubbleItem;
@@ -43,10 +44,10 @@ export const NotificationMentionBubbleView: FC<NotificationMentionBubbleViewProp
                 </div>
             </div>
             <div className="octane-mention-notification__actions">
-                <button className="octane-mention-notification__later" type="button" onClick={() => onClose()}>
+                <BaseButton className="octane-mention-notification__later" type="button" onClick={() => onClose()}>
                     {LocalizeText('notifications.button.later')}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="octane-mention-notification__button"
                     type="button"
                     onClick={() => {
@@ -55,7 +56,7 @@ export const NotificationMentionBubbleView: FC<NotificationMentionBubbleViewProp
                     }}
                 >
                     {LocalizeText('mentions.window.title')}
-                </button>
+                </BaseButton>
             </div>
         </LayoutNotificationBubbleView>
     );

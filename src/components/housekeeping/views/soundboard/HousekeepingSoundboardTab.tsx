@@ -14,6 +14,7 @@ import { resolveSoundboardSoundUrl } from '../../../../hooks/soundboard/soundboa
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true, cooldownSeconds: 0 };
 const RESULT_KEYS = [
@@ -211,30 +212,30 @@ export const HousekeepingSoundboardTab: FC = () => {
                     </div>
                 )}
                 <div className="col-span-2 flex flex-wrap justify-end gap-1.5">
-                    <button
+                    <BaseButton
                         type="button"
                         disabled={draftLocked}
                         onClick={() => setDraft({ ...EMPTY_DRAFT })}
                         className="rounded bg-zinc-200 px-2 py-1 text-xs font-semibold disabled:opacity-40"
                     >
                         {LocalizeText('housekeeping.soundboard.create')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         type="button"
                         disabled={!validation.valid}
                         onClick={() => preview(draft)}
                         className="rounded bg-sky-600 px-2 py-1 text-xs font-semibold text-white disabled:opacity-40"
                     >
                         {LocalizeText('housekeeping.soundboard.preview')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         type="button"
                         disabled={!validation.valid || pendingOperation !== null}
                         onClick={() => upsert(draft)}
                         className="rounded bg-emerald-600 px-2 py-1 text-xs font-semibold text-white disabled:opacity-40"
                     >
                         {LocalizeText('housekeeping.soundboard.save')}
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
 
@@ -268,15 +269,15 @@ export const HousekeepingSoundboardTab: FC = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
-                                <button
+                                <BaseButton
                                     type="button"
                                     aria-label={`${LocalizeText('housekeeping.soundboard.preview')} ${sound.name}`}
                                     onClick={() => preview(sound)}
                                     className="rounded bg-sky-100 px-1.5 py-1 text-[10px]"
                                 >
                                     ▶
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     type="button"
                                     disabled={draftLocked}
                                     aria-label={`${LocalizeText('housekeeping.soundboard.edit')} ${sound.name}`}
@@ -284,8 +285,8 @@ export const HousekeepingSoundboardTab: FC = () => {
                                     className="rounded bg-zinc-200 px-1.5 py-1 text-[10px] disabled:opacity-40"
                                 >
                                     {LocalizeText('housekeeping.soundboard.edit')}
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     type="button"
                                     disabled={draftLocked}
                                     aria-label={`${LocalizeText(sound.enabled ? 'housekeeping.soundboard.disable' : 'housekeeping.soundboard.enable')} ${sound.name}`}
@@ -293,8 +294,8 @@ export const HousekeepingSoundboardTab: FC = () => {
                                     className="rounded bg-zinc-100 px-1.5 py-1 text-[10px] disabled:opacity-40"
                                 >
                                     {sound.enabled ? '⏻' : '○'}
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     type="button"
                                     disabled={orderIndex <= 0}
                                     aria-label={`${LocalizeText('housekeeping.soundboard.move_up')} ${sound.name}`}
@@ -302,8 +303,8 @@ export const HousekeepingSoundboardTab: FC = () => {
                                     className="rounded bg-zinc-100 px-1.5 py-1 text-[10px] disabled:opacity-30"
                                 >
                                     ↑
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     type="button"
                                     disabled={orderIndex < 0 || orderIndex >= orderedIds.length - 1}
                                     aria-label={`${LocalizeText('housekeeping.soundboard.move_down')} ${sound.name}`}
@@ -311,7 +312,7 @@ export const HousekeepingSoundboardTab: FC = () => {
                                     className="rounded bg-zinc-100 px-1.5 py-1 text-[10px] disabled:opacity-30"
                                 >
                                     ↓
-                                </button>
+                                </BaseButton>
                             </div>
                         </div>
                     );
@@ -320,14 +321,14 @@ export const HousekeepingSoundboardTab: FC = () => {
 
             <div className="flex items-center justify-end gap-2">
                 {orderChanged && <span className="text-[10px] text-amber-700">{LocalizeText('housekeeping.soundboard.order_changed')}</span>}
-                <button
+                <BaseButton
                     type="button"
                     disabled={!orderChanged || pendingOperation !== null}
                     onClick={() => reorder(orderedIds)}
                     className="rounded bg-violet-600 px-2.5 py-1 text-xs font-semibold text-white disabled:opacity-40"
                 >
                     {LocalizeText('housekeeping.soundboard.save_order')}
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

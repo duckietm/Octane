@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, DetailedHTMLProps, PropsWithChildren, Ref } from 'react';
 import { classNames } from './classNames';
+import { BaseButton } from '../common/BaseButton';
 
 const classes = {
     base: 'inline-flex justify-center items-center gap-2 rounded-none font-bold text-[11px] leading-tight cursor-pointer select-none',
@@ -43,7 +44,7 @@ export const OctaneButton = ({
           : classes.variant[color in classes.variant ? color : 'default'];
 
     return (
-        <button
+        <BaseButton
             ref={ref}
             className={classNames(
                 classes.base,

@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren, ReactNode } from 'react';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 /**
  * Small building blocks shared by the housekeeping tabs, so every tab uses the
@@ -141,7 +142,7 @@ export const HousekeepingButton: FC<
         onClick?: () => void;
     }>
 > = ({ variant = 'primary', size = 'md', disabled = false, title, classNames = [], type = 'button', onClick, children }) => (
-    <button
+    <BaseButton
         className={['hk-btn', BUTTON_TONES[variant], size === 'sm' ? 'hk-btn--sm' : '', ...classNames].filter(Boolean).join(' ')}
         disabled={disabled}
         title={title}
@@ -149,5 +150,5 @@ export const HousekeepingButton: FC<
         onClick={onClick}
     >
         {children}
-    </button>
+    </BaseButton>
 );

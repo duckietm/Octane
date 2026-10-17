@@ -6,6 +6,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const MODE_LINEAR = 1;
 const MODE_EXPONENTIAL = 2;
@@ -343,10 +344,10 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 260 }}>
             <div className="octane-wired__levelup">
                 <div className="octane-wired__levelup-section">
-                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsModeSectionOpen((value) => !value)}>
+                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsModeSectionOpen((value) => !value)}>
                         <Text bold>{LocalizeText('wiredfurni.params.levelup.mode')}</Text>
                         <span className={`octane-wired__levelup-chevron ${isModeSectionOpen ? 'is-open' : ''}`}>^</span>
-                    </button>
+                    </BaseButton>
 
                     {isModeSectionOpen && (
                         <div className="octane-wired__levelup-section-body">
@@ -443,10 +444,10 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                 <div className="octane-wired__divider" />
 
                 <div className="octane-wired__levelup-section">
-                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsPreviewSectionOpen((value) => !value)}>
+                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsPreviewSectionOpen((value) => !value)}>
                         <Text bold>{LocalizeText('wiredfurni.params.levelup.preview')}</Text>
                         <span className={`octane-wired__levelup-chevron ${isPreviewSectionOpen ? 'is-open' : ''}`}>^</span>
-                    </button>
+                    </BaseButton>
 
                     {isPreviewSectionOpen && (
                         <div className="octane-wired__levelup-preview">
@@ -467,10 +468,10 @@ export const WiredExtraVariableLevelUpSystemView: FC<{}> = () => {
                 <div className="octane-wired__divider" />
 
                 <div className="octane-wired__levelup-section">
-                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsSubvariablesSectionOpen((value) => !value)}>
+                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsSubvariablesSectionOpen((value) => !value)}>
                         <Text bold>{LocalizeText('wiredfurni.params.create_subvariables')}</Text>
                         <span className={`octane-wired__levelup-chevron ${isSubvariablesSectionOpen ? 'is-open' : ''}`}>^</span>
-                    </button>
+                    </BaseButton>
 
                     {isSubvariablesSectionOpen && (
                         <div className="octane-wired__levelup-subvariables">

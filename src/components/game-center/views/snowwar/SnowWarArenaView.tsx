@@ -44,6 +44,7 @@ import {
     SnowWarEditorTile,
 } from './SnowWarEditorTools';
 import { Checkbox } from '../../../../common/Checkbox';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -1649,18 +1650,18 @@ export const SnowWarArenaView: FC = () =>
                             aria-label={localizeWithFallback('snowwar.editor.name', 'Arena name')}
                             onChange={event => setEditorArenaName(event.target.value)}
                         />
-                        <button type="button" className="snowwar-button" onClick={() => saveEditor()}>
+                        <BaseButton type="button" className="snowwar-button" onClick={() => saveEditor()}>
                             {localizeWithFallback('snowwar.editor.publish', 'Publish arena')}
-                        </button>
-                        <button type="button" className="snowwar-button snowwar-button--danger" onClick={() => stopEditing()}>
+                        </BaseButton>
+                        <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => stopEditing()}>
                             {localizeWithFallback('snowwar.editor.exit', 'Exit editor')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
             ) : (
                 <div className="snowwar-official-hud">
                     {/* AIR snowwar_exit: the ui_exit_up / ui_exit_down bitmap button, no caption. */}
-                    <button
+                    <BaseButton
                         aria-label={localizeWithFallback('snowwar.exit.title', 'Leave game?')}
                         className="snowwar-official-hud__quit"
                         style={{ '--exit-up': `url(${getHudAssetUrl('ui_exit_up')})`, '--exit-down': `url(${getHudAssetUrl('ui_exit_down')})` } as CSSProperties}
@@ -1708,7 +1709,7 @@ export const SnowWarArenaView: FC = () =>
                                         src={getHudAssetUrl(`load_${getLoopFrame(frameNow, 8)}`)}
                                     />
                                 )}
-                                <button
+                                <BaseButton
                                     type="button"
                                     className="snowwar-official-hud__make-ball"
                                     disabled={phase !== 'playing' || ownAvatar.snowballCount >= INITIAL_SNOWBALL_COUNT}
@@ -1772,9 +1773,9 @@ export const SnowWarArenaView: FC = () =>
                     </div>
 
                     {levelData.canEditRoom && (
-                        <button type="button" className="snowwar-button snowwar-official-hud__edit" onClick={() => startEditing()}>
+                        <BaseButton type="button" className="snowwar-button snowwar-official-hud__edit" onClick={() => startEditing()}>
                             {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
-                        </button>
+                        </BaseButton>
                     )}
                 </div>
             )}
@@ -1795,30 +1796,30 @@ export const SnowWarArenaView: FC = () =>
                     {/* Function controls (modes + tools), grouped and separated
                         from the furni palette below - these are actions, not furni. */}
                     <div className="snowwar-editor__tools snowwar-editor__tools--modes">
-                        <button
+                        <BaseButton
                             type="button"
                             className={'snowwar-editor__chip' + (paletteSel === null ? ' snowwar-editor__chip--active' : '')}
                             onClick={() => setPaletteSel(null)}
                         >
                             {localizeWithFallback('snowwar.editor.select', 'Select / Move')}
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             className={'snowwar-editor__chip' + (paletteSel === 'edit' ? ' snowwar-editor__chip--active' : '')}
                             onClick={() => setPaletteSel('edit')}
                         >
                             {localizeWithFallback('snowwar.editor.edit', 'Edit')}
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             className={'snowwar-editor__chip' + (paletteSel === 'walk' ? ' snowwar-editor__chip--active' : '')}
                             onClick={() => { setPaletteSel('walk'); setSelectedIndex(-1); }}
                         >
                             {localizeWithFallback('snowwar.editor.walk', 'Walk')}
-                        </button>
-                        <button type="button" className="snowwar-button snowwar-button--danger" onClick={() => clearAllItems()}>
+                        </BaseButton>
+                        <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => clearAllItems()}>
                             {localizeWithFallback('snowwar.editor.clear', 'Clear all furni')}
-                        </button>
+                        </BaseButton>
                     </div>
                     <div className="snowwar-editor__floor-plan">
                         <div className="snowwar-editor__floor-plan-heading">
@@ -1829,22 +1830,22 @@ export const SnowWarArenaView: FC = () =>
                             {localizeWithFallback('snowwar.editor.floor_plan_hint', 'Open the full floor plan editor to shape the playable snowfield with its canvas, height tools, selection, undo and redo.')}
                         </div>
                         <div className="snowwar-editor__tools">
-                            <button type="button" className="snowwar-button" onClick={() => setFloorplanEditorVisible(true)}>
+                            <BaseButton type="button" className="snowwar-button" onClick={() => setFloorplanEditorVisible(true)}>
                                 {localizeWithFallback('snowwar.editor.floor_open', 'Edit floor plan')}
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
                     {EDITOR_PALETTE.length > 0 && (
                         <div className="snowwar-editor__palette">
                             {EDITOR_PALETTE.map(name => (
-                                <button
+                                <BaseButton
                                     key={name}
                                     type="button"
                                     className={'snowwar-editor__chip' + (paletteSel === name ? ' snowwar-editor__chip--active' : '')}
                                     onClick={() => { setPaletteSel(prev => prev === name ? null : name); setSelectedIndex(-1); setHoverTile(null); }}
                                 >
                                     {name.replace('block_', '').replace('obst_', '').replace('sw_', '')}
-                                </button>
+                                </BaseButton>
                             ))}
                         </div>
                     )}
@@ -1858,7 +1859,7 @@ export const SnowWarArenaView: FC = () =>
                     {furniMatches.length > 0 && (
                         <div className="snowwar-editor__palette snowwar-editor__palette--furni">
                             {furniMatches.map(furni => (
-                                <button
+                                <BaseButton
                                     key={furni.id}
                                     type="button"
                                     title={furni.className}
@@ -1866,7 +1867,7 @@ export const SnowWarArenaView: FC = () =>
                                     onClick={() => { setPaletteSel(prev => prev === furni.className ? null : furni.className); setSelectedIndex(-1); setHoverTile(null); }}
                                 >
                                     {(furni.name && furni.name.trim()) || furni.className}
-                                </button>
+                                </BaseButton>
                             ))}
                         </div>
                     )}
@@ -1886,33 +1887,33 @@ export const SnowWarArenaView: FC = () =>
                                 <span>{(selectedFurni?.name && selectedFurni.name.trim()) || selectedItem.name}</span>
                             </div>
                             <div className="snowwar-editor__tools">
-                                <button type="button" className="snowwar-button" onClick={() => rotateSelected()}>
+                                <BaseButton type="button" className="snowwar-button" onClick={() => rotateSelected()}>
                                     {localizeWithFallback('snowwar.editor.rotate', 'Rotate')}
-                                </button>
-                                <button type="button" className="snowwar-button snowwar-button--danger" onClick={() => deleteSelected()}>
+                                </BaseButton>
+                                <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => deleteSelected()}>
                                     {localizeWithFallback('snowwar.editor.delete', 'Delete')}
-                                </button>
+                                </BaseButton>
                             </div>
                             {!selectedItem.imageUrl && selectedStateMax > 0 && (
                                 <div className="snowwar-editor__state">
                                     <span>{localizeWithFallback('snowwar.editor.state', 'State')}</span>
-                                    <button
+                                    <BaseButton
                                         type="button"
                                         className="snowwar-button snowwar-button--icon"
                                         disabled={(selectedItem.state ?? 0) <= 0}
                                         onClick={() => cycleState(-1)}>
                                         &#8722;
-                                    </button>
+                                    </BaseButton>
                                     <span className="snowwar-editor__state-value">
                                         {(selectedItem.state ?? 0)}{selectedStateCount ? ` / ${selectedStateMax}` : ''}
                                     </span>
-                                    <button
+                                    <BaseButton
                                         type="button"
                                         className="snowwar-button snowwar-button--icon"
                                         disabled={(selectedItem.state ?? 0) >= selectedStateMax}
                                         onClick={() => cycleState(1)}>
                                         +
-                                    </button>
+                                    </BaseButton>
                                 </div>
                             )}
                         </div>
@@ -2167,7 +2168,7 @@ export const SnowWarArenaView: FC = () =>
                                 } : undefined}
                             >
                                 {item.name === 'ads_igorraygun' && !editing && (
-                                    <button
+                                    <BaseButton
                                         type="button"
                                         className="snowwar-raygun-hitbox"
                                         aria-label={localizeWithFallback('snowwar.raygun.use', 'Use Ray Gun')}

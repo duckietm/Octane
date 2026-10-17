@@ -21,6 +21,7 @@ import { WiredActionDelaySection } from './WiredActionDelaySection';
 import { localizeWiredVariableOperation, WIRED_VARIABLE_ADVANCED_OPERATIONS, WIRED_VARIABLE_BASIC_OPERATIONS, WIRED_VARIABLE_UNARY_OPERATIONS } from './WiredVariableOperations';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -400,7 +401,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                     <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
                     <div className="octane-wired__give-var-targets">
                         {TARGET_BUTTONS.map((button) => (
-                            <button
+                            <BaseButton
                                 key={button.key}
                                 type="button"
                                 disabled={button.disabled}
@@ -408,7 +409,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                                 onClick={() => handleDestinationTargetChange(button.key)}
                             >
                                 <img src={button.icon} alt={button.key} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>
@@ -467,7 +468,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                             <div className="octane-wired__give-var-targets">
                                 {TARGET_BUTTONS.map((button) => (
-                                    <button
+                                    <BaseButton
                                         key={`reference-${button.key}`}
                                         type="button"
                                         disabled={button.disabled || referenceMode !== 'variable'}
@@ -475,7 +476,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                                         onClick={() => handleReferenceTargetChange(button.key)}
                                     >
                                         <img src={button.icon} alt={button.key} />
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         </label>

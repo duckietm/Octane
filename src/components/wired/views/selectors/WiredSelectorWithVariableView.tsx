@@ -20,6 +20,7 @@ import {
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -345,7 +346,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                                 <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                                 <div className="octane-wired__give-var-targets">
                                     {TARGET_BUTTONS.map((button) => (
-                                        <button
+                                        <BaseButton
                                             key={`reference-${button.key}`}
                                             type="button"
                                             disabled={button.disabled || !selectByValue || referenceMode !== 'variable'}
@@ -353,7 +354,7 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
                                             onClick={() => handleReferenceTargetChange(button.key)}
                                         >
                                             <img src={button.icon} alt={button.key} />
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </label>

@@ -1,6 +1,7 @@
 import { FC, ReactNode } from 'react';
 import { HousekeepingTabId, LocalizeText } from '../../../../api';
 import { HousekeepingGlobalSearch } from './HousekeepingGlobalSearch';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export interface HousekeepingNavItem {
     id: HousekeepingTabId;
@@ -45,7 +46,7 @@ export const HousekeepingSidebar: FC<{
                             const isActive = item.id === active;
 
                             return (
-                                <button
+                                <BaseButton
                                     key={item.id}
                                     aria-current={isActive ? 'page' : undefined}
                                     className={`flex items-center gap-1.5 rounded px-1 py-0.5 text-left text-xs transition-colors ${
@@ -59,7 +60,7 @@ export const HousekeepingSidebar: FC<{
                                     {!!item.count && (
                                         <span className="rounded-full bg-sky-600 px-1.5 text-[9px] font-bold tabular-nums text-white">{item.count}</span>
                                     )}
-                                </button>
+                                </BaseButton>
                             );
                         })}
                     </div>

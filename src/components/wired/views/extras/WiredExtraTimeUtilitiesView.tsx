@@ -16,6 +16,7 @@ import {
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const MODE_FALLBACKS = ['Variable value', 'Creation time', 'Last update time'];
 const SUB_VARIABLE_KEY = 'wiredfurni.params.time_util.subvariable.';
@@ -71,20 +72,20 @@ export const WiredExtraTimeUtilitiesView: FC<{}> = () => {
                 <div className="octane-wired__divider" />
 
                 <div className="octane-wired__levelup-section">
-                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsCalendarOpen((value) => !value)}>
+                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsCalendarOpen((value) => !value)}>
                         <Text bold>{localizeWithFallback('wiredfurni.params.create_subvariables', 'Create sub-variables:')}</Text>
                         <span className={`octane-wired__levelup-chevron ${isCalendarOpen ? 'is-open' : ''}`}>^</span>
-                    </button>
+                    </BaseButton>
                     {isCalendarOpen && renderSubVariables(TIME_UTIL_SUB_VARIABLES)}
                 </div>
 
                 <div className="octane-wired__divider" />
 
                 <div className="octane-wired__levelup-section">
-                    <button type="button" className="octane-wired__levelup-section-header" onClick={() => setIsAdvancedOpen((value) => !value)}>
+                    <BaseButton type="button" className="octane-wired__levelup-section-header" onClick={() => setIsAdvancedOpen((value) => !value)}>
                         <Text bold>{localizeWithFallback('wiredfurni.params.create_subvariables.advanced', 'Advanced sub-variables:')}</Text>
                         <span className={`octane-wired__levelup-chevron ${isAdvancedOpen ? 'is-open' : ''}`}>^</span>
-                    </button>
+                    </BaseButton>
                     {isAdvancedOpen && (
                         <>
                             <Text small>

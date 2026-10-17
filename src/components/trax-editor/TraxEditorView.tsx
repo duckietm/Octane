@@ -7,6 +7,7 @@ import { useOctaneEvent, usePurse, useTraxEditor } from '../../hooks';
 import { OctaneCard, OctaneInput } from '../../layout';
 import { CreateEmptyChannels, ITraxPlacement, ParseTraxSong, SerializeTraxSong, TRAX_CHANNEL_COUNT, TRAX_DEFAULT_UNITS, TRAX_MAX_UNITS, TRAX_MIN_UNITS, TraxChannels } from './TraxSongData';
 import { GetTraxSampleId, GetTraxSoundSetForSample, TraxSoundSets } from './TraxSoundSets';
+import { BaseButton } from '../../common/BaseButton';
 
 const CELL_WIDTH = 22;
 const CARTRIDGES_PER_PAGE = 8;
@@ -33,7 +34,7 @@ interface MachineButtonProps {
 }
 
 const MachineButton: FC<MachineButtonProps> = ({ title = undefined, disabled = false, accent = undefined, onClick, children = null }) => (
-    <button
+    <BaseButton
         title={title}
         disabled={disabled}
         onClick={onClick}
@@ -52,7 +53,7 @@ const MachineButton: FC<MachineButtonProps> = ({ title = undefined, disabled = f
         }}
     >
         {children}
-    </button>
+    </BaseButton>
 );
 
 export const TraxEditorView: FC<{}> = () =>
@@ -565,7 +566,7 @@ export const TraxEditorView: FC<{}> = () =>
                                     </MachineButton>
                                     <div className="grid min-w-0 flex-1 grid-cols-4 gap-1">
                                         {rackCartridges.map((set) => (
-                                            <button
+                                            <BaseButton
                                                 key={set.cd}
                                                 title={`${set.title} — ${set.artist}`}
                                                 onClick={() => loadCartridge(set.cd)}
@@ -581,7 +582,7 @@ export const TraxEditorView: FC<{}> = () =>
                                                     <span className="h-5 w-4 shrink-0 rounded-[2px] border border-black/30" style={{ backgroundColor: set.color }} />
                                                 )}
                                                 <span className="truncate text-left text-[10px] font-bold leading-tight text-black/75">{set.title}</span>
-                                            </button>
+                                            </BaseButton>
                                         ))}
                                     </div>
                                     <MachineButton
@@ -625,7 +626,7 @@ export const TraxEditorView: FC<{}> = () =>
                                                 </Flex>
                                                 <div className="grid grid-cols-9 gap-0.5">
                                                     {(set?.sampleLengths ?? []).map((length, index) => (
-                                                        <button
+                                                        <BaseButton
                                                             key={index}
                                                             title={`#${index + 1} — ${length * 2}s`}
                                                             onClick={(event) =>
@@ -641,7 +642,7 @@ export const TraxEditorView: FC<{}> = () =>
                                                             }}
                                                         >
                                                             {index + 1}
-                                                        </button>
+                                                        </BaseButton>
                                                     ))}
                                                 </div>
                                             </div>

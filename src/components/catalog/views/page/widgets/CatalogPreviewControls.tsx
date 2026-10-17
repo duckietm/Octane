@@ -3,6 +3,7 @@ import { FC, MouseEvent, useCallback, useEffect, useMemo, useState, useSyncExter
 import { ProductTypeEnum } from '../../../../../api';
 import previewArrowLeft from '../../../../../assets/images/catalog/air/preview-arrow-left.png';
 import previewArrowRight from '../../../../../assets/images/catalog/air/preview-arrow-right.png';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface CatalogPreviewControlsProps {
     productType: string;
@@ -113,7 +114,7 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
         <div className={`octane-catalog-preview-controls is-${capabilities.mode}`} role="toolbar" aria-label="Product preview">
             {showRotationControls && (
                 <>
-                    <button
+                    <BaseButton
                         aria-label="Rotate left"
                         className="octane-catalog-preview-btn is-left"
                         disabled={!capabilities.canRotate}
@@ -121,8 +122,8 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                         onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(true))}
                     >
                         <CatalogPreviewArrowIcon direction="left" />
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         aria-label="Rotate right"
                         className="octane-catalog-preview-btn is-right"
                         disabled={!capabilities.canRotate}
@@ -130,11 +131,11 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                         onClick={(event) => runPreviewAction(event, () => directionalPreviewer.changeRoomObjectDirection(false))}
                     >
                         <CatalogPreviewArrowIcon direction="right" />
-                    </button>
+                    </BaseButton>
                 </>
             )}
             {canToggleZoom && (
-                <button
+                <BaseButton
                     aria-label="Toggle zoom"
                     aria-pressed={avatarZoomed}
                     className="octane-catalog-preview-region octane-catalog-preview-zoom-btn"
@@ -142,10 +143,10 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                     onClick={(event) => runPreviewAction(event, () => setAvatarZoomed((value) => !value))}
                 >
                     <i aria-hidden="true" className="octane-icon icon-zoom-more" />
-                </button>
+                </BaseButton>
             )}
             {isAvatarPreview && (
-                <button
+                <BaseButton
                     aria-label="Change avatar action"
                     className="octane-catalog-preview-region octane-catalog-preview-action-btn"
                     disabled={!canChangeAvatarAction}
@@ -153,7 +154,7 @@ const CatalogPreviewControlsContent: FC<Required<CatalogPreviewControlsProps>> =
                     onClick={(event) => runPreviewAction(event, () => directionalPreviewer.cycleAvatarAction?.())}
                 >
                     <span aria-hidden="true" className="octane-catalog-preview-action-icon" />
-                </button>
+                </BaseButton>
             )}
         </div>
     );

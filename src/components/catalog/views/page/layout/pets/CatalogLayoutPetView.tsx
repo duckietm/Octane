@@ -27,6 +27,7 @@ import {
     PetPaletteLike,
 } from './petCatalog.helpers';
 import { Select } from '../../../../../../common/Select';
+import { BaseButton } from '../../../../../../common/BaseButton';
 
 interface PendingPetPurchase {
     extraData: string;
@@ -272,7 +273,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 role="group"
                             >
                                 {legacyColors.map((colors, index) => (
-                                    <button
+                                    <BaseButton
                                         key={`${colors[0]}-${index}`}
                                         aria-label={`${colorLabel} ${index + 1}`}
                                         aria-pressed={selectedColorIndex === index}
@@ -327,7 +328,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                 const locked = isBreedLocked(choice.palette);
 
                                 return (
-                                    <button
+                                    <BaseButton
                                         key={choice.palette.paletteId}
                                         aria-label={locked ? `${colorLabel} ${index + 1} — ${hcOnlyLabel}` : `${colorLabel} ${index + 1}`}
                                         aria-pressed={selectedPaletteIndex === index}
@@ -339,7 +340,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                         onClick={() => setSelectedPaletteIndex(index)}
                                     >
                                         {locked && <FaLock className="octane-catalog-pet-swatch-lock" />}
-                                    </button>
+                                    </BaseButton>
                                 );
                             })}
                         </CatalogScrollAreaView>
@@ -369,13 +370,13 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                         </span>
                     )}
                     <div className="octane-catalog-pet-purchase-row">
-                        <button
+                        <BaseButton
                             className="octane-catalog-standard-button octane-catalog-standard-buy-button"
                             disabled={controlsDisabled || !purchaseExtraData}
                             onClick={requestPurchase}
                         >
                             {LocalizeText('catalog.purchase_confirmation.buy')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
             </div>

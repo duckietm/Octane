@@ -1,5 +1,6 @@
 import { FC, MouseEvent, PropsWithChildren } from 'react';
 import { InlineDialog } from '../../../common/InlineDialog';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface LoginModalProps extends PropsWithChildren {
     title: string;
@@ -29,7 +30,7 @@ export const LoginModal: FC<LoginModalProps> = ({ title, titleId, closeLabel, di
                         <span id={titleId} className="octane-card-title">
                             {title}
                         </span>
-                        <button type="button" className="octane-card-close-button" aria-label={closeLabel} onClick={onClose} />
+                        <BaseButton type="button" className="octane-card-close-button" aria-label={closeLabel} onClick={onClose} />
                     </div>
                     {children}
                 </div>

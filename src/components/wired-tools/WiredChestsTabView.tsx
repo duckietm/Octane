@@ -19,6 +19,7 @@ import { localizeWithFallback, ProductImageUtility, SendMessageComposer } from '
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useMessageEvent, useNotification, useRoom } from '../../hooks';
 import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 /** Rows per request. The preview and the detail window share one page size, so one response shape
  * serves both and there is never a question of which request a page belongs to. */
@@ -429,7 +430,7 @@ const WiredChestTransactionsWindow: FC<WiredChestTransactionsWindowProps> = (pro
                                     <Fragment key={row.transactionId}>
                                         <tr className="border-t border-[#e4e0d5]">
                                             <td className="px-2 py-1 tabular-nums">
-                                                <button
+                                                <BaseButton
                                                     type="button"
                                                     className="underline decoration-dotted"
                                                     title={localizeWithFallback(
@@ -439,7 +440,7 @@ const WiredChestTransactionsWindow: FC<WiredChestTransactionsWindowProps> = (pro
                                                     onClick={() => onFilterChest(row.chestId)}
                                                 >
                                                     {row.chestId}
-                                                </button>
+                                                </BaseButton>
                                             </td>
                                             <td className="px-2 py-1">{formatTimestamp(row.timestamp)}</td>
                                             <td className="px-2 py-1">{typeLabel(row)}</td>
@@ -448,13 +449,13 @@ const WiredChestTransactionsWindow: FC<WiredChestTransactionsWindowProps> = (pro
                                             <td className="px-2 py-1 text-right tabular-nums">{row.withdrawn || '-'}</td>
                                             <td className="px-2 py-1 text-right tabular-nums">{row.deposited || '-'}</td>
                                             <td className="px-2 py-1 text-right">
-                                                <button
+                                                <BaseButton
                                                     className="rounded border border-[#7f7f7f] bg-[#ece9e1] px-2 py-[1px] text-[11px] text-[#333] hover:bg-[#e3ded2]"
                                                     type="button"
                                                     onClick={() => onToggleDetail(row.transactionId, row.hasDetails)}
                                                 >
                                                     {expandedId === row.transactionId ? '-' : '+'}
-                                                </button>
+                                                </BaseButton>
                                             </td>
                                         </tr>
                                         {expandedId === row.transactionId && (

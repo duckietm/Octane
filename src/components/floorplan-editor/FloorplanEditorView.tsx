@@ -33,6 +33,7 @@ import { FloorplanOptionsPanel } from './views/FloorplanOptionsPanel';
 import { FloorplanPreviewSVG } from './views/FloorplanPreviewSVG';
 import { FloorplanToolbar } from './views/FloorplanToolbar';
 import { FloorplanWallHeightSlider } from './views/FloorplanWallHeightSlider';
+import { BaseButton } from '../../common/BaseButton';
 
 export type FloorplanEditorExternalSession = {
     tilemap: string;
@@ -327,7 +328,7 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                         </div>
                                         <span className="fp-panel-title">{LocalizeText('floor.editor.wall.height')}</span>
                                         <div className="fp-view-switch" data-testid="floorplan-view-switch" role="group" aria-label={localizeOr('floor.plan.editor.preview.mode', 'Preview')}>
-                                            <button
+                                            <BaseButton
                                                 type="button"
                                                 data-testid="floorplan-view-2d"
                                                 data-active={preview3d ? 'false' : 'true'}
@@ -336,8 +337,8 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                                 onClick={() => choosePreview(false)}
                                             >
                                                 2D
-                                            </button>
-                                            <button
+                                            </BaseButton>
+                                            <BaseButton
                                                 type="button"
                                                 data-testid="floorplan-view-3d"
                                                 data-active={preview3d ? 'true' : 'false'}
@@ -346,7 +347,7 @@ export const FloorplanEditorView: FC<Props> = ({ externalSession }) => {
                                                 onClick={() => choosePreview(true)}
                                             >
                                                 3D
-                                            </button>
+                                            </BaseButton>
                                         </div>
                                     </div>
                                     <div className="fp-panel-body">

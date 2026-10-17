@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '../../../../common/FloatingPopover';
 import { CHAT_TEXT_SIZES, ChatTextSize, getChatTextSizeLabel, getStoredChatTextSize, setStoredChatTextSize } from './chatTextSize';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ChatInputStyleSelectorViewProps {
     chatStyleId: number;
@@ -41,7 +42,7 @@ export const ChatInputStyleSelectorView: FC<ChatInputStyleSelectorViewProps> = (
                     {chatStyleIds &&
                         chatStyleIds.length > 0 &&
                         chatStyleIds.map((styleId) => (
-                            <button
+                            <BaseButton
                                 key={styleId}
                                 type="button"
                                 className={`swf-chat-style-option ${chatStyleId === styleId ? 'is-active' : ''}`}
@@ -50,20 +51,20 @@ export const ChatInputStyleSelectorView: FC<ChatInputStyleSelectorViewProps> = (
                                 <span className="swf-chat-style-preview bubble-container">
                                     <span className={`chat-bubble bubble-${styleId}`} />
                                 </span>
-                            </button>
+                            </BaseButton>
                         ))}
                 </div>
                 <div className="swf-chat-font-row">
                     <span className="swf-chat-font-label">Dimensione del testo</span>
                     {CHAT_TEXT_SIZES.map((size) => (
-                        <button
+                        <BaseButton
                             key={size}
                             type="button"
                             className={`swf-chat-font-option ${chatTextSize === size ? 'is-active' : ''}`}
                             onClick={() => selectTextSize(size)}
                         >
                             {getChatTextSizeLabel(size)}
-                        </button>
+                        </BaseButton>
                     ))}
                 </div>
             </PopoverContent>

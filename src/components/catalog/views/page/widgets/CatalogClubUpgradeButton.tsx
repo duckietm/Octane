@@ -1,6 +1,7 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC } from 'react';
 import { LocalizeText } from '../../../../../api';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface CatalogClubUpgradeButtonProps {
     onOpenClubCenter?: () => void;
@@ -13,8 +14,8 @@ export const CatalogClubUpgradeButton: FC<CatalogClubUpgradeButtonProps> = ({ on
         <span className="octane-catalog-club-upgrade-caption min-w-0 truncate text-[11px] font-bold text-[#111111]">
             {LocalizeText('catalog.buy.widget.get.vip.to.unlock.this.product')}
         </span>
-        <button className="octane-catalog-standard-button octane-catalog-standard-buy-button shrink-0" type="button" onClick={onOpenClubCenter}>
+        <BaseButton className="octane-catalog-standard-button octane-catalog-standard-buy-button shrink-0" type="button" onClick={onOpenClubCenter}>
             {LocalizeText('catalog.buy.widget.get.vip.button')}
-        </button>
+        </BaseButton>
     </div>
 );

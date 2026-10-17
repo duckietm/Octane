@@ -20,6 +20,7 @@ import {
     RecyclerInventoryChoice,
     reconcileRecyclerSlots
 } from './recycler.helpers';
+import { BaseButton } from '../../../../../../common/BaseButton';
 
 const OPERATION_TIMEOUT_MS = 12000;
 
@@ -136,7 +137,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
                     const slot = slots[index];
 
                     return (
-                        <button
+                        <BaseButton
                             key={index}
                             aria-label={slot?.name ?? `${index + 1}`}
                             className={`octane-catalog-recycler-slot${slot ? ' is-filled' : ''}`}
@@ -146,7 +147,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
                             onClick={() => setSlots((current) => current.filter((_, slotIndex) => slotIndex !== index))}
                         >
                             {slot?.iconUrl && <img alt="" src={slot.iconUrl} />}
-                        </button>
+                        </BaseButton>
                     );
                 })}
             </div>
@@ -154,17 +155,17 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
             <div className="octane-catalog-recycler-inventory">
                 {choices.length ? (
                     choices.map((choice) => (
-                        <button key={choice.itemId} disabled={processing || slots.length >= slotCount} type="button" onClick={() => addChoice(choice)}>
+                        <BaseButton key={choice.itemId} disabled={processing || slots.length >= slotCount} type="button" onClick={() => addChoice(choice)}>
                             {choice.iconUrl && <img alt="" src={choice.iconUrl} />}
                             <span>{choice.name}</span>
-                        </button>
+                        </BaseButton>
                     ))
                 ) : (
                     <span className="octane-catalog-specialized-empty">{LocalizeText('inventory.furni.preview.not_recyclable')}</span>
                 )}
             </div>
 
-            <button
+            <BaseButton
                 className="octane-catalog-standard-button octane-catalog-recycler-action"
                 disabled={processing || !enabled || secondsLeft > 0 || slots.length !== slotCount}
                 type="button"
@@ -173,7 +174,7 @@ export const CatalogLayoutRecyclerView: FC<CatalogLayoutProps> = ({ page }) => {
                 {secondsLeft > 0
                     ? LocalizeText('catalog.recycler.button.wait', ['s'], [secondsLeft.toString()])
                     : LocalizeText('catalog.recycler.button.recycle')}
-            </button>
+            </BaseButton>
         </div>
     );
 };

@@ -18,6 +18,7 @@ import { formatHousekeepingDate, FriendlyTime, IHousekeepingUser, LocalizeText }
 import { LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon } from '../../../../common';
 import { HousekeepingFact, HousekeepingPill } from '../common/HousekeepingParts';
 import { HousekeepingPrivateIpView } from './HousekeepingPrivateIpView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const CURRENCIES: { type: number; key: string; field: 'creditsBalance' | 'ducketsBalance' | 'diamondsBalance'; tone: string }[] = [
     { type: -1, key: 'housekeeping.user.credits', field: 'creditsBalance', tone: 'border-amber-200 bg-amber-50 text-amber-800' },
@@ -89,9 +90,9 @@ export const HousekeepingUserCard: FC<{ user: IHousekeepingUser; onClear: () => 
                         ))}
                     </div>
                 </div>
-                <button className="p-1 text-zinc-400 transition-colors hover:text-rose-600" title={LocalizeText('housekeeping.user.clear')} onClick={onClear}>
+                <BaseButton className="p-1 text-zinc-400 transition-colors hover:text-rose-600" title={LocalizeText('housekeeping.user.clear')} onClick={onClear}>
                     <FaTimes size={12} />
-                </button>
+                </BaseButton>
             </div>
 
             <div className="mt-2 grid grid-cols-3 gap-1">

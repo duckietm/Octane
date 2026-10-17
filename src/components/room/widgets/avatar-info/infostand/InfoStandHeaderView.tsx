@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../../../api';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface InfoStandHeaderViewProps {
     name: string;
@@ -13,7 +14,7 @@ interface InfoStandHeaderViewProps {
  */
 export const InfoStandHeaderView: FC<InfoStandHeaderViewProps> = ({ name, onClose }) => (
     <>
-        <button
+        <BaseButton
             type="button"
             className="octane-infostand__close"
             aria-label={LocalizeText('generic.close')}

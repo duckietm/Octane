@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Button, DraggableWindow, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useFurnitureFriendFurniWidget } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const formatEngravingDate = (value: string) => {
     if (!value) return value;
@@ -64,7 +65,7 @@ export const FurnitureFriendFurniView: FC<{}> = (props) => {
         return (
             <DraggableWindow handleSelector=".octane-engraving-lock-view">
                 <div className={`octane-engraving-lock-view ${engravingTypeClass}`.trim()}>
-                    <button type="button" className="engraving-lock-close" onClick={onClose} aria-label="Close" />
+                    <BaseButton type="button" className="engraving-lock-close" onClick={onClose} aria-label="Close" />
                     <div className="engraving-lock-avatar engraving-lock-avatar--left">
                         <LayoutAvatarImageView direction={2} figure={figures[0]} />
                     </div>

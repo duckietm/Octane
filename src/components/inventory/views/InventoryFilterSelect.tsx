@@ -1,5 +1,6 @@
 import { Children, FC, isValidElement, KeyboardEvent, ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface InventoryFilterSelectProps {
     value?: string | number;
@@ -113,7 +114,7 @@ export const InventoryFilterSelect: FC<InventoryFilterSelectProps> = ({ value, d
 
     return (
         <span className="octane-inventory-filter-choice">
-            <button
+            <BaseButton
                 ref={trigger}
                 type="button"
                 className="octane-inventory-filter-select"
@@ -127,7 +128,7 @@ export const InventoryFilterSelect: FC<InventoryFilterSelectProps> = ({ value, d
                 onKeyDown={onKeyDown}
             >
                 {options[selected]?.label}
-            </button>
+            </BaseButton>
             {open &&
                 createPortal(
                     <div

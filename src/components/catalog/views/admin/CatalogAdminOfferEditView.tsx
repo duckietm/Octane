@@ -12,6 +12,7 @@ import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const isCatalogAdminNewOffer = (offer: IPurchasableOffer | null): boolean =>
     offer?.offerId === -1;
@@ -462,27 +463,27 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                         </div>
                         <div className="octane-catalog-admin-savebar-actions">
                             {!isNewOffer && (
-                                <button className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
+                                <BaseButton className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
                                     <FaTrash className="text-[8px]" /> {LocalizeText('catalog.admin.delete')}
-                                </button>
+                                </BaseButton>
                             )}
-                            <button
+                            <BaseButton
                                 className="octane-catalog-admin-button is-muted"
                                 disabled={!smartSave.isDirty || !!smartSave.inFlight}
                                 type="button"
                                 onClick={smartSave.reset}
                             >
                                 <FaUndo className="text-[8px]" /> Reset
-                            </button>
-                            <button
+                            </BaseButton>
+                            <BaseButton
                                 className="octane-catalog-admin-button is-muted"
                                 disabled={!canSubmit}
                                 type="button"
                                 onClick={() => handleSave(true)}
                             >
                                 Save and close
-                            </button>
-                            <button
+                            </BaseButton>
+                            <BaseButton
                                 className="octane-catalog-admin-button is-primary"
                                 disabled={!canSubmit}
                                 type="button"
@@ -490,7 +491,7 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                             >
                                 {smartSave.status === 'saving' ? <FaSpinner className="text-[8px] animate-spin" /> : <FaSave className="text-[8px]" />}{' '}
                                 {isNewOffer ? LocalizeText('catalog.admin.create') : LocalizeText('catalog.admin.save')}
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
                 </div>

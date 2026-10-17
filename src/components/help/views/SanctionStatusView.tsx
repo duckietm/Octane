@@ -3,6 +3,7 @@ import { FaArrowCircleRight } from 'react-icons/fa';
 import { CreateLinkEvent, localizeWithFallback, LocalizeText } from '../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useHelp } from '../../../hooks';
+import { BaseButton } from '../../../common/BaseButton';
 
 const SERVER_DATE = /^\w{3} (\w{3}) (\d{1,2}) (\d{2}:\d{2}:\d{2}) [A-Z]{2,5} (\d{4})$/;
 
@@ -87,13 +88,13 @@ export const SanctionSatusView: FC<{}> = (props) => {
                         )}
                     </div>
                     <div className="mt-auto flex items-end justify-between gap-3 pt-3">
-                        <button type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
+                        <BaseButton type="button" className="help-link" onClick={() => CreateLinkEvent('habbopages/help')}>
                             <FaArrowCircleRight className="help-link__icon" />
                             {LocalizeText('help.main.faq.link.text')}
-                        </button>
-                        <button type="button" className="habbo-btn-green habbo-btn-green--auto" onClick={() => setSanctionInfo(null)}>
+                        </BaseButton>
+                        <BaseButton type="button" className="habbo-btn-green habbo-btn-green--auto" onClick={() => setSanctionInfo(null)}>
                             {localizeWithFallback('generic.got.it', 'Got it')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
             </OctaneCardContentView>

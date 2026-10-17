@@ -58,6 +58,7 @@ import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -122,10 +123,10 @@ const ProjectileSection: FC<PropsWithChildren<{ title: string; open: boolean; fi
         <>
             {!first && <div className="octane-wired__divider" />}
             <div className="octane-wired__projectile-section">
-                <button aria-expanded={open} className="octane-wired__projectile-section-header" type="button" onClick={onToggle}>
+                <BaseButton aria-expanded={open} className="octane-wired__projectile-section-header" type="button" onClick={onToggle}>
                     <Text bold>{title}</Text>
                     {open ? <FaChevronUp className="octane-wired__projectile-chevron" /> : <FaChevronDown className="octane-wired__projectile-chevron" />}
-                </button>
+                </BaseButton>
                 {open && <div className="octane-wired__projectile-section-body">{children}</div>}
             </div>
         </>

@@ -7,6 +7,7 @@ import { buildHeightmapInstances, cameraEye, clampCamera, fitCamera, OrbitCamera
 import { mat4LookAt, mat4Multiply, mat4Perspective } from '../scene3d/mat4';
 import { cameraRay, pickTile, TileHit } from '../scene3d/picking';
 import { FloorplanAction, FloorplanState } from '../state/types';
+import { BaseButton } from '../../../common/BaseButton';
 
 type Props = {
     state: FloorplanState;
@@ -343,21 +344,21 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                 </div>
             )}
             <div className="fp-stage-buttons" onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
-                <button type="button" data-testid="view3d-reset" title={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`} className="fp-round-btn is-small" disabled={status !== 'ready'} onClick={resetView}>
+                <BaseButton type="button" data-testid="view3d-reset" title={`Fit room to view (double-click)${zoomLabel ? ` · distance ${zoomLabel}` : ''}`} className="fp-round-btn is-small" disabled={status !== 'ready'} onClick={resetView}>
                     <FaExpand size={10} />
-                </button>
-                <button type="button" data-testid="view3d-zoom-in" title="Zoom in (wheel)" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(1 / ZOOM_STEP)}>
+                </BaseButton>
+                <BaseButton type="button" data-testid="view3d-zoom-in" title="Zoom in (wheel)" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(1 / ZOOM_STEP)}>
                     <FaPlus size={13} />
-                </button>
-                <button type="button" data-testid="view3d-zoom-out" title="Zoom out (wheel)" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(ZOOM_STEP)}>
+                </BaseButton>
+                <BaseButton type="button" data-testid="view3d-zoom-out" title="Zoom out (wheel)" className="fp-round-btn" disabled={status !== 'ready'} onClick={() => zoomBy(ZOOM_STEP)}>
                     <FaMinus size={13} />
-                </button>
+                </BaseButton>
             </div>
             <div className="fp-stage-toggles" onPointerDown={(event) => event.stopPropagation()} onDoubleClick={(event) => event.stopPropagation()}>
-                <button type="button" data-testid="view3d-walls" data-active={showWalls ? 'true' : 'false'} title="Show the room walls" className={`fp-pill ${showWalls ? 'is-on' : ''}`} onClick={() => setShowWalls((value) => !value)}>
+                <BaseButton type="button" data-testid="view3d-walls" data-active={showWalls ? 'true' : 'false'} title="Show the room walls" className={`fp-pill ${showWalls ? 'is-on' : ''}`} onClick={() => setShowWalls((value) => !value)}>
                     Walls
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     type="button"
                     data-testid="view3d-textures"
                     data-active={textured ? 'true' : 'false'}
@@ -366,8 +367,8 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                     onClick={() => setTextured((value) => !value)}
                 >
                     Textures
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     type="button"
                     data-testid="view3d-rotate"
                     data-active={autoRotate ? 'true' : 'false'}
@@ -378,7 +379,7 @@ export const Floorplan3DView: FC<Props> = ({ state, dispatch, panMode = false })
                 >
                     <FaSyncAlt size={10} className={autoRotate ? 'animate-spin' : ''} style={autoRotate ? { animationDuration: '3s' } : undefined} />
                     360°
-                </button>
+                </BaseButton>
             </div>
             <div className="fp-stage-hint">
                 {panMode ? 'Drag to rotate · Shift-drag to pan · Wheel to zoom' : 'Click or drag to edit · Right-drag to rotate · Shift-drag to pan · Wheel to zoom'}

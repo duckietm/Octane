@@ -2,6 +2,7 @@ import { IPartColor } from '@octane/renderer';
 import { ButtonHTMLAttributes, CSSProperties, FC } from 'react';
 import { ColorUtils, GetClubMemberLevel, GetConfigurationValue } from '../../../api';
 import hcSmallSrc from '../../../assets/images/avatareditor/air/hc-small.png';
+import { BaseButton } from '../../../common/BaseButton';
 
 export const AvatarEditorPaletteSetItem: FC<
     {
@@ -17,7 +18,7 @@ export const AvatarEditorPaletteSetItem: FC<
     const isLocked = isHC && GetClubMemberLevel() < partColor.clubLevel;
 
     return (
-        <button
+        <BaseButton
             type="button"
             aria-pressed={isSelected}
             className={`avatar-editor-palette-item${isSelected ? ' is-selected' : ''}${isLocked ? ' is-locked' : ''}${className ? ` ${className}` : ''}`}
@@ -27,6 +28,6 @@ export const AvatarEditorPaletteSetItem: FC<
             <span className="avatar-editor-palette-color" style={{ backgroundColor: ColorUtils.makeColorNumberHex(partColor.rgb & 0xffffff) }} />
             <span className="avatar-editor-palette-frame" />
             {isHC && <img className="avatar-editor-palette-hc" src={hcSmallSrc} alt="" draggable={false} />}
-        </button>
+        </BaseButton>
     );
 };

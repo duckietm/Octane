@@ -6,6 +6,7 @@ import { useFortuneWheel } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 interface EditRow {
     id: number;
@@ -138,14 +139,14 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                                     onChange={(event) => updateRow(row.id, { label: event.target.value })}
                                     className="min-w-0 grow rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
                                 />
-                                <button
+                                <BaseButton
                                     type="button"
                                     title={LocalizeText('rarevalues.editor.remove')}
                                     onClick={() => removeRow(row.id)}
                                     className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded bg-[#d9534f] font-bold leading-none text-white hover:bg-[#c44440]"
                                 >
                                     ×
-                                </button>
+                                </BaseButton>
                             </Flex>
                         ))}
                         {!editRows.length && (
@@ -154,22 +155,22 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                             </Text>
                         )}
                     </Column>
-                    <button
+                    <BaseButton
                         type="button"
                         disabled={editRows.length >= 64}
                         onClick={addRow}
                         className="cursor-pointer rounded border border-dashed border-[#3a7bb5] px-4 py-1.5 text-sm font-bold text-[#3a7bb5] hover:bg-[#3a7bb5]/10 disabled:cursor-default disabled:opacity-40"
                     >
                         {LocalizeText('rarevalues.editor.add')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         type="button"
                         disabled={!editRows.length}
                         onClick={() => saveAdminPrizes?.(editRows.map(rowToEdit))}
                         className="cursor-pointer rounded bg-[#3a7bb5] px-4 py-2 font-bold text-white hover:bg-[#336ea3] disabled:cursor-default disabled:opacity-40"
                     >
                         {LocalizeText('rarevalues.editor.save')}
-                    </button>
+                    </BaseButton>
                 </Column>
             </OctaneCard.Content>
         </OctaneCard>

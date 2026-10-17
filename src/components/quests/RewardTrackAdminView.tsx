@@ -7,6 +7,7 @@ import { RewardTrackAdminModalView } from './RewardTrackAdminModalView';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 const text = (key: string, fallback: string) => localizeWithFallback(`reward_track.admin.${key}`, fallback);
 
@@ -198,9 +199,9 @@ const Panel: FC<{ title: ReactNode; summary?: ReactNode; actions?: ReactNode; ch
         <section className={`octane-reward-track-admin-panel ${className}${collapsed ? ' is-collapsed' : ''}`.trim()}>
             <header className={`octane-reward-track-admin-panel-head${collapseKey ? ' is-toggle' : ''}`} onClick={collapseKey ? () => setCollapsed((value) => !value) : undefined}>
                 {collapseKey && (
-                    <button type="button" className="octane-reward-track-admin-chevron" aria-expanded={!collapsed} data-testid={`rt-admin-collapse-${collapseKey}`}>
+                    <BaseButton type="button" className="octane-reward-track-admin-chevron" aria-expanded={!collapsed} data-testid={`rt-admin-collapse-${collapseKey}`}>
                         {collapsed ? '▸' : '▾'}
-                    </button>
+                    </BaseButton>
                 )}
                 <span className="octane-reward-track-admin-panel-title">{title}</span>
                 {collapsed && summary && <span className="octane-reward-track-admin-panel-summary">{summary}</span>}
@@ -267,10 +268,10 @@ const FurniPicker: FC<{ value: string; results: { query: string; matches: { name
             {matches.length > 0 && (
                 <div className="octane-reward-track-admin-furni-results">
                     {matches.map((match) => (
-                        <button key={match.name} type="button" className={`octane-reward-track-admin-furni-match${match.name === value ? ' is-picked' : ''}`} onClick={() => onPick(match.name)} data-testid="rt-admin-furni-match">
+                        <BaseButton key={match.name} type="button" className={`octane-reward-track-admin-furni-match${match.name === value ? ' is-picked' : ''}`} onClick={() => onPick(match.name)} data-testid="rt-admin-furni-match">
                             <LayoutFurniIconImageView productType={match.typeCode} productClassId={match.spriteId} className="octane-reward-track-admin-furni-icon" />
                             <span>{match.name}</span>
-                        </button>
+                        </BaseButton>
                     ))}
                 </div>
             )}
@@ -425,9 +426,9 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                 >
                     <div className="octane-reward-track-admin-filters" data-testid="rt-admin-filters">
                         {FILTERS.map((entry) => (
-                            <button key={entry} type="button" className={`octane-reward-track-admin-filter${filter === entry ? ' is-active' : ''}`} onClick={() => setFilter(entry)}>
+                            <BaseButton key={entry} type="button" className={`octane-reward-track-admin-filter${filter === entry ? ' is-active' : ''}`} onClick={() => setFilter(entry)}>
                                 {text(`filter.${entry}`, entry)}
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                     <div className="octane-reward-track-admin-track-list">
@@ -435,7 +436,7 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                         {loaded && !tracks.length && <span className="octane-reward-track-admin-muted">{text('empty', 'No reward track yet.')}</span>}
                         {loaded && tracks.length > 0 && !visibleTracks.length && <span className="octane-reward-track-admin-muted">{text('filter.empty', 'No track in this state.')}</span>}
                         {visibleTracks.map((track) => (
-                            <button
+                            <BaseButton
                                 key={track.id}
                                 type="button"
                                 className={`octane-reward-track-admin-track${track.id === selectedTrackId ? ' is-active' : ''}${track.enabled ? '' : ' is-disabled'}`}
@@ -450,7 +451,7 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                     </span>
                                 </span>
                                 <StateTag state={getRewardTrackAdminState(track)} />
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </Panel>
@@ -620,10 +621,10 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                             {selectedTrack.tasks.map((task, index) => (
                                                 <tr key={task.id} data-testid="rt-admin-task-row">
                                                     <td className="octane-reward-track-admin-order">
-                                                        <button type="button" className="octane-reward-track-admin-arrow" disabled={pending || index === 0} title={text('move.up', 'Move up')} data-testid="rt-admin-task-up" onClick={() => moveTask(index, -1)}>
+                                                        <BaseButton type="button" className="octane-reward-track-admin-arrow" disabled={pending || index === 0} title={text('move.up', 'Move up')} data-testid="rt-admin-task-up" onClick={() => moveTask(index, -1)}>
                                                             ▲
-                                                        </button>
-                                                        <button
+                                                        </BaseButton>
+                                                        <BaseButton
                                                             type="button"
                                                             className="octane-reward-track-admin-arrow"
                                                             disabled={pending || index === selectedTrack.tasks.length - 1}
@@ -632,7 +633,7 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                             onClick={() => moveTask(index, 1)}
                                                         >
                                                             ▼
-                                                        </button>
+                                                        </BaseButton>
                                                     </td>
                                                     <td>
                                                         <b>{task.id}</b>

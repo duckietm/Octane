@@ -14,6 +14,7 @@ import { useAvatarEffects } from '../../hooks';
 import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { AvatarEffectPreviewView } from './AvatarEffectPreviewView';
 import { Checkbox } from '../../common/Checkbox';
+import { BaseButton } from '../../common/BaseButton';
 
 interface EffectMapEntry {
     id: string;
@@ -179,22 +180,22 @@ export const AvatarEffectsView: FC<{}> = () => {
                     <div className="figure-preview-container overflow-hidden relative w-full h-[280px] bg-gradient-to-b from-[#1a1a1a] to-black rounded-md shadow-inner">
                         <AvatarEffectPreviewView figure={figure} gender={gender} direction={direction} effect={selectedId} height={280} zoom={2} />
                         <div className="arrow-container absolute inset-y-0 left-0 right-0 flex items-center justify-between px-1 z-10 pointer-events-none">
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="pointer-events-auto flex items-center justify-center w-7 h-7 rounded-full bg-black/55 hover:bg-black/75 border border-white/15 text-white shadow-md transition-all hover:scale-110 active:scale-95"
                                 onClick={() => rotateFigure(1)}
                                 aria-label="Rotate left"
                             >
                                 <FaChevronLeft className="w-3 h-3" />
-                            </button>
-                            <button
+                            </BaseButton>
+                            <BaseButton
                                 type="button"
                                 className="pointer-events-auto flex items-center justify-center w-7 h-7 rounded-full bg-black/55 hover:bg-black/75 border border-white/15 text-white shadow-md transition-all hover:scale-110 active:scale-95"
                                 onClick={() => rotateFigure(-1)}
                                 aria-label="Rotate right"
                             >
                                 <FaChevronRight className="w-3 h-3" />
-                            </button>
+                            </BaseButton>
                         </div>
                         {selectedEffect && (
                             <div className="absolute top-2 left-2 right-2 bg-black/65 rounded px-2 py-1 text-white text-xs leading-tight">
@@ -234,14 +235,14 @@ export const AvatarEffectsView: FC<{}> = () => {
                             </label>
                         )}
                         {selectedId > 0 && (
-                            <button
+                            <BaseButton
                                 type="button"
                                 onClick={jumpToSelected}
                                 className="text-[#3a78c4] hover:text-[#2a5d9e] hover:underline normal-case font-semibold cursor-pointer"
                                 title="Jump to selected effect"
                             >
                                 #{selectedId} selected
-                            </button>
+                            </BaseButton>
                         )}
                     </div>
                     <div className="flex-1 min-h-0 overflow-auto">
@@ -261,7 +262,7 @@ export const AvatarEffectsView: FC<{}> = () => {
                                     const isActive = id === activeEffectType;
                                     return (
                                         <li key={effect.id}>
-                                            <button
+                                            <BaseButton
                                                 ref={isSelected ? selectedRowRef : undefined}
                                                 type="button"
                                                 onClick={() => setSelectedId(id)}
@@ -286,20 +287,20 @@ export const AvatarEffectsView: FC<{}> = () => {
                                                         {LocalizeText('inventory.effects.owned') || 'owned'}
                                                     </span>
                                                 )}
-                                            </button>
+                                            </BaseButton>
                                         </li>
                                     );
                                 })}
                                 {hasMore && (
                                     <li className="px-3 py-2 border-t border-[#2a2a2a]/10 mt-1">
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
                                             className="w-full text-sm font-semibold text-[#3a78c4] hover:text-[#2a5d9e] hover:bg-[#eef3f9] cursor-pointer py-1.5 rounded-md transition-colors"
                                         >
                                             {LocalizeText('navigator.show.more') || 'See More'}
                                             <span className="opacity-60 ml-1 font-normal">({filteredEffects.length - visibleEffects.length} more)</span>
-                                        </button>
+                                        </BaseButton>
                                     </li>
                                 )}
                             </ul>

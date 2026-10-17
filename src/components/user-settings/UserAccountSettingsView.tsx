@@ -3,6 +3,7 @@ import { FC, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import { FaArrowLeft, FaCheckCircle, FaChevronRight, FaEnvelope, FaExclamationTriangle, FaEye, FaEyeSlash, FaIdBadge, FaInfoCircle, FaKey, FaShieldAlt, FaUserCog } from 'react-icons/fa';
 import { GetConfigurationValue, getAccessToken, LocalizeText, localizeWithFallback } from '../../api';
 import { Button, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
 
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 128;
@@ -420,7 +421,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 { section === 'menu' && (
                     <div className="flex flex-col gap-2">
                         <Text small className="text-black/60 uppercase tracking-wider px-1">{ localizeWithFallback('usersettings.menu.section', "Account") }</Text>
-                        <button
+                        <BaseButton
                             type="button"
                             className="group flex items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 hover:bg-[#f5fbfd] hover:border-[#418db0] transition-colors cursor-pointer text-left"
                             onClick={ () => { resetForm(); setSection('password'); } }>
@@ -432,9 +433,9 @@ export const UserAccountSettingsView: FC<{}> = () =>
                                 <Text small className="text-black/60">{ localizeWithFallback('usersettings.menu.password.desc', "Change the password you use to log in.") }</Text>
                             </div>
                             <FaChevronRight className="text-black/40 group-hover:text-[#418db0]" />
-                        </button>
+                        </BaseButton>
 
-                        <button
+                        <BaseButton
                             type="button"
                             className="group flex items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 hover:bg-[#f5fbfd] hover:border-[#418db0] transition-colors cursor-pointer text-left"
                             onClick={ () => { resetForm(); setSection('email'); } }>
@@ -446,9 +447,9 @@ export const UserAccountSettingsView: FC<{}> = () =>
                                 <Text small className="text-black/60">{ localizeWithFallback('usersettings.menu.email.desc', "Update your account's email address.") }</Text>
                             </div>
                             <FaChevronRight className="text-black/40 group-hover:text-[#418db0]" />
-                        </button>
+                        </BaseButton>
 
-                        <button
+                        <BaseButton
                             type="button"
                             className="group flex items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 hover:bg-[#fef7e0] hover:border-[#ffc107] transition-colors cursor-pointer text-left"
                             onClick={ () => { resetForm(); setSection('username'); } }>
@@ -460,7 +461,7 @@ export const UserAccountSettingsView: FC<{}> = () =>
                                 <Text small className="text-black/60">{ localizeWithFallback('usersettings.menu.username.desc', "Pick a new name. You'll need to log in again.") }</Text>
                             </div>
                             <FaChevronRight className="text-black/40 group-hover:text-[#a37800]" />
-                        </button>
+                        </BaseButton>
 
                         <div className="flex items-center gap-3 rounded-md border border-dashed border-black/15 bg-black/[0.02] px-3 py-2 opacity-70">
                             <div className="flex items-center justify-center w-9 h-9 rounded-full bg-black/10 text-black/40 shrink-0">
@@ -477,13 +478,13 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 { section === 'password' && (
                     <div className="flex flex-col gap-2" onKeyDown={ (event: KeyboardEvent<HTMLDivElement>) => { if(event.key === 'Enter') { event.preventDefault(); submitPasswordChange(); } } }>
                         <div className="flex items-center gap-2 -mt-1 mb-1">
-                            <button
+                            <BaseButton
                                 type="button"
                                 disabled={ submitting }
                                 onClick={ () => { resetForm(); setSection('menu'); } }
                                 className="flex items-center justify-center w-7 h-7 rounded-full bg-black/5 hover:bg-black/10 text-black/70 disabled:opacity-50">
                                 <FaArrowLeft size={ 11 } />
-                            </button>
+                            </BaseButton>
                             <FaUserCog className="text-[#418db0]" />
                             <Text bold>{ localizeWithFallback('usersettings.menu.password.title', "Reset password") }</Text>
                         </div>
@@ -506,13 +507,13 @@ export const UserAccountSettingsView: FC<{}> = () =>
                                     onChange={ event => setCurrentPassword(event.target.value) }
                                     disabled={ submitting }
                                 />
-                                <button
+                                <BaseButton
                                     type="button"
                                     aria-label={ showCurrent ? localizeWithFallback('usersettings.aria.hide_password', "Hide password") : localizeWithFallback('usersettings.aria.show_password', "Show password") }
                                     onClick={ () => setShowCurrent(prev => !prev) }
                                     className="absolute right-2 text-black/40 hover:text-black/70">
                                     { showCurrent ? <FaEyeSlash size={ 12 } /> : <FaEye size={ 12 } /> }
-                                </button>
+                                </BaseButton>
                             </div>
                         </label>
 
@@ -529,13 +530,13 @@ export const UserAccountSettingsView: FC<{}> = () =>
                                     onChange={ event => setNewPassword(event.target.value) }
                                     disabled={ submitting }
                                 />
-                                <button
+                                <BaseButton
                                     type="button"
                                     aria-label={ showNew ? localizeWithFallback('usersettings.aria.hide_password', "Hide password") : localizeWithFallback('usersettings.aria.show_password', "Show password") }
                                     onClick={ () => setShowNew(prev => !prev) }
                                     className="absolute right-2 text-black/40 hover:text-black/70">
                                     { showNew ? <FaEyeSlash size={ 12 } /> : <FaEye size={ 12 } /> }
-                                </button>
+                                </BaseButton>
                             </div>
                             { newPassword.length > 0 && (
                                 <div className="flex items-center gap-2 mt-1">
@@ -589,13 +590,13 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 { section === 'email' && (
                     <div className="flex flex-col gap-2" onKeyDown={ (event: KeyboardEvent<HTMLDivElement>) => { if(event.key === 'Enter') { event.preventDefault(); submitEmailChange(); } } }>
                         <div className="flex items-center gap-2 -mt-1 mb-1">
-                            <button
+                            <BaseButton
                                 type="button"
                                 disabled={ submitting }
                                 onClick={ () => { resetForm(); setSection('menu'); } }
                                 className="flex items-center justify-center w-7 h-7 rounded-full bg-black/5 hover:bg-black/10 text-black/70 disabled:opacity-50">
                                 <FaArrowLeft size={ 11 } />
-                            </button>
+                            </BaseButton>
                             <FaEnvelope className="text-[#376275]" />
                             <Text bold>{ localizeWithFallback('usersettings.menu.email.title', "Change email") }</Text>
                         </div>
@@ -618,13 +619,13 @@ export const UserAccountSettingsView: FC<{}> = () =>
                                     onChange={ event => setEmailCurrentPassword(event.target.value) }
                                     disabled={ submitting }
                                 />
-                                <button
+                                <BaseButton
                                     type="button"
                                     aria-label={ showEmailPassword ? localizeWithFallback('usersettings.aria.hide_password', "Hide password") : localizeWithFallback('usersettings.aria.show_password', "Show password") }
                                     onClick={ () => setShowEmailPassword(prev => !prev) }
                                     className="absolute right-2 text-black/40 hover:text-black/70">
                                     { showEmailPassword ? <FaEyeSlash size={ 12 } /> : <FaEye size={ 12 } /> }
-                                </button>
+                                </BaseButton>
                             </div>
                         </label>
 
@@ -672,13 +673,13 @@ export const UserAccountSettingsView: FC<{}> = () =>
                 { section === 'username' && (
                     <div className="flex flex-col gap-2" onKeyDown={ (event: KeyboardEvent<HTMLDivElement>) => { if(event.key === 'Enter') { event.preventDefault(); submitUsernameChange(); } } }>
                         <div className="flex items-center gap-2 -mt-1 mb-1">
-                            <button
+                            <BaseButton
                                 type="button"
                                 disabled={ submitting }
                                 onClick={ () => { resetForm(); setSection('menu'); } }
                                 className="flex items-center justify-center w-7 h-7 rounded-full bg-black/5 hover:bg-black/10 text-black/70 disabled:opacity-50">
                                 <FaArrowLeft size={ 11 } />
-                            </button>
+                            </BaseButton>
                             <FaIdBadge className="text-[#a37800]" />
                             <Text bold>{ localizeWithFallback('usersettings.menu.username.title', "Change username") }</Text>
                         </div>
@@ -701,13 +702,13 @@ export const UserAccountSettingsView: FC<{}> = () =>
                                     onChange={ event => setUsernameCurrentPassword(event.target.value) }
                                     disabled={ submitting }
                                 />
-                                <button
+                                <BaseButton
                                     type="button"
                                     aria-label={ showUsernamePassword ? localizeWithFallback('usersettings.aria.hide_password', "Hide password") : localizeWithFallback('usersettings.aria.show_password', "Show password") }
                                     onClick={ () => setShowUsernamePassword(prev => !prev) }
                                     className="absolute right-2 text-black/40 hover:text-black/70">
                                     { showUsernamePassword ? <FaEyeSlash size={ 12 } /> : <FaEye size={ 12 } /> }
-                                </button>
+                                </BaseButton>
                             </div>
                         </label>
 

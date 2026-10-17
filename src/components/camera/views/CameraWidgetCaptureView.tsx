@@ -5,6 +5,7 @@ import { Column, DraggableWindow } from '../../../common';
 import { useCamera, useNotification } from '../../../hooks';
 import { getNextEmptyCameraSlot, willFillLastCameraSlot } from '../CameraAirUtilities';
 import { CameraCenteredText } from './CameraNativeText';
+import { BaseButton } from '../../../common/BaseButton';
 
 export interface CameraWidgetCaptureViewProps {
     onClose: () => void;
@@ -219,8 +220,8 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
                     <div className="octane-camera-capture__title">
                         <CameraCenteredText color={0xffffff} text={LocalizeText('camera.interface.title')} textStyle="u_frame_title" width={340} />
                     </div>
-                    <button type="button" className="octane-camera-capture__help" aria-label={LocalizeText('generic.help')} onClick={() => CreateLinkEvent('habbopages/camera')} />
-                    <button type="button" className="octane-camera-capture__close" aria-label={LocalizeText('generic.close')} onClick={onClose} />
+                    <BaseButton type="button" className="octane-camera-capture__help" aria-label={LocalizeText('generic.help')} onClick={() => CreateLinkEvent('habbopages/camera')} />
+                    <BaseButton type="button" className="octane-camera-capture__close" aria-label={LocalizeText('generic.close')} onClick={onClose} />
                     <div className="octane-camera-viewfinder">
                         {!selectedPicture && (
                             <>
@@ -234,18 +235,18 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
                     <div ref={flashRef} className="octane-camera-capture__flash" aria-hidden="true" />
                     {selectedPicture && (
                         <div className="octane-camera-capture__preview-actions">
-                            {/* A real <button>: the drag handle lets only native controls take the mouse. */}
-                            <button
+                            {/* A real <BaseButton>: the drag handle lets only native controls take the mouse. */}
+                            <BaseButton
                                 className="habbo-btn-primary octane-camera-capture__editor-button"
                                 title={LocalizeText('camera.editor.button.tooltip')}
                                 type="button"
                                 onClick={onEdit}
                             >
                                 <CameraCenteredText color={0xffffff} text={LocalizeText('camera.editor.button.text')} textStyle="button_shiny_bold" width={36} />
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
-                    <button
+                    <BaseButton
                         type="button"
                         className="octane-camera-capture__shutter"
                         aria-label={LocalizeText('camera.take.photo.button.tooltip')}
@@ -260,7 +261,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
 
                         return (
                             <div key={index} className={`octane-camera-roll__slot${isActive ? ' octane-camera-roll__slot--active' : ''}`}>
-                                <button
+                                <BaseButton
                                     type="button"
                                     className="octane-camera-roll__slot-button"
                                     aria-label={picture ? LocalizeText('camera.editor.button.tooltip') : LocalizeText('camera.take.photo.button.tooltip')}
@@ -272,9 +273,9 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
                                     }}
                                 >
                                     {picture && <img alt="" src={picture.imageUrl} />}
-                                </button>
+                                </BaseButton>
                                 {picture && selectedPictureIndex === index && (
-                                    <button
+                                    <BaseButton
                                         type="button"
                                         className="octane-camera-roll__delete"
                                         aria-label={LocalizeText('camera.delete.button.text')}

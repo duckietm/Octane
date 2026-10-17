@@ -4,6 +4,7 @@ import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../a
 import { LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { Checkbox } from '../../../common/Checkbox';
 import { InlineDialog } from '../../../common/InlineDialog';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface CatalogPurchaseConfirmViewProps {
     offer: IPurchasableOffer;
@@ -112,17 +113,17 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                     </div>
                 )}
                 <div className="octane-catalog-purchase-confirm-actions">
-                    <button className="octane-catalog-purchase-confirm-button is-cancel" disabled={isSubmitting} type="button" onClick={onCancel}>
+                    <BaseButton className="octane-catalog-purchase-confirm-button is-cancel" disabled={isSubmitting} type="button" onClick={onCancel}>
                         {LocalizeText('catalog.purchase_confirmation.cancel')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         className="octane-catalog-purchase-confirm-button is-buy"
                         disabled={isSubmitting || !spendingDisclaimerAccepted}
                         type="button"
                         onClick={onConfirm}
                     >
                         {LocalizeText(isGift ? 'catalog.purchase_confirmation.gift' : `catalog.purchase_confirmation.${offer.isRentOffer ? 'rent' : 'buy'}`)}
-                    </button>
+                    </BaseButton>
                 </div>
             </OctaneCardContentView>
         </InlineDialog>

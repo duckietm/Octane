@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { DisplaySoundboardSound } from '../../hooks/soundboard/soundboardPresentation';
 import { SOUNDBOARD_TONE_CLASSES } from './SoundboardPadView';
+import { BaseButton } from '../../common/BaseButton';
 
 interface SoundboardShelfViewProps {
     label: string;
@@ -16,7 +17,7 @@ export const SoundboardShelfView: FC<SoundboardShelfViewProps> = ({ label, sound
         <span className="soundboard-shelf__label">{label}</span>
         <div className="soundboard-shelf__row">
             {sounds.map((sound) => (
-                <button
+                <BaseButton
                     key={sound.id}
                     type="button"
                     aria-label={sound.name}
@@ -27,7 +28,7 @@ export const SoundboardShelfView: FC<SoundboardShelfViewProps> = ({ label, sound
                     className={`soundboard-shelf__button ${SOUNDBOARD_TONE_CLASSES[sound.tone]}`}
                 >
                     ♪
-                </button>
+                </BaseButton>
             ))}
         </div>
     </div>

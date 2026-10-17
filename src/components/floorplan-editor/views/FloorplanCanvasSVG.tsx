@@ -5,6 +5,7 @@ import { useTool } from '../hooks/useTool';
 import { MAX_NUM_TILE_PER_AXIS, TILE_SIZE } from '../state/constants';
 import { FloorplanAction, FloorplanState } from '../state/types';
 import { FloorplanTile } from './FloorplanTile';
+import { BaseButton } from '../../../common/BaseButton';
 
 type Props = {
     state: FloorplanState;
@@ -244,10 +245,10 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                 {outOfBoundsOverlay}
             </svg>
             <div className="fp-stage-buttons">
-                <button type="button" data-testid="zoom-reset" title="Fit room to view" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
+                <BaseButton type="button" data-testid="zoom-reset" title="Fit room to view" className="fp-round-btn is-small" disabled={!roomBounds} onClick={resetView}>
                     <FaExpand size={10} />
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     type="button"
                     data-testid="zoom-recenter"
                     title="Recenter on room (keep zoom)"
@@ -259,8 +260,8 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                     }}
                 >
                     <FaCrosshairs size={10} />
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     type="button"
                     data-testid="zoom-flip"
                     data-active={flipped ? 'true' : 'false'}
@@ -269,13 +270,13 @@ export const FloorplanCanvasSVG: FC<Props> = ({ state, dispatch, panMode }) => {
                     onClick={() => setFlipped((v) => !v)}
                 >
                     <FaSyncAlt size={10} />
-                </button>
-                <button type="button" data-testid="zoom-in" title={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} className="fp-round-btn" disabled={zoom >= ZOOM_MAX - 1e-3} onClick={zoomIn}>
+                </BaseButton>
+                <BaseButton type="button" data-testid="zoom-in" title={`Zoom in (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} className="fp-round-btn" disabled={zoom >= ZOOM_MAX - 1e-3} onClick={zoomIn}>
                     <FaPlus size={13} />
-                </button>
-                <button type="button" data-testid="zoom-out" title={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} className="fp-round-btn" disabled={zoom <= ZOOM_MIN + 1e-3} onClick={zoomOut}>
+                </BaseButton>
+                <BaseButton type="button" data-testid="zoom-out" title={`Zoom out (Ctrl+wheel) · ${Math.round(zoom * 100)}%`} className="fp-round-btn" disabled={zoom <= ZOOM_MIN + 1e-3} onClick={zoomOut}>
                     <FaMinus size={13} />
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

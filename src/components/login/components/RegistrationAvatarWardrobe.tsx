@@ -10,6 +10,7 @@ import { InfiniteGrid } from '../../../layout';
 import { AvatarEditorIcon } from '../../avatar-editor/AvatarEditorIcon';
 import { t } from '../utils/i18n';
 import { TabBar, TabBarTab } from '../../../common/TabBar';
+import { BaseButton } from '../../../common/BaseButton';
 
 type GenderKey = 'M' | 'F';
 type FigureSelection = Record<string, { partId: number; colors: number[] }>;
@@ -204,22 +205,22 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
                         <div className="registration-avatar-shadow" />
                     </div>
                     <div className="registration-wardrobe-rotation">
-                        <button
+                        <BaseButton
                             type="button"
                             aria-label={t('nitro.login.register.wardrobe.rotate_left', 'Rotate left')}
                             title={t('nitro.login.register.wardrobe.rotate_left', 'Rotate left')}
                             onClick={() => rotateAvatar(1)}
                         >
                             <AvatarEditorIcon icon="arrow-left" />
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             aria-label={t('nitro.login.register.wardrobe.rotate_right', 'Rotate right')}
                             title={t('nitro.login.register.wardrobe.rotate_right', 'Rotate right')}
                             onClick={() => rotateAvatar(-1)}
                         >
                             <AvatarEditorIcon icon="arrow-right" />
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
 
@@ -274,7 +275,7 @@ export const RegistrationAvatarWardrobe: FC<RegistrationAvatarWardrobeProps> = (
                     <div className="registration-wardrobe-section-title">{t('nitro.login.register.wardrobe.colors', 'Colors')}</div>
                     <div className="registration-wardrobe-palette">
                         {availableColors.map((color) => (
-                            <button
+                            <BaseButton
                                 key={color.id}
                                 type="button"
                                 className={color.id === selectedColor ? 'active' : ''}

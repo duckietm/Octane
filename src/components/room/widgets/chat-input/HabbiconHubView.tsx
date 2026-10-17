@@ -6,6 +6,7 @@ import { DraggableWindowPosition, LayoutCurrencyIcon, LayoutHabbiconImageView, O
 import { HabbiconProgressBarView } from './HabbiconProgressBarView';
 import { HabbiconPurchaseView } from './HabbiconPurchaseView';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const HabbiconPrice: FC<{ priceCredits: number; priceActivityPoints: number; activityPointType: number }> = ({
     priceCredits,
@@ -60,7 +61,7 @@ export const HabbiconHubView: FC = () => {
     };
 
     const renderTile = (entry: HabbiconEntry) => (
-        <button
+        <BaseButton
             className={`habbicon-tile air-bitmap-surface ${entry.owned ? 'owned' : 'unowned'} ${entry.claimable ? 'claimable' : ''} ${popup?.id === entry.id ? 'active' : ''}`}
             key={entry.id}
             type="button"
@@ -70,7 +71,7 @@ export const HabbiconHubView: FC = () => {
             <LayoutHabbiconImageView id={entry.id} className="habbicon-tile-image" />
             {entry.favorite && <img alt="" className="habbicon-hub-fav" src={HabbiconFavorite} />}
             {entry.claimable && <span className="habbicon-claimable-marker" />}
-        </button>
+        </BaseButton>
     );
 
     return (
@@ -147,9 +148,9 @@ export const HabbiconHubView: FC = () => {
                     )}
 
                     {!catalog.loaded && catalog.error && (
-                        <button type="button" className="habbicon-action habbicon-hub-retry" onClick={catalog.retry}>
+                        <BaseButton type="button" className="habbicon-action habbicon-hub-retry" onClick={catalog.retry}>
                             {localizeWithFallback('generic.retry', 'Try again')}
-                        </button>
+                        </BaseButton>
                     )}
 
                     {catalog.loaded && tab === 'all_sets' && (
@@ -157,7 +158,7 @@ export const HabbiconHubView: FC = () => {
                             <div className="habbicon-hub-rail air-bitmap-surface">
                                 <div className="habbicon-hub-rail-list has-classic-scrollbar">
                                     {sets.map((set) => (
-                                        <button
+                                        <BaseButton
                                             className={`air-bitmap-surface ${set.id === activeSet?.id ? 'active' : ''}`}
                                             key={set.id}
                                             type="button"
@@ -171,7 +172,7 @@ export const HabbiconHubView: FC = () => {
                                                 <strong>{set.title}</strong>
                                                 <HabbiconProgressBarView completed={set.completed} total={set.total} variant="rail" />
                                             </div>
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </div>
@@ -210,7 +211,7 @@ export const HabbiconHubView: FC = () => {
                                                           : 'Complete this set to unlock the reward.'
                                                 )}
                                             </p>
-                                            <button
+                                            <BaseButton
                                                 className="habbicon-action"
                                                 type="button"
                                                 disabled={!activeSet.reward.claimable || !!catalog.pending}
@@ -220,20 +221,20 @@ export const HabbiconHubView: FC = () => {
                                                     activeSet.reward.owned ? 'habbicon_reward.claimed' : 'habbicon_reward.claim',
                                                     activeSet.reward.owned ? 'Claimed' : 'Claim'
                                                 )}
-                                            </button>
+                                            </BaseButton>
                                             {activeSet.canBuy && !activeSet.reward.owned && !activeSet.reward.claimable && (
                                                 <div className="habbicon-hub-buy-set">
                                                     <strong>{localizeWithFallback('habbicon_book.buy_set', 'Buy set')}</strong>
                                                     <div className="habbicon-hub-buy-row">
                                                         <HabbiconPrice {...activeSet} />
-                                                        <button
+                                                        <BaseButton
                                                             className="habbicon-action"
                                                             type="button"
                                                             disabled={!!catalog.pending}
                                                             onClick={() => catalog.setPurchase({ id: activeSet.collectionId, collection: true })}
                                                         >
                                                             {localizeWithFallback('generic.buy', 'Buy')}
-                                                        </button>
+                                                        </BaseButton>
                                                     </div>
                                                 </div>
                                             )}
@@ -289,7 +290,7 @@ export const HabbiconHubView: FC = () => {
                                         <Popover.Arrow className="habbicon-hub-popup-arrow" />
                                         <strong>{localizeHabbiconName(popupEntry)}</strong>
                                         {popupEntry.owned ? (
-                                            <button
+                                            <BaseButton
                                                 className={`habbicon-action ${popupEntry.favorite ? 'remove' : ''}`}
                                                 type="button"
                                                 disabled={!!catalog.pending}
@@ -299,16 +300,16 @@ export const HabbiconHubView: FC = () => {
                                                     popupEntry.favorite ? 'habbicon.favourite.remove' : 'habbicon.favourite.add',
                                                     popupEntry.favorite ? 'Remove from favourites' : 'Add to favourites'
                                                 )}
-                                            </button>
+                                            </BaseButton>
                                         ) : popupEntry.claimable ? (
-                                            <button
+                                            <BaseButton
                                                 className="habbicon-action"
                                                 type="button"
                                                 disabled={!!catalog.pending}
                                                 onClick={() => catalog.claim(popupEntry.id)}
                                             >
                                                 {localizeWithFallback('habbicon_reward.claim', 'Claim')}
-                                            </button>
+                                            </BaseButton>
                                         ) : (
                                             <>
                                                 <p>
@@ -320,14 +321,14 @@ export const HabbiconHubView: FC = () => {
                                                 {popupEntry.purchasable && (
                                                     <div className="habbicon-popup-purchase">
                                                         <HabbiconPrice {...popupEntry} />
-                                                        <button
+                                                        <BaseButton
                                                             className="habbicon-action"
                                                             type="button"
                                                             disabled={!!catalog.pending}
                                                             onClick={() => catalog.setPurchase({ id: popupEntry.id, collection: false })}
                                                         >
                                                             {localizeWithFallback('generic.buy', 'Buy')}
-                                                        </button>
+                                                        </BaseButton>
                                                     </div>
                                                 )}
                                             </>

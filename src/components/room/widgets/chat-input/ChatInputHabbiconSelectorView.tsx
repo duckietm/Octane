@@ -12,6 +12,7 @@ import {
 } from '../../../../api';
 import { UseHabbiconIcon } from '../../../../assets/images/habbicons';
 import { LayoutHabbiconImageView, LayoutItemCountView, Popover, PopoverContent, PopoverTrigger } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type SelectorSection = {
     id: string;
@@ -123,9 +124,9 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                         <div className="habbicon-selector-search">
                             <input maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
                             {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
-                            {search && <button aria-label="Clear" type="button" onClick={() => setSearch('')} />}
+                            {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
                         </div>
-                        <button
+                        <BaseButton
                             className="habbicon-selector-book-button"
                             type="button"
                             onClick={() => {
@@ -134,7 +135,7 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                             }}
                         >
                             {localizeWithFallback('habbicons.hud.get_more', 'Get more')}
-                        </button>
+                        </BaseButton>
                     </div>
                     {sections.length > 0 ? (
                         <div className="habbicon-selector-sections has-classic-scrollbar" style={{ height: listHeight }}>
@@ -144,7 +145,7 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                                     <div className="habbicon-selector-grid">
                                         {padHabbiconRow(section.entries).map((entry, index) =>
                                             entry ? (
-                                                <button
+                                                <BaseButton
                                                     className="habbicon-selector-item filled"
                                                     key={entry.id}
                                                     title={localizeHabbiconName(entry)}
@@ -153,7 +154,7 @@ export const ChatInputHabbiconSelectorView: FC = () => {
                                                 >
                                                     <LayoutHabbiconImageView id={entry.id} size={30} />
                                                     {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -5, right: -5 }} />}
-                                                </button>
+                                                </BaseButton>
                                             ) : (
                                                 <div className="habbicon-selector-item empty" key={`empty-${section.id}-${index}`} />
                                             )

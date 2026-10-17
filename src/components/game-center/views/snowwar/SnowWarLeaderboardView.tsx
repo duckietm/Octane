@@ -4,6 +4,7 @@ import { SNOWWAR_AIR_ASSETS } from '../../../../assets/images/snowstorm/air';
 import { LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
 import { useSnowWar } from '../../../../hooks';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // AIR viewSize: eight 42px rows in the 336px list.
 const PAGE_SIZE = 8;
@@ -89,28 +90,28 @@ export const SnowWarLeaderboardView: FC = () =>
             <div className="snowwar-leaderboard-frame" role="dialog" aria-label={ caption }>
                 <div className="snowwar-leaderboard-frame__title">
                     <span>{ caption }</span>
-                    <button aria-label={ localizeWithFallback('generic.close', 'Close') } className="snowwar-leaderboard__close" type="button" onClick={ closeLeaderboard }>×</button>
+                    <BaseButton aria-label={ localizeWithFallback('generic.close', 'Close') } className="snowwar-leaderboard__close" type="button" onClick={ closeLeaderboard }>×</BaseButton>
                 </div>
                 <div className="snowwar-leaderboard" style={ { backgroundImage: `url(${ asset('leaderboard_bg') })` } }>
                     <div className="snowwar-leaderboard__tabs">
-                        <button
+                        <BaseButton
                             className={ `snowwar-leaderboard__tab ${ leaderboard.weekly ? 'is-active' : '' }` }
                             style={ { backgroundImage: `url(${ asset(leaderboard.weekly ? 'left_black' : 'left_blue') })` } }
                             type="button"
                             onClick={ () => go('this_week') }>
                             { pastWeek ? `${ leaderboard.year }/${ leaderboard.week }` : localizeWithFallback('snowwar.leaderboard.this_week', 'This week') }
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             className={ `snowwar-leaderboard__tab ${ !leaderboard.weekly ? 'is-active' : '' }` }
                             style={ { backgroundImage: `url(${ asset(!leaderboard.weekly ? 'right_black' : 'right_blue') })` } }
                             type="button"
                             onClick={ () => go('all_time') }>
                             { localizeWithFallback('snowwar.leaderboard.all_time', 'All time') }
-                        </button>
+                        </BaseButton>
                     </div>
 
                     { canScrollUp && (
-                        <button aria-label="Scroll up" className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--up" style={ scrollImages('up') } type="button" onClick={ () => setRowOffset(offset => Math.max(0, offset - PAGE_SIZE)) } />
+                        <BaseButton aria-label="Scroll up" className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--up" style={ scrollImages('up') } type="button" onClick={ () => setRowOffset(offset => Math.max(0, offset - PAGE_SIZE)) } />
                     ) }
 
                     <div className="snowwar-leaderboard__list">
@@ -129,14 +130,14 @@ export const SnowWarLeaderboardView: FC = () =>
                                 <div key={ `${ entry.userId }-${ entry.rank }` } className={ `snowwar-leaderboard__row ${ own ? 'is-own' : '' }` }>
                                     { own && <img alt="" className="snowwar-leaderboard__highlight" src={ asset('leaderboard_highlighter') } /> }
                                     <span className="snowwar-leaderboard__rank">{ entry.rank }</span>
-                                    <button
+                                    <BaseButton
                                         className="snowwar-leaderboard__avatar"
                                         type="button"
                                         onClick={ () => (isGroup ? GetGroupInformation(entry.userId) : GetUserProfile(entry.userId)) }>
                                         { isGroup
                                             ? <LayoutBadgeImageView badgeCode={ entry.figure } isGroup={ true } />
                                             : <LayoutAvatarImageView direction={ 2 } figure={ entry.figure } gender={ entry.gender } headOnly={ true } /> }
-                                    </button>
+                                    </BaseButton>
                                     <span className="snowwar-leaderboard__name">{ entry.name }</span>
                                     <span className="snowwar-leaderboard__score">{ entry.score }</span>
                                 </div>
@@ -145,17 +146,17 @@ export const SnowWarLeaderboardView: FC = () =>
                     </div>
 
                     { canScrollDown && (
-                        <button aria-label="Scroll down" className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--down" style={ scrollImages('down') } type="button" onClick={ () => setRowOffset(offset => Math.min(Math.max(0, leaderboard.entries.length - PAGE_SIZE), offset + PAGE_SIZE)) } />
+                        <BaseButton aria-label="Scroll down" className="snowwar-leaderboard__scroll snowwar-leaderboard__scroll--down" style={ scrollImages('down') } type="button" onClick={ () => setRowOffset(offset => Math.min(Math.max(0, leaderboard.entries.length - PAGE_SIZE), offset + PAGE_SIZE)) } />
                     ) }
 
                     { leaderboard.weekly && (
                         <>
                             { /* AIR previousWeek (left, scroll_left) goes back a week; nextWeek (right) forward. */ }
                             { (leaderboard.currentOffset < leaderboard.maxOffset) && (
-                                <button aria-label="Previous week" className="snowwar-leaderboard__week snowwar-leaderboard__week--previous" style={ { backgroundImage: `url(${ asset('scroll_left') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset + 1) } />
+                                <BaseButton aria-label="Previous week" className="snowwar-leaderboard__week snowwar-leaderboard__week--previous" style={ { backgroundImage: `url(${ asset('scroll_left') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset + 1) } />
                             ) }
                             { pastWeek && (
-                                <button aria-label="Next week" className="snowwar-leaderboard__week snowwar-leaderboard__week--next" style={ { backgroundImage: `url(${ asset('scroll_right') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset - 1) } />
+                                <BaseButton aria-label="Next week" className="snowwar-leaderboard__week snowwar-leaderboard__week--next" style={ { backgroundImage: `url(${ asset('scroll_right') })` } } type="button" onClick={ () => goWeek(leaderboard.currentOffset - 1) } />
                             ) }
                             { !pastWeek && (
                                 <div className="snowwar-leaderboard__reset">
@@ -169,15 +170,15 @@ export const SnowWarLeaderboardView: FC = () =>
                     ) }
 
                     <div className="snowwar-leaderboard__links">
-                        <button className={ `snowwar-leaderboard__link ${ (!leaderboard.friendsOnly && !leaderboard.groups) ? 'is-active' : '' }` } type="button" onClick={ () => go('everyone') }>
+                        <BaseButton className={ `snowwar-leaderboard__link ${ (!leaderboard.friendsOnly && !leaderboard.groups) ? 'is-active' : '' }` } type="button" onClick={ () => go('everyone') }>
                             { localizeWithFallback('snowwar.leaderboard.all', 'Top Scores') }
-                        </button>
-                        <button className={ `snowwar-leaderboard__link ${ leaderboard.friendsOnly ? 'is-active' : '' }` } type="button" onClick={ () => go('friends') }>
+                        </BaseButton>
+                        <BaseButton className={ `snowwar-leaderboard__link ${ leaderboard.friendsOnly ? 'is-active' : '' }` } type="button" onClick={ () => go('friends') }>
                             { localizeWithFallback('snowwar.leaderboard.friends', 'Friends Scores') }
-                        </button>
-                        <button className={ `snowwar-leaderboard__link ${ leaderboard.groups ? 'is-active' : '' }` } type="button" onClick={ () => go('groups') }>
+                        </BaseButton>
+                        <BaseButton className={ `snowwar-leaderboard__link ${ leaderboard.groups ? 'is-active' : '' }` } type="button" onClick={ () => go('groups') }>
                             { localizeWithFallback('people.groups.title', 'Groups') }
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
             </div>

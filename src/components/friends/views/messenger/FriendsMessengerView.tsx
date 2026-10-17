@@ -11,6 +11,7 @@ import { resolveAvatarFigure } from '../friends-list/resolveAvatarFigure';
 import './FriendsMessengerView.css';
 import { FriendsMessengerHabbiconPickerView } from './FriendsMessengerHabbiconPickerView';
 import { FriendsMessengerThreadView } from './messenger-thread/FriendsMessengerThreadView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const MESSENGER_VISIBLE_AVATARS = 7;
 
@@ -212,10 +213,10 @@ export const FriendsMessengerView: FC<{}> = (props) => {
         <DraggableWindow handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
             <div className="messenger-window">
                 <div className="messenger-drag" />
-                <button className="messenger-minimize" onClick={() => setIsVisible(false)} />
+                <BaseButton className="messenger-minimize" onClick={() => setIsVisible(false)} />
                 <div className="messenger-open-title">{LocalizeText('messenger.window.title', ['OPEN_CHAT_COUNT'], [visibleThreads.length.toString()])}</div>
                 <div className="messenger-avatar-navigation">
-                    <button
+                    <BaseButton
                         type="button"
                         className="messenger-avatar-scroll left"
                         data-action="scroll-left"
@@ -233,7 +234,7 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                             );
 
                             return (
-                                <button
+                                <BaseButton
                                     key={thread.threadId}
                                     type="button"
                                     data-participant-id={thread.participant.id}
@@ -254,11 +255,11 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                                             direction={thread.participant.id < 0 ? 3 : 2}
                                         />
                                     )}
-                                </button>
+                                </BaseButton>
                             );
                         })}
                     </div>
-                    <button
+                    <BaseButton
                         type="button"
                         className="messenger-avatar-scroll right"
                         data-action="scroll-right"
@@ -277,27 +278,27 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                             <div className="messenger-actions">
                                 {activeThread.participant.id > 0 && (
                                     <>
-                                        <button
+                                        <BaseButton
                                             className="messenger-btn icon-btn follow"
                                             aria-label={LocalizeText('friendlist.tip.follow')}
                                             onClick={followFriend}
                                         />
-                                        <button
+                                        <BaseButton
                                             className="messenger-btn icon-btn profile"
                                             aria-label={LocalizeText('infostand.profile.link.tooltip')}
                                             onClick={openProfile}
                                         />
-                                        <button
+                                        <BaseButton
                                             className="messenger-btn danger"
                                             onClick={() => report(ReportType.IM, { reportedUserId: activeThread.participant.id })}
                                         >
                                             {LocalizeText('messenger.window.button.report')}
-                                        </button>
+                                        </BaseButton>
                                     </>
                                 )}
-                                <button className="messenger-btn close-btn" onClick={(event) => closeThread(activeThread.threadId)}>
+                                <BaseButton className="messenger-btn close-btn" onClick={(event) => closeThread(activeThread.threadId)}>
                                     <FaTimes />
-                                </button>
+                                </BaseButton>
                             </div>
                         </div>
 
@@ -320,17 +321,17 @@ export const FriendsMessengerView: FC<{}> = (props) => {
                                 onChange={(event) => handleInputChange(event.target.value)}
                                 onKeyDown={onKeyDown}
                             />
-                            <button className="messenger-btn send" onClick={() => void send()}>
+                            <BaseButton className="messenger-btn send" onClick={() => void send()}>
                                 {LocalizeText('widgets.chatinput.say')}
-                            </button>
-                            <button
+                            </BaseButton>
+                            <BaseButton
                                 className="messenger-btn habbicon"
                                 aria-label={LocalizeText('messenger.habbicons.tooltip')}
                                 onMouseDown={(event) => event.stopPropagation()}
                                 onClick={() => setIsHabbiconPickerVisible((value) => !value)}
                             >
                                 <img alt="" src={HabbiconsDmIcon} />
-                            </button>
+                            </BaseButton>
                         </div>
                         {isHabbiconPickerVisible && (
                             <FriendsMessengerHabbiconPickerView

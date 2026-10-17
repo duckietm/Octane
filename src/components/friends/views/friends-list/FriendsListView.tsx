@@ -9,6 +9,7 @@ import { FriendsRoomInviteView } from './FriendsListRoomInviteView';
 import { FriendsSearchView } from './FriendsListSearchView';
 import { FriendsListGroupView } from './friends-list-group/FriendsListGroupView';
 import { FriendsListRequestView } from './friends-list-request/FriendsListRequestView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const FriendsListView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -163,17 +164,17 @@ export const FriendsListView: FC<{}> = (props) => {
                     <div className="hfl-titlebar drag-handler">
                         <span className="hfl-titlebar-grip" />
                         <span className="hfl-title">{LocalizeText('friendlist.friends')}</span>
-                        <button type="button" className="hfl-close" onClick={() => setIsVisible(false)} />
+                        <BaseButton type="button" className="hfl-close" onClick={() => setIsVisible(false)} />
                     </div>
                     <div className="hfl-category">
-                        <button
+                        <BaseButton
                             type="button"
                             className="hfl-category-current"
                             aria-expanded={activePanel === 'friends'}
                             onClick={() => setActivePanel((value) => (value === 'friends' ? null : 'friends'))}
                         >
                             {LocalizeText('friendlist.friends')}
-                        </button>
+                        </BaseButton>
                     </div>
                     {activePanel !== null && (
                         <div className="hfl-content">
@@ -182,19 +183,19 @@ export const FriendsListView: FC<{}> = (props) => {
                                 <>
                                     <FriendsListRequestView />
                                     <div className="hfl-request-footer" data-testid="requests-footer">
-                                        <button type="button" data-action="accept-all" disabled={!requests.length} onClick={() => respondToAllRequests(true)}>
+                                        <BaseButton type="button" data-action="accept-all" disabled={!requests.length} onClick={() => respondToAllRequests(true)}>
                                             {LocalizeText('friendlist.requests.acceptall')}
-                                        </button>
-                                        <button type="button" data-action="dismiss-all" disabled={!requests.length} onClick={() => respondToAllRequests(false)}>
+                                        </BaseButton>
+                                        <BaseButton type="button" data-action="dismiss-all" disabled={!requests.length} onClick={() => respondToAllRequests(false)}>
                                             {LocalizeText('friendlist.requests.dismissall')}
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 </>
                             )}
                             {activePanel === 'friends' && (
                                 <>
                                     <section className="hfl-section">
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             className={`hfl-section-header${isOnlineExpanded ? '' : ' collapsed'}`}
                                             onClick={() => setIsOnlineExpanded((value) => !value)}
@@ -212,7 +213,7 @@ export const FriendsListView: FC<{}> = (props) => {
                                                     ? LocalizeText('friendlist.unselect_all')
                                                     : LocalizeText('friendlist.select_all')}
                                             </span>
-                                        </button>
+                                        </BaseButton>
                                         {isOnlineExpanded && (
                                             <div className="hfl-list">
                                                 <FriendsListGroupView
@@ -224,13 +225,13 @@ export const FriendsListView: FC<{}> = (props) => {
                                         )}
                                     </section>
                                     <section className="hfl-section">
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             className={`hfl-section-header${isOfflineExpanded ? '' : ' collapsed'}`}
                                             onClick={() => setIsOfflineExpanded((value) => !value)}
                                         >
                                             <span>{LocalizeText('friendlist.friends.offlinecaption') + ` (${filteredOfflineFriends.length})`}</span>
-                                        </button>
+                                        </BaseButton>
                                         {isOfflineExpanded && (
                                             <div className="hfl-list">
                                                 <FriendsListGroupView
@@ -248,13 +249,13 @@ export const FriendsListView: FC<{}> = (props) => {
                     {activePanel === 'friends' && (
                         <div className="hfl-footer" data-testid="friends-footer">
                             <div className="hfl-footer-border">
-                                <button
+                                <BaseButton
                                     type="button"
                                     className="hfl-footer-button invite"
                                     title={LocalizeText('friendlist.tip.invite')}
                                     onClick={() => setShowRoomInvite(true)}
                                 />
-                                <button
+                                <BaseButton
                                     type="button"
                                     className="hfl-footer-button home"
                                     title={LocalizeText('friendlist.tip.home')}
@@ -263,7 +264,7 @@ export const FriendsListView: FC<{}> = (props) => {
                                 {isFriendSearchOpen ? (
                                     <div className="hfl-footer-search">
                                         <input autoFocus value={friendSearchValue} onChange={(event) => setFriendSearchValue(event.target.value)} />
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             title={LocalizeText('generic.clear')}
                                             onClick={() => {
@@ -273,14 +274,14 @@ export const FriendsListView: FC<{}> = (props) => {
                                         />
                                     </div>
                                 ) : (
-                                    <button
+                                    <BaseButton
                                         type="button"
                                         className="hfl-footer-button search"
                                         title={LocalizeText('people.search.title')}
                                         onClick={() => setIsFriendSearchOpen(true)}
                                     />
                                 )}
-                                <button
+                                <BaseButton
                                     type="button"
                                     className="hfl-footer-button delete"
                                     disabled={!selectedFriendsIds.length}
@@ -291,17 +292,17 @@ export const FriendsListView: FC<{}> = (props) => {
                         </div>
                     )}
                     {!!requests.length && (
-                        <button
+                        <BaseButton
                             type="button"
                             className="hfl-request-strip"
                             onClick={() => setActivePanel((value) => (value === 'requests' ? null : 'requests'))}
                         >
                             {LocalizeText('friendlist.tab.friendrequests')}
-                        </button>
+                        </BaseButton>
                     )}
-                    <button type="button" className="hfl-search-strip" onClick={() => setActivePanel((value) => (value === 'search' ? null : 'search'))}>
+                    <BaseButton type="button" className="hfl-search-strip" onClick={() => setActivePanel((value) => (value === 'search' ? null : 'search'))}>
                         {LocalizeText('generic.search')}
-                    </button>
+                    </BaseButton>
                     <div className="hfl-bottom" />
                 </div>
             </DraggableWindow>

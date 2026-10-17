@@ -4,6 +4,7 @@ import { FaDownload, FaTrash, FaUndo, FaUpload } from 'react-icons/fa';
 import { LocalizeText, PRESET_COLORS, THEME_PRESETS, useUiSettings } from '../../api';
 import { Flex, Text } from '../../common';
 import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 const hexToRgba = (hex: string, a = 1): RgbaColor => {
     const num = parseInt(hex.replace('#', ''), 16);
@@ -205,7 +206,7 @@ export const InterfaceColorTabView: FC<{}> = () => {
 
             {/* Action buttons */}
             <Flex gap={1} className="w-full mt-2">
-                <button
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#5f9ea0' }}
                     onClick={onReset}
@@ -213,8 +214,8 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaUndo size={12} />
                     {LocalizeText('interface.settings.color.reset')}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#c0392b' }}
                     onClick={onDelete}
@@ -222,8 +223,8 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaTrash size={12} />
                     {LocalizeText('interface.settings.color.remove')}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#2980b9' }}
                     onClick={onExport}
@@ -231,8 +232,8 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaDownload size={12} />
                     {copyFeedback ? LocalizeText('interface.settings.color.copied') : LocalizeText('interface.settings.color.export')}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="flex-1 flex items-center justify-center gap-1 py-2 rounded cursor-pointer text-white text-xs"
                     style={{ backgroundColor: '#27ae60' }}
                     onClick={() => setShowImport(!showImport)}
@@ -240,7 +241,7 @@ export const InterfaceColorTabView: FC<{}> = () => {
                 >
                     <FaUpload size={12} />
                     {LocalizeText('interface.settings.color.import')}
-                </button>
+                </BaseButton>
             </Flex>
 
             {/* Import panel */}
@@ -252,9 +253,9 @@ export const InterfaceColorTabView: FC<{}> = () => {
                         value={importValue}
                         onChange={(e) => setImportValue(e.target.value)}
                     />
-                    <button className="px-3 py-1 rounded cursor-pointer text-white text-xs" style={{ backgroundColor: '#27ae60' }} onClick={onImport}>
+                    <BaseButton className="px-3 py-1 rounded cursor-pointer text-white text-xs" style={{ backgroundColor: '#27ae60' }} onClick={onImport}>
                         OK
-                    </button>
+                    </BaseButton>
                 </Flex>
             )}
         </Flex>

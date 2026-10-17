@@ -14,6 +14,7 @@ import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeade
 import { useMessageEvent, useModTools } from '../../../../hooks';
 import { ModToolsTemplateSelectView } from '../ModToolsTemplateSelectView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ModToolsRoomViewProps {
     roomId: number;
@@ -105,13 +106,13 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = (props) => {
                         <span className={`inline-block w-2 h-2 rounded-full ${ownerDotClass}`} />
                         {ownerInRoom ? LocalizeText('modtools.roominfo.owner.here') : LocalizeText('modtools.roominfo.owner.away')}
                     </span>
-                    <button
+                    <BaseButton
                         className="octane-mod-tools-refresh"
                         onClick={refresh}
                         title={LocalizeText('modtools.roominfo.refresh')}
                     >
                         {LocalizeText('modtools.roominfo.refresh')}
-                    </button>
+                    </BaseButton>
                 </div>
 
                 {/* Stat strip */}

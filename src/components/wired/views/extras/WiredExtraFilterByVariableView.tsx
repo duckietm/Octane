@@ -20,6 +20,7 @@ import {
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type AmountMode = 'constant' | 'variable';
@@ -309,7 +310,7 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                             <div className="octane-wired__give-var-targets">
                                 {TARGET_BUTTONS.map((button) => (
-                                    <button
+                                    <BaseButton
                                         key={`reference-${button.key}`}
                                         type="button"
                                         disabled={button.disabled || amountMode !== 'variable'}
@@ -317,7 +318,7 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
                                         onClick={() => handleReferenceTargetChange(button.key)}
                                     >
                                         <img src={button.icon} alt={button.key} />
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         </label>

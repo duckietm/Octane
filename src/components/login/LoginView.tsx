@@ -23,6 +23,7 @@ import { clearRegistrationDraft, loadRegistrationDraft, saveRegistrationDraft } 
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
 import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 type DialogMode = 'login' | 'register' | 'forgot';
 type LoginLocale = { code: string; file: string; label: string; flag: string };
@@ -164,13 +165,13 @@ const LoginSubmitButton: FC<{ isEntering: boolean; isLocked: boolean; loginPingi
     const { pending } = useFormStatus();
 
     return (
-        <button type="submit" className="ok-button" disabled={pending || isEntering || isLocked}>
+        <BaseButton type="submit" className="ok-button" disabled={pending || isEntering || isLocked}>
             {isEntering
                 ? t('nitro.login.entering', 'Entering…')
                 : pending || loginPingingServer
                   ? t('nitro.login.server.checking', 'Checking…')
                   : t('login.title', 'Log in')}
-        </button>
+        </BaseButton>
     );
 };
 
@@ -859,9 +860,9 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                         {loginServerReachable === false && (
                             <div className="error-line server-offline">
                                 {t('nitro.login.server.offline.short', "The gameserver isn't running right now. Please try again in a moment.")}
-                                <button type="button" className="retry-link" onClick={pingLoginServer} disabled={loginPingingServer}>
+                                <BaseButton type="button" className="retry-link" onClick={pingLoginServer} disabled={loginPingingServer}>
                                     {loginPingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                                </button>
+                                </BaseButton>
                             </div>
                         )}
                         {error && <div className="error-line">{error}</div>}
@@ -885,9 +886,9 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                     </div>
                     <div className="card-body octane-card-content-shell register-card-body">
                         <span>{t('nitro.login.firsttime.text', "Don't have a Habbo yet?")}</span>
-                        <button type="button" className="register-link" onClick={() => setMode('register')}>
+                        <BaseButton type="button" className="register-link" onClick={() => setMode('register')}>
                             {t('nitro.login.firsttime.link', 'You can create one here')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
             </div>
@@ -1486,9 +1487,9 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                                 'nitro.login.server.offline.long',
                                 "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
                             )}
-                            <button type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
+                            <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
                                 {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     <div className="field">
@@ -1531,9 +1532,9 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                     {info && <div className="info-line">{info}</div>}
                     <div className="step-footer">
                         <span className="step-indicator">1/3</span>
-                        <button type="submit" className="ok-button" disabled={!credentialsValid || busy || serverOffline}>
+                        <BaseButton type="submit" className="ok-button" disabled={!credentialsValid || busy || serverOffline}>
                             {isCredentialsPending || pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.register.next', 'Next')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </form>
             )}
@@ -1552,9 +1553,9 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                                 'nitro.login.server.offline.long',
                                 "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
                             )}
-                            <button type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
+                            <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
                                 {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     <div className="field">
@@ -1591,7 +1592,7 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                     />
 
                     <div className="hot-looks-row">
-                        <button
+                        <BaseButton
                             type="button"
                             className="ok-button hot-looks-button"
                             onClick={cycleHotLook}
@@ -1604,8 +1605,8 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                         >
                             {t('nitro.login.register.hotlooks', 'Hot Looks')}
                             {hotLookIndex >= 0 && hotLooks.length ? ` (${hotLookIndex + 1}/${hotLooks.length})` : ''}
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             className="ok-button back-button hot-looks-button random-look-button"
                             onClick={randomizeLook}
@@ -1614,7 +1615,7 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                         >
                             <FaDice aria-hidden="true" />
                             {t('nitro.login.register.randomlook', 'Random Look')}
-                        </button>
+                        </BaseButton>
                     </div>
 
                     {turnstileEnabled && (
@@ -1631,17 +1632,17 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                     {info && <div className="info-line">{info}</div>}
 
                     <div className="step-footer step-footer-split">
-                        <button type="button" className="ok-button back-button" onClick={() => setStep('credentials')} disabled={busy}>
+                        <BaseButton type="button" className="ok-button back-button" onClick={() => setStep('credentials')} disabled={busy}>
                             {t('nitro.login.register.back', 'Back')}
-                        </button>
+                        </BaseButton>
                         <span className="step-indicator">2/3</span>
-                        <button type="submit" className="ok-button" disabled={!username.trim() || busy || serverOffline}>
+                        <BaseButton type="submit" className="ok-button" disabled={!username.trim() || busy || serverOffline}>
                             {isAvatarPending
                                 ? t('nitro.login.server.checking', 'Checking…')
                                 : pingingServer
                                   ? t('nitro.login.server.checking', 'Checking…')
                                   : t('nitro.login.register.next', 'Next')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </form>
             )}
@@ -1658,9 +1659,9 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                                 'nitro.login.server.offline.long',
                                 "The gameserver isn't running right now, so new accounts can't be created. Please try again in a moment."
                             )}
-                            <button type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
+                            <BaseButton type="button" className="retry-link" onClick={pingServer} disabled={pingingServer}>
                                 {pingingServer ? t('nitro.login.server.checking', 'Checking…') : t('nitro.login.server.retry', 'Retry')}
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
 
@@ -1707,13 +1708,13 @@ const RegisterDialog: FC<RegisterDialogProps> = (props) => {
                     {info && <div className="info-line">{info}</div>}
 
                     <div className="step-footer step-footer-split">
-                        <button type="button" className="ok-button back-button" onClick={() => setStep('avatar')} disabled={busy}>
+                        <BaseButton type="button" className="ok-button back-button" onClick={() => setStep('avatar')} disabled={busy}>
                             {t('nitro.login.register.back', 'Back')}
-                        </button>
+                        </BaseButton>
                         <span className="step-indicator">3/3</span>
-                        <button type="submit" className="ok-button" disabled={busy || serverOffline}>
+                        <BaseButton type="submit" className="ok-button" disabled={busy || serverOffline}>
                             {submitting || isRoomPending ? t('nitro.login.register.creating', 'Creating…') : t('nitro.login.register.finish', 'Finish')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </form>
             )}
@@ -1729,9 +1730,9 @@ const ForgotSubmitButton: FC = () => {
     const { pending } = useFormStatus();
 
     return (
-        <button type="submit" className="ok-button" disabled={pending}>
+        <BaseButton type="submit" className="ok-button" disabled={pending}>
             {t('nitro.login.forgot.send', 'Send email')}
-        </button>
+        </BaseButton>
     );
 };
 

@@ -6,6 +6,7 @@ import { useFurniPickupGuard } from '../../../../hooks';
 import { classNames, OctaneInput } from '../../../../layout';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const LIMIT_FURNI_PICKALL = 100;
 const FILTER_ALL = 'all';
@@ -129,14 +130,14 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                             onChange={(event) => setSearchValue(event.target.value)}
                         />
                         {searchValue.length > 0 && (
-                            <button
+                            <BaseButton
                                 aria-label={localizeWithFallback('generic.clear', 'Clear')}
                                 className="octane-chooser-clear"
                                 type="button"
                                 onClick={() => setSearchValue('')}
                             >
                                 ×
-                            </button>
+                            </BaseButton>
                         )}
                     </div>
                     <Select

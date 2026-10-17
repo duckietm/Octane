@@ -2,6 +2,7 @@ import { RoomDataParser } from '@octane/renderer';
 import { FC, MouseEvent, useRef } from 'react';
 import { LocalizeText } from '../../../../api';
 import { useNavigatorRoomInfoPopupStore } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface NavigatorSearchResultItemInfoViewProps {
     roomData: RoomDataParser;
@@ -25,7 +26,7 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
     };
 
     return (
-        <button
+        <BaseButton
             type="button"
             ref={elementRef}
             className="octane-navigator-air__room-info"

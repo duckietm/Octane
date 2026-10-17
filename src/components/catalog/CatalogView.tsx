@@ -20,6 +20,7 @@ import { CatalogNavigationView } from './views/navigation/CatalogNavigationView'
 import { CatalogSearchView } from './views/page/common/CatalogSearchView';
 import { GetCatalogLayout } from './views/page/layout/GetCatalogLayout';
 import { MarketplacePostOfferView } from './views/page/layout/marketplace/MarketplacePostOfferView';
+import { BaseButton } from '../../common/BaseButton';
 
 const CatalogViewInner: FC<{}> = () => {
     const { rootNode = null, currentPage = null, searchResult = null, isBusy = false, catalogLoadError = null } = useCatalogData();
@@ -167,19 +168,19 @@ const CatalogViewInner: FC<{}> = () => {
                     <div className="octane-catalog-mobile-header">
                         {isMod && (
                             <div className="octane-catalog-mobile-burger">
-                                <button className="octane-catalog-burger-btn" onClick={() => setMobileMenuOpen((value) => !value)}>
+                                <BaseButton className="octane-catalog-burger-btn" onClick={() => setMobileMenuOpen((value) => !value)}>
                                     <FaBars />
-                                </button>
+                                </BaseButton>
                                 {mobileMenuOpen && (
                                     <div className="octane-catalog-burger-menu">
-                                        <button
+                                        <BaseButton
                                             onClick={() => {
                                                 setAdminMode(!adminMode);
                                                 setMobileMenuOpen(false);
                                             }}
                                         >
                                             {adminMode ? 'Exit Admin' : 'Admin'}
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 )}
                             </div>

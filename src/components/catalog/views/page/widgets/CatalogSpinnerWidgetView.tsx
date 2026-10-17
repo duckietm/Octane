@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useId, useMemo, useRef, useState } from 're
 import { CatalogType, GetConfigurationValue, LocalizeText } from '../../../../../api';
 import { getCatalogBundleDiscountFlatPriceSteps, getCatalogBundleDiscountItemCount } from '../../../../../api/catalog/CatalogBundleDiscount';
 import { useCatalogBundleDiscountRuleset, useCatalogData, useCatalogUiState } from '../../../../../hooks';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 const MIN_VALUE: number = 1;
 const MAX_VALUE: number = 100;
@@ -167,7 +168,7 @@ export const CatalogSpinnerWidgetView: FC<{}> = () => {
                     <span aria-hidden="true" className="octane-catalog-standard-spinner-discount-star" />
                 </div>
             )}
-            <button
+            <BaseButton
                 type="button"
                 className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-less"
                 aria-controls={quantityInputId}
@@ -203,7 +204,7 @@ export const CatalogSpinnerWidgetView: FC<{}> = () => {
                     }}
                 />
             </div>
-            <button
+            <BaseButton
                 type="button"
                 className="octane-catalog-standard-spinner-button octane-catalog-standard-spinner-button-more"
                 aria-controls={quantityInputId}

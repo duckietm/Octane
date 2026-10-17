@@ -4,6 +4,7 @@ import { formatHousekeepingListCell, HousekeepingApi, housekeepingFailureKey, Ho
 import { useHasPermission, useHousekeepingStore } from '../../../../hooks';
 import { HousekeepingButton, HousekeepingEmptyState } from './HousekeepingParts';
 import { HousekeepingSubTabs } from './HousekeepingSubTabs';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export interface HousekeepingListChoice {
     key: string;
@@ -148,7 +149,7 @@ export const HousekeepingListView: FC<{ lists: HousekeepingListChoice[]; targetI
                                     ))}
                                     {(userColumn >= 0 || roomColumn >= 0) && (
                                         <td className="px-1 py-0.5">
-                                            <button
+                                            <BaseButton
                                                 className="text-zinc-400 hover:text-sky-600"
                                                 title={LocalizeText(
                                                     userColumn >= 0 ? 'housekeeping.audit.detail.open_user' : 'housekeeping.audit.detail.open_room'
@@ -157,7 +158,7 @@ export const HousekeepingListView: FC<{ lists: HousekeepingListChoice[]; targetI
                                                 onClick={() => openRow(row)}
                                             >
                                                 <FaExternalLinkAlt size={9} />
-                                            </button>
+                                            </BaseButton>
                                         </td>
                                     )}
                                 </tr>

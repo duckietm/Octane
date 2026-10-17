@@ -117,12 +117,11 @@ login/WebGL, so they're not usable for in-game verification.
   `target.value` / `target.valueAsNumber`, role spinbutton, hover/focus up-down overlay), `Slider`, `FloatingPopover`,
   `TabBar`, `InlineDialog` (dialog mounted inline; `modal="trap-focus"` for the catalog confirms), `CollapsibleSection`, `Tooltip`.
   Radios that share a `name` keep native group behaviour (arrow keys, one tab stop).
-  Deliberately native: `<button>` (684 sites; Base UI Button only adds `focusableWhenDisabled` and
-  a `render` escape hatch, and it sets `type="button"` unless a `type` is passed, so converting means
-  an explicit `type` on the 122 untyped ones for no behaviour gain), text `<input>` and `<textarea>`
-  (Base UI `Input` is a plain input; there is no textarea primitive), and the draggable-window
-  dialogs (`UserSettingsView`, `LayoutMiniCameraView`: Dialog.Popup needs a Dialog.Portal, which
-  mounts one render late, but `DraggableWindow` looks up its handle and measures its size once at
+  `<button>` is `BaseButton` (Base UI Button, still a native `<button>`; it sets `type="button"` unless a
+  `type` is passed, so form submit buttons need an explicit `type="submit"`). Deliberately native: text
+  `<input>` and `<textarea>` (Base UI `Input` is a plain input; there is no textarea primitive), and the
+  draggable-window dialogs (`UserSettingsView`, `LayoutMiniCameraView`: Dialog.Popup needs a Dialog.Portal,
+  which mounts one render late, but `DraggableWindow` looks up its handle and measures its size once at
   mount, and the camera preview effect needs its canvas at mount).
   Skin them through the `octane-*` classes (`.octane-checkbox[data-checked]`,
   `.octane-radio`, `.octane-select-trigger`, `.octane-number-input`): CSS written for

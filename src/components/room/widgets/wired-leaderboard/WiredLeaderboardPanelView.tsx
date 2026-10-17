@@ -14,6 +14,7 @@ import {
     leaderboardPanelWidth
 } from '../../../../api/wired/WiredLeaderboard';
 import { LayoutAvatarImageView } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 /** Where a panel stands: a tile, a horizontal offset and an altitude, both in pixels at scale 1. */
 export interface ILeaderboardLocation {
@@ -197,7 +198,7 @@ export const WiredLeaderboardPanelView: FC<WiredLeaderboardPanelViewProps> = (pr
                 </div>
                 {onRelocate && <span className="octane-wired-leaderboard__drag" title={localizeWithFallback('wiredfurni.params.variable_leaderboard.location.drag_status', 'Drag to move')}>✥</span>}
                 {choices.length > 1 && (
-                    <button type="button" className="octane-wired-leaderboard__choice-toggle" onMouseDown={(event) => event.stopPropagation()} onClick={() => setChoicesOpen((open) => !open)}>▾</button>
+                    <BaseButton type="button" className="octane-wired-leaderboard__choice-toggle" onMouseDown={(event) => event.stopPropagation()} onClick={() => setChoicesOpen((open) => !open)}>▾</BaseButton>
                 )}
             </div>
             {choicesOpen && choices.length > 1 && (
@@ -244,9 +245,9 @@ export const WiredLeaderboardPanelView: FC<WiredLeaderboardPanelViewProps> = (pr
                 ))}
             </div>
             <div className="octane-wired-leaderboard__pager">
-                <button type="button" disabled={page <= 0} onClick={() => onMovePage?.(-1)}>‹</button>
+                <BaseButton type="button" disabled={page <= 0} onClick={() => onMovePage?.(-1)}>‹</BaseButton>
                 <span>{localizeWithFallback('wiredfurni.variable_leaderboard.page', `Page ${ page + 1 } / ${ pages }`, [ 'page', 'pages' ], [ String(page + 1), String(pages) ])}</span>
-                <button type="button" disabled={page + 1 >= pages} onClick={() => onMovePage?.(1)}>›</button>
+                <BaseButton type="button" disabled={page + 1 >= pages} onClick={() => onMovePage?.(1)}>›</BaseButton>
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ import { useWiredPageRequests } from '../../hooks/wired-tools/useWiredPageReques
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { NO_PAGE } from './WiredPaging.helpers';
 import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 export const WIRED_ARRAY_INSPECTOR_PAGE_SIZE = 25;
 const REQUEST_PAGE_RATELIMIT = 300;
@@ -133,13 +134,13 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
         return {
             className: 'tabular-nums',
             content: (
-                <button
+                <BaseButton
                     className="text-[#1b57b2] underline underline-offset-2"
                     type="button"
                     onClick={() => setEditing({ fieldId, index: entry.index, value: raw })}
                 >
                     {shown}
-                </button>
+                </BaseButton>
             ),
             title: raw
         };

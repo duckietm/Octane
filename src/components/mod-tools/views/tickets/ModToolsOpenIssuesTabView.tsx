@@ -1,6 +1,7 @@
 import { IssueMessageData, PickIssuesMessageComposer } from '@octane/renderer';
 import { FC, useMemo, useRef } from 'react';
 import { GetIssueCategoryName, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ModToolsOpenIssuesTabViewProps {
     openIssues: IssueMessageData[];
@@ -27,12 +28,12 @@ export const ModToolsOpenIssuesTabView: FC<ModToolsOpenIssuesTabViewProps> = (pr
     return (
         <div className="flex flex-col gap-1 overflow-hidden">
             {!isEmpty && (
-                <button
+                <BaseButton
                     className="octane-mod-tools-button octane-mod-tools-button--green self-end"
                     onClick={() => pickIssue(sortedIssues[0].issueId)}
                 >
                     {localizeWithFallback('modtools.tickets.action.pick.next', 'Give me the next priority issue')}
-                </button>
+                </BaseButton>
             )}
             <div className="min-w-0 overflow-x-auto">
                 <div className="min-w-[470px]">
@@ -67,12 +68,12 @@ export const ModToolsOpenIssuesTabView: FC<ModToolsOpenIssuesTabViewProps> = (pr
                                     <span className="font-mono text-[.75rem] opacity-70 tabular-nums">
                                         {new Date(Date.now() - issue.issueAgeInMilliseconds).toLocaleTimeString()}
                                     </span>
-                                    <button
+                                    <BaseButton
                                         className="octane-mod-tools-button octane-mod-tools-button--green"
                                         onClick={() => pickIssue(issue.issueId)}
                                     >
                                         {LocalizeText('modtools.tickets.action.pick')}
-                                    </button>
+                                    </BaseButton>
                                 </div>
                             ))}
                         </div>

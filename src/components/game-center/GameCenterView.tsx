@@ -51,7 +51,7 @@ export const GameCenterView = () => {
         <div className="game-center-main">
             <div className="game-center-header">
                 <div className="game-center-header__title">{localizeWithFallback('gamecenter.game_list_title', 'Choose a game')}</div>
-                <button className="game-center-header__close" type="button" onClick={() => setIsVisible(false)}>&times;</button>
+                <BaseButton className="game-center-header__close" type="button" onClick={() => setIsVisible(false)}>&times;</BaseButton>
             </div>
             {instructionsOpen
                 ? <SnowWarInstructionsView />

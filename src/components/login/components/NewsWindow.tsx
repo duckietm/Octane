@@ -2,6 +2,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { useDraggableLoginWindow } from '../hooks/useDraggableLoginWindow';
 import { interpolate, t } from '../utils/i18n';
 import { resolveNewsImage, resolveNewsLink } from '../utils/news';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface NewsItem {
     id: number;
@@ -134,24 +135,24 @@ export const NewsWindow: FC<NewsWindowProps> = ({ newsUrl }) => {
 
                         <div className="news-footer">
                             {current.linkText && safeLinkUrl ? (
-                                <button type="button" className="ok-button news-link-button" onClick={openLink}>
+                                <BaseButton type="button" className="ok-button news-link-button" onClick={openLink}>
                                     {current.linkText}
-                                </button>
+                                </BaseButton>
                             ) : (
                                 <span />
                             )}
 
                             {hasMany && (
                                 <div className="news-pager">
-                                    <button type="button" className="arrow-btn" aria-label="Previous news" onClick={prev}>
+                                    <BaseButton type="button" className="arrow-btn" aria-label="Previous news" onClick={prev}>
                                         &lsaquo;
-                                    </button>
+                                    </BaseButton>
                                     <span className="news-counter">
                                         {index + 1}/{items.length}
                                     </span>
-                                    <button type="button" className="arrow-btn" aria-label="Next news" onClick={next}>
+                                    <BaseButton type="button" className="arrow-btn" aria-label="Next news" onClick={next}>
                                         &rsaquo;
-                                    </button>
+                                    </BaseButton>
                                 </div>
                             )}
                         </div>

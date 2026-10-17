@@ -6,6 +6,7 @@ import friendsBrowseBg from '../../../../assets/images/toolbar/air/friends-brows
 import { LocalizeText, localizeWithFallback, MessengerFriend } from '../../../../api';
 import { AIR_RAIL_CHAT_RESERVED_HALF, AIR_RAIL_EDGE_GAP, resolveAirFriendTabCapacity } from '../../../toolbar/bottomDockLayout';
 import { FriendBarItemView } from './FriendBarItemView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const AIR_TAB_WIDTH = 127;
 const AIR_TAB_SPACING = 3;
@@ -103,7 +104,7 @@ export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount
             )}
             {showArrows && (
                 <motion.div variants={itemVariants}>
-                    <button
+                    <BaseButton
                         type="button"
                         disabled={!canScrollLeft}
                         aria-label={localizeWithFallback('friendbar.scroll.left', 'Previous friends')}
@@ -112,7 +113,7 @@ export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount
                     >
                         <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
                         <img src={friendsBrowseArrowLeft} alt="" className="friend-bar-browse-arrow" />
-                    </button>
+                    </BaseButton>
                 </motion.div>
             )}
 
@@ -131,7 +132,7 @@ export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount
 
             {showArrows && (
                 <motion.div variants={itemVariants}>
-                    <button
+                    <BaseButton
                         type="button"
                         disabled={!canScrollRight}
                         aria-label={localizeWithFallback('friendbar.scroll.right', 'Next friends')}
@@ -140,7 +141,7 @@ export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount
                     >
                         <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
                         <img src={friendsBrowseArrowRight} alt="" className="friend-bar-browse-arrow" />
-                    </button>
+                    </BaseButton>
                 </motion.div>
             )}
         </motion.div>

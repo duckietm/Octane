@@ -20,6 +20,7 @@ export * from './FloatingPopover';
 export * from './Checkbox';
 export * from './Radio';
 export * from './Select';
+export * from './BaseButton';
 export * from './NumberInput';
 export * from './TabBar';
 export * from './InlineDialog';

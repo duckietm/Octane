@@ -6,6 +6,7 @@ import { useAvatarEditor } from '../../hooks';
 import { AvatarEditorIcon } from './AvatarEditorIcon';
 import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
+import { BaseButton } from '../../common/BaseButton';
 
 export const AvatarEditorNftView: FC<{
     categories: IAvatarEditorCategory[];
@@ -72,22 +73,22 @@ export const AvatarEditorNftView: FC<{
             <div ref={subcategoryRef} className={`octane-avatar-editor-subcategories${hasPagedSubcategories ? ' is-paged' : ''}`}>
                 {categories.map((category) => (
                     <Fragment key={category.setType}>
-                        <button
+                        <BaseButton
                             type="button"
                             className="category-item"
                             aria-pressed={resolvedSetType === category.setType}
                             onClick={() => selectSet(category.setType)}
                         >
                             <AvatarEditorIcon icon={category.setType} selected={resolvedSetType === category.setType} />
-                        </button>
+                        </BaseButton>
                         {category.setType === AvatarFigurePartType.HEAD && resolvedSetType === AvatarFigurePartType.HEAD && (
                             <>
-                                <button type="button" className="category-item" onClick={() => setGender?.(AvatarFigurePartType.MALE)}>
+                                <BaseButton type="button" className="category-item" onClick={() => setGender?.(AvatarFigurePartType.MALE)}>
                                     <AvatarEditorIcon icon="male" selected={gender === FigureDataContainer.MALE} />
-                                </button>
-                                <button type="button" className="category-item" onClick={() => setGender?.(AvatarFigurePartType.FEMALE)}>
+                                </BaseButton>
+                                <BaseButton type="button" className="category-item" onClick={() => setGender?.(AvatarFigurePartType.FEMALE)}>
                                     <AvatarEditorIcon icon="female" selected={gender === FigureDataContainer.FEMALE} />
-                                </button>
+                                </BaseButton>
                             </>
                         )}
                     </Fragment>
@@ -95,13 +96,13 @@ export const AvatarEditorNftView: FC<{
             </div>
             {hasPagedSubcategories && (
                 <>
-                    <button
+                    <BaseButton
                         type="button"
                         className="octane-avatar-editor-nft-category-scroll is-left"
                         aria-label="Previous NFT categories"
                         onClick={() => scrollSubcategories(-1)}
                     />
-                    <button
+                    <BaseButton
                         type="button"
                         className="octane-avatar-editor-nft-category-scroll is-right"
                         aria-label="Next NFT categories"
@@ -114,14 +115,14 @@ export const AvatarEditorNftView: FC<{
                 <AvatarEditorFigureSetView category={activeCategory} columnCount={6} />
             </div>
 
-            <button
+            <BaseButton
                 type="button"
                 className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                 onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
             >
                 Advanced Color
                 <LayoutCurrencyIcon type="hc" />
-            </button>
+            </BaseButton>
 
             <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
                 {maxPaletteCount >= 1 && (

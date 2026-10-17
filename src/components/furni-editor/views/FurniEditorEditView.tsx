@@ -19,6 +19,7 @@ import {
 } from '../furniEditorSuggestions';
 import { NumberInput } from '../../../common/NumberInput';
 import { TabBar, TabBarTab } from '../../../common/TabBar';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface FurniEditorEditViewProps {
     item: FurniDetail;
@@ -328,7 +329,7 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                 {width}×{length}
             </span>
             <div className="absolute bottom-1 left-1 flex gap-1">
-                <button
+                <BaseButton
                     type="button"
                     onClick={() => setDirectionIndex((prev) => prev + 1)}
                     aria-label={`Rotate, facing ${direction}`}
@@ -336,9 +337,9 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                     className="inline-flex items-center gap-0.5 text-[9px] rounded-full border border-slate-200 bg-[#ffffff] px-1.5 py-px text-slate-600 hover:border-slate-300"
                 >
                     <span aria-hidden="true">⟳</span> {direction}
-                </button>
+                </BaseButton>
                 {stateCount > 1 && (
-                    <button
+                    <BaseButton
                         type="button"
                         onClick={nextState}
                         aria-label={`Next state, showing ${state < 0 ? 'base' : state + 1} of ${stateCount}`}
@@ -346,7 +347,7 @@ const FurniPreview: FC<FurniPreviewProps> = ({ item, width, length, modes }) => 
                         className="inline-flex items-center gap-0.5 text-[9px] rounded-full border border-slate-200 bg-[#ffffff] px-1.5 py-px text-slate-600 hover:border-slate-300"
                     >
                         <span aria-hidden="true">▸</span> {state < 0 ? 'base' : `${state + 1}/${stateCount}`}
-                    </button>
+                    </BaseButton>
                 )}
             </div>
         </div>
@@ -418,7 +419,7 @@ const Section: FC<SectionProps> = ({ title, children, defaultOpen = true }) => {
 
     return (
         <div className="bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm">
-            <button
+            <BaseButton
                 type="button"
                 className={`w-full flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-slate-50 transition-colors rounded-t-xl ${open ? '' : 'rounded-b-xl'}`}
                 onClick={() => setOpen((p) => !p)}
@@ -427,7 +428,7 @@ const Section: FC<SectionProps> = ({ title, children, defaultOpen = true }) => {
                 <span className="text-[11px] text-slate-400 transition-transform duration-200" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
                     ▾
                 </span>
-            </button>
+            </BaseButton>
             {open && <div className="px-3 pb-2.5 pt-0.5">{children}</div>}
         </div>
     );
@@ -849,7 +850,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
     // "was X" next to a changed field's label: one click puts the stored value back.
     const revert = (field: EditField) =>
         isChanged(field) && (
-            <button
+            <BaseButton
                 type="button"
                 onClick={() => setField(field, stored[field])}
                 title="Put the stored value back"
@@ -857,12 +858,12 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                 className="ml-auto inline-flex items-center gap-0.5 text-[9px] font-normal text-amber-600 hover:text-amber-800 transition"
             >
                 <span aria-hidden="true">↺</span> was {formatValue(stored[field])}
-            </button>
+            </BaseButton>
         );
 
     const chipClass = 'mt-1 inline-flex items-center gap-1 text-[10px] font-medium rounded-md px-2 py-0.5 transition';
     const suggestionChip = (s: Suggestion) => (
-        <button
+        <BaseButton
             key={`${s.field}:${String(s.value)}`}
             type="button"
             onClick={() => applySuggestion(s)}
@@ -872,7 +873,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         >
             <span aria-hidden="true">✦</span> Suggested: <span className="font-mono">{formatValue(s.value)}</span>
             <span className="text-primary/70 font-normal">· {s.reason}</span>
-        </button>
+        </BaseButton>
     );
     const warningChip = (w: { field: EditField; message: string }) => (
         <span key={w.field} role="note" className={`${chipClass} text-amber-700 bg-amber-100 border border-amber-200`}>
@@ -889,7 +890,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
     const permissionChips = permissionSuggestions.length > 0 && (
         <div className="flex flex-wrap items-center gap-0.5">
             {permissionSuggestions.map((s) => (
-                <button
+                <BaseButton
                     key={s.field}
                     type="button"
                     onClick={() => applySuggestion(s)}
@@ -899,7 +900,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                 >
                     <span aria-hidden="true">✦</span> {FIELD_LABELS[s.field]} {formatValue(s.value)}
                     <span className="text-primary/70 font-normal">· {s.reason}</span>
-                </button>
+                </BaseButton>
             ))}
         </div>
     );
@@ -912,13 +913,13 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
         <div className="h-full min-h-0 grid grid-cols-[176px_minmax(0,1fr)] gap-2">
             {/* Sidebar: who this furni is, what state it is in, and the actions. Never scrolls away. */}
             <aside className="min-h-0 flex flex-col gap-2 bg-[#ffffff] rounded-xl border border-slate-200 shadow-sm p-2 overflow-y-auto">
-                <button
+                <BaseButton
                     type="button"
                     onClick={handleBack}
                     className="self-start inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 hover:text-slate-800 transition"
                 >
                     <span aria-hidden="true">‹</span> Back
-                </button>
+                </BaseButton>
                 <FurniPreview item={item} width={form.width} length={form.length} modes={form.interactionModesCount} />
                 <div className="min-w-0">
                     <div className="flex items-center gap-1">
@@ -942,9 +943,9 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                     </div>
                     <div className={statusRow}>
                         <span className="text-slate-500">Catalogue</span>
-                        <button type="button" className={statusLink} onClick={() => setGroup('catalogue')}>
+                        <BaseButton type="button" className={statusLink} onClick={() => setGroup('catalogue')}>
                             {catalogItems.length === 0 ? 'not listed' : `${catalogItems.length} offer${catalogItems.length === 1 ? '' : 's'}`} ›
-                        </button>
+                        </BaseButton>
                     </div>
                     <div className={statusRow}>
                         <span className="text-slate-500">Placed in rooms</span>
@@ -952,16 +953,16 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                     </div>
                     {(suggestions.length > 0 || warnings.length > 0) && (
                         <div className={`${statusRow} text-primary`}>
-                            <button type="button" className={statusLink} onClick={() => jumpToField((suggestions[0] ?? warnings[0]).field)}>
+                            <BaseButton type="button" className={statusLink} onClick={() => jumpToField((suggestions[0] ?? warnings[0]).field)}>
                                 {suggestions.length > 0
                                     ? `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'}`
                                     : `${warnings.length} warning${warnings.length === 1 ? '' : 's'}`}{' '}
                                 ›
-                            </button>
+                            </BaseButton>
                             {suggestions.length > 1 && (
-                                <button type="button" className={statusLink} onClick={applyAllSuggestions}>
+                                <BaseButton type="button" className={statusLink} onClick={applyAllSuggestions}>
                                     apply all
-                                </button>
+                                </BaseButton>
                             )}
                         </div>
                     )}
@@ -970,17 +971,17 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                             <span>
                                 {duplicates.length} duplicate{duplicates.length === 1 ? '' : 's'}
                             </span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                                 see ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     {related.siblings.length > 0 && (
                         <div className={statusRow}>
                             <span className="text-slate-500">Same line</span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                                 {related.siblings.length} furni ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     {furnidataIdMismatch !== null && (
@@ -990,9 +991,9 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                             >
                                 Furnidata id {furnidataIdMismatch} ≠ sprite
                             </span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                                 see ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     <div className={statusRow}>
@@ -1014,21 +1015,21 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                     {interactionUnregistered && (
                         <div className={`${statusRow} text-amber-700`}>
                             <span>Type has no class</span>
-                            <button type="button" className={statusLink} onClick={() => setGroup('behaviour')}>
+                            <BaseButton type="button" className={statusLink} onClick={() => setGroup('behaviour')}>
                                 fix ›
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
                     <div className={`${statusRow} border-b`}>
                         <span className="text-slate-500">Furnidata</span>
-                        <button type="button" className={statusLink} onClick={() => setGroup('data')}>
+                        <BaseButton type="button" className={statusLink} onClick={() => setGroup('data')}>
                             {furnidataMissReason === 'not_found' && !furniDataEntry
                                 ? 'missing'
                                 : furnidataEditable
                                   ? 'resolved'
                                   : furnidataMissReason.replace(/_/g, ' ')}{' '}
                             ›
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
                 {isDirty && (
@@ -1039,9 +1040,9 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                         <ul className="mt-0.5 space-y-px leading-snug">
                             {changedFields.map((field) => (
                                 <li key={field} className="truncate">
-                                    <button type="button" className="text-amber-700 hover:underline" onClick={() => jumpToField(field)}>
+                                    <BaseButton type="button" className="text-amber-700 hover:underline" onClick={() => jumpToField(field)}>
                                         {FIELD_LABELS[field]}
-                                    </button>{' '}
+                                    </BaseButton>{' '}
                                     · {formatValue(stored[field])} → {formatValue(form[field])}
                                 </li>
                             ))}
@@ -1173,7 +1174,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                 <Button variant="secondary" disabled={loading} onClick={() => onRevertFurnidata(item.id)}>
                                                     Revert
                                                 </Button>
-                                                <button
+                                                <BaseButton
                                                     type="button"
                                                     disabled={loading}
                                                     onClick={() => onImportText(item.id)}
@@ -1194,7 +1195,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                         <path d="M4 16h12" />
                                                     </svg>
                                                     Import from Habbo
-                                                </button>
+                                                </BaseButton>
                                             </>
                                         )}
                                     </Flex>
@@ -1343,7 +1344,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 </Text>
                                 <div data-testid="furni-editor-duplicates" className="flex flex-col gap-0.5">
                                     {duplicates.map((row) => (
-                                        <button
+                                        <BaseButton
                                             key={row.id}
                                             type="button"
                                             onClick={() => openFurni(row.spriteId)}
@@ -1353,7 +1354,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                             <span className="font-mono text-slate-500">
                                                 #{row.id} · s{row.spriteId}
                                             </span>
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </Section>
@@ -1365,7 +1366,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                 </Text>
                                 <div data-testid="furni-editor-siblings" className="flex flex-col gap-0.5">
                                     {related.siblings.map((row) => (
-                                        <button
+                                        <BaseButton
                                             key={row.id}
                                             type="button"
                                             onClick={() => openFurni(row.spriteId)}
@@ -1376,7 +1377,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                 {row.width}×{row.length}
                                             </span>
                                             <span className="font-mono text-slate-400">{row.interactionType || 'none'}</span>
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </Section>
@@ -1449,7 +1450,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                             {group.keys.map((key) => {
                                                 const on = form[key] === true;
                                                 return (
-                                                    <button
+                                                    <BaseButton
                                                         key={key}
                                                         type="button"
                                                         onClick={() => setField(key, !on)}
@@ -1461,7 +1462,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                                             className={`inline-block w-2 h-2 rounded-full ring-1 ${on ? 'bg-[#22c55e] ring-[#ffffff]/70' : 'bg-[#ef4444] ring-[#00000014]'}`}
                                                         />
                                                         {key.replace('allow', '')}
-                                                    </button>
+                                                    </BaseButton>
                                                 );
                                             })}
                                         </div>
@@ -1488,7 +1489,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         onChange={(value) => setField('interactionType', value)}
                                     />
                                     {suggestedType && (
-                                        <button
+                                        <BaseButton
                                             type="button"
                                             onClick={() => setField('interactionType', suggestedType.type)}
                                             title={suggestedType.reason}
@@ -1496,7 +1497,7 @@ export const FurniEditorEditView: FC<FurniEditorEditViewProps> = (props) => {
                                         >
                                             <span aria-hidden="true">✦</span> Suggested: <span className="font-mono">{suggestedType.type}</span>
                                             <span className="text-primary/70 font-normal">· {suggestedType.reason}</span>
-                                        </button>
+                                        </BaseButton>
                                     )}
                                     {interactionUnregistered && (
                                         <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-100 border border-amber-200 rounded-md px-2 py-0.5">

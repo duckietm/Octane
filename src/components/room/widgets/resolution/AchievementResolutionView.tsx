@@ -11,6 +11,7 @@ import { FC, useEffect, useState } from 'react';
 import { FriendlyTime, LocalizeBadgeDescription, LocalizeBadgeName, localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { Button, LayoutBadgeImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useMessageEvent, useNotification } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type ResolutionView =
     | { kind: 'picker'; stuffId: number; achievements: AchievementResolutionData[]; endsAt: number }
@@ -161,7 +162,7 @@ export const AchievementResolutionView: FC = () => {
                 <Text small>{localizeWithFallback('resolution.header', 'Pick an achievement and see what level you need to reach.')}</Text>
                 <div className="grid grid-cols-6 gap-1 overflow-auto max-h-[150px] p-1 rounded bg-black/10">
                     {view.achievements.map((achievement) => (
-                        <button
+                        <BaseButton
                             key={achievement.achievementId}
                             className={`p-0.5 rounded border-2 bg-transparent cursor-pointer ${achievement.achievementId === selectedId ? 'border-[#1e7295]' : 'border-transparent'} ${achievement.state === STATE_SELECTABLE ? '' : 'opacity-40'}`}
                             title={LocalizeBadgeName(achievement.badgeId)}
@@ -169,7 +170,7 @@ export const AchievementResolutionView: FC = () => {
                             onClick={() => setSelectedId(achievement.achievementId)}
                         >
                             <LayoutBadgeImageView badgeCode={achievement.badgeId} />
-                        </button>
+                        </BaseButton>
                     ))}
                 </div>
                 {selected && (

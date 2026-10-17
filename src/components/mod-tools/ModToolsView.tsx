@@ -23,6 +23,7 @@ import { ModToolsRoomView } from './views/room/ModToolsRoomView';
 import { ModToolsTicketsView } from './views/tickets/ModToolsTicketsView';
 import { ModToolsUserChatlogView } from './views/user/ModToolsUserChatlogView';
 import { ModToolsUserView } from './views/user/ModToolsUserView';
+import { BaseButton } from '../../common/BaseButton';
 
 export const ModToolsView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -278,7 +279,7 @@ export const ModToolsView: FC<{}> = (props) => {
                                             }
                                         />
                                         <span className="truncate grow text-start text-sm font-semibold leading-tight">{selectedUser.username}</span>
-                                        <button
+                                        <BaseButton
                                             className="inline-flex items-center justify-center w-5 h-5 rounded text-zinc-500 hover:text-rose-600 hover:bg-rose-100 shrink-0 transition-colors"
                                             onClick={(event) => {
                                                 event.stopPropagation();
@@ -287,7 +288,7 @@ export const ModToolsView: FC<{}> = (props) => {
                                             title={LocalizeText('modtools.window.user.clear')}
                                         >
                                             <FaTimes size={10} />
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                     <Button
                                         active={!!isUserInfoOpen}
@@ -337,7 +338,7 @@ export const ModToolsView: FC<{}> = (props) => {
                                         {LocalizeText('generic.no_results_found')}
                                     </div>}
                                     {userResults && userResults.length > 0 && <div className="flex flex-col gap-0.5 max-h-28 overflow-y-auto">
-                                        {userResults.slice(0, 12).map((result) => <button
+                                        {userResults.slice(0, 12).map((result) => <BaseButton
                                             key={result.avatarId}
                                             className="flex items-center gap-2 rounded px-2 py-1 text-start hover:bg-zinc-100"
                                             type="button"
@@ -345,7 +346,7 @@ export const ModToolsView: FC<{}> = (props) => {
                                         >
                                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${result.isAvatarOnline ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
                                             <span className="truncate text-xs">{result.avatarName}</span>
-                                        </button>)}
+                                        </BaseButton>)}
                                     </div>}
                                 </div>
                             )}

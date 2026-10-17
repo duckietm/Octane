@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { localizeWithFallback } from '../../api';
 import { WiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests';
 import { clampInputPage, NO_PAGE, parseInputPage, restrictPageInput } from './WiredPaging.helpers';
+import { BaseButton } from '../../common/BaseButton';
 
 export interface WiredTableColumn {
     id: string;
@@ -111,12 +112,12 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
             </div>
             <div className="flex items-center justify-between gap-3">
                 <div className="flex gap-2">
-                    <button className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" title="First page" onClick={() => requests.requestFirstPage()}>
+                    <BaseButton className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" title="First page" onClick={() => requests.requestFirstPage()}>
                         &laquo;
-                    </button>
-                    <button className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" title="Previous page" onClick={() => requests.requestPreviousPage()}>
+                    </BaseButton>
+                    <BaseButton className={PAGE_BUTTON_CLASS} disabled={isFirst} type="button" title="Previous page" onClick={() => requests.requestPreviousPage()}>
                         &lsaquo;
-                    </button>
+                    </BaseButton>
                 </div>
                 <div className="flex items-center gap-2 text-[12px] text-[#555]">
                     {currentPage !== NO_PAGE && (
@@ -149,12 +150,12 @@ export const WiredPagedTable = <T,>(props: WiredPagedTableProps<T>) => {
                     )}
                 </div>
                 <div className="flex gap-2">
-                    <button className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" title="Next page" onClick={() => requests.requestNextPage()}>
+                    <BaseButton className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" title="Next page" onClick={() => requests.requestNextPage()}>
                         &rsaquo;
-                    </button>
-                    <button className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" title="Last page" onClick={() => requests.requestLastPage()}>
+                    </BaseButton>
+                    <BaseButton className={PAGE_BUTTON_CLASS} disabled={isLast} type="button" title="Last page" onClick={() => requests.requestLastPage()}>
                         &raquo;
-                    </button>
+                    </BaseButton>
                 </div>
             </div>
         </div>

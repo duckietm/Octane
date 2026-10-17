@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, FC } from 'react';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export type ChestButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     /** Footer / dialog buttons with longer captions (auto width, min 73px). */
@@ -34,8 +35,8 @@ export const ChestButton: FC<ChestButtonProps> = ({
         .join(' ');
 
     return (
-        <button type={type} className={classes} {...rest}>
+        <BaseButton type={type} className={classes} {...rest}>
             {children}
-        </button>
+        </BaseButton>
     );
 };

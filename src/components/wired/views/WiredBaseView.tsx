@@ -364,7 +364,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                                                     className="octane-wired__menu-item"
                                                     disabled={item.disabled}
                                                     nativeButton
-                                                    render={<button type="button" />}
+                                                    render={<BaseButton type="button" />}
                                                     title={item.tooltip}
                                                     onClick={() => item.onClick()}
                                                 >
@@ -378,7 +378,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                                                     closeOnClick={false}
                                                     disabled={item.disabled}
                                                     nativeButton
-                                                    render={<button type="button" />}
+                                                    render={<BaseButton type="button" />}
                                                     title={item.tooltip}
                                                     onCheckedChange={() => item.onClick()}
                                                 >
@@ -406,9 +406,9 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                             {splitWiredName(wiredName).title}
                         </Text>
                         {headerButton && (
-                            <button className="octane-wired__header-button" type="button" onClick={onHeaderButton}>
+                            <BaseButton className="octane-wired__header-button" type="button" onClick={onHeaderButton}>
                                 {localizeWithFallback(WIRED_HEADER_BUTTON_KEYS[headerButton].key, WIRED_HEADER_BUTTON_KEYS[headerButton].fallback)}
-                            </button>
+                            </BaseButton>
                         )}
                     </div>
                 </div>
@@ -433,9 +433,9 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                             <div className="octane-wired__section octane-wired__section--footer">
                                 {footerCollapsible ? (
                                     <>
-                                        <button className="octane-wired__advanced-toggle" type="button" onClick={() => setShowFooter((value) => !value)}>
+                                        <BaseButton className="octane-wired__advanced-toggle" type="button" onClick={() => setShowFooter((value) => !value)}>
                                             {LocalizeText(showFooter ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                                        </button>
+                                        </BaseButton>
                                         {showFooter && <div className="octane-wired__advanced-body">{footer}</div>}
                                     </>
                                 ) : (

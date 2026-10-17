@@ -12,6 +12,7 @@ import {
     useState
 } from 'react';
 import { getClassicScrollbarMetrics } from './classicScrollbar.helpers';
+import { BaseButton } from '../BaseButton';
 
 interface ClassicScrollAreaViewProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onScroll'> {
     children: ReactNode;
@@ -168,7 +169,7 @@ export const ClassicScrollAreaView: FC<ClassicScrollAreaViewProps> = ({
                 </div>
             </div>
             <div className="octane-classic-scrollbar" data-visible={metrics.overflow}>
-                <button aria-label="Scroll up" className="octane-classic-scrollbar-button is-up" type="button" onClick={() => scrollBy(-scrollStep)} />
+                <BaseButton aria-label="Scroll up" className="octane-classic-scrollbar-button is-up" type="button" onClick={() => scrollBy(-scrollStep)} />
                 <div ref={trackRef} className="octane-classic-scrollbar-track" onPointerDown={handleTrackPointerDown}>
                     <div
                         className="octane-classic-scrollbar-thumb"
@@ -187,7 +188,7 @@ export const ClassicScrollAreaView: FC<ClassicScrollAreaViewProps> = ({
                         onPointerUp={stopDragging}
                     />
                 </div>
-                <button aria-label="Scroll down" className="octane-classic-scrollbar-button is-down" type="button" onClick={() => scrollBy(scrollStep)} />
+                <BaseButton aria-label="Scroll down" className="octane-classic-scrollbar-button is-down" type="button" onClick={() => scrollBy(scrollStep)} />
             </div>
         </div>
     );

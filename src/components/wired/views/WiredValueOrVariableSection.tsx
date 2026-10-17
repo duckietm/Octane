@@ -22,6 +22,7 @@ import {
 } from './WiredVariablePickerData';
 import { Radio } from '../../../common/Radio';
 import { NumberInput } from '../../../common/NumberInput';
+import { BaseButton } from '../../../common/BaseButton';
 
 /** Where an official value variable is read, with the official variable target ids. */
 export const WIRED_VALUE_TARGETS: Array<{ key: WiredVariablePickerTarget; value: number; icon: string }> = [
@@ -142,7 +143,7 @@ export const WiredValueOrVariableSection: FC<WiredValueOrVariableSectionProps> =
                 <>
                     <div className="octane-wired__give-var-targets">
                         { WIRED_VALUE_TARGETS.filter(entry => !targets || targets.includes(entry.value)).map(entry => (
-                            <button
+                            <BaseButton
                                 key={ entry.key }
                                 type="button"
                                 className={ `octane-wired__give-var-target octane-wired__give-var-target--${ entry.key } ${ target === entry.value ? 'is-active' : '' }` }
@@ -153,7 +154,7 @@ export const WiredValueOrVariableSection: FC<WiredValueOrVariableSectionProps> =
                                     props.onTokenChange('');
                                 } }>
                                 <img src={ entry.icon } alt={ entry.key } />
-                            </button>
+                            </BaseButton>
                         )) }
                     </div>
                     <WiredVariablePicker entries={ entries } recentScope="variable-references" selectedToken={ token } onSelect={ entry => props.onTokenChange(entry.token) } />

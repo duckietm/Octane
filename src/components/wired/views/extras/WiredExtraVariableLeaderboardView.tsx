@@ -32,6 +32,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const P = 'wiredfurni.params.variable_leaderboard';
 const SORT_FALLBACKS = [ 'Highest value first', 'Lowest value first', 'Oldest creation first', 'Latest creation first', 'Oldest update first', 'Latest update first' ];
@@ -208,7 +209,7 @@ export const WiredExtraVariableLeaderboardView: FC<{}> = () => {
                                 <OctaneInput inputSize="sm" maxLength={LEADERBOARD_OVERRIDE_MAX} value={names[choice.variableId] ?? ''} onChange={(event) => setNames({ ...names, [choice.variableId]: event.target.value.replace(/\t/g, ' ') })} />
                             </div>
                         ))}
-                        <button type="button" className="btn btn-sm btn-secondary self-start" onClick={() => setNames(Object.fromEntries(choices.map((choice) => [ choice.variableId, suggestLeaderboardName(choice.technicalName) ])))}>{text('suggest', 'Suggest')}</button>
+                        <BaseButton type="button" className="btn btn-sm btn-secondary self-start" onClick={() => setNames(Object.fromEntries(choices.map((choice) => [ choice.variableId, suggestLeaderboardName(choice.technicalName) ])))}>{text('suggest', 'Suggest')}</BaseButton>
                     </>
                 )}
 

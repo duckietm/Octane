@@ -10,6 +10,7 @@ import navViewThumbs from '../../../../assets/images/navigator/air/nav-view-thum
 import { LayoutSearchSavesView } from '../../../../common';
 import { useNavigatorData, useNavigatorUiStore } from '../../../../hooks';
 import { NavigatorSearchResultItemView } from './NavigatorSearchResultItemView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export interface NavigatorSearchResultViewProps {
     searchResult: NavigatorSearchResultList;
@@ -72,7 +73,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
     return (
         <section className={`octane-navigator-air__category${isExtended ? '' : ' is-collapsed'}`}>
             <header className="octane-navigator-air__category-header">
-                <button
+                <BaseButton
                     type="button"
                     className="octane-navigator-air__category-toggle"
                     aria-label={resultTitle}
@@ -81,10 +82,10 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                 >
                     <img src={isExtended ? categoryCollapse : categoryExpand} alt="" />
                     <span>{resultTitle}</span>
-                </button>
+                </BaseButton>
                 <div className="octane-navigator-air__category-controls">
                     {isExtended && displayMode === NavigatorSearchResultViewDisplayMode.LIST && (
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-navigator-air__icon-button"
                             aria-label={tileViewLabel}
@@ -92,10 +93,10 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                             onClick={toggleDisplayMode}
                         >
                             <img src={navViewThumbs} alt="" />
-                        </button>
+                        </BaseButton>
                     )}
                     {isExtended && isTileMode && (
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-navigator-air__icon-button"
                             aria-label={listViewLabel}
@@ -103,17 +104,17 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = (pr
                             onClick={toggleDisplayMode}
                         >
                             <img src={navViewRow} alt="" />
-                        </button>
+                        </BaseButton>
                     )}
                     {searchResult.action > 0 && searchResult.action === 1 && (
-                        <button type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.more.rooms')} onClick={showMore}>
+                        <BaseButton type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.more.rooms')} onClick={showMore}>
                             <img src={categoryShowMore} alt="" />
-                        </button>
+                        </BaseButton>
                     )}
                     {searchResult.action > 0 && searchResult.action !== 1 && (
-                        <button type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.back')} onClick={showMore}>
+                        <BaseButton type="button" className="octane-navigator-air__icon-button" title={LocalizeText('navigator.back')} onClick={showMore}>
                             <img src={navViewMini} alt="" />
-                        </button>
+                        </BaseButton>
                     )}
                     {!hideSave && (
                         <LayoutSearchSavesView

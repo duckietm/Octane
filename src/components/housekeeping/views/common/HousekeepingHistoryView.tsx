@@ -4,6 +4,7 @@ import { formatRelativePast, IHousekeepingActionLogEntry, localizeHousekeepingAc
 import { useHousekeepingStore } from '../../../../hooks';
 import { HousekeepingAuditEntryDetails } from './HousekeepingAuditEntryDetails';
 import { HousekeepingButton, HousekeepingEmptyState } from './HousekeepingParts';
+import { BaseButton } from '../../../../common/BaseButton';
 
 /**
  * Staff actions on one user or one room, read from the loaded action log.
@@ -38,7 +39,7 @@ export const HousekeepingHistoryView: FC<{ entries: IHousekeepingActionLogEntry[
                                     {localizeHousekeepingAction(entry.action)}
                                 </span>
                                 <span className="grow truncate text-zinc-500">{entry.detail}</span>
-                                <button
+                                <BaseButton
                                     aria-expanded={expandedId === entry.id}
                                     className={`shrink-0 rounded p-0.5 transition-colors ${expandedId === entry.id ? 'bg-sky-100 text-sky-700' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700'}`}
                                     title={LocalizeText('housekeeping.audit.detail.toggle')}
@@ -46,7 +47,7 @@ export const HousekeepingHistoryView: FC<{ entries: IHousekeepingActionLogEntry[
                                     onClick={() => setExpandedId((current) => (current === entry.id ? null : entry.id))}
                                 >
                                     <FaInfoCircle size={11} />
-                                </button>
+                                </BaseButton>
                             </div>
                             {expandedId === entry.id && <HousekeepingAuditEntryDetails entry={entry} />}
                         </li>

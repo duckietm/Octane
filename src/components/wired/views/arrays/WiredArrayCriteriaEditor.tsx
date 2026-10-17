@@ -12,6 +12,7 @@ import {
 import { Text } from '../../../../common';
 import { WiredArrayValueField } from './WiredArrayValueField';
 import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface WiredArrayCriteriaEditorProps {
     criteria: IWiredArrayCriterion[];
@@ -66,9 +67,9 @@ export const WiredArrayCriteriaEditor: FC<WiredArrayCriteriaEditorProps> = (prop
                                 ))}
                             </Select>
                         </div>
-                        <button className="btn btn-sm btn-danger" type="button" onClick={() => onChange(criteria.filter((_, position) => position !== index))}>
+                        <BaseButton className="btn btn-sm btn-danger" type="button" onClick={() => onChange(criteria.filter((_, position) => position !== index))}>
                             {localizeWithFallback('wiredfurni.params.arrays.criteria.remove', 'Remove')}
-                        </button>
+                        </BaseButton>
                     </div>
                     <WiredArrayValueField
                         label={localizeWithFallback('wiredfurni.params.arrays.criteria.target', 'Compared with')}
@@ -80,13 +81,13 @@ export const WiredArrayCriteriaEditor: FC<WiredArrayCriteriaEditorProps> = (prop
             ))}
 
             {criteria.length < WIRED_ARRAY_MAX_FIELDS && (
-                <button
+                <BaseButton
                     className="btn btn-sm btn-primary"
                     type="button"
                     onClick={() => onChange([...criteria, createWiredArrayCriterion(fields[0]?.id)])}
                 >
                     {localizeWithFallback('wiredfurni.params.arrays.criteria.add', 'Add a rule')}
-                </button>
+                </BaseButton>
             )}
         </div>
     );

@@ -1,5 +1,6 @@
 import { Slider } from '@base-ui/react/slider';
 import { FC, useEffect, useRef } from 'react';
+import { BaseButton } from '../../common/BaseButton';
 
 interface AirSettingsVolumeRowProps {
     id: string;
@@ -37,7 +38,7 @@ export const AirSettingsVolumeRow: FC<AirSettingsVolumeRowProps> = ({ id, label,
             <label className="air-settings-volume-row__label" htmlFor={id}>
                 {label}
             </label>
-            <button
+            <BaseButton
                 aria-label={`${label}: ${muteLabel}`}
                 className="air-settings-volume-row__speaker air-settings-volume-row__speaker--off"
                 onClick={() => setDirectValue(0)}
@@ -59,7 +60,7 @@ export const AirSettingsVolumeRow: FC<AirSettingsVolumeRowProps> = ({ id, label,
                     </Slider.Control>
                 </Slider.Root>
             </div>
-            <button
+            <BaseButton
                 aria-label={`${label}: ${maximumLabel}`}
                 className="air-settings-volume-row__speaker air-settings-volume-row__speaker--on"
                 onClick={() => setDirectValue(100)}

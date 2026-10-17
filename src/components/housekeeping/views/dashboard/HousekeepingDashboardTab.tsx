@@ -14,6 +14,7 @@ import {
 import { useHousekeepingStore, useNotification } from '../../../../hooks';
 import { HousekeepingButton } from '../common/HousekeepingParts';
 import { HousekeepingStatsView } from './HousekeepingStatsView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const AUTO_REFRESH_MS = 30_000;
 const STALE_AFTER_MS = 60_000;
@@ -292,7 +293,7 @@ export const HousekeepingDashboardTab: FC = () => {
                     </h4>
                     <div className="flex flex-wrap gap-1">
                         {recentLookups.map((entry, index) => (
-                            <button
+                            <BaseButton
                                 key={`${entry.kind}-${entry.id}-${index}`}
                                 type="button"
                                 onClick={() => onRecentClick(entry)}
@@ -301,7 +302,7 @@ export const HousekeepingDashboardTab: FC = () => {
                             >
                                 <span className="opacity-60 font-bold">{entry.kind === 'user' ? 'U' : 'R'}</span>
                                 <span className="font-medium">{entry.label}</span>
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>

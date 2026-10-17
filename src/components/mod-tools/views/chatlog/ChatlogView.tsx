@@ -6,6 +6,7 @@ import { useModTools } from '../../../../hooks';
 import { ChatlogRecord } from './ChatlogRecord';
 import messageIcon from '../../../../assets/images/mod-tools/send-message.png';
 import roomVisitsIcon from '../../../../assets/images/mod-tools/room-visits.png';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ChatlogViewProps {
     records: ChatRecordData[];
@@ -148,19 +149,19 @@ export const ChatlogView: FC<ChatlogViewProps> = (props) => {
                 <div className="font-semibold leading-tight grow truncate">{title}</div>
                 <div className="flex gap-1 shrink-0">
                     {hasRoom && isRoomRecord && (
-                        <button className={headerButtonClass} onClick={() => TryVisitRoom(roomId)}>
+                        <BaseButton className={headerButtonClass} onClick={() => TryVisitRoom(roomId)}>
                             <img alt="" className="octane-mod-tools-button-icon" src={roomVisitsIcon} /> {LocalizeText('modtools.chatlog.visit')}
-                        </button>
+                        </BaseButton>
                     )}
                     {showRoomTools && (
-                        <button className={headerButtonClass} onClick={() => openRoomInfo(roomId)}>
+                        <BaseButton className={headerButtonClass} onClick={() => openRoomInfo(roomId)}>
                             {LocalizeText('modtools.chatlog.tools')}
-                        </button>
+                        </BaseButton>
                     )}
                     {isForum && (groupId > 0) && (
-                        <button className={headerButtonClass} onClick={() => CreateLinkEvent(`groupforum/${groupId}`)}>
+                        <BaseButton className={headerButtonClass} onClick={() => CreateLinkEvent(`groupforum/${groupId}`)}>
                             {localizeWithFallback('modtools.chatlog.open_forum', 'Open forum')}
-                        </button>
+                        </BaseButton>
                     )}
                 </div>
             </div>
@@ -180,14 +181,14 @@ export const ChatlogView: FC<ChatlogViewProps> = (props) => {
                         placeholder={LocalizeText('generic.search')}
                         onChange={(event) => setQuery(event.target.value)}
                     />
-                    {isFiltering && <button
+                    {isFiltering && <BaseButton
                         className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-4 h-4"
                         type="button"
                         title={LocalizeText('generic.cancel')}
                         onClick={() => setQuery('')}
                     >
                         ×
-                    </button>}
+                    </BaseButton>}
                 </div>
                 <span className="text-[.65rem] opacity-60 shrink-0 tabular-nums">
                     {isFiltering ? `${matchCount}/${totalMessages}` : totalMessages}
@@ -223,12 +224,12 @@ export const ChatlogView: FC<ChatlogViewProps> = (props) => {
                                         className={`grid grid-cols-[84px_120px_1fr] gap-2 items-start px-1 py-1.5 text-sm border-b border-zinc-100 even:bg-black/[0.02] hover:bg-sky-50/50 transition-colors ${row.hasHighlighting ? 'bg-amber-50/60' : ''}`}
                                     >
                                         <span className="font-mono text-[.7rem] opacity-70 tabular-nums whitespace-nowrap">{row.timestamp}</span>
-                                        <button
+                                        <BaseButton
                                             className="text-left font-semibold text-sky-700 hover:text-sky-900 hover:underline truncate"
                                             onClick={() => CreateLinkEvent(`mod-tools/open-user-info/${row.habboId}`)}
                                         >
                                             {highlight(row.username)}
-                                        </button>
+                                        </BaseButton>
                                         <span className="break-words">{highlight(row.message)}</span>
                                     </div>
                                 );

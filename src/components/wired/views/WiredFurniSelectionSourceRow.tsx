@@ -3,6 +3,7 @@ import { FaChevronLeft, FaChevronRight, FaMousePointer } from 'react-icons/fa';
 import { LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';
 import { WiredSourceOption } from './WiredSourcesSelector';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface WiredFurniSelectionSourceRowProps {
     title: string;
@@ -62,14 +63,14 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
                 <Text>{resolvedTitle}</Text>
                 {headerContent}
                 {showSelectionToggle && (
-                    <button
+                    <BaseButton
                         type="button"
                         className={`octane-wired__selection-toggle octane-wired__selection-toggle--${selectionKind} ${selectionActive ? 'is-active' : ''}`}
                         disabled={!canActivateSelection}
                         onClick={() => onSelectionActivate && onSelectionActivate()}
                     >
                         <FaMousePointer />
-                    </button>
+                    </BaseButton>
                 )}
             </div>
             <div className="flex items-center gap-1">

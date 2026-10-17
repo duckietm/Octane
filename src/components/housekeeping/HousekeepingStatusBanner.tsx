@@ -2,6 +2,7 @@ import { FC, useEffect } from 'react';
 import { FaCheckCircle, FaExclamationTriangle, FaTimes } from 'react-icons/fa';
 import { LocalizeText } from '../../api';
 import { useHousekeepingStore } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const localizeOrPassthrough = (key: string | null): string => {
     if (!key) return '';
@@ -46,13 +47,13 @@ export const HousekeepingStatusBanner: FC = () => {
         <div className={`flex items-center gap-2 px-2 py-1 text-xs border-y ${tone}`} role="status">
             <Icon size={12} />
             <span className="grow truncate">{message}</span>
-            <button
+            <BaseButton
                 className="inline-flex items-center justify-center w-5 h-5 rounded hover:bg-black/10"
                 onClick={() => clearStatus()}
                 title={LocalizeText('housekeeping.status.dismiss')}
             >
                 <FaTimes size={10} />
-            </button>
+            </BaseButton>
         </div>
     );
 };

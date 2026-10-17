@@ -22,6 +22,7 @@ import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSources
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // Official source values (InputSourcesConf): 0 trigger, 11 clicked user, 100 picks, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -307,13 +308,13 @@ export const WiredNeighborhoodSelectorView: FC<{}> = () =>
                     headerContent={
                         <div className="octane-wired__give-var-targets">
                             { SOURCE_GROUP_BUTTONS.map(button => (
-                                <button
+                                <BaseButton
                                     key={ button.key }
                                     type="button"
                                     className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ isUser === button.isUser ? 'is-active' : '' }` }
                                     onClick={ () => setIsUser(button.isUser) }>
                                     <img src={ button.icon } alt={ button.key } />
-                                </button>
+                                </BaseButton>
                             )) }
                         </div>
                     }

@@ -4,6 +4,7 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } fro
 import { useTranslation } from '../../hooks';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 export const TranslationSettingsView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -136,13 +137,13 @@ export const TranslationSettingsView: FC<{}> = () => {
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-black/60">
                     <span>{languagesLoading ? 'Loading languages...' : `${supportedLanguages.length} languages available`}</span>
-                    <button
+                    <BaseButton
                         className="rounded border border-black/15 bg-white px-2 py-1 text-[11px] text-black hover:bg-black/5"
                         type="button"
                         onClick={() => ensureSupportedLanguagesLoaded(true)}
                     >
                         Refresh
-                    </button>
+                    </BaseButton>
                 </div>
                 {localizationTextsLoading && (
                     <div className="rounded border border-blue-300 bg-blue-50 px-2 py-1 text-[11px] leading-4 text-blue-700">

@@ -26,6 +26,7 @@ import { HousekeepingUserCard } from './HousekeepingUserCard';
 import { HousekeepingUserEconomyView } from './HousekeepingUserEconomyView';
 import { DEFAULT_SANCTION_DRAFT, HousekeepingSanctionDraft, HousekeepingUserSanctionsView, sanctionReason } from './HousekeepingUserSanctionsView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const BULK_CONFIRM_THRESHOLD = 5;
 
@@ -175,7 +176,7 @@ export const HousekeepingUsersTab: FC = () => {
                                           onMouseDown={(event) => event.preventDefault()}
                                       >
                                           <Checkbox checked={isChecked} className="shrink-0" title={isChecked ? LocalizeText('housekeeping.bulk.clear') : LocalizeText('housekeeping.bulk.apply')} onCheckedChange={() => toggleUserSelection(entry.id)} />
-                                          <button
+                                          <BaseButton
                                               className="flex grow items-center gap-2 text-left"
                                               onClick={() => {
                                                   setQuery(entry.username);
@@ -188,12 +189,12 @@ export const HousekeepingUsersTab: FC = () => {
                                               <span className="shrink-0 text-[10px] text-zinc-500">
                                                   #{entry.id} · {entry.rank}
                                               </span>
-                                          </button>
+                                          </BaseButton>
                                       </div>
                                   );
                               })
                             : recentUsers.map((entry) => (
-                                  <button
+                                  <BaseButton
                                       key={entry.id}
                                       className="flex w-full items-center gap-2 border-b border-zinc-100 px-2 py-1 text-left text-xs last:border-b-0 hover:bg-sky-50"
                                       onClick={() => {
@@ -206,7 +207,7 @@ export const HousekeepingUsersTab: FC = () => {
                                       <span className="shrink-0 text-[10px] uppercase text-zinc-400">{LocalizeText('housekeeping.user.recent')}</span>
                                       <span className="grow truncate font-medium">{entry.label}</span>
                                       <span className="shrink-0 text-[10px] text-zinc-500">#{entry.id}</span>
-                                  </button>
+                                  </BaseButton>
                               ))}
                     </div>
                 )}
@@ -255,13 +256,13 @@ export const HousekeepingUsersTab: FC = () => {
                         <FaUserSlash size={10} />
                         <span>{LocalizeText('housekeeping.action.kick')}</span>
                     </HousekeepingButton>
-                    <button
+                    <BaseButton
                         className="ml-auto px-1 text-zinc-500 hover:text-rose-600"
                         title={LocalizeText('housekeeping.bulk.clear')}
                         onClick={clearUserSelection}
                     >
                         <FaTimes size={10} />
-                    </button>
+                    </BaseButton>
                 </div>
             )}
 

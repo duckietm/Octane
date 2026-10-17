@@ -34,6 +34,7 @@ import { WordFilterSettingsView } from './WordFilterSettingsView';
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
 import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -57,9 +58,9 @@ const AirSettingsFrame: FC<AirSettingsFrameProps> = ({ backLabel, children, onBa
             <h2 className="air-settings-window__title">{title}</h2>
             <div aria-hidden="true" className="air-settings-window__divider" />
             {children}
-            <button className="air-settings-button air-settings-window__back" onClick={onBack} type="button">
+            <BaseButton className="air-settings-button air-settings-window__back" onClick={onBack} type="button">
                 {backLabel}
-            </button>
+            </BaseButton>
         </section>
     </DraggableWindow>
 );
@@ -268,10 +269,10 @@ export const UserSettingsView: FC<{}> = () => {
         return (
             <AirSettingsFrame backLabel={backLabel} onBack={closeView} title={localizeWithFallback('widget.memenu.settings', 'Settings')} variant="menu">
                 <div className="air-settings-menu__items">
-                    <button className="air-settings-button" onClick={() => openMenuSection('audio')} type="button">
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('audio')} type="button">
                         {localizeWithFallback('widget.memenu.settings.audio', 'Sound settings')}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         className="air-settings-button"
                         onClick={() => {
                             CreateLinkEvent('avatar-editor/show');
@@ -280,19 +281,19 @@ export const UserSettingsView: FC<{}> = () => {
                         type="button"
                     >
                         {localizeWithFallback('widget.memenu.settings.character', 'Character settings')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => openMenuSection('chat')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('chat')} type="button">
                         {localizeWithFallback('widget.memenu.settings.chat', 'Chat settings')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => openMenuSection('other')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('other')} type="button">
                         {localizeWithFallback('widget.memenu.settings.other', 'Other settings')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => openMenuSection('privacy')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => openMenuSection('privacy')} type="button">
                         {localizeWithFallback('privacy.settings.title', 'Game Privacy')}
-                    </button>
-                    <button className="air-settings-button" onClick={() => CreateLinkEvent('user-account-settings/show')} type="button">
+                    </BaseButton>
+                    <BaseButton className="air-settings-button" onClick={() => CreateLinkEvent('user-account-settings/show')} type="button">
                         {localizeWithFallback('usersettings.open.title', 'User Settings')}
-                    </button>
+                    </BaseButton>
                 </div>
             </AirSettingsFrame>
         );
@@ -398,9 +399,9 @@ export const UserSettingsView: FC<{}> = () => {
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_FAST}>{localizeWithFallback('navigator.roomsettings.chat.speed.fast', 'Fast')}</option>
                         </Select>
                     </label>
-                    <button className="air-settings-button" onClick={() => setSection('wordfilter')} type="button">
+                    <BaseButton className="air-settings-button" onClick={() => setSection('wordfilter')} type="button">
                         {localizeWithFallback('memenu.settings.wordfilter', 'Word filter')}
-                    </button>
+                    </BaseButton>
                 </div>
             </AirSettingsFrame>
         );

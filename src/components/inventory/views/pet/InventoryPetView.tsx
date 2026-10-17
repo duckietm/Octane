@@ -10,6 +10,7 @@ import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryPetImageView } from './InventoryPetImageView';
 import { InventoryPetItemView } from './InventoryPetItemView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const InventoryPetView: FC<{
     roomSession: IRoomSession;
@@ -110,7 +111,7 @@ export const InventoryPetView: FC<{
                         }}
                     />
                     {searchInput && (
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-inventory-filter-clear"
                             aria-label={LocalizeText('generic.clear')}

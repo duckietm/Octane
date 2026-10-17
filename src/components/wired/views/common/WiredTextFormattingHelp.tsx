@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { Text } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export const WIRED_TEXT_MESSAGE_MAX_LENGTH = 512;
 
@@ -25,11 +26,11 @@ export const WiredTextFormattingHelp: FC<{}> = () => {
 
     return (
         <div className="flex flex-col gap-1 rounded bg-black/5 p-1 text-[11px] leading-[14px]">
-            <button className="w-full text-left" type="button" onClick={() => setIsOpen((value) => !value)}>
+            <BaseButton className="w-full text-left" type="button" onClick={() => setIsOpen((value) => !value)}>
                 <Text small bold>
                     {isOpen ? 'Hide format examples' : 'Show format examples'}
                 </Text>
-            </button>
+            </BaseButton>
             {isOpen && (
                 <>
                     <Text small>

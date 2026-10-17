@@ -2,6 +2,7 @@ import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Column, Flex, LayoutFurniIconImageView, Text } from '../../../common';
 import { FurniItem } from '../../../hooks/furni-editor';
 import { suggestInteractionType } from '../furniEditorSuggestions';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface FurniEditorSearchViewProps {
     items: FurniItem[];
@@ -44,7 +45,7 @@ const SortArrow: FC<{ field: SortField; active: SortField; dir: SortDir }> = ({ 
 };
 
 const PagBtn: FC<{ disabled?: boolean; onClick: () => void; children: ReactNode; title?: string }> = ({ disabled, onClick, children, title }) => (
-    <button
+    <BaseButton
         type="button"
         title={title}
         disabled={disabled}
@@ -52,7 +53,7 @@ const PagBtn: FC<{ disabled?: boolean; onClick: () => void; children: ReactNode;
         className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 bg-[#ffffff] text-slate-600 text-sm leading-none hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
     >
         {children}
-    </button>
+    </BaseButton>
 );
 
 export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => {
@@ -161,13 +162,13 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                         onChange={(e) => setQuery(e.target.value)}
                     />
                     {query && (
-                        <button
+                        <BaseButton
                             type="button"
                             onClick={() => setQuery('')}
                             className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-[11px] text-slate-300 hover:text-slate-500 hover:bg-slate-100"
                         >
                             ✕
-                        </button>
+                        </BaseButton>
                     )}
                 </div>
                 <Flex gap={1}>
@@ -175,14 +176,14 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                         const on = typeFilter === t;
 
                         return (
-                            <button
+                            <BaseButton
                                 key={t || 'all'}
                                 type="button"
                                 onClick={() => applyType(t)}
                                 className={`px-3 py-1.5 text-[12px] font-medium rounded-lg border transition ${on ? 'bg-[#418db0] border-[#418db0] text-[#ffffff] shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200 hover:text-slate-600'}`}
                             >
                                 {t === '' ? 'All' : t === 's' ? 'Floor' : 'Wall'}
-                            </button>
+                            </BaseButton>
                         );
                     })}
                 </Flex>
@@ -195,7 +196,7 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                 </Text>
                 {loading && <span className="w-3 h-3 rounded-full border-2 border-slate-300 border-t-primary animate-spin" />}
                 {flaggedCount > 0 && (
-                    <button
+                    <BaseButton
                         type="button"
                         onClick={() => setOnlyFlagged((prev) => !prev)}
                         aria-pressed={onlyFlagged}
@@ -204,7 +205,7 @@ export const FurniEditorSearchView: FC<FurniEditorSearchViewProps> = (props) => 
                     >
                         <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
                         {flaggedCount} to check on this page
-                    </button>
+                    </BaseButton>
                 )}
             </Flex>
 

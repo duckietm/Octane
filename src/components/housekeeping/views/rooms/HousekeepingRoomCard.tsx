@@ -3,6 +3,7 @@ import { FaCalendarAlt, FaCrown, FaDoorOpen, FaEyeSlash, FaKey, FaLock, FaTags, 
 import { CreateLinkEvent, formatHousekeepingDate, IHousekeepingRoom, LocalizeText } from '../../../../api';
 import { useNavigatorData } from '../../../../hooks';
 import { HousekeepingFact, HousekeepingPill } from '../common/HousekeepingParts';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const RoomStatePill: FC<{ room: IHousekeepingRoom }> = ({ room }) => {
     const state = room.settings?.state ?? (room.isLocked ? 1 : 0);
@@ -63,16 +64,16 @@ export const HousekeepingRoomCard: FC<{ room: IHousekeepingRoom; onClear: () => 
                     </div>
                     <div className="mt-0.5 line-clamp-2 text-xs text-zinc-600">{room.description || LocalizeText('housekeeping.room.no_description')}</div>
                 </div>
-                <button
+                <BaseButton
                     className="shrink-0 rounded border border-sky-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 hover:bg-sky-50"
                     title={LocalizeText('housekeeping.room.go.title')}
                     onClick={() => CreateLinkEvent(`navigator/goto/${room.id}`)}
                 >
                     {LocalizeText('housekeeping.room.go')}
-                </button>
-                <button className="p-1 text-zinc-400 transition-colors hover:text-rose-600" title={LocalizeText('housekeeping.room.clear')} onClick={onClear}>
+                </BaseButton>
+                <BaseButton className="p-1 text-zinc-400 transition-colors hover:text-rose-600" title={LocalizeText('housekeeping.room.clear')} onClick={onClear}>
                     <FaTimes size={12} />
-                </button>
+                </BaseButton>
             </div>
             <div className="mt-2 grid grid-cols-4 gap-1">
                 <HousekeepingFact

@@ -24,6 +24,7 @@ import imgMarketplace from '../../assets/images/vault/marketplace.png';
 import imgSurprise from '../../assets/images/vault/surprise.png';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useMessageEvent } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -210,7 +211,7 @@ export const VaultView: FC<{}> = (props) => {
                                           </span>
                                       ))}
                             </div>
-                            <button
+                            <BaseButton
                                 type="button"
                                 disabled={!canClaim}
                                 onClick={canClaim ? () => claimOne(category.key) : undefined}
@@ -221,12 +222,12 @@ export const VaultView: FC<{}> = (props) => {
                                 }
                             >
                                 {localizeWithFallback('earnings.claim.button', 'Riscatta')}
-                            </button>
+                            </BaseButton>
                         </div>
                     );
                 })}
                 <div className="flex justify-center pt-1">
-                    <button
+                    <BaseButton
                         type="button"
                         disabled={!anyClaimable}
                         onClick={anyClaimable ? claimAll : undefined}
@@ -237,7 +238,7 @@ export const VaultView: FC<{}> = (props) => {
                         }
                     >
                         {localizeWithFallback('earnings.claim.all', 'Richiedili Tutti')}
-                    </button>
+                    </BaseButton>
                 </div>
             </OctaneCardContentView>
         </OctaneCardView>

@@ -1,6 +1,7 @@
 import { InventoryFilterSelect } from './InventoryFilterSelect';
 import { FC } from 'react';
 import { FURNI_MAIN_FILTER, FURNI_TYPE_OPTIONS, FurniMainFilter, furniMainFilterKey, furniTypeFilterKey, LocalizeText } from '../../../api';
+import { BaseButton } from '../../../common/BaseButton';
 
 export const BADGE_MAIN_ALL = 'all';
 export const BADGE_MAIN_NORMAL = 'normal';
@@ -94,7 +95,7 @@ export const InventoryCategoryFilterView: FC<InventoryCategoryFilterViewProps> =
                     onChange={(event) => onSearchChange?.(event.target.value)}
                 />
                 {searchValue.length > 0 && (
-                    <button
+                    <BaseButton
                         type="button"
                         className="octane-inventory-filter-clear"
                         aria-label={localizeOr('generic.clear', 'Clear search')}

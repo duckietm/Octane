@@ -3,6 +3,7 @@ import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { ChatEntryType, SanitizeHtml } from '../../api';
 import { ChatBubbleUtilities } from '../../api/room/widgets/ChatBubbleUtilities';
 import { useChatHistory, useOnClickChat } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const ChatHistoryUserImage: FC<{ imageUrl?: string; look?: string }> = (props) => {
     const { imageUrl = '', look = '' } = props;
@@ -138,7 +139,7 @@ export const ChatHistoryView: FC<{}> = (props) => {
                     ))}
                 </div>
             </div>
-            <button className="octane-chat-history-handle" type="button" onClick={() => setIsVisible(false)} />
+            <BaseButton className="octane-chat-history-handle" type="button" onClick={() => setIsVisible(false)} />
         </div>
     );
 };

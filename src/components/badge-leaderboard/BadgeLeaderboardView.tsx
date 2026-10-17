@@ -23,6 +23,7 @@ import {
     leaderboardDropdownOpener
 } from '../../assets/images/leaderboard_badge';
 import { Column, DraggableWindow, DraggableWindowPosition, Flex, LayoutAvatarImageView, Text } from '../../common';
+import { BaseButton } from '../../common/BaseButton';
 
 type LeaderboardPage =
     | { key: 'totalBadges'; board: BadgeLeaderboardBoard; frame: string; emblem: string; title: () => string; info: () => string; option: () => string }
@@ -232,7 +233,7 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                 >
                     <div className="octane-badge-leaderboard__frame" aria-hidden="true" />
                     <div className="octane-badge-leaderboard__drag-handle" />
-                    <button
+                    <BaseButton
                         className="octane-badge-leaderboard__close"
                         type="button"
                         onPointerDown={(event) => event.stopPropagation()}
@@ -240,9 +241,9 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                         aria-label="Close"
                     >
                         <span className="octane-badge-leaderboard__close-icon" style={{ backgroundImage: `url(${leaderboardButtonCloseSwf})` }} />
-                    </button>
+                    </BaseButton>
                     <div className="octane-badge-leaderboard__header">
-                        <button
+                        <BaseButton
                             className="octane-badge-leaderboard__category-button"
                             type="button"
                             onPointerDown={(event) => event.stopPropagation()}
@@ -252,11 +253,11 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                                 {currentPage?.title() || LocalizeText('badge_leaderboard.title.total_badges')}
                             </Text>
                             <img className="octane-badge-leaderboard__header-arrow" src={leaderboardDropdownOpener} alt="" />
-                        </button>
+                        </BaseButton>
                         {isCategoryMenuVisible && (
                             <div className="octane-badge-leaderboard__category-menu" onPointerDown={(event) => event.stopPropagation()}>
                                 {pages.map((page, index) => (
-                                    <button
+                                    <BaseButton
                                         key={page.key}
                                         className={`octane-badge-leaderboard__category-option ${index === categoryIndex ? 'is-active' : ''}`}
                                         type="button"
@@ -266,7 +267,7 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                                         }}
                                     >
                                         {page.option()}
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         )}
@@ -298,26 +299,26 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
                                 </div>
                                 <img className="octane-badge-leaderboard__divider" src={leaderboardDivider} alt="" />
                                 <Flex className="octane-badge-leaderboard__footer" justifyContent="between" alignItems="center">
-                                    <button
+                                    <BaseButton
                                         className="octane-badge-leaderboard__nav-button is-previous"
                                         disabled={clampedEntryPageIndex <= 0}
                                         onClick={() => setEntryPageIndex((value) => Math.max(0, value - 1))}
                                     >
                                         {LocalizeText('badge_leaderboard.previous')}
-                                    </button>
+                                    </BaseButton>
                                     <Column gap={0} alignItems="center">
                                         <Text small bold>
                                             {currentPage.option()}
                                         </Text>
                                         <Text className="opacity-70" small>{`${clampedEntryPageIndex + 1} / ${totalEntryPages}`}</Text>
                                     </Column>
-                                    <button
+                                    <BaseButton
                                         className="octane-badge-leaderboard__nav-button is-next"
                                         disabled={clampedEntryPageIndex >= totalEntryPages - 1}
                                         onClick={() => setEntryPageIndex((value) => Math.min(totalEntryPages - 1, value + 1))}
                                     >
                                         {LocalizeText('badge_leaderboard.next')}
-                                    </button>
+                                    </BaseButton>
                                 </Flex>
                             </>
                         )}

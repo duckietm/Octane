@@ -12,6 +12,7 @@ import effectsFxSrc from '../../assets/images/avatareditor/air/effects-fx.png';
 import removeSelectionSrc from '../../assets/images/avatareditor/air/remove-selection.png';
 import { ClassicScrollAreaView } from '../../common/scroll-area/ClassicScrollAreaView';
 import { OwnedAvatarEffect, useAvatarEffects } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const isEffectRunning = (effect: OwnedAvatarEffect) => effect.isPermanent || effect.secondsLeft > 0;
 
@@ -64,18 +65,18 @@ export const AvatarEditorEffectsView: FC<{
                 ) : (
                     <ClassicScrollAreaView className="size-full">
                         <div className="octane-avatar-editor-effects-grid">
-                            <button
+                            <BaseButton
                                 type="button"
                                 className={`avatar-parts${selectedType <= 0 ? ' part-selected' : ''}`}
                                 onClick={() => onSelect(AVATAR_EDITOR_NO_EFFECT)}
                             >
                                 <img alt="" src={removeSelectionSrc} draggable={false} />
-                            </button>
+                            </BaseButton>
                             {effects.map((effect) => {
                                 const iconUrl = getAvatarEffectIconUrl(effect.type);
 
                                 return (
-                                    <button
+                                    <BaseButton
                                         key={effect.type}
                                         type="button"
                                         title={localizeWithFallback(`fx_${effect.type}`, `fx_${effect.type}`)}
@@ -93,7 +94,7 @@ export const AvatarEditorEffectsView: FC<{
                                                 />
                                             </span>
                                         )}
-                                    </button>
+                                    </BaseButton>
                                 );
                             })}
                         </div>
@@ -113,9 +114,9 @@ export const AvatarEditorEffectsView: FC<{
                     </>
                 )}
                 {shopPage && (
-                    <button type="button" className="octane-avatar-editor-effects-shop" onClick={() => CreateLinkEvent(`catalog/open/${shopPage}`)}>
+                    <BaseButton type="button" className="octane-avatar-editor-effects-shop" onClick={() => CreateLinkEvent(`catalog/open/${shopPage}`)}>
                         {LocalizeText('avatareditor.effects.shop')}
-                    </button>
+                    </BaseButton>
                 )}
             </div>
         </div>

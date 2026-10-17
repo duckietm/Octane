@@ -2,6 +2,7 @@ import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { HABBICON_GRID_COLUMNS, HabbiconEntry, localizeHabbiconName, localizeWithFallback, padHabbiconRow, useHabbiconCatalog } from '../../../../api';
 import { LayoutHabbiconImageView, LayoutItemCountView } from '../../../../common';
 import { InlineDialog } from '../../../../common/InlineDialog';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type PickerSection = {
     id: string;
@@ -115,11 +116,11 @@ export const FriendsMessengerHabbiconPickerView: FC<{
                 <div className="messenger-habbicon-search">
                     <input autoFocus maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
                     {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
-                    {search && <button aria-label="Clear" type="button" onClick={() => setSearch('')} />}
+                    {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
                 </div>
-                <button className="messenger-btn messenger-habbicon-get-more" type="button" onClick={onOpenHub}>
+                <BaseButton className="messenger-btn messenger-habbicon-get-more" type="button" onClick={onOpenHub}>
                     {localizeWithFallback('habbicons.hud.get_more', 'Get more')}
-                </button>
+                </BaseButton>
             </div>
             {sections.length > 0 ? (
                 <div className="messenger-habbicon-scroll has-classic-scrollbar" style={{ height: listHeight }}>
@@ -129,7 +130,7 @@ export const FriendsMessengerHabbiconPickerView: FC<{
                             <div className="messenger-habbicon-grid">
                                 {padHabbiconRow(section.entries).map((entry, index) =>
                                     entry ? (
-                                        <button
+                                        <BaseButton
                                             key={entry.id}
                                             type="button"
                                             title={localizeHabbiconName(entry)}
@@ -137,7 +138,7 @@ export const FriendsMessengerHabbiconPickerView: FC<{
                                         >
                                             <LayoutHabbiconImageView id={entry.id} size={40} />
                                             {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -3, right: -3 }} />}
-                                        </button>
+                                        </BaseButton>
                                     ) : (
                                         <div className="empty" key={`empty-${section.id}-${index}`} />
                                     )

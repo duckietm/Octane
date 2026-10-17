@@ -8,6 +8,7 @@ import { useAchievements, useMessageEvent, useNavigatorData, useOctaneEvent, use
 import { classNames } from '../../../../layout';
 import { getRegisteredPlugins, IOctanePlugin, subscribePlugins } from '../../../plugins/OctanePluginApi';
 import { applyRoomZoom } from './roomZoom.helpers';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface RoomHistoryEntry {
     roomId: number;
@@ -278,19 +279,19 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
 
     return (
         <div className={classNames('octane-room-tools-container', !isToolsOpen && 'is-collapsed')}>
-            <button className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
+            <BaseButton className="room-tools-collapse-toggle" type="button" onClick={() => setIsToolsOpen((prevValue) => !prevValue)}>
                 {isToolsOpen ? '‹' : '›'}
-            </button>
+            </BaseButton>
             {isToolsOpen && (
                 <div className="octane-room-tools">
                     <div className="room-tools-zoom-row">
                         <span>{LocalizeText('room.zoom.text', ['zoom_level'], [getZoomText(zoomScale)])}</span>
-                        <button className="room-tools-zoom-button" type="button" title={LocalizeText('room.zoom.zoom_in.tooltip')} disabled={!canZoomIn} onClick={() => handleToolClick('zoom_in')}>
+                        <BaseButton className="room-tools-zoom-button" type="button" title={LocalizeText('room.zoom.zoom_in.tooltip')} disabled={!canZoomIn} onClick={() => handleToolClick('zoom_in')}>
                             +
-                        </button>
-                        <button className="room-tools-zoom-button" type="button" title={LocalizeText('room.zoom.zoom_out.tooltip')} disabled={!canZoomOut} onClick={() => handleToolClick('zoom_out')}>
+                        </BaseButton>
+                        <BaseButton className="room-tools-zoom-button" type="button" title={LocalizeText('room.zoom.zoom_out.tooltip')} disabled={!canZoomOut} onClick={() => handleToolClick('zoom_out')}>
                             -
-                        </button>
+                        </BaseButton>
                     </div>
                     {tools.map((tool) => (
                         <div
@@ -351,7 +352,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                         {roomEnterInfo.tags.length > 0 && (
                             <div className="flex gap-2 mt-1">
                                 {roomEnterInfo.tags.map((tag) => (
-                                    <button
+                                    <BaseButton
                                         key={tag}
                                         className="text-[12px] text-[#1b79ab] hover:text-[#47a8e6] bg-transparent border-0 p-0 cursor-pointer"
                                         type="button"
@@ -361,7 +362,7 @@ export const RoomToolsWidgetView: FC<{}> = (props) => {
                                         }}
                                     >
                                         #{trimRoomTag(tag)}
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         )}

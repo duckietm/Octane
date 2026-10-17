@@ -1,5 +1,6 @@
 import { FC, useRef } from 'react';
 import { useDraggableLoginWindow } from '../hooks/useDraggableLoginWindow';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface LoginWidgetSlotProps {
     slotKey: string;
@@ -30,7 +31,7 @@ export const LoginWidgetSlot: FC<LoginWidgetSlotProps> = ({ slotKey, type, image
                 <div className="login-widget-title">{title}</div>
                 {description && <div className="login-widget-description">{description}</div>}
                 {buttonText && (
-                    <button
+                    <BaseButton
                         type="button"
                         className="login-widget-button"
                         onClick={() => {
@@ -38,7 +39,7 @@ export const LoginWidgetSlot: FC<LoginWidgetSlotProps> = ({ slotKey, type, image
                         }}
                     >
                         {buttonText}
-                    </button>
+                    </BaseButton>
                 )}
             </div>
         </div>

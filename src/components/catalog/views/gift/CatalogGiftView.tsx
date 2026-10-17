@@ -45,6 +45,7 @@ import {
     wrapGiftSelectionIndex
 } from './CatalogGiftView.helpers';
 import { Checkbox } from '../../../../common/Checkbox';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface GiftPaletteColor {
     id: number;
@@ -574,28 +575,28 @@ export const CatalogGiftView: FC = () => {
                             )}
                         </div>
                     </div>
-                    <button
+                    <BaseButton
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
                         className="octane-catalog-gift-arrow octane-catalog-gift-box-prev"
                         type="button"
                         onClick={() => selectRelativeBox(-1)}
                     >
                         <img alt="" draggable={false} src={giftArrowLeftImage} />
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_box')}
                         className="octane-catalog-gift-arrow octane-catalog-gift-box-next"
                         type="button"
                         onClick={() => selectRelativeBox(1)}
                     >
                         <img alt="" draggable={false} src={giftArrowRightImage} />
-                    </button>
+                    </BaseButton>
                     <div className="octane-catalog-gift-box-name">{LocalizeText(boxName)}</div>
                     <div className="octane-catalog-gift-price">
                         <span>{LocalizeText(priceText, ['price'], [giftConfiguration.price.toString()])}</span>
                         {!isDefaultBox && <img alt="" draggable={false} src={giftSmallCoinImage} />}
                     </div>
-                    <button
+                    <BaseButton
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
                         className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-prev${isRibbonEnabled ? '' : ' is-disabled'}`}
                         disabled={!isRibbonEnabled}
@@ -603,8 +604,8 @@ export const CatalogGiftView: FC = () => {
                         onClick={() => selectRelativeRibbon(-1)}
                     >
                         <img alt="" draggable={false} src={giftArrowLeftImage} />
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         aria-label={LocalizeText('catalog.gift_wrapping.pick_ribbon')}
                         className={`octane-catalog-gift-arrow octane-catalog-gift-ribbon-next${isRibbonEnabled ? '' : ' is-disabled'}`}
                         disabled={!isRibbonEnabled}
@@ -612,7 +613,7 @@ export const CatalogGiftView: FC = () => {
                         onClick={() => selectRelativeRibbon(1)}
                     >
                         <img alt="" draggable={false} src={giftArrowRightImage} />
-                    </button>
+                    </BaseButton>
                     <div className={`octane-catalog-gift-ribbon-name${isRibbonEnabled ? '' : ' is-disabled'}`}>{LocalizeText(ribbonName)}</div>
                 </div>
 
@@ -622,7 +623,7 @@ export const CatalogGiftView: FC = () => {
                 <div className={`octane-catalog-gift-palette${isColorEnabled ? '' : ' is-disabled'}`}>
                     <div className="octane-catalog-gift-palette-grid">
                         {colors.map((color) => (
-                            <button
+                            <BaseButton
                                 aria-label={color.color}
                                 className="octane-catalog-gift-palette-item"
                                 disabled={!isColorEnabled}
@@ -639,17 +640,17 @@ export const CatalogGiftView: FC = () => {
                                 {color.id === selectedColorId && (
                                     <img alt="" className="octane-catalog-gift-palette-selection" draggable={false} src={giftPaletteSelectionImage} />
                                 )}
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>
 
-                <button className="octane-catalog-gift-cancel" type="button" onClick={onClose}>
+                <BaseButton className="octane-catalog-gift-cancel" type="button" onClick={onClose}>
                     {LocalizeText('catalog.gift_wrapping.cancel')}
-                </button>
-                <button className="octane-catalog-gift-submit" disabled={isBuyingGift} type="button" onClick={onBuyGift}>
+                </BaseButton>
+                <BaseButton className="octane-catalog-gift-submit" disabled={isBuyingGift} type="button" onClick={onBuyGift}>
                     {LocalizeText('catalog.gift_wrapping.give_gift')}
-                </button>
+                </BaseButton>
             </OctaneCardContentView>
         </OctaneCardView>
     );

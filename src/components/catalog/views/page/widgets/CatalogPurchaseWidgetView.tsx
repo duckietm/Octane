@@ -39,6 +39,7 @@ import {
 import { CatalogPurchaseConfirmView } from '../../CatalogPurchaseConfirmView';
 import { CatalogClubUpgradeButton } from './CatalogClubUpgradeButton';
 import { canPurchaseCatalogOffer } from './catalogPurchase.helpers';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface CatalogPurchaseWidgetViewProps {
     disabled?: boolean;
@@ -329,9 +330,9 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
         if (habbiconOwned)
             return (
-                <button type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
                     {localizeWithFallback('generic.owned', 'Owned')}
-                </button>
+                </BaseButton>
             );
 
         if (isBuildersClubPlaceable) {
@@ -359,22 +360,22 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
             return (
                 <div className="flex flex-col gap-1.5 items-start">
                     <div className="octane-builders-place-buttons flex gap-1.5 flex-wrap">
-                        <button
+                        <BaseButton
                             type="button"
                             className="octane-builders-place-button is-one"
                             disabled={isDisabled}
                             onClick={() => startBuilderPlacement(false)}
                         >
                             {LocalizeText('builder.placement_widget.place_one')}
-                        </button>
-                        <button
+                        </BaseButton>
+                        <BaseButton
                             type="button"
                             className="octane-builders-place-button is-many"
                             disabled={isDisabled}
                             onClick={() => startBuilderPlacement(true)}
                         >
                             {LocalizeText('builder.placement_widget.place_many')}
-                        </button>
+                        </BaseButton>
                     </div>
                     {isBlockedByVisitors && (
                         <Text className="max-w-full" small variant="danger">
@@ -392,47 +393,47 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
         if (isOfferUnavailable)
             return (
-                <button type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
                     {currentOffer.isLazy ? LocalizeText('generic.loading') : LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
-                </button>
+                </BaseButton>
             );
 
         if (isLimitedSoldOut)
             return (
-                <button type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
                     {LocalizeText('catalog.alert.limited_edition_sold_out.title')}
-                </button>
+                </BaseButton>
             );
 
         switch (purchaseState) {
             case CatalogPurchaseState.CONFIRM:
                 return (
-                    <button type="button" className={`${purchaseButtonClassNames.join(' ')} pointer-events-none`}>
+                    <BaseButton type="button" className={`${purchaseButtonClassNames.join(' ')} pointer-events-none`}>
                         {LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
-                    </button>
+                    </BaseButton>
                 );
             case CatalogPurchaseState.PURCHASE:
                 return (
-                    <button type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
                         <LayoutLoadingSpinnerView />
-                    </button>
+                    </BaseButton>
                 );
             case CatalogPurchaseState.FAILED:
                 return (
-                    <button type="button" className={purchaseButtonClassNames.join(' ')}>
+                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')}>
                         {LocalizeText('generic.failed')}
-                    </button>
+                    </BaseButton>
                 );
             case CatalogPurchaseState.SOLD_OUT:
                 return (
-                    <button type="button" className={purchaseButtonClassNames.join(' ')}>
+                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')}>
                         {LocalizeText('generic.failed') + ' - ' + LocalizeText('catalog.alert.limited_edition_sold_out.title')}
-                    </button>
+                    </BaseButton>
                 );
             case CatalogPurchaseState.NONE:
             default:
                 return (
-                    <button
+                    <BaseButton
                         type="button"
                         className={purchaseButtonClassNames.join(' ')}
                         disabled={disabled || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))}
@@ -453,7 +454,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                         }}
                     >
                         {LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
-                    </button>
+                    </BaseButton>
                 );
         }
     };
@@ -462,7 +463,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
         <>
             {isClubLocked && <CatalogClubUpgradeButton />}
             {!isClubLocked && !isBuildersClubOffer && !noGiftOption && !currentOffer.isRentOffer && (
-                <button
+                <BaseButton
                     type="button"
                     className="octane-catalog-standard-button octane-catalog-standard-gift-button"
                     disabled={
@@ -483,7 +484,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                     }}
                 >
                     {LocalizeText('catalog.purchase_confirmation.gift')}
-                </button>
+                </BaseButton>
             )}
             {!isClubLocked && <PurchaseButton />}
             {confirmationOpenRef.current && (purchaseState === CatalogPurchaseState.CONFIRM || purchaseState === CatalogPurchaseState.PURCHASE) && (

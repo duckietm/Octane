@@ -20,6 +20,7 @@ import {
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { BaseButton } from '../../../../common/BaseButton';
 
 /**
  * Habbo's "movement curve" (wf_xtra_mov_curve): how high the furni the stack moves jump, typed or
@@ -198,7 +199,7 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
                             <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
                             <div className="octane-wired__give-var-targets">
                                 {TARGETS.map((button) => (
-                                    <button
+                                    <BaseButton
                                         key={button.key}
                                         className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${target === button.key ? 'is-active' : ''}`}
                                         disabled={!fromVariable}
@@ -206,7 +207,7 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
                                         onClick={() => chooseTarget(button.key)}
                                     >
                                         <img alt={button.key} src={button.icon} />
-                                    </button>
+                                    </BaseButton>
                                 ))}
                             </div>
                         </label>

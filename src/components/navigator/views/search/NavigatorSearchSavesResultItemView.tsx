@@ -2,6 +2,7 @@ import { NavigatorDeleteSavedSearchComposer, NavigatorSavedSearch } from '@octan
 import { FC, MouseEvent } from 'react';
 import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { useNavigatorUiStore } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 export interface NavigatorSearchSavesResultItemViewProps {
     search: NavigatorSavedSearch;
@@ -34,10 +35,10 @@ export const NavigatorSearchSavesResultItemView: FC<NavigatorSearchSavesResultIt
 
     return (
         <div className="saved-search-row">
-            <button type="button" className="saved-search-row__open" title={LocalizeText('navigator.tooltip.open.saved.search')} onClick={openSearch}>
+            <BaseButton type="button" className="saved-search-row__open" title={LocalizeText('navigator.tooltip.open.saved.search')} onClick={openSearch}>
                 <span className="saved-search-row__label">{title}</span>
-            </button>
-            <button
+            </BaseButton>
+            <BaseButton
                 type="button"
                 className="saved-search-row__delete"
                 aria-label={`${LocalizeText('navigator.tooltip.remove.saved.search')} ${title}`}

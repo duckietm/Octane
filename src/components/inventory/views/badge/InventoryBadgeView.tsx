@@ -21,6 +21,7 @@ import { LayoutBadgeImageView } from '../../../../common';
 import { useInventoryBadges, useInventoryUnseenTracker, useNotification } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 import { InventoryBadgeItemView } from './InventoryBadgeItemView';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const ActiveBadgeSlot: FC<{
     slotIndex: number;
@@ -236,9 +237,9 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
                     {pageCount > 1 && (
                         <div className="octane-inventory-badges-pages">
                             {Array.from({ length: pageCount }, (_, index) => (
-                                <button key={index} type="button" className={currentPage === index ? 'is-active' : ''} onClick={() => setPage(index)}>
+                                <BaseButton key={index} type="button" className={currentPage === index ? 'is-active' : ''} onClick={() => setPage(index)}>
                                     {index}
-                                </button>
+                                </BaseButton>
                             ))}
                         </div>
                     )}
@@ -320,15 +321,15 @@ export const InventoryBadgeView: FC<{ filteredBadgeCodes?: string[] }> = (props)
                     </>
                 )}
 
-                <button type="button" className={customFilter === 'all' ? 'is-active' : ''} onClick={() => setCustomFilter('all')}>
+                <BaseButton type="button" className={customFilter === 'all' ? 'is-active' : ''} onClick={() => setCustomFilter('all')}>
                     {localizeWithFallback('inventory.badges.tab.all', 'All')} ({baseCodes.length})
-                </button>
-                <button type="button" className={customFilter === 'custom' ? 'is-active' : ''} onClick={() => setCustomFilter('custom')}>
+                </BaseButton>
+                <BaseButton type="button" className={customFilter === 'custom' ? 'is-active' : ''} onClick={() => setCustomFilter('custom')}>
                     {localizeWithFallback('inventory.badges.tab.custom', 'Custom')} ({customCount})
-                </button>
-                <button type="button" className="is-create" onClick={() => CreateLinkEvent('badge-creator/show')}>
+                </BaseButton>
+                <BaseButton type="button" className="is-create" onClick={() => CreateLinkEvent('badge-creator/show')}>
                     <FaPaintBrush className="fa-icon" /> {localizeWithFallback('inventory.badges.create', 'Create badge')}
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

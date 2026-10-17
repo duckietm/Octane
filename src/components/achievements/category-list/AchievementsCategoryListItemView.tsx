@@ -1,5 +1,6 @@
 import { CSSProperties, FC } from 'react';
 import { AchievementUtilities, IAchievementCategory } from '../../../api';
+import { BaseButton } from '../../../common/BaseButton';
 
 interface AchievementCategoryListItemViewProps {
     category: IAchievementCategory;
@@ -32,7 +33,7 @@ export const AchievementsCategoryListItemView: FC<AchievementCategoryListItemVie
     } as CSSProperties;
 
     return (
-        <button
+        <BaseButton
             type="button"
             className={`air-achievements-category-tile${!AchievementUtilities.hasBundledCategoryImage(category) ? ' is-legacy-category' : ''}${selectedCategoryCode === category.code ? ' is-active' : ''}`}
             style={style}
@@ -44,6 +45,6 @@ export const AchievementsCategoryListItemView: FC<AchievementCategoryListItemVie
                 {progress}/{maxProgress}
             </span>
             {getTotalUnseen > 0 && <span className="air-achievements-unseen-count">{getTotalUnseen}</span>}
-        </button>
+        </BaseButton>
     );
 };

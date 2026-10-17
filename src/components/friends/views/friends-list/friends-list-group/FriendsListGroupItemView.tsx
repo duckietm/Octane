@@ -7,6 +7,7 @@ import { StaffChatFrankIconView } from '../../../StaffChatFrankIconView';
 import { resolveAvatarFigure } from '../resolveAvatarFigure';
 import { resolveAvatarGender } from '../resolveAvatarGender';
 import { canFollowFriendListEntry } from './friendsListActions.helpers';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 export const FriendsListGroupItemView: FC<{ friend: MessengerFriend; selected: boolean; selectFriend: (userId: number) => void }> = ({
     friend,
@@ -82,7 +83,7 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend; selected: b
             <span className="hfl-friend-name">{friend.name}</span>
             <div className="hfl-friend-actions" onClick={stop}>
                 {friend.id > 0 && (
-                    <button
+                    <BaseButton
                         type="button"
                         className={`hfl-relationship ${relationshipName}`}
                         title={LocalizeText('friendlist.tip.relationship')}
@@ -90,16 +91,16 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend; selected: b
                     />
                 )}
                 {canFollowFriendListEntry(friend) && (
-                    <button type="button" className="hfl-action follow" title={LocalizeText('friendlist.tip.follow')} onClick={() => followFriend(friend)} />
+                    <BaseButton type="button" className="hfl-action follow" title={LocalizeText('friendlist.tip.follow')} onClick={() => followFriend(friend)} />
                 )}
-                <button type="button" className="hfl-action chat" title={LocalizeText('friendlist.tip.im')} onClick={() => OpenMessengerChat(friend.id)} />
+                <BaseButton type="button" className="hfl-action chat" title={LocalizeText('friendlist.tip.im')} onClick={() => OpenMessengerChat(friend.id)} />
             </div>
             {isRelationshipOpen && (
                 <div ref={relationshipMenuRef} className="hfl-relationship-menu">
-                    <button type="button" className="none" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_NONE)} />
-                    <button type="button" className="heart" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_HEART)} />
-                    <button type="button" className="smile" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_SMILE)} />
-                    <button type="button" className="bobba" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_BOBBA)} />
+                    <BaseButton type="button" className="none" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_NONE)} />
+                    <BaseButton type="button" className="heart" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_HEART)} />
+                    <BaseButton type="button" className="smile" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_SMILE)} />
+                    <BaseButton type="button" className="bobba" onClick={(event) => setRelationship(event, MessengerFriend.RELATIONSHIP_BOBBA)} />
                 </div>
             )}
         </div>

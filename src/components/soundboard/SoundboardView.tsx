@@ -12,6 +12,7 @@ import {
 import { OctaneCard } from '../../layout';
 import { SoundboardPadView } from './SoundboardPadView';
 import { SoundboardShelfView } from './SoundboardShelfView';
+import { BaseButton } from '../../common/BaseButton';
 
 const PAGE_SIZE = 10;
 const PLAYING_MS = 1_500;
@@ -149,22 +150,22 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
 
             <div className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={LocalizeText('soundboard.categories')}>
                 {!!favoriteIds.length && (
-                    <button type="button" onClick={() => selectCategory('favorites')} className={categoryClassName('favorites')}>
+                    <BaseButton type="button" onClick={() => selectCategory('favorites')} className={categoryClassName('favorites')}>
                         ★ {LocalizeText('soundboard.category.favorites')}
-                    </button>
+                    </BaseButton>
                 )}
-                <button type="button" onClick={() => selectCategory('all')} className={categoryClassName('all')}>
+                <BaseButton type="button" onClick={() => selectCategory('all')} className={categoryClassName('all')}>
                     {LocalizeText('soundboard.category.all')}
-                </button>
+                </BaseButton>
                 {!!recentSoundIds.length && (
-                    <button type="button" onClick={() => selectCategory('recent')} className={categoryClassName('recent')}>
+                    <BaseButton type="button" onClick={() => selectCategory('recent')} className={categoryClassName('recent')}>
                         {LocalizeText('soundboard.category.recent')}
-                    </button>
+                    </BaseButton>
                 )}
                 {categories.map((category) => (
-                    <button key={category.id} type="button" onClick={() => selectCategory(category.id)} className={categoryClassName(category.id)}>
+                    <BaseButton key={category.id} type="button" onClick={() => selectCategory(category.id)} className={categoryClassName(category.id)}>
                         {category.label}
-                    </button>
+                    </BaseButton>
                 ))}
             </div>
 
@@ -200,7 +201,7 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
             {totalPages > 1 && (
                 <div className="flex select-none items-center justify-center gap-1.5">
                     {Array.from({ length: totalPages }, (_, index) => (
-                        <button
+                        <BaseButton
                             key={index}
                             type="button"
                             aria-label={LocalizeText('soundboard.pagination.page', ['page'], [String(index + 1)])}
@@ -215,9 +216,9 @@ export const SoundboardContentView: FC<SoundboardContentViewProps> = ({
             {silencedCount > 0 && (
                 <div className="soundboard-silenced text-black/60">
                     <span>{LocalizeText('soundboard.silenced.count', ['count'], [String(silencedCount)])}</span>
-                    <button type="button" className="soundboard-silenced__restore" onClick={onRestoreSilenced}>
+                    <BaseButton type="button" className="soundboard-silenced__restore" onClick={onRestoreSilenced}>
                         {LocalizeText('soundboard.silenced.restore')}
-                    </button>
+                    </BaseButton>
                 </div>
             )}
 

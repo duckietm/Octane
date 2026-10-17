@@ -3,6 +3,7 @@ import { FC, useMemo, useState } from 'react';
 import { ChatEntryType, IChatEntry, localizeWithFallback, LocalizeText, ReportState, ReportType } from '../../../api';
 import { AutoGrid, Button, Column, Flex, LayoutAvatarImageView, LayoutGridItem, Text } from '../../../common';
 import { useChatHistory, useHelp } from '../../../hooks';
+import { BaseButton } from '../../../common/BaseButton';
 
 export const SelectReportedChatsView: FC<{}> = (props) => {
     const [selectedChats, setSelectedChats] = useState<IChatEntry[]>([]);
@@ -73,9 +74,9 @@ export const SelectReportedChatsView: FC<{}> = (props) => {
                         <span>{localizeWithFallback('help.cfh.selected_user.title', 'Selected user')}</span>
                         <b>{reportedUser.name}</b>
                     </span>
-                    <button className="help-link" type="button" onClick={changeUser}>
+                    <BaseButton className="help-link" type="button" onClick={changeUser}>
                         {localizeWithFallback('help.cfh.selected_user.change', 'Select another user')}
-                    </button>
+                    </BaseButton>
                 </div>
             )}
             <Column gap={1} overflow="hidden">

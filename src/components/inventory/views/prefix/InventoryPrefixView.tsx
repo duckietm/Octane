@@ -6,6 +6,7 @@ import { useInventoryNickIcons, useInventoryPrefixes, useNotification } from '..
 import { OctaneButton } from '../../../../layout';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
+import { BaseButton } from '../../../../common/BaseButton';
 
 type InventoryIdentityTab = 'prefixes' | 'icons';
 
@@ -138,14 +139,14 @@ export const InventoryPrefixView: FC<{}> = () => {
                             <ClassicScrollAreaView className="size-full">
                                 <div className="octane-inventory-animal-cells">
                                     {prefixes.map((prefix: IPrefixItem) => (
-                                        <button
+                                        <BaseButton
                                             key={prefix.id}
                                             className={cellClass(selectedPrefix?.id === prefix.id, !!prefix.active)}
                                             type="button"
                                             onClick={() => setSelectedPrefix(prefix)}
                                         >
                                             <PrefixPreview color={prefix.color} effect={prefix.effect} font={prefix.font} icon={prefix.icon} text={prefix.text} />
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </ClassicScrollAreaView>
@@ -199,14 +200,14 @@ export const InventoryPrefixView: FC<{}> = () => {
                             <ClassicScrollAreaView className="size-full">
                                 <div className="octane-inventory-animal-cells">
                                     {nickIcons.map((icon) => (
-                                        <button
+                                        <BaseButton
                                             key={icon.id}
                                             className={cellClass(selectedNickIcon?.id === icon.id, !!icon.active)}
                                             type="button"
                                             onClick={() => setSelectedNickIcon(icon)}
                                         >
                                             <img alt={icon.displayName || icon.iconKey} className="octane-inventory-identity-icon" src={GetNickIconUrl(icon.iconKey)} />
-                                        </button>
+                                        </BaseButton>
                                     ))}
                                 </div>
                             </ClassicScrollAreaView>

@@ -6,6 +6,7 @@ import { useModTools } from '../../../../hooks';
 import { CfhChatlogView } from './CfhChatlogView';
 import chatIcon from '../../../../assets/images/mod-tools/chatlog.png';
 import staffIcon from '../../../../assets/images/mod-tools/mod-action.png';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface IssueInfoViewProps {
     issueId: number;
@@ -81,20 +82,20 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = (props) => {
                             </Field>
                             <Field label={LocalizeText('modtools.tickets.issue.field.description')}>{ticket.message}</Field>
                             <Field label={LocalizeText('modtools.tickets.issue.field.caller')}>
-                                <button
+                                <BaseButton
                                     className="font-semibold text-sky-700 hover:text-sky-900 hover:underline inline-flex items-center gap-1"
                                     onClick={() => openUserInfo(ticket.reporterUserId)}
                                 >
                                     {ticket.reporterUserName} 
-                                </button>
+                                </BaseButton>
                             </Field>
                             <Field label={LocalizeText('modtools.tickets.issue.field.reported')}>
-                                <button
+                                <BaseButton
                                     className="font-semibold text-sky-700 hover:text-sky-900 hover:underline inline-flex items-center gap-1"
                                     onClick={() => openUserInfo(ticket.reportedUserId)}
                                 >
                                     {ticket.reportedUserName} 
-                                </button>
+                                </BaseButton>
                             </Field>
                         </dl>
                     </div>

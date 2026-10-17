@@ -6,6 +6,7 @@ import { useAvatarEditor } from '../../hooks';
 import { AvatarEditorIcon } from './AvatarEditorIcon';
 import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
+import { BaseButton } from '../../common/BaseButton';
 
 export const AvatarEditorModelView: FC<{
     name: string;
@@ -62,19 +63,19 @@ export const AvatarEditorModelView: FC<{
             <div className={`octane-avatar-editor-subcategories${name === AvatarEditorFigureCategory.GENERIC ? ' is-gender' : ''}`}>
                 {name === AvatarEditorFigureCategory.GENERIC && (
                     <>
-                        <button type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.MALE)}>
+                        <BaseButton type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.MALE)}>
                             <AvatarEditorIcon icon="male" selected={gender === FigureDataContainer.MALE} />
                             <span>{LocalizeText('avatareditor.generic.boy')}</span>
-                        </button>
-                        <button type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.FEMALE)}>
+                        </BaseButton>
+                        <BaseButton type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.FEMALE)}>
                             <AvatarEditorIcon icon="female" selected={gender === FigureDataContainer.FEMALE} />
                             <span>{LocalizeText('avatareditor.generic.girl')}</span>
-                        </button>
+                        </BaseButton>
                     </>
                 )}
                 {name !== AvatarEditorFigureCategory.GENERIC &&
                     categories.map((category) => (
-                        <button
+                        <BaseButton
                             type="button"
                             key={category.setType}
                             className="category-item"
@@ -82,7 +83,7 @@ export const AvatarEditorModelView: FC<{
                             onClick={() => selectSet(category.setType)}
                         >
                             <AvatarEditorIcon icon={category.setType} selected={resolvedSetType === category.setType} />
-                        </button>
+                        </BaseButton>
                     ))}
             </div>
 
@@ -90,14 +91,14 @@ export const AvatarEditorModelView: FC<{
                 <AvatarEditorFigureSetView category={activeCategory} columnCount={6} />
             </div>
 
-            <button
+            <BaseButton
                 type="button"
                 className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                 onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
             >
                 Advanced Color
                 <LayoutCurrencyIcon type="hc" />
-            </button>
+            </BaseButton>
 
             <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
                 {maxPaletteCount >= 1 && (

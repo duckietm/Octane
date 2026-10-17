@@ -15,6 +15,7 @@ import { badgeEmblemDefault } from '../../assets/images/leaderboard_badge';
 import { block as profileBlockIcon, level as profileLevelIcon, rooms as profileRoomsIcon } from '../../assets/images/user-profile';
 import { LayoutAvatarImageView, LayoutBadgeImageView, Text, UserIdentityView } from '../../common';
 import { RelationshipsContainerView } from './RelationshipsContainerView';
+import { BaseButton } from '../../common/BaseButton';
 
 interface UserContainerViewProps {
     userProfile: UserProfileParser;
@@ -75,7 +76,7 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
     return (
         <div className={`octane-extended-profile${isBlocked ? ' is-blocked' : ''}`}>
             {!isOwnProfile && onToggleBlock && (
-                <button
+                <BaseButton
                     type="button"
                     className={`octane-extended-profile__block-button${isBlocked ? ' is-active' : ''}`}
                     title={isBlocked ? localizeWithFallback('extendedprofile.unblock_player.title', 'Unblock user') : localizeWithFallback('extendedprofile.block_player.title', 'Block user')}
@@ -84,7 +85,7 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                 >
                     {/* The official extended_profile_block_icon, 16x16. */}
                     <img src={profileBlockIcon} alt="" draggable={false} />
-                </button>
+                </BaseButton>
             )}
             <div className="octane-extended-profile__top">
                 <div className="octane-extended-profile__left">
@@ -128,9 +129,9 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                                 </div>
                                 <div className="octane-extended-profile__status-copy">
                                     {canSendFriendRequest && (
-                                        <button className="octane-extended-profile__friend-button" type="button" onClick={addFriend}>
+                                        <BaseButton className="octane-extended-profile__friend-button" type="button" onClick={addFriend}>
                                             {LocalizeText('extendedprofile.addasafriend')}
-                                        </button>
+                                        </BaseButton>
                                     )}
                                     {!canSendFriendRequest && (
                                         <>
@@ -149,20 +150,20 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
 
                     {isOwnProfile && (
                         <div className="octane-extended-profile__actions">
-                            <button className="octane-extended-profile__link" type="button" onClick={() => CreateLinkEvent('avatar-editor/show')}>
+                            <BaseButton className="octane-extended-profile__link" type="button" onClick={() => CreateLinkEvent('avatar-editor/show')}>
                                 {LocalizeText('extended.profile.change.looks')}
-                            </button>
-                            <button className="octane-extended-profile__link" type="button" onClick={() => CreateLinkEvent('inventory/show/badges')}>
+                            </BaseButton>
+                            <BaseButton className="octane-extended-profile__link" type="button" onClick={() => CreateLinkEvent('inventory/show/badges')}>
                                 {LocalizeText('extended.profile.change.badges')}
-                            </button>
+                            </BaseButton>
                         </div>
                     )}
 
                     <div className="octane-extended-profile__badges">
                         {[0, 1, 2, 3, 4].map((index) => (
-                            <button key={index} className="octane-extended-profile__badge-slot" type="button">
+                            <BaseButton key={index} className="octane-extended-profile__badge-slot" type="button">
                                 {selectedBadges[index] && <LayoutBadgeImageView badgeCode={selectedBadges[index]} highlightRarity showInfo showRarityInfo />}
-                            </button>
+                            </BaseButton>
                         ))}
                     </div>
                 </div>
@@ -192,11 +193,11 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
             </div>
 
             <div className="octane-extended-profile__summary-bar">
-                <button className="octane-extended-profile__summary-button" type="button" onClick={onOpenRooms}>
+                <BaseButton className="octane-extended-profile__summary-button" type="button" onClick={onOpenRooms}>
                     <img className="octane-extended-profile__summary-icon" src={profileRoomsIcon} alt="" />
                     <span className="octane-extended-profile__summary-label">{LocalizeText('extendedprofile.rooms')}</span>
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="octane-extended-profile__summary-button octane-extended-profile__summary-button--center"
                     type="button"
                     onClick={() => CreateLinkEvent('badge-leaderboard/show')}
@@ -205,8 +206,8 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                     <span className="octane-extended-profile__summary-label">{LocalizeText('inventory.badges')}</span>
                     <span className="octane-extended-profile__summary-value">{totalBadges}</span>
                     {badgesRank > 0 && <span className="octane-extended-profile__summary-rank">(#{badgesRank})</span>}
-                </button>
-                <button
+                </BaseButton>
+                <BaseButton
                     className="octane-extended-profile__summary-button octane-extended-profile__summary-button--center"
                     type="button"
                     onClick={() => CreateLinkEvent('achievements/toggle')}
@@ -214,7 +215,7 @@ export const UserContainerView: FC<UserContainerViewProps> = (props) => {
                     <img className="octane-extended-profile__summary-icon" src={profileLevelIcon} alt="" />
                     <span className="octane-extended-profile__summary-label">{LocalizeText('extendedprofile.achievementscore')}</span>
                     <span className="octane-extended-profile__summary-value">{userProfile.achievementPoints}</span>
-                </button>
+                </BaseButton>
             </div>
         </div>
     );

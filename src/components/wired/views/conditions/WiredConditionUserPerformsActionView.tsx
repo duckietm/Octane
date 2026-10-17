@@ -6,6 +6,7 @@ import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector
 import { WiredUserActionSection } from '../WiredUserActionSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { BaseButton } from '../../../../common/BaseButton';
 
 
 const USER_ACTION_SOURCES: WiredSourceOption[] = [
@@ -51,9 +52,9 @@ export const WiredConditionUserPerformsActionView: FC<WiredConditionUserPerforms
             footerCollapsible={false}
             footer={
                 <div className="flex flex-col gap-2">
-                    <button className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
                         {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </button>
+                    </BaseButton>
                     {showAdvanced && (
                         <>
                             <div className="flex flex-col gap-1">

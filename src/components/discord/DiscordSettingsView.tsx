@@ -10,6 +10,7 @@ import { GetConfigurationValue, LocalizeText, OpenUrl } from '../../api';
 import { LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { DiscordPreferences, useDiscordSettings } from '../../hooks';
 import { Checkbox } from '../../common/Checkbox';
+import { BaseButton } from '../../common/BaseButton';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -53,7 +54,7 @@ const ServerLink: FC<ServerLinkProps> = ({ label, configKey }) => {
     if (!link) return null;
 
     return (
-        <button
+        <BaseButton
             type="button"
             className="flex items-center justify-center gap-2 rounded-md bg-[#5865F2] px-3 py-2 text-white shadow-[inset_0_2px_#ffffff26,inset_0_-2px_#0000001a] transition-colors hover:bg-[#4752c4] cursor-pointer"
             onClick={() => OpenUrl(link)}
@@ -62,7 +63,7 @@ const ServerLink: FC<ServerLinkProps> = ({ label, configKey }) => {
             <Text bold className="text-white">
                 {label}
             </Text>
-        </button>
+        </BaseButton>
     );
 };
 

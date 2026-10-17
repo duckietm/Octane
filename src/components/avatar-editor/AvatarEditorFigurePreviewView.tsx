@@ -4,6 +4,7 @@ import rotateSrc from '../../assets/images/avatareditor/air/rotate.png';
 import { LayoutAvatarImageView } from '../../common';
 import { AvatarEffectPreviewView } from '../avatar-effects/AvatarEffectPreviewView';
 import { useAvatarEditor } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const DEFAULT_DIRECTION: number = 4;
 const AVATAR_DIRECTIONS: number = 8;
@@ -28,9 +29,9 @@ export const AvatarEditorFigurePreviewView: FC<{ effectType?: number }> = (props
                     <LayoutAvatarImageView direction={direction} figure={getFigureString} gender={gender} />
                 )}
             </div>
-            <button type="button" className="octane-avatar-editor-rotate" aria-label="Rotate avatar" onClick={rotateFigure}>
+            <BaseButton type="button" className="octane-avatar-editor-rotate" aria-label="Rotate avatar" onClick={rotateFigure}>
                 <img src={rotateSrc} alt="" draggable={false} />
-            </button>
+            </BaseButton>
         </div>
     );
 };

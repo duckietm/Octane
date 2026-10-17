@@ -39,6 +39,7 @@ import { useMessageEvent, useNotification } from '../../../hooks';
 import { classNames } from '../../../layout';
 import { Select } from '../../../common/Select';
 import { NumberInput } from '../../../common/NumberInput';
+import { BaseButton } from '../../../common/BaseButton';
 
 export const GroupMembersView: FC<{}> = (props) => {
     const [groupId, setGroupId] = useState<number>(-1);
@@ -318,26 +319,26 @@ export const GroupMembersView: FC<{}> = (props) => {
                                     )}
                                     {membersData.admin && member.rank === GroupRank.BLOCKED && (
                                         <Flex alignItems="center">
-                                            <button
+                                            <BaseButton
                                                 className="octane-group-member-row__action cursor-pointer text-[#1e7295] hover:text-[#0d4a63]"
                                                 title={localizeWithFallback('group.members.unblock', 'Unblock')}
                                                 type="button"
                                                 onClick={() => unblockMember(member)}
                                             >
                                                 <FaUndo size={11} />
-                                            </button>
+                                            </BaseButton>
                                         </Flex>
                                     )}
                                     {membersData.admin && blockingEnabled && (member.rank === GroupRank.MEMBER || member.rank === GroupRank.ADMIN) && member.id !== GetSessionDataManager().userId && (
                                         <Flex alignItems="center">
-                                            <button
+                                            <BaseButton
                                                 className="octane-group-member-row__action cursor-pointer text-[#a81a12] hover:text-[#6f0f0a]"
                                                 title={localizeWithFallback('group.members.block', 'Block from group')}
                                                 type="button"
                                                 onClick={() => blockMember(member)}
                                             >
                                                 <FaBan size={11} />
-                                            </button>
+                                            </BaseButton>
                                         </Flex>
                                     )}
                                     {membersData.admin && member.rank !== GroupRank.OWNER && member.rank !== GroupRank.BLOCKED && member.id !== GetSessionDataManager().userId && (

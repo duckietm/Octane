@@ -6,6 +6,7 @@ import { WiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests'
 import { VariablesElementType } from './WiredCreatorTools.types';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { Select } from '../../common/Select';
+import { BaseButton } from '../../common/BaseButton';
 
 /** The server's holder kinds (`entityType`). */
 export const HOLDER_TYPE_ROOM = 0;
@@ -116,9 +117,9 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                 return holder.entityType === HOLDER_TYPE_USER && holder.entityId > 0 && onOpenUserProfile
                     ? {
                           content: (
-                              <button className={LINK_CLASS} type="button" onClick={() => onOpenUserProfile(holder.entityId)}>
+                              <BaseButton className={LINK_CLASS} type="button" onClick={() => onOpenUserProfile(holder.entityId)}>
                                   {description.entityName}
-                              </button>
+                              </BaseButton>
                           ),
                           title: description.entityName
                       }
@@ -133,13 +134,13 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                 return {
                     content: (
                         <span className="flex gap-2">
-                            <button className={LINK_CLASS} type="button" onClick={() => onManage(holder)}>
+                            <BaseButton className={LINK_CLASS} type="button" onClick={() => onManage(holder)}>
                                 {localizeWithFallback('wiredmenu.variable_management.manage', 'Manage')}
-                            </button>
+                            </BaseButton>
                             {!!onDelete && (
-                                <button className="text-[#a32a2a] underline underline-offset-2" type="button" onClick={() => onDelete(holder)}>
+                                <BaseButton className="text-[#a32a2a] underline underline-offset-2" type="button" onClick={() => onDelete(holder)}>
                                     {localizeWithFallback('wiredmenu.variable_management.delete', 'Delete')}
-                                </button>
+                                </BaseButton>
                             )}
                         </span>
                     )

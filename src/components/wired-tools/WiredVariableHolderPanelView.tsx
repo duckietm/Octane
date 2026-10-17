@@ -2,6 +2,7 @@ import { KeyboardEvent, ReactNode } from 'react';
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 export interface WiredHolderPanelEntry {
     id: string;
@@ -167,7 +168,7 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                             <td className="px-2 py-1">
                                                 {!entry.hasValue && <span className="text-[#8a8476]">/</span>}
                                                 {!!entry.hasValue && !isEditing && (
-                                                    <button
+                                                    <BaseButton
                                                         className={`rounded px-1 py-[1px] ${isEditable ? 'text-[#1b57b2] underline underline-offset-2' : 'text-[#222]'}`}
                                                         disabled={!isEditable}
                                                         type="button"
@@ -180,7 +181,7 @@ export const WiredVariableHolderPanelView = (props: WiredVariableHolderPanelView
                                                         }}
                                                     >
                                                         {entry.value ?? 0}
-                                                    </button>
+                                                    </BaseButton>
                                                 )}
                                                 {!!entry.hasValue && isEditing && (
                                                     <NumberInput autoFocus className="w-[72px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={editingValue} onBlur={onEditBlur} onChange={(event) => onEditingValueChange(event.target.value)} onClick={(event) => event.stopPropagation()} onKeyDownCapture={onEditKeyDown} />

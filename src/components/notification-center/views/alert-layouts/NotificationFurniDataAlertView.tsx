@@ -2,6 +2,7 @@ import { FC, useMemo, useState } from 'react';
 import { FaCheck, FaCopy } from 'react-icons/fa';
 import { LocalizeText, NotificationAlertItem } from '../../../../api';
 import { Button, Column, LayoutNotificationAlertView, LayoutNotificationAlertViewProps } from '../../../../common';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface NotificationFurniDataAlertViewProps extends LayoutNotificationAlertViewProps {
     item: NotificationAlertItem;
@@ -125,7 +126,7 @@ export const NotificationFurniDataAlertView: FC<NotificationFurniDataAlertViewPr
                         <div className="furnidata-section-header">
                             <span className="furnidata-section-icon">{section.kind === 'base' ? '📦' : '📍'}</span>
                             <span className="furnidata-section-title">{section.title}</span>
-                            <button className="furnidata-copy-btn" type="button" onClick={() => copySection(section)}>
+                            <BaseButton className="furnidata-copy-btn" type="button" onClick={() => copySection(section)}>
                                 {copiedSection === section.title ? (
                                     <>
                                         <FaCheck size={10} /> Copied!
@@ -135,7 +136,7 @@ export const NotificationFurniDataAlertView: FC<NotificationFurniDataAlertViewPr
                                         <FaCopy size={10} /> Copy
                                     </>
                                 )}
-                            </button>
+                            </BaseButton>
                         </div>
                         <ul className="furnidata-rows">
                             {section.rows.map((row, index) => (

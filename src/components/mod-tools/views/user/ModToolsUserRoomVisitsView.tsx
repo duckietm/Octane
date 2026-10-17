@@ -4,6 +4,7 @@ import { LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api
 import { DraggableWindowPosition, InfiniteScroll, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import roomVisitsIcon from '../../../../assets/images/mod-tools/room-visits.png';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ModToolsUserRoomVisitsViewProps {
     userId: number;
@@ -77,13 +78,13 @@ export const ModToolsUserRoomVisitsView: FC<ModToolsUserRoomVisitsViewProps> = (
                                                 {row.enterHour.toString().padStart(2, '0')}:{row.enterMinute.toString().padStart(2, '0')}
                                             </span>
                                             <span className="truncate font-medium">{row.roomName}</span>
-                                            <button
+                                            <BaseButton
                                                 className="inline-flex items-center justify-end gap-1 text-sky-700 hover:text-sky-900 hover:underline text-xs"
                                                 onClick={() => TryVisitRoom(row.roomId)}
                                                 title={LocalizeText('modtools.user.visits.visit.title')}
                                             >
                                                 <img alt="" className="octane-mod-tools-button-icon" src={roomVisitsIcon} /> {LocalizeText('modtools.user.visits.visit')}
-                                            </button>
+                                            </BaseButton>
                                         </div>
                                     )}
                                     rows={rows}

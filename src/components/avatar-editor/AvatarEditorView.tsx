@@ -28,6 +28,7 @@ import { AvatarEditorModelView } from './AvatarEditorModelView';
 import { AvatarEditorNftView } from './AvatarEditorNftView';
 import { AvatarEditorPetView } from './AvatarEditorPetView';
 import { AvatarEditorWardrobeView } from './AvatarEditorWardrobeView';
+import { BaseButton } from '../../common/BaseButton';
 
 const MAIN_TAB_ICONS: Record<string, string> = {
     [AvatarEditorFigureCategory.GENERIC]: mainGenericSrc,
@@ -203,7 +204,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
                         </OctaneCardTabsView>
                     </div>
                     {canUseWardrobe && (
-                        <button
+                        <BaseButton
                             type="button"
                             className={`octane-avatar-editor-wardrobe-toggle${isWardrobeOpen ? ' is-open' : ''}`}
                             aria-pressed={isWardrobeOpen}
@@ -211,7 +212,7 @@ export const AvatarEditorView: FC<{}> = (props) => {
                             onClick={() => setIsWardrobeOpen((open) => !open)}
                         >
                             <img alt="" draggable={false} src={wardrobeHangerSrc} />
-                        </button>
+                        </BaseButton>
                     )}
                     <div className="octane-avatar-editor-main">
                         {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && !isEffectsOpen && avatarModels[activeModelKey] && (
@@ -225,35 +226,35 @@ export const AvatarEditorView: FC<{}> = (props) => {
                         <AvatarEditorFigurePreviewView effectType={effectSelection ?? 0} />
                         {!clothingChangeData && (
                             <div className="octane-avatar-editor-secondary-actions">
-                                <button
+                                <BaseButton
                                     type="button"
                                     aria-label="Reset avatar"
                                     title="Reset avatar"
                                     onClick={() => processAction(AvatarEditorAction.ACTION_RESET)}
                                 >
                                     <FaRedo className="fa-icon" />
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     type="button"
                                     aria-label="Clear avatar"
                                     title="Clear avatar"
                                     onClick={() => processAction(AvatarEditorAction.ACTION_CLEAR)}
                                 >
                                     <FaTrash className="fa-icon" />
-                                </button>
-                                <button
+                                </BaseButton>
+                                <BaseButton
                                     type="button"
                                     aria-label="Randomize avatar"
                                     title="Randomize avatar"
                                     onClick={() => processAction(AvatarEditorAction.ACTION_RANDOMIZE)}
                                 >
                                     <FaDice className="fa-icon" />
-                                </button>
+                                </BaseButton>
                             </div>
                         )}
-                        <button type="button" className="octane-avatar-editor-save" onClick={() => processAction(AvatarEditorAction.ACTION_SAVE)}>
+                        <BaseButton type="button" className="octane-avatar-editor-save" onClick={() => processAction(AvatarEditorAction.ACTION_SAVE)}>
                             {LocalizeText('avatareditor.save')}
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
                 {isWardrobeOpen && canUseWardrobe && <AvatarEditorWardrobeView />}

@@ -2,6 +2,7 @@ import { FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { FaCircle, FaHome, FaSearch, FaUser } from 'react-icons/fa';
 import { HousekeepingTabId, LocalizeText, parseHousekeepingSearch } from '../../../../api';
 import { useHousekeepingStore } from '../../../../hooks';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface SearchRow {
     key: string;
@@ -138,7 +139,7 @@ export const HousekeepingGlobalSearch: FC = () => {
                     )}
                     {rows.length === 0 && <div className="px-2 py-1.5 text-[11px] italic text-zinc-500">{LocalizeText('housekeeping.search.no_results')}</div>}
                     {rows.map((row, index) => (
-                        <button
+                        <BaseButton
                             key={row.key}
                             className={`flex w-full items-center gap-1.5 px-2 py-1 text-left text-xs ${index === highlight ? 'bg-sky-50' : 'hover:bg-zinc-50'}`}
                             type="button"
@@ -154,7 +155,7 @@ export const HousekeepingGlobalSearch: FC = () => {
                             <span className="grow truncate font-medium">{row.label}</span>
                             {row.online !== undefined && <FaCircle className={row.online ? 'text-emerald-500' : 'text-zinc-300'} size={6} />}
                             {row.hint && <span className="max-w-[80px] shrink-0 truncate text-[10px] text-zinc-500">{row.hint}</span>}
-                        </button>
+                        </BaseButton>
                     ))}
                 </div>
             )}

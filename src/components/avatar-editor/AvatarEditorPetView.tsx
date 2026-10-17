@@ -6,6 +6,7 @@ import { useAvatarEditor } from '../../hooks';
 import { AvatarEditorIcon } from './AvatarEditorIcon';
 import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
+import { BaseButton } from '../../common/BaseButton';
 
 export const AvatarEditorPetView: FC<{
     categories: IAvatarEditorCategory[];
@@ -81,16 +82,16 @@ export const AvatarEditorPetView: FC<{
     return (
         <div className="octane-avatar-editor-model octane-avatar-editor-pet-model">
             <div className="octane-avatar-editor-subcategories octane-avatar-editor-pet-subcategories">
-                <button type="button" className="category-item" aria-pressed="true">
+                <BaseButton type="button" className="category-item" aria-pressed="true">
                     <AvatarEditorIcon icon="pt" selected />
-                </button>
+                </BaseButton>
                 <div className="octane-avatar-editor-pet-equipped">
                     {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
                     <span>{selectedPartItem ? 'Companion equipped' : 'No companion selected'}</span>
                     {selectedPartItem && (
-                        <button type="button" className="octane-avatar-editor-pet-remove" aria-label="Remove companion" onClick={removePet}>
+                        <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label="Remove companion" onClick={removePet}>
                             <AvatarEditorIcon icon="clear" />
-                        </button>
+                        </BaseButton>
                     )}
                 </div>
             </div>
@@ -101,14 +102,14 @@ export const AvatarEditorPetView: FC<{
 
             {hasColors && (
                 <>
-                    <button
+                    <BaseButton
                         type="button"
                         className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
                         onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
                     >
                         Advanced Color
                         <LayoutCurrencyIcon type="hc" />
-                    </button>
+                    </BaseButton>
                     <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
                         {maxPaletteCount >= 1 && (
                             <div className="avatar-editor-palette-set-view">

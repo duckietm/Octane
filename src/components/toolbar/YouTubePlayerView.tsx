@@ -13,6 +13,7 @@ import { useFurnitureYoutubeWidget, useHasPermission, useMessageEvent } from '..
 import ReactPlayer from '../youtube/YoutubeReactPlayer';
 import { Checkbox } from '../../common/Checkbox';
 import { Slider } from '../../common/Slider';
+import { BaseButton } from '../../common/BaseButton';
 
 const CONTROL_COMMAND_PREVIOUS_VIDEO = 0;
 const CONTROL_COMMAND_NEXT_VIDEO = 1;
@@ -214,7 +215,7 @@ export const YouTubePlayerView: FC<{}> = () => {
     const isMyRoom = isModerator || (roomSession && roomSession.isRoomOwner);
 
     const QuickVolumeButton = ({ value, label }: { value: number; label: string }) => (
-        <button
+        <BaseButton
             onClick={() => {
                 setVolume(value);
                 setVolumePreset(value);
@@ -222,7 +223,7 @@ export const YouTubePlayerView: FC<{}> = () => {
             className={`px-2 py-1 rounded text-xs ${volumePreset === value ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
         >
             {label}
-        </button>
+        </BaseButton>
     );
 
     return (
@@ -230,32 +231,32 @@ export const YouTubePlayerView: FC<{}> = () => {
             <OctaneCardHeaderView headerText={isRoomMode ? '📺 YouTube TV' : '▶ YouTube'} onCloseClick={() => setIsOpen(false)} />
             <OctaneCardContentView>
                 <div className="flex gap-1 mb-3 border-b border-gray-700 pb-2 flex-wrap">
-                    <button
+                    <BaseButton
                         onClick={() => setTab('player')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'player' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         ▶
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         onClick={() => setTab('playlist')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'playlist' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         📋 {playlist.length}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         onClick={() => setTab('history')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'history' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         🕐 {history.length}
-                    </button>
-                    <button
+                    </BaseButton>
+                    <BaseButton
                         onClick={() => setTab('share')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'share' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         📤
-                    </button>
+                    </BaseButton>
                     {watcherIds.size > 0 && (
-                        <button
+                        <BaseButton
                             onClick={() => {
                                 setTab('spectators');
                                 loadRoomUsers();
@@ -263,14 +264,14 @@ export const YouTubePlayerView: FC<{}> = () => {
                             className={`px-3 py-1 rounded text-sm ${tab === 'spectators' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                         >
                             📺 {watcherIds.size}
-                        </button>
+                        </BaseButton>
                     )}
-                    <button
+                    <BaseButton
                         onClick={() => setTab('settings')}
                         className={`px-3 py-1 rounded text-sm ${tab === 'settings' ? 'bg-amber-600 text-white' : 'bg-gray-700 text-gray-300'}`}
                     >
                         ⚙️
-                    </button>
+                    </BaseButton>
                 </div>
 
                 {tab === 'player' && (
@@ -311,15 +312,15 @@ export const YouTubePlayerView: FC<{}> = () => {
 
                         {isRoomMode && hasControl && (
                             <div className="mt-2 flex gap-2 justify-center">
-                                <button onClick={handlePrev} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
+                                <BaseButton onClick={handlePrev} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
                                     ◀◀
-                                </button>
-                                <button onClick={isPlaying ? handlePause : handlePlay} className="px-4 py-1 bg-amber-600 rounded text-white font-bold text-sm">
+                                </BaseButton>
+                                <BaseButton onClick={isPlaying ? handlePause : handlePlay} className="px-4 py-1 bg-amber-600 rounded text-white font-bold text-sm">
                                     {isPlaying ? '⏸' : '▶'}
-                                </button>
-                                <button onClick={handleNext} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
+                                </BaseButton>
+                                <BaseButton onClick={handleNext} className="px-3 py-1 bg-gray-700 rounded text-white text-sm">
                                     ▶▶
-                                </button>
+                                </BaseButton>
                             </div>
                         )}
 
@@ -327,7 +328,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                             <div className="mt-2 p-2 bg-purple-900/50 rounded text-sm flex justify-between items-center">
                                 <span className="text-purple-300">📡 {broadcastSender} broadcasting</span>
                                 {isMyRoom && (
-                                    <button
+                                    <BaseButton
                                         onClick={() => {
                                             try {
                                                 SendMessageComposer(new YouTubeRoomPlayComposer('', []));
@@ -339,7 +340,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                         className="px-2 py-0.5 bg-red-700 hover:bg-red-600 rounded text-white text-xs"
                                     >
                                         ⏹ {LocalizeText('useproduct.widget.cancel')}
-                                    </button>
+                                    </BaseButton>
                                 )}
                             </div>
                         )}
@@ -354,7 +355,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                 placeholder="YouTube URL / video ID"
                             />
                             {isMyRoom && youtubeEnabled && videoId && (
-                                <button
+                                <BaseButton
                                     onClick={() => {
                                         try {
                                             SendMessageComposer(new YouTubeRoomPlayComposer(videoId, playlist));
@@ -364,7 +365,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                     title="Speel deze video voor iedereen in de kamer"
                                 >
                                     📡 {LocalizeText('wiredchests.logs.type.1')}
-                                </button>
+                                </BaseButton>
                             )}
                         </div>
                     </>
@@ -381,17 +382,17 @@ export const YouTubePlayerView: FC<{}> = () => {
                                 className="flex-1 p-2 bg-gray-700 text-white rounded text-sm"
                                 onKeyDown={(e) => e.key === 'Enter' && addToPlaylist()}
                             />
-                            <button onClick={addToPlaylist} className="px-4 bg-purple-600 rounded text-white">
+                            <BaseButton onClick={addToPlaylist} className="px-4 bg-purple-600 rounded text-white">
                                 +
-                            </button>
+                            </BaseButton>
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={() => setInputValue('')} className="flex-1 px-3 py-2 bg-gray-700 rounded text-white text-sm">
+                            <BaseButton onClick={() => setInputValue('')} className="flex-1 px-3 py-2 bg-gray-700 rounded text-white text-sm">
                                 🔄 New video
-                            </button>
-                            <button onClick={() => setPlaylist([])} className="px-3 py-2 bg-red-900 rounded text-white text-sm">
+                            </BaseButton>
+                            <BaseButton onClick={() => setPlaylist([])} className="px-3 py-2 bg-red-900 rounded text-white text-sm">
                                 🗑 Clear
-                            </button>
+                            </BaseButton>
                         </div>
                         {playlist.length === 0 ? (
                             <div className="p-4 text-center text-gray-500 text-sm">Playlist is empty</div>
@@ -408,7 +409,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                     >
                                         <span className="text-amber-500 text-sm w-6">{i + 1}.</span>
                                         <div className="flex-1 min-w-0 text-white text-sm truncate font-mono">{id}</div>
-                                        <button
+                                        <BaseButton
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setPlaylist((p) => p.filter((x) => x !== id));
@@ -416,7 +417,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                             className="text-red-500 px-2"
                                         >
                                             ✕
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 ))}
                             </div>
@@ -428,9 +429,9 @@ export const YouTubePlayerView: FC<{}> = () => {
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
                             <div className="text-gray-400 text-sm">🕐 Watch history ({history.length})</div>
-                            <button onClick={() => setHistory([])} className="text-red-400 text-xs hover:text-red-300">
+                            <BaseButton onClick={() => setHistory([])} className="text-red-400 text-xs hover:text-red-300">
                                 🗑 Clear
-                            </button>
+                            </BaseButton>
                         </div>
                         {history.length === 0 ? (
                             <div className="p-4 text-center text-gray-500 text-sm">No videos watched yet</div>
@@ -466,14 +467,14 @@ export const YouTubePlayerView: FC<{}> = () => {
                                             readOnly
                                             className="flex-1 p-2 bg-gray-700 text-white rounded text-sm"
                                         />
-                                        <button
+                                        <BaseButton
                                             onClick={() => {
                                                 void CopyToClipboard(`https://youtube.com/watch?v=${videoId}`);
                                             }}
                                             className="px-3 bg-blue-600 rounded text-white text-sm"
                                         >
                                             📋
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 </div>
                             ) : (
@@ -483,7 +484,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                         <div className="p-3 bg-gray-800 rounded">
                             <div className="text-gray-400 text-sm mb-2">📋 Quick share</div>
                             <div className="grid grid-cols-2 gap-2">
-                                <button
+                                <BaseButton
                                     onClick={() => {
                                         if (videoId) {
                                             const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
@@ -496,7 +497,7 @@ export const YouTubePlayerView: FC<{}> = () => {
                                     className="px-3 py-2 bg-blue-600 rounded text-white text-sm disabled:opacity-50"
                                 >
                                     🐦 Twitter
-                                </button>
+                                </BaseButton>
                             </div>
                         </div>
                     </div>
@@ -518,9 +519,9 @@ export const YouTubePlayerView: FC<{}> = () => {
                             <div className="p-3 bg-gray-800 rounded">
                                 <div className="flex justify-between items-center mb-2">
                                     <div className="text-gray-400 text-sm">📺 {watchers.length} watching</div>
-                                    <button onClick={loadRoomUsers} className="text-gray-400 hover:text-white text-xs">
+                                    <BaseButton onClick={loadRoomUsers} className="text-gray-400 hover:text-white text-xs">
                                         🔄
-                                    </button>
+                                    </BaseButton>
                                 </div>
                                 {watchers.length === 0 ? (
                                     <div className="text-gray-500 text-sm text-center py-4">No one is watching</div>
@@ -552,9 +553,9 @@ export const YouTubePlayerView: FC<{}> = () => {
                         <div>
                             <div className="flex justify-between items-center mb-1">
                                 <label className="text-white text-sm">🔊 Volume: {volume}%</label>
-                                <button onClick={() => setShowVolumeSlider(!showVolumeSlider)} className="text-gray-400 text-xs">
+                                <BaseButton onClick={() => setShowVolumeSlider(!showVolumeSlider)} className="text-gray-400 text-xs">
                                     {showVolumeSlider ? '▼' : '▲'}
-                                </button>
+                                </BaseButton>
                             </div>
                             {showVolumeSlider && (
                                 <Slider

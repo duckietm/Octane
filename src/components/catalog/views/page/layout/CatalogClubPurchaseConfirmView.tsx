@@ -4,6 +4,7 @@ import { GetConfigurationValue, LocalizeText } from '../../../../../api';
 import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../../common';
 import { Checkbox } from '../../../../../common/Checkbox';
 import { InlineDialog } from '../../../../../common/InlineDialog';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface CatalogClubPurchaseConfirmViewProps {
     offer: ClubOfferData;
@@ -71,12 +72,12 @@ export const CatalogClubPurchaseConfirmView: FC<CatalogClubPurchaseConfirmViewPr
                 )}
 
                 <div className="octane-club-purchase-confirm-actions">
-                    <button className="octane-club-purchase-confirm-cancel" type="button" onClick={onCancel}>
+                    <BaseButton className="octane-club-purchase-confirm-cancel" type="button" onClick={onCancel}>
                         {LocalizeText('cancel')}
-                    </button>
-                    <button className="octane-club-purchase-confirm-submit" disabled={!disclaimerAccepted} type="button" onClick={onConfirm}>
+                    </BaseButton>
+                    <BaseButton className="octane-club-purchase-confirm-submit" disabled={!disclaimerAccepted} type="button" onClick={onConfirm}>
                         {LocalizeText('catalog.club.buy.subscribe')}
-                    </button>
+                    </BaseButton>
                 </div>
             </OctaneCardContentView>
         </InlineDialog>

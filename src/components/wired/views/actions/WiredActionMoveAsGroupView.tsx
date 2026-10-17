@@ -8,6 +8,7 @@ import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 // Official source values: 0 trigger, 11 clicked user, 100 picks, 200 selector, 201 signal.
 const SOURCE_TRIGGER = 0;
@@ -113,14 +114,14 @@ export const WiredActionMoveAsGroupView: FC<{}> = () =>
                     headerContent={
                         <div className="octane-wired__give-var-targets">
                             { [ { key: 'furni', icon: sourceFurniIcon, isUser: false }, { key: 'user', icon: sourceUserIcon, isUser: true } ].map(button => (
-                                <button
+                                <BaseButton
                                     key={ button.key }
                                     type="button"
                                     title={ LocalizeText(`wiredfurni.params.sources.${ button.isUser ? 'users' : 'furni' }.title`) }
                                     className={ `octane-wired__give-var-target octane-wired__give-var-target--${ button.key } ${ targetIsUser === button.isUser ? 'is-active' : '' }` }
                                     onClick={ () => setTargetIsUser(button.isUser) }>
                                     <img src={ button.icon } alt={ button.key } />
-                                </button>
+                                </BaseButton>
                             )) }
                         </div>
                     }

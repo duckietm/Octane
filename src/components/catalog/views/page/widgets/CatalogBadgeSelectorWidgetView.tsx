@@ -3,6 +3,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { GetConfigurationValue, LocalizeBadgeDescription, LocalizeBadgeName, LocalizeText, localizeWithFallback } from '../../../../../api';
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView, LayoutBadgeImageView, LayoutGridItem } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useInventoryBadges } from '../../../../../hooks';
+import { BaseButton } from '../../../../../common/BaseButton';
 
 interface CatalogBadgeSelectorWidgetViewProps extends AutoGridProps {}
 
@@ -101,14 +102,14 @@ export const CatalogBadgeSelectorWidgetView: FC<CatalogBadgeSelectorWidgetViewPr
                     }}
                 />
                 {!!searchText.length && (
-                    <button
+                    <BaseButton
                         aria-label={localizeWithFallback('generic.clear', 'Clear')}
                         className="octane-catalog-badge-search-clear"
                         type="button"
                         onClick={() => setSearchText('')}
                     >
                         ×
-                    </button>
+                    </BaseButton>
                 )}
             </div>
             <ClassicScrollAreaView className="octane-catalog-badge-scroll-area" scrollStep={45}>

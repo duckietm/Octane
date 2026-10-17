@@ -14,6 +14,7 @@ import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
+import { BaseButton } from '../../../../common/BaseButton';
 
 const MODE_OPTIONS = [
     { value: 'NORMAL', label: 'Normal' },
@@ -544,7 +545,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     <label className="octane-catalog-admin-label is-field">
                                         {localizeWithFallback('catalog.admin.page.text.1', 'Page text')}
                                     </label>
-                                    <button
+                                    <BaseButton
                                         className="octane-catalog-admin-button is-ghost is-compact"
                                         disabled={isTranslating || !pageText1.trim().length}
                                         title={localizeWithFallback('catalog.admin.translate.title', 'Translate via Google Translate')}
@@ -553,7 +554,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                     >
                                         {isTranslating ? <FaSpinner className="text-[8px] animate-spin" /> : <FaLanguage className="text-[10px]" />}
                                         {localizeWithFallback('catalog.admin.translate.action', 'Translate')}
-                                    </button>
+                                    </BaseButton>
                                 </div>
                                 {showTranslate && (
                                     <div className="octane-catalog-admin-translate-bar">
@@ -574,7 +575,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                                 </option>
                                             ))}
                                         </Select>
-                                        <button
+                                        <BaseButton
                                             className="octane-catalog-admin-button is-primary"
                                             disabled={isTranslating || !translateTargetLanguage || !pageText1.trim().length}
                                             type="button"
@@ -585,8 +586,8 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                             ) : (
                                                 localizeWithFallback('catalog.admin.translate.apply', 'Apply')
                                             )}
-                                        </button>
-                                        <button
+                                        </BaseButton>
+                                        <BaseButton
                                             className="octane-catalog-admin-button is-muted"
                                             disabled={isTranslating}
                                             type="button"
@@ -596,7 +597,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                             }}
                                         >
                                             {localizeWithFallback('catalog.admin.cancel', 'Cancel')}
-                                        </button>
+                                        </BaseButton>
                                     </div>
                                 )}
                                 {translateError && <span className="octane-catalog-admin-translate-error">{translateError}</span>}
@@ -638,25 +639,25 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                         </div>
                         <div className="octane-catalog-admin-savebar-actions">
                             {!isRoot && !isNewPage && (
-                                <button className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
+                                <BaseButton className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
                                     <FaTrash className="text-[8px]" /> {LocalizeText('catalog.admin.delete')}
-                                </button>
+                                </BaseButton>
                             )}
-                            <button
+                            <BaseButton
                                 className="octane-catalog-admin-button is-muted"
                                 disabled={!smartSave.isDirty || !!smartSave.inFlight}
                                 type="button"
                                 onClick={smartSave.reset}
                             >
                                 <FaUndo className="text-[8px]" /> Reset
-                            </button>
-                            <button className="octane-catalog-admin-button is-muted" disabled={!canSubmit} type="button" onClick={() => handleSave(true)}>
+                            </BaseButton>
+                            <BaseButton className="octane-catalog-admin-button is-muted" disabled={!canSubmit} type="button" onClick={() => handleSave(true)}>
                                 Save and close
-                            </button>
-                            <button className="octane-catalog-admin-button is-primary" disabled={!canSubmit} type="button" onClick={() => handleSave(false)}>
+                            </BaseButton>
+                            <BaseButton className="octane-catalog-admin-button is-primary" disabled={!canSubmit} type="button" onClick={() => handleSave(false)}>
                                 {smartSave.status === 'saving' ? <FaSpinner className="text-[8px] animate-spin" /> : <FaSave className="text-[8px]" />}{' '}
                                 {isNewPage ? LocalizeText('catalog.admin.create') : LocalizeText('catalog.admin.save')}
-                            </button>
+                            </BaseButton>
                         </div>
                     </div>
                 </div>

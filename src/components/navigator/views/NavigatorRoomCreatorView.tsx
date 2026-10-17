@@ -10,6 +10,7 @@ import tileIconWhite from '../../../assets/images/navigator/air/tile-icon-white.
 import { DraggableWindow } from '../../../common';
 import { useNavigatorData, useNavigatorUiStore, useUserDataSnapshot, useUserPermissions } from '../../../hooks';
 import { useRoomCreatorStore } from './navigatorRoomCreatorStore';
+import { BaseButton } from '../../../common/BaseButton';
 
 const AIR_TRADE_KEYS = ['navigator.roomsettings.trade_not_allowed', 'navigator.roomsettings.trade_not_with_Controller', 'navigator.roomsettings.trade_allowed'];
 
@@ -58,7 +59,7 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
 
     return (
         <div ref={rootRef} className={`octane-room-creator-air__dropmenu ${className}${open ? ' is-open' : ''}`}>
-            <button
+            <BaseButton
                 type="button"
                 className="octane-room-creator-air__dropmenu-button"
                 aria-haspopup="listbox"
@@ -68,12 +69,12 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
             >
                 <span>{options[value] ?? ''}</span>
                 <img src={dropmenuArrow} alt="" width={16} height={16} />
-            </button>
+            </BaseButton>
             {open && (
                 <ul className="octane-room-creator-air__dropmenu-list" role="listbox">
                     {options.map((option, index) => (
                         <li key={`${index}-${option}`}>
-                            <button
+                            <BaseButton
                                 type="button"
                                 role="option"
                                 aria-selected={index === value}
@@ -84,7 +85,7 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
                                 }}
                             >
                                 {option}
-                            </button>
+                            </BaseButton>
                         </li>
                     ))}
                 </ul>
@@ -188,7 +189,7 @@ export const NavigatorRoomCreatorView: FC = () => {
                 <div className="octane-room-creator-air__skin" aria-hidden="true" />
                 <div className="octane-room-creator-air__caption">
                     <span className="octane-room-creator-air__title">{LocalizeText('navigator.createroom.title')}</span>
-                    <button type="button" className="octane-room-creator-air__close" aria-label={LocalizeText('generic.close')} onClick={closeCreator} />
+                    <BaseButton type="button" className="octane-room-creator-air__close" aria-label={LocalizeText('generic.close')} onClick={closeCreator} />
                 </div>
 
                 <span className="octane-room-creator-air__label octane-room-creator-air__label--name">{LocalizeText('navigator.roomname')}</span>
@@ -253,12 +254,12 @@ export const NavigatorRoomCreatorView: FC = () => {
                     onChange={setTradeIndex}
                 />
 
-                <button type="button" className="octane-room-creator-air__button octane-room-creator-air__button--create" onClick={createRoom}>
+                <BaseButton type="button" className="octane-room-creator-air__button octane-room-creator-air__button--create" onClick={createRoom}>
                     {LocalizeText('navigator.createroom.create')}
-                </button>
-                <button type="button" className="octane-room-creator-air__button octane-room-creator-air__button--cancel" onClick={closeCreator}>
+                </BaseButton>
+                <BaseButton type="button" className="octane-room-creator-air__button octane-room-creator-air__button--cancel" onClick={closeCreator}>
                     {LocalizeText('generic.cancel')}
-                </button>
+                </BaseButton>
 
                 <span className="octane-room-creator-air__label octane-room-creator-air__label--layout">
                     {LocalizeText('navigator.createroom.chooselayoutcaption')}
@@ -302,13 +303,13 @@ export const NavigatorRoomCreatorView: FC = () => {
                             <div className="octane-room-creator-air__vip-promo">
                                 <img className="octane-room-creator-air__vip-promo-icon" src={vipIconBig} alt="" width={37} height={37} />
                                 <span className="octane-room-creator-air__vip-promo-text">{LocalizeText('navigator.createroom.vippromo.text')}</span>
-                                <button
+                                <BaseButton
                                     type="button"
                                     className="octane-room-creator-air__vip-promo-link"
                                     onClick={() => CreateLinkEvent('habboUI/open/hccenter')}
                                 >
                                     {LocalizeText('navigator.createroom.vippromo.link')}
-                                </button>
+                                </BaseButton>
                             </div>
                         )}
                     </div>

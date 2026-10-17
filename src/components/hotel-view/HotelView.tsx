@@ -16,6 +16,7 @@ import { useMessageEvent } from '../../hooks';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
 import { NumberInput } from '../../common/NumberInput';
+import { BaseButton } from '../../common/BaseButton';
 
 interface HotelViewLandingData {
     canEdit: boolean;
@@ -509,14 +510,14 @@ export const HotelView: FC = () => {
                 ? <div className="hotelview-edge hotelview-edge-left"><img src={resolveImageUrl(scene.leftUrl, imageLibraryUrl, assetUrl)} alt="" /><LayoutAvatarImageView classNames={['hotelview-avatar']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} /></div>
                 : <LayoutAvatarImageView classNames={['hotelview-avatar hotelview-avatar-fallback']} figure={GetSessionDataManager().figure} gender={GetSessionDataManager().gender} direction={2} />}
             {scene.rightUrl && <div className="hotelview-edge hotelview-edge-right"><img src={resolveImageUrl(scene.rightUrl, imageLibraryUrl, assetUrl)} alt="" /></div>}
-            {scene.drapeUrl && <div className="hotelview-edge hotelview-edge-drape" style={getScenePositionStyle('drape')}><img src={resolveImageUrl(scene.drapeUrl, imageLibraryUrl, assetUrl)} alt="" />{landingData.canEdit && <button type="button" className="hotelview-scene-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'drape')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag} title="Drag drape">↕</button>}</div>}
+            {scene.drapeUrl && <div className="hotelview-edge hotelview-edge-drape" style={getScenePositionStyle('drape')}><img src={resolveImageUrl(scene.drapeUrl, imageLibraryUrl, assetUrl)} alt="" />{landingData.canEdit && <BaseButton type="button" className="hotelview-scene-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'drape')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag} title="Drag drape">↕</BaseButton>}</div>}
             <div className="hotelview-stage" style={stageStyle}>
                 <div ref={hotelViewRef} className="hotelview">
                     <div className="hotelview-background" />
-                    {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-left" onClick={() => setEditingScene(scene)} aria-label="Edit left image">✎</button>}
-                    {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-right" onClick={() => setEditingScene(scene)} aria-label="Edit right image">✎</button>}
-                    {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-drape" onClick={() => setEditingScene(scene)} aria-label="Edit drape image">✎</button>}
-                    {landingData.canEdit && <button type="button" className="hotelview-scene-edit hotelview-scene-edit-background" onClick={() => setEditingScene(scene)} aria-label="Edit HotelView background" title="Edit HotelView background">BG</button>}
+                    {landingData.canEdit && <BaseButton type="button" className="hotelview-scene-edit hotelview-scene-edit-left" onClick={() => setEditingScene(scene)} aria-label="Edit left image">✎</BaseButton>}
+                    {landingData.canEdit && <BaseButton type="button" className="hotelview-scene-edit hotelview-scene-edit-right" onClick={() => setEditingScene(scene)} aria-label="Edit right image">✎</BaseButton>}
+                    {landingData.canEdit && <BaseButton type="button" className="hotelview-scene-edit hotelview-scene-edit-drape" onClick={() => setEditingScene(scene)} aria-label="Edit drape image">✎</BaseButton>}
+                    {landingData.canEdit && <BaseButton type="button" className="hotelview-scene-edit hotelview-scene-edit-background" onClick={() => setEditingScene(scene)} aria-label="Edit HotelView background" title="Edit HotelView background">BG</BaseButton>}
                     <main className="hotelview-slots">
                         {landingData.slots.filter((slot) => slot.enabled || landingData.canEdit).map((slot) => (
                             <section key={slot.id} className={`hotelview-slot hotelview-slot-${slot.id} hotelview-slot-${slot.type}${slot.enabled ? '' : ' hotelview-slot-disabled'}`} style={getSlotPositionStyle(slot)}>
@@ -544,15 +545,15 @@ export const HotelView: FC = () => {
                                             : <strong className="hotelview-countdown">{isExpired ? 'Expired' : (seconds ? formatCountdown(seconds) : 'Available now')}</strong>)}
                                         {slot.progressLabel && <strong>{slot.progressLabel}</strong>}
                                         {slot.type === 'communitygoal'
-                                            ? <div className="hotelview-vote-options">{voteOptions.map((option) => <button key={option.id} className={config.userVote === option.id ? 'hotelview-vote-selected' : ''} type="button" disabled={config.userVote !== undefined} onClick={() => SendMessageComposer(new HotelViewLandingVoteComposer(slot.id, option.id))}>{option.label} <span>{config.voteCounts?.[String(option.id)] || 0}</span></button>)}</div>
-                                            : <>{slot.buttonText && <button type="button" disabled={isLtdPending || isExpired} onClick={() => handleSlotClick(getCatalogLink(slot))}>{isLtdPending ? 'Coming soon' : slot.buttonText}</button>}{config.secondaryButtonText && <button type="button" onClick={() => handleSlotClick(config.secondaryLink || '')}>{config.secondaryButtonText}</button>}</>}
+                                            ? <div className="hotelview-vote-options">{voteOptions.map((option) => <BaseButton key={option.id} className={config.userVote === option.id ? 'hotelview-vote-selected' : ''} type="button" disabled={config.userVote !== undefined} onClick={() => SendMessageComposer(new HotelViewLandingVoteComposer(slot.id, option.id))}>{option.label} <span>{config.voteCounts?.[String(option.id)] || 0}</span></BaseButton>)}</div>
+                                            : <>{slot.buttonText && <BaseButton type="button" disabled={isLtdPending || isExpired} onClick={() => handleSlotClick(getCatalogLink(slot))}>{isLtdPending ? 'Coming soon' : slot.buttonText}</BaseButton>}{config.secondaryButtonText && <BaseButton type="button" onClick={() => handleSlotClick(config.secondaryLink || '')}>{config.secondaryButtonText}</BaseButton>}</>}
                                             </>;
                                         })()}
                                     </div>
                                 </>}
                                 {!slot.enabled && <span>Disabled slot</span>}
-                                {landingData.canEdit && <button type="button" className="hotelview-slot-drag-handle" onPointerDown={(event) => startSlotDrag(event, slot)} onPointerMove={moveSlotDrag} onPointerUp={finishSlotDrag} onPointerCancel={finishSlotDrag} aria-label={`Move slot ${slot.id}`} title="Drag to move">↕</button>}
-                                {landingData.canEdit && <button type="button" className="hotelview-slot-edit" onClick={() => { setEditingSlot(slot); setCountdownInput(toEditableCountdownValue(parseSlotConfig(slot.configJson).endsAt)); }} aria-label={`Edit slot ${slot.id}`}>✎</button>}
+                                {landingData.canEdit && <BaseButton type="button" className="hotelview-slot-drag-handle" onPointerDown={(event) => startSlotDrag(event, slot)} onPointerMove={moveSlotDrag} onPointerUp={finishSlotDrag} onPointerCancel={finishSlotDrag} aria-label={`Move slot ${slot.id}`} title="Drag to move">↕</BaseButton>}
+                                {landingData.canEdit && <BaseButton type="button" className="hotelview-slot-edit" onClick={() => { setEditingSlot(slot); setCountdownInput(toEditableCountdownValue(parseSlotConfig(slot.configJson).endsAt)); }} aria-label={`Edit slot ${slot.id}`}>✎</BaseButton>}
                             </section>
                         ))}
                     </main>
@@ -565,7 +566,7 @@ export const HotelView: FC = () => {
                             <LayoutAvatarImageView classNames={['hotelview-hall-of-fame-avatar']} figure={user.figure} gender={user.gender} direction={[2, 4][index % 2]} />
                             <span>{user.username}</span>
                         </div>)}
-                        {landingData.canEdit && <button type="button" className="hotelview-hall-of-fame-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'hallOfFame')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag} title="Drag Hall of Fame">↕</button>}
+                        {landingData.canEdit && <BaseButton type="button" className="hotelview-hall-of-fame-drag-handle" onPointerDown={(event) => startSceneDrag(event, 'hallOfFame')} onPointerMove={moveSceneDrag} onPointerUp={finishSceneDrag} onPointerCancel={finishSceneDrag} title="Drag Hall of Fame">↕</BaseButton>}
                     </div>}
                     {editingSlot && (
                         <form className="hotelview-editor" onSubmit={saveSlot}>
@@ -577,8 +578,8 @@ export const HotelView: FC = () => {
                                     {editingSlot.title && <strong>{editingSlot.title}</strong>}
                                     {editingSlot.body && <p>{editingSlot.body}</p>}
                                     {editingSlot.type === 'communitygoal'
-                                        ? <div className="hotelview-editor-preview-votes">{(parseSlotConfig(editingSlot.configJson).voteOptions || []).slice(0, 2).map((option) => <button key={option.id} type="button">{option.label || `Vote ${option.id}`}</button>)}</div>
-                                        : editingSlot.buttonText && <button type="button">{editingSlot.buttonText}</button>}
+                                        ? <div className="hotelview-editor-preview-votes">{(parseSlotConfig(editingSlot.configJson).voteOptions || []).slice(0, 2).map((option) => <BaseButton key={option.id} type="button">{option.label || `Vote ${option.id}`}</BaseButton>)}</div>
+                                        : editingSlot.buttonText && <BaseButton type="button">{editingSlot.buttonText}</BaseButton>}
                                 </div>
                                 {!editingSlot.enabled && <em>Disabled slot</em>}
                             </div>
@@ -616,14 +617,14 @@ export const HotelView: FC = () => {
                                     <label>Currency quantity<NumberInput min="1" value={parseSlotConfig(editingSlot.configJson).voteOptions?.[1]?.currencyAmount || ''} placeholder="Optional" onChange={(event) => updateEditingConfig((config) => ({ ...config, voteOptions: [config.voteOptions?.[0] || { id: 1, label: 'Vote option 1' }, { ...(config.voteOptions?.[1] || { id: 2, label: 'Vote option 2' }), currencyAmount: event.target.value ? Number(event.target.value) : undefined }] }))} /></label>
                                 </fieldset>
                                 </div>
-                                <button className="hotelview-reset-votes" type="button" onClick={() => resetCommunityGoalVotes(editingSlot.id)}>Reset all community votes</button>
+                                <BaseButton className="hotelview-reset-votes" type="button" onClick={() => resetCommunityGoalVotes(editingSlot.id)}>Reset all community votes</BaseButton>
                             </>}
                             {editingSlot.type !== 'communitygoal' && <>
                                 <label>Secondary button<input value={parseSlotConfig(editingSlot.configJson).secondaryButtonText || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryButtonText: event.target.value }))} /></label>
                                 <label>Secondary action<Select value={getSelectedAction(parseSlotConfig(editingSlot.configJson).secondaryLink || '')} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value === CUSTOM_ACTION ? '' : event.target.value }))}><option value={CUSTOM_ACTION}>Custom link</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</Select></label>
                                 <label>Secondary custom link<input value={parseSlotConfig(editingSlot.configJson).secondaryLink || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value }))} /></label>
                             </>}
-                            <footer><button type="button" onClick={() => { setEditingSlot(null); setCountdownInput(''); }}>Cancel</button><button type="submit">Save</button></footer>
+                            <footer><BaseButton type="button" onClick={() => { setEditingSlot(null); setCountdownInput(''); }}>Cancel</BaseButton><BaseButton type="submit">Save</BaseButton></footer>
                         </form>
                     )}
                     {editingScene && (
@@ -646,7 +647,7 @@ export const HotelView: FC = () => {
                                 <label>Hall of Fame ranking<Select value={editingScene.hallOfFameMode} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameMode: event.target.value })}><option value="latest_registered">Latest registered users</option><option value="online_time">Most online time</option><option value="achievement_score">Highest achievement score</option><option value="currency">Highest currency balance</option></Select></label>
                                 {editingScene.hallOfFameMode === 'currency' && <label>Currency type<NumberInput min="0" value={editingScene.hallOfFameCurrencyType} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameCurrencyType: Math.max(0, Number(event.target.value) || 0) })} /></label>}
                             </>}
-                            <footer><button type="button" onClick={() => setEditingScene(null)}>Cancel</button><button type="submit">Save</button></footer>
+                            <footer><BaseButton type="button" onClick={() => setEditingScene(null)}>Cancel</BaseButton><BaseButton type="submit">Save</BaseButton></footer>
                         </form>
                     )}
                 </div>

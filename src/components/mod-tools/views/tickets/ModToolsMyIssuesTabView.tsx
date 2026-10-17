@@ -1,6 +1,7 @@
 import { IssueMessageData, ReleaseIssuesMessageComposer } from '@octane/renderer';
 import { FC, useRef } from 'react';
 import { GetIssueCategoryName, LocalizeText, localizeWithFallback, SendMessageComposer } from '../../../../api';
+import { BaseButton } from '../../../../common/BaseButton';
 
 interface ModToolsMyIssuesTabViewProps {
     myIssues: IssueMessageData[];
@@ -31,12 +32,12 @@ export const ModToolsMyIssuesTabView: FC<ModToolsMyIssuesTabViewProps> = (props)
     return (
         <div className="flex flex-col gap-1 overflow-hidden">
             {!isEmpty && (
-                <button
+                <BaseButton
                     className="octane-mod-tools-button octane-mod-tools-button--red self-end"
                     onClick={releaseAll}
                 >
                     {localizeWithFallback('modtools.tickets.action.release.all', 'Release all')}
-                </button>
+                </BaseButton>
             )}
             <div className="min-w-0 overflow-x-auto">
                 <div className="min-w-[500px]">
@@ -70,18 +71,18 @@ export const ModToolsMyIssuesTabView: FC<ModToolsMyIssuesTabViewProps> = (props)
                                     <span className="font-mono text-[.75rem] opacity-70 tabular-nums">
                                         {new Date(Date.now() - issue.issueAgeInMilliseconds).toLocaleTimeString()}
                                     </span>
-                                    <button
+                                    <BaseButton
                                         className="octane-mod-tools-button"
                                         onClick={() => handleIssue(issue.issueId)}
                                     >
                                         {LocalizeText('modtools.tickets.action.handle')}
-                                    </button>
-                                    <button
+                                    </BaseButton>
+                                    <BaseButton
                                         className="octane-mod-tools-button octane-mod-tools-button--red"
                                         onClick={() => releaseIssue(issue.issueId)}
                                     >
                                         {LocalizeText('modtools.tickets.action.release')}
-                                    </button>
+                                    </BaseButton>
                                 </div>
                             ))}
                         </div>

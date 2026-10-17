@@ -7,6 +7,7 @@ import { OctaneCard } from '../../layout';
 import { AchievementCategoryView } from './AchievementCategoryView';
 import { AirAchievementProgressBar } from './AirAchievementProgressBar';
 import { AchievementsCategoryListView } from './category-list';
+import { BaseButton } from '../../common/BaseButton';
 
 export const AchievementsView: FC = () => {
     const {
@@ -101,7 +102,7 @@ export const AchievementsView: FC = () => {
                 {selectedCategory && (
                     <>
                         <div className="air-achievements-category-header">
-                            <button
+                            <BaseButton
                                 type="button"
                                 className="air-achievements-back"
                                 onClick={() => setSelectedCategoryCode(null)}

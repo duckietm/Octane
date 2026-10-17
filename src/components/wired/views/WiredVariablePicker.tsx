@@ -21,6 +21,7 @@ import {
     WIRED_VARIABLE_TYPE_USER_DERIVED
 } from './WiredVariablePickerData';
 import { addWiredVariablePickerHistory, getWiredVariablePickerHistory, registerWiredVariablePickerFinalizer } from './WiredVariablePickerHistory';
+import { BaseButton } from '../../../common/BaseButton';
 
 /*
  * Port of the AIR variable picker, build WIN63-202610131318-860371703, under
@@ -470,9 +471,9 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
                 onKeyDown={onKeyDown}
             />
             {isExpanded && text.length > 0 && (
-                <button aria-label="cancel" className="octane-wired__vpicker-cancel" type="button" onClick={onCancelSearch}>
+                <BaseButton aria-label="cancel" className="octane-wired__vpicker-cancel" type="button" onClick={onCancelSearch}>
                     <img alt="" src={cancelSearchIcon} />
-                </button>
+                </BaseButton>
             )}
         </div>
     );
@@ -498,7 +499,7 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
                                     const colors = tab.id === tabId ? TAB_COLORS.active : hoveredTab === tab.id ? TAB_COLORS.hover : TAB_COLORS.none;
 
                                     return (
-                                        <button
+                                        <BaseButton
                                             key={tab.id}
                                             aria-pressed={tab.id === tabId}
                                             className="octane-wired__vpicker-tab"
@@ -510,7 +511,7 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
                                             onMouseLeave={() => setHoveredTab(null)}
                                         >
                                             <img alt={LocalizeText(tab.tooltip)} src={tab.icon} style={{ opacity: colors.blend }} />
-                                        </button>
+                                        </BaseButton>
                                     );
                                 })}
                             </div>

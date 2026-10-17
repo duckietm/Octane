@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { FaCheck, FaCopy, FaKey, FaTimes } from 'react-icons/fa';
 import { LocalizeText } from '../../api';
 import { useHousekeepingStore } from '../../hooks';
+import { BaseButton } from '../../common/BaseButton';
 
 const COPY_CONFIRM_MS = 1600;
 
@@ -102,14 +103,14 @@ export const HousekeepingPasswordReveal: FC = () => {
                 <span className="grow">
                     {LocalizeText('housekeeping.password.title', ['username', 'id'], [passwordReveal.username || '-', String(passwordReveal.userId)])}
                 </span>
-                <button
+                <BaseButton
                     className="inline-flex items-center justify-center w-5 h-5 rounded text-amber-700 hover:text-amber-900 hover:bg-amber-200/60"
                     onClick={() => clearPasswordReveal()}
                     title={LocalizeText('housekeeping.password.dismiss')}
                     aria-label={LocalizeText('housekeeping.password.dismiss')}
                 >
                     <FaTimes size={10} />
-                </button>
+                </BaseButton>
             </div>
 
             <div className="flex items-center gap-2">
@@ -125,7 +126,7 @@ export const HousekeepingPasswordReveal: FC = () => {
                     onFocus={(event) => event.currentTarget.select()}
                     aria-label={LocalizeText('housekeeping.password.value_label')}
                 />
-                <button
+                <BaseButton
                     className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold border transition-colors ${copyState === 'ok' ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : copyState === 'fail' ? 'bg-rose-100 border-rose-300 text-rose-800' : 'bg-amber-100 border-amber-300 text-amber-900 hover:bg-amber-200'}`}
                     onClick={copyPassword}
                     title={copyLabel}
@@ -133,7 +134,7 @@ export const HousekeepingPasswordReveal: FC = () => {
                 >
                     {copyIcon}
                     <span>{copyLabel}</span>
-                </button>
+                </BaseButton>
             </div>
 
             <p className="text-[10px] text-amber-700/80 leading-snug">{LocalizeText('housekeeping.password.hint')}</p>
