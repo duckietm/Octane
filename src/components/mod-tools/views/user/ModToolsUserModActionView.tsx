@@ -15,6 +15,7 @@ import { ISelectedUser, LocalizeText, ModActionDefinition, NotificationAlertType
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { useModTools, useNotification } from '../../../../hooks';
 import { ModToolsTemplateSelectView } from '../ModToolsTemplateSelectView';
+import { Select } from '../../../../common/Select';
 
 interface ModToolsUserModActionViewProps {
     user: ISelectedUser;
@@ -208,7 +209,7 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                     <label className="text-[.7rem] uppercase tracking-wide opacity-60 font-semibold">
                         {LocalizeText('modtools.user.modaction.step.topic')}
                     </label>
-                    <select className="form-select form-select-sm" value={selectedTopic} onChange={(event) => setSelectedTopic(parseInt(event.target.value))}>
+                    <Select className="form-select form-select-sm" value={selectedTopic} onChange={(event) => setSelectedTopic(parseInt(event.target.value))}>
                         <option disabled value={-1}>
                             {LocalizeText('modtools.user.modaction.step.topic.placeholder')}
                         </option>
@@ -217,7 +218,7 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                                 {LocalizeText('help.cfh.topic.' + topic.id)}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
 
                 {/* Sanction type */}
@@ -225,7 +226,7 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                     <label className="text-[.7rem] uppercase tracking-wide opacity-60 font-semibold">
                         {LocalizeText('modtools.user.modaction.step.sanction')}
                     </label>
-                    <select className="form-select form-select-sm" value={selectedAction} onChange={(event) => setSelectedAction(parseInt(event.target.value))}>
+                    <Select className="form-select form-select-sm" value={selectedAction} onChange={(event) => setSelectedAction(parseInt(event.target.value))}>
                         <option disabled value={-1}>
                             {LocalizeText('modtools.user.modaction.step.sanction.placeholder')}
                         </option>
@@ -234,7 +235,7 @@ export const ModToolsUserModActionView: FC<ModToolsUserModActionViewProps> = (pr
                                 {action.name}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
 
                 {/* Message */}

@@ -924,7 +924,7 @@
     color: #2f5f7a !important;
 }
 
-.octane-wired :where(select, input[type='text'], input[type='number'], textarea) {
+.octane-wired :where(select, .octane-select-trigger, input[type='text'], input[type='number'], textarea) {
     min-height: 22px;
     border: 1px solid #8b8b8b !important;
     border-radius: 3px !important;
@@ -934,7 +934,7 @@
     font-size: 11px !important;
 }
 
-.octane-wired :where(select, input[type='text'], input[type='number'], textarea):focus {
+.octane-wired :where(select, .octane-select-trigger, input[type='text'], input[type='number'], textarea):focus {
     border-color: #5c8fa8 !important;
     box-shadow: 0 0 0 2px rgba(92, 143, 168, 0.24), inset 0 1px 0 rgba(0, 0, 0, 0.14) !important;
     outline: none !important;

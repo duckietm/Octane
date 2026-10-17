@@ -127,13 +127,13 @@ export const WiredActionChatView: FC<{}> = (props) => {
                             <div className="bubble-container relative w-[50px] shrink-0">
                                 <div className={`relative min-h-[26px] chat-bubble bubble-${bubbleStyle}`} />
                             </div>
-                            <select className="form-select form-select-sm" value={bubbleStyle} onChange={(event) => setBubbleStyle(Number(event.target.value))}>
+                            <Select className="form-select form-select-sm" value={bubbleStyle} onChange={(event) => setBubbleStyle(Number(event.target.value))}>
                                 {bubbleStyleIds.map((styleId) => (
                                     <option key={styleId} value={styleId}>
                                         {LocalizeText(`wiredfurni.params.show_message.style_selection.${styleId}`)}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                     </details>
                     <details>

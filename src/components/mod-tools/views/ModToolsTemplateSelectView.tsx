@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { localizeWithFallback } from '../../../api';
+import { Select } from '../../../common/Select';
 
 interface ModToolsTemplateSelectViewProps {
     templates: string[];
@@ -17,7 +18,7 @@ export const ModToolsTemplateSelectView: FC<ModToolsTemplateSelectViewProps> = (
     const placeholder = localizeWithFallback('modtools.template.select', 'Select from message templates');
 
     return (
-        <select
+        <Select
             aria-label={placeholder}
             className={`form-select form-select-sm ${className}`}
             value=""
@@ -33,6 +34,6 @@ export const ModToolsTemplateSelectView: FC<ModToolsTemplateSelectViewProps> = (
                     {template.length > 70 ? `${template.slice(0, 67)}...` : template}
                 </option>
             ))}
-        </select>
+        </Select>
     );
 };

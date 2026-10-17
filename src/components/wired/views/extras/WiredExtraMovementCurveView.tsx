@@ -19,6 +19,7 @@ import {
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 /**
  * Habbo's "movement curve" (wf_xtra_mov_curve): how high the furni the stack moves jump, typed or
@@ -148,13 +149,13 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
         <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.movement_curve.style', 'Curve style')}</Text>
-                <select className="form-select form-select-sm" value={curveType} onChange={(event) => setCurveType(clamp(parseInt(event.target.value, 10), 0, CURVE_MAX, CURVE_JUMP))}>
+                <Select className="form-select form-select-sm" value={curveType} onChange={(event) => setCurveType(clamp(parseInt(event.target.value, 10), 0, CURVE_MAX, CURVE_JUMP))}>
                     {CURVE_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
                             {localizeWithFallback(`wiredfurni.params.movement_curve.style.${option.value}`, option.label)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
             {!isJump && curveType > 0 && (
                 <div className="flex flex-col gap-1">

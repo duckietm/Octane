@@ -19,6 +19,7 @@ import {
 import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 
@@ -356,7 +357,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                     />
                     <div className="flex items-center gap-2">
                         <Text>{localizeWithFallback('wiredfurni.params.variables.duration.unit', LocalizeText('wiredfurni.params.variables.duration'))}</Text>
-                        <select
+                        <Select
                             className="min-w-0 flex-1 rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
                             value={durationUnit}
                             onChange={(event) => setDurationUnit(Number(event.target.value))}
@@ -366,7 +367,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
                                     {LocalizeText(`wiredfurni.params.variables.duration.${unit}`)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                 </div>
             </div>

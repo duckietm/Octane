@@ -8,6 +8,7 @@ import { MONITOR_ERROR_INFO, MONITOR_LOG_ORDER } from './WiredCreatorTools.const
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
 import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
 import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 /** Rows per page, as the official log list shows them. */
 export const WIRED_ROOM_LOGS_PAGE_SIZE = 50;
@@ -211,7 +212,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                     </label>
                     <label className="flex items-center gap-2">
                         <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_source', 'Source')}:</Text>
-                        <select
+                        <Select
                             className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                             value={source}
                             onChange={(event) => {
@@ -227,11 +228,11 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                                     {sourceLabel(index)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </label>
                     <label className="flex items-center gap-2">
                         <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_level', 'Level')}:</Text>
-                        <select
+                        <Select
                             className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                             value={level}
                             onChange={(event) => {
@@ -247,7 +248,7 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
                                     {name}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </label>
                 </div>
                 <WiredPagedTable

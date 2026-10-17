@@ -29,6 +29,7 @@ import {
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const DIRECTION_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'the first match', value: WIRED_ARRAY_CAPTURE_DIRECTION_FIRST },
@@ -94,7 +95,7 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                 {ownerSources.length > 0 && (
                     <div className="flex flex-col gap-1">
                         <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={payload.ownerSource}
                             onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
@@ -104,7 +105,7 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                                     {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                 )}
 
@@ -142,7 +143,7 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                         </label>
                         <div className="flex flex-col gap-1">
                             <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.direction', 'Take')}</Text>
-                            <select
+                            <Select
                                 className="form-select form-select-sm"
                                 value={payload.findDirection}
                                 onChange={(event) => setPayload({ ...payload, findDirection: parseInt(event.target.value, 10) })}
@@ -152,14 +153,14 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                                         {localizeWithFallback(`wiredfurni.params.arrays.capture.direction.${option.value}`, option.fallback)}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                     </>
                 )}
 
                 <div className="flex flex-col gap-1">
                     <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.into', 'Store it in')}</Text>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={payload.contextVariableItemId}
                         onChange={(event) => setPayload({ ...payload, contextVariableItemId: parseInt(event.target.value, 10) })}
@@ -170,7 +171,7 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
                                 {entry.name}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                     {!contextTargets.length && (
                         <Text small className="text-black/60">
                             {localizeWithFallback(

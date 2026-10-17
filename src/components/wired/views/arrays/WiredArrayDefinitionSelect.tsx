@@ -3,6 +3,7 @@ import { IWiredArrayEditorDefinition, localizeWithFallback, wiredArrayDefinition
 import { Text } from '../../../../common';
 import { WIRED_ARRAY_TARGETS } from './WiredArrayValueField';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const FALLBACK_TARGET_LABELS: Record<number, string> = {
     0: 'Furni',
@@ -35,7 +36,7 @@ export const WiredArrayDefinitionSelect: FC<WiredArrayDefinitionSelectProps> = (
                     </label>
                 ))}
             </div>
-            <select
+            <Select
                 className="form-select form-select-sm"
                 value={itemId}
                 onChange={(event) => onChange(variableType, parseInt(event.target.value, 10))}
@@ -46,7 +47,7 @@ export const WiredArrayDefinitionSelect: FC<WiredArrayDefinitionSelectProps> = (
                         {definition.name} ({definition.arrayMode === 'slots' ? definition.maxEntries : '…'})
                     </option>
                 ))}
-            </select>
+            </Select>
             {!available.length && (
                 <Text small className="text-black/60">
                     {localizeWithFallback(

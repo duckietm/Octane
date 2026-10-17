@@ -2,6 +2,7 @@ import { RoomObjectVariable } from '@octane/renderer';
 import { FC, useMemo } from 'react';
 import { GetOwnRoomObject, LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';
+import { Select } from '../../../common/Select';
 
 export const DEFAULT_HAND_ITEM_IDS: number[] = [2, 5, 7, 8, 9, 10, 27];
 
@@ -55,14 +56,14 @@ export const WiredHandItemField: FC<WiredHandItemFieldProps> = (props) => {
         <div className="flex flex-col gap-1">
             <Text bold>{LocalizeText(labelKey)}</Text>
             <div className="flex items-center gap-2">
-                <select className="form-select form-select-sm flex-1" value={handItemId} onChange={(event) => onChange(parseInt(event.target.value))}>
+                <Select className="form-select form-select-sm flex-1" value={handItemId} onChange={(event) => onChange(parseInt(event.target.value))}>
                     <option value={0}>------</option>
                     {options.map((value) => (
                         <option key={value} value={value}>
                             {getLabel(value)}
                         </option>
                     ))}
-                </select>
+                </Select>
                 {showCopyButton && (
                     <Button variant="secondary" onClick={copyOwnHandItem}>
                         {LocalizeText('wiredfurni.params.capture.handitem')}

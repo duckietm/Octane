@@ -11,6 +11,7 @@ import { Button, Column, Text } from '../../../../../common';
 import { useCatalogUiState, useMessageEvent, useNavigatorData, useRoomPromote } from '../../../../../hooks';
 import { OctaneInput } from '../../../../../layout';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { Select } from '../../../../../common/Select';
 
 export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
     const { page = null } = props;
@@ -92,7 +93,7 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
                 <div className="p-1 rounded bg-muted">
                     <Column gap={2}>
                         <Text bold>{LocalizeText('navigator.category')}</Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             disabled={extended}
                             value={categoryId}
@@ -104,7 +105,7 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
                                         {LocalizeText(cat.name)}
                                     </option>
                                 ))}
-                        </select>
+                        </Select>
                     </Column>
                     <div className="flex flex-col gap-1">
                         <Text bold>{LocalizeText('roomad.catalog_name')}</Text>
@@ -122,7 +123,7 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
                     </div>
                     <div className="flex flex-col gap-1">
                         <Text bold>{LocalizeText('roomad.catalog_roomname')}</Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             disabled={extended}
                             value={roomId}
@@ -137,7 +138,7 @@ export const CatalogLayoutRoomAdsView: FC<CatalogLayoutProps> = (props) => {
                                         {room.roomName}
                                     </option>
                                 ))}
-                        </select>
+                        </Select>
                     </div>
                     <div className="flex flex-col gap-1">
                         <Button

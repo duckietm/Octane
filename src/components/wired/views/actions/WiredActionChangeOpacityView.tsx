@@ -19,6 +19,7 @@ import {
 } from './WiredActionChangeOpacityState';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const EASING_FALLBACKS = ['Instant', 'Linear', 'Ease in', 'Ease out', 'Ease in and out'];
 
@@ -119,10 +120,10 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.furni_visualization.audience', 'Who should see the effect?')}</Text>
-                <select className="form-select form-select-sm" value={state.visibility} onChange={(event) => changeAudience(Number(event.target.value))}>
+                <Select className="form-select form-select-sm" value={state.visibility} onChange={(event) => changeAudience(Number(event.target.value))}>
                     <option value={WIRED_OPACITY_VISIBILITY_SOURCE_USERS}>{localizeWithFallback('wiredfurni.params.furni_visualization.audience.selected_users', 'Selected users')}</option>
                     <option value={WIRED_OPACITY_VISIBILITY_EVERYONE}>{localizeWithFallback('wiredfurni.params.furni_visualization.audience.everyone', 'Everyone, also users who enter later')}</option>
-                </select>
+                </Select>
             </div>
 
             <div className="flex flex-col gap-1">
@@ -154,13 +155,13 @@ export const WiredActionChangeOpacityView: FC<{}> = () => {
 
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.set_furni_transparency.easing', 'Transition:')}</Text>
-                <select className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
+                <Select className="form-select form-select-sm" value={state.easing} onChange={(event) => update({ easing: Number(event.target.value) })}>
                     {EASING_FALLBACKS.map((fallback, value) => (
                         <option key={value} value={value}>
                             {localizeWithFallback(`wiredfurni.params.set_furni_transparency.easing.${value}`, fallback)}
                         </option>
                     ))}
-                </select>
+                </Select>
                 {state.easing !== WIRED_OPACITY_EASING_INSTANT && (
                     <label className="flex items-center justify-between gap-2">
                         <Text>{localizeWithFallback('wiredfurni.params.variables.duration', 'Duration (seconds, 0 = default)')}</Text>

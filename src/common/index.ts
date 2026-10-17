@@ -19,6 +19,7 @@ export * from './layout/limited-edition';
 export * from './FloatingPopover';
 export * from './Checkbox';
 export * from './Radio';
+export * from './Select';
 export * from './Slider';
 export * from './scroll-area/ClassicScrollAreaView';
 export * from './Text';

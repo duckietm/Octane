@@ -45,6 +45,7 @@ import {
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const RESULT_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'every entry matches', value: WIRED_ARRAY_RESULT_ALL },
@@ -123,7 +124,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                 {ownerSources.length > 0 && (
                     <div className="flex flex-col gap-1">
                         <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={payload.ownerSource}
                             onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
@@ -133,7 +134,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                                     {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                 )}
 
@@ -185,7 +186,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                         {!isSpecificIndex && (
                             <div className="flex flex-col gap-1">
                                 <Text bold>{localizeWithFallback('wiredfurni.params.arrays.check.result', 'Passes when')}</Text>
-                                <select
+                                <Select
                                     className="form-select form-select-sm"
                                     value={payload.resultMode}
                                     onChange={(event) => setPayload({ ...payload, resultMode: parseInt(event.target.value, 10) })}
@@ -195,7 +196,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                                             {localizeWithFallback(`wiredfurni.params.arrays.check.result.${option.value}`, option.fallback)}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </div>
                         )}
 
@@ -215,7 +216,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                     <>
                         <div className="flex flex-col gap-1">
                             <Text bold>{localizeWithFallback('wiredfurni.params.arrays.check.state.what', 'Check')}</Text>
-                            <select
+                            <Select
                                 className="form-select form-select-sm"
                                 value={payload.stateCheck}
                                 onChange={(event) => setPayload({ ...payload, stateCheck: parseInt(event.target.value, 10) })}
@@ -225,14 +226,14 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                                         {localizeWithFallback(`wiredfurni.params.arrays.check.state.${option.value}`, option.fallback)}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
 
                         {wiredArrayStateNeedsReference(payload.stateCheck) && (
                             <>
                                 <div className="flex flex-col gap-1">
                                     <Text bold>{localizeWithFallback('wiredfurni.params.arrays.criteria.comparison', 'Is')}</Text>
-                                    <select
+                                    <Select
                                         className="form-select form-select-sm"
                                         style={{ maxWidth: 96 }}
                                         value={payload.stateComparison}
@@ -243,7 +244,7 @@ export const WiredConditionCheckArrayView: FC<{}> = () => {
                                                 {wiredArrayComparisonSymbol(comparison)}
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                                 <WiredArrayValueField
                                     constantMin={0}

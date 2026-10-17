@@ -5,6 +5,7 @@ import { Button, LayoutFurniIconImageView } from '../../common';
 import { RewardTrackAdminEntity, RewardTrackAdminPrizeInput, RewardTrackAdminTaskInput, RewardTrackAdminTrackInput, useRewardTrackAdmin } from '../../hooks';
 import { RewardTrackAdminModalView } from './RewardTrackAdminModalView';
 import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 const text = (key: string, fallback: string) => localizeWithFallback(`reward_track.admin.${key}`, fallback);
 
@@ -678,13 +679,13 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                 <input value={taskForm.id} maxLength={64} placeholder="talk" onChange={(e) => setTaskForm({ ...taskForm, id: e.target.value })} />
                                             </Field>
                                             <Field label={text('task.action', 'Action')} error={taskErrors.actionType}>
-                                                <select value={taskForm.actionType} onChange={(e) => setTaskForm({ ...taskForm, actionType: e.target.value })}>
+                                                <Select value={taskForm.actionType} onChange={(e) => setTaskForm({ ...taskForm, actionType: e.target.value })}>
                                                     {actionTypes.map((actionType) => (
                                                         <option key={actionType} value={actionType}>
                                                             {actionType}
                                                         </option>
                                                     ))}
-                                                </select>
+                                                </Select>
                                             </Field>
                                             <Field label={text('task.parameter', 'Parameter')} error={taskErrors.parameter}>
                                                 <input value={taskForm.parameter} maxLength={255} onChange={(e) => setTaskForm({ ...taskForm, parameter: e.target.value })} />
@@ -840,13 +841,13 @@ export const RewardTrackAdminView: FC<{ onClose: () => void; onPreview?: (trackI
                                                 <input type="number" min={0} value={prizeForm.requiredPoints} onChange={(e) => setPrizeForm({ ...prizeForm, requiredPoints: toInt(e.target.value) })} />
                                             </Field>
                                             <Field label={text('prize.type', 'Reward type')} error={prizeErrors.rewardType}>
-                                                <select value={prizeForm.rewardType} onChange={(e) => setPrizeForm({ ...prizeForm, rewardType: e.target.value })}>
+                                                <Select value={prizeForm.rewardType} onChange={(e) => setPrizeForm({ ...prizeForm, rewardType: e.target.value })}>
                                                     {rewardTypes.map((rewardType) => (
                                                         <option key={rewardType} value={rewardType}>
                                                             {rewardType}
                                                         </option>
                                                     ))}
-                                                </select>
+                                                </Select>
                                             </Field>
                                             <Field label={text('prize.amount', 'Amount')} error={prizeErrors.rewardAmount}>
                                                 <input type="number" min={0} value={prizeForm.rewardAmount} onChange={(e) => setPrizeForm({ ...prizeForm, rewardAmount: toInt(e.target.value) })} />

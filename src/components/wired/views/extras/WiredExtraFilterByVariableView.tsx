@@ -19,6 +19,7 @@ import {
 } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type AmountMode = 'constant' | 'variable';
@@ -276,13 +277,13 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
 
                 <div className="flex flex-col gap-1">
                     <Text>{LocalizeText('wiredfurni.params.variables.sort_by')}</Text>
-                    <select className="form-select form-select-sm" value={sortBy} onChange={(event) => setSortBy(parseInt(event.target.value, 10) || 0)}>
+                    <Select className="form-select form-select-sm" value={sortBy} onChange={(event) => setSortBy(parseInt(event.target.value, 10) || 0)}>
                         {SORT_OPTIONS.map((option) => (
                             <option key={option} value={option}>
                                 {LocalizeText(`wiredfurni.params.variables.sort_by.${option}`)}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
 
                 <div className="octane-wired__divider" />

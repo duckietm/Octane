@@ -35,6 +35,7 @@ import { CatalogPreviewControls } from '../widgets/CatalogPreviewControls';
 import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { Select } from '../../../../../common/Select';
 
 /** The colours of the recolourable furni in the active room. */
 const roomRecolors = (): number[] =>
@@ -123,14 +124,14 @@ const RecolorableColorWindow: FC<RecolorableColorWindowProps> = ({ offer, color,
                     {localizeWithFallback('furniture.recolor.scope', 'Apply to:')}
                 </Text>
                 <div className="flex items-center gap-2">
-                    <select
+                    <Select
                         className="form-select form-select-sm grow"
                         value={everyShape ? 'all' : 'this'}
                         onChange={(event) => setEveryShape(event.target.value === 'all')}
                     >
                         <option value="this">{localizeWithFallback('builder.palette.apply_to.this', 'Only this furni')}</option>
                         <option value="all">{localizeWithFallback('builder.palette.apply_to.all', 'On multiple furni')}</option>
-                    </select>
+                    </Select>
                     <Button
                         disabled={target === NO_RECOLOR || (target === color && !everyShape)}
                         variant="success"

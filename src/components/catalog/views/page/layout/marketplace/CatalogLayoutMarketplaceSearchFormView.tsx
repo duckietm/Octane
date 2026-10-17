@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import { IMarketplaceSearchOptions, LocalizeText, MarketplaceSearchType } from '../../../../../../api';
 import { Button, Text } from '../../../../../../common';
 import { OctaneInput } from '../../../../../../layout';
+import { Select } from '../../../../../../common/Select';
 
 export interface SearchFormViewProps {
     searchType: number;
@@ -48,13 +49,13 @@ export const SearchFormView: FC<SearchFormViewProps> = (props) => {
         <div className="flex flex-col gap-1">
             <div className="flex items-center gap-1">
                 <Text className="col-span-3">{LocalizeText('catalog.marketplace.sort_order')}</Text>
-                <select className="form-select form-select-sm" value={sortType} onChange={(event) => onSortTypeChange(parseInt(event.target.value))}>
+                <Select className="form-select form-select-sm" value={sortType} onChange={(event) => onSortTypeChange(parseInt(event.target.value))}>
                     {sortTypes.map((type) => (
                         <option key={type} value={type}>
                             {LocalizeText(`catalog.marketplace.sort.${type}`)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
             {searchType === MarketplaceSearchType.ADVANCED && (
                 <>

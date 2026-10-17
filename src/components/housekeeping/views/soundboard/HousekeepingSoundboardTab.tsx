@@ -12,6 +12,7 @@ import {
 } from '../../../../hooks/soundboard/soundboardCatalogState';
 import { resolveSoundboardSoundUrl } from '../../../../hooks/soundboard/soundboardUrl';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 const EMPTY_DRAFT: SoundboardCatalogDraft = { id: 0, name: '', classname: '', url: '', minRank: 1, enabled: true, cooldownSeconds: 0 };
 const RESULT_KEYS = [
@@ -119,7 +120,7 @@ export const HousekeepingSoundboardTab: FC = () => {
                     onChange={(event) => setQuery(event.target.value)}
                     className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs"
                 />
-                <select
+                <Select
                     aria-label={LocalizeText('housekeeping.soundboard.filter')}
                     value={filter}
                     onChange={(event) => setFilter(event.target.value as SoundboardCatalogFilter)}
@@ -128,7 +129,7 @@ export const HousekeepingSoundboardTab: FC = () => {
                     <option value="all">{LocalizeText('housekeeping.soundboard.filter.all')}</option>
                     <option value="enabled">{LocalizeText('housekeeping.soundboard.filter.enabled')}</option>
                     <option value="disabled">{LocalizeText('housekeeping.soundboard.filter.disabled')}</option>
-                </select>
+                </Select>
             </div>
 
             {resultKey && (

@@ -5,6 +5,7 @@ import { CreateLinkEvent, GetMaxVisitorsList, getYoutubeRoomEnabled, IRoomData, 
 import { Column, Flex, Text } from '../../../../common';
 import { useMessageEvent, useNavigatorData, useNotification, useSoundboard } from '../../../../hooks';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 const ROOM_NAME_MIN_LENGTH = 3;
 const ROOM_NAME_MAX_LENGTH = 60;
@@ -155,18 +156,18 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
             </Column>
             <Column gap={1}>
                 <Text bold>{LocalizeText('navigator.category')}</Text>
-                <select className="form-select form-select-sm" value={roomData.categoryId} onChange={(event) => handleChange('category', event.target.value)}>
+                <Select className="form-select form-select-sm" value={roomData.categoryId} onChange={(event) => handleChange('category', event.target.value)}>
                     {categories &&
                         categories.map((category) => (
                             <option key={category.id} value={category.id}>
                                 {LocalizeText(category.name)}
                             </option>
                         ))}
-                </select>
+                </Select>
             </Column>
             <Column gap={1}>
                 <Text bold>{LocalizeText('navigator.maxvisitors')}</Text>
-                <select
+                <Select
                     className="form-select form-select-sm"
                     value={roomData.userCount}
                     onChange={(event) => handleChange('max_visitors', event.target.value)}
@@ -177,11 +178,11 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                                 {value}
                             </option>
                         ))}
-                </select>
+                </Select>
             </Column>
             <Column gap={1}>
                 <Text bold>{LocalizeText('navigator.tradesettings')}</Text>
-                <select
+                <Select
                     className="form-select form-select-sm"
                     value={roomData.tradeState}
                     onChange={(event) => handleChange('trade_state', event.target.value)}
@@ -189,7 +190,7 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                     <option value="0">{LocalizeText('navigator.roomsettings.trade_not_allowed')}</option>
                     <option value="1">{LocalizeText('navigator.roomsettings.trade_not_with_Controller')}</option>
                     <option value="2">{LocalizeText('navigator.roomsettings.trade_allowed')}</option>
-                </select>
+                </Select>
             </Column>
             <Column gap={1}>
                 <Text bold>{LocalizeText('navigator.tags')}</Text>
@@ -247,7 +248,7 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
             </Flex>
             <Column gap={1}>
                 <Text bold>{LocalizeText('soundboard.room.allow')}</Text>
-                <select
+                <Select
                     aria-label={LocalizeText('soundboard.room.allow')}
                     className="form-select form-select-sm"
                     value={soundboardRoomMode}
@@ -256,7 +257,7 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                     <option value="0">{LocalizeText('soundboard.room.mode.off')}</option>
                     <option value="1">{LocalizeText('soundboard.room.mode.everyone')}</option>
                     <option value="2">{LocalizeText('soundboard.room.mode.rights')}</option>
-                </select>
+                </Select>
             </Column>
             <Flex pointer alignItems="center" justifyContent="center" gap={1} onClick={deleteRoom}>
                 <FaTimes className="fa-icon shrink-0 text-[#a81a12]" />

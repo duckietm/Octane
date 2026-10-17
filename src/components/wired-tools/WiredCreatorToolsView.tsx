@@ -138,6 +138,7 @@ import { WiredVariableHolderPanelView } from './WiredVariableHolderPanelView';
 import { WiredVariablesTabView } from './WiredVariablesTabView';
 import { translateWiredMenuLink, wiredMenuTabKey } from './WiredMenuLinks';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
+import { Select } from '../../common/Select';
 
 const WIRED_FURNI_GRAVITY_MODEL_KEY = 'wired_furni_gravity';
 
@@ -3293,7 +3294,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                 </button>
                             ))}
                             <span className="ml-2 text-[#555]">Type:</span>
-                            <select
+                            <Select
                                 className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                                 value={monitorHistoryTypeFilter}
                                 onChange={(event) => setMonitorHistoryTypeFilter(event.target.value)}
@@ -3303,7 +3304,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                                         {type}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                         <div className="grow overflow-y-auto border border-[#d1ccbf] rounded bg-white">
                             <table className="w-full text-[12px]">

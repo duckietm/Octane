@@ -11,6 +11,7 @@ import {
 import { Button, Text } from '../../common';
 import { useNotification, useRoom, useWiredTools } from '../../hooks';
 import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 const WIRED_ACCESS_EVERYONE = 1;
 const WIRED_ACCESS_USERS_WITH_RIGHTS = 2;
@@ -166,7 +167,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                     <Text bold small>
                         Timezone:
                     </Text>
-                    <select
+                    <Select
                         aria-label="Timezone"
                         className="w-full rounded border border-[#9d998e] bg-[#f4f0e8] px-2 py-[6px] text-[12px] text-[#555] disabled:opacity-70"
                         disabled={!roomSettings.isLoaded || !canManageSettings}
@@ -178,7 +179,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                                 {zone === serverTimeZone ? `${zone} (hotel)` : zone}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
                 <div className="rounded bg-[#dfddd7] p-3 flex flex-col gap-2">
                     <Text bold small>
@@ -236,7 +237,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                     </label>
                     <label className="flex items-center gap-2 text-[12px] text-[#222]">
                         <span>{localizeWithFallback('wiredmenu.settings.preferences.wired_style', 'Wired style:')}</span>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={accountPreferences.wiredStyle}
                             onChange={(event) => updateAccountPreferences({ wiredStyle: normalizeWiredStyle(event.target.value) })}
@@ -248,7 +249,7 @@ export const WiredToolsSettingsTabView: FC<WiredToolsSettingsTabViewProps> = ({ 
                                         : wiredStyleTitle(style)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </label>
                 </div>
             </div>

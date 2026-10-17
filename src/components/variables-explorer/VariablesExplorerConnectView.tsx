@@ -15,6 +15,7 @@ import {
 import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { VariablesExplorerPrefill } from '../../state/variablesExplorer';
 import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 export interface VariablesExplorerConnectViewProps {
     prefill: VariablesExplorerPrefill | null;
@@ -121,14 +122,14 @@ export const VariablesExplorerConnectView: FC<VariablesExplorerConnectViewProps>
                     </div>
                     <label className="flex flex-col gap-1">
                         <span className={LABEL_CLASS}>{localizeWithFallback('wiredmenu.variables_explorer.hotel', 'Hotel')}</span>
-                        <select className={FIELD_CLASS} value={hotelUrl} onChange={(event) => setHotelUrl(event.target.value)}>
+                        <Select className={FIELD_CLASS} value={hotelUrl} onChange={(event) => setHotelUrl(event.target.value)}>
                             {!hotels.length && <option value="">-</option>}
                             {hotels.map((hotel) => (
                                 <option key={hotel.url} value={hotel.url}>
                                     {hotel.name}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                         {fieldError('hotelUrl')}
                     </label>
                     <label className="flex flex-col gap-1">

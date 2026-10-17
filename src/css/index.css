@@ -829,8 +829,8 @@ body {
 /* Text fields only. This rule used to catch every input, so checkboxes and radios
    came out as 22px cream text boxes with their tick painted over - the mod tool was
    the one window in the client where a checkbox did not look like a checkbox. */
-.octane-mod-tools :where(input:not([type='checkbox']):not([type='radio']), select, textarea),
-[class*="octane-mod-tools-"] :where(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+.octane-mod-tools :where(input:not([type='checkbox']):not([type='radio']), select, .octane-select-trigger, textarea),
+[class*="octane-mod-tools-"] :where(input:not([type='checkbox']):not([type='radio']), select, .octane-select-trigger, textarea) {
     min-height: 22px;
     border: 1px solid var(--mod-tools-line-dark) !important;
     border-radius: 3px !important;
@@ -840,8 +840,8 @@ body {
     font-size: 11px !important;
 }
 
-.octane-mod-tools :where(input:not([type='checkbox']):not([type='radio']):focus, select:focus, textarea:focus),
-[class*="octane-mod-tools-"] :where(input:not([type='checkbox']):not([type='radio']):focus, select:focus, textarea:focus) {
+.octane-mod-tools :where(input:not([type='checkbox']):not([type='radio']):focus, select:focus, .octane-select-trigger:focus, textarea:focus),
+[class*="octane-mod-tools-"] :where(input:not([type='checkbox']):not([type='radio']):focus, select:focus, .octane-select-trigger:focus, textarea:focus) {
     border-color: var(--mod-tools-accent) !important;
     box-shadow: 0 0 0 2px rgba(47, 128, 151, 0.28), inset 0 1px 0 rgba(0, 0, 0, 0.16) !important;
     outline: none !important;

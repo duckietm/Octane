@@ -4,6 +4,7 @@ import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
+import { Select } from '../../../../common/Select';
 
 interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
@@ -80,7 +81,7 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
                         <Text bold small>
                             {LocalizeText('navigator.roomsettings.moderation.mute.header')}
                         </Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={roomData.moderationSettings.allowMute}
                             onChange={(event) => handleChange('moderation_mute', event.target.value)}
@@ -89,13 +90,13 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
                             <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>
                                 {LocalizeText('navigator.roomsettings.moderation.rights')}
                             </option>
-                        </select>
+                        </Select>
                     </Column>
                     <Column gap={1}>
                         <Text bold small>
                             {LocalizeText('navigator.roomsettings.moderation.kick.header')}
                         </Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={roomData.moderationSettings.allowKick}
                             onChange={(event) => handleChange('moderation_kick', event.target.value)}
@@ -105,13 +106,13 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
                                 {LocalizeText('navigator.roomsettings.moderation.rights')}
                             </option>
                             <option value={RoomModerationSettings.MODERATION_LEVEL_ALL}>{LocalizeText('navigator.roomsettings.moderation.all')}</option>
-                        </select>
+                        </Select>
                     </Column>
                     <Column gap={1}>
                         <Text bold small>
                             {LocalizeText('navigator.roomsettings.moderation.ban.header')}
                         </Text>
-                        <select
+                        <Select
                             className="form-select form-select-sm"
                             value={roomData.moderationSettings.allowBan}
                             onChange={(event) => handleChange('moderation_ban', event.target.value)}
@@ -120,7 +121,7 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
                             <option value={RoomModerationSettings.MODERATION_LEVEL_USER_WITH_RIGHTS}>
                                 {LocalizeText('navigator.roomsettings.moderation.rights')}
                             </option>
-                        </select>
+                        </Select>
                     </Column>
                 </NavigatorRoomSettingsSectionView>
             </Column>

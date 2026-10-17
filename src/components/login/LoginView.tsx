@@ -22,6 +22,7 @@ import { t } from './utils/i18n';
 import { clearRegistrationDraft, loadRegistrationDraft, saveRegistrationDraft } from './utils/registrationDraft';
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
+import { Select } from '../../common/Select';
 
 type DialogMode = 'login' | 'register' | 'forgot';
 type LoginLocale = { code: string; file: string; label: string; flag: string };
@@ -779,7 +780,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                 <div className="login-language-content octane-card-content-shell">
                     <div className="login-language-select-wrap">
                         <img src={selectedLocale.flag} alt="" draggable={false} />
-                        <select
+                        <Select
                             id="login-language-select"
                             className="form-select"
                             value={selectedLocale.code}
@@ -792,7 +793,7 @@ export const LoginView: FC<LoginViewProps> = ({ onAuthenticated, isEntering = fa
                                     {locale.label}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                     {localeError.length > 0 && <div className="language-error">{localeError}</div>}
                 </div>

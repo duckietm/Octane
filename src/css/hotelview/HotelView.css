@@ -808,6 +808,7 @@
 
 .hotelview-editor input,
 .hotelview-editor select,
+.hotelview-editor .octane-select-trigger,
 .hotelview-editor textarea {
     min-width: 0;
     padding: 3px 6px;

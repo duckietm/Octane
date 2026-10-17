@@ -56,6 +56,7 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredProjectileDirectionGrid } from './WiredProjectileDirectionGrid';
 import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -157,13 +158,13 @@ const NumberField: FC<{ disabled?: boolean; label: string; value: number; onChan
 const SourceSelect: FC<{ label: string; options: WiredSourceOption[]; value: number; onChange: (value: number) => void }> = ({ label, options, value, onChange }) => (
     <label className="flex items-center justify-between gap-2">
         <Text small>{label}</Text>
-        <select aria-label={label} className="form-select form-select-sm" value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))}>
+        <Select aria-label={label} className="form-select form-select-sm" value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))}>
             {options.map((option) => (
                 <option key={option.value} value={option.value}>
                     {LocalizeText(option.label)}
                 </option>
             ))}
-        </select>
+        </Select>
     </label>
 );
 
@@ -229,7 +230,7 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
             </label>
             {fromVariable && (
                 <div className="flex flex-col gap-1 octane-wired__projectile-indent">
-                    <select
+                    <Select
                         aria-label={`${label} variable type`}
                         className="form-select form-select-sm"
                         value={target}
@@ -243,7 +244,7 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
                                 {text(`variable_target.${option.key}`, option.fallback)}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                     <WiredVariablePicker entries={entries} recentScope="projectile-reference" selectedToken={token} onSelect={(entry) => props.onToken(entry.token)} />
                     {targetKey === 'user' && (
                         <SourceSelect label={text('variable_source', 'Read it from:')} options={userSources} value={userSource} onChange={props.onUserSource} />
@@ -321,7 +322,7 @@ export const WiredExtraProjectileView: FC<{}> = () => {
                     />
                     <div className="flex flex-col gap-1">
                         <Text small>{text('system', 'System:')}</Text>
-                        <select
+                        <Select
                             aria-label={text('system', 'System:')}
                             className="form-select form-select-sm"
                             disabled={!rotates && !changesShooter}
@@ -333,7 +334,7 @@ export const WiredExtraProjectileView: FC<{}> = () => {
                                     {text(`system.${system.value}`, system.fallback)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                     <WiredProjectileDirectionGrid disabled={!rotates && !changesShooter} system={params[PROJECTILE_PARAM_DIRECTIONAL_SYSTEM]} />
                     <Checkbox

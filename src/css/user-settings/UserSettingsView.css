@@ -159,7 +159,8 @@
 .air-settings-radio:focus-visible,
 .air-settings-volume-row input:focus-visible,
 .air-settings-volume-row__speaker:focus-visible,
-.air-settings-select-row select:focus-visible {
+.air-settings-select-row select:focus-visible,
+.air-settings-select-row .octane-select-trigger:focus-visible {
     outline: 1px solid #fff27a;
     outline-offset: 1px;
 }
@@ -410,7 +411,8 @@
     white-space: nowrap;
 }
 
-.air-settings-select-row select {
+.air-settings-select-row select,
+.air-settings-select-row .octane-select-trigger {
     appearance: auto;
     box-sizing: border-box;
     width: 96px;

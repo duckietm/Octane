@@ -7,6 +7,7 @@ import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 /**
  * Habbo's progress-achievement action (`wf_act_progress_achievement`): progresses one of the room's
@@ -84,14 +85,14 @@ export const WiredActionProgressAchievementView: FC<{}> = () => {
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.name', 'Achievement')}</Text>
                 {options.length ? (
-                    <select className="form-select form-select-sm" value={achievement} onChange={(event) => setAchievement(event.target.value)}>
+                    <Select className="form-select form-select-sm" value={achievement} onChange={(event) => setAchievement(event.target.value)}>
                         {!achievement && <option value="">{localizeWithFallback('wiredfurni.params.progress_achievement.pick', 'Pick an achievement')}</option>}
                         {options.map((name) => (
                             <option key={name} value={name}>
                                 {name}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 ) : (
                     <Text small>
                         {localizeWithFallback(

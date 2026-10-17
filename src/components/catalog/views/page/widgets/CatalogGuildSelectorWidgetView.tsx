@@ -3,6 +3,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { LocalizeText } from '../../../../../api';
 import { Button, Flex } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useUserGroups } from '../../../../../hooks';
+import { Select } from '../../../../../common/Select';
 
 interface CatalogGuildSelectorWidgetViewProps {
     ownerOnly?: boolean;
@@ -81,13 +82,13 @@ export const CatalogGuildSelectorWidgetView: FC<CatalogGuildSelectorWidgetViewPr
                     <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorB }} />
                 </Flex>
             )}
-            <select className="form-select form-select-sm" value={selectedGroupIndex} onChange={(event) => setSelectedGroupIndex(parseInt(event.target.value))}>
+            <Select className="form-select form-select-sm" value={selectedGroupIndex} onChange={(event) => setSelectedGroupIndex(parseInt(event.target.value))}>
                 {groups.map((group, index) => (
                     <option key={index} value={index}>
                         {group.groupName}
                     </option>
                 ))}
-            </select>
+            </Select>
         </div>
     );
 };

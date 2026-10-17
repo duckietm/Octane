@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useTranslation } from '../../hooks';
 import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 export const TranslationSettingsView: FC<{}> = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -75,7 +76,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                     <div className="flex flex-col gap-1">
                         <label className="flex flex-col gap-1 text-[12px]">
                             <span>Localized text pack</span>
-                            <select
+                            <Select
                                 className="rounded border border-black/20 bg-white px-2 py-1"
                                 disabled={localizationTextsLoading}
                                 value={settings.uiTextLanguage || ''}
@@ -87,7 +88,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                                         {locale.name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </label>
                     </div>
                 </div>
@@ -97,7 +98,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                         <Text>Detected language (auto): {getLanguageName(lastIncomingLanguage)}</Text>
                         <label className="flex flex-col gap-1 text-[12px]">
                             <span>Translate into</span>
-                            <select
+                            <Select
                                 className="rounded border border-black/20 bg-white px-2 py-1"
                                 disabled={languagesLoading || !supportedLanguages.length}
                                 value={settings.incomingTargetLanguage}
@@ -108,7 +109,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                                         {language.name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </label>
                     </div>
                 </div>
@@ -118,7 +119,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                         <Text>Detected writing language (auto): {getLanguageName(lastOutgoingLanguage)}</Text>
                         <label className="flex flex-col gap-1 text-[12px]">
                             <span>Send text as</span>
-                            <select
+                            <Select
                                 className="rounded border border-black/20 bg-white px-2 py-1"
                                 disabled={languagesLoading || !supportedLanguages.length}
                                 value={settings.outgoingTargetLanguage}
@@ -129,7 +130,7 @@ export const TranslationSettingsView: FC<{}> = () => {
                                         {language.name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </label>
                     </div>
                 </div>

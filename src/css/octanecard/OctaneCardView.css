@@ -485,6 +485,7 @@
     input,
     textarea,
     select,
+    .octane-select-trigger,
     button {
         font-family: Ubuntu, sans-serif;
         color: var(--octane-card-text);
@@ -498,6 +499,7 @@
     input,
     textarea,
     select,
+    .octane-select-trigger,
     button {
         font-size: 12px;
         line-height: 1.25;
@@ -596,6 +598,7 @@
         input,
         textarea,
         select,
+        .octane-select-trigger,
         button {
             font-size: 11.5px;
         }

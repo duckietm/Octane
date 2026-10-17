@@ -5,6 +5,7 @@ import { useUserGroups, useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const GROUP_CURRENT_ROOM = 0;
 const GROUP_SELECTED = 1;
@@ -57,7 +58,7 @@ export const WiredSelectorUsersGroupView: FC<{}> = () => {
                 </div>
 
                 {groupType === GROUP_SELECTED && (
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={selectedGroupId}
                         onChange={(event) => setSelectedGroupId(parseInt(event.target.value))}
@@ -68,7 +69,7 @@ export const WiredSelectorUsersGroupView: FC<{}> = () => {
                                 {group.label}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 )}
 
                 <hr className="m-0 bg-dark" />

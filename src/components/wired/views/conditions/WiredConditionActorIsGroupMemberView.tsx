@@ -5,6 +5,7 @@ import { useUserGroups, useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const GROUP_CURRENT_ROOM = 0;
 const GROUP_SELECTED = 1;
@@ -77,7 +78,7 @@ export const WiredConditionActorIsGroupMemberView: FC<WiredConditionActorIsGroup
                 </div>
 
                 {groupType === GROUP_SELECTED && (
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={selectedGroupId}
                         onChange={(event) => setSelectedGroupId(parseInt(event.target.value))}
@@ -88,7 +89,7 @@ export const WiredConditionActorIsGroupMemberView: FC<WiredConditionActorIsGroup
                                 {group.label}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 )}
             </div>
         </WiredConditionBaseView>

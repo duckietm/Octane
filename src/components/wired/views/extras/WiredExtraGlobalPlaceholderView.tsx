@@ -21,6 +21,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 const EMPTY_FORM: IGlobalPlaceholderForm = { name: '', mode: GLOBAL_PLACEHOLDER_FROM_VALUE, value: '', roomId: 0, placeholderName: '', rooms: [] };
 
@@ -104,16 +105,16 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                     {form.mode === GLOBAL_PLACEHOLDER_FROM_ANOTHER_ROOM && (
                         <div className="flex flex-col gap-1">
                             <Text>{localizeWithFallback('wiredfurni.params.room_selection', 'Room')}</Text>
-                            <select className="form-select form-select-sm" value={form.roomId} onChange={(event) => selectRoom(parseInt(event.target.value, 10) || 0)}>
+                            <Select className="form-select form-select-sm" value={form.roomId} onChange={(event) => selectRoom(parseInt(event.target.value, 10) || 0)}>
                                 <option value={0}>{localizeWithFallback('wiredfurni.params.room_selection.tooltip', 'Pick a room')}</option>
                                 {form.rooms.map((room) => (
                                     <option key={room.roomId} value={room.roomId}>
                                         {room.roomName}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                             <Text>{localizeWithFallback('wiredfurni.params.placeholder_selection', 'Placeholder')}</Text>
-                            <select
+                            <Select
                                 className="form-select form-select-sm"
                                 value={form.placeholderName}
                                 onChange={(event) => {
@@ -128,7 +129,7 @@ export const WiredExtraGlobalPlaceholderView: FC<{}> = () => {
                                         {`$(${name})`}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                     )}
                 </div>

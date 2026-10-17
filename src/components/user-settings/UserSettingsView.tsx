@@ -33,6 +33,7 @@ import { SoundboardVolumeControl } from './SoundboardVolumeControl';
 import { WordFilterSettingsView } from './WordFilterSettingsView';
 import { Checkbox } from '../../common/Checkbox';
 import { Radio } from '../../common/Radio';
+import { Select } from '../../common/Select';
 
 type SettingsSection = null | 'audio' | 'chat' | 'other' | 'privacy' | 'wordfilter';
 type VolumeAction = 'system_volume' | 'furni_volume' | 'trax_volume' | 'soundboard_volume';
@@ -364,18 +365,18 @@ export const UserSettingsView: FC<{}> = () => {
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('toolbar.chat.settings.mode', 'Chat mode')}
                             value={userSettings.chatMode === RoomChatSettings.CHAT_MODE_LINE_BY_LINE ? RoomChatSettings.CHAT_MODE_LINE_BY_LINE : RoomChatSettings.CHAT_MODE_FREE_FLOW}
                             onChange={(event) => processAction('chat_mode', Number(event.target.value))}
                         >
                             <option value={RoomChatSettings.CHAT_MODE_FREE_FLOW}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
                             <option value={RoomChatSettings.CHAT_MODE_LINE_BY_LINE}>{localizeWithFallback('navigator.roomsettings.chat.mode.line.by.line', 'Line-by-Line Mode')}</option>
-                        </select>
+                        </Select>
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('toolbar.chat.settings.bubble_width', 'Bubble width')}
                             value={userSettings.chatBubbleWidth}
                             onChange={(event) => processAction('chat_bubble_width', Number(event.target.value))}
@@ -383,11 +384,11 @@ export const UserSettingsView: FC<{}> = () => {
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_THIN}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.thin', 'Thin')}</option>
                             <option value={RoomChatSettings.CHAT_BUBBLE_WIDTH_WIDE}>{localizeWithFallback('navigator.roomsettings.chat.bubbles.width.wide', 'Wide')}</option>
-                        </select>
+                        </Select>
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('toolbar.chat.settings.scroll_speed', 'Scroll speed')}
                             value={userSettings.chatScrollSpeed}
                             onChange={(event) => processAction('chat_scroll_speed', Number(event.target.value))}
@@ -395,7 +396,7 @@ export const UserSettingsView: FC<{}> = () => {
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_NORMAL}>{localizeWithFallback('toolbar.chat.settings.room_default', 'Room default')}</option>
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_SLOW}>{localizeWithFallback('navigator.roomsettings.chat.speed.slow', 'Slow')}</option>
                             <option value={RoomChatSettings.CHAT_SCROLL_SPEED_FAST}>{localizeWithFallback('navigator.roomsettings.chat.speed.fast', 'Fast')}</option>
-                        </select>
+                        </Select>
                     </label>
                     <button className="air-settings-button" onClick={() => setSection('wordfilter')} type="button">
                         {localizeWithFallback('memenu.settings.wordfilter', 'Word filter')}
@@ -449,7 +450,7 @@ export const UserSettingsView: FC<{}> = () => {
                     </label>
                     <label className="air-settings-select-row">
                         <span>{localizeWithFallback('memenu.settings.other.catalog.grid.density', 'Catalog item size')}</span>
-                        <select
+                        <Select
                             aria-label={localizeWithFallback('memenu.settings.other.catalog.grid.density', 'Catalog item size')}
                             value={catalogGridDensity}
                             onChange={(event) => setCatalogGridDensity(event.target.value as 'compact' | 'standard' | 'large')}
@@ -457,7 +458,7 @@ export const UserSettingsView: FC<{}> = () => {
                             <option value="compact">{localizeWithFallback('generic.compact', 'Compact')}</option>
                             <option value="standard">{localizeWithFallback('generic.standard', 'Standard')}</option>
                             <option value="large">{localizeWithFallback('generic.large', 'Large')}</option>
-                        </select>
+                        </Select>
                     </label>
                     <label className="air-settings-check-row">
                         <Checkbox checked={showTilePrices} className="air-settings-checkbox" onCheckedChange={(nextChecked) => setShowTilePrices(nextChecked)} />

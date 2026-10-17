@@ -3,6 +3,7 @@ import { Text } from '../../../../common';
 import { ChestFurniIconPreview } from '../ChestFurniIconPreview';
 import { CONTRACT_KIND_CURRENCY, CONTRACT_KIND_FURNI, ContractTermRow, CURRENCY_OPTIONS } from './contractTermWire';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 interface WiredContractTermRowProps {
     row: ContractTermRow;
@@ -13,14 +14,14 @@ interface WiredContractTermRowProps {
 export const WiredContractTermRow: FC<WiredContractTermRowProps> = ({ row, showDirection = false, onChange }) => (
     <div className="flex flex-col gap-2 rounded border border-black/10 p-2">
         {showDirection && (
-            <select
+            <Select
                 className="form-select form-select-sm"
                 value={row.direction}
                 onChange={(event) => onChange({ direction: parseInt(event.target.value, 10) })}
             >
                 <option value={0}>PAY</option>
                 <option value={1}>RECEIVE</option>
-            </select>
+            </Select>
         )}
         <div className="flex flex-wrap gap-2">
             <label className="flex items-center gap-1">

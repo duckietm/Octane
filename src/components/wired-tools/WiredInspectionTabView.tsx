@@ -5,6 +5,7 @@ import { INSPECTION_ELEMENTS } from './WiredCreatorTools.constants';
 import { InspectionFurniSelection, InspectionUserSelection, InspectionVariable } from './WiredCreatorTools.types';
 import { useWiredCreatorToolsUiStore } from './wiredCreatorToolsUiStore';
 import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 /**
  * Structural shape we need from the renderer's variable-definition
@@ -221,7 +222,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                     {isInspectionGiveOpen && (
                         <div className="absolute right-0 bottom-full mb-2 w-[210px] rounded border border-[#8d887a] bg-[#efede5] p-3 shadow-[0_2px_8px_rgba(0,0,0,.25)] z-10 flex flex-col gap-2">
                             <Text bold>Variable:</Text>
-                            <select
+                            <Select
                                 className="rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
                                 value={selectedInspectionGiveDefinition?.itemId ?? 0}
                                 onChange={(event) => onSelectGiveVariable(Number(event.target.value))}
@@ -232,7 +233,7 @@ export const WiredInspectionTabView = (props: WiredInspectionTabViewProps) => {
                                         {definition.name}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                             <Text bold>Value:</Text>
                             <input
                                 className="w-[96px] rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px] disabled:opacity-60"

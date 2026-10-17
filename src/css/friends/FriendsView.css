@@ -926,9 +926,9 @@
     background: #f3f3ef;
 }
 
-.octane-friends-category-manager :where(input, select, textarea),
-.octane-friends-room-invite :where(input, select, textarea),
-.octane-friends-remove-confirmation :where(input, select, textarea) {
+.octane-friends-category-manager :where(input, select, .octane-select-trigger, textarea),
+.octane-friends-room-invite :where(input, select, .octane-select-trigger, textarea),
+.octane-friends-remove-confirmation :where(input, select, .octane-select-trigger, textarea) {
     min-height: 22px;
     border: 1px solid #858585 !important;
     border-radius: 3px !important;
@@ -938,9 +938,9 @@
     font-size: 11px !important;
 }
 
-.octane-friends-category-manager :where(input:focus, select:focus, textarea:focus),
-.octane-friends-room-invite :where(input:focus, select:focus, textarea:focus),
-.octane-friends-remove-confirmation :where(input:focus, select:focus, textarea:focus) {
+.octane-friends-category-manager :where(input:focus, select:focus, .octane-select-trigger:focus, textarea:focus),
+.octane-friends-room-invite :where(input:focus, select:focus, .octane-select-trigger:focus, textarea:focus),
+.octane-friends-remove-confirmation :where(input:focus, select:focus, .octane-select-trigger:focus, textarea:focus) {
     border-color: #4a7d8c !important;
     box-shadow: 0 0 0 2px rgba(74, 125, 140, 0.24), inset 0 1px 0 rgba(0, 0, 0, 0.14) !important;
     outline: none !important;

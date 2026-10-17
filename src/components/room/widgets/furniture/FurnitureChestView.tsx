@@ -40,6 +40,7 @@ import { ChestFurniGroup, chestFurniDisplayName, groupStoredFurni } from './ches
 import { FurniChestGridItem } from './FurniChestGridItem';
 import { FurniChestSearchBar } from './FurniChestSearchBar';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 interface ChestEntry {
     currencyType: number;
@@ -757,13 +758,13 @@ export const FurnitureChestView: FC = () => {
                             <textarea className="form-control form-control-sm" rows={3} maxLength={255} value={description} onChange={(e) => setDescription(e.target.value)} />
                             <Text bold>{LocalizeText('wiredchests.settings.appearance')}</Text>
                             <Text small>{LocalizeText('wiredchests.settings.appearance.state')}</Text>
-                            <select className="form-select form-select-sm" value={appearanceState} onChange={(e) => setAppearanceState(parseInt(e.target.value, 10))}>
+                            <Select className="form-select form-select-sm" value={appearanceState} onChange={(e) => setAppearanceState(parseInt(e.target.value, 10))}>
                                 {appearanceOptions.map((o) => (
                                     <option key={o.value} value={o.value}>
                                         {o.label}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                             {isFurni && (
                                 <>
                                     <label className="flex items-center gap-2">
@@ -786,7 +787,7 @@ export const FurnitureChestView: FC = () => {
                                                     'How many',
                                                 )}
                                             </Text>
-                                            <select
+                                            <Select
                                                 className="form-select form-select-sm"
                                                 value={previewAmount}
                                                 onChange={(e) => setPreviewAmount(parseInt(e.target.value, 10))}
@@ -796,7 +797,7 @@ export const FurnitureChestView: FC = () => {
                                                         {n}
                                                     </option>
                                                 ))}
-                                            </select>
+                                            </Select>
                                         </Flex>
                                     )}
                                 </>
@@ -873,13 +874,13 @@ export const FurnitureChestView: FC = () => {
                                 <Text small>{LocalizeText('wiredchests.notification_settings.enable_notifications.wired.2')}</Text>
                             </label>
                             <Text bold>{LocalizeText('wiredchests.notification_settings.notification_mode.when')}</Text>
-                            <select className="form-select form-select-sm" value={notifyMode} onChange={(e) => setNotifyMode(parseInt(e.target.value, 10))}>
+                            <Select className="form-select form-select-sm" value={notifyMode} onChange={(e) => setNotifyMode(parseInt(e.target.value, 10))}>
                                 {notifyModes.map((o) => (
                                     <option key={o.value} value={o.value}>
                                         {o.label}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                             <div className="octane-chest__actions">
                                 <ChestButton wide onClick={saveNotifications}>
                                     {LocalizeText('wiredchests.ready')}
@@ -917,7 +918,7 @@ export const FurnitureChestView: FC = () => {
                             </Flex>
                             <Flex alignItems="center" gap={2}>
                                 <Text small>{LocalizeText('wiredchests.quantity')}</Text>
-                                <select
+                                <Select
                                     className="form-select form-select-sm"
                                     value={upgradeQty}
                                     onChange={(e) => setUpgradeQty(parseInt(e.target.value, 10))}
@@ -927,7 +928,7 @@ export const FurnitureChestView: FC = () => {
                                             {q}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </Flex>
                             <Flex alignItems="center" gap={1}>
                                 {COST_CREDITS > 0 && (

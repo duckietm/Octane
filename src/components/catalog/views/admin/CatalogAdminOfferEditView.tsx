@@ -10,6 +10,7 @@ import { CatalogAdminModalView } from './CatalogAdminModalView';
 import { CatalogAdminOfferPriceView } from './CatalogAdminOfferPriceView';
 import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 export const isCatalogAdminNewOffer = (offer: IPurchasableOffer | null): boolean =>
     offer?.offerId === -1;
@@ -423,13 +424,13 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points.type')}</label>
-                                    <select className={inputClass} value={pointsType} onChange={(e) => setPointsType(parseInt(e.target.value))}>
+                                    <Select className={inputClass} value={pointsType} onChange={(e) => setPointsType(parseInt(e.target.value))}>
                                         {currencyTypes.map((type) => (
                                             <option key={type} value={type}>
                                                 {localizeWithFallback(`purse.seasonal.currency.${type}`, `Currency ${type}`)} ({type})
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                             </div>
                         </section>
@@ -439,10 +440,10 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
                             <div className="octane-catalog-admin-form-grid is-3col">
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.club.only')}</label>
-                                    <select className={inputClass} value={clubOnly} onChange={(e) => setClubOnly(e.target.value)}>
+                                    <Select className={inputClass} value={clubOnly} onChange={(e) => setClubOnly(e.target.value)}>
                                         <option value="0">{localizeWithFallback('generic.no', 'No')}</option>
                                         <option value="1">{localizeWithFallback('generic.yes', 'Yes')}</option>
-                                    </select>
+                                    </Select>
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">

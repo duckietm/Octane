@@ -2,6 +2,7 @@ import { ExtendedForumData, UpdateForumSettingsMessageComposer } from '@octane/r
 import { FC, useCallback, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Flex, Text } from '../../../../common';
+import { Select } from '../../../../common/Select';
 
 // Permission levels: 0 = EVERYONE, 1 = MEMBERS, 2 = ADMINS, 3 = OWNER
 const PERMISSION_EVERYONE = 0;
@@ -59,19 +60,19 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = (props) =
                     <Text bold small>
                         {LocalizeText('groupforum.permissions.read_label')}
                     </Text>
-                    <select className="form-select form-select-sm" value={readPermission} onChange={(e) => setReadPermission(parseInt(e.target.value))}>
+                    <Select className="form-select form-select-sm" value={readPermission} onChange={(e) => setReadPermission(parseInt(e.target.value))}>
                         {getPermissionOptions().map((opt) => (
                             <option key={opt.value} value={opt.value}>
                                 {opt.label}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </Column>
                 <Column gap={1}>
                     <Text bold small>
                         {LocalizeText('groupforum.permissions.post_message_label')}
                     </Text>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={postMessagePermission}
                         onChange={(e) => setPostMessagePermission(parseInt(e.target.value))}
@@ -81,13 +82,13 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = (props) =
                                 {opt.label}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </Column>
                 <Column gap={1}>
                     <Text bold small>
                         {LocalizeText('groupforum.permissions.post_thread_label')}
                     </Text>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={postThreadPermission}
                         onChange={(e) => setPostThreadPermission(parseInt(e.target.value))}
@@ -97,13 +98,13 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = (props) =
                                 {opt.label}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </Column>
                 <Column gap={1}>
                     <Text bold small>
                         {LocalizeText('groupforum.permissions.moderate_label')}
                     </Text>
-                    <select className="form-select form-select-sm" value={moderatePermission} onChange={(e) => setModeratePermission(parseInt(e.target.value))}>
+                    <Select className="form-select form-select-sm" value={moderatePermission} onChange={(e) => setModeratePermission(parseInt(e.target.value))}>
                         {[
                             { value: PERMISSION_ADMINS, label: LocalizeText('groupforum.permissions.option_group_admins') },
                             { value: PERMISSION_OWNER, label: LocalizeText('groupforum.permissions.option_owner') }
@@ -112,7 +113,7 @@ export const GroupForumSettingsView: FC<GroupForumSettingsViewProps> = (props) =
                                 {opt.label}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </Column>
             </Column>
             <Flex className="mt-auto" gap={2} justifyContent="end">

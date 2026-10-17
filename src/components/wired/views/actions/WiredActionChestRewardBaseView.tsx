@@ -8,6 +8,7 @@ import { variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueO
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 export const CHEST_REWARD_MODE_AMOUNT = 0;
 export const CHEST_REWARD_MODE_EVERYTHING = 1;
@@ -144,13 +145,13 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                 </summary>
                 <fieldset className="flex flex-col gap-1 pt-1" disabled={extraDisabled}>
                     {extra.dropdown ? (
-                        <select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
+                        <Select aria-label="chest extra" className="form-select form-select-sm" value={extraValue} onChange={(event) => setExtraValue(Number(event.target.value))}>
                             {extra.options.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {localizeWithFallback(option.key, option.label)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     ) : (
                         extra.options.map((option) => (
                             <label key={option.value} className="flex items-center gap-1">

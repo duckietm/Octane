@@ -37,6 +37,7 @@ import {
 import { LazyEmojiPicker } from '../../common/LazyEmojiPicker';
 import { LayoutCurrencyIcon } from '../../common/layout/LayoutCurrencyIcon';
 import { useMessageEvent } from '../../hooks';
+import { Select } from '../../common/Select';
 
 type CustomizeTab = 'icons' | 'prefix' | 'settings';
 type PrefixSubTab = 'library' | 'custom';
@@ -520,7 +521,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                     <div className="rounded border border-black/10 bg-white p-2">
                                         <div className="mb-2 text-[11px] leading-4 text-black/70">Effect</div>
                                         <div className="flex items-center gap-2">
-                                            <select
+                                            <Select
                                                 className="flex-1 rounded border border-black/10 bg-white px-2 py-2 text-sm"
                                                 value={customPrefixEffect}
                                                 onChange={(event) => setCustomPrefixEffect(event.target.value)}
@@ -539,7 +540,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                         </option>
                                                     ))}
                                                 </optgroup>
-                                            </select>
+                                            </Select>
                                             <div className="min-w-[130px] rounded border border-black/10 bg-black/5 px-2 py-2 text-center text-[11px] font-bold">
                                                 {selectedEffectOption.icon} {selectedEffectOption.label}
                                                 <div className="mt-1 text-[9px] uppercase text-black/60">{selectedEffectOption.tier}</div>
@@ -549,7 +550,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                     <div className="rounded border border-black/10 bg-white p-2">
                                         <div className="mb-2 text-[11px] leading-4 text-black/70">Font</div>
                                         <div className="flex items-center gap-2">
-                                            <select
+                                            <Select
                                                 className="flex-1 rounded border border-black/10 bg-white px-2 py-2 text-sm"
                                                 value={customPrefixFont}
                                                 onChange={(event) => setCustomPrefixFont(event.target.value)}
@@ -568,7 +569,7 @@ export const CustomizeNickIconView: FC<{}> = () => {
                                                         </option>
                                                     ))}
                                                 </optgroup>
-                                            </select>
+                                            </Select>
                                             <div className="min-w-[130px] rounded border border-black/10 bg-black/5 px-2 py-2 text-center text-[11px] font-bold">
                                                 <span style={customPrefixFontStyle}>{selectedFontOption.label}</span>
                                                 <div className="mt-1 text-[9px] uppercase text-black/60">{selectedFontOption.tier}</div>

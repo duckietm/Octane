@@ -4,6 +4,7 @@ import { IGroupData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Button, Column, Text } from '../../../../common';
 import { useNotification } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
+import { Select } from '../../../../common/Select';
 
 interface GroupTabIdentityViewProps {
     groupData: IGroupData;
@@ -105,7 +106,7 @@ export const GroupTabIdentityView: FC<GroupTabIdentityViewProps> = (props) => {
                                 {LocalizeText('group.edit.base')}
                             </Text>
                             <Column fullWidth gap={1}>
-                                <select
+                                <Select
                                     className="form-select form-select-sm"
                                     value={groupHomeroomId}
                                     onChange={(event) => setGroupHomeroomId(parseInt(event.target.value))}
@@ -119,7 +120,7 @@ export const GroupTabIdentityView: FC<GroupTabIdentityViewProps> = (props) => {
                                                 {room.name}
                                             </option>
                                         ))}
-                                </select>
+                                </Select>
                             </Column>
                         </div>
                         <div className="flex gap-1">

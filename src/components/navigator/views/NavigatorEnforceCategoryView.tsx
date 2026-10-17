@@ -4,6 +4,7 @@ import { localizeWithFallback, SendMessageComposer } from '../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { useMessageEvent, useNavigatorData, useUserDataSnapshot, useUserPermissions } from '../../../hooks';
 import { OctaneButton } from '../../../layout';
+import { Select } from '../../../common/Select';
 
 /** Selection types of RoomCategorySelectionEnforcement: after creating a room, after saving its settings. */
 const SELECTION_ROOM_CREATED = 1;
@@ -66,23 +67,23 @@ export const NavigatorEnforceCategoryView: FC<{}> = () => {
                 </p>
                 <label className="flex flex-col gap-1 text-sm">
                     <span className="font-bold">{localizeWithFallback('navigator.category', 'Category')}</span>
-                    <select className="form-select form-select-sm" value={categoryId} onChange={(event) => setCategoryId(Number(event.target.value))}>
+                    <Select className="form-select form-select-sm" value={categoryId} onChange={(event) => setCategoryId(Number(event.target.value))}>
                         {selectableCategories.map((category) => (
                             <option key={category.id} value={category.id}>
                                 {localizeWithFallback(category.name, category.name)}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </label>
                 <label className="flex flex-col gap-1 text-sm">
                     <span className="font-bold">{localizeWithFallback('navigator.roomsettings.trade_settings', 'Trading')}</span>
-                    <select className="form-select form-select-sm" value={tradeMode} onChange={(event) => setTradeMode(Number(event.target.value))}>
+                    <Select className="form-select form-select-sm" value={tradeMode} onChange={(event) => setTradeMode(Number(event.target.value))}>
                         {TRADE_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
                                 {localizeWithFallback(option.key, option.fallback)}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </label>
                 <OctaneButton disabled={categoryId < 0} onClick={save}>
                     {localizeWithFallback('generic.ok', 'OK')}

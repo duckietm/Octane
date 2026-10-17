@@ -5,6 +5,7 @@ import { Button, DraggableWindowPosition, OctaneCardContentView, OctaneCardHeade
 import { WiredPageRequests } from '../../hooks/wired-tools/useWiredPageRequests';
 import { VariablesElementType } from './WiredCreatorTools.types';
 import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedTable';
+import { Select } from '../../common/Select';
 
 /** The server's holder kinds (`entityType`). */
 export const HOLDER_TYPE_ROOM = 0;
@@ -178,7 +179,7 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                     {filters.map((filter) => (
                         <label key={filter.id} className="flex items-center gap-2">
                             <Text>{filter.label}:</Text>
-                            <select
+                            <Select
                                 className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
                                 value={filter.value}
                                 onChange={(event) => filter.onChange(event.target.value)}
@@ -188,7 +189,7 @@ export const WiredVariableOwnersPanel = (props: WiredVariableOwnersPanelProps) =
                                         {option.label}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </label>
                     ))}
                 </div>

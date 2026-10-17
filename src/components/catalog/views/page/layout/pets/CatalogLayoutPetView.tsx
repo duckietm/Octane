@@ -26,6 +26,7 @@ import {
     isLegacyPetType,
     PetPaletteLike,
 } from './petCatalog.helpers';
+import { Select } from '../../../../../../common/Select';
 
 interface PendingPetPurchase {
     extraData: string;
@@ -287,7 +288,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                         {selectablePalettes.length > 1 && (
                             <label className="octane-catalog-pet-breed-selector">
                                 <span>{LocalizeText('catalog.pets.choose.breed')}</span>
-                                <select
+                                <Select
                                     value={selectedPaletteIndex}
                                     disabled={controlsDisabled}
                                     onChange={(event) => setSelectedPaletteIndex(Number(event.target.value))}
@@ -302,7 +303,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
                                             </option>
                                         );
                                     })}
-                                </select>
+                                </Select>
                             </label>
                         )}
                     </>

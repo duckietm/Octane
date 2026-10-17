@@ -13,6 +13,7 @@ import {
 import { useHousekeeping, useHousekeepingConfirm } from '../../../../hooks';
 import { HOUSEKEEPING_INPUT_CLASS, HousekeepingButton, HousekeepingEmptyState, HousekeepingPill, HousekeepingSection } from '../common/HousekeepingParts';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 /**
  * Every permission against every rank. A cell saves on change and the server reloads the
@@ -158,7 +159,7 @@ export const HousekeepingPermissionsTab: FC = () => {
                                                 {row.max <= 1 ? (
                                                     <Checkbox aria-label={label} checked={value > 0} disabled={disabled} onCheckedChange={(nextChecked) => change(row.key, rank, rankIndex, value, nextChecked ? 1 : 0)} />
                                                 ) : (
-                                                    <select
+                                                    <Select
                                                         aria-label={label}
                                                         className="rounded border border-zinc-300 bg-white px-0.5 text-[11px] disabled:opacity-50"
                                                         disabled={disabled}
@@ -170,7 +171,7 @@ export const HousekeepingPermissionsTab: FC = () => {
                                                                 {option}
                                                             </option>
                                                         ))}
-                                                    </select>
+                                                    </Select>
                                                 )}
                                             </td>
                                         );

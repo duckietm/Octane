@@ -12,6 +12,7 @@ import { CatalogAdminModalView } from './CatalogAdminModalView';
 import { createCatalogAdminPageDetailsFromSnapshot } from './CatalogAdminPageState';
 import { useCatalogAdminSmartSave } from './useCatalogAdminSmartSave';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 const MODE_OPTIONS = [
     { value: 'NORMAL', label: 'Normal' },
@@ -467,23 +468,23 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                             <div className="octane-catalog-admin-form-grid is-3col">
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.mode', 'Mode')}</label>
-                                    <select className={inputClass} value={catalogMode} onChange={(e) => setCatalogMode(e.target.value)}>
+                                    <Select className={inputClass} value={catalogMode} onChange={(e) => setCatalogMode(e.target.value)}>
                                         {MODE_OPTIONS.map((option) => (
                                             <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.page.layout', 'Layout')}</label>
-                                    <select className={inputClass} value={pageLayout} onChange={(e) => setPageLayout(e.target.value)}>
+                                    <Select className={inputClass} value={pageLayout} onChange={(e) => setPageLayout(e.target.value)}>
                                         {CATALOG_STUDIO_LAYOUT_CODES.map((l) => (
                                             <option key={l} value={l}>
                                                 {l}
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                                 <div className="octane-catalog-admin-form-field">
                                     <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
@@ -585,7 +586,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                 </div>
                                 {showTranslate && (
                                     <div className="octane-catalog-admin-translate-bar">
-                                        <select
+                                        <Select
                                             className={`${inputClass} flex-1 min-w-[120px]`}
                                             disabled={isTranslating || languagesLoading}
                                             value={translateTargetLanguage}
@@ -601,7 +602,7 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
                                                     {lang.name} ({lang.code})
                                                 </option>
                                             ))}
-                                        </select>
+                                        </Select>
                                         <button
                                             className="octane-catalog-admin-button is-primary"
                                             disabled={isTranslating || !translateTargetLanguage || !pageText1.trim().length}

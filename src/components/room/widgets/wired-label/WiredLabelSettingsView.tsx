@@ -4,6 +4,7 @@ import { localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { wiredLabelCss } from './WiredLabelBubbleView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 const COLOR_NAMES = [ 'blue', 'teal', 'green', 'gold', 'orange', 'red', 'purple', 'charcoal' ];
 const COLOR_FALLBACKS = [ 'Blue', 'Teal', 'Green', 'Gold', 'Orange', 'Red', 'Purple', 'Charcoal' ];
@@ -40,18 +41,18 @@ export const WiredLabelSettingsView: FC<WiredLabelSettingsViewProps> = ({ label,
             <OctaneCardContentView gap={2}>
                 <Text bold>{localizeWithFallback('widget.furniture_label.settings.color', 'Label color')}</Text>
                 <div className="flex items-center gap-2">
-                    <select className="form-select form-select-sm octane-wired-label-settings__color" data-testid="wired-label-color" value={colorIndex} onChange={(event) => setColorIndex(parseInt(event.target.value, 10) || 0)}>
+                    <Select className="form-select form-select-sm octane-wired-label-settings__color" data-testid="wired-label-color" value={colorIndex} onChange={(event) => setColorIndex(parseInt(event.target.value, 10) || 0)}>
                         {COLOR_NAMES.map((name, index) => (
                             <option key={name} value={index}>{localizeWithFallback(`widget.furniture_label.settings.color.${ name }`, COLOR_FALLBACKS[index])}</option>
                         ))}
-                    </select>
+                    </Select>
                     <div className="octane-wired-label-settings__preview" style={{ ['--octane-wired-label-color' as string]: wiredLabelCss(WIRED_LABEL_COLORS[colorIndex]) }} />
                 </div>
                 <Text bold>{localizeWithFallback('widget.furniture_label.settings.visibility', 'Who can see this label?')}</Text>
-                <select className="form-select form-select-sm" data-testid="wired-label-visibility" value={visibility} onChange={(event) => setVisibility(parseInt(event.target.value, 10) === WIRED_LABEL_VISIBILITY_EVERYONE ? WIRED_LABEL_VISIBILITY_EVERYONE : WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS)}>
+                <Select className="form-select form-select-sm" data-testid="wired-label-visibility" value={visibility} onChange={(event) => setVisibility(parseInt(event.target.value, 10) === WIRED_LABEL_VISIBILITY_EVERYONE ? WIRED_LABEL_VISIBILITY_EVERYONE : WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS)}>
                     <option value={WIRED_LABEL_VISIBILITY_EVERYONE}>{localizeWithFallback('widget.furniture_label.settings.visibility.everyone', 'Everyone')}</option>
                     <option value={WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS}>{localizeWithFallback('widget.furniture_label.settings.visibility.wired', 'Users with Wired inspection rights')}</option>
-                </select>
+                </Select>
                 <label className={`flex items-center gap-1${ everyone ? '' : ' opacity-50' }`}>
                     <Checkbox data-testid="wired-label-always-open" disabled={!everyone} checked={everyone && alwaysOpen} onCheckedChange={(nextChecked) => setAlwaysOpen(nextChecked)} />
                     <Text>{localizeWithFallback('widget.furniture_label.settings.always_open', 'Keep this label always open')}</Text>

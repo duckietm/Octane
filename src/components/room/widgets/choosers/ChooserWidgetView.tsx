@@ -5,6 +5,7 @@ import { Button, InfiniteScroll, OctaneCardContentView, OctaneCardHeaderView, Oc
 import { useFurniPickupGuard } from '../../../../hooks';
 import { classNames, OctaneInput } from '../../../../layout';
 import { Checkbox } from '../../../../common/Checkbox';
+import { Select } from '../../../../common/Select';
 
 const LIMIT_FURNI_PICKALL = 100;
 const FILTER_ALL = 'all';
@@ -138,7 +139,7 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                             </button>
                         )}
                     </div>
-                    <select
+                    <Select
                         aria-label={isUsers ? localizeWithFallback('widget.chooser.filter.type', 'Type') : localizeWithFallback('widget.chooser.filter.owner', 'Owner')}
                         className={classNames('octane-chooser-filter', !isUsers && 'octane-chooser-filter-wide')}
                         value={selectedFilter}
@@ -152,7 +153,7 @@ export const ChooserWidgetView: FC<ChooserWidgetViewProps> = (props) => {
                                 {value}
                             </option>
                         ))}
-                    </select>
+                    </Select>
                 </div>
                 <div className="octane-chooser-table">
                     <div className="octane-chooser-row octane-chooser-head">

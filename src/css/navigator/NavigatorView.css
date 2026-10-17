@@ -29,7 +29,8 @@
 
 .octane-navigator-air button,
 .octane-navigator-air input,
-.octane-navigator-air select {
+.octane-navigator-air select,
+.octane-navigator-air .octane-select-trigger {
     appearance: none;
     font-family: inherit;
     -webkit-appearance: none;

@@ -18,6 +18,7 @@ import { FC, Fragment, JSX, useCallback, useEffect, useMemo, useRef, useState } 
 import { localizeWithFallback, ProductImageUtility, SendMessageComposer } from '../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../common';
 import { useMessageEvent, useNotification, useRoom } from '../../hooks';
+import { Select } from '../../common/Select';
 
 /** Rows per request. The preview and the detail window share one page size, so one response shape
  * serves both and there is never a question of which request a page belongs to. */
@@ -270,7 +271,7 @@ export const WiredChestsTabView: FC<{}> = () => {
                 <div className="bg-white rounded border border-[#b9b3a5] p-2 flex flex-col gap-2">
                     <div className="flex items-center justify-between gap-2">
                         <Text bold>{localizeWithFallback('wiredmenu.chests.room_logs.title', 'Room transaction log')}</Text>
-                        <select
+                        <Select
                             className="rounded border border-[#7f7f7f] bg-[#ece9e1] px-2 py-[2px] text-[11px] text-[#333]"
                             value={filter}
                             onChange={(event) => setFilter(parseInt(event.target.value, 10))}
@@ -280,7 +281,7 @@ export const WiredChestsTabView: FC<{}> = () => {
                                     {localizeWithFallback(option.key, option.fallback)}
                                 </option>
                             ))}
-                        </select>
+                        </Select>
                     </div>
                     {!!onlyChestId && (
                         <div className="flex items-center justify-between gap-2 rounded border border-[#c08a5a] bg-[#f7e6cf] px-2 py-1">

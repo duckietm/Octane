@@ -3,6 +3,7 @@ import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Select } from '../../../../common/Select';
 
 export const WiredActionQuickBopperView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null } = useWired();
@@ -22,10 +23,10 @@ export const WiredActionQuickBopperView: FC<{}> = (props) => {
         <WiredActionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.bopper.action', 'Music action')}</Text>
-                <select className="form-select form-select-sm" value={playOrStop} onChange={(event) => setPlayOrStop(parseInt(event.target.value, 10) || 0)}>
+                <Select className="form-select form-select-sm" value={playOrStop} onChange={(event) => setPlayOrStop(parseInt(event.target.value, 10) || 0)}>
                     <option value={1}>{localizeWithFallback('wiredfurni.params.bopper.play', 'Play')}</option>
                     <option value={0}>{localizeWithFallback('wiredfurni.params.bopper.stop', 'Stop')}</option>
-                </select>
+                </Select>
             </div>
             {playOrStop === 1 && (
                 <div className="flex flex-col gap-1">

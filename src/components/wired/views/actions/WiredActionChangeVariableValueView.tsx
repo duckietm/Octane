@@ -20,6 +20,7 @@ import { WiredActionBaseView } from './WiredActionBaseView';
 import { WiredActionDelaySection } from './WiredActionDelaySection';
 import { localizeWiredVariableOperation, WIRED_VARIABLE_ADVANCED_OPERATIONS, WIRED_VARIABLE_BASIC_OPERATIONS, WIRED_VARIABLE_UNARY_OPERATIONS } from './WiredVariableOperations';
 import { Radio } from '../../../../common/Radio';
+import { Select } from '../../../../common/Select';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -423,7 +424,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
                 <div className="octane-wired__give-var-section">
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.operation')}</div>
-                    <select
+                    <Select
                         className="form-select form-select-sm octane-wired__give-var-select"
                         title={localizeWithFallback('wiredfurni.params.variables.operation.tooltip', '')}
                         value={operation}
@@ -441,7 +442,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                                 </option>
                             ))}
                         </optgroup>
-                    </select>
+                    </Select>
                 </div>
 
                 <div className="octane-wired__divider" />

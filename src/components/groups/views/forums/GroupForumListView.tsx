@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Column, Flex, LayoutBadgeImageView, Text } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
+import { Select } from '../../../../common/Select';
 
 const FORUMS_PER_PAGE = 20;
 
@@ -46,7 +47,7 @@ export const GroupForumListView: FC<GroupForumListViewProps> = (props) => {
             <Flex className="bg-muted p-2 border-b" gap={2} alignItems="center" justifyContent="between">
                 <Text bold>{LocalizeText('messageboard.all.threads.header')}</Text>
                 <Flex gap={1}>
-                    <select
+                    <Select
                         className="form-select form-select-sm"
                         value={listMode}
                         onChange={(e) => {
@@ -56,7 +57,7 @@ export const GroupForumListView: FC<GroupForumListViewProps> = (props) => {
                     >
                         <option value={0}>{LocalizeText('groupforum.list.tab.most_active')}</option>
                         <option value={2}>{LocalizeText('groupforum.list.tab.my_forums')}</option>
-                    </select>
+                    </Select>
                 </Flex>
             </Flex>
             <Column className="overflow-auto flex-1 p-2" gap={1}>

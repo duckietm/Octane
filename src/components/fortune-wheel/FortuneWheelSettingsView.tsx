@@ -4,6 +4,7 @@ import { LocalizeText } from '../../api';
 import { Column, Flex, Text } from '../../common';
 import { useFortuneWheel } from '../../hooks';
 import { OctaneCard } from '../../layout';
+import { Select } from '../../common/Select';
 
 interface EditRow {
     id: number;
@@ -117,7 +118,7 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                     <Column gap={1} overflow="auto" className="grow">
                         {editRows.map((row) => (
                             <Flex key={row.id} alignItems="center" gap={1} className="border-b border-black/10 pb-1">
-                                <select
+                                <Select
                                     value={row.category}
                                     onChange={(event) => updateRow(row.id, { category: event.target.value })}
                                     className="w-28 rounded border border-black/20 bg-white px-1 py-0.5 text-sm text-[#1f2d34]"
@@ -127,7 +128,7 @@ export const FortuneWheelSettingsView: FC<FortuneWheelSettingsViewProps> = ({ on
                                             {LocalizeText(cat.labelKey)}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                                 <input
                                     type="number"
                                     value={row.num}

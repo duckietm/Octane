@@ -14,6 +14,7 @@ import { GetConfigurationValue, SendMessageComposer } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { useMessageEvent } from '../../hooks';
 import { Checkbox } from '../../common/Checkbox';
+import { Select } from '../../common/Select';
 
 interface HotelViewLandingData {
     canEdit: boolean;
@@ -581,12 +582,12 @@ export const HotelView: FC = () => {
                                 {!editingSlot.enabled && <em>Disabled slot</em>}
                             </div>
                             <label className="hotelview-editor-toggle"><Checkbox checked={editingSlot.enabled} onCheckedChange={(nextChecked) => setEditingSlot({ ...editingSlot, enabled: nextChecked })} /><span>Enabled: {editingSlot.enabled ? 'Yes' : 'No'}</span></label>
-                            <label>Widget type<select value={editingSlot.type} onChange={(event) => selectSlotWidgetType(event.target.value as IHotelViewLandingSlot['type'])}>{SLOT_WIDGET_TYPES.map((widget) => <option key={widget.value} value={widget.value}>{widget.label}</option>)}</select></label>
+                            <label>Widget type<Select value={editingSlot.type} onChange={(event) => selectSlotWidgetType(event.target.value as IHotelViewLandingSlot['type'])}>{SLOT_WIDGET_TYPES.map((widget) => <option key={widget.value} value={widget.value}>{widget.label}</option>)}</Select></label>
                             <label>Title<input value={editingSlot.title} onChange={(event) => setEditingSlot({ ...editingSlot, title: event.target.value })} /></label>
                             <label>Body<textarea value={editingSlot.body} onChange={(event) => setEditingSlot({ ...editingSlot, body: event.target.value })} /></label>
                             <label>Image URL<input value={editingSlot.imageUrl} onChange={(event) => setEditingSlot({ ...editingSlot, imageUrl: event.target.value })} /></label>
                             <label>Button<input value={editingSlot.buttonText} onChange={(event) => setEditingSlot({ ...editingSlot, buttonText: event.target.value })} /></label>
-                            <label>Button action<select value={getSelectedAction(editingSlot.link)} onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value === CUSTOM_ACTION ? '' : event.target.value })}><option value={CUSTOM_ACTION}>Custom link</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</select></label>
+                            <label>Button action<Select value={getSelectedAction(editingSlot.link)} onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value === CUSTOM_ACTION ? '' : event.target.value })}><option value={CUSTOM_ACTION}>Custom link</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</Select></label>
                             <label>Custom link<input value={editingSlot.link} placeholder="navigator/goto/123" onChange={(event) => setEditingSlot({ ...editingSlot, link: event.target.value })} /></label>
                             {['catalogpromo', 'catalogpromosmall', 'expiringcatalogpage', 'expiringcatalogpagesmall', 'nextlimitedrarecountdown'].includes(editingSlot.type) && <label>Catalog page name / ID<input value={parseSlotConfig(editingSlot.configJson).catalogPage || ''} placeholder="limited_rares" onChange={(event) => updateEditingConfig((config) => ({ ...config, catalogPage: event.target.value }))} /></label>}
                             {(editingSlot.type === 'expiringcatalogpage' || editingSlot.type === 'expiringcatalogpagesmall') && <label>Featured catalog slot<input type="number" min="1" value={parseSlotConfig(editingSlot.configJson).featuredSlot || ''} placeholder="Optional" onChange={(event) => updateEditingConfig((config) => ({ ...config, featuredSlot: Number(event.target.value) || undefined }))} /></label>}
@@ -618,7 +619,7 @@ export const HotelView: FC = () => {
                             </>}
                             {editingSlot.type !== 'communitygoal' && <>
                                 <label>Secondary button<input value={parseSlotConfig(editingSlot.configJson).secondaryButtonText || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryButtonText: event.target.value }))} /></label>
-                                <label>Secondary action<select value={getSelectedAction(parseSlotConfig(editingSlot.configJson).secondaryLink || '')} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value === CUSTOM_ACTION ? '' : event.target.value }))}><option value={CUSTOM_ACTION}>Custom link</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</select></label>
+                                <label>Secondary action<Select value={getSelectedAction(parseSlotConfig(editingSlot.configJson).secondaryLink || '')} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value === CUSTOM_ACTION ? '' : event.target.value }))}><option value={CUSTOM_ACTION}>Custom link</option>{HOTEL_VIEW_ACTIONS.map((action) => <option key={action.value} value={action.value}>{action.label}</option>)}</Select></label>
                                 <label>Secondary custom link<input value={parseSlotConfig(editingSlot.configJson).secondaryLink || ''} onChange={(event) => updateEditingConfig((config) => ({ ...config, secondaryLink: event.target.value }))} /></label>
                             </>}
                             <footer><button type="button" onClick={() => { setEditingSlot(null); setCountdownInput(''); }}>Cancel</button><button type="submit">Save</button></footer>
@@ -641,7 +642,7 @@ export const HotelView: FC = () => {
                             <label>Right image URL<input value={editingScene.rightUrl} onChange={(event) => setEditingScene({ ...editingScene, rightUrl: event.target.value })} /></label>
                             <label className="hotelview-editor-toggle"><Checkbox checked={editingScene.hallOfFameEnabled} onCheckedChange={(nextChecked) => setEditingScene({ ...editingScene, hallOfFameEnabled: nextChecked })} /><span>Hall of Fame: {editingScene.hallOfFameEnabled ? 'Enabled' : 'Disabled'}</span></label>
                             {editingScene.hallOfFameEnabled && <>
-                                <label>Hall of Fame ranking<select value={editingScene.hallOfFameMode} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameMode: event.target.value })}><option value="latest_registered">Latest registered users</option><option value="online_time">Most online time</option><option value="achievement_score">Highest achievement score</option><option value="currency">Highest currency balance</option></select></label>
+                                <label>Hall of Fame ranking<Select value={editingScene.hallOfFameMode} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameMode: event.target.value })}><option value="latest_registered">Latest registered users</option><option value="online_time">Most online time</option><option value="achievement_score">Highest achievement score</option><option value="currency">Highest currency balance</option></Select></label>
                                 {editingScene.hallOfFameMode === 'currency' && <label>Currency type<input type="number" min="0" value={editingScene.hallOfFameCurrencyType} onChange={(event) => setEditingScene({ ...editingScene, hallOfFameCurrencyType: Math.max(0, Number(event.target.value) || 0) })} /></label>}
                             </>}
                             <footer><button type="button" onClick={() => setEditingScene(null)}>Cancel</button><button type="submit">Save</button></footer>

@@ -11,6 +11,7 @@ import {
 } from '../../../../api';
 import { Text } from '../../../../common';
 import { WiredArrayValueField } from './WiredArrayValueField';
+import { Select } from '../../../../common/Select';
 
 interface WiredArrayCriteriaEditorProps {
     criteria: IWiredArrayCriterion[];
@@ -39,7 +40,7 @@ export const WiredArrayCriteriaEditor: FC<WiredArrayCriteriaEditorProps> = (prop
                     <div className="flex gap-2 items-end">
                         <div className="flex flex-col gap-1">
                             <Text small>{localizeWithFallback('wiredfurni.params.arrays.criteria.field', 'Field')}</Text>
-                            <select
+                            <Select
                                 className="form-select form-select-sm"
                                 value={criterion.fieldId}
                                 onChange={(event) => replace(index, { ...criterion, fieldId: parseInt(event.target.value, 10) })}
@@ -49,11 +50,11 @@ export const WiredArrayCriteriaEditor: FC<WiredArrayCriteriaEditorProps> = (prop
                                         {field.name || localizeWithFallback('wiredfurni.params.arrays.criteria.value', 'Value')}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                         <div className="flex flex-col gap-1">
                             <Text small>{localizeWithFallback('wiredfurni.params.arrays.criteria.comparison', 'Is')}</Text>
-                            <select
+                            <Select
                                 className="form-select form-select-sm"
                                 value={criterion.comparison}
                                 onChange={(event) => replace(index, { ...criterion, comparison: parseInt(event.target.value, 10) })}
@@ -63,7 +64,7 @@ export const WiredArrayCriteriaEditor: FC<WiredArrayCriteriaEditorProps> = (prop
                                         {wiredArrayComparisonSymbol(comparison)}
                                     </option>
                                 ))}
-                            </select>
+                            </Select>
                         </div>
                         <button className="btn btn-sm btn-danger" type="button" onClick={() => onChange(criteria.filter((_, position) => position !== index))}>
                             {localizeWithFallback('wiredfurni.params.arrays.criteria.remove', 'Remove')}

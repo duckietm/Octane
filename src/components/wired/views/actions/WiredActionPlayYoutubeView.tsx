@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { Select } from '../../../../common/Select';
 
 const PLAYBACK_OPTIONS = [
     { value: 1, key: 'wiredfurni.params.youtube.play', label: 'Play video' },
@@ -36,7 +37,7 @@ export const WiredActionPlayYoutubeView: FC<{}> = (props) => {
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>Action</Text>
-                <select
+                <Select
                     className="form-select form-select-sm"
                     value={autoStart}
                     onChange={(event) => setAutoStart(parseInt(event.target.value, 10) === 0 ? 0 : 1)}
@@ -46,7 +47,7 @@ export const WiredActionPlayYoutubeView: FC<{}> = (props) => {
                             {localizeWithFallback(option.key, option.label)}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
         </WiredActionBaseView>
     );

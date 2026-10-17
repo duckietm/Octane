@@ -37,6 +37,7 @@ import {
 } from '../../../common';
 import { useMessageEvent, useNotification } from '../../../hooks';
 import { classNames } from '../../../layout';
+import { Select } from '../../../common/Select';
 
 export const GroupMembersView: FC<{}> = (props) => {
     const [groupId, setGroupId] = useState<number>(-1);
@@ -259,12 +260,12 @@ export const GroupMembersView: FC<{}> = (props) => {
                             value={searchQuery}
                             onChange={(event) => setSearchQuery(event.target.value)}
                         />
-                        <select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
+                        <Select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
                             <option value="0">{LocalizeText('group.members.search.all')}</option>
                             <option value="1">{LocalizeText('group.members.search.admins')}</option>
                             {membersData.admin && <option value="2">{LocalizeText('group.members.search.pending')}</option>}
                             {membersData.admin && blockingEnabled && <option value="3">{localizeWithFallback('group.members.search.blocked', 'Show blocked users')}</option>}
-                        </select>
+                        </Select>
                     </Column>
                 </div>
                 <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
