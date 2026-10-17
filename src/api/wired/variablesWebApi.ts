@@ -346,7 +346,7 @@ export const createVariablesWebApiClient = (options: VariablesWebApiClientOption
             throw new VariablesWebApiError(response.status, code, code, retryAfter);
         }
 
-        if (response.status === 204) return undefined as T;
+        if (response.status === 204) return undefined;
 
         try {
             return (await response.json()) as T;

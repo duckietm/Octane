@@ -64,7 +64,7 @@ export const getViewfinderRoomFrame = (target: HTMLCanvasElement | null, width?:
     {
         const master = GetRoomEngine()?.getActiveRoomInstanceRenderingCanvas?.()?.master;
         const renderer = GetRenderer();
-        const source = renderer?.canvas as HTMLCanvasElement | undefined;
+        const source = renderer?.canvas;
 
         if(!master || !source) return null;
 

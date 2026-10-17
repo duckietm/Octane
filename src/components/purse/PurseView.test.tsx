@@ -69,7 +69,7 @@ describe('PurseView', () => {
         const settingsButton = container.querySelector('.octane-purse__btn--settings');
         expect(settingsButton).toBeTruthy();
 
-        fireEvent.click(settingsButton!);
+        fireEvent.click(settingsButton);
 
         const settingsMenu = container.querySelector('.octane-purse-menu');
         expect(settingsMenu).toBeTruthy();

@@ -90,7 +90,7 @@ const loadPetConfig = async (): Promise<DerivedPetConfig | null> => {
 
         const text = await response.text();
         const parsed = parseJsonDocument(text, resolveJsonMode(), url) as { pets?: unknown } | unknown[];
-        const list = Array.isArray(parsed) ? parsed : (parsed as { pets?: unknown })?.pets;
+        const list = Array.isArray(parsed) ? parsed : (parsed)?.pets;
         const derived = derivePetConfig(list as PetDefinition[]);
 
         setBootDebug(derived ? 'boot: pet config loaded' : 'boot: pets.json empty, using config pet.types');

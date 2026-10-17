@@ -102,7 +102,7 @@ describe('navigator filter shapes (smoke)', () => {
     });
 
     it('persists AIR category collapse independently for each result block', () => {
-        useNavigatorUiStore.setState({ collapsedResultCodes: [] } as any);
+        useNavigatorUiStore.setState({ collapsedResultCodes: [] });
         const store = useNavigatorUiStore.getState() as any;
 
         expect(typeof store.toggleResultCollapsed).toBe('function');
@@ -114,7 +114,7 @@ describe('navigator filter shapes (smoke)', () => {
     });
 
     it('persists a list or tile mode for each AIR result block', () => {
-        useNavigatorUiStore.setState({ resultViewModes: {} } as any);
+        useNavigatorUiStore.setState({ resultViewModes: {} });
         const store = useNavigatorUiStore.getState() as any;
 
         expect(typeof store.setResultViewMode).toBe('function');

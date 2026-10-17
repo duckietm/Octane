@@ -21,7 +21,7 @@ const liveNode = (pageId: number, parent: ICatalogNode | null = null): ICatalogN
     iconId: 0,
     children: [],
     offerIds: [],
-    parent: parent as ICatalogNode,
+    parent: parent,
     isVisible: true,
     isActive: false,
     isOpen: false

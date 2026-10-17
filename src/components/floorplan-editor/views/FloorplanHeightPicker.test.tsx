@@ -21,7 +21,7 @@ const stubTrackGeometry = (top = 0) => {
                 x: 0,
                 y: top,
                 toJSON: () => ''
-            } as DOMRect;
+            };
         }
 
         return original.call(this);

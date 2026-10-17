@@ -25,7 +25,7 @@ const buildAvatarInfoUser = (overrides: Partial<AvatarInfoUser> = {}): AvatarInf
 
 describe('applyUserBadgesUpdate', () => {
     it('returns the same reference when state is not an AvatarInfoUser', () => {
-        const state: IAvatarInfo = { type: 'NOT_USER' } as IAvatarInfo;
+        const state: IAvatarInfo = { type: 'NOT_USER' };
         const event = { userId: 42, badges: ['a'] } as any;
 
         expect(applyUserBadgesUpdate(state, event)).toBe(state);
@@ -67,7 +67,7 @@ describe('applyUserBadgesUpdate', () => {
 
 describe('applyUserFigureUpdate', () => {
     it('returns the same reference when state is not an AvatarInfoUser', () => {
-        const state: IAvatarInfo = { type: 'NOT_USER' } as IAvatarInfo;
+        const state: IAvatarInfo = { type: 'NOT_USER' };
         const event = { roomIndex: 5, figure: 'hr-100' } as any;
 
         expect(applyUserFigureUpdate(state, event)).toBe(state);
@@ -146,7 +146,7 @@ describe('applyFavouriteGroupUpdate', () => {
     const resolveGroupBadge = (groupId: number) => `badge-${groupId}`;
 
     it('returns the same reference when state is not an AvatarInfoUser', () => {
-        const state: IAvatarInfo = { type: 'NOT_USER' } as IAvatarInfo;
+        const state: IAvatarInfo = { type: 'NOT_USER' };
         const event = { roomIndex: 5, status: 1, habboGroupId: 42, habboGroupName: 'Cool Group' } as any;
 
         expect(applyFavouriteGroupUpdate(state, event, resolveGroupBadge)).toBe(state);

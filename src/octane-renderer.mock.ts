@@ -689,7 +689,7 @@ const _msgEventWrappers = new WeakMap<MessageEvent, (ev: any) => void>();
 export const GetCommunication = vi.fn(() => ({
     registerMessageEvent(event: MessageEvent) {
         if (!event.callBack) return;
-        const wrapper = (ev: any) => event.callBack!(ev);
+        const wrapper = (ev: any) => event.callBack(ev);
         _msgEventWrappers.set(event, wrapper);
         let bucket = msgListeners.get(event.type);
         if (!bucket) {

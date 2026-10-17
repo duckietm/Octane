@@ -76,7 +76,7 @@ describe('AIR navigator result blocks', () => {
     });
 
     it('keeps a server-closed AIR category closed until the user explicitly expands it', () => {
-        useNavigatorUiStore.setState({ collapsedResultCodes: [], expandedResultCodes: [] } as any);
+        useNavigatorUiStore.setState({ collapsedResultCodes: [], expandedResultCodes: [] });
 
         render(<NavigatorSearchResultView searchResult={{ ...result, closed: true }} />);
 

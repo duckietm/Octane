@@ -60,7 +60,7 @@ describe('Friends list avatar head', () => {
         expect(avatar).toHaveClass('compact-head');
         expect(avatar).toHaveStyle({
             backgroundSize: '20px 20px',
-            backgroundPosition: 'center',
+            backgroundPosition: '50% 50%',
             imageRendering: 'auto'
         });
     });

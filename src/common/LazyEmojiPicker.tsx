@@ -13,7 +13,7 @@ type EmojiPickerProps = Record<string, unknown>;
 const PickerWithData = lazy(async () => {
     const [dataModule, pickerModule] = await Promise.all([import('@emoji-mart/data'), import('@emoji-mart/react')]);
 
-    const data = (dataModule as { default: unknown }).default;
+    const data = (dataModule).default;
     const Picker = (pickerModule as { default: ComponentType<EmojiPickerProps> }).default;
 
     const Wrapped: ComponentType<EmojiPickerProps> = (props) => <Picker data={data} {...props} />;

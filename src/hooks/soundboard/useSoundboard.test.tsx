@@ -107,7 +107,7 @@ describe('useSoundboardState', () => {
         act(() => result.current.play({ id: 7 } as any));
 
         expect(mocks.sendMessage).toHaveBeenCalledTimes(2);
-        expect((mocks.sendMessage.mock.calls[1][0] as any).id).toBe(7);
+        expect((mocks.sendMessage.mock.calls[1][0]).id).toBe(7);
     });
 
     describe('the room mode', () => {
@@ -135,7 +135,7 @@ describe('useSoundboardState', () => {
             act(() => result.current.setRoomMode(2));
 
             expect(result.current.roomMode).toBe(2);
-            expect((mocks.sendMessage.mock.calls[0][0] as any).mode).toBe(2);
+            expect((mocks.sendMessage.mock.calls[0][0]).mode).toBe(2);
         });
 
         it('tells the player when somebody else changes it, but not on the first packet or on their own change', () => {

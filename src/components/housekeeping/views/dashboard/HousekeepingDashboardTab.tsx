@@ -239,7 +239,7 @@ export const HousekeepingDashboardTab: FC = () => {
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && canSendAlert) {
                                         e.preventDefault();
-                                        onSubmitAlert(e as unknown as FormEvent);
+                                        onSubmitAlert(e);
                                     }
                                 }}
                                 placeholder={LocalizeText('housekeeping.hotel.alert.placeholder')}

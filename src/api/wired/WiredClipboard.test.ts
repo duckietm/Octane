@@ -56,7 +56,7 @@ import { ConditionDefinition, TriggerDefinition, WiredActionDefinition } from '@
 import { pasteTriggerableData, resetTriggerableData, wiredClipboardKeyOf, withTriggerableData } from './WiredClipboard';
 
 const action = (code: number) => {
-    const box = new (WiredActionDefinition as any)() as any;
+    const box = new (WiredActionDefinition as any)();
     box._id = 77;
     box._type = code;
     box._intParams = [5, 200];
@@ -70,10 +70,10 @@ const action = (code: number) => {
 describe('WiredClipboard', () => {
     it('keys a slot by holder and code', () => {
         expect(wiredClipboardKeyOf(action(7))).toBe('action:7');
-        const trigger = new (TriggerDefinition as any)() as any;
+        const trigger = new (TriggerDefinition as any)();
         trigger._triggerConf = 4;
         expect(wiredClipboardKeyOf(trigger)).toBe('trigger:4');
-        const condition = new (ConditionDefinition as any)() as any;
+        const condition = new (ConditionDefinition as any)();
         condition._type = 9;
         expect(wiredClipboardKeyOf(condition)).toBe('condition:9');
     });

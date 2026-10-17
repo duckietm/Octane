@@ -284,14 +284,14 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = (props) => {
             {canGlow && (glowRun > 0 || glowBreathing) && (
                 <span key={glowBreathing ? 'breathing' : glowRun} className="badge-glow" aria-hidden="true">
                     {/* Breathing touches only the outline: the badge pixels stay as they are. */}
-                    <span className={`badge-glow-run${glowBreathing ? ' badge-glow-run--outline' : ''}`} style={{ ...glowAnimation, backgroundImage: getStyle.backgroundImage as string }} />
+                    <span className={`badge-glow-run${glowBreathing ? ' badge-glow-run--outline' : ''}`} style={{ ...glowAnimation, backgroundImage: getStyle.backgroundImage }} />
                     {!glowBreathing && (
                         <span
                             className="badge-glow-tint"
                             style={{
                                 ...glowAnimation,
-                                maskImage: getStyle.backgroundImage as string,
-                                WebkitMaskImage: getStyle.backgroundImage as string
+                                maskImage: getStyle.backgroundImage,
+                                WebkitMaskImage: getStyle.backgroundImage
                             }}
                         />
                     )}

@@ -132,7 +132,7 @@ describe('LayoutRoomPreviewerView interactions', () => {
         const roomPreviewer = createRoomPreviewer();
         const view = renderPreview(roomPreviewer, 200);
 
-        fireEvent.click(view.container.querySelector('.shadow-room-previewer')!);
+        fireEvent.click(view.container.querySelector('.shadow-room-previewer'));
 
         expect(roomPreviewer.changeRoomObjectState).toHaveBeenCalledOnce();
     });
@@ -141,7 +141,7 @@ describe('LayoutRoomPreviewerView interactions', () => {
         const roomPreviewer = createRoomPreviewer();
         const view = renderPreview(roomPreviewer, 200);
 
-        fireEvent.click(view.container.querySelector('.shadow-room-previewer')!, { shiftKey: true });
+        fireEvent.click(view.container.querySelector('.shadow-room-previewer'), { shiftKey: true });
 
         expect(roomPreviewer.changeRoomObjectDirection).not.toHaveBeenCalled();
         expect(roomPreviewer.changeRoomObjectState).toHaveBeenCalledOnce();
@@ -151,7 +151,7 @@ describe('LayoutRoomPreviewerView interactions', () => {
         const roomPreviewer = createRoomPreviewer();
         const view = renderPreview(roomPreviewer, 200);
 
-        fireEvent.click(view.container.querySelector('.shadow-room-previewer')!);
+        fireEvent.click(view.container.querySelector('.shadow-room-previewer'));
 
         expect(roomPreviewer.cycleAvatarAction).not.toHaveBeenCalled();
         expect(roomPreviewer.changeRoomObjectState).toHaveBeenCalledOnce();

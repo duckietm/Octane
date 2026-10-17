@@ -26,7 +26,7 @@ describe('LoginModal', () => {
     it('closes when the overlay itself is clicked', () => {
         const { onClose, dialog } = renderModal();
 
-        fireEvent.click(dialog.parentElement!);
+        fireEvent.click(dialog.parentElement);
 
         expect(onClose).toHaveBeenCalledOnce();
     });

@@ -63,7 +63,7 @@ beforeEach(() => {
     vi.clearAllMocks();
     badgeCodes = ['ALPHA', 'BETA', 'GAMMA'];
     purchaseOptions = { extraData: null, extraParamRequired: false, previewStuffData: null };
-    vi.mocked(GetConfigurationValue).mockReturnValue('GAMMA' as any);
+    vi.mocked(GetConfigurationValue).mockReturnValue('GAMMA');
     vi.mocked(useCatalogData).mockReturnValue({ currentOffer: { offerId: 10 } } as any);
     vi.mocked(useCatalogUiState).mockReturnValue({ setPurchaseOptions } as any);
     vi.mocked(useInventoryBadges).mockImplementation(

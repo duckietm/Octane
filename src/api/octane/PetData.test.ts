@@ -23,8 +23,8 @@ describe('derivePetConfig', () => {
         ]);
 
         expect(derived).not.toBeNull();
-        expect(derived!['pet.types']).toEqual(['dog', '', 'croco']);
-        expect(derived!['pet.data']).toEqual({
+        expect(derived['pet.types']).toEqual(['dog', '', 'croco']);
+        expect(derived['pet.data']).toEqual({
             0: { name: 'Dog', description: 'woof' },
             2: { name: 'Crocodile', description: '' }
         });
@@ -32,7 +32,7 @@ describe('derivePetConfig', () => {
 
     it('returns null on empty or invalid input so the static pet.types config survives', () => {
         expect(derivePetConfig([])).toBeNull();
-        expect(derivePetConfig(null as unknown as [])).toBeNull();
+        expect(derivePetConfig(null)).toBeNull();
     });
 });
 

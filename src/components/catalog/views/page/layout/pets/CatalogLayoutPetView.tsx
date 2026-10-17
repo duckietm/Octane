@@ -47,7 +47,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
     activePageIdRef.current = page?.pageId ?? -1;
     const { currentOffer = null } = useCatalogData();
     const { setCurrentOffer = null } = useCatalogUiState();
-    const breed = (currentOffer?.product?.productData?.type as unknown as string) ?? '';
+    const breed = (currentOffer?.product?.productData?.type) ?? '';
     const { data: petPalette = null } = useSellablePetPalette(breed);
     const legacyPet = isLegacyPetType(petIndex);
     const clubLevel = useUserDataSnapshot().clubLevel;
@@ -97,7 +97,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
 
         void petAssetRefreshKey;
 
-        let palettes: PetPaletteLike[] = sellablePalettes as unknown as PetPaletteLike[];
+        let palettes: PetPaletteLike[] = sellablePalettes;
 
         if (!palettes.length) {
             const derived: PetPaletteLike[] = [];
@@ -120,7 +120,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = ({ page = null }) =>
     );
 
     const legacyColors = useMemo(
-        () => (legacyPet ? GetPetAvailableColors(petIndex, sellablePalettes as SellablePetPaletteData[]) : []),
+        () => (legacyPet ? GetPetAvailableColors(petIndex, sellablePalettes) : []),
         [legacyPet, petIndex, sellablePalettes]
     );
 

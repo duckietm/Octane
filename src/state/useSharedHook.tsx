@@ -50,9 +50,9 @@ const createSharedHookResource = <T,>(useSourceHook: SourceHook<T>): SharedHookR
         ready: false,
         readyPromise,
         request: () => {
-            if (requestedResources.has(resource as SharedHookResource<unknown>)) return;
+            if (requestedResources.has(resource)) return;
 
-            requestedResources.add(resource as SharedHookResource<unknown>);
+            requestedResources.add(resource);
             queueRegistryChange();
         },
         store
@@ -78,11 +78,11 @@ const createSharedHookResource = <T,>(useSourceHook: SourceHook<T>): SharedHookR
 };
 
 const getSharedHookResource = <T,>(useSourceHook: SourceHook<T>): SharedHookResource<T> => {
-    let resource = resources.get(useSourceHook as SourceHook<unknown>) as SharedHookResource<T>;
+    let resource = resources.get(useSourceHook) as SharedHookResource<T>;
 
     if (!resource) {
         resource = createSharedHookResource(useSourceHook);
-        resources.set(useSourceHook as SourceHook<unknown>, resource as SharedHookResource<unknown>);
+        resources.set(useSourceHook, resource);
     }
 
     return resource;

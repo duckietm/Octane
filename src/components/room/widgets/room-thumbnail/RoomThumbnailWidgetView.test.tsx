@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
     saveTextureAsScreenshot: vi.fn(() => Promise.resolve()),
     sendMessageComposer: vi.fn(),
     simpleAlert: vi.fn(),
-    uiHandler: null as null | ((event: { type: string }) => void)
+    uiHandler: null
 }));
 
 vi.mock('@octane/renderer', async () => {

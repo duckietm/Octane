@@ -43,7 +43,7 @@ for (const key of [ 'localStorage', 'sessionStorage' ] as const) {
             return entries.size;
         },
         clear: () => entries.clear(),
-        getItem: (name: string) => (entries.has(String(name)) ? entries.get(String(name)) as string : null),
+        getItem: (name: string) => (entries.has(String(name)) ? entries.get(String(name)) : null),
         key: (index: number) => Array.from(entries.keys())[index] ?? null,
         removeItem: (name: string) => entries.delete(String(name)) as unknown as void,
         setItem: (name: string, value: string) => {

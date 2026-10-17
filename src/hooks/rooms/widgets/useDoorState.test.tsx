@@ -25,7 +25,7 @@ const renderDoorStateHook = async () => {
 
 const makeParserlessEvent = (klass: any, parser: any) => {
     const ev = new klass();
-    (ev as any).getParser = () => parser;
+    (ev).getParser = () => parser;
     return ev;
 };
 

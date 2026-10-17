@@ -20,6 +20,6 @@ describe('resolveLocalized', () => {
 
     it('returns the fallback for empty / null text', () => {
         expect(resolveLocalized('', 'some.key', 'FB')).toBe('FB');
-        expect(resolveLocalized(null as unknown as string, 'some.key', 'FB')).toBe('FB');
+        expect(resolveLocalized(null, 'some.key', 'FB')).toBe('FB');
     });
 });

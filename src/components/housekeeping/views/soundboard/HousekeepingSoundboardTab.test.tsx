@@ -11,8 +11,8 @@ const mocks = vi.hoisted(() => ({
     request: vi.fn(),
     upsert: vi.fn(),
     reorder: vi.fn(),
-    lastResult: null as { operation: number; resultCode: number; soundId: number } | null,
-    pendingOperation: null as number | null,
+    lastResult: null,
+    pendingOperation: null,
     sounds: [
         { id: 7, name: 'Campanella', url: '/bell.mp3', enabled: true, sortOrder: 10, minRank: 1, cooldownSeconds: 0 },
         { id: 12, name: 'Applauso', url: '/clap.mp3', enabled: false, sortOrder: 20, minRank: 5, cooldownSeconds: 0 }

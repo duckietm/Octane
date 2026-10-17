@@ -130,9 +130,9 @@ export const CatalogAdminPageEditView: FC<{}> = () => {
     const [translateTargetLanguage, setTranslateTargetLanguage] = useState('en');
     const [isTranslating, setIsTranslating] = useState(false);
     const [translateError, setTranslateError] = useState<string | null>(null);
-    const initializationClaimRef = useRef({ current: null as string | null });
-    const detailsClaimRef = useRef({ current: null as string | null });
-    const requestClaimRef = useRef({ current: null as string | null });
+    const initializationClaimRef = useRef({ current: null });
+    const detailsClaimRef = useRef({ current: null });
+    const requestClaimRef = useRef({ current: null });
     const captionInputRef = useRef<HTMLInputElement>(null);
     const { supportedLanguages = [], languagesLoading = false } = useTranslationState();
     const { translateText, ensureSupportedLanguagesLoaded } = useTranslationActions();

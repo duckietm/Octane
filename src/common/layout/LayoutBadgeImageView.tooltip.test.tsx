@@ -35,7 +35,7 @@ describe('badge tooltip', () => {
     it('shows the badge name and description in the skinned bubble on hover', () => {
         const { container } = render(<LayoutBadgeImageView badgeCode="ACH_BasicClub1" showInfo />);
 
-        fireEvent.mouseEnter(container.firstElementChild as HTMLElement);
+        fireEvent.mouseEnter(container.firstElementChild);
 
         act(() => {
             vi.advanceTimersByTime(250);
@@ -46,14 +46,14 @@ describe('badge tooltip', () => {
         expect(bubble).toHaveTextContent('Name of ACH_BasicClub1');
         expect(bubble).toHaveTextContent('Description of ACH_BasicClub1');
 
-        fireEvent.mouseLeave(container.firstElementChild as HTMLElement);
+        fireEvent.mouseLeave(container.firstElementChild);
         expect(screen.queryByRole('tooltip')).toBeNull();
     });
 
     it('stays silent without showInfo', () => {
         const { container } = render(<LayoutBadgeImageView badgeCode="ACH_BasicClub1" />);
 
-        fireEvent.mouseEnter(container.firstElementChild as HTMLElement);
+        fireEvent.mouseEnter(container.firstElementChild);
 
         act(() => {
             vi.advanceTimersByTime(250);

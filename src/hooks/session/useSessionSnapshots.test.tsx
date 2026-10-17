@@ -28,7 +28,7 @@ const makeFakeDispatcher = () => {
                 listeners.set(type, bucket);
             }
             bucket.add(cb);
-            return () => bucket!.delete(cb);
+            return () => bucket.delete(cb);
         },
         dispatch(type: string): void {
             listeners.get(type)?.forEach((cb) => cb());

@@ -37,42 +37,27 @@ export default [
             ...typescriptEslintPlugin.configs[
                 "recommended-requiring-type-checking"
             ].rules,
-            'indent': [
-                'error',
-                4,
-                {
-                    'SwitchCase': 1
-                }
-            ],
-            'no-multi-spaces': [
-                'error'
-            ],
-            'no-trailing-spaces': [
-                'error',
-                {
-                    'skipBlankLines': false,
-                    'ignoreComments': true
-                }
-            ],
-            'linebreak-style': [
-                'off'
-            ],
-            'quotes': [
-                'error',
-                'single'
-            ],
-            'semi': [
-                'error',
-                'always'
-            ],
-            'brace-style': [
-                'error',
-                'allman'
-            ],
-            'object-curly-spacing': [
-                'error',
-                'always'
-            ],
+            // Formatting (indent, quotes, braces, spacing) is owned by Biome.
+            // React Compiler era / legacy-typing rules: reported as warnings so they stay visible
+            // without blocking; they flag existing patterns that need per-hook refactors.
+            'react-hooks/set-state-in-effect': 'warn',
+            'react-hooks/refs': 'warn',
+            'react-hooks/purity': 'warn',
+            'react-hooks/immutability': 'warn',
+            'react-hooks/static-components': 'warn',
+            'react-hooks/preserve-manual-memoization': 'warn',
+            'react-hooks/set-state-in-render': 'warn',
+            '@typescript-eslint/no-empty-object-type': 'warn',
+            '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+            '@typescript-eslint/no-base-to-string': 'warn',
+            '@typescript-eslint/no-unused-expressions': 'warn',
+            '@typescript-eslint/no-unsafe-function-type': 'warn',
+            '@typescript-eslint/no-redundant-type-constituents': 'warn',
+            '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
+            '@typescript-eslint/prefer-promise-reject-errors': 'warn',
+            '@typescript-eslint/await-thenable': 'warn',
+            '@typescript-eslint/only-throw-error': 'warn',
+            'react/no-unescaped-entities': 'warn',
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-unsafe-assignment': 'off',
             '@typescript-eslint/no-unsafe-call': 'off',

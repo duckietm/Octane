@@ -72,7 +72,7 @@ export const resolveSanctionTemplates = (configured: unknown): HousekeepingSanct
 
         const entry = raw as Partial<HousekeepingSanctionTemplate>;
         const id = typeof entry.id === 'string' ? entry.id.trim() : '';
-        const type = entry.type as HousekeepingSanctionType;
+        const type = entry.type;
         const duration = Number(entry.durationValue);
 
         if (!id || seen.has(id) || !SANCTION_TYPES.has(type) || !Number.isInteger(duration)) continue;

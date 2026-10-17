@@ -201,7 +201,7 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
             figure: session.figure || '',
             score: 0,
             rank: 0
-        } as BadgeLeaderboardEntry;
+        };
     }, [currentPage?.board?.viewerEntry, leaderboard?.viewerUserId]);
     const rankedEntries = useMemo(() => {
         if (!allEntries.length) return [];

@@ -54,8 +54,8 @@ describe('mentions requests', () => {
     it('marks one mention read here and on the server, once', () => {
         setMentions([make(1), make(2)]);
 
-        markMentionRead(getMentionsSnapshot().find((mention) => mention.mentionId === 1)!);
-        markMentionRead(getMentionsSnapshot().find((mention) => mention.mentionId === 1)!);
+        markMentionRead(getMentionsSnapshot().find((mention) => mention.mentionId === 1));
+        markMentionRead(getMentionsSnapshot().find((mention) => mention.mentionId === 1));
 
         expect(sent).toHaveLength(1);
         expect(getUnreadCount()).toBe(1);

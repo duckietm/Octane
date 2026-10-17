@@ -21,7 +21,7 @@ const CLUB_GIFTS_KEY = ['octane', 'catalog', 'clubGifts'] as const;
  */
 export const useClubGifts = (options: { enabled?: boolean } = {}): UseQueryResult<ClubGiftInfoParser> => {
     const query = useOctaneQuery<ClubGiftInfoEvent, ClubGiftInfoParser>({
-        key: CLUB_GIFTS_KEY as unknown as string[],
+        key: CLUB_GIFTS_KEY,
         request: () => new GetClubGiftInfo(),
         parser: ClubGiftInfoEvent,
         select: (event) => event.getParser(),
@@ -29,7 +29,7 @@ export const useClubGifts = (options: { enabled?: boolean } = {}): UseQueryResul
         staleTime: Infinity
     });
 
-    useOctaneEventInvalidator<ClubGiftInfoEvent>(ClubGiftInfoEvent, CLUB_GIFTS_KEY as unknown as string[]);
+    useOctaneEventInvalidator<ClubGiftInfoEvent>(ClubGiftInfoEvent, CLUB_GIFTS_KEY);
 
     return query;
 };

@@ -292,7 +292,7 @@ describe('SnowWarSimulation', () =>
         sim.update(clock);
         expect(sim.subturnCount).toBe(1);
         expect(sim.snowballs.has(99)).toBe(true);
-        const presentedPositions = [sim.snowballs.get(99)!.locH];
+        const presentedPositions = [sim.snowballs.get(99).locH];
 
         sim.queueGameStatus(Array.from({ length: 30 }, () => []));
         expect(sim.subturnCount).toBe(1);
@@ -302,7 +302,7 @@ describe('SnowWarSimulation', () =>
         sim.update(clock);
         expect(sim.subturnCount).toBe(2);
         expect(sim.snowballs.has(99)).toBe(true);
-        presentedPositions.push(sim.snowballs.get(99)!.locH);
+        presentedPositions.push(sim.snowballs.get(99).locH);
 
         // Subturns 0..9 each leave a projectile state for React to paint.
         // Subturn 10 is the authoritative impact/delete event.

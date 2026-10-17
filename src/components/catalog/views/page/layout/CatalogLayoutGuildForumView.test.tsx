@@ -85,7 +85,7 @@ describe('guild forum page', () => {
     });
 
     it('offers nothing to buy without a selectable guild', () => {
-        vi.mocked(useUserGroups).mockReturnValue({ data: [] } as any);
+        vi.mocked(useUserGroups).mockReturnValue({ data: [] });
         selectGroup(null);
         renderView();
 

@@ -124,7 +124,7 @@ export const holderInfoLines = (target: ExplorerHolderTarget, profile: WebApiPro
     const name = profile?.name || localName || ('username' in target ? target.username : '');
 
     return [
-        `User type: ${targetKindLabel(target.kind as WebApiUserTargetKind)}`,
+        `User type: ${targetKindLabel(target.kind)}`,
         ...(name ? [`Name: ${name}`] : []),
         ...(localOwner ? [`Owner: ${localOwner}`] : []),
         `${target.kind === 'pets' ? 'Pet' : target.kind === 'bots' ? 'Bot' : 'User'} id: ${idText}`

@@ -62,7 +62,7 @@ describe('catalog purchase confirmation', () => {
                 uniqueLimitedItemsLeft: 7,
                 uniqueLimitedItemSeriesSize: 100
             }
-        } as any;
+        };
 
         render(<CatalogPurchaseConfirmView offer={limitedOffer} quantity={1} onCancel={() => undefined} onConfirm={() => undefined} />);
 

@@ -15,7 +15,7 @@ const mocks = vi.hoisted(() => ({
         setAllowsFurni: vi.fn(),
         saveWired: vi.fn(),
         saveWiredAndKeepOpen: vi.fn(),
-        clipboardEntry: null as unknown,
+        clipboardEntry: null,
         copyWiredToClipboard: vi.fn(),
         pasteWiredFromClipboard: vi.fn(),
         resetWiredToDefault: vi.fn(),
