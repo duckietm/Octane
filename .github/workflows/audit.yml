@@ -1,0 +1,45 @@
+name: Audit
+
+# Fails when yarn npm audit reports an advisory of high severity or above, in a dependency or in the
+# tooling. It is its own workflow, not a step of CI, so a new advisory in a transitive package does not
+# turn every unrelated pull request red: it runs when the dependencies change, every Monday, and on demand.
+on:
+  pull_request:
+    branches: [ Dev, main ]
+    paths:
+      - package.json
+      - yarn.lock
+      - .yarnrc.yml
+  schedule:
+    - cron: "41 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: yarn npm audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      # The audit reads the lockfile; nothing is installed.
+      - name: Audit
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        run: corepack yarn npm audit --all --recursive --severity high

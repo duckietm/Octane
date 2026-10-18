@@ -1,0 +1,35 @@
+version: 2
+updates:
+  # Compatible updates (minor and patch) arrive as one weekly pull request; a major version is not
+  # proposed, it is a decision. Dependabot waits three days after a release, like .yarnrc.yml.
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "Dev"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 3
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "Dev"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "ci"
+    commit-message:
+      prefix: "ci"
