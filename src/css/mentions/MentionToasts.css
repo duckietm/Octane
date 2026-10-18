@@ -73,7 +73,7 @@
     min-height: 0;
     padding: 0;
     border: 0 !important;
-    border-image: none !important;
+    border-image-source: none !important;
     background: transparent !important;
     color: #ffffff !important;
     font-family: Ubuntu, sans-serif;

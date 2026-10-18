@@ -6,9 +6,9 @@ import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_
 import userVariableIcon from '../../../../assets/images/wired/var/icon_source_user.png';
 import { Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
-import { OctaneInput } from '../../../../layout';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { CLICKED_USER_SOURCE, FURNI_SOURCES, sortWiredSourceOptions, USER_SOURCES, useAvailableUserSources, WiredSourceOption } from '../WiredSourcesSelector';
+import { isWiredSameHolderEligible, WiredValueOrVariableInput } from '../WiredValueOrVariableInput';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import {
     buildWiredVariablePickerEntries,
@@ -42,6 +42,8 @@ const SOURCE_TRIGGER = 0;
 const SOURCE_SELECTED = 100;
 const SOURCE_SECONDARY_SELECTED = 101;
 
+const REFERENCE_TARGETS: VariableTargetType[] = ['furni', 'user', 'global', 'context'];
+
 const TARGET_BUTTONS: Array<{ key: VariableTargetType; icon: string; disabled?: boolean }> = [
     { key: 'furni', icon: furniVariableIcon },
     { key: 'user', icon: userVariableIcon },
@@ -60,7 +62,7 @@ const SECONDARY_FURNI_SOURCES: WiredSourceOption[] = sortWiredSourceOptions(
 );
 
 const GLOBAL_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.global' }];
-const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.context.current' }];
+const CONTEXT_SOURCE_OPTIONS: WiredSourceOption[] = [{ value: SOURCE_TRIGGER, label: 'wiredfurni.params.sources.context' }];
 
 const parseIds = (value: string): number[] => {
     if (!value?.length) return [];
@@ -168,6 +170,7 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
     const [destinationFurniIds, setDestinationFurniIds] = useState<number[]>([]);
     const [referenceFurniIds, setReferenceFurniIds] = useState<number[]>([]);
     const [selectionMode, setSelectionMode] = useState<SelectionMode>('destination');
+    const [referenceValid, setReferenceValid] = useState(true);
     const highlightedIds = useRef<number[]>([]);
 
     const availableUserSources = useAvailableUserSources(trigger, USER_SOURCES);
@@ -332,11 +335,12 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
         };
     }, []);
 
-    // Official: "use the same furni or user as the target variable" only exists for a variable reference on the
-    // destination's own kind of holder, and then the reference source row is locked.
-    const sameHolderAvailable =
-        referenceMode === 'variable' && referenceTargetType === destinationTargetType && (destinationTargetType === 'user' || isFurniTarget(destinationTargetType));
-    const sameHolderActive = sameHolderAvailable && referenceSameHolder;
+    // AIR ValueOrVariableSection.updateReferenceVariableOnTargetState (L453-481): "use the same furni or user as the
+    // target variable" only counts for a variable reference on the destination's own furni or user holder, and then
+    // the reference source is locked (ChangeVariable.isInputSourceDisabled). ChangeVariable.readIntParamsFromForm: an
+    // operation without operand saves the typed-number option.
+    const referenceIsVariable = !isUnaryOperation && referenceMode === 'variable';
+    const sameHolderActive = referenceIsVariable && referenceSameHolder && isWiredSameHolderEligible(destinationTargetType, referenceTargetType);
 
     const save = () => {
         const nextDestinationFurniIds = selectionMode === 'destination' ? [...furniIds] : [...destinationFurniIds];
@@ -345,11 +349,11 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
         setDestinationFurniIds(nextDestinationFurniIds);
         setReferenceFurniIds(nextReferenceFurniIds);
-        setStringParam(serializeStringData(destinationVariableToken, referenceMode === 'variable' ? referenceVariableToken : '', nextReferenceFurniIds));
+        setStringParam(serializeStringData(destinationVariableToken, referenceIsVariable ? referenceVariableToken : '', nextReferenceFurniIds));
         setIntParams([
             getTargetValue(destinationTargetType),
             operation,
-            referenceMode === 'variable' ? REFERENCE_VARIABLE : REFERENCE_CONSTANT,
+            referenceIsVariable ? REFERENCE_VARIABLE : REFERENCE_CONSTANT,
             Number.isFinite(parsedReferenceConstantValue) ? parsedReferenceConstantValue : 0,
             getTargetValue(referenceTargetType),
             destinationUserSource,
@@ -363,7 +367,8 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
     const validate = () => {
         if (!destinationVariableToken) return false;
-        if (referenceMode === 'variable' && !referenceVariableToken) return false;
+        if (referenceIsVariable && !referenceVariableToken) return false;
+        if (!isUnaryOperation && !referenceValid) return false;
 
         return true;
     };
@@ -447,63 +452,51 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
 
                 <div className="octane-wired__give-var-section">
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
-                    <label className="octane-wired__change-var-radio">
-                        <input checked={referenceMode === 'constant'} disabled={isUnaryOperation} type="radio" onChange={() => setReferenceMode('constant')} />
-                        <Text>{LocalizeText('wiredfurni.params.operator.2')}</Text>
-                        <OctaneInput
-                            className="octane-wired__give-var-number"
-                            disabled={isUnaryOperation}
-                            type="number"
-                            value={referenceConstantValueInput}
-                            onChange={(event) => setReferenceConstantValueInput(event.target.value)}
-                        />
-                    </label>
+                    <WiredValueOrVariableInput
+                        disabled={isUnaryOperation}
+                        entries={resolvedReferenceVariableEntries}
+                        isVariable={referenceMode === 'variable'}
+                        label={LocalizeText('wiredfurni.params.variables.reference_value')}
+                        literal={referenceConstantValueInput}
+                        primaryTarget={destinationTargetType}
+                        sameHolder={referenceSameHolder}
+                        target={referenceTargetType}
+                        targets={REFERENCE_TARGETS}
+                        token={referenceVariableToken}
+                        renderSource={({ typeSelector, locked }) => (
+                            // AIR ChangeVariable: the reference value section claims merged slot 1, so its holder is the popup's
+                            // first section; the same holder or an operation without operand disables it (isInputSourceDisabled).
+                            <fieldset className="octane-wired__value-popup-locked" disabled={locked || isUnaryOperation}>
+                                <WiredFurniSelectionSourceRow
+                                    headerContent={typeSelector}
+                                    options={referenceSourceOptions}
+                                    selectionActive={selectionMode === 'reference'}
+                                    selectionCount={referenceFurniIds.length}
+                                    selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                                    selectionKind="secondary"
+                                    selectionLimit={selectionLimit}
+                                    showSelectionToggle={isFurniTarget(referenceTargetType)}
+                                    title="wiredfurni.params.sources.merged.title.variables"
+                                    value={referenceSelectedSourceValue}
+                                    onChange={(value) => {
+                                        if (isFurniTarget(referenceTargetType)) {
+                                            setReferenceFurniSource(value);
+                                            return;
+                                        }
 
-                    <div className="octane-wired__change-var-reference-block">
-                        <label className="octane-wired__change-var-radio">
-                            <input
-                                checked={referenceMode === 'variable'}
-                                disabled={isUnaryOperation}
-                                type="radio"
-                                onChange={() => setReferenceMode('variable')}
-                            />
-                            <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-                            <div className="octane-wired__give-var-targets">
-                                {TARGET_BUTTONS.map((button) => (
-                                    <button
-                                        key={`reference-${button.key}`}
-                                        type="button"
-                                        disabled={button.disabled || referenceMode !== 'variable'}
-                                        className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
-                                        onClick={() => handleReferenceTargetChange(button.key)}
-                                    >
-                                        <img src={button.icon} alt={button.key} />
-                                    </button>
-                                ))}
-                            </div>
-                        </label>
-
-                        {referenceMode === 'variable' && (
-                            <WiredVariablePicker
-                                entries={resolvedReferenceVariableEntries}
-                                recentScope="variable-effects"
-                                selectedToken={referenceVariableToken}
-                                onSelect={(entry) => setReferenceVariableToken(entry.token)}
-                            />
-                        )}
-                        {referenceMode === 'variable' && (
-                            <label className={`flex items-center gap-1 ${sameHolderAvailable ? '' : 'opacity-50'}`}>
-                                <input
-                                    checked={sameHolderActive}
-                                    className="form-check-input"
-                                    disabled={!sameHolderAvailable}
-                                    type="checkbox"
-                                    onChange={(event) => setReferenceSameHolder(event.target.checked)}
+                                        if (!isGlobalTarget(referenceTargetType) && !isContextTarget(referenceTargetType)) setReferenceUserSource(value);
+                                    }}
+                                    onSelectionActivate={() => switchSelection('reference')}
                                 />
-                                <Text>{LocalizeText('wiredfurni.params.variables.reference_value.same_holder')}</Text>
-                            </label>
+                            </fieldset>
                         )}
-                    </div>
+                        onIsVariableChange={(isVariable) => setReferenceMode(isVariable ? 'variable' : 'constant')}
+                        onLiteralChange={setReferenceConstantValueInput}
+                        onSameHolderChange={setReferenceSameHolder}
+                        onTargetChange={handleReferenceTargetChange}
+                        onTokenChange={setReferenceVariableToken}
+                        onValidityChange={setReferenceValid}
+                    />
                 </div>
 
                 <div className="octane-wired__divider" />
@@ -535,33 +528,6 @@ export const WiredActionChangeVariableValueView: FC<{}> = () => {
                     />
                 </div>
 
-                {referenceMode === 'variable' && (
-                    <>
-                        <div className="octane-wired__divider" />
-                        <div className={`octane-wired__give-var-section ${sameHolderActive ? 'opacity-50 pointer-events-none' : ''}`} aria-disabled={sameHolderActive}>
-                            <WiredFurniSelectionSourceRow
-                                title="wiredfurni.params.sources.merged.title.variables_reference"
-                                options={referenceSourceOptions}
-                                value={referenceSelectedSourceValue}
-                                selectionKind="secondary"
-                                selectionActive={selectionMode === 'reference'}
-                                selectionCount={referenceFurniIds.length}
-                                selectionLimit={selectionLimit}
-                                selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                                showSelectionToggle={isFurniTarget(referenceTargetType)}
-                                onChange={(value) => {
-                                    if (isFurniTarget(referenceTargetType)) {
-                                        setReferenceFurniSource(value);
-                                        return;
-                                    }
-
-                                    if (!isGlobalTarget(referenceTargetType) && !isContextTarget(referenceTargetType)) setReferenceUserSource(value);
-                                }}
-                                onSelectionActivate={() => switchSelection('reference')}
-                            />
-                        </div>
-                    </>
-                )}
             </div>
         </WiredActionBaseView>
     );

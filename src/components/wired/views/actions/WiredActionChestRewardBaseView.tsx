@@ -4,7 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
-import { variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
+import { variableTokenFromId, WIRED_FIXED_HOLDER_SOURCE, WiredValueOrVariableField } from '../WiredValueOrVariableField';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
 export const CHEST_REWARD_MODE_AMOUNT = 0;
@@ -47,6 +47,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
     const [popupText, setPopupText] = useState('');
     const [extraValue, setExtraValue] = useState(extra.defaultValue);
     const [userSource, setUserSource] = useState(0);
+    const [amountValid, setAmountValid] = useState(true);
 
     useEffect(() => {
         if (!trigger) return;
@@ -73,7 +74,7 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
         setSourceTypes({ furni: [100], users: [userSource] });
     };
 
-    const validate = () => mode === CHEST_REWARD_MODE_EVERYTHING || !isVariable || getCustomVariableItemId(token) > 0;
+    const validate = () => mode === CHEST_REWARD_MODE_EVERYTHING || (amountValid && (!isVariable || getCustomVariableItemId(token) > 0));
     const extraDisabled = extra.disabledWhenEverything && mode === CHEST_REWARD_MODE_EVERYTHING;
 
     return (
@@ -101,26 +102,27 @@ export const WiredActionChestRewardBaseView: FC<{ extra: ChestRewardExtra }> = (
                     </label>
                 ))}
             </div>
-            <fieldset className="flex flex-col gap-1" disabled={mode === CHEST_REWARD_MODE_EVERYTHING}>
+            <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}</Text>
-                <WiredValueOrVariableSection
-                    name="chestRewardAmount"
+                {/* AIR ?_-b1s?: createValueOrVariableSection(0, mergedSourceOptions(0), amount_to_give, 1, int max), disabled
+                    when the box gives everything (onModeChange). The server reads the variable on a room or context holder. */}
+                <WiredValueOrVariableField
+                    disabled={mode === CHEST_REWARD_MODE_EVERYTHING}
+                    holderSource={WIRED_FIXED_HOLDER_SOURCE}
                     isVariable={isVariable}
-                    value={amount}
-                    target={target}
-                    token={token}
-                    furniSource={0}
-                    userSource={0}
+                    label={localizeWithFallback('wiredfurni.params.amount_to_give', 'Amount to give:')}
+                    literal={amount}
                     min={1}
+                    target={target}
                     targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
+                    token={token}
                     onIsVariableChange={setIsVariable}
-                    onValueChange={setAmount}
+                    onLiteralChange={setAmount}
                     onTargetChange={setTarget}
                     onTokenChange={setToken}
-                    onFurniSourceChange={() => undefined}
-                    onUserSourceChange={() => undefined}
+                    onValidityChange={setAmountValid}
                 />
-            </fieldset>
+            </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.reward_contract.reward_popup', 'Reward popup')}</Text>
                 <textarea

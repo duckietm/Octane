@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,24 +7,39 @@ const setStringParam = vi.fn();
 let trigger: { stringData: string; intData: number[]; userSourceTypes?: number[] } | null = null;
 const setSourceTypes = vi.fn();
 let baseProps: { save: () => void; validate?: () => boolean } | null = null;
+const variable = (itemId: number, name: string, hasValue = true) => ({ itemId, name, availability: 0, hasValue, isReadOnly: false, variableType: 0 });
+const tools = {
+    userVariableDefinitions: [variable(5, 'score')],
+    furniVariableDefinitions: [variable(7, 'height')],
+    roomVariableDefinitions: [variable(8, 'round'), variable(9, 'flag', false)],
+    contextVariableDefinitions: [variable(10, 'combo')]
+};
 
+vi.mock('../../../../api', () => ({
+    LocalizeText: (key: string) => key,
+    localizeWithFallback: (key: string, fallback?: string) => fallback ?? key,
+    GetRoomSession: () => ({ roomId: 1 }),
+    WiredFurniType: { STUFF_SELECTION_OPTION_NONE: 0, STUFF_SELECTION_OPTION_BY_ID: 1 }
+}));
 vi.mock('../../../../hooks', () => ({
     useWired: () => ({ trigger, setIntParams, setStringParam, setSourceTypes }),
+    useWiredTools: () => tools,
     useAchievements: () => ({ enabledWiredAchievements: [] })
 }));
 
 vi.mock('../../../../common', () => ({
+    Button: ({ children, disabled, onClick }: PropsWithChildren<{ disabled?: boolean; onClick?: () => void }>) => (
+        <button disabled={disabled} type="button" onClick={onClick}>
+            {children}
+        </button>
+    ),
     Text: ({ children }: PropsWithChildren) => <span>{children}</span>
 }));
 
 vi.mock('../WiredSourcesSelector', () => ({
-    WiredSourcesSelector: () => <div>sources</div>
-}));
-
-vi.mock('../WiredValueOrVariableSection', () => ({
-    normalizeWiredValueTarget: (value: number) => value,
-    variableTokenFromId: () => '',
-    WiredValueOrVariableSection: () => <div>value</div>
+    WiredSourcesSelector: () => <div>sources</div>,
+    sortWiredSourceOptions: (options: unknown[]) => options,
+    useAvailableUserSources: (_trigger: unknown, options: unknown[]) => options
 }));
 
 vi.mock('./WiredActionBaseView', () => ({
@@ -73,6 +88,32 @@ describe('reward track wired actions', () => {
         baseProps.save();
         expect(setIntParams).toHaveBeenCalledWith([0, 0, 25, -20]);
         expect(setSourceTypes).toHaveBeenCalledWith({ furni: [], users: [201] });
+    });
+
+    it('progress: the score is one AIR value field; a variable is saved after the ids with its target', () => {
+        trigger = { stringData: 'season_1\tgames', intData: [0, 0, 25, -10] };
+        render(<WiredActionProgressRewardTrackView />);
+
+        const field = screen.getByRole('textbox', { name: 'Score' });
+
+        expect(field).toHaveValue('25');
+        fireEvent.change(field, { target: { value: '0' } });
+        expect(baseProps.validate()).toBe(false);
+        fireEvent.change(field, { target: { value: '0x10' } });
+        expect(baseProps.validate()).toBe(true);
+        baseProps.save();
+        expect(setIntParams).toHaveBeenLastCalledWith([0, 0, 16, -10]);
+
+        fireEvent.click(screen.getByRole('button', { name: 'wiredfurni.params.variables.reference_value.popup' }));
+        const popup = screen.getByRole('dialog');
+
+        expect(within(popup).getByText('wiredfurni.params.sources.merged.title.variables')).toBeTruthy();
+        expect(within(popup).queryByRole('button', { name: 'user' })).toBeNull();
+        fireEvent.click(within(popup).getByText('round'));
+        expect(field).toHaveValue('round');
+        baseProps.save();
+        expect(setStringParam).toHaveBeenLastCalledWith('season_1\tgames\t8');
+        expect(setIntParams).toHaveBeenLastCalledWith([0, 1, 16, -10]);
     });
 
     it('reset: saves the track and the user source', () => {

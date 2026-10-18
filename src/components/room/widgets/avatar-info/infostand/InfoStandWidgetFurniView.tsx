@@ -69,6 +69,7 @@ import statStateIcon from '../../../../../assets/images/infostand/stat-state.png
 import statXIcon from '../../../../../assets/images/infostand/stat-x.png';
 import statYIcon from '../../../../../assets/images/infostand/stat-y.png';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
+import { infostandFurniOwnerText, infostandFurniPanelClass } from './infostandFurni.helpers';
 
 interface InfoStandWidgetFurniViewProps {
     avatarInfo: AvatarInfoFurni;
@@ -283,10 +284,8 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         return () => clearInterval(interval);
     }, [avatarInfo, roomSession]);
     const showOwnerProfileIcon = useMemo(() => {
-        const ownerName = (avatarInfo?.ownerName || '').trim().toLowerCase();
-
-        // A temporary (Wired) copy hides its owner: no profile link.
-        return !!avatarInfo && !avatarInfo.isTemporary && avatarInfo.ownerId > 0 && ownerName !== 'builders club';
+        // A temporary (Wired) copy and a Builders Club furni show no owner: no profile link (official setOwnerInfo).
+        return !!avatarInfo && !avatarInfo.isTemporary && !avatarInfo.isBuildersClub && avatarInfo.ownerId > 0;
     }, [avatarInfo]);
 
     const sendUpdate = useCallback(
@@ -435,6 +434,16 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         )
             canUse = true;
 
+        // AIR InfoStandFurniView: the room's free furni movements mode (ConfigurationItemStates) shows move,
+        // rotate (floor only) and use for any furni. Recolour keeps following real rights.
+        const canRecolorByRights = canMove;
+
+        if (GetRoomEngine().activeRoomHasFreeFurniMovementsMode) {
+            canMove = true;
+            canRotate = !avatarInfo.isWallItem;
+            canUse = true;
+        }
+
         if (avatarInfo.extraParam) {
             if (avatarInfo.extraParam === RoomWidgetEnumItemExtradataParameter.CRACKABLE_FURNI) {
                 const stuffData = avatarInfo.stuffData as CrackableDataType;
@@ -516,7 +525,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         const recolorData = recolorTypeId > 0 ? GetSessionDataManager().getFloorItemData(recolorTypeId) : null;
         // Only placed recolourable furni (*_recolorable) can be recoloured; the old Builders Club colour
         // variants (bc_x*N) keep the colour they were placed in.
-        setCanRecolor(canMove && isRecolorableClass(recolorData?.className));
+        setCanRecolor(canRecolorByRights && isRecolorableClass(recolorData?.className));
         setCanUse(canUse);
         setCanRemoveBackground(removeBackgroundAllowed);
         setFurniKeys(furniKeyss);
@@ -774,8 +783,8 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
             <Column
                 className={
                     'relative min-w-[190px] max-w-[190px] z-30 pointer-events-auto [box-shadow:inset_0_5px_#22222799,inset_0_-4px_#12121599] rounded ' +
-                    // Official: a temporary (Wired) copy draws on the blue panel (0x142B44) with 0x2F4C6B spacers.
-                    (avatarInfo.isTemporary ? 'octane-infostand-furni--temporary bg-[rgba(20,43,68,.95)]' : 'bg-[rgba(28,28,32,.95)]')
+                    // Official colours (InfoStandFurniView.update): Builders Club 0x331C00, temporary (Wired) 0x142B44, else dark.
+                    infostandFurniPanelClass(avatarInfo)
                 }
             >
                 <Column className="h-full p-[8px] overflow-auto" gap={1} overflow="visible">
@@ -853,8 +862,9 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                     src={GetConfigurationValue<string>('catalog.asset.icon.url', '').replace('%name%', '80')}
                                 />
                             )}
+                            {avatarInfo.isBuildersClub && !avatarInfo.isTemporary && <i className="octane-icon icon-buildersclub shrink-0 scale-75" />}
                             <Text small wrap variant="white">
-                                {avatarInfo.isTemporary ? LocalizeText('temp.catalog.title') : LocalizeText('furni.owner', ['name'], [avatarInfo.ownerName])}
+                                {infostandFurniOwnerText(avatarInfo)}
                             </Text>
                         </div>
                         {avatarInfo.purchaseOfferId > 0 && (

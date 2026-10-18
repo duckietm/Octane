@@ -13,14 +13,18 @@ interface ChatWidgetMessageViewProps {
     makeRoom: (chat: ChatBubbleMessage) => void;
     bubbleWidth?: number;
     showPointer?: boolean;
+    /** 'history' draws the same bubble in the chat history list: in the flow, not placed over the room. */
+    layout?: 'room' | 'history';
 }
 
 export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
     chat = null,
     makeRoom = null,
     bubbleWidth = RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL,
-    showPointer = true
+    showPointer = true,
+    layout = 'room'
 }) => {
+    const inHistory = layout === 'history';
     const [isVisible, setIsVisible] = useState(false);
     const [isReady, setIsReady] = useState(false);
     const [chatTextSize, setChatTextSize] = useState<ChatTextSize>(() => chat?.textSize ?? getStoredChatTextSize());
@@ -44,6 +48,9 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
     );
 
     const getBubbleWidth = useMemo(() => {
+        // AIR ChatBubbleFactory.getHistoryLineEntry asks for NORMAL (350) and ChatBubble keeps 15px of it back.
+        if (inHistory) return 'max-w-[335px]';
+
         switch (bubbleWidth) {
             case RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL:
                 return 'max-w-[350px]';
@@ -54,11 +61,16 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
             default:
                 return 'max-w-[350px]';
         }
-    }, [bubbleWidth]);
+    }, [bubbleWidth, inHistory]);
 
     useEffect(() => {
         const element = elementRef.current;
         if (!element) return;
+
+        if (inHistory) {
+            setIsReady(true);
+            return;
+        }
 
         const previousWidth = chat.width;
         const previousHeight = chat.height;
@@ -95,7 +107,8 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
         chatTextSize,
         isVisible,
         makeRoom,
-        showPointer
+        showPointer,
+        inHistory
     ]);
 
     useEffect(() => {
@@ -120,7 +133,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
     useEffect(() => {
         const element = elementRef.current;
 
-        if (!element || typeof ResizeObserver === 'undefined') return;
+        if (!element || inHistory || typeof ResizeObserver === 'undefined') return;
 
         const observer = new ResizeObserver(() => {
             const { offsetWidth: width, offsetHeight: height } = element;
@@ -142,7 +155,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
         observer.observe(element);
 
         return () => observer.disconnect();
-    }, [chat]);
+    }, [chat, inHistory]);
 
     useEffect(() => {
         return () => {
@@ -162,9 +175,11 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = ({
     return (
         <div
             ref={elementRef}
-            className={`bubble-container newbubblehe chat-text-size ${isVisible ? 'visible' : 'invisible'} w-max absolute select-none pointer-events-auto`}
+            className={`bubble-container chat-text-size ${inHistory ? 'octane-chat-history-bubble relative' : 'newbubblehe absolute'} ${isVisible ? 'visible' : 'invisible'} w-max select-none pointer-events-auto`}
             style={{ '--chat-text-size': `${CHAT_TEXT_SIZE_PIXELS[chatTextSize]}px` } as CSSProperties}
-            onClick={() => GetRoomEngine().selectRoomObject(chat.roomId, chat.senderId, RoomObjectCategory.UNIT)}
+            onClick={() => {
+                if (!inHistory) GetRoomEngine().selectRoomObject(chat.roomId, chat.senderId, RoomObjectCategory.UNIT);
+            }}
         >
             {chat.styleId === 0 && (
                 <div className="absolute -top-px left-px w-[30px] h-[calc(100%-0.5px)] rounded-[7px] z-1" style={{ backgroundColor: chat.color }} />

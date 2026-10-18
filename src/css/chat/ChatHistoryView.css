@@ -56,29 +56,26 @@
     min-width: 0;
 }
 
-.octane-chat-history-bubble-wrap {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
+/* The live chat bubble (ChatWidgetMessageView layout="history"), in the flow of the list. */
+.octane-chat-history-bubble {
     min-width: 0;
     max-width: 100%;
 }
 
-.octane-chat-history-bubble-wrap .chat-bubble {
+.octane-chat-history-bubble .chat-bubble {
     margin: 0;
-    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35));
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 }
 
-.octane-chat-history-bubble-wrap .chat-content {
+.octane-chat-history-bubble .chat-content {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
 }
 
-.octane-chat-history-bubble-wrap .message {
+.octane-chat-history-bubble .message {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;

@@ -39,6 +39,17 @@ interface WiredVariablePickerProps {
     onSelect: (entry: IWiredVariablePickerEntry) => void;
     /** NewVariablePicker.select(null): the search field was emptied or cancelled (NewVariablePicker.as:276-291, 496-500, 571-578). */
     onClear?: () => void;
+    /**
+     * NewVariablePicker.configureExternalPopup (NewVariablePicker.as:104-120, 355-383): no collapsed field; the expanded
+     * view (tabs, search field, list) is drawn in place inside the owner's popup, at `width`.
+     */
+    embedded?: IWiredVariablePickerEmbedding;
+}
+
+export interface IWiredVariablePickerEmbedding {
+    width: number;
+    /** The picker hid its expanded view (a selection, Escape). */
+    onClose: () => void;
 }
 
 /** TabButtonConfigs.as:56-66. */
@@ -263,6 +274,7 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
         selectedToken = '',
         onSelect,
         onClear,
+        embedded,
         placeholder = LocalizeText('wiredfurni.variable_picker.search'),
         emptyText = LocalizeText('wiredfurni.variable_picker.empty')
     } = props;
@@ -315,6 +327,8 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
         setIsExpanded(false);
         setPanelRect(null);
         setHoveredTab(null);
+
+        if (embedded) embedded.onClose();
     };
 
     const select = (entry: IWiredVariablePickerEntry | null) => {
@@ -337,11 +351,17 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
     const expand = () => {
         if (isExpanded) return;
 
-        const rect = containerRef.current?.getBoundingClientRect();
+        const rect = embedded ? null : containerRef.current?.getBoundingClientRect();
 
         // NewVariablePicker.expandView (NewVariablePicker.as:355-383): the popup takes the picker's width and sits so
-        // that its search field covers the collapsed field.
-        setPanelRect(rect ? { left: rect.left, top: rect.top, width: Math.round(rect.width) } : { left: 0, top: 0, width: 0 });
+        // that its search field covers the collapsed field; an external popup takes its anchor's width.
+        setPanelRect(
+            embedded
+                ? { left: 0, top: 0, width: embedded.width }
+                : rect
+                  ? { left: rect.left, top: rect.top, width: Math.round(rect.width) }
+                  : { left: 0, top: 0, width: 0 }
+        );
         setIsExpanded(true);
         setDirty(false);
 
@@ -357,6 +377,11 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
         inputRef.current?.focus();
     };
 
+    // An embedded picker is its owner's open popup: expanded for as long as it is mounted.
+    useLayoutEffect(() => {
+        if (embedded) expand();
+    }, []);
+
     // The single input moves between the collapsed and the expanded wrapper and keeps focus (NewVariablePicker.as:375-376, 413-419).
     useLayoutEffect(() => {
         if (isExpanded) inputRef.current?.focus();
@@ -364,7 +389,8 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
 
     // NewVariablePicker.onDeactivate/completeDeactivation (NewVariablePicker.as:421-467).
     useEffect(() => {
-        if (!isExpanded) return;
+        // The owner of an embedded picker closes its popup on an outside click.
+        if (!isExpanded || embedded) return;
 
         const onMouseDown = (event: globalThis.MouseEvent) => {
             const target = event.target as Node;
@@ -477,6 +503,50 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
         </div>
     );
 
+    const expandedView = panelRect && (
+        <>
+            <div className="octane-wired__vpicker-tabs">
+                {TAB_BUTTONS.map((tab, index) => {
+                    const colors = tab.id === tabId ? TAB_COLORS.active : hoveredTab === tab.id ? TAB_COLORS.hover : TAB_COLORS.none;
+
+                    return (
+                        <button
+                            key={tab.id}
+                            aria-pressed={tab.id === tabId}
+                            className="octane-wired__vpicker-tab"
+                            title={LocalizeText(tab.tooltip)}
+                            type="button"
+                            style={{ width: widths[index], background: colors.border, borderBottom: `1px solid ${colors.shadow}` }}
+                            onClick={() => selectTab(tab.id)}
+                            onMouseEnter={() => setHoveredTab(tab.id)}
+                            onMouseLeave={() => setHoveredTab(null)}
+                        >
+                            <img alt={LocalizeText(tab.tooltip)} src={tab.icon} style={{ opacity: colors.blend }} />
+                        </button>
+                    );
+                })}
+            </div>
+            {/* Live AIR: the tab row is above the search field. */}
+            <div className="octane-wired__vpicker-search">{input}</div>
+            <div className="octane-wired__vpicker-content">
+                {rootNodes.length ? (
+                    <WiredVariableNodeList key={`${tabId}:${tabLoad}`} isRoot nodes={rootNodes} width={panelRect.width - 2} onSelect={select} />
+                ) : (
+                    <div className="octane-wired__vpicker-empty">{emptyText}</div>
+                )}
+            </div>
+        </>
+    );
+
+    if (embedded) {
+        return (
+            // `width` is the popup's outer width; the view sits inside its 1px frame.
+            <div ref={panelRef} className="octane-wired__vpicker octane-wired__vpicker-embedded" style={{ width: embedded.width - 2 }}>
+                {isExpanded && expandedView}
+            </div>
+        );
+    }
+
     return (
         <div className="octane-wired__vpicker" ref={containerRef}>
             <div className="octane-wired__vpicker-collapsed" style={isExpanded ? { visibility: 'hidden' } : undefined}>
@@ -493,36 +563,7 @@ export const WiredVariablePicker: FC<WiredVariablePickerProps> = (props) => {
                             className="octane-wired__vpicker-expanded"
                             style={{ left: panelRect.left, top: panelRect.top, width: panelRect.width }}
                         >
-                            <div className="octane-wired__vpicker-tabs">
-                                {TAB_BUTTONS.map((tab, index) => {
-                                    const colors = tab.id === tabId ? TAB_COLORS.active : hoveredTab === tab.id ? TAB_COLORS.hover : TAB_COLORS.none;
-
-                                    return (
-                                        <button
-                                            key={tab.id}
-                                            aria-pressed={tab.id === tabId}
-                                            className="octane-wired__vpicker-tab"
-                                            title={LocalizeText(tab.tooltip)}
-                                            type="button"
-                                            style={{ width: widths[index], background: colors.border, borderBottom: `1px solid ${colors.shadow}` }}
-                                            onClick={() => selectTab(tab.id)}
-                                            onMouseEnter={() => setHoveredTab(tab.id)}
-                                            onMouseLeave={() => setHoveredTab(null)}
-                                        >
-                                            <img alt={LocalizeText(tab.tooltip)} src={tab.icon} style={{ opacity: colors.blend }} />
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            {/* Live AIR: the tab row is above the search field. */}
-                            <div className="octane-wired__vpicker-search">{input}</div>
-                            <div className="octane-wired__vpicker-content">
-                                {rootNodes.length ? (
-                                    <WiredVariableNodeList key={`${tabId}:${tabLoad}`} isRoot nodes={rootNodes} width={panelRect.width - 2} onSelect={select} />
-                                ) : (
-                                    <div className="octane-wired__vpicker-empty">{emptyText}</div>
-                                )}
-                            </div>
+                            {expandedView}
                         </div>
                     </div>,
                     portalTarget

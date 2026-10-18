@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,33 +8,40 @@ const setSourceTypes = vi.fn();
 let trigger: { stringData: string; intData: number[]; userSourceTypes?: number[]; furniSourceTypes?: number[] } | null = null;
 let enabledWiredAchievements: string[] = [];
 let baseProps: { save: () => void; validate?: () => boolean } | null = null;
+const variable = (itemId: number, name: string, hasValue = true) => ({ itemId, name, availability: 0, hasValue, isReadOnly: false, variableType: 0 });
+const tools = {
+    userVariableDefinitions: [variable(5, 'score')],
+    furniVariableDefinitions: [variable(42, 'height')],
+    roomVariableDefinitions: [variable(8, 'round')],
+    contextVariableDefinitions: []
+};
+
+vi.mock('../../../../api', () => ({
+    LocalizeText: (key: string) => key,
+    localizeWithFallback: (key: string, fallback?: string) => fallback ?? key,
+    GetRoomSession: () => ({ roomId: 1 }),
+    WiredFurniType: { STUFF_SELECTION_OPTION_NONE: 0 }
+}));
 
 vi.mock('../../../../hooks', () => ({
     useWired: () => ({ trigger, setIntParams, setStringParam, setSourceTypes }),
+    useWiredTools: () => tools,
     useAchievements: () => ({ enabledWiredAchievements })
 }));
 
 vi.mock('../../../../common', () => ({
+    Button: ({ children, disabled, onClick }: PropsWithChildren<{ disabled?: boolean; onClick?: () => void }>) => (
+        <button disabled={disabled} type="button" onClick={onClick}>
+            {children}
+        </button>
+    ),
     Text: ({ children }: PropsWithChildren) => <span>{children}</span>
 }));
 
 vi.mock('../WiredSourcesSelector', () => ({
-    WiredSourcesSelector: () => <div>sources</div>
-}));
-
-vi.mock('../WiredValueOrVariableSection', () => ({
-    normalizeWiredValueTarget: (value: number) => value,
-    variableTokenFromId: (text: string) => (parseInt(text, 10) > 0 ? `custom:${text}` : ''),
-    WiredValueOrVariableSection: (props: { isVariable: boolean; value: string; onValueChange: (value: string) => void; onIsVariableChange: (value: boolean) => void; onTokenChange: (token: string) => void }) => (
-        <div>
-            <input type="number" value={props.value} onChange={(event) => props.onValueChange(event.target.value)} />
-            <button onClick={() => { props.onIsVariableChange(true); props.onTokenChange('custom:42'); }}>use variable</button>
-        </div>
-    )
-}));
-
-vi.mock('../WiredVariablePickerData', () => ({
-    getCustomVariableItemId: (token: string) => (token.startsWith('custom:') ? parseInt(token.slice(7), 10) : 0)
+    WiredSourcesSelector: () => <div>sources</div>,
+    sortWiredSourceOptions: (options: unknown[]) => options,
+    useAvailableUserSources: (_trigger: unknown, options: unknown[]) => options
 }));
 
 vi.mock('./WiredActionBaseView', () => ({
@@ -75,7 +82,7 @@ describe('WiredActionProgressAchievementView', () => {
         expect(select.value).toBe('ACH_Game');
         fireEvent.change(select, { target: { value: 'ACH_Race' } });
         fireEvent.click(screen.getAllByRole('radio')[1]);
-        fireEvent.change(screen.getByRole('spinbutton'), { target: { value: '5000000' } });
+        fireEvent.change(screen.getByRole('textbox', { name: 'Amount' }), { target: { value: '5000000' } });
         baseProps.save();
 
         expect(setStringParam).toHaveBeenCalledWith('ACH_Race\t0');
@@ -88,7 +95,7 @@ describe('WiredActionProgressAchievementView', () => {
         trigger = { stringData: 'ACH_Game', intData: [1, 0, 1, 0] };
         render(<WiredActionProgressAchievementView />);
 
-        fireEvent.click(screen.getByText('use variable'));
+        fireEvent.change(screen.getByRole('textbox', { name: 'Amount' }), { target: { value: 'Height' } });
         baseProps.save();
 
         expect(setStringParam).toHaveBeenCalledWith('ACH_Game\t42');
@@ -101,6 +108,42 @@ describe('WiredActionProgressAchievementView', () => {
         render(<WiredActionProgressAchievementView />);
 
         expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('ACH_Old');
+        expect(baseProps.validate()).toBe(true);
+    });
+
+    it('offers the value holder with the type selector in the popup (AIR merged slot 0) and saves its sources', () => {
+        enabledWiredAchievements = ['ACH_Game'];
+        trigger = { stringData: 'ACH_Game\t5', intData: [1, 1, 1, 1], userSourceTypes: [0, 200], furniSourceTypes: [0] };
+        render(<WiredActionProgressAchievementView />);
+
+        const field = screen.getByRole('textbox', { name: 'Amount' });
+
+        expect(field).toHaveValue('score');
+        fireEvent.click(screen.getByRole('button', { name: 'wiredfurni.params.variables.reference_value.popup' }));
+        const popup = screen.getByRole('dialog');
+
+        expect(within(popup).getByText('wiredfurni.params.sources.merged.title.variables')).toBeTruthy();
+        expect(within(popup).getByText('wiredfurni.params.sources.users.200')).toBeTruthy();
+        expect(within(popup).getAllByRole('button', { name: /^(global|context|furni|user)$/ })).toHaveLength(4);
+        expect(within(popup).queryByRole('checkbox')).toBeNull();
+        baseProps.save();
+        expect(setIntParams).toHaveBeenLastCalledWith([1, 1, 1, 1]);
+        expect(setSourceTypes).toHaveBeenLastCalledWith({ furni: [0], users: [0, 200] });
+    });
+
+    it('marks a negative or unknown amount invalid (AIR range 0..int max)', () => {
+        enabledWiredAchievements = ['ACH_Game'];
+        trigger = { stringData: 'ACH_Game', intData: [1, 0, 1, 0] };
+        render(<WiredActionProgressAchievementView />);
+
+        const field = screen.getByRole('textbox', { name: 'Amount' });
+
+        fireEvent.change(field, { target: { value: '-1' } });
+        expect(baseProps.validate()).toBe(false);
+        fireEvent.change(field, { target: { value: 'nobody' } });
+        expect(screen.getByRole('alert')).toBeTruthy();
+        expect(baseProps.validate()).toBe(false);
+        fireEvent.change(field, { target: { value: '0' } });
         expect(baseProps.validate()).toBe(true);
     });
 

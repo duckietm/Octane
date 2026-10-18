@@ -1,30 +1,23 @@
 import { GetRoomEngine, RoomObjectCategory } from '@octane/renderer';
 import { useState } from 'react';
-import { GetRoomSession, RoomObjectItem } from '../../../api';
+import { CanOpenUserChooser, GetRoomSession, RoomObjectItem } from '../../../api';
 import { useUserAddedEvent, useUserRemovedEvent } from '../engine';
 
-const resolveUserType = (userType: number): string => {
-    switch (userType) {
-        case 1:
-            return 'Habbo';
-        case 2:
-            return 'Pet';
-        case 3:
-            return 'Bot';
-        default:
-            return '-';
-    }
-};
+/** AIR ChooserItem order (UserChooserWidgetHandler.compareItems): names compared upper-cased. */
+const compareItems = (a: RoomObjectItem, b: RoomObjectItem) => (a.name.toUpperCase() < b.name.toUpperCase() ? -1 : 1);
 
+/**
+ * AIR UserChooserWidgetHandler.handleUserChooserRequest: every room unit with user data (Habbos, pets and both
+ * bot kinds), with its user type kept as the type the table localizes (`new_user_chooser.usertype.<type>`).
+ */
 const buildUserItem = (roomIndex: number): RoomObjectItem | null => {
     if (roomIndex < 0) return null;
 
     const userData = GetRoomSession()?.userDataManager?.getUserDataByIndex(roomIndex);
 
     if (!userData) return null;
-    if (userData.type !== 1) return null;
 
-    return new RoomObjectItem(userData.roomIndex, RoomObjectCategory.UNIT, userData.name, 0, '-', resolveUserType(userData.type));
+    return new RoomObjectItem(userData.roomIndex, RoomObjectCategory.UNIT, userData.name, 0, '-', String(userData.type));
 };
 
 /**
@@ -39,7 +32,7 @@ export const useUserChooserState = () => {
     const populateChooser = () => {
         const session = GetRoomSession();
 
-        if (!session) return;
+        if (!session || !CanOpenUserChooser(session)) return;
 
         const roomObjects = GetRoomEngine().getRoomObjects(session.roomId, RoomObjectCategory.UNIT);
 
@@ -47,7 +40,7 @@ export const useUserChooserState = () => {
             roomObjects
                 .map((roomObject) => buildUserItem(roomObject.id))
                 .filter((item): item is RoomObjectItem => item !== null)
-                .sort((a, b) => (a.name < b.name ? -1 : 1))
+                .sort(compareItems)
         );
     };
 
@@ -58,7 +51,7 @@ export const useUserChooserState = () => {
 
         setItems((prevValue) => {
             const newValue = [...(prevValue ?? []), item];
-            newValue.sort((a, b) => (a.name < b.name ? -1 : 1));
+            newValue.sort(compareItems);
             return newValue;
         });
     });

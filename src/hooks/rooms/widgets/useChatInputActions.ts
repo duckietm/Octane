@@ -15,7 +15,7 @@ import {
     TriggerHabbiconComposer
 } from '@octane/renderer';
 import { useCallback } from 'react';
-import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, SendMessageComposer } from '../../../api';
+import { CanOpenFurniChooser, CanOpenUserChooser,ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, SendMessageComposer } from '../../../api';
 import { useNotification } from '../../notification';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
@@ -221,10 +221,12 @@ export const useChatInputActions = () => {
                         }
                         return null;
                     case ':furni':
-                        CreateLinkEvent('furni-chooser/');
+                        // AIR: rights holders, security level 2+ and ambassadors only; anyone else is swallowed silently.
+                        if (CanOpenFurniChooser(roomSession)) CreateLinkEvent('furni-chooser/');
                         return null;
                     case ':chooser':
-                        CreateLinkEvent('user-chooser/');
+                        // AIR: swallowed silently for visitors below rights while the room's :chooser disabler is on.
+                        if (CanOpenUserChooser(roomSession)) CreateLinkEvent('user-chooser/');
                         return null;
                     case ':floor':
                     case ':bcfloor':

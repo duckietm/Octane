@@ -3,3 +3,4 @@ export * from './useWiredToolsActions';
 export * from './useWiredToolsState';
 export * from './useWiredToolsStore';
 export * from './useWiredPageRequests';
+export * from './useWiredObjectInspection';

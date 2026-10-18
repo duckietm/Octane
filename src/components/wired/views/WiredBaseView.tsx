@@ -28,7 +28,7 @@ import {
     WiredSelectionVisualizer,
     wiredStyleClassName
 } from '../../../api';
-import { isUsingAdvancedSettings } from '../../../api/wired/WiredAdvancedSettings';
+import { isAdvancedAlwaysVisible, isUsingAdvancedSettings } from '../../../api/wired/WiredAdvancedSettings';
 import wiredBgLeft from '../../../assets/images/wired/wired_bg_left.png';
 import wiredBgRight from '../../../assets/images/wired/wired_bg_right.png';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
@@ -336,6 +336,9 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
         setAllowsFurni(requiresFurni);
     }, [trigger, requiresFurni, setAllowsFurni]);
 
+    // Official advancedAlwaysVisible(): these elements show their advanced section open, without the toggle.
+    const footerFolds = footerCollapsible && !(trigger && isAdvancedAlwaysVisible(holderKind(trigger), trigger.code));
+
     const resolvedCardStyle: CSSProperties = { ...cardStyle };
 
     resolvedCardStyle.width = WIRED_CARD_WIDTH;
@@ -425,7 +428,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = (props) 
                         <>
                             <div className="octane-wired__divider" />
                             <div className="octane-wired__section octane-wired__section--footer">
-                                {footerCollapsible ? (
+                                {footerFolds ? (
                                     <>
                                         <button className="octane-wired__advanced-toggle" type="button" onClick={() => setShowFooter((value) => !value)}>
                                             {LocalizeText(showFooter ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}

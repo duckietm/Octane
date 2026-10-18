@@ -1140,6 +1140,181 @@
     color: #555;
 }
 
+/*
+ * AIR value-or-variable field (ValueOrVariableInputPreset over the illumina input_template: a 21px white field with
+ * the 105 frame) and its popup (ValueOrVariablePopupPreset). value_or_variable_input_icons: two 19px regions that end
+ * 2px before the field's right edge; the target region shows only for a variable with a choice of types.
+ */
+.octane-wired__value-field {
+    position: relative;
+    width: 100%;
+}
+
+/* A value field in one row with another control (AIR SimpleListViewPreset horizontal, e.g. VariableAge's unit). */
+.octane-wired__value-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.octane-wired__value-row .octane-wired__value-field {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.octane-wired__value-row-select {
+    flex: 0 0 90px;
+    width: 90px;
+}
+
+.octane-wired__value-input {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    box-sizing: border-box;
+    height: 21px;
+    padding-right: 2px;
+    border: 1px solid #848484;
+    border-radius: 4px;
+    background: #fff;
+}
+
+/* WiredStyle.invalidInputBackgroundColor (IlluminaWiredStyle: 0xffc6c9). */
+.octane-wired__value-input.is-invalid {
+    background: #ffc6c9;
+}
+
+.octane-wired__value-input.is-disabled {
+    opacity: 0.5;
+}
+
+.octane-wired .octane-wired__value-input input,
+.octane-wired__value-input input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 19px;
+    min-height: 0 !important;
+    padding: 0 0 0 4px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #4a4a4a !important;
+    outline: 0;
+}
+
+.octane-wired__value-input-target,
+.octane-wired__value-input-button {
+    display: flex;
+    flex: 0 0 19px;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.octane-wired__value-input-button {
+    cursor: pointer;
+}
+
+.octane-wired__value-input-button:disabled {
+    cursor: default;
+}
+
+.octane-wired__value-input-target img,
+.octane-wired__value-input-button img {
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+/* input_template warning_display: a bordered caption centred over the field, its pointer 9px above the field. */
+.octane-wired__value-input-error {
+    position: absolute;
+    bottom: calc(100% + 9px);
+    left: 50%;
+    z-index: 2;
+    padding: 3px 7px;
+    border: 1px solid #5a5a5a;
+    border-radius: 3px;
+    background: #fff;
+    color: #4a4a4a;
+    font-size: 11px;
+    line-height: 15px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.octane-wired__value-input-error::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border-right: 1px solid #5a5a5a;
+    border-bottom: 1px solid #5a5a5a;
+    background: #fff;
+    transform: translate(-50%, -3px) rotate(45deg);
+}
+
+/* search_tree_dropdown main_cont: the header list sits above the tabs, 5px apart (genericVerticalSpacing). */
+.octane-wired__value-popup {
+    color: #000;
+    font: inherit;
+    font-size: 11px;
+}
+
+.octane-wired__value-popup-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 1px;
+}
+
+/* attachInputSource: padded 5/5/5/0 (genericHorizontalSpacing, genericVerticalSpacing); the title in softTextColor 0x444444. */
+.octane-wired__value-popup-source {
+    padding: 5px 5px 0;
+    color: #444;
+}
+
+.octane-wired__value-popup-target {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+/* The checkbox group, padded 5/0/5/0 (ValueOrVariablePopupPreset L92). */
+.octane-wired__value-popup-same-holder {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 5px;
+}
+
+.octane-wired__value-popup-same-holder.is-disabled {
+    opacity: 0.5;
+}
+
+.octane-wired__value-popup .octane-wired__divider {
+    margin: 0;
+}
+
+.octane-wired__value-popup-locked {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.octane-wired__value-popup-locked:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 
 /*
  * Official wired window skins, colour for colour from the AIR client's wired_style_*.xml layouts:
@@ -1429,4 +1604,15 @@
 .octane-wired__delay-mode-menu button.is-active,
 .octane-wired__delay-mode-menu button:hover {
     background: #c3dfeb;
+}
+
+/* A disabled icon button keeps its frame; only the icon is drawn at half alpha (AIR Illumina icon buttons). */
+.octane-wired .octane-wired__picker-button:disabled {
+    filter: none;
+    cursor: default;
+}
+
+.octane-wired .octane-wired__picker-button:disabled svg,
+.octane-wired .octane-wired__value-input-button:disabled img {
+    opacity: 0.5;
 }

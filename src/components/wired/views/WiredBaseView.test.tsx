@@ -103,6 +103,7 @@ vi.mock('../../../hooks', () => ({
 
 vi.mock('./WiredFurniSelectorView', () => ({ WiredFurniSelectorView: () => null }));
 
+import { TriggerDefinition } from '@octane/renderer';
 import { WiredBaseView } from './WiredBaseView';
 
 const openMenu = () => fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
@@ -201,5 +202,31 @@ describe('WiredBaseView quick menu', () => {
 
         act(() => mocks.showConfirm.mock.calls[0][1]());
         expect(mocks.wired.saveWired).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('WiredBaseView advanced section', () => {
+    afterEach(cleanup);
+
+    const renderWith = (code: number) => {
+        const original = mocks.wired.trigger;
+
+        mocks.wired.trigger = Object.assign(Object.create(TriggerDefinition.prototype), { ...original, code });
+        render(<WiredBaseView hasSpecialInput={false} requiresFurni={0} save={vi.fn()} wiredType="trigger" footer={<span>source rows</span>} />);
+        mocks.wired.trigger = original;
+    };
+
+    it('keeps an advancedAlwaysVisible element open without the toggle (AIR ReceiveLinkMessage)', () => {
+        renderWith(29);
+
+        expect(screen.getByText('source rows')).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'wiredfurni.params.sources.expand' })).toBeNull();
+    });
+
+    it('folds the advanced section of any other element', () => {
+        renderWith(1);
+
+        expect(screen.queryByText('source rows')).toBeNull();
+        expect(screen.getByRole('button', { name: 'wiredfurni.params.sources.expand' })).toBeInTheDocument();
     });
 });

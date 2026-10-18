@@ -2,6 +2,7 @@ import { IWiredLabel, WIRED_LABEL_COLORS, WIRED_LABEL_VISIBILITY_EVERYONE, WIRED
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, SendMessageComposer } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
+import { UbuntuDropmenuView } from '../../../../common/dropmenu/UbuntuDropmenuView';
 import { wiredLabelCss } from './WiredLabelBubbleView';
 
 const COLOR_NAMES = [ 'blue', 'teal', 'green', 'gold', 'orange', 'red', 'purple', 'charcoal' ];
@@ -39,20 +40,27 @@ export const WiredLabelSettingsView: FC<WiredLabelSettingsViewProps> = ({ label,
             <OctaneCardContentView gap={2}>
                 <Text bold>{localizeWithFallback('widget.furniture_label.settings.color', 'Label color')}</Text>
                 <div className="flex items-center gap-2">
-                    <select className="form-select form-select-sm octane-wired-label-settings__color" data-testid="wired-label-color" value={colorIndex} onChange={(event) => setColorIndex(parseInt(event.target.value, 10) || 0)}>
-                        {COLOR_NAMES.map((name, index) => (
-                            <option key={name} value={index}>{localizeWithFallback(`widget.furniture_label.settings.color.${ name }`, COLOR_FALLBACKS[index])}</option>
-                        ))}
-                    </select>
+                    <UbuntuDropmenuView
+                        className="octane-wired-label-settings__color"
+                        label={localizeWithFallback('widget.furniture_label.settings.color', 'Label color')}
+                        value={colorIndex}
+                        options={COLOR_NAMES.map((name, index) => ({ value: index, label: localizeWithFallback(`widget.furniture_label.settings.color.${ name }`, COLOR_FALLBACKS[index]) }))}
+                        onSelect={(value) => setColorIndex(Number(value))}
+                    />
                     <div className="octane-wired-label-settings__preview" style={{ ['--octane-wired-label-color' as string]: wiredLabelCss(WIRED_LABEL_COLORS[colorIndex]) }} />
                 </div>
                 <Text bold>{localizeWithFallback('widget.furniture_label.settings.visibility', 'Who can see this label?')}</Text>
-                <select className="form-select form-select-sm" data-testid="wired-label-visibility" value={visibility} onChange={(event) => setVisibility(parseInt(event.target.value, 10) === WIRED_LABEL_VISIBILITY_EVERYONE ? WIRED_LABEL_VISIBILITY_EVERYONE : WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS)}>
-                    <option value={WIRED_LABEL_VISIBILITY_EVERYONE}>{localizeWithFallback('widget.furniture_label.settings.visibility.everyone', 'Everyone')}</option>
-                    <option value={WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS}>{localizeWithFallback('widget.furniture_label.settings.visibility.wired', 'Users with Wired inspection rights')}</option>
-                </select>
-                <label className={`flex items-center gap-1${ everyone ? '' : ' opacity-50' }`}>
-                    <input type="checkbox" data-testid="wired-label-always-open" disabled={!everyone} checked={everyone && alwaysOpen} onChange={(event) => setAlwaysOpen(event.target.checked)} />
+                <UbuntuDropmenuView
+                    label={localizeWithFallback('widget.furniture_label.settings.visibility', 'Who can see this label?')}
+                    value={visibility}
+                    options={[
+                        { value: WIRED_LABEL_VISIBILITY_EVERYONE, label: localizeWithFallback('widget.furniture_label.settings.visibility.everyone', 'Everyone') },
+                        { value: WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS, label: localizeWithFallback('widget.furniture_label.settings.visibility.wired', 'Users with Wired inspection rights') }
+                    ]}
+                    onSelect={(value) => setVisibility(Number(value) === WIRED_LABEL_VISIBILITY_EVERYONE ? WIRED_LABEL_VISIBILITY_EVERYONE : WIRED_LABEL_VISIBILITY_WIRED_INSPECTORS)}
+                />
+                <label className="flex items-center gap-1">
+                    <input type="checkbox" className="octane-wired-label-settings__checkbox" data-testid="wired-label-always-open" disabled={!everyone} checked={everyone && alwaysOpen} onChange={(event) => setAlwaysOpen(event.target.checked)} />
                     <Text>{localizeWithFallback('widget.furniture_label.settings.always_open', 'Keep this label always open')}</Text>
                 </label>
                 <div className="flex justify-between gap-2">

@@ -15,7 +15,7 @@ describe('Messenger component structure', () => {
         expect(css).toMatch(/\.messenger-window \.messenger-minimize,[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;/);
         expect(css).toMatch(/\.messenger-window \.messenger-minimize:hover,[^}]*background-position:\s*-52px 0;/s);
         expect(css).toMatch(/\.messenger-window \.messenger-minimize:active,[^}]*background-position:\s*-26px 0;/s);
-        expect(css).toMatch(/\.messenger-window \.messenger-btn\.close-btn\s*\{[^}]*border-image:\s*none;/s);
+        expect(css).toMatch(/\.messenger-window \.messenger-btn\.close-btn\s*\{[^}]*border-image-source:\s*none;/s);
         expect(css).toMatch(/\.messenger-window \.messenger-btn\.danger\s*\{[^}]*flex:\s*1 1 auto;/s);
         expect(css).toMatch(/\.messenger-window \.messenger-avatar-tab\.unread::after\s*\{[^}]*width:\s*13px;[^}]*height:\s*12px;/s);
         expect(css).toContain('chat-indicator.svg');

@@ -16,7 +16,8 @@ import {
     getCustomVariableItemId,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
-import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
+import { isWiredSameHolderEligible, WiredValueOrVariableInput } from '../WiredValueOrVariableInput';
+import { customVariablePickerEntries, normalizeWiredValueTarget, variableTokenFromId, WIRED_VALUE_TARGETS } from '../WiredValueOrVariableField';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { WiredActionDelaySection } from './WiredActionDelaySection';
 
@@ -68,7 +69,7 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
         setStringParam = null,
         setSourceTypes = null
     } = useWired();
-    const { userVariableDefinitions = [], furniVariableDefinitions = [], contextVariableDefinitions = [] } = useWiredTools();
+    const { userVariableDefinitions = [], furniVariableDefinitions = [], roomVariableDefinitions = [], contextVariableDefinitions = [] } = useWiredTools();
     const [selectedTargetType, setSelectedTargetType] = useState<VariableTargetType>('user');
     const [selectedVariableToken, setSelectedVariableToken] = useState('');
     const [overrideExisting, setOverrideExisting] = useState(false);
@@ -79,6 +80,17 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
     const [referenceTarget, setReferenceTarget] = useState(REFERENCE_GLOBAL);
     const [referenceToken, setReferenceToken] = useState('');
     const [sameHolder, setSameHolder] = useState(false);
+    const [initialValueValid, setInitialValueValid] = useState(true);
+    const referenceTargetKey = WIRED_VALUE_TARGETS.find((entry) => entry.value === referenceTarget)?.key ?? 'global';
+    const referenceEntries = useMemo(() => {
+        const definitions = { furni: furniVariableDefinitions, user: userVariableDefinitions, global: roomVariableDefinitions, context: contextVariableDefinitions }[
+            referenceTargetKey
+        ];
+
+        return customVariablePickerEntries(referenceTargetKey, 'change-reference', definitions.filter((definition) => definition.hasValue), referenceToken);
+    }, [contextVariableDefinitions, furniVariableDefinitions, referenceTargetKey, referenceToken, roomVariableDefinitions, userVariableDefinitions]);
+    // AIR ValueOrVariableSection.referenceVariableOnTarget: only for a variable on the destination's own furni or user holder.
+    const sameHolderActive = fromVariable && sameHolder && isWiredSameHolderEligible(selectedTargetType, referenceTargetKey);
 
     const targetDefinitions = useMemo(() => {
         if (selectedTargetType === 'furni') return furniVariableDefinitions;
@@ -173,12 +185,14 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
         const referenceItemId = fromVariable ? getCustomVariableItemId(referenceToken) : 0;
 
         setStringParam(`${variableItemId || ''}\t${referenceItemId}`);
-        setIntParams([targetValue, initialValue < 0 ? -1 : 0, initialValue, overrideExisting ? 1 : 0, fromVariable ? 1 : 0, referenceTarget, fromVariable && sameHolder ? 1 : 0]);
+        setIntParams([targetValue, initialValue < 0 ? -1 : 0, initialValue, overrideExisting ? 1 : 0, fromVariable ? 1 : 0, referenceTarget, sameHolderActive ? 1 : 0]);
         setSourceTypes({ furni: [furniSource], users: [userSource] });
         setFurniIds(selectedTargetType === 'furni' && furniSource === SOURCE_SELECTED ? [...furniIds] : []);
     };
 
-    const validate = () => getCustomVariableItemId(selectedVariableToken) > 0 && (!fromVariable || getCustomVariableItemId(referenceToken) > 0);
+    const validate = () =>
+        getCustomVariableItemId(selectedVariableToken) > 0 &&
+        (!selectedVariableDefinition?.hasValue || (initialValueValid && (!fromVariable || getCustomVariableItemId(referenceToken) > 0)));
 
     const requiresFurni =
         selectedTargetType === 'furni' ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT : WiredFurniType.STUFF_SELECTION_OPTION_NONE;
@@ -254,35 +268,26 @@ export const WiredActionGiveVariableView: FC<{}> = () => {
                     <div className="octane-wired__divider" />
 
                     <div className="octane-wired__give-var-section">
-                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.value_settings')}</div>
-                        {selectedVariableDefinition?.hasValue ? (
-                            <>
-                                <WiredValueOrVariableSection
-                                    name="giveVariableInitial"
-                                    hideSources={true}
-                                    isVariable={fromVariable}
-                                    value={initialValueInput}
-                                    target={referenceTarget}
-                                    token={referenceToken}
-                                    furniSource={furniSource}
-                                    userSource={userSource}
-                                    onIsVariableChange={setFromVariable}
-                                    onValueChange={setInitialValueInput}
-                                    onTargetChange={setReferenceTarget}
-                                    onTokenChange={setReferenceToken}
-                                    onFurniSourceChange={() => null}
-                                    onUserSourceChange={() => null}
-                                />
-                                {fromVariable && (
-                                    <label className="octane-wired__give-var-checkbox">
-                                        <input checked={sameHolder} className="form-check-input" type="checkbox" onChange={(event) => setSameHolder(event.target.checked)} />
-                                        <Text>{localizeWithFallback('wiredfurni.params.variables.same_holder', 'Read it on each target itself')}</Text>
-                                    </label>
-                                )}
-                            </>
-                        ) : (
-                            <Text small>{localizeWithFallback('wiredfurni.params.variables.value_settings.no_value', 'This variable has no value.')}</Text>
-                        )}
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.value_settings.initial_value')}</div>
+                        {/* AIR GiveVariable: the initial value is a value-or-variable section (createValueOrVariableSection). */}
+                        <WiredValueOrVariableInput
+                            disabled={!selectedVariableDefinition?.hasValue}
+                            entries={referenceEntries}
+                            isVariable={fromVariable}
+                            label={LocalizeText('wiredfurni.params.variables.value_settings.initial_value')}
+                            literal={initialValueInput}
+                            primaryTarget={selectedTargetType}
+                            sameHolder={sameHolder}
+                            target={referenceTargetKey}
+                            targets={WIRED_VALUE_TARGETS.map((entry) => entry.key)}
+                            token={referenceToken}
+                            onIsVariableChange={setFromVariable}
+                            onLiteralChange={setInitialValueInput}
+                            onSameHolderChange={setSameHolder}
+                            onTargetChange={(key) => setReferenceTarget(WIRED_VALUE_TARGETS.find((entry) => entry.key === key)?.value ?? REFERENCE_GLOBAL)}
+                            onTokenChange={setReferenceToken}
+                            onValidityChange={setInitialValueValid}
+                        />
                     </div>
 
                     <div className="octane-wired__divider" />

@@ -42,3 +42,22 @@ export const isUsingAdvancedSettings = (trigger: Triggerable | null, wiredType: 
 
     return wiredType === 'condition' && !!trigger.quantifierType && (trigger.quantifierCode ?? 0) !== 0;
 };
+
+/**
+ * The elements whose official advancedAlwaysVisible() returns true, by holder and code (AIR roomevents/wired_setup:
+ * StuffTypeMatches, input source quantity, HasVariable, VariableValue, VariableAge, ChestHasAmount and its item-type
+ * child; ReceiveLinkMessage; CarryUsers, VariablePlaceholderAddon, the chest item type scanner and the furni name
+ * placeholder; furni to furni, furni to user, GiveVariable, RemoveVariable, ChangeVariable, user to furni, the chest
+ * rewards, initiate transaction, remove furni, MoveAsGroup, the reward track actions, furni transparency and
+ * highlight; InNeighborhood and its furni / users children). Their advanced section is always open, with no toggle.
+ */
+const ADVANCED_ALWAYS_VISIBLE: Partial<Record<string, ReadonlySet<number>>> = {
+    trigger: new Set([29]),
+    condition: new Set([8, 38, 40, 42, 43, 45, 46]),
+    action: new Set([34, 35, 39, 40, 41, 43, 45, 46, 47, 56, 57, 58, 59, 61, 62]),
+    addon: new Set([8, 15, 18, 19]),
+    selector: new Set([6, 12])
+};
+
+/** Official advancedAlwaysVisible(): the element's advanced section opens expanded and cannot be folded. */
+export const isAdvancedAlwaysVisible = (holder: string | null, code: number): boolean => !!holder && !!ADVANCED_ALWAYS_VISIBLE[holder]?.has(code);

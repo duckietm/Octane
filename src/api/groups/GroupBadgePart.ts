@@ -28,6 +28,38 @@ export class GroupBadgePart {
         return GroupBadgePart.getCode(this.type, this.key, this.color, this.position);
     }
 
+    /** The badge editor's layers: the base, then four symbols. */
+    public static LAYER_COUNT: number = 5;
+
+    /**
+     * AIR `GuildManagementWindowCtrl.onGuildCreationInfo`: the creator opens on the badge the server sends with the
+     * group buy data (`key, colour, position` per layer). The first layer is the base, the rest symbols; a short list
+     * is padded with empty symbol layers. No parts means the server sent no default.
+     */
+    public static fromBadgeSettings(parts: ReadonlyArray<{ key: number; color: number; position: number }>): GroupBadgePart[] {
+        if (!parts || !parts.length) return [];
+
+        const layers: GroupBadgePart[] = [];
+
+        for (let index = 0; index < GroupBadgePart.LAYER_COUNT; index++) {
+            const part = parts[index];
+
+            layers.push(new GroupBadgePart(index === 0 ? GroupBadgePart.BASE : GroupBadgePart.SYMBOL, part?.key ?? 0, part?.color ?? 0, part?.position ?? 0));
+        }
+
+        return layers;
+    }
+
+    /**
+     * AIR `BadgeEditorCtrl.createLayerOption`: a layer whose colour is not in the palette (the empty layers of the
+     * default badge carry colour 0) shows, and is saved with, the palette's first colour.
+     */
+    public static withPaletteColors(parts: GroupBadgePart[], colorIds: ReadonlyArray<number>): GroupBadgePart[] {
+        if (!parts || !colorIds || !colorIds.length) return parts;
+
+        return parts.map((part) => (colorIds.includes(part.color) ? part : new GroupBadgePart(part.type, part.key, colorIds[0], part.position)));
+    }
+
     public static getCode(type: string, key: number, color: number, position: number): string {
         return type + (key < 10 ? '0' : '') + key + (color < 10 ? '0' : '') + color + position;
     }

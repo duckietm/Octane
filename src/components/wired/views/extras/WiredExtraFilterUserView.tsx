@@ -1,4 +1,4 @@
 import { FC } from 'react';
 import { WiredExtraFilterAmountView } from './WiredExtraFilterAmountView';
 
-export const WiredExtraFilterUserView: FC<{}> = () => <WiredExtraFilterAmountView name="wiredExtraFilterUserAmount" />;
+export const WiredExtraFilterUserView: FC<{}> = () => <WiredExtraFilterAmountView />;

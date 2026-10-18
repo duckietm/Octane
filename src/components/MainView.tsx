@@ -15,7 +15,6 @@ import { useMentionMessages, useOctaneEventReducer } from '../hooks';
 import { AchievementsView } from './achievements/AchievementsView';
 import { GoogleAdsView } from './ads/GoogleAdsView';
 import { AvatarEditorView } from './avatar-editor';
-import { AvatarEffectsView } from './avatar-effects';
 import { BadgeCreatorView } from './badge-creator';
 import { BadgeLeaderboardView } from './badge-leaderboard/BadgeLeaderboardView';
 import { CameraWidgetView } from './camera/CameraWidgetView';
@@ -199,7 +198,6 @@ export const MainView: FC<{}> = (props) =>
             <BadgeCreatorView />
             <BadgeLeaderboardView />
             <EmuStatsView />
-            <AvatarEffectsView />
             <AchievementsView />
             <HabbiconHubView />
             <NavigatorView />

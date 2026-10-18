@@ -18,9 +18,9 @@ export const WiredActionInitTransactionView: FC<{}> = () => {
             footerCollapsible={false}
         >
             <Text small>
-                Pick the Contract furni above to execute. Their terms are checked and applied atomically:
-                on success the "Transaction Completed" triggers fire, otherwise "Transaction Failed".
-                With no contract selected it simply fires "Transaction Completed".
+                Pick the Contract furni above to execute, and the chests they pay into and out of. Their terms are
+                checked and applied atomically: on success the "Transaction Completed" triggers fire, otherwise
+                "Transaction Failed". With no contract selected it simply fires "Transaction Completed".
             </Text>
         </WiredActionBaseView>
     );
