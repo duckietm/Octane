@@ -106,8 +106,9 @@ login/WebGL, so they're not usable for in-game verification.
 ## Stack snapshot
 
 - React 19.2.5, `react-dom` 19.2.5, `@types/react` 19.2.x.
-- TypeScript: TS 6 for build, **TS 7 native preview** (`@typescript/native-preview`,
-  invoked via `tsgo`) for the `typecheck` script.
+- TypeScript: TS 6 (`typescript`) for the tools that need its JavaScript API (`@typescript-eslint/parser`,
+  peer `<6.1`), and **TS 7** (the `typescript7` alias of `typescript@7`, run as
+  `node node_modules/typescript7/bin/tsc`) for the `typecheck` script.
 - Vite 8 + `@vitejs/plugin-react` 6 + `babel-plugin-react-compiler` 1.0.
 - ESLint 10 + `typescript-eslint` 8 + `eslint-plugin-react-hooks@7` +
   `eslint-plugin-react-compiler`.

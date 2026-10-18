@@ -23,7 +23,7 @@
         "format": "biome format --write ./src",
         "eslint": "eslint ./src",
         "lint:hooks": "eslint --config eslint.hooks.config.mjs ./src",
-        "typecheck": "tsgo --noEmit",
+        "typecheck": "node node_modules/typescript7/bin/tsc --noEmit",
         "test": "vitest run",
         "test:watch": "vitest",
         "verify:jsonc": "node scripts/verify-jsonc.mjs"
@@ -60,7 +60,6 @@
         "@types/react-dom": "^19.3.0",
         "@typescript-eslint/eslint-plugin": "^8.71.2",
         "@typescript-eslint/parser": "^8.71.2",
-        "@typescript/native-preview": "^7.0.0-dev.20260707.2",
         "@vitejs/plugin-react": "^6.1.2",
         "babel-plugin-react-compiler": "^1.0.0",
         "eslint": "^10.13.0",
@@ -73,6 +72,7 @@
         "sirv": "^3.0.2",
         "tailwindcss": "^4.3.3",
         "typescript": "^6.0.3",
+        "typescript7": "npm:typescript@^7.0.2",
         "vite": "^8.3.4",
         "vitest": "^5.0.5"
     }
