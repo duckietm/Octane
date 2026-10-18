@@ -60,10 +60,9 @@ describe('Friends list avatar head', () => {
         expect(avatar).toHaveClass('compact-head');
         expect(avatar).toHaveStyle({
             backgroundSize: '20px 20px',
+            backgroundPosition: 'center',
             imageRendering: 'auto'
         });
-        // jsdom 30.1.3 reports `center` as `50% 50%`; both mean the same position.
-        expect(['center', 'center center', '50% 50%']).toContain((avatar as HTMLElement).style.backgroundPosition);
     });
 
     it('renders the dedicated Frank face for Staff Chat', () => {

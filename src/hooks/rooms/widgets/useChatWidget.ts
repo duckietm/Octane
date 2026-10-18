@@ -288,6 +288,7 @@ const useChatWidgetState = () => {
                       name: username,
                       look: userData.figure,
                       imageUrl,
+                      textSize: chatMessage.textSize,
                       style: styleId,
                       chatType: chatType,
                       entityType: userData.type,

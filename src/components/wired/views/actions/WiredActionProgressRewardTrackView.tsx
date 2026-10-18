@@ -5,7 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
-import { variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
+import { variableTokenFromId, WIRED_FIXED_HOLDER_SOURCE, WiredValueOrVariableField } from '../WiredValueOrVariableField';
 import { clampProgressAmount, PROGRESS_ACHIEVEMENT_MAX_AMOUNT } from './WiredActionProgressAchievementView';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
@@ -35,6 +35,7 @@ export const WiredActionProgressRewardTrackView: FC<{}> = () => {
     const [valueTarget, setValueTarget] = useState(GLOBAL_TARGET);
     const [valueToken, setValueToken] = useState('');
     const [userSource, setUserSource] = useState(0);
+    const [valueValid, setValueValid] = useState(true);
 
     useEffect(() => {
         if (!trigger) return;
@@ -66,7 +67,7 @@ export const WiredActionProgressRewardTrackView: FC<{}> = () => {
             hasSpecialInput={true}
             requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
             save={save}
-            validate={() => trackId.length > 0 && taskId.length > 0 && (!isVariable || getCustomVariableItemId(valueToken) > 0)}
+            validate={() => trackId.length > 0 && taskId.length > 0 && valueValid && (!isVariable || getCustomVariableItemId(valueToken) > 0)}
         >
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.progress.ids', 'Reward track')}</Text>
@@ -93,22 +94,22 @@ export const WiredActionProgressRewardTrackView: FC<{}> = () => {
             </label>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.score', 'Score')}</Text>
-                <WiredValueOrVariableSection
-                    name="rewardTrackValue"
+                {/* AIR ProgressRewardTrack: createValueOrVariableSection(0, mergedSourceOptions(0), score, 1, int max) with the
+                    claimed merged slot 0 in the popup. The server reads the variable on a room or context holder only. */}
+                <WiredValueOrVariableField
+                    holderSource={WIRED_FIXED_HOLDER_SOURCE}
                     isVariable={isVariable}
-                    value={amount}
-                    target={valueTarget}
-                    token={valueToken}
-                    furniSource={0}
-                    userSource={0}
+                    label={localizeWithFallback('wiredfurni.params.reward_track.score', 'Score')}
+                    literal={amount}
                     min={1}
+                    target={valueTarget}
                     targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
+                    token={valueToken}
                     onIsVariableChange={setIsVariable}
-                    onValueChange={setAmount}
+                    onLiteralChange={setAmount}
                     onTargetChange={setValueTarget}
                     onTokenChange={setValueToken}
-                    onFurniSourceChange={() => undefined}
-                    onUserSourceChange={() => undefined}
+                    onValidityChange={setValueValid}
                 />
             </div>
         </WiredActionBaseView>

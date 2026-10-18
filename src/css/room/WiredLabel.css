@@ -89,8 +89,36 @@
     min-width: 61px;
 }
 
+/* AIR save_button keeps its right edge and shrinks to its caption with the label margins (60px for "Ready"),
+   white button_shiny_bold on the green style-5 button. */
 .octane-wired-label-settings__ready {
-    min-width: 119px;
+    width: auto;
+    min-width: 0;
+    padding: 0 5px 0 4px;
+    color: #fff;
+}
+
+/* Checkbox style 102 has no element entry, so AIR draws the default 15x15 checkbox skin, at half alpha while disabled. */
+.octane-wired-label-settings__checkbox {
+    flex: 0 0 15px;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    appearance: none;
+    background: url('../../assets/images/wired/label/checkbox-default.png') 0 0 no-repeat;
+    box-shadow: none;
+    image-rendering: pixelated;
+}
+
+.octane-wired-label-settings__checkbox:checked {
+    background-image: url('../../assets/images/wired/label/checkbox-checked.png');
+}
+
+.octane-wired-label-settings__checkbox:disabled {
+    opacity: 0.5;
 }
 
 .octane-wired-label-settings__preview {

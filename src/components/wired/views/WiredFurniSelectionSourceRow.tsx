@@ -4,6 +4,13 @@ import { LocalizeText } from '../../../api';
 import { Button, Text } from '../../../common';
 import { WiredSourceOption } from './WiredSourcesSelector';
 
+/**
+ * AIR WiredInputSourcePicker.refreshContainer + InputSourceControlPreset.updateUI: a room or context holder
+ * ("wiredfurni.params.sources.global" / ".context") has nothing to cycle, so both arrows are disabled
+ * (isButtonsDisabled). A single furni or user option keeps live arrows.
+ */
+export const isWiredHolderSourceLabel = (label: string): boolean => /^wiredfurni\.params\.sources\.(global|context)$/.test(label ?? '');
+
 interface WiredFurniSelectionSourceRowProps {
     title: string;
     titleIsLiteral?: boolean;
@@ -47,9 +54,10 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
     const labelText = currentOption ? LocalizeText(currentOption.label) : '';
     const displayText = shouldShowCount ? `${labelText} ${countText}` : labelText;
     const resolvedTitle = titleIsLiteral ? title : LocalizeText(title);
+    const holderRow = isWiredHolderSourceLabel(currentOption?.label);
 
     const cycleValue = (direction: -1 | 1) => {
-        if (!options.length || !onChange) return;
+        if (!options.length || !onChange || holderRow) return;
 
         const nextIndex = (currentIndex + direction + options.length) % options.length;
 
@@ -73,7 +81,7 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
                 )}
             </div>
             <div className="flex items-center gap-1">
-                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(-1)}>
+                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" disabled={holderRow} onClick={() => cycleValue(-1)}>
                     <FaChevronLeft />
                 </Button>
                 <div className="flex min-w-0 flex-1 items-center justify-center octane-wired__picker-label">
@@ -81,7 +89,7 @@ export const WiredFurniSelectionSourceRow: FC<WiredFurniSelectionSourceRowProps>
                         {displayText}
                     </Text>
                 </div>
-                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" onClick={() => cycleValue(1)}>
+                <Button variant="primary" classNames={['octane-wired__picker-button']} className="px-2 py-1" disabled={holderRow} onClick={() => cycleValue(1)}>
                     <FaChevronRight />
                 </Button>
             </div>

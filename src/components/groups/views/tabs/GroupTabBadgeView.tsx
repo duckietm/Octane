@@ -90,13 +90,15 @@ export const GroupTabBadgeView: FC<GroupTabBadgeViewProps> = (props) => {
 
     useEffect(() => {
         if (groupData.groupId <= 0) {
-            setBadgeParts(groupData.groupBadgeParts ? [...groupData.groupBadgeParts] : null);
+            const colorIds = groupCustomize?.badgePartColors?.map((color) => color.id) ?? [];
+
+            setBadgeParts(groupData.groupBadgeParts ? GroupBadgePart.withPaletteColors([...groupData.groupBadgeParts], colorIds) : null);
 
             return;
         }
 
         setBadgeParts(groupData.groupBadgeParts);
-    }, [groupData.groupId, groupData.groupBadgeParts]);
+    }, [groupData.groupId, groupData.groupBadgeParts, groupCustomize?.badgePartColors]);
 
     useEffect(() => {
         setCloseAction({ action: saveBadge });

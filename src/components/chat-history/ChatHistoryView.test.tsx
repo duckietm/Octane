@@ -12,6 +12,10 @@ vi.mock('../../hooks', () => ({
     useOnClickChat: () => ({ onClickChat: vi.fn() })
 }));
 
+vi.mock('../../hooks/session/useSessionSnapshots', () => ({
+    useUserDataSnapshot: () => ({ userName: 'Viewer' })
+}));
+
 const roomInfoEntry = (overrides: Partial<IChatEntry> = {}): IChatEntry => ({
     id: 1,
     webId: -1,
@@ -51,5 +55,32 @@ describe('ChatHistoryView room information', () => {
         renderVisibleHistory([roomInfoEntry({ name: 'Sala da pranzo' })]);
 
         expect(screen.getByText('Sala da pranzo')).toBeInTheDocument();
+    });
+
+    it('draws a chat line with the live chat bubble, in the flow of the list', () => {
+        renderVisibleHistory([
+            roomInfoEntry({
+                id: 2,
+                webId: 7,
+                entityId: 3,
+                name: 'dennis',
+                message: 'hallo daar',
+                style: 0,
+                chatType: 0,
+                color: '#ff0000',
+                imageUrl: 'data:image/png;base64,AA==',
+                type: ChatEntryType.TYPE_CHAT
+            })
+        ]);
+
+        const message = screen.getByText('hallo daar');
+        const bubble = message.closest('.bubble-container');
+
+        expect(bubble).not.toBeNull();
+        expect(bubble.className).toContain('octane-chat-history-bubble');
+        expect(bubble.className).toContain('relative');
+        expect(bubble.className).not.toContain('absolute');
+        expect(bubble.querySelector('.chat-bubble').className).toContain('max-w-[335px]');
+        expect(screen.getByText('dennis', { exact: false })).toBeInTheDocument();
     });
 });

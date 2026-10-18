@@ -87,6 +87,17 @@ export const GroupCreatorView: FC<GroupCreatorViewProps> = (props) => {
 
         setAvailableRooms(rooms);
         setPurchaseCost(parser.groupCost);
+
+        // AIR opens the badge step on the server's default badge; a badge already being made is kept.
+        const defaultBadgeParts = GroupBadgePart.fromBadgeSettings(parser.badgeParts ?? []);
+
+        if (!defaultBadgeParts.length) return;
+
+        setGroupData((prevValue) => {
+            if (!prevValue || prevValue.groupBadgeParts?.length) return prevValue;
+
+            return { ...prevValue, groupBadgeParts: defaultBadgeParts };
+        });
     });
 
     useEffect(() => {

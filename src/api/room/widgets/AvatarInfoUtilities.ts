@@ -18,7 +18,7 @@ import {
     RoomWidgetEnumItemExtradataParameter
 } from '@octane/renderer';
 import { GetRoomSession, IsAnyRoomController, IsOwnerOfFurniture } from '../../octane';
-import { IsTemporaryFurniId, LocalizeText } from '../../utils';
+import { IsBuildersClubFurniId, IsTemporaryFurniId, LocalizeText } from '../../utils';
 import { AvatarInfoFurni } from './AvatarInfoFurni';
 import { AvatarInfoName } from './AvatarInfoName';
 import { AvatarInfoPet } from './AvatarInfoPet';
@@ -87,6 +87,7 @@ export class AvatarInfoUtilities {
         furniInfo.id = objectId;
         furniInfo.category = category;
         furniInfo.isTemporary = IsTemporaryFurniId(objectId);
+        furniInfo.isBuildersClub = IsBuildersClubFurniId(objectId);
 
         const model = roomObject.model;
 

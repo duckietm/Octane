@@ -4,7 +4,7 @@ import { Text } from '../../../../common';
 import { useAchievements, useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
-import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
+import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableField } from '../WiredValueOrVariableField';
 import { WiredActionBaseView } from './WiredActionBaseView';
 
 /**
@@ -37,6 +37,7 @@ export const WiredActionProgressAchievementView: FC<{}> = () => {
     const [valueToken, setValueToken] = useState('');
     const [valueFurniSource, setValueFurniSource] = useState(0);
     const [valueUserSource, setValueUserSource] = useState(0);
+    const [valueValid, setValueValid] = useState(true);
 
     useEffect(() => {
         if (!trigger) return;
@@ -70,7 +71,7 @@ export const WiredActionProgressAchievementView: FC<{}> = () => {
         setSourceTypes({ furni: [valueFurniSource], users: [userSource, valueUserSource] });
     };
 
-    const validate = () => achievement.length > 0 && (!isVariable || getCustomVariableItemId(valueToken) > 0);
+    const validate = () => achievement.length > 0 && valueValid && (!isVariable || getCustomVariableItemId(valueToken) > 0);
 
     return (
         <WiredActionBaseView
@@ -116,21 +117,27 @@ export const WiredActionProgressAchievementView: FC<{}> = () => {
             </div>
             <div className="flex flex-col gap-1">
                 <Text bold>{localizeWithFallback('wiredfurni.params.progress_achievement.score', 'Amount')}</Text>
-                <WiredValueOrVariableSection
-                    name="progressAchievementValue"
+                {/* AIR ProgressAchievement: createValueOrVariableSection(0, mergedSourceOptions(0), score, 0, int max); the
+                    claimed merged slot 0 (furni 0 + users 1) is the value's holder in the popup. The server keeps the
+                    amount to 1..1000000 (clampProgressAmount on save). */}
+                <WiredValueOrVariableField
+                    holderSource={{
+                        furniSource: valueFurniSource,
+                        userSource: valueUserSource,
+                        onFurniSourceChange: setValueFurniSource,
+                        onUserSourceChange: setValueUserSource
+                    }}
                     isVariable={isVariable}
-                    value={amount}
+                    label={localizeWithFallback('wiredfurni.params.progress_achievement.score', 'Amount')}
+                    literal={amount}
+                    min={0}
                     target={valueTarget}
                     token={valueToken}
-                    furniSource={valueFurniSource}
-                    userSource={valueUserSource}
-                    min={1}
                     onIsVariableChange={setIsVariable}
-                    onValueChange={setAmount}
+                    onLiteralChange={setAmount}
                     onTargetChange={setValueTarget}
                     onTokenChange={setValueToken}
-                    onFurniSourceChange={setValueFurniSource}
-                    onUserSourceChange={setValueUserSource}
+                    onValidityChange={setValueValid}
                 />
             </div>
         </WiredActionBaseView>

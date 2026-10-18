@@ -46,7 +46,7 @@ describe('SWF messenger compact avatar cascade', () => {
         expect(style.width).toBe('35px');
         expect(style.height).toBe('35px');
         expect(style.backgroundSize).toBe('35px 35px');
-        expect(['center center', '50% 50%']).toContain(style.backgroundPosition);
+        expect(style.backgroundPosition).toBe('center center');
     });
 
     it('keeps message heads centered at their cropped size', () => {
@@ -55,6 +55,6 @@ describe('SWF messenger compact avatar cascade', () => {
         expect(style.width).toBe('40px');
         expect(style.height).toBe('40px');
         expect(style.backgroundSize).toBe('40px 40px');
-        expect(['center center', '50% 50%']).toContain(style.backgroundPosition);
+        expect(style.backgroundPosition).toBe('center center');
     });
 });

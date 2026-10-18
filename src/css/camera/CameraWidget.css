@@ -196,13 +196,18 @@
     cursor: default;
 }
 
+/* camera_interface_xml button_editor: button_thick at y=308, 40 high, params accommodate + align centre, so it
+   shrinks to its label (habbo_window_layout_button_thick: 8px left/right margins) and stays centred. */
 .octane-camera-capture__editor-button {
     position: relative;
+    display: inline-flex;
     box-sizing: border-box;
     top: 1px;
-    width: 46px;
+    width: auto;
     height: 40px;
-    padding: 0;
+    padding: 0 3px;
+    align-items: center;
+    justify-content: center;
     border: 5px solid transparent;
     border-image: var(--habbo-skin-shiny-thick-green) 5 fill / 5px stretch;
     background: none;

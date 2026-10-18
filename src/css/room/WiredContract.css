@@ -1,0 +1,376 @@
+/*
+ * The official contract editor (AIR PaymentContract / TradeContract / RewardContract / AddEditContractElement) in the
+ * Ubuntu wired style: container 0xe9e9e1, ruler 0xb5b5b5, 7px section spacing, 262px frames (420 for elements).
+ */
+.wired-contract .octane-card-content-shell {
+    padding: 0 7px 7px !important;
+    color: #000;
+    background: #e9e9e1;
+}
+
+.wired-contract__editable {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.wired-contract__section {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    margin: 7px 0 0;
+    padding: 7px 0 0;
+    border: 0;
+    border-top: 1px solid #b5b5b5;
+}
+
+.wired-contract__editable > .wired-contract__section:first-child,
+.wired-contract__element-top > .wired-contract__section {
+    margin-top: 0;
+    border-top: 0;
+}
+
+.wired-contract__section:disabled {
+    opacity: 0.5;
+}
+
+.wired-contract__section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.wired-contract__fold {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.wired-contract__choice {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 20px;
+    margin: 0;
+}
+
+/* Ubuntu radio / checkbox skins. */
+.wired-contract__choice > input {
+    flex: 0 0 15px;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    border: 0;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: center;
+    image-rendering: pixelated;
+}
+
+.wired-contract__choice > input[type='radio'] {
+    background-image: var(--habbo-skin-radio);
+}
+
+.wired-contract__choice > input[type='radio']:checked {
+    background-image: var(--habbo-skin-radio-checked);
+}
+
+.wired-contract__choice > input[type='checkbox'] {
+    background-image: var(--habbo-skin-checkbox);
+    background-size: 15px 15px;
+}
+
+.wired-contract__choice > input[type='checkbox']:checked {
+    background-image: var(--habbo-skin-checkbox-checked);
+}
+
+.wired-contract__input {
+    width: 100%;
+    min-width: 0;
+    height: 22px;
+    padding: 2px 3px;
+    border: 1px solid #777;
+    border-radius: 3px;
+    background: #fff;
+    color: #000;
+    font: 12px Ubuntu, sans-serif;
+    resize: none;
+}
+
+.wired-contract__textarea {
+    height: 52px;
+}
+
+.wired-contract__amount {
+    width: 80px;
+}
+
+.wired-contract__input:disabled {
+    opacity: 0.5;
+}
+
+.wired-contract__footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 7px;
+    padding-top: 7px;
+    border-top: 1px solid #b5b5b5;
+}
+
+.wired-contract__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    padding: 0 8px;
+    border: 3px solid transparent;
+    border-image: url('../../assets/images/habbo-skin/slices/button-default.png') 3 fill / 3px stretch;
+    background: transparent;
+    color: #000;
+    font: 12px Ubuntu, sans-serif;
+}
+
+.wired-contract__button--wide {
+    width: 100%;
+}
+
+.wired-contract__button:hover:not(:disabled) {
+    filter: brightness(1.04);
+}
+
+.wired-contract__button:active:not(:disabled) {
+    filter: brightness(0.92);
+}
+
+.wired-contract__button:disabled {
+    opacity: 0.5;
+}
+
+.wired-contract__rule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.wired-contract__rule {
+    position: relative;
+    min-height: 68px;
+    padding: 3px 6px 5px;
+    isolation: isolate;
+}
+
+.wired-contract__nodes {
+    position: absolute;
+    top: 20px;
+    right: 6px;
+    left: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 42px;
+    margin-top: 1px;
+}
+
+.wired-contract__node {
+    position: relative;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+}
+
+.wired-contract__node-edit {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 1px;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    isolation: isolate;
+}
+
+.wired-contract__node-edit > img,
+.wired-contract__coins {
+    image-rendering: pixelated;
+}
+
+.wired-contract__quantity {
+    position: absolute;
+    right: 3px;
+    bottom: 2px;
+    min-width: 16px;
+    height: 13px;
+    padding: 0 3px;
+    border-radius: 3px;
+    background: #cccccccc;
+    color: #222;
+    font: bold 10px Ubuntu, sans-serif;
+}
+
+/* AIR shows a node's and a removable rule's close button only while hovered. */
+.wired-contract__remove-node,
+.wired-contract__remove-rule {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    visibility: hidden;
+    isolation: isolate;
+}
+
+.wired-contract__remove-rule {
+    top: 3px;
+    right: 4px;
+}
+
+.wired-contract__node:hover .wired-contract__remove-node,
+.wired-contract__node:focus-within .wired-contract__remove-node,
+.wired-contract__rule:hover > .wired-contract__remove-rule,
+.wired-contract__rule:focus-within > .wired-contract__remove-rule {
+    visibility: visible;
+}
+
+.wired-contract__remove-node > img,
+.wired-contract__remove-rule > img {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 9px;
+    height: 9px;
+    filter: brightness(0) invert(46.666667%);
+    image-rendering: pixelated;
+}
+
+.wired-contract__add-node {
+    position: relative;
+    flex: 0 0 23px;
+    width: 23px;
+    height: 22px;
+    margin-left: 2px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    isolation: isolate;
+}
+
+.wired-contract__skin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.wired-contract__element-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.wired-contract__named {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.wired-contract__named-input {
+    width: 150px;
+}
+
+.wired-contract__selected-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 20px;
+    overflow: visible;
+}
+
+/* AIR table_view_xml: border_white, 5px margins, 23px header plus a 1px splitter, 20px rows. */
+.wired-contract__item-table {
+    position: relative;
+    height: 234px;
+    padding: 5px;
+    isolation: isolate;
+}
+
+.wired-contract__item-heading,
+.wired-contract__item-row {
+    display: grid;
+    grid-template-columns: 50% 30% 20%;
+    width: 100%;
+}
+
+.wired-contract__item-heading {
+    height: 24px;
+    border-bottom: 1px solid #00000050;
+    background: #fff;
+}
+
+.wired-contract__item-heading > span {
+    padding-top: 2px;
+}
+
+.wired-contract__item-scroll {
+    height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.wired-contract__item-row {
+    position: absolute;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: #f9f9f9;
+    font: 12px Ubuntu, sans-serif;
+    text-align: left;
+}
+
+.wired-contract__item-row > span,
+.wired-contract__item-heading > span {
+    min-width: 0;
+    padding-right: 4px;
+    padding-left: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wired-contract__item-row > span {
+    padding-top: 1px;
+}
+
+.wired-contract__item-row[data-even='true'] {
+    background: #eaeaea;
+}
+
+.wired-contract__item-row[aria-selected='true'] {
+    background: #d1d1d1;
+}
+
+.wired-contract__item-row[aria-selected='true']:focus {
+    background: #b8e2fc;
+}
+
+/* AIR TextPreset.halfBlend. */
+.wired-contract__count {
+    opacity: 0.5;
+}

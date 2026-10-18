@@ -128,6 +128,15 @@ export const RoomWidgetEnumItemExtradataParameter = makeEnumProxy('RoomWidgetEnu
 // Numeric enums — values mirror the real renderer SDK so comparisons
 // (`controllerLevel >= GUILD_ADMIN`, category branching) keep working.
 
+// Mirrors `packages/communication/src/messages/parser/roomsettings/RoomChatSettings.ts`.
+export class RoomChatSettings {
+    static readonly CHAT_MODE_FREE_FLOW = 0;
+    static readonly CHAT_MODE_LINE_BY_LINE = 1;
+    static readonly CHAT_BUBBLE_WIDTH_WIDE = 0;
+    static readonly CHAT_BUBBLE_WIDTH_NORMAL = 1;
+    static readonly CHAT_BUBBLE_WIDTH_THIN = 2;
+}
+
 export class RoomControllerLevel {
     static readonly NONE = 0;
     static readonly GUEST = 1;
@@ -975,6 +984,8 @@ export class WiredRoomLogsPageComposer extends RecordingComposer {}
 export class WiredArrayInspectionRequestComposer extends RecordingComposer {}
 export class WiredArrayInspectionUpdateComposer extends RecordingComposer {}
 export class WiredArrayInspectionDataEvent extends StubClass {}
+export class WiredGetVariablesForObjectComposer extends RecordingComposer {}
+export class WiredVariablesForObjectEvent extends StubClass {}
 export class WiredSetupExportComposer extends RecordingComposer {}
 export class WiredSetupImportComposer extends RecordingComposer {}
 export class WiredSetupExportResultEvent extends StubClass {}

@@ -135,12 +135,13 @@ describe('AIR own-avatar menu', () => {
             'widget.memenu.dance',
             'infostand.show.signs',
             'avatar.widget.drop_hand_item',
-            'widget.memenu.effects',
             'infostand.button.wired_inspect',
             'Custom nickname',
             'Badge leaderboard'
         ]);
         expect(screen.queryByText('product.type.effect')).not.toBeInTheDocument();
+        // Effects are bought in the catalogue and worn from the inventory, so the menu has no Effects entry.
+        expect(screen.queryByText('widget.memenu.effects')).not.toBeInTheDocument();
     });
 
     it('keeps the retained AIR and Polaris actions wired', () => {
@@ -149,15 +150,14 @@ describe('AIR own-avatar menu', () => {
         renderMenu(onClose);
 
         fireEvent.click(screen.getByText('widget.memenu.myclothes'));
-        fireEvent.click(screen.getByText('widget.memenu.effects'));
         fireEvent.click(screen.getByText('Custom nickname'));
         fireEvent.click(screen.getByText('Badge leaderboard'));
 
         expect(mocks.createLinkEvent).toHaveBeenCalledWith('avatar-editor/show');
-        expect(mocks.createLinkEvent).toHaveBeenCalledWith('avatar-effects/show');
+        expect(mocks.createLinkEvent).not.toHaveBeenCalledWith('avatar-effects/show');
         expect(mocks.createLinkEvent).toHaveBeenCalledWith('customize/show');
         expect(mocks.createLinkEvent).toHaveBeenCalledWith('badge-leaderboard/show');
-        expect(onClose).toHaveBeenCalledTimes(4);
+        expect(onClose).toHaveBeenCalledTimes(3);
     });
 
 });

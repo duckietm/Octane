@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { fromOfficialVariableTarget, LocalizeText, localizeWithFallback, toOfficialVariableTarget, WiredFurniType } from '../../../../api';
+import { fromOfficialVariableTarget, LocalizeText, toOfficialVariableTarget, WiredFurniType } from '../../../../api';
 import contextVariableIcon from '../../../../assets/images/wired/var/icon_source_context_clean.png';
 import furniVariableIcon from '../../../../assets/images/wired/var/icon_source_furni.png';
 import globalVariableIcon from '../../../../assets/images/wired/var/icon_source_global.png';
@@ -16,7 +16,7 @@ import {
     IWiredVariablePickerEntry,
     normalizeVariableTokenFromWire
 } from '../WiredVariablePickerData';
-import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
+import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableField } from '../WiredValueOrVariableField';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
@@ -134,6 +134,7 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
     const [userSource, setUserSource] = useState(SOURCE_TRIGGER);
     const [furniSource, setFurniSource] = useState(SOURCE_TRIGGER);
     const [quantifier, setQuantifier] = useState(QUANTIFIER_ALL);
+    const [durationValid, setDurationValid] = useState(true);
 
     const availableUserSources = useAvailableUserSources(trigger, USER_SOURCES);
     const orderedUserSources = useMemo(() => sortWiredSourceOptions(availableUserSources, 'users'), [availableUserSources]);
@@ -228,6 +229,8 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
     const validate = () => {
         if (!variableToken.length) return false;
         if (targetType === 'global' && compareValue !== COMPARE_VALUE_UPDATED) return false;
+        if (!durationValid) return false;
+        if (fromVariable && getCustomVariableItemId(durationToken) <= 0) return false;
 
         return true;
     };
@@ -355,27 +358,25 @@ export const WiredConditionVariableAgeMatchView: FC<{}> = () => {
 
                 <div className="octane-wired__give-var-section">
                     <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.time_selection')}</div>
-                    <WiredValueOrVariableSection
-                        name="variableAgeDuration"
-                        hideSources={true}
-                        min={0}
-                        isVariable={fromVariable}
-                        value={durationInput}
-                        target={durationTarget}
-                        token={durationToken}
-                        furniSource={furniSource}
-                        userSource={userSource}
-                        onIsVariableChange={setFromVariable}
-                        onValueChange={setDurationInput}
-                        onTargetChange={setDurationTarget}
-                        onTokenChange={setDurationToken}
-                        onFurniSourceChange={() => null}
-                        onUserSourceChange={() => null}
-                    />
-                    <div className="flex items-center gap-2">
-                        <Text>{localizeWithFallback('wiredfurni.params.variables.duration.unit', LocalizeText('wiredfurni.params.variables.duration'))}</Text>
+                    {/* AIR VariableAge: createValueOrVariableSection(1, mergedSourceOptions(1), null, int min, int max, false, 0) in
+                        one row with the unit dropdown (90 wide). The server reads the duration variable on the condition's own
+                        holder, so the popup offers the type selector only. */}
+                    <div className="octane-wired__value-row">
+                        <WiredValueOrVariableField
+                            isVariable={fromVariable}
+                            label={LocalizeText('wiredfurni.params.variables.time_selection')}
+                            literal={durationInput}
+                            target={durationTarget}
+                            token={durationToken}
+                            onIsVariableChange={setFromVariable}
+                            onLiteralChange={setDurationInput}
+                            onTargetChange={setDurationTarget}
+                            onTokenChange={setDurationToken}
+                            onValidityChange={setDurationValid}
+                        />
                         <select
-                            className="min-w-0 flex-1 rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
+                            aria-label={LocalizeText('wiredfurni.params.variables.duration')}
+                            className="octane-wired__value-row-select rounded border border-[#b8b2a4] bg-white px-2 py-[3px] text-[12px]"
                             value={durationUnit}
                             onChange={(event) => setDurationUnit(Number(event.target.value))}
                         >

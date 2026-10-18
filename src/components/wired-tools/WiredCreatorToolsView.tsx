@@ -43,9 +43,13 @@ import {
     LocalizeText,
     localizeWithFallback,
     NotificationAlertType,
+    canHighlightWiredBoxesFor,
     decodeUserVariableHolder,
     findUserVariableHolderData,
+    getWiredObjectInspectionRequest,
+    getWiredObjectInspectionValues,
     SendMessageComposer,
+    toWiredInspectionAssignments,
     userVariableHolderKey,
     WiredSelectionVisualizer
 } from '../../api';
@@ -65,7 +69,7 @@ import {
     OctaneCardView,
     Text
 } from '../../common';
-import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredTools } from '../../hooks';
+import { useInventoryTrade, useMessageEvent, useNotification, useObjectSelectedEvent, useRoom, useWiredObjectInspection, useWiredTools } from '../../hooks';
 import { WiredChestsTabView } from './WiredChestsTabView';
 import { WiredShareTabView } from './WiredShareTabView';
 import { isRecolorableFurniKey, parseRecolorableFurniValue, recolorableFurniVariables } from './WiredRecolorableFurni.helpers';
@@ -258,6 +262,34 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         updateFurniVariableValue,
         updateRoomVariableValue
     } = useWiredTools();
+    // AIR's inspection tab reads the inspected object's variables from the server (and re-reads them while open).
+    const objectInspectionRequest = useMemo(
+        () => getWiredObjectInspectionRequest(inspectionType, selectedFurni, selectedUser),
+        [inspectionType, selectedFurni?.objectId, selectedUser?.roomIndex]
+    );
+    const { data: objectInspection, refresh: refreshObjectInspection } = useWiredObjectInspection({
+        active: isVisible && activeTab === 'inspection' && !!roomSession?.roomId && roomSettings.canInspect,
+        request: objectInspectionRequest
+    });
+    const [isHighlightingConfiguredWireds, setIsHighlightingConfiguredWireds] = useState(false);
+    const canHighlightConfiguredWireds = canHighlightWiredBoxesFor(objectInspection);
+    const configuredWiredsKey = canHighlightConfiguredWireds ? objectInspection.configuredInWireds.join(',') : '';
+
+    // AIR clears the box highlight when another object is inspected or the tab is left.
+    useEffect(() => {
+        setIsHighlightingConfiguredWireds(false);
+    }, [objectInspectionRequest?.type, objectInspectionRequest?.objectId, activeTab, isVisible]);
+
+    // AIR `onHighlightWiredsClicked`: the wired boxes that have the inspected furni in their furni picks.
+    useEffect(() => {
+        if (!isHighlightingConfiguredWireds || !configuredWiredsKey) return;
+
+        const objects = configuredWiredsKey.split(',').map((id) => ({ category: RoomObjectCategory.FLOOR, objectId: Number(id) }));
+
+        WiredSelectionVisualizer.applyVariableHighlightToObjects(objects);
+
+        return () => WiredSelectionVisualizer.clearVariableHighlightFromObjects(objects);
+    }, [isHighlightingConfiguredWireds, configuredWiredsKey]);
     const { simpleAlert = null, showConfirm = null } = useNotification();
 
     const getFurniLiveState = useCallback(
@@ -1313,11 +1345,12 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const roomCustomVariableDefinitionMap = useMemo(() => {
         return new Map(roomCustomVariableDefinitions.map((definition) => [definition.name, definition]));
     }, [roomCustomVariableDefinitions]);
+    const inspectedRoomValues = useMemo(() => getWiredObjectInspectionValues(objectInspection, 'room'), [objectInspection]);
     const selectedFurniAssignments = useMemo(() => {
         if (!selectedFurni) return [];
 
-        return furniVariableAssignments[selectedFurni.objectId] ?? [];
-    }, [selectedFurni, furniVariableAssignments]);
+        return toWiredInspectionAssignments(getWiredObjectInspectionValues(objectInspection, 'furni'));
+    }, [selectedFurni, objectInspection]);
     const selectedFurniAssignmentMap = useMemo(() => {
         return new Map(selectedFurniAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedFurniAssignments]);
@@ -1420,8 +1453,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
     const selectedUserAssignments = useMemo(() => {
         if (!selectedUserHolderKey) return [];
 
-        return userVariableAssignments[selectedUserHolderKey] ?? [];
-    }, [selectedUserHolderKey, userVariableAssignments]);
+        return toWiredInspectionAssignments(getWiredObjectInspectionValues(objectInspection, 'user'));
+    }, [selectedUserHolderKey, objectInspection]);
     const selectedUserAssignmentMap = useMemo(() => {
         return new Map(selectedUserAssignments.map((assignment) => [assignment.variableItemId, assignment]));
     }, [selectedUserAssignments]);
@@ -1582,15 +1615,14 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const clientTimeZoneOffsetMinutes = getTimeZoneOffsetMinutes(hotelCurrentTimeMs, clientTimeZone);
         const weekdayIndex = getMondayBasedWeekday(hotelNow);
         const monthIndex = hotelNow.month;
-        const customVariables: InspectionVariable[] = roomCustomVariableDefinitions.map((definition) => {
-            const assignment = roomVariableAssignmentMap.get(definition.itemId);
-
-            return {
+        // Only the variables the server reported for the room, as AIR lists the reply's values.
+        const customVariables: InspectionVariable[] = roomCustomVariableDefinitions
+            .filter((definition) => inspectedRoomValues.has(definition.itemId))
+            .map((definition) => ({
                 key: definition.name,
-                value: String(assignment?.value ?? 0),
+                value: String(inspectedRoomValues.get(definition.itemId) ?? 0),
                 editable: canEditInspection
-            };
-        });
+            }));
 
         return [
             ...customVariables,
@@ -1621,7 +1653,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             { key: '@current_time.month_of_year', value: `${monthIndex} (${MONTH_NAMES[monthIndex - 1]})` },
             { key: '@current_time.year', value: String(hotelNow.year) }
         ];
-    }, [roomSession, globalClock, roomEnteredAt, roomCustomVariableDefinitions, roomVariableAssignmentMap, canEditInspection]);
+    }, [roomSession, globalClock, roomEnteredAt, roomCustomVariableDefinitions, inspectedRoomValues, canEditInspection]);
     const displayedVariables = inspectionType === 'user' ? userVariables : inspectionType === 'global' ? globalVariables : furniVariables;
     const selectedInspectionVariableKey = selectedInspectionVariableKeys[inspectionType] ?? '';
     const currentVariableMaps = useMemo(
@@ -2549,7 +2581,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 return;
             }
 
-            const currentValue = roomVariableAssignmentMap.get(customDefinition.itemId)?.value ?? 0;
+            const currentValue = inspectedRoomValues.get(customDefinition.itemId) ?? 0;
 
             if (currentValue === parsed) {
                 cancelVariableEdit();
@@ -2557,6 +2589,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             }
 
             updateRoomVariableValue(customDefinition.itemId, parsed);
+            refreshObjectInspection();
             setEditingVariable(null);
             setEditingValue('');
             return;
@@ -2581,6 +2614,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 }
 
                 updateUserVariableValue(selectedUserHolderKey, customDefinition.itemId, parsed);
+                refreshObjectInspection();
                 setEditingVariable(null);
                 setEditingValue('');
                 return;
@@ -2703,6 +2737,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             }
 
             updateFurniVariableValue(selectedFurni.objectId, customFurniDefinition.itemId, parsed);
+            refreshObjectInspection();
             setEditingVariable(null);
             setEditingValue('');
             return;
@@ -3070,6 +3105,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             setSelectedInspectionVariableKeys((prev) => ({ ...prev, furni: selectedInspectionGiveDefinition.name }));
         }
 
+        refreshObjectInspection();
         setInspectionGiveValue('0');
         setIsInspectionGiveOpen(false);
     }, [
@@ -3081,7 +3117,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         selectedUserHolderKey,
         assignUserVariable,
         selectedFurni,
-        assignFurniVariable
+        assignFurniVariable,
+        refreshObjectInspection
     ]);
     const removeInspectionVariable = useCallback(() => {
         if (!canManageInspectionVariableAssignments || !selectedInspectionCustomDefinition || selectedInspectionCustomDefinition.isReadOnly) return;
@@ -3096,6 +3133,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             setSelectedInspectionVariableKeys((prev) => ({ ...prev, furni: '' }));
         }
 
+        refreshObjectInspection();
         setIsInspectionGiveOpen(false);
     }, [
         canManageInspectionVariableAssignments,
@@ -3104,7 +3142,8 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         selectedUser,
         removeUserVariable,
         selectedFurni,
-        removeFurniVariable
+        removeFurniVariable,
+        refreshObjectInspection
     ]);
 
     const onVariableInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -3290,6 +3329,9 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                             onGiveInspectionVariable={() => giveInspectionVariable()}
                             canRemoveInspectionVariable={canRemoveInspectionVariable}
                             onRemoveInspectionVariable={() => removeInspectionVariable()}
+                            canHighlightWireds={canHighlightConfiguredWireds}
+                            isHighlightingWireds={isHighlightingConfiguredWireds && canHighlightConfiguredWireds}
+                            onToggleHighlightWireds={() => setIsHighlightingConfiguredWireds((value) => !value)}
                         />
                     )}
                     {activeTab === 'variables' && (

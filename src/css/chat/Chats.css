@@ -874,7 +874,7 @@
         &.bubble-250,
         &.bubble-251,
         &.bubble-252 {
-            border-image: none;
+            border-image-source: none;
             border: 1px solid #000;
             border-radius: 6px;
             background: #dbdbdb;

@@ -36,6 +36,7 @@ import { RoomFilterWordsWidgetView } from './room-filter-words/RoomFilterWordsWi
 import { RoomThumbnailWidgetView } from './room-thumbnail/RoomThumbnailWidgetView';
 import { RoomToolsWidgetView } from './room-tools/RoomToolsWidgetView';
 import { applyRoomZoom } from './room-tools/roomZoom.helpers';
+import { WiredContractWidgetView } from './wired-contract/WiredContractWidgetView';
 import { WiredLinkWidgetView } from './wired-link/WiredLinkWidgetView';
 import { WordQuizWidgetView } from './word-quiz/WordQuizWidgetView';
 
@@ -255,6 +256,9 @@ export const RoomWidgetsView: FC<{}> = (props) => {
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="WiredLinkWidget">
                 <WiredLinkWidgetView />
+            </WidgetErrorBoundary>
+            <WidgetErrorBoundary name="WiredContractWidget">
+                <WiredContractWidgetView />
             </WidgetErrorBoundary>
             <WidgetErrorBoundary name="BuildHeightWidget">
                 <BuildHeightWidgetView />

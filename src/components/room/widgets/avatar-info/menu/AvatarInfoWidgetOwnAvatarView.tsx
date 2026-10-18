@@ -86,12 +86,11 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
     const isRidingHorse = IsRidingHorse();
     const isSwimming = SWIM_EFFECTS.includes(activeEffectId);
     const [mode, setMode] = useState(isDancing && hasClub && !hasActiveEffect ? MODE_CLUB_DANCES : MODE_NORMAL);
-    const { roomSession = null } = useRoom();
+    const { roomSession = null, isHandItemBlocked = false } = useRoom();
     const { openInspectionForUser, showInspectButton } = useWiredTools();
 
     const expressionsMenuEnabled = GetConfigurationValue('avatar.expressions_menu.enabled', true);
     const signsEnabled = GetConfigurationValue('avatar.signs.enabled', true);
-    const effectsEnabled = !GetConfigurationValue('memenu.effects.widget.disabled', false);
     const handItemDropEnabled = GetConfigurationValue('handitem.drop.enabled', true);
     const sittingEnabled = GetConfigurationValue('avatar.sitting.enabled', true);
     const expression67Enabled = GetConfigurationValue('avatar.expression.67.enabled', false);
@@ -125,9 +124,6 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                         break;
                     case 'change_looks':
                         CreateLinkEvent('avatar-editor/show');
-                        break;
-                    case 'avatar_effect':
-                        CreateLinkEvent('avatar-effects/show');
                         break;
                     case 'customize_nick':
                         CreateLinkEvent('customize/show');
@@ -273,14 +269,9 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                                 {LocalizeText('infostand.show.signs')}
                             </ContextMenuListItemView>
                         )}
-                        {avatarInfo.carryItem > 0 && avatarInfo.carryItem < 999999 && handItemDropEnabled && (
+                        {avatarInfo.carryItem > 0 && avatarInfo.carryItem < 999999 && handItemDropEnabled && !isHandItemBlocked && (
                             <ContextMenuListItemView onClick={() => processAction('drop_carry_item')}>
                                 {LocalizeText('avatar.widget.drop_hand_item')}
-                            </ContextMenuListItemView>
-                        )}
-                        {effectsEnabled && !isRidingHorse && (
-                            <ContextMenuListItemView classNames={['air-avatar-menu-item--link']} onClick={() => processAction('avatar_effect')}>
-                                {LocalizeText('widget.memenu.effects')}
                             </ContextMenuListItemView>
                         )}
                         {showInspectButton && (

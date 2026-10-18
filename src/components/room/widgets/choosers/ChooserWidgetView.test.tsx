@@ -35,10 +35,11 @@ vi.mock('../../../../layout', () => ({
     )
 }));
 
+const { chooserSelectionVisualizer } = await import('../../../../api');
 const { ChooserWidgetView } = await import('./ChooserWidgetView');
 
-const user = (id: number, name: string, type = 'Habbo') => ({ id, category: 100, name, ownerName: '-', ownerId: 0, type }) as never;
-const furni = (id: number, name: string, owner: string) => ({ id, category: 1, name, ownerName: owner, ownerId: 0, type: 'furniture' }) as never;
+const user = (id: number, name: string, type = '1') => ({ id, category: 100, name, ownerName: '-', ownerId: 0, type }) as never;
+const furni = (id: number, name: string, owner: string, category = 1) => ({ id, category, name, ownerName: owner, ownerId: 0, type: 'furniture' }) as never;
 
 afterEach(cleanup);
 
@@ -78,8 +79,69 @@ describe('ChooserWidgetView', () => {
 
         expect(screen.getByText('3 items found')).toBeTruthy();
 
-        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Bob' } });
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'owner:Bob' } });
         expect(screen.getByText('2 items found')).toBeTruthy();
         expect(screen.getByText('1')).toBeTruthy();
+    });
+
+    it('localizes the AIR user types and filters on them, the bot entry on user type 4', () => {
+        render(
+            <ChooserWidgetView
+                items={[user(0, 'Alice'), user(1, 'Rover', '2'), user(2, 'Robo', '4'), user(3, 'Oldbot', '3')]}
+                onClose={() => undefined}
+                selectItem={() => undefined}
+                title="Users"
+                type="users"
+            />
+        );
+
+        expect(screen.getByText('4 users found')).toBeTruthy();
+        expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(['All types', 'Habbo', 'Pet', 'Bot']);
+
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: '4' } });
+        expect(screen.getByText('1 users found')).toBeTruthy();
+        expect(screen.getByText('Robo')).toBeTruthy();
+    });
+
+    it('selects one row at a time and highlights room index zero', () => {
+        const selectItem = vi.fn();
+        const items = [user(0, 'Alice'), user(1, 'Bob')];
+
+        render(<ChooserWidgetView items={items} onClose={() => undefined} selectItem={selectItem} title="Users" type="users" />);
+
+        fireEvent.click(screen.getByText('Alice'));
+        fireEvent.click(screen.getByText('Bob'));
+
+        expect(selectItem).toHaveBeenLastCalledWith(items[1]);
+        expect(vi.mocked(chooserSelectionVisualizer.show)).toHaveBeenCalledWith(0, 100);
+        expect(screen.getAllByRole('row').filter((row) => row.getAttribute('aria-selected') === 'true').map((row) => row.textContent)).toEqual(['BobHabbo']);
+    });
+
+    it('keeps an owner called "all" apart from the all-owners entry', () => {
+        render(<ChooserWidgetView items={[furni(1, 'Lamp', 'all'), furni(2, 'Chair', 'Bob')]} onClose={() => undefined} selectItem={() => undefined} title="Furni" type="furni" />);
+
+        expect(screen.getByText('2 items found')).toBeTruthy();
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'owner:all' } });
+        expect(screen.getByText('1 items found')).toBeTruthy();
+        expect(screen.getByText('Lamp')).toBeTruthy();
+    });
+
+    it('tells a floor and a wall furni with the same id apart when picking', () => {
+        render(
+            <ChooserWidgetView
+                items={[furni(7, 'Chair', 'Bob', 1), furni(7, 'Poster', 'Bob', 2)]}
+                onClose={() => undefined}
+                pickallFurni
+                selectItem={() => undefined}
+                title="Furni"
+                type="furni"
+            />
+        );
+
+        fireEvent.click(screen.getByText('Poster'));
+
+        const selected = screen.getAllByRole('row').filter((row) => row.getAttribute('aria-selected') === 'true');
+
+        expect(selected.map((row) => row.textContent)).toEqual(['PosterBob7']);
     });
 });

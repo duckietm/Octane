@@ -9,6 +9,8 @@ export interface IChatEntry {
     style?: number;
     chatType?: number;
     imageUrl?: string;
+    /** The chat text size the bubble had when it arrived; the history draws it the same. */
+    textSize?: import('../../components/room/widgets/chat-input/chatTextSize').ChatTextSize;
     color?: string;
     showTranslation?: boolean;
     originalMessage?: string;

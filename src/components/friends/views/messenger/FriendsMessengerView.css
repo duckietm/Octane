@@ -296,7 +296,7 @@
 
 .messenger-window .messenger-btn.close-btn {
     margin-left: auto;
-    border-image: none;
+    border-image-source: none;
     background-image: url("@/assets/images/friends/swf/illumina_light_button_frame_close.png");
 }
 

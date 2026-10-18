@@ -207,7 +207,7 @@
     height: 17px;
     padding: 0 !important;
     border: 0 !important;
-    border-image: none !important;
+    border-image-source: none !important;
     background: transparent !important;
     box-shadow: none !important;
     color: #000000 !important;
@@ -330,7 +330,7 @@
     min-height: 29px !important;
     box-sizing: border-box !important;
     border: 2px solid #111111 !important;
-    border-image: none !important;
+    border-image-source: none !important;
     border-radius: 3px !important;
     background: linear-gradient(180deg, #ffffff 0%, #f4f4f2 48%, #d5d5d1 100%) !important;
     color: #111111 !important;
@@ -880,7 +880,7 @@
     min-height: 29px !important;
     box-sizing: border-box !important;
     border: 1px solid #050505 !important;
-    border-image: none !important;
+    border-image-source: none !important;
     border-radius: 2px !important;
     display: flex !important;
     align-items: center !important;

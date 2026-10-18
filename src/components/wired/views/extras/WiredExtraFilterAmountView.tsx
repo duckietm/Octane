@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableSection } from '../WiredValueOrVariableSection';
+import { normalizeWiredValueTarget, variableTokenFromId, WiredValueOrVariableField } from '../WiredValueOrVariableField';
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 
@@ -20,13 +20,14 @@ const clampValue = (value: number) => {
  * Official layout: [N, N from a variable, variable target], the variable id as text; ours follow:
  * [random pick]. The variable is read on the triggering holder.
  */
-export const WiredExtraFilterAmountView: FC<{ name: string }> = ({ name }) => {
+export const WiredExtraFilterAmountView: FC<{}> = () => {
     const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
     const [amount, setAmount] = useState(String(MIN_FILTER));
     const [fromVariable, setFromVariable] = useState(false);
     const [target, setTarget] = useState(TARGET_USER);
     const [token, setToken] = useState('');
     const [randomPick, setRandomPick] = useState(true);
+    const [amountValid, setAmountValid] = useState(true);
 
     useEffect(() => {
         if (!trigger) return;
@@ -47,28 +48,27 @@ export const WiredExtraFilterAmountView: FC<{ name: string }> = ({ name }) => {
         setStringParam(variableId > 0 ? String(variableId) : '');
     };
 
-    const validate = () => !fromVariable || getCustomVariableItemId(token) > 0;
+    const validate = () => amountValid && (!fromVariable || getCustomVariableItemId(token) > 0);
 
     return (
         <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 360 }}>
             <div className="flex flex-col gap-2">
                 <Text bold>{LocalizeText('wiredfurni.params.setfilter')}</Text>
-                <WiredValueOrVariableSection
-                    hideSources={true}
-                    furniSource={0}
+                {/* AIR SelectorFilter / VariableFilter: createValueOrVariableSection(0, mergedSourceOptions(0), setfilter, 1, 1000).
+                    The server reads the variable on the triggering holder, so the popup offers the type selector only. */}
+                <WiredValueOrVariableField
                     isVariable={fromVariable}
+                    label={LocalizeText('wiredfurni.params.setfilter')}
+                    literal={amount}
+                    max={MAX_FILTER}
                     min={MIN_FILTER}
-                    name={name}
                     target={target}
                     token={token}
-                    userSource={0}
-                    value={amount}
-                    onFurniSourceChange={() => {}}
                     onIsVariableChange={setFromVariable}
+                    onLiteralChange={setAmount}
                     onTargetChange={setTarget}
                     onTokenChange={setToken}
-                    onUserSourceChange={() => {}}
-                    onValueChange={setAmount}
+                    onValidityChange={setAmountValid}
                 />
                 <label className="flex items-center gap-1">
                     <input checked={randomPick} className="form-check-input" type="checkbox" onChange={(event) => setRandomPick(event.target.checked)} />

@@ -51,6 +51,7 @@
   "room.color.skip.transition": true,
   "room.landscapes.enabled": true,
   "room.zoom.enabled": true,
+  "room.planes.direct": false,
   "room.camera.follow_user": true,
   "room.camera.move.speed": 12,
   // General interface features and locale settings.

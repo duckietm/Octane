@@ -1,5 +1,5 @@
 import { GetGuestRoomResultEvent, NewConsoleMessageEvent, RoomInviteEvent, RoomSessionEvent } from '@octane/renderer';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { ChatEntryType, ChatHistoryCurrentDate, IChatEntry, IRoomHistoryEntry, MessengerHistoryCurrentDate } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
@@ -45,7 +45,12 @@ const useChatHistoryState = () => {
     const [messengerHistory, setMessengerHistory] = useLocalStorage<IChatEntry[]>('messengerHistory', [], { toStorage: slimChatEntriesForStorage });
     const [needsRoomInsert, setNeedsRoomInsert] = useLocalStorage('needsRoomInsert', false);
 
+    // Stored entries survive a reload; the module counter does not. New ids go above the restored range, so an
+    // update (translation, avatar image) never lands on an older entry that has the same id.
+    const nextChatId = useMemo(() => chatHistory.reduce((next, entry) => Math.max(next, (entry.id ?? -1) + 1), 0), [chatHistory]);
+
     const addChatEntry = (entry: IChatEntry) => {
+        CHAT_HISTORY_COUNTER = Math.max(CHAT_HISTORY_COUNTER, nextChatId);
         entry.id = CHAT_HISTORY_COUNTER++;
 
         setChatHistory((prevValue) => {

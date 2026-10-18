@@ -2,8 +2,10 @@ import { RoomObjectCategory, RoomObjectOperationType } from '@octane/renderer';
 import { useCallback } from 'react';
 import {
     expandLocalizedText,
+    GetConfigurationValue,
     GetFurnitureDataForRoomObject,
     GetRoomSession,
+    IsBuildersClubFurniId,
     isWebApiBoxClassName,
     localizeWithFallback,
     ProcessRoomObjectOperation
@@ -21,6 +23,20 @@ export const hasWebApiBox = (objectIds: number[], category: number = RoomObjectC
 
     return objectIds.some((objectId) => isWebApiBoxClassName(GetFurnitureDataForRoomObject(roomId, objectId, category)?.className));
 };
+
+/**
+ * Official InfoStandWidgetHandler.pickupObjectWithConfirmation: picking up a Builders Club furni (an id of the band)
+ * whose furnidata is not in the warehouse (`bc="1"`) asks `room.confirm.not_in_warehouse` first, while the Builders
+ * Club catalogue is enabled. Picking it up deletes it; the warehouse could not place it again.
+ */
+export const needsWarehouseConfirm = (
+    objectId: number,
+    availableForBuildersClub: boolean | undefined,
+    buildersClubEnabled: boolean
+): boolean => buildersClubEnabled && IsBuildersClubFurniId(objectId) && !availableForBuildersClub;
+
+const isBuildersClubEnabled = (): boolean =>
+    GetConfigurationValue<boolean>('buildersclub.enabled', GetConfigurationValue<boolean>('toolbar.buildersclub.enabled', true));
 
 /** Picking up a web api box first asks (`wiredfurni.web_api.pickup.*`); everything else goes straight through. */
 export const useFurniPickupGuard = () => {
@@ -49,9 +65,34 @@ export const useFurniPickupGuard = () => {
     );
 
     const pickupRoomObject = useCallback(
-        (objectId: number, category: number, operation: string = RoomObjectOperationType.OBJECT_PICKUP) =>
-            confirmIfWebApiBox([objectId], category, () => ProcessRoomObjectOperation(objectId, category, operation)),
-        [confirmIfWebApiBox]
+        (objectId: number, category: number, operation: string = RoomObjectOperationType.OBJECT_PICKUP) => {
+            const pickup = () =>
+                confirmIfWebApiBox([objectId], category, () => ProcessRoomObjectOperation(objectId, category, operation));
+            const roomId = GetRoomSession()?.roomId;
+            const furniData = roomId ? GetFurnitureDataForRoomObject(roomId, objectId, category) : null;
+
+            if (
+                !showConfirm ||
+                operation !== RoomObjectOperationType.OBJECT_PICKUP ||
+                !needsWarehouseConfirm(objectId, furniData?.availableForBuildersClub, isBuildersClubEnabled())
+            ) {
+                pickup();
+                return;
+            }
+
+            showConfirm(
+                localizeText(
+                    'room.confirm.not_in_warehouse',
+                    'This furni is not in the Builders Club warehouse. If you pick it up you cannot place it again. Continue?'
+                ),
+                pickup,
+                null,
+                null,
+                null,
+                localizeText('generic.alert.title', 'Notice')
+            );
+        },
+        [confirmIfWebApiBox, showConfirm]
     );
 
     return { pickupRoomObject, confirmIfWebApiBox };

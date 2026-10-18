@@ -2035,7 +2035,7 @@ button.swf-friends-section-header {
 }
 .swf-messenger-window .swf-messenger-minimize {
     border: 0;
-    border-image: none;
+    border-image-source: none;
     background: url("@/assets/images/friends/swf/illumina_light_button_frame_minimize.png") 0 0 / auto 20px no-repeat;
 }
 .swf-messenger-window .swf-messenger-minimize:hover { background-position: -52px 0; }
@@ -2043,7 +2043,7 @@ button.swf-friends-section-header {
 .swf-messenger-window .swf-messenger-minimize::before { display: none; }
 .swf-messenger-window .messenger-btn.close-btn {
     border: 0;
-    border-image: none;
+    border-image-source: none;
     border-radius: 0;
     background: url("@/assets/images/friends/swf/illumina_light_button_frame_close.png") 0 0 / auto 20px no-repeat;
     color: transparent;
@@ -2223,7 +2223,7 @@ button.swf-friends-section-header {
 
 .swf-messenger-window {
     border: 1px solid #777771;
-    border-image: none;
+    border-image-source: none;
     border-radius: 5px;
     background: #e4e4e4;
     box-shadow: inset 0 0 0 1px #fff, 0 2px 5px rgba(0, 0, 0, .42);
@@ -2232,7 +2232,7 @@ button.swf-friends-section-header {
 .swf-messenger-window .messenger-avatar-tab,
 .swf-messenger-window .messenger-avatar-tab.active {
     border: 1px solid #c5c5c5 !important;
-    border-image: none !important;
+    border-image-source: none !important;
     border-radius: 4px !important;
     background: #ebebeb !important;
     box-shadow: inset 1px 1px 0 #fff !important;
@@ -2324,7 +2324,7 @@ button.swf-friends-section-header {
 
 .swf-messenger-window .messenger-btn:not(.close-btn),
 .swf-messenger-window .messenger-input-row input {
-    border-image: none !important;
+    border-image-source: none !important;
 }
 
 
@@ -2841,7 +2841,7 @@ button.swf-friends-section-header {
     margin: 0 3px;
     padding-left: 0;
     border: 0;
-    border-image: none !important;
+    border-image-source: none !important;
     border-radius: 2px 2px 0 0 !important;
     background: transparent !important;
     box-shadow: none !important;

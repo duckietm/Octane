@@ -110,7 +110,7 @@ jobs:
       # The renderer SDK is consumed via a filesystem symlink in
       # node_modules/@octane/renderer; create it AFTER yarn
       # install (otherwise yarn would clean it up since the package
-      # isn't declared in package.json). TypeScript 7
+      # isn't declared in package.json). tsgo (TS 7 native preview)
       # then resolves the tsconfig `include` entry pointing at the
       # renderer's `src/**/*.ts`.
       #
@@ -118,7 +118,7 @@ jobs:
       # regardless of the cwd that reads it. A relative target like
       # `../../../octane-renderer` resolves to
       # `octane/octane-renderer` (one too few `..`), which doesn't
-      # exist and makes the type check report TS2307 across the entire src/.
+      # exist and makes tsgo report TS2307 across the entire src/.
       - name: Symlink renderer into client node_modules
         run: |
           mkdir -p octane/node_modules/@octane
@@ -126,7 +126,7 @@ jobs:
           ls -la octane/node_modules/@octane/
           ls octane/node_modules/@octane/renderer/packages/api/src/ | head -5
 
-      - name: Type check (TypeScript 7)
+      - name: Type check (tsgo)
         working-directory: octane
         run: yarn typecheck
 
