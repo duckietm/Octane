@@ -55,7 +55,7 @@ jobs:
           token: ${{ secrets.DUCKET_REPO_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: 'octane/.nvmrc'
 
