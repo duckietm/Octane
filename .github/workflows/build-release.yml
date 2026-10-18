@@ -96,7 +96,7 @@ jobs:
           zip -r "../ducket-client-dist-${{ steps.version.outputs.short_sha }}.zip" dist
 
       - name: Publish release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: client-v${{ steps.version.outputs.version }}-${{ steps.version.outputs.short_sha }}
           name: Ducket Client ${{ steps.version.outputs.version }} (${{ steps.version.outputs.short_sha }})
