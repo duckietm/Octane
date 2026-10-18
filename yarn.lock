@@ -4653,7 +4653,7 @@ __metadata:
     framer-motion: "npm:^14.3.0"
     jsdom: "npm:^30.1.3"
     postcss: "npm:^8.5.30"
-    postcss-nested: "npm:^8.0.1"
+    postcss-nested: "npm:^9.0.0"
     react: "npm:^19.3.1"
     react-colorful: "npm:^5.8.1"
     react-dom: "npm:^19.3.1"
@@ -4782,18 +4782,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-nested@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "postcss-nested@npm:8.0.1"
+"postcss-nested@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "postcss-nested@npm:9.0.0"
   dependencies:
-    postcss-selector-parser: "npm:^7.1.4"
+    postcss-selector-parser: "npm:^7.1.6"
   peerDependencies:
     postcss: ^8.2.14
-  checksum: 10c0/f65c87cca4158fb3e04fddee04959e70dad80bce1587e90f05787378610be8b7160a2c0421201c83885a2b43cbfa01f486f7fd7f4dcd32ff63135409f542f9ea
+  checksum: 10c0/3dcad51b17af37f35497672c573133059b73be58636b35e65cc49dfc03dfd27c1f1ace1fbee4c5da65c89059fc6cc49781e4babbef840f4480c1dae9e09e5454
   languageName: node
   linkType: hard
 
-"postcss-selector-parser@npm:^7.1.4":
+"postcss-selector-parser@npm:^7.1.6":
   version: 7.1.6
   resolution: "postcss-selector-parser@npm:7.1.6"
   dependencies:
