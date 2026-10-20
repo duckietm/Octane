@@ -24,6 +24,7 @@ import { useMessageEvent, useNotification, useUiEvent } from '../../hooks';
 import { GuideToolAcceptView } from './views/GuideToolAcceptView';
 import { GuideToolMenuView } from './views/GuideToolMenuView';
 import { GuideToolOngoingView } from './views/GuideToolOngoingView';
+import { GuideToolReportView } from './views/GuideToolReportView';
 import { GuideToolUserCreateRequestView } from './views/GuideToolUserCreateRequestView';
 import { GuideToolUserFeedbackView } from './views/GuideToolUserFeedbackView';
 import { GuideToolUserNoHelpersView } from './views/GuideToolUserNoHelpersView';
@@ -56,6 +57,7 @@ export const GuideToolView: FC<{}> = (props) => {
     const [ongoingFigure, setOngoingFigure] = useState<string>(null);
     const [ongoingIsTyping, setOngoingIsTyping] = useState<boolean>(false);
     const [ongoingMessageGroups, setOngoingMessageGroups] = useState<GuideToolMessageGroup[]>([]);
+    const [isReporting, setIsReporting] = useState<boolean>(false);
 
     const { simpleAlert = null } = useNotification();
 
@@ -288,6 +290,7 @@ export const GuideToolView: FC<{}> = (props) => {
             switch (action) {
                 case 'close':
                     setIsVisible(false);
+                    setIsReporting(false);
                     setUserRequest('');
                     setSessionState(GuideSessionState.GUIDE_TOOL_MENU);
                     return;
@@ -331,47 +334,58 @@ export const GuideToolView: FC<{}> = (props) => {
 
     if (!isVisible) return null;
 
+    // AIR offers "report" in the ongoing windows of both sides and in the user's feedback window.
+    const canReport = [GuideSessionState.GUIDE_ONGOING, GuideSessionState.USER_ONGOING, GuideSessionState.USER_FEEDBACK].includes(sessionState);
+
     return (
-        <OctaneCardView className="octane-guide-tool" theme="primary-slim">
-            <OctaneCardHeaderView headerText={headerText} noCloseButton={noCloseButton} onCloseClick={(event) => processAction('close')} />
-            <OctaneCardContentView className="text-black">
-                {sessionState === GuideSessionState.GUIDE_TOOL_MENU && (
-                    <GuideToolMenuView
-                        guardiansOnDuty={guardiansOnDuty}
-                        guidesOnDuty={guidesOnDuty}
-                        helpersOnDuty={helpersOnDuty}
-                        isHandlingBullyReports={isHandlingBullyReports}
-                        isHandlingGuideRequests={isHandlingGuideRequests}
-                        isHandlingHelpRequests={isHandlingHelpRequests}
-                        isOnDuty={isOnDuty}
-                        processAction={processAction}
-                        setIsHandlingBullyReports={setIsHandlingBullyReports}
-                        setIsHandlingGuideRequests={setIsHandlingGuideRequests}
-                        setIsHandlingHelpRequests={setIsHandlingHelpRequests}
-                    />
-                )}
-                {sessionState === GuideSessionState.GUIDE_ACCEPT && (
-                    <GuideToolAcceptView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
-                )}
-                {[GuideSessionState.GUIDE_ONGOING, GuideSessionState.USER_ONGOING].includes(sessionState) && (
-                    <GuideToolOngoingView
-                        isGuide={isOnDuty}
-                        isTyping={ongoingIsTyping}
-                        messageGroups={ongoingMessageGroups}
-                        userFigure={ongoingFigure}
-                        userId={ongoingUserId}
-                        userName={ongoingUsername}
-                    />
-                )}
-                {sessionState === GuideSessionState.USER_CREATE && <GuideToolUserCreateRequestView setUserRequest={setUserRequest} userRequest={userRequest} />}
-                {sessionState === GuideSessionState.USER_PENDING && (
-                    <GuideToolUserPendingView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
-                )}
-                {sessionState === GuideSessionState.USER_FEEDBACK && <GuideToolUserFeedbackView userName={ongoingUsername} />}
-                {sessionState === GuideSessionState.USER_THANKS && <GuideToolUserThanksView />}
-                {sessionState === GuideSessionState.USER_NO_HELPERS && <GuideToolUserNoHelpersView />}
-                {sessionState === GuideSessionState.USER_SOMETHING_WRONG && <GuideToolUserSomethingWrogView />}
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <>
+            {isReporting && canReport && <GuideToolReportView onClose={() => setIsReporting(false)} />}
+            <OctaneCardView className="octane-guide-tool" theme="primary-slim">
+                <OctaneCardHeaderView headerText={headerText} noCloseButton={noCloseButton} onCloseClick={(event) => processAction('close')} />
+                <OctaneCardContentView className="text-black">
+                    {sessionState === GuideSessionState.GUIDE_TOOL_MENU && (
+                        <GuideToolMenuView
+                            guardiansOnDuty={guardiansOnDuty}
+                            guidesOnDuty={guidesOnDuty}
+                            helpersOnDuty={helpersOnDuty}
+                            isHandlingBullyReports={isHandlingBullyReports}
+                            isHandlingGuideRequests={isHandlingGuideRequests}
+                            isHandlingHelpRequests={isHandlingHelpRequests}
+                            isOnDuty={isOnDuty}
+                            processAction={processAction}
+                            setIsHandlingBullyReports={setIsHandlingBullyReports}
+                            setIsHandlingGuideRequests={setIsHandlingGuideRequests}
+                            setIsHandlingHelpRequests={setIsHandlingHelpRequests}
+                        />
+                    )}
+                    {sessionState === GuideSessionState.GUIDE_ACCEPT && (
+                        <GuideToolAcceptView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
+                    )}
+                    {[GuideSessionState.GUIDE_ONGOING, GuideSessionState.USER_ONGOING].includes(sessionState) && (
+                        <GuideToolOngoingView
+                            isGuide={isOnDuty}
+                            isTyping={ongoingIsTyping}
+                            messageGroups={ongoingMessageGroups}
+                            userFigure={ongoingFigure}
+                            userId={ongoingUserId}
+                            userName={ongoingUsername}
+                            onReport={() => setIsReporting(true)}
+                        />
+                    )}
+                    {sessionState === GuideSessionState.USER_CREATE && (
+                        <GuideToolUserCreateRequestView setUserRequest={setUserRequest} userRequest={userRequest} />
+                    )}
+                    {sessionState === GuideSessionState.USER_PENDING && (
+                        <GuideToolUserPendingView helpRequestAverageTime={helpRequestAverageTime} helpRequestDescription={helpRequestDescription} />
+                    )}
+                    {sessionState === GuideSessionState.USER_FEEDBACK && (
+                        <GuideToolUserFeedbackView userName={ongoingUsername} onReport={() => setIsReporting(true)} />
+                    )}
+                    {sessionState === GuideSessionState.USER_THANKS && <GuideToolUserThanksView />}
+                    {sessionState === GuideSessionState.USER_NO_HELPERS && <GuideToolUserNoHelpersView />}
+                    {sessionState === GuideSessionState.USER_SOMETHING_WRONG && <GuideToolUserSomethingWrogView />}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </>
     );
 };

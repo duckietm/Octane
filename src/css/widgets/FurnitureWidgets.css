@@ -11,8 +11,18 @@
 }
 
 .octane-widget-custom-stack-height {
-    width: 275px;
-    height: 220px;
+    width: 320px;
+    min-height: 185px;
+
+    .octane-stack-height-arrow {
+        width: 19px;
+        min-height: 20px;
+        height: 20px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .octane-room-widget-toner {
@@ -973,5 +983,144 @@
 
     .octane-widget-exchange-credit {
         height: auto;
+    }
+}
+
+/* Official ecotronbox_card (257 x 114): gift-card background, date at 12/9, 39 px preview at 7/38,
+   message at 49/39 and the buttons on the bottom row at y 90. */
+.octane-ecotronbox-card {
+    position: relative;
+    width: 257px;
+    height: 114px;
+    background-color: #f3f1e5;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    pointer-events: all;
+    cursor: move;
+    font-size: 11px;
+    color: #000;
+
+    .octane-ecotronbox-date {
+        position: absolute;
+        left: 12px;
+        top: 9px;
+        width: 104px;
+        height: 12px;
+        line-height: 12px;
+        overflow: hidden;
+    }
+
+    .octane-ecotronbox-preview {
+        position: absolute;
+        left: 7px;
+        top: 38px;
+        width: 39px;
+        height: 39px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            max-width: 39px;
+            max-height: 39px;
+            image-rendering: pixelated;
+        }
+    }
+
+    .octane-ecotronbox-msg {
+        position: absolute;
+        left: 49px;
+        top: 39px;
+        width: 139px;
+        height: 45px;
+        overflow: hidden;
+        word-wrap: break-word;
+    }
+
+    .octane-ecotronbox-open,
+    .octane-ecotronbox-close {
+        position: absolute;
+        top: 90px;
+        height: 22px;
+        padding: 0 8px;
+        border: 1px solid #000;
+        border-radius: 4px;
+        background: linear-gradient(#fff, #d6d6d6);
+        font-size: 11px;
+        cursor: pointer;
+    }
+
+    .octane-ecotronbox-open {
+        left: 47px;
+        width: 148px;
+        font-weight: bold;
+    }
+
+    .octane-ecotronbox-close {
+        left: 200px;
+        width: 50px;
+    }
+}
+
+/* Official niko_trophy (428 x 325): dark 169 px band (0xff36494e) with the 93 x 112 trophy at 26/30 and
+   the 249 px text column at 153, then the 320 x 92 app store banner. */
+.octane-niko-trophy {
+    width: 428px;
+
+    .octane-niko-trophy-content {
+        padding: 0;
+    }
+
+    .octane-niko-trophy-band {
+        display: flex;
+        gap: 34px;
+        height: 169px;
+        padding: 28px 26px 0;
+        background: #36494e;
+        color: #fff;
+    }
+
+    .octane-niko-trophy-preview {
+        width: 93px;
+        height: 112px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    .octane-niko-trophy-texts {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 249px;
+    }
+
+    .octane-niko-trophy-description {
+        min-height: 64px;
+    }
+
+    .octane-niko-trophy-link {
+        align-self: flex-start;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: #9fd8ff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .octane-niko-trophy-store {
+        align-self: center;
+        width: 320px;
+        height: 92px;
+        margin: 14px 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+
+        img {
+            width: 320px;
+            height: 92px;
+        }
     }
 }

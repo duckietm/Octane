@@ -28,6 +28,7 @@ import {
     FriendlyTime,
     GetConfigurationValue,
     GetGroupInformation,
+    getWiredChestInfostandData,
     IPhotoData,
     isRecolorableClass,
     recolorOfData,
@@ -68,6 +69,7 @@ import statRotationIcon from '../../../../../assets/images/infostand/stat-rotati
 import statStateIcon from '../../../../../assets/images/infostand/stat-state.png';
 import statXIcon from '../../../../../assets/images/infostand/stat-x.png';
 import statYIcon from '../../../../../assets/images/infostand/stat-y.png';
+import chestLockedIcon from '../../../../../assets/images/groups/native/forum_forum_locked.png';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
 import { infostandFurniOwnerText, infostandFurniPanelClass } from './infostandFurni.helpers';
 import { BaseButton } from '../../../../../common/BaseButton';
@@ -785,6 +787,11 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
     const showIds = godMode && canSeeFurniId;
     const showEditFurni = godMode && isModerator;
     const showBuildtools = godMode && !avatarInfo.isWallItem && canMove;
+    // AIR InfoStandFurniView.showChestData: a furni / coins chest (furnidata special type 24 / 25) shows its name,
+    // its contents count and, with wired enabled, the wired (and locked) icons.
+    const chestData = avatarInfo.isWallItem
+        ? null
+        : getWiredChestInfostandData(GetSessionDataManager().getFloorItemData(avatarInfo.spriteId)?.specialType ?? -1, avatarInfo.stuffData);
 
     return (
         <Column alignItems="end" gap={1}>
@@ -803,6 +810,11 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                             </Text>
                             <FaTimes className="cursor-pointer fa-icon" onClick={onClose} />
                         </Flex>
+                        {!!chestData?.chestName && (
+                            <Text small wrap className="octane-infostand-chest-name" variant="white">
+                                {chestData.chestName}
+                            </Text>
+                        )}
                         <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
                     </div>
                     {!isBranded && (
@@ -819,6 +831,17 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                                 {avatarInfo.stuffData.rarityLevel > -1 && (
                                     <div className="absolute inset-e-0">
                                         <LayoutRarityLevelView level={avatarInfo.stuffData.rarityLevel} />
+                                    </div>
+                                )}
+                                {chestData?.wiredEnabled && (
+                                    <div className="octane-infostand-chest-wired absolute inset-e-0 top-0 z-[1] flex items-start gap-[3px]">
+                                        {chestData.locked && <img alt="" className="[image-rendering:pixelated]" draggable={false} src={chestLockedIcon} />}
+                                        <img
+                                            alt=""
+                                            className="[image-rendering:pixelated]"
+                                            draggable={false}
+                                            src={GetConfigurationValue<string>('catalog.asset.icon.url', '').replace('%name%', '80')}
+                                        />
                                     </div>
                                 )}
                                 <Flex center fullWidth className="min-h-[74px] max-h-[86px] overflow-hidden">
@@ -855,6 +878,14 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
                         <Column gap={1}>
                             <Text fullWidth wrap textBreak variant="white" small>
                                 {avatarInfo.description}
+                            </Text>
+                            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                        </Column>
+                    )}
+                    {chestData && (
+                        <Column gap={1}>
+                            <Text fullWidth wrap small className="octane-infostand-chest-count" variant="white">
+                                {chestData.countText}
                             </Text>
                             <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
                         </Column>

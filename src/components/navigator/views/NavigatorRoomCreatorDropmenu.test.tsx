@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../hooks', () => ({
     useNavigatorData: () => ({ categories: [{ id: 1, name: 'General', visible: true }] }),
     useNavigatorUiStore: () => undefined,
+    useRoomCreateLimitAlert: () => undefined,
     useUserDataSnapshot: () => ({ clubLevel: 0, securityLevel: 1 }),
     useUserPermissions: () => new Map()
 }));

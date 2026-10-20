@@ -1,4 +1,14 @@
-import { AddLinkEventTracker, CreateLinkEvent, GetSessionDataManager, ILinkEventTracker, RemoveLinkEventTracker, RewardTrackData, RewardTrackPrizeData, RewardTrackTaskData } from '@octane/renderer';
+import {
+    AddLinkEventTracker,
+    CreateLinkEvent,
+    GetSessionDataManager,
+    ILinkEventTracker,
+    RemoveLinkEventTracker,
+    RewardTrackData,
+    RewardTrackPrizeData,
+    RewardTrackTaskData,
+    SecurityLevel
+} from '@octane/renderer';
 import { CSSProperties, FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCog } from 'react-icons/fa';
 import {
@@ -8,8 +18,8 @@ import {
     filterRewardTrackTasks,
     GetConfigurationValue,
     getPremiumBoostPercent,
-    getRewardTrackBarWidths,
-    getRewardTrackMiniBarWidth,
+    getRewardTrackMainBarFillWidth,
+    getRewardTrackMainBarRatio,
     getRewardTrackPrizeState,
     getRewardTrackPrizeTooltip,
     getRewardTrackSlotLeft,
@@ -18,10 +28,10 @@ import {
     getRewardTrackText,
     localizeWithFallback,
     NotificationAlertType,
-    REWARD_TRACK_TASK_BAR_COMPLETE,
-    REWARD_TRACK_TASK_BAR_INCOMPLETE,
+    REWARD_TRACK_BAR_WIDTH,
     RewardTrackTaskFilter,
-    resolveRewardTrackTheme
+    resolveRewardTrackTheme,
+    rewardTrackColorToCss
 } from '../../api';
 import availableIcon from '../../assets/images/reward-track/available-icon.png';
 import checkmarkIcon from '../../assets/images/reward-track/checkmark.png';
@@ -44,7 +54,7 @@ import { GetRewardTrackTaskIconUrl } from '../../assets/images/reward-track/task
 import { Button, DraggableWindowPosition, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutFurniIconImageView, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
-import { useHasPermission, useNotification, useRewardTracks } from '../../hooks';
+import { useHasPermission, useNotification, useRewardTrackProgressBar, useRewardTracks, useUserDataSnapshot } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { RewardTrackAdminView } from './RewardTrackAdminView';
 
@@ -84,19 +94,40 @@ const RewardTrackTaskGlyph: FC<{ actionType: string; large?: boolean }> = ({ act
     );
 };
 
-/** A loading_bar of the task rows and levels: grey track, orange (green when full) fill with its gloss. */
-const RewardTrackMiniBar: FC<{ ratio: number; width: number }> = ({ ratio, width }) => {
-    const progress = getRewardTrackMiniBarWidth(ratio, width);
-    const complete = ratio >= 1;
+/**
+ * A loading_bar of the task rows and levels (RewardTrackTaskProgressBarView): grey track, orange fill that
+ * turns green over 300 ms once full, with its gloss. The fill moves with AIR's accelerated mover.
+ */
+const RewardTrackMiniBar: FC<{ ratio: number; width: number; snapKey: string; levelIndex?: number }> = ({ ratio, width, snapKey, levelIndex = -1 }) => {
+    const bar = useRewardTrackProgressBar({ ratio, maxWidth: width, animate: true, snapKey, task: true, levelIndex });
 
     return (
-        <div className="octane-reward-track-mini-bar" style={{ width }} data-complete={complete}>
-            <div className="octane-reward-track-mini-bar-progress" style={{ width: progress }}>
-                <div
-                    className="octane-reward-track-mini-bar-fill"
-                    style={{ backgroundColor: complete ? REWARD_TRACK_TASK_BAR_COMPLETE : REWARD_TRACK_TASK_BAR_INCOMPLETE }}
-                />
+        <div className="octane-reward-track-mini-bar" style={{ width }} data-complete={ratio >= 1}>
+            <div className="octane-reward-track-mini-bar-progress" style={{ width: bar.width }}>
+                <div className="octane-reward-track-mini-bar-fill" style={{ backgroundColor: rewardTrackColorToCss(bar.color) }} />
                 <div className="octane-reward-track-mini-bar-gloss" />
+            </div>
+        </div>
+    );
+};
+
+/**
+ * The track's main loading_bar (RewardTrackMainProgressBarView): the `progress` container moves to the x of
+ * the points with AIR's accelerated mover; the green shape is 4px longer (the whole bar near the end).
+ */
+const RewardTrackMainBar: FC<{ x: number; snapKey: string }> = ({ x, snapKey }) => {
+    const bar = useRewardTrackProgressBar({
+        ratio: getRewardTrackMainBarRatio(x, REWARD_TRACK_BAR_WIDTH),
+        maxWidth: REWARD_TRACK_BAR_WIDTH,
+        animate: true,
+        snapKey
+    });
+
+    return (
+        <div className="octane-reward-track-bar" data-testid="reward-track-bar">
+            <div className="octane-reward-track-bar-progress" style={{ width: bar.width }}>
+                <div className="octane-reward-track-bar-fill" style={{ width: getRewardTrackMainBarFillWidth(bar.width, REWARD_TRACK_BAR_WIDTH) }} />
+                <div className="octane-reward-track-bar-gloss" />
             </div>
         </div>
     );
@@ -295,7 +326,19 @@ export const RewardTrackView: FC<{}> = () => {
     // The gear opens the staff editor inside the same window (acc_rewardtrack).
     const isEditor = useHasPermission('acc_rewardtrack');
     const [editMode, setEditMode] = useState(false);
-    const { tracks = [], reloadCount = 0, pendingPurchase = null, requestTracks = null, claimPrize = null, purchasePremium = null } = useRewardTracks();
+    const {
+        tracks = [],
+        reloadCount = 0,
+        tracksVersion = 0,
+        pendingPurchase = null,
+        requestTracks = null,
+        claimPrize = null,
+        purchasePremium = null,
+        copyTrackId = null,
+        copyTaskId = null
+    } = useRewardTracks();
+    // RewardTrackController._ra5fbf8bddad7bd: EMPLOYEE or MODERATOR security (level 4+) may copy the ids.
+    const canCopyIds = useUserDataSnapshot().securityLevel >= SecurityLevel.EMPLOYEE;
     const { simpleAlert = null } = useNotification();
 
     const track = useMemo(() => tracks.find((existing) => existing.id === trackId) ?? null, [tracks, trackId]);
@@ -368,8 +411,14 @@ export const RewardTrackView: FC<{}> = () => {
     const pages = useMemo(() => buildRewardTrackPages(prizes, layout), [prizes, layout]);
     const points = track?.points ?? 0;
     const currentPage = Math.max(0, Math.min(layout.pageCount - 1, page ?? layout.pageOf(points)));
+    // RewardTrackPrizeTrackView picks the page of the points once, when the view is built; progress
+    // afterwards moves the bar on that page instead of turning the page.
+    const pinnedPage = track ? currentPage : null;
+
+    useEffect(() => {
+        if (page === null && pinnedPage !== null) setPage(pinnedPage);
+    }, [page, pinnedPage]);
     const pageData = pages[currentPage] ?? { free: [], premium: [], points: [] };
-    const bar = getRewardTrackBarWidths(layout.xFor(points, currentPage));
     const unclaimed = track ? countRewardTrackUnclaimed(prizes, layout, currentPage, (prize) => prize.isClaimable(track)) : { next: 0, previous: 0 };
 
     const themeStyle = {
@@ -436,12 +485,7 @@ export const RewardTrackView: FC<{}> = () => {
                                     <img src={prizesStarsImage} alt="" draggable={false} className="octane-reward-track-rewards-stars" />
                                     <RewardTrackBandView premium={false} />
                                     <RewardTrackBandView premium />
-                                    <div className="octane-reward-track-bar" data-testid="reward-track-bar">
-                                        <div className="octane-reward-track-bar-progress" style={{ width: bar.progress }}>
-                                            <div className="octane-reward-track-bar-fill" style={{ width: bar.fill }} />
-                                            <div className="octane-reward-track-bar-gloss" />
-                                        </div>
-                                    </div>
+                                    <RewardTrackMainBar x={layout.xFor(points, currentPage)} snapKey={`${tracksVersion}:${track.id}:${currentPage}`} />
                                     <div className="octane-reward-track-points-band" />
                                     <div className="octane-reward-track-indicators">
                                         {pageData.points.map((value) => (
@@ -501,7 +545,17 @@ export const RewardTrackView: FC<{}> = () => {
                                     <div className="octane-reward-track-profile">
                                         <LayoutAvatarImageView figure={GetSessionDataManager().figure} direction={2} className="octane-reward-track-avatar" />
                                         <div className="octane-reward-track-info">
-                                            <div className="octane-reward-track-title">{getRewardTrackText(track.id, 'name', track.id)}</div>
+                                            {canCopyIds ? (
+                                                <BaseButton
+                                                    type="button"
+                                                    className="octane-reward-track-title octane-reward-track-copy-region"
+                                                    onClick={() => copyTrackId && copyTrackId(track.id)}
+                                                >
+                                                    {getRewardTrackText(track.id, 'name', track.id)}
+                                                </BaseButton>
+                                            ) : (
+                                                <div className="octane-reward-track-title">{getRewardTrackText(track.id, 'name', track.id)}</div>
+                                            )}
                                             <div className="octane-reward-track-desc">{getRewardTrackText(track.id, 'desc', '')}</div>
                                             <div className="octane-reward-track-instructions">{getRewardTrackText(track.id, 'info', '')}</div>
                                         </div>
@@ -570,7 +624,12 @@ export const RewardTrackView: FC<{}> = () => {
                                                     <span className="octane-reward-track-task-name">{getRewardTrackTaskText(track.id, task.id, 'name', task.id)}</span>
                                                     <span className="octane-reward-track-task-desc">{getRewardTrackTaskText(track.id, task.id, 'desc', '')}</span>
                                                     <span className="octane-reward-track-task-bar">
-                                                        <RewardTrackMiniBar ratio={task.progressRatioFor(level)} width={TASK_BAR_WIDTH} />
+                                                        <RewardTrackMiniBar
+                                                            ratio={task.progressRatioFor(level)}
+                                                            width={TASK_BAR_WIDTH}
+                                                            snapKey={`${tracksVersion}:${track.id}`}
+                                                            levelIndex={task.activeLevelIndex}
+                                                        />
                                                     </span>
                                                     <span className="octane-reward-track-task-count">
                                                         {task.progressCount} / {level ? level.requiredCount : 0}
@@ -607,9 +666,19 @@ export const RewardTrackView: FC<{}> = () => {
                                     {selectedTask && (
                                         <>
                                             <RewardTrackTaskGlyph actionType={selectedTask.actionType} large />
-                                            <div className="octane-reward-track-task-info-name">
-                                                {getRewardTrackTaskText(track.id, selectedTask.id, 'name', selectedTask.id)}
-                                            </div>
+                                            {canCopyIds ? (
+                                                <BaseButton
+                                                    type="button"
+                                                    className="octane-reward-track-task-info-name octane-reward-track-copy-region"
+                                                    onClick={() => copyTaskId && copyTaskId(selectedTask.id)}
+                                                >
+                                                    {getRewardTrackTaskText(track.id, selectedTask.id, 'name', selectedTask.id)}
+                                                </BaseButton>
+                                            ) : (
+                                                <div className="octane-reward-track-task-info-name">
+                                                    {getRewardTrackTaskText(track.id, selectedTask.id, 'name', selectedTask.id)}
+                                                </div>
+                                            )}
                                             <div className="octane-reward-track-task-info-desc">{getRewardTrackTaskText(track.id, selectedTask.id, 'desc', '')}</div>
                                             <span className="octane-reward-track-levels-rule" />
                                             <span className="octane-reward-track-levels-title">{localizeWithFallback('reward_track.levels.title', 'Levels')}</span>
@@ -623,7 +692,11 @@ export const RewardTrackView: FC<{}> = () => {
                                                                 {localizeWithFallback('reward_track.levels.level', 'Level %level%', ['level'], [String(index + 1)])}
                                                             </span>
                                                             <span className="octane-reward-track-level-bar">
-                                                                <RewardTrackMiniBar ratio={ratio} width={LEVEL_BAR_WIDTH} />
+                                                                <RewardTrackMiniBar
+                                                                    ratio={ratio}
+                                                                    width={LEVEL_BAR_WIDTH}
+                                                                    snapKey={`${tracksVersion}:${track.id}:${selectedTask.id}`}
+                                                                />
                                                             </span>
                                                             <span className="octane-reward-track-level-count">
                                                                 {selectedTask.progressCount} / {level.requiredCount}

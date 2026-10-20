@@ -221,7 +221,6 @@
     left: -1px;
     top: -1px;
     height: 13px;
-    transition: width 0.3s ease-out;
 }
 
 .octane-reward-track-bar-fill {
@@ -233,7 +232,6 @@
     border: 1px solid #4f7a19;
     border-radius: 6px;
     background: #71af24;
-    transition: width 0.3s ease-out;
 }
 
 .octane-reward-track-bar-gloss {
@@ -612,6 +610,23 @@
     line-height: 22px;
 }
 
+/*
+ * track_title_region / task_info_name_region: for staff (security 4+) a click copies the track / task id;
+ * AIR turns the region's interactive cursor on for them and gives no other hover feedback.
+ */
+.octane-reward-track-copy-region {
+    display: block;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
 .octane-reward-track-desc,
 .octane-reward-track-instructions {
     font-size: 11px;
@@ -880,14 +895,12 @@
     height: 7px;
     overflow: hidden;
     border-radius: 5px;
-    transition: width 0.3s ease-out;
 }
 
 .octane-reward-track-mini-bar-fill {
     position: absolute;
     inset: 0;
     border-radius: 5px;
-    transition: background-color 0.3s;
 }
 
 .octane-reward-track-mini-bar-gloss {

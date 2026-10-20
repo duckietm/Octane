@@ -43,6 +43,7 @@ const useQuestsState = () => {
     const [trackedQuest, setTrackedQuest] = useState<QuestMessageData>(null);
     const [completion, setCompletion] = useState<QuestCompletion>(null);
     const [dailyQuest, setDailyQuest] = useState<DailyQuestState>(null);
+    const [questClock, setQuestClock] = useState(0);
     const { roomSession = null } = useRoom();
     const { simpleAlert = null } = useNotification();
 
@@ -73,6 +74,18 @@ const useQuestsState = () => {
     const clearCompletion = useCallback(() => setCompletion(null), []);
 
     const clearTrackedQuest = useCallback(() => setTrackedQuest(null), []);
+
+    /**
+     * NextQuestTimer.refresh(): once the wait is over the timer zeroes it and hands the quest back to
+     * the quest controller, so the tracker and the list show it as a normal quest.
+     */
+    const releaseDelayedQuest = useCallback((quest: QuestMessageData) => {
+        if (!quest) return;
+
+        quest.waitPeriodSeconds = 0;
+        setQuests((prevValue) => [...prevValue]);
+        setQuestClock(Date.now());
+    }, []);
 
     const replaceQuestInList = useCallback((quest: QuestMessageData, accepted: boolean) => {
         setQuests((prevValue) =>
@@ -151,6 +164,7 @@ const useQuestsState = () => {
         dailyQuest,
         acceptedQuest,
         isInRoom,
+        questClock,
         requestQuests,
         acceptQuest,
         rejectQuest,
@@ -159,7 +173,8 @@ const useQuestsState = () => {
         startCampaign,
         requestDailyQuest,
         clearCompletion,
-        clearTrackedQuest
+        clearTrackedQuest,
+        releaseDelayedQuest
     };
 };
 

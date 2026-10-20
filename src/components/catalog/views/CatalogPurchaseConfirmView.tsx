@@ -1,5 +1,6 @@
-import { FC, MutableRefObject, useState } from 'react';
+import { FC, MutableRefObject, useEffect, useState } from 'react';
 import { GetConfigurationValue, IPurchasableOffer, LocalizeText, ProductTypeEnum } from '../../../api';
+import { localizeWithFallback } from '../../../api/utils/localizeWithFallback';
 import { getCatalogBundlePrice, ICatalogBundleDiscountRuleset } from '../../../api/catalog/CatalogBundleDiscount';
 import { LayoutCurrencyIcon, LayoutFurniImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../common';
 import { Checkbox } from '../../../common/Checkbox';
@@ -12,12 +13,37 @@ interface CatalogPurchaseConfirmViewProps {
     bundleDiscountRuleset?: ICatalogBundleDiscountRuleset;
     isGift?: boolean;
     isSubmitting?: boolean;
+    /** AIR PurchaseConfirmationDialog.ltdRaffleEnded: the server put this LTD purchase into a raffle. */
+    isRaffling?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
 }
 
+const RAFFLE_DOT_INTERVAL = 150;
+const RAFFLE_MAX_DOTS = 14;
+
+export const nextRaffleDots = (dots: number): number => (dots >= RAFFLE_MAX_DOTS ? 1 : dots + 1);
+
+// AIR updateDots: the raffling line with one to fourteen dots behind it, one more every 150 ms.
+const CatalogPurchaseRaffleText: FC = () => {
+    const [dots, setDots] = useState(1);
+
+    useEffect(() => {
+        const interval = setInterval(() => setDots((value) => nextRaffleDots(value)), RAFFLE_DOT_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <span className="octane-catalog-purchase-confirm-raffle-text">
+            {localizeWithFallback('catalog.purchase.confirmation.dialog.raffling', 'We are processing your LTD purchase. Please wait')}
+            {'.'.repeat(dots)}
+        </span>
+    );
+};
+
 export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (props) => {
-    const { offer = null, quantity = 1, bundleDiscountRuleset = null, isGift = false, isSubmitting = false, onConfirm = null, onCancel = null } = props;
+    const { offer = null, quantity = 1, bundleDiscountRuleset = null, isGift = false, isSubmitting = false, isRaffling = false, onConfirm = null, onCancel = null } = props;
     const spendingDisclaimerEnabled = GetConfigurationValue<boolean>('disclaimer.credit_spending.enabled', false) === true;
     const [spendingDisclaimerAccepted, setSpendingDisclaimerAccepted] = useState(!spendingDisclaimerEnabled);
 
@@ -103,7 +129,12 @@ export const CatalogPurchaseConfirmView: FC<CatalogPurchaseConfirmViewProps> = (
                         <span>{LocalizeText('disclaimer.credit_spending')}</span>
                     </label>
                 )}
-                {isLimited && (
+                {isRaffling && (
+                    <div className="octane-catalog-purchase-confirm-limited is-raffling" role="status">
+                        <CatalogPurchaseRaffleText />
+                    </div>
+                )}
+                {isLimited && !isRaffling && (
                     <div className="octane-catalog-purchase-confirm-limited" role="status">
                         <span>
                             {LocalizeText('unique.items.left')} <strong>{offer.product.uniqueLimitedItemsLeft}</strong>

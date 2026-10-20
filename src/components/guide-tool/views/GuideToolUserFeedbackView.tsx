@@ -5,10 +5,11 @@ import { Button, Column, Flex, Text } from '../../../common';
 
 interface GuideToolUserFeedbackViewProps {
     userName: string;
+    onReport?: () => void;
 }
 
 export const GuideToolUserFeedbackView: FC<GuideToolUserFeedbackViewProps> = (props) => {
-    const { userName = null } = props;
+    const { userName = null, onReport = null } = props;
 
     const giveFeedback = (recommend: boolean) => SendMessageComposer(new GuideSessionFeedbackMessageComposer(recommend));
 
@@ -19,7 +20,7 @@ export const GuideToolUserFeedbackView: FC<GuideToolUserFeedbackViewProps> = (pr
                     <Text bold>{userName}</Text>
                     <Text>{LocalizeText('guide.help.request.user.feedback.guide.desc')}</Text>
                 </Column>
-                <Button disabled variant="danger">
+                <Button disabled={!onReport} variant="danger" onClick={() => onReport?.()}>
                     {LocalizeText('guide.help.common.report.link')}
                 </Button>
             </Flex>
