@@ -1,6 +1,6 @@
-import { RoomBannedUsersComposer, RoomDataParser, RoomSettingsDataEvent, SaveRoomSettingsComposer } from '@octane/renderer';
-import { FC, useState } from 'react';
-import { CreateLinkEvent, IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
+import { RoomBannedUsersComposer, RoomDataParser, RoomSettingsDataEvent, RoomSettingsSaveErrorEvent, SaveRoomSettingsComposer } from '@octane/renderer';
+import { FC, useRef, useState } from 'react';
+import { CreateLinkEvent, IRoomData, LocalizeText, resolveRoomSettingsSaveError, RoomSettingsSaveErrorResult, SendMessageComposer } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardTabsItemView, OctaneCardTabsView, OctaneCardView } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { NavigatorRoomSettingsAccessTabView } from './NavigatorRoomSettingsAccessTabView';
@@ -20,6 +20,22 @@ const TABS: string[] = [
 export const NavigatorRoomSettingsView: FC<{}> = (props) => {
     const [roomData, setRoomData] = useState<IRoomData>(null);
     const [currentTab, setCurrentTab] = useState(TABS[0]);
+    const [fieldErrors, setFieldErrors] = useState<RoomSettingsSaveErrorResult['errors']>({});
+    // AIR's _savedFlatId: a save error is shown only for a save this window sent.
+    const pendingSaveRoomId = useRef(0);
+
+    useMessageEvent<RoomSettingsSaveErrorEvent>(RoomSettingsSaveErrorEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser || !roomData || parser.roomId !== roomData.roomId || pendingSaveRoomId.current < 1) return;
+
+        pendingSaveRoomId.current = 0;
+
+        const result = resolveRoomSettingsSaveError(parser.code, parser.message, roomData.tags ?? []);
+
+        setCurrentTab(TABS[result.tab - 1] ?? TABS[0]);
+        setFieldErrors(result.errors);
+    });
 
     useMessageEvent<RoomSettingsDataEvent>(RoomSettingsDataEvent, (event) => {
         const parser = event.getParser();
@@ -66,15 +82,23 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
             hiddenByBc: data.hiddenByBc
         });
 
+        setFieldErrors({});
+        pendingSaveRoomId.current = 0;
         SendMessageComposer(new RoomBannedUsersComposer(data.roomId));
     });
 
     const onClose = () => {
         setRoomData(null);
         setCurrentTab(TABS[0]);
+        setFieldErrors({});
+        pendingSaveRoomId.current = 0;
     };
 
     const handleChange = (field: string, value: string | number | boolean | string[]) => {
+        // AIR clears every field error before it sends a save.
+        setFieldErrors({});
+        if (roomData) pendingSaveRoomId.current = roomData.roomId;
+
         setRoomData((prevValue) => {
             const newValue = { ...prevValue };
 
@@ -240,10 +264,12 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
                 })}
             </OctaneCardTabsView>
             <OctaneCardContentView overflow="auto">
-                {currentTab === TABS[0] && <NavigatorRoomSettingsBasicTabView handleChange={handleChange} roomData={roomData} onClose={onClose} />}
-                {currentTab === TABS[1] && <NavigatorRoomSettingsAccessTabView handleChange={handleChange} roomData={roomData} />}
+                {currentTab === TABS[0] && (
+                    <NavigatorRoomSettingsBasicTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} onClose={onClose} />
+                )}
+                {currentTab === TABS[1] && <NavigatorRoomSettingsAccessTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
                 {currentTab === TABS[2] && <NavigatorRoomSettingsRightsTabView handleChange={handleChange} roomData={roomData} />}
-                {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView handleChange={handleChange} roomData={roomData} />}
+                {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
                 {currentTab === TABS[4] && <NavigatorRoomSettingsModTabView handleChange={handleChange} roomData={roomData} />}
             </OctaneCardContentView>
         </OctaneCardView>

@@ -17,4 +17,6 @@ export * from './TradingNotificationType';
 export * from './TradingUtilities';
 export * from './UnseenItemCategory';
 export * from './TradeNameScam';
+export * from './TradeOfferSummary';
+export * from './WiredChestDisplay';
 export * from './WiredTradingUtilities';

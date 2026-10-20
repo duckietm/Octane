@@ -1,21 +1,23 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { convertEmojiShortcodes, emojiShortcodesReady, loadEmojiShortcodes, registerEmojiShortcodes, resetEmojiShortcodes } from './emojiShortcodes';
 
-vi.mock('@emoji-mart/data', () => ({
-    default: {
+const { loadEmojiMartData } = vi.hoisted(() => ({
+    loadEmojiMartData: vi.fn(async () => ({
         emojis: {
             joy: { id: 'joy', skins: [{ native: '😂' }] }
         }
-    }
+    }))
 }));
+
+vi.mock('./emojiData', () => ({ loadEmojiMartData }));
 
 const sample = {
     emojis: {
-        sob: { id: 'sob', emoticons: [":'("], skins: [{ native: '😭' }] },
-        cry: { id: 'cry', emoticons: [":'("], skins: [{ native: '😢' }] },
-        smiley: { id: 'smiley', emoticons: [':)', '=)'], skins: [{ native: '😃' }] },
-        slightly_smiling_face: { id: 'slightly_smiling_face', emoticons: [':)', ':-)'], skins: [{ native: '🙂' }] },
-        confused: { id: 'confused', emoticons: [':/'], skins: [{ native: '😕' }] },
+        sob: { id: 'sob', skins: [{ native: '😭' }] },
+        cry: { id: 'cry', skins: [{ native: '😢' }] },
+        smiley: { id: 'smiley', skins: [{ native: '😃' }] },
+        slightly_smiling_face: { id: 'slightly_smiling_face', skins: [{ native: '🙂' }] },
+        confused: { id: 'confused', skins: [{ native: '😕' }] },
         '+1': { id: '+1', skins: [{ native: '👍' }] },
         laughing: { id: 'laughing', skins: [{ native: '😆' }] }
     },
@@ -47,10 +49,11 @@ describe('convertEmojiShortcodes', () => {
         expect(convertEmojiShortcodes('why:/')).toBe('why:/');
     });
 
-    it('loads the emoji-mart data on demand once', async () => {
+    it('loads the emoji data on demand once', async () => {
         await loadEmojiShortcodes();
         await loadEmojiShortcodes();
 
+        expect(loadEmojiMartData).toHaveBeenCalledTimes(1);
         expect(emojiShortcodesReady()).toBe(true);
         expect(convertEmojiShortcodes(':joy:')).toBe('😂');
     });

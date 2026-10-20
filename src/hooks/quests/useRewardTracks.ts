@@ -1,6 +1,7 @@
 import {
     ClaimRewardTrackPrizeMessageComposer,
     GetLocalizationManager,
+    GetSessionDataManager,
     GetRewardTracksMessageComposer,
     PurchaseRewardTrackPremiumMessageComposer,
     RewardTrackClaimResultMessageEvent,
@@ -8,11 +9,12 @@ import {
     RewardTrackPremiumPurchaseResultMessageEvent,
     RewardTrackProgressMessageEvent,
     RewardTrackTextsMessageEvent,
-    RewardTracksMessageEvent
+    RewardTracksMessageEvent,
+    SecurityLevel
 } from '@octane/renderer';
 import { useCallback, useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
-import { getRewardTrackResultText, localizeWithFallback, NotificationAlertType, NotificationBubbleType, SendMessageComposer } from '../../api';
+import { CopyToClipboard, getRewardTrackResultText, localizeWithFallback, NotificationAlertType, NotificationBubbleType, SendMessageComposer } from '../../api';
 import FREE_CLAIM_ICON from '../../assets/images/reward-track/free-track.png';
 import PREMIUM_CLAIM_ICON from '../../assets/images/reward-track/premium-track.png';
 import { useMessageEvent } from '../events';
@@ -24,6 +26,8 @@ const useRewardTracksState = () => {
     const [disabled, setDisabled] = useState(false);
     const [reloadCount, setReloadCount] = useState(0);
     const [textsVersion, setTextsVersion] = useState(0);
+    // Bumped on every RewardTracksMessageEvent: AIR rebuilds the track views then, so their bars snap.
+    const [tracksVersion, setTracksVersion] = useState(0);
     const [pendingPurchase, setPendingPurchase] = useState<string>(null);
     const { showSingleBubble = null, simpleAlert = null } = useNotification();
 
@@ -35,6 +39,31 @@ const useRewardTracksState = () => {
         setPendingPurchase(trackId);
         SendMessageComposer(new PurchaseRewardTrackPremiumMessageComposer(trackId));
     }, []);
+
+    /**
+     * RewardTrackController.copyDebugId(): staff only (`hasSecurity(EMPLOYEE) || hasSecurity(MODERATOR)`,
+     * i.e. a security level of 4 or more), copies the id and always confirms with an INFO notification.
+     */
+    const copyDebugId = useCallback(
+        (id: string, key: string, fallback: string) => {
+            if (!GetSessionDataManager().hasSecurity(SecurityLevel.EMPLOYEE)) return;
+
+            void CopyToClipboard(id);
+
+            if (showSingleBubble) showSingleBubble(localizeWithFallback(key, fallback), NotificationBubbleType.INFO);
+        },
+        [showSingleBubble]
+    );
+
+    const copyTrackId = useCallback(
+        (trackId: string) => copyDebugId(trackId, 'reward_track.debug.copy_track_id.success', 'Track ID copied to the clipboard'),
+        [copyDebugId]
+    );
+
+    const copyTaskId = useCallback(
+        (taskId: string) => copyDebugId(taskId, 'reward_track.debug.copy_task_id.success', 'Task ID copied to the clipboard'),
+        [copyDebugId]
+    );
 
     const getTrack = useCallback((trackId: string) => tracks.find((track) => track.id === trackId) ?? null, [tracks]);
 
@@ -56,6 +85,7 @@ const useRewardTracksState = () => {
 
         setDisabled(parser.disabled);
         setTracks(parser.disabled ? [] : parser.tracks);
+        setTracksVersion((prevValue) => prevValue + 1);
 
         if (parser.reload) setReloadCount((prevValue) => prevValue + 1);
     });
@@ -149,7 +179,21 @@ const useRewardTracksState = () => {
 
     const unseenCount = useMemo(() => tracks.reduce((total, track) => total + track.claimablePrizeCount, 0), [tracks]);
 
-    return { tracks, disabled, reloadCount, textsVersion, pendingPurchase, unseenCount, getTrack, requestTracks, claimPrize, purchasePremium };
+    return {
+        tracks,
+        disabled,
+        reloadCount,
+        textsVersion,
+        tracksVersion,
+        pendingPurchase,
+        unseenCount,
+        getTrack,
+        requestTracks,
+        claimPrize,
+        purchasePremium,
+        copyTrackId,
+        copyTaskId
+    };
 };
 
 registerSharedHook(useRewardTracksState);

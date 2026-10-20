@@ -1,8 +1,9 @@
 import { RoomChatSettings } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { GetClubMemberLevel, IRoomData, LocalizeText } from '../../../../api';
+import { GetClubMemberLevel, IRoomData, LocalizeText, RoomSettingsSaveErrorResult } from '../../../../api';
 import { Column, Flex, Grid, Text } from '../../../../common';
 import { OctaneInput } from '../../../../layout';
+import { NavigatorRoomSettingsFieldErrorView } from './NavigatorRoomSettingsFieldErrorView';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
@@ -10,10 +11,11 @@ import { Select } from '../../../../common/Select';
 interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
     handleChange: (field: string, value: string | number | boolean) => void;
+    errors?: RoomSettingsSaveErrorResult['errors'];
 }
 
 export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabViewProps> = (props) => {
-    const { roomData = null, handleChange = null } = props;
+    const { roomData = null, handleChange = null, errors = {} } = props;
     const [chatDistance, setChatDistance] = useState<number>(0);
     const [idleSleepTimeoutSeconds, setIdleSleepTimeoutSeconds] = useState<string>('');
     const [idleAutokickTimeoutSeconds, setIdleAutokickTimeoutSeconds] = useState<string>('');
@@ -94,7 +96,11 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                 <Column gap={1} size={6}>
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.vip_settings')} gap={1} className="h-full">
                         <div className="flex items-center gap-1">
-                            <Checkbox checked={roomData.hideWalls} disabled={!isHC} onCheckedChange={(nextChecked) => handleChange('hide_walls', nextChecked)} />
+                            <Checkbox
+                                checked={roomData.hideWalls}
+                                disabled={!isHC}
+                                onCheckedChange={(nextChecked) => handleChange('hide_walls', nextChecked)}
+                            />
                             <Text small>{LocalizeText('navigator.roomsettings.hide_walls')}</Text>
                         </div>
                         <Select
@@ -124,7 +130,10 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                 <Column gap={1} size={12}>
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.room_behavior')} gap={1}>
                         <Flex alignItems="center" gap={1}>
-                            <Checkbox checked={!roomData.leaveOnDoorTileEnabled} onCheckedChange={(nextChecked) => handleChange('leave_on_door_tile_enabled', !nextChecked)} />
+                            <Checkbox
+                                checked={!roomData.leaveOnDoorTileEnabled}
+                                onCheckedChange={(nextChecked) => handleChange('leave_on_door_tile_enabled', !nextChecked)}
+                            />
                             <Text small>{LocalizeText('navigator.roomsettings.do_not_leave_on_door_tile')}</Text>
                         </Flex>
                         <Flex alignItems="center" gap={1}>
@@ -153,8 +162,12 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             />
                             <Text small>{LocalizeText('navigator.roomsettings.timeout.seconds')}</Text>
                         </Flex>
+                        <NavigatorRoomSettingsFieldErrorView error={errors.idle_sleep} />
                         <Flex alignItems="center" gap={1}>
-                            <Checkbox checked={roomData.idleAutokickEnabled} onCheckedChange={(nextChecked) => handleChange('idle_autokick_enabled', nextChecked)} />
+                            <Checkbox
+                                checked={roomData.idleAutokickEnabled}
+                                onCheckedChange={(nextChecked) => handleChange('idle_autokick_enabled', nextChecked)}
+                            />
                             <Text small>{LocalizeText('navigator.roomsettings.idle_autokick')}</Text>
                             <OctaneInput
                                 className="form-control-sm w-20"
@@ -175,6 +188,7 @@ export const NavigatorRoomSettingsVipChatTabView: FC<NavigatorRoomSettingsTabVie
                             />
                             <Text small>{LocalizeText('navigator.roomsettings.timeout.seconds')}</Text>
                         </Flex>
+                        <NavigatorRoomSettingsFieldErrorView error={errors.idle_autokick} />
                     </NavigatorRoomSettingsSectionView>
                 </Column>
             </Grid>

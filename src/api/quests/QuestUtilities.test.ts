@@ -6,9 +6,12 @@ import {
     getCampaignCounterStyle,
     getDailyTaskProgressPercent,
     getDailyTaskStyle,
+    getFriendlyTimeParts,
     getPremiumBoostPercent,
+    getQuestDelayedMessageKey,
     getQuestImageName,
     getQuestProgressPercent,
+    getQuestWaitSecondsLeft,
     getRewardTrackPrizeState,
     isQuestRewardVisible,
     paginatePrizes,
@@ -165,5 +168,25 @@ describe('reward track', () => {
     it('turns the boost multiplier into a percentage', () => {
         expect(getPremiumBoostPercent(1.5)).toBe(50);
         expect(getPremiumBoostPercent(1)).toBe(0);
+    });
+});
+
+describe('next quest timer', () => {
+    it('picks the FriendlyTime unit the wait exceeds three times', () => {
+        expect(getFriendlyTimeParts(45)).toMatchObject({ key: 'friendlytime.seconds', amount: 45 });
+        expect(getFriendlyTimeParts(180)).toMatchObject({ key: 'friendlytime.seconds', amount: 180 });
+        expect(getFriendlyTimeParts(181)).toMatchObject({ key: 'friendlytime.minutes', amount: 3 });
+        expect(getFriendlyTimeParts(4 * 3600)).toMatchObject({ key: 'friendlytime.hours', amount: 4 });
+        expect(getFriendlyTimeParts(4 * 86400)).toMatchObject({ key: 'friendlytime.days', amount: 4 });
+    });
+
+    it('reads the delayed message of the campaign', () => {
+        expect(getQuestDelayedMessageKey({ campaignCode: 'room_builder' } as never)).toBe('quests.room_builder.delayedmsg');
+    });
+
+    it('never reports a negative wait', () => {
+        expect(getQuestWaitSecondsLeft({ waitPeriodSeconds: 12 } as never, 1)).toBe(12);
+        expect(getQuestWaitSecondsLeft({ waitPeriodSeconds: -4 } as never, 1)).toBe(0);
+        expect(getQuestWaitSecondsLeft(null, 1)).toBe(0);
     });
 });

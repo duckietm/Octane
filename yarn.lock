@@ -499,13 +499,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emoji-mart/data@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "@emoji-mart/data@npm:1.2.1"
-  checksum: 10c0/6784b97bf49a0d3ff110d8447bbd3b0449fcbc497294be3d1c3a6cb1609308776895c7520200be604cbecaa5e172c76927e47f34419c72ba8a76fd4e5a53674b
-  languageName: node
-  linkType: hard
-
 "@emoji-mart/react@npm:^1.1.1":
   version: 1.1.1
   resolution: "@emoji-mart/react@npm:1.1.1"
@@ -2272,6 +2265,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"emojibase-data@npm:^18.0.0":
+  version: 18.0.0
+  resolution: "emojibase-data@npm:18.0.0"
+  peerDependencies:
+    emojibase: "*"
+  checksum: 10c0/f00e0ace7b4cd53b19d70512180d0e79331aa7251351a524cfc9ee038785b27f284de4fe9fe8e1ef5817a0d8c037cde9f1194f6ac6c95cb32b5241bcfaa4539b
+  languageName: node
+  linkType: hard
+
+"emojibase@npm:^18.0.0":
+  version: 18.0.0
+  resolution: "emojibase@npm:18.0.0"
+  checksum: 10c0/77ed3a9abe5f5a1a998e6bef8451fefbf8ba20698d3cbe0cefb73afe181b6d4bbda19c586f96906ead4d072846f2f3b7d84a798553b706853f1f5103328595b1
+  languageName: node
+  linkType: hard
+
 "enhanced-resolve@npm:^5.24.1":
   version: 5.24.5
   resolution: "enhanced-resolve@npm:5.24.5"
@@ -3292,7 +3301,6 @@ __metadata:
     "@babel/runtime": "npm:^8.0.7"
     "@base-ui/react": "npm:^1.9.0"
     "@biomejs/biome": "npm:^2.5.15"
-    "@emoji-mart/data": "npm:^1.2.1"
     "@emoji-mart/react": "npm:^1.1.1"
     "@tailwindcss/forms": "npm:^0.5.11"
     "@tailwindcss/postcss": "npm:^4.3.3"
@@ -3310,6 +3318,8 @@ __metadata:
     babel-plugin-react-compiler: "npm:^1.0.0"
     dompurify: "npm:^3.4.17"
     emoji-mart: "npm:^5.6.0"
+    emojibase: "npm:^18.0.0"
+    emojibase-data: "npm:^18.0.0"
     eslint: "npm:^10.13.0"
     eslint-plugin-react-hooks: "npm:^7.1.1"
     framer-motion: "npm:^14.3.0"

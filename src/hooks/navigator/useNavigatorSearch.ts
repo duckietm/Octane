@@ -1,10 +1,11 @@
-import { FlatCreatedEvent, NavigatorSearchComposer, NavigatorSearchEvent, NavigatorSearchResultSet } from '@octane/renderer';
+import { FlatCreatedEvent, NavigatorSearchComposer, NavigatorSearchEvent, NavigatorSearchResultSet, RoomSettingsSavedEvent } from '@octane/renderer';
 import { useEffect, useState } from 'react';
 import { SendMessageComposer } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNavigatorUiStore } from './navigatorUiStore';
 
 const NAVIGATOR_USER_COUNT_REFRESH_MS = 15000;
+const MY_ROOMS_TAB_CODE = 'myworld_view';
 
 export const useNavigatorSearch = () => {
     const tabCode = useNavigatorUiStore((s) => s.currentTabCode);
@@ -53,6 +54,14 @@ export const useNavigatorSearch = () => {
 
     useMessageEvent<FlatCreatedEvent>(FlatCreatedEvent, () => {
         if (!tabCode) return;
+
+        setIsFetching(true);
+        SendMessageComposer(new NavigatorSearchComposer(tabCode, filter));
+    });
+
+    // AIR (navigator IncomingMessages.onRoomSettingsSaved) reloads the own rooms list, so a renamed room shows its new name.
+    useMessageEvent<RoomSettingsSavedEvent>(RoomSettingsSavedEvent, () => {
+        if (tabCode !== MY_ROOMS_TAB_CODE) return;
 
         setIsFetching(true);
         SendMessageComposer(new NavigatorSearchComposer(tabCode, filter));

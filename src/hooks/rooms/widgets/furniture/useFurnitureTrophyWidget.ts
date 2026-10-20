@@ -3,6 +3,17 @@ import { useState } from 'react';
 import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
 
+/** Official `TrophyFurniWidget.VIEW_NIKO_SILVER` / `VIEW_NIKO_GOLD`, read from the furni's extra int. */
+export const TROPHY_VIEW_NIKO_SILVER = 10;
+export const TROPHY_VIEW_NIKO_GOLD = 20;
+
+/** Official `TrophyFurniWidgetHandler`: `parseInt(furniture_extras)`; only the two Niko views switch the card. */
+export const resolveTrophyView = (extras: string): number => {
+    const view = Number.parseInt(extras, 10);
+
+    return view === TROPHY_VIEW_NIKO_SILVER || view === TROPHY_VIEW_NIKO_GOLD ? view : 0;
+};
+
 const useFurnitureTrophyWidgetState = () => {
     const [objectId, setObjectId] = useState(-1);
     const [category, setCategory] = useState(-1);
@@ -10,6 +21,7 @@ const useFurnitureTrophyWidgetState = () => {
     const [senderName, setSenderName] = useState('');
     const [date, setDate] = useState('');
     const [message, setMessage] = useState('');
+    const [view, setView] = useState(0);
 
     const onClose = () => {
         setObjectId(-1);
@@ -18,6 +30,7 @@ const useFurnitureTrophyWidgetState = () => {
         setSenderName('');
         setDate('');
         setMessage('');
+        setView(0);
     };
 
     useOctaneEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_TROPHY, (event) => {
@@ -44,6 +57,7 @@ const useFurnitureTrophyWidgetState = () => {
         setSenderName(senderName);
         setDate(trophyDate);
         setMessage(trophyText);
+        setView(resolveTrophyView(extra));
     });
 
     useFurniRemovedEvent(objectId !== -1 && category !== -1, (event) => {
@@ -52,7 +66,7 @@ const useFurnitureTrophyWidgetState = () => {
         onClose();
     });
 
-    return { objectId, color, senderName, date, message, onClose };
+    return { objectId, color, senderName, date, message, view, onClose };
 };
 
 export const useFurnitureTrophyWidget = useFurnitureTrophyWidgetState;

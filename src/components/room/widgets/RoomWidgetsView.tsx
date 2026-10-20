@@ -124,7 +124,7 @@ export const RoomWidgetsView: FC<{}> = (props) => {
                     //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_TEASER, objectId, category, event.roomId));
                     break;
                 case RoomEngineTriggerWidgetEvent.REQUEST_ECOTRONBOX:
-                    //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_ECOTRONBOX, objectId, category, event.roomId));
+                    // Handled by useFurnitureEcotronBoxWidget (official EcotronBoxFurniWidget).
                     break;
                 case RoomEngineTriggerWidgetEvent.REQUEST_PLACEHOLDER:
                     //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_PLACEHOLDER, objectId, category, event.roomId));

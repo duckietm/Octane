@@ -1,4 +1,4 @@
-import { NavigatorSearchEvent, NavigatorSearchResultSet } from '@octane/renderer';
+import { NavigatorSearchEvent, NavigatorSearchResultSet, RoomSettingsSavedEvent } from '@octane/renderer';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockEventDispatcher } from '../../octane-renderer.mock';
@@ -188,5 +188,37 @@ describe('useNavigatorSearch', () => {
 
         await waitFor(() => expect(result.current.searchResult).not.toBeNull());
         expect((result.current.searchResult as any).code).toBe('public');
+    });
+
+    it('8. RoomSettingsSaved reloads the own rooms list, as AIR does, and leaves other tabs alone', async () => {
+        const { result } = renderHook(() => useNavigatorSearch());
+
+        act(() => {
+            useNavigatorUiStore.getState().setTab('public');
+        });
+        await waitFor(() => expect(result.current.isFetching).toBe(true));
+        act(() => {
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('public') as any);
+        });
+        await waitFor(() => expect(result.current.isFetching).toBe(false));
+
+        act(() => {
+            mockEventDispatcher.dispatchEvent(new (RoomSettingsSavedEvent as any)() as any);
+        });
+        expect(result.current.isFetching).toBe(false);
+
+        act(() => {
+            useNavigatorUiStore.getState().setTab('myworld_view');
+        });
+        await waitFor(() => expect(result.current.isFetching).toBe(true));
+        act(() => {
+            mockEventDispatcher.dispatchEvent(makeSearchEvent('myworld_view') as any);
+        });
+        await waitFor(() => expect(result.current.isFetching).toBe(false));
+
+        act(() => {
+            mockEventDispatcher.dispatchEvent(new (RoomSettingsSavedEvent as any)() as any);
+        });
+        await waitFor(() => expect(result.current.isFetching).toBe(true));
     });
 });

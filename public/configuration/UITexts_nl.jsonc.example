@@ -1582,5 +1582,7 @@
     "inventory.trading.notification.caption": "De ruil kon niet worden voltooid",
     "nitro.info.title": "Over deze client",
     "notifications.text.club_gift.selected": "Je hebt je cadeau gekozen.",
+    "reward_track.debug.copy_track_id.success": "Track-ID gekopieerd naar het klembord",
+    "reward_track.debug.copy_task_id.success": "Taak-ID gekopieerd naar het klembord",
     "chat.confirm.openurl": "Je staat op het punt %url% te openen. Ga alleen verder als je de link vertrouwt."
 }

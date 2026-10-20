@@ -1,4 +1,4 @@
-import { CreateLinkEvent, PurchaseFromCatalogComposer } from '@octane/renderer';
+import { CreateLinkEvent, LtdRaffleEnteredMessageEvent, LtdRaffleResultMessageEvent, PurchaseFromCatalogComposer } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     BuilderFurniPlaceableStatus,
@@ -32,6 +32,7 @@ import {
     useCatalogData,
     useCatalogSkipPurchaseConfirmation,
     useCatalogUiState,
+    useMessageEvent,
     useNotification,
     usePurse,
     useUiEvent
@@ -57,6 +58,10 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     const ownsPurchaseOutcomeRef = useRef(false);
     const confirmationOpenRef = useRef(false);
     const purchaseGuardTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+    const { showConfirm = null, showSingleBubble = null, simpleAlert = null } = useNotification();
+    // AIR PurchaseConfirmationDialog raffle_container: shown while the server holds this LTD purchase in a raffle.
+    const [isRaffling, setIsRaffling] = useState(false);
+    const rafflingRef = useRef(false);
     const [catalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
     const { data: bundleDiscountRuleset = null } = useCatalogBundleDiscountRuleset();
     const { currentOffer = null, currentPage = null } = useCatalogData();
@@ -69,7 +74,24 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     } = useCatalogUiState();
     const { requestOfferToMover = null, getBuilderFurniPlaceableStatus = null, getNodesByOfferId = null, resetPlacedOfferData = null } = useCatalogActions();
     const { getCurrencyAmount = null } = usePurse();
-    const { showConfirm = null, showSingleBubble = null, simpleAlert = null } = useNotification();
+
+    const setRaffling = useCallback((value: boolean) => {
+        rafflingRef.current = value;
+        setIsRaffling(value);
+    }, []);
+
+    // AIR hideRaffle: a dialog closed while its raffle is still running says the purchase is not processed yet.
+    const notifyRaffleOngoing = useCallback(() => {
+        if (!rafflingRef.current) return;
+
+        setRaffling(false);
+        showSingleBubble?.(localizeWithFallback('notification.raffle.ongoing', 'This LTD purchase has not been processed yet!'), NotificationBubbleType.LTD);
+    }, [setRaffling, showSingleBubble]);
+    const notifyRaffleOngoingRef = useRef(notifyRaffleOngoing);
+
+    useEffect(() => {
+        notifyRaffleOngoingRef.current = notifyRaffleOngoing;
+    }, [notifyRaffleOngoing]);
 
     const resetPurchaseGuard = useCallback(() => {
         purchasePendingRef.current = false;
@@ -176,6 +198,8 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
             switch (event.type) {
                 case CatalogPurchasedEvent.PURCHASE_SUCCESS:
+                    // AIR onPurchaseOK -> ltdRaffleStarted: a won raffle closes the dialog without the ongoing note.
+                    setRaffling(false);
                     resetPurchaseGuard();
                     setPurchaseWillBeGift(false);
                     setPurchaseState(CatalogPurchaseState.NONE);
@@ -197,8 +221,29 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
                     return;
             }
         },
-        [resetPurchaseGuard]
+        [resetPurchaseGuard, setRaffling]
     );
+
+    // AIR HabboCatalog event 933 -> PurchaseConfirmationDialog.ltdRaffleEnded: keep the dialog open with the
+    // raffling line until the draw. The draw can outlast the purchase guard, so the guard stops here.
+    useMessageEvent<LtdRaffleEnteredMessageEvent>(LtdRaffleEnteredMessageEvent, () => {
+        if (!purchasePendingRef.current || !confirmationOpenRef.current) return;
+
+        if (purchaseGuardTimeoutRef.current) clearTimeout(purchaseGuardTimeoutRef.current);
+
+        purchaseGuardTimeoutRef.current = null;
+        setRaffling(true);
+    });
+
+    // AIR event 2316: the draw is over, the dialog closes (the won / lost note comes from useNotification).
+    useMessageEvent<LtdRaffleResultMessageEvent>(LtdRaffleResultMessageEvent, () => {
+        if (!rafflingRef.current) return;
+
+        setRaffling(false);
+        resetPurchaseGuard();
+        setPurchaseWillBeGift(false);
+        setPurchaseState(CatalogPurchaseState.NONE);
+    });
 
     useUiEvent(CatalogPurchasedEvent.PURCHASE_SUCCESS, onCatalogEvent);
     useUiEvent(CatalogPurchaseFailureEvent.PURCHASE_FAILED, onCatalogEvent);
@@ -277,6 +322,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     useEffect(() => {
         if (!currentOffer) return;
 
+        notifyRaffleOngoingRef.current();
         resetPurchaseGuard();
         ownsPurchaseOutcomeRef.current = false;
         setPurchaseWillBeGift(false);
@@ -284,6 +330,9 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
     }, [currentOffer, resetPurchaseGuard, setPurchaseOptions]);
 
     useEffect(() => resetPurchaseGuard, [resetPurchaseGuard]);
+
+    // AIR dispose -> hideRaffle: closing the catalog while the raffle runs leaves the ongoing note behind.
+    useEffect(() => () => notifyRaffleOngoingRef.current(), []);
 
     useEffect(() => {
         let timeout: ReturnType<typeof setTimeout> = null;
@@ -490,11 +539,16 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
             {confirmationOpenRef.current && (purchaseState === CatalogPurchaseState.CONFIRM || purchaseState === CatalogPurchaseState.PURCHASE) && (
                 <CatalogPurchaseConfirmView
                     isGift={purchaseWillBeGift}
+                    isRaffling={isRaffling}
                     isSubmitting={purchaseState === CatalogPurchaseState.PURCHASE}
                     bundleDiscountRuleset={bundleDiscountRuleset}
                     offer={currentOffer}
                     quantity={purchaseOptions.quantity}
                     onCancel={() => {
+                        // The raffle result still arrives later; this dialog just stops waiting for it.
+                        if (rafflingRef.current) resetPurchaseGuard();
+
+                        notifyRaffleOngoing();
                         confirmationOpenRef.current = false;
                         resetPlacedOfferData?.();
                         setPurchaseWillBeGift(false);
