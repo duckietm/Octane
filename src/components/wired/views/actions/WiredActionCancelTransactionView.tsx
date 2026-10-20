@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { Radio } from '../../../../common/Radio';
 import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES } from '../WiredSourcesSelector';
@@ -71,7 +72,7 @@ export const WiredActionCancelTransactionView: FC<{}> = () => {
                 <Text bold>{localizeWithFallback('wiredfurni.params.cancel_transaction.match_criteria', 'Cancel transaction:')}</Text>
                 {[CANCEL_MATCH_SPECIFIC_CONTRACT, CANCEL_MATCH_ANY].map((value) => (
                     <label key={value} className="flex items-center gap-1">
-                        <input type="radio" className="form-check-input" name="cancelTransactionMatch" checked={matchCriteria === value} onChange={() => setMatchCriteria(value)} />
+                        <Radio name="cancelTransactionMatch" checked={matchCriteria === value} onCheckedChange={() => setMatchCriteria(value)} />
                         <Text>{localizeWithFallback(`wiredfurni.params.cancel_transaction.match_criteria.${value}`, MATCH_LABELS[value])}</Text>
                     </label>
                 ))}

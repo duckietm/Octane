@@ -1,18 +1,20 @@
 import { GetSessionDataManager, RoomDataParser } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { CreateLinkEvent, IRoomData, LocalizeText } from '../../../../api';
+import { CreateLinkEvent, IRoomData, LocalizeText, RoomSettingsSaveErrorResult } from '../../../../api';
 import { Button, Column, Flex, Text } from '../../../../common';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { NavigatorRoomSettingsFieldErrorView } from './NavigatorRoomSettingsFieldErrorView';
 import { NavigatorRoomSettingsSectionView } from './NavigatorRoomSettingsSectionView';
 
 interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
     handleChange: (field: string, value: string | number | boolean) => void;
+    errors?: RoomSettingsSaveErrorResult['errors'];
 }
 
 export const NavigatorRoomSettingsAccessTabView: FC<NavigatorRoomSettingsTabViewProps> = (props) => {
-    const { roomData = null, handleChange = null } = props;
+    const { roomData = null, handleChange = null, errors = {} } = props;
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isTryingPassword, setIsTryingPassword] = useState(false);
@@ -51,19 +53,35 @@ export const NavigatorRoomSettingsAccessTabView: FC<NavigatorRoomSettingsTabView
                 {!lockedByBuildersClub && (
                     <NavigatorRoomSettingsSectionView title={LocalizeText('navigator.roomsettings.doormode')} gap={1}>
                         <Flex alignItems="center" gap={1}>
-                            <Radio name="lockState" checked={roomData.lockState === RoomDataParser.OPEN_STATE && !isTryingPassword} onCheckedChange={() => handleChange('lock_state', RoomDataParser.OPEN_STATE)} />
+                            <Radio
+                                name="lockState"
+                                checked={roomData.lockState === RoomDataParser.OPEN_STATE && !isTryingPassword}
+                                onCheckedChange={() => handleChange('lock_state', RoomDataParser.OPEN_STATE)}
+                            />
                             <Text>{LocalizeText('navigator.roomsettings.doormode.open')}</Text>
                         </Flex>
                         <Flex alignItems="center" gap={1}>
-                            <Radio name="lockState" checked={roomData.lockState === RoomDataParser.DOORBELL_STATE && !isTryingPassword} onCheckedChange={() => handleChange('lock_state', RoomDataParser.DOORBELL_STATE)} />
+                            <Radio
+                                name="lockState"
+                                checked={roomData.lockState === RoomDataParser.DOORBELL_STATE && !isTryingPassword}
+                                onCheckedChange={() => handleChange('lock_state', RoomDataParser.DOORBELL_STATE)}
+                            />
                             <Text>{LocalizeText('navigator.roomsettings.doormode.doorbell')}</Text>
                         </Flex>
                         <Flex alignItems="center" gap={1}>
-                            <Radio name="lockState" checked={roomData.lockState === RoomDataParser.INVISIBLE_STATE && !isTryingPassword} onCheckedChange={() => handleChange('lock_state', RoomDataParser.INVISIBLE_STATE)} />
+                            <Radio
+                                name="lockState"
+                                checked={roomData.lockState === RoomDataParser.INVISIBLE_STATE && !isTryingPassword}
+                                onCheckedChange={() => handleChange('lock_state', RoomDataParser.INVISIBLE_STATE)}
+                            />
                             <Text>{LocalizeText('navigator.roomsettings.doormode.invisible')}</Text>
                         </Flex>
                         <Flex fullWidth gap={1}>
-                            <Radio name="lockState" checked={roomData.lockState === RoomDataParser.PASSWORD_STATE || isTryingPassword} onCheckedChange={() => setIsTryingPassword(true)} />
+                            <Radio
+                                name="lockState"
+                                checked={roomData.lockState === RoomDataParser.PASSWORD_STATE || isTryingPassword}
+                                onCheckedChange={() => setIsTryingPassword(true)}
+                            />
                             {!isTryingPassword && roomData.lockState !== RoomDataParser.PASSWORD_STATE && (
                                 <Text>{LocalizeText('navigator.roomsettings.doormode.password')}</Text>
                             )}
@@ -78,7 +96,8 @@ export const NavigatorRoomSettingsAccessTabView: FC<NavigatorRoomSettingsTabView
                                         placeholder={LocalizeText('navigator.roomsettings.password')}
                                         onFocus={(event) => setIsTryingPassword(true)}
                                     />
-                                    {isTryingPassword && password.length <= 0 && (
+                                    <NavigatorRoomSettingsFieldErrorView error={errors.password} />
+                                    {!errors.password && isTryingPassword && password.length <= 0 && (
                                         <Text bold small variant="danger">
                                             {LocalizeText('navigator.roomsettings.passwordismandatory')}
                                         </Text>

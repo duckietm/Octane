@@ -34,7 +34,7 @@ export const ChatInputEmojiSelectorView: FC<ChatInputEmojiSelectorViewProps> = (
                 <span aria-hidden="true">🙂</span>
             </PopoverTrigger>
             <PopoverContent align="end" className="swf-chat-emoji-popover" positionerClassName="z-[1070]" side="top" sideOffset={8}>
-                <LazyEmojiPicker onEmojiSelect={handleEmojiSelect} previewPosition="none" skinTonePosition="search" theme="light" />
+                <LazyEmojiPicker onEmojiSelect={handleEmojiSelect} previewPosition="none" skinTonePosition="search" theme="dark" />
             </PopoverContent>
         </Popover>
     );

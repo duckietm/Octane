@@ -1,7 +1,8 @@
 import { QuestMessageData } from '@octane/renderer';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
     formatFriendlySeconds,
+    formatQuestWaitTime,
     getActivityPointIconType,
     getCampaignCounterStyle,
     getCampaignImageUrl,
@@ -10,8 +11,10 @@ import {
     getQuestHint,
     getQuestImageUrl,
     getQuestName,
+    getQuestWaitSecondsLeft,
     isQuestRewardVisible,
-    localizeWithFallback
+    localizeWithFallback,
+    NEXT_QUEST_TIMER_REFRESH_MS
 } from '../../api';
 import { Button, LayoutCurrencyIcon, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
@@ -33,10 +36,21 @@ export const QuestEntryView: FC<QuestEntryViewProps> = (props) => {
 
     const completedCampaign = quest.completedCampaign;
     const accepted = quest.accepted;
-    const waiting = quest.waitPeriodSeconds > 0;
+    const [now, setNow] = useState(() => Date.now());
+    const waitSeconds = getQuestWaitSecondsLeft(quest, now);
+    const waiting = waitSeconds > 0;
     const counterStyle = getCampaignCounterStyle(quest.completedQuestsInCampaign, completedCampaign);
     const description = getQuestDescription(quest);
     const hint = showHint ? getQuestHint(quest) : '';
+
+    // QuestsList.update(): the delay is redrawn every second; at zero the row turns into the quest.
+    useEffect(() => {
+        if (!waiting) return;
+
+        const interval = window.setInterval(() => setNow(Date.now()), NEXT_QUEST_TIMER_REFRESH_MS);
+
+        return () => window.clearInterval(interval);
+    }, [waiting]);
 
     return (
         <div className="octane-quest-entry" data-accepted={accepted} data-completed={completedCampaign}>
@@ -65,13 +79,13 @@ export const QuestEntryView: FC<QuestEntryViewProps> = (props) => {
                             <span className="octane-quest-block-timeleft">{formatFriendlySeconds(quest.secondsLeft)}</span>
                         )}
                     </div>
-                    <img className="octane-quest-block-image" src={getQuestImageUrl(quest)} alt="" draggable={false} />
+                    <img className="octane-quest-block-image" src={getQuestImageUrl(quest, waiting)} alt="" draggable={false} />
                     <div className="octane-quest-block-body">
                         {waiting && (
                             <>
                                 <Text small>{localizeWithFallback('quests.list.nextquestavailable', 'The next quest will be available in')}</Text>
                                 <Text bold className="octane-quest-delay">
-                                    {formatFriendlySeconds(quest.waitPeriodSeconds)}
+                                    {formatQuestWaitTime(waitSeconds)}
                                 </Text>
                             </>
                         )}

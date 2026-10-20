@@ -295,7 +295,7 @@ export default defineConfig({
                     const norm = id.replace(/\\/g, '/');
                     if(norm.includes('pixi.js') || norm.includes('pixi-filters')) return 'vendor-pixi';
                     if(norm.includes('howler')) return 'vendor-audio';
-                    if(norm.includes('@emoji-mart')) return 'vendor-emoji';
+                    if(norm.includes('@emoji-mart') || norm.includes('emojibase-data')) return 'vendor-emoji';
                     if(norm.includes('jodit') || norm.includes('@react-page')) return 'vendor-editor';
 
                     if(id.includes('Octane-Renderer') || id.includes(`${ rendererRoot }`))

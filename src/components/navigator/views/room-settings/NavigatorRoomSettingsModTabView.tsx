@@ -1,4 +1,11 @@
-import { BannedUserData, BannedUsersFromRoomEvent, RoomBannedUsersComposer, RoomModerationSettings, RoomUnbanUserComposer } from '@octane/renderer';
+import {
+    BannedUserData,
+    BannedUsersFromRoomEvent,
+    RoomBannedUsersComposer,
+    RoomModerationSettings,
+    RoomUnbanUserComposer,
+    UserUnbannedFromRoomEvent
+} from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { BaseButton, Button, Column, Flex, Grid, Text, UserProfileIconView } from '../../../../common';
@@ -40,6 +47,17 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
         setBannedUsers(parser.bannedUsers);
     });
 
+    // AIR's RoomSettingsCtrl drops an unbanned user from the list as the server confirms it,
+    // including an unban made by someone else with rights while the window is open.
+    useMessageEvent<UserUnbannedFromRoomEvent>(UserUnbannedFromRoomEvent, (event) => {
+        const parser = event.getParser();
+
+        if (!parser || !roomData || roomData.roomId !== parser.roomId) return;
+
+        setBannedUsers((prevValue) => prevValue.filter((user) => user.userId !== parser.userId));
+        setSelectedUserId((prevValue) => (prevValue === parser.userId ? -1 : prevValue));
+    });
+
     useEffect(() => {
         SendMessageComposer(new RoomBannedUsersComposer(roomData.roomId));
     }, [roomData.roomId]);
@@ -60,7 +78,13 @@ export const NavigatorRoomSettingsModTabView: FC<NavigatorRoomSettingsTabViewPro
                                     return (
                                         <Flex key={index} shrink alignItems="center" gap={1} overflow="hidden">
                                             <UserProfileIconView userId={user.userId} />
-                                            <Text pointer grow className="border-0 bg-transparent p-0 text-left" component={BaseButton} onClick={(event) => setSelectedUserId(user.userId)}>
+                                            <Text
+                                                pointer
+                                                grow
+                                                className="border-0 bg-transparent p-0 text-left"
+                                                component={BaseButton}
+                                                onClick={(event) => setSelectedUserId(user.userId)}
+                                            >
                                                 {' '}
                                                 {user.userName}
                                             </Text>

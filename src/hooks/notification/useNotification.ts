@@ -16,6 +16,7 @@ import {
     HotelClosesAndWillOpenAtEvent,
     HotelWillCloseInMinutesEvent,
     InfoFeedEnableMessageEvent,
+    LtdRaffleResultMessageEvent,
     MaintenanceStatusMessageEvent,
     MOTDNotificationEvent,
     ModeratorCautionEvent,
@@ -102,6 +103,12 @@ export const prependSingleAlert = (alerts: NotificationAlertItem[], item: Notifi
 };
 
 // Like the official client, a new item goes below the ones already shown.
+/** AIR HabboCatalog.onLtdRaffleResult: `notification.raffle.won` for a win, `notification.raffle.lost` otherwise. */
+export const ltdRaffleResultText = (hasWon: boolean): string =>
+    hasWon
+        ? localizeWithFallback('notification.raffle.won', 'You successfully bought an LTD!')
+        : localizeWithFallback('notification.raffle.lost', 'Unfortunately you were not lucky enough to get an LTD this time.');
+
 export const addSingleBubble = (alerts: NotificationBubbleItem[], item: NotificationBubbleItem): NotificationBubbleItem[] => {
     const shouldReplace = item.notificationType === NotificationBubbleType.CLUBGIFT || item.notificationType === NotificationBubbleType.SOUNDBOARD;
 
@@ -453,6 +460,13 @@ const useNotificationStore = () => {
         const senderName = parser.senderName || '';
 
         showSingleBubble(badgeName, NotificationBubbleType.BADGE_RECEIVED, badgeImage, parser.badgeCode, senderName);
+    });
+
+    // AIR HabboCatalog event 2316: the LTD raffle is drawn; result code 0 is a win, anything else a loss.
+    useMessageEvent<LtdRaffleResultMessageEvent>(LtdRaffleResultMessageEvent, (event) => {
+        const parser = event.getParser();
+
+        showSingleBubble(ltdRaffleResultText(!!parser?.hasWon), NotificationBubbleType.LTD);
     });
 
     useMessageEvent<ClubGiftNotificationEvent>(ClubGiftNotificationEvent, (event) => {

@@ -1,12 +1,23 @@
-import { RoomDeleteComposer, RoomSettingsSaveErrorEvent, RoomSettingsSaveErrorParser, YouTubeRoomSettingsComposer, YouTubeRoomSettingsEvent } from '@octane/renderer';
+import { RoomDeleteComposer, YouTubeRoomSettingsComposer, YouTubeRoomSettingsEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { CreateLinkEvent, GetMaxVisitorsList, getYoutubeRoomEnabled, IRoomData, LocalizeText, localizeWithFallback, SendMessageComposer, setYoutubeRoomEnabled } from '../../../../api';
+import {
+    CreateLinkEvent,
+    GetMaxVisitorsList,
+    getYoutubeRoomEnabled,
+    IRoomData,
+    LocalizeText,
+    localizeWithFallback,
+    RoomSettingsSaveErrorResult,
+    SendMessageComposer,
+    setYoutubeRoomEnabled
+} from '../../../../api';
 import { Column, Flex, Text } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
 import { useMessageEvent, useNavigatorData, useNotification, useSoundboard } from '../../../../hooks';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NavigatorRoomSettingsFieldErrorView } from './NavigatorRoomSettingsFieldErrorView';
 
 const ROOM_NAME_MIN_LENGTH = 3;
 const ROOM_NAME_MAX_LENGTH = 60;
@@ -17,16 +28,15 @@ interface NavigatorRoomSettingsTabViewProps {
     roomData: IRoomData;
     handleChange: (field: string, value: string | number | boolean | string[]) => void;
     onClose: () => void;
+    errors?: RoomSettingsSaveErrorResult['errors'];
 }
 
 export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewProps> = (props) => {
-    const { roomData = null, handleChange = null, onClose = null } = props;
+    const { roomData = null, handleChange = null, onClose = null, errors = {} } = props;
     const [roomName, setRoomName] = useState<string>('');
     const [roomDescription, setRoomDescription] = useState<string>('');
     const [roomTag1, setRoomTag1] = useState<string>('');
     const [roomTag2, setRoomTag2] = useState<string>('');
-    const [tagIndex, setTagIndex] = useState(0);
-    const [typeError, setTypeError] = useState<string>('');
     const [youtubeEnabled, setYoutubeEnabled] = useState(getYoutubeRoomEnabled());
     const { showConfirm = null, simpleAlert = null } = useNotification();
     const { categories, navigatorData } = useNavigatorData();
@@ -41,24 +51,6 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
         setYoutubeRoomEnabled(enabled);
         SendMessageComposer(new YouTubeRoomSettingsComposer(enabled));
     };
-
-    useMessageEvent<RoomSettingsSaveErrorEvent>(RoomSettingsSaveErrorEvent, (event) => {
-        const parser = event.getParser();
-
-        if (!parser) return;
-
-        switch (parser.code) {
-            case RoomSettingsSaveErrorParser.ERROR_INVALID_TAG:
-                setTypeError('navigator.roomsettings.unacceptablewords');
-                break;
-            case RoomSettingsSaveErrorParser.ERROR_NON_USER_CHOOSABLE_TAG:
-                setTypeError('navigator.roomsettings.nonuserchoosabletag');
-                break;
-            default:
-                setTypeError('');
-                break;
-        }
-    });
 
     const deleteRoom = () => {
         // The server ignores deleting your home room, which looked like it worked.
@@ -79,7 +71,9 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
 
         showConfirm(
             // Deleting a group's room deletes the group with it.
-            isGroupBase ? `${confirmMessage}\n\n${localizeWithFallback('group.deletebase.body', 'This room is the home of a group: the group will be deleted too.')}` : confirmMessage,
+            isGroupBase
+                ? `${confirmMessage}\n\n${localizeWithFallback('group.deletebase.body', 'This room is the home of a group: the group will be deleted too.')}`
+                : confirmMessage,
             () => {
                 SendMessageComposer(new RoomDeleteComposer(roomData.roomId));
 
@@ -113,8 +107,6 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
 
         if (roomTag1 === '' && roomTag2 !== '') setRoomTag2('');
 
-        setTypeError('');
-        setTagIndex(index);
         handleChange('tags', roomTag1 === '' && roomTag2 !== '' ? [roomTag2] : [roomTag1, roomTag2]);
     };
 
@@ -139,10 +131,14 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                         if (event.key === 'Enter') saveRoomName(event.currentTarget.value);
                     }}
                 />
-                {roomName.length < ROOM_NAME_MIN_LENGTH && (
-                    <Text bold small variant="danger">
-                        {LocalizeText('navigator.roomsettings.roomnameismandatory')}
-                    </Text>
+                {errors.name ? (
+                    <NavigatorRoomSettingsFieldErrorView error={errors.name} />
+                ) : (
+                    roomName.length < ROOM_NAME_MIN_LENGTH && (
+                        <Text bold small variant="danger">
+                            {LocalizeText('navigator.roomsettings.roomnameismandatory')}
+                        </Text>
+                    )
                 )}
             </Column>
             <Column gap={1}>
@@ -154,6 +150,7 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                     onChange={(event) => setRoomDescription(event.target.value)}
                     onBlur={(event) => saveRoomDescription(event.currentTarget.value)}
                 />
+                <NavigatorRoomSettingsFieldErrorView error={errors.description} />
             </Column>
             <Column gap={1}>
                 <Text bold>{LocalizeText('navigator.category')}</Text>
@@ -203,15 +200,14 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                             onChange={(event) => setRoomTag1(event.target.value)}
                             onBlur={() => saveTags(0)}
                         />
-                        {roomTag1.length > TAGS_MAX_LENGTH && (
-                            <Text bold small variant="danger">
-                                {LocalizeText('navigator.roomsettings.toomanycharacters')}
-                            </Text>
-                        )}
-                        {tagIndex === 0 && typeError != '' && (
-                            <Text bold small variant="danger">
-                                {LocalizeText(typeError)}
-                            </Text>
+                        {errors.tag1 ? (
+                            <NavigatorRoomSettingsFieldErrorView error={errors.tag1} />
+                        ) : (
+                            roomTag1.length > TAGS_MAX_LENGTH && (
+                                <Text bold small variant="danger">
+                                    {LocalizeText('navigator.roomsettings.toomanycharacters')}
+                                </Text>
+                            )
                         )}
                     </Column>
                     <Column fullWidth gap={0}>
@@ -221,15 +217,14 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                             onChange={(event) => setRoomTag2(event.target.value)}
                             onBlur={() => saveTags(1)}
                         />
-                        {roomTag2.length > TAGS_MAX_LENGTH && (
-                            <Text bold small variant="danger">
-                                {LocalizeText('navigator.roomsettings.toomanycharacters')}
-                            </Text>
-                        )}
-                        {tagIndex === 1 && typeError != '' && (
-                            <Text bold small variant="danger">
-                                {LocalizeText(typeError)}
-                            </Text>
+                        {errors.tag2 ? (
+                            <NavigatorRoomSettingsFieldErrorView error={errors.tag2} />
+                        ) : (
+                            roomTag2.length > TAGS_MAX_LENGTH && (
+                                <Text bold small variant="danger">
+                                    {LocalizeText('navigator.roomsettings.toomanycharacters')}
+                                </Text>
+                            )
                         )}
                     </Column>
                 </Flex>
@@ -244,7 +239,11 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                 <Text>{LocalizeText('navigator.roomsettings.allow_underpass')}</Text>
             </Flex>
             <Flex alignItems="center" gap={1}>
-                <Checkbox aria-label={LocalizeText('widget.room.youtube.shared')} checked={youtubeEnabled} onCheckedChange={(nextChecked) => toggleYouTube(nextChecked)} />
+                <Checkbox
+                    aria-label={LocalizeText('widget.room.youtube.shared')}
+                    checked={youtubeEnabled}
+                    onCheckedChange={(nextChecked) => toggleYouTube(nextChecked)}
+                />
                 <Text>{LocalizeText('widget.room.youtube.shared')}</Text>
             </Flex>
             <Column gap={1}>
@@ -260,7 +259,15 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                     <option value="2">{LocalizeText('soundboard.room.mode.rights')}</option>
                 </Select>
             </Column>
-            <Flex pointer alignItems="center" className="w-full border-0 bg-transparent p-0" component={BaseButton} justifyContent="center" gap={1} onClick={deleteRoom}>
+            <Flex
+                pointer
+                alignItems="center"
+                className="w-full border-0 bg-transparent p-0"
+                component={BaseButton}
+                justifyContent="center"
+                gap={1}
+                onClick={deleteRoom}
+            >
                 <FaTimes className="fa-icon shrink-0 text-[#a81a12]" />
                 <Text variant="danger" underline bold className="whitespace-nowrap">
                     {LocalizeText('navigator.roomsettings.delete')}

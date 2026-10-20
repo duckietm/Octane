@@ -196,9 +196,5 @@ export const countRewardTrackUnclaimed = <T extends RewardTrackLayoutPrize>(
     return { next, previous };
 };
 
-/** RewardTrackTaskProgressBarView colours: orange while running, green once full. */
-export const REWARD_TRACK_TASK_BAR_INCOMPLETE = '#EBA60C';
-export const REWARD_TRACK_TASK_BAR_COMPLETE = '#71AF24';
-
 /** A task / level mini bar: `progress` width in px (rounded like RewardTrackProgressBarViewBase.render()). */
 export const getRewardTrackMiniBarWidth = (ratio: number, width: number): number => Math.max(0, Math.min(width, Math.round(width * Math.max(0, Math.min(1, ratio)))));

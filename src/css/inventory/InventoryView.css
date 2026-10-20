@@ -700,35 +700,59 @@
 }
 
 
-/* chest_overlay_(brown|gold)_background + ChestItemGridOverlayWidget: the contents count sits on a
-   small plate at the bottom of the tile, in the chest's own colour. */
+/* AIR inventory_thumb + ChestItemGridOverlayWidget (GroupItem.updateItemImageVisual): a chest tile gets
+   chest_overlay_<colour>_background (36x36 at 2,2) under the furni image, then the chest_overlay_<colour>_plaque
+   with the contents count (24x5 at 6,28, centred glyphs) and chest_overlay_shine at 0.6 on top. Gold for a
+   coins chest, brown for a furni chest. */
+.octane-inventory-window .octane-inventory-thumb-chest-background,
 .octane-inventory-window .octane-inventory-thumb-chest {
     position: absolute;
+    top: 2px;
     left: 2px;
-    right: 2px;
-    bottom: 2px;
-    height: 11px;
-    line-height: 11px;
-    border-radius: 2px;
-    color: #ffffff;
-    font-size: 8px;
-    font-weight: 700;
-    text-align: center;
-    z-index: 1;
+    width: 36px;
+    height: 36px;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
     pointer-events: none;
 }
 
-
-.octane-inventory-window .octane-inventory-thumb-chest.is-brown {
-    background: #7a4a1e;
-    border: 1px solid #4a2a0c;
+.octane-inventory-window .octane-inventory-thumb-chest-background.is-brown {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_brown_background.png');
 }
 
+.octane-inventory-window .octane-inventory-thumb-chest-background.is-gold {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_gold_background.png');
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest {
+    z-index: 1;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest.is-brown {
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_brown_plaque.png');
+}
 
 .octane-inventory-window .octane-inventory-thumb-chest.is-gold {
-    background: #d9a521;
-    border: 1px solid #8a6d13;
-    color: #3a2c00;
+    background-image: url('../../assets/images/inventory/chest/chest_overlay_gold_plaque.png');
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest-count {
+    position: absolute;
+    top: 28px;
+    left: 6px;
+    display: flex;
+    justify-content: center;
+    width: 24px;
+    height: 5px;
+    line-height: 0;
+}
+
+.octane-inventory-window .octane-inventory-thumb-chest::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../../assets/images/inventory/chest/chest_overlay_shine.png') no-repeat;
+    opacity: 0.6;
 }
 
 

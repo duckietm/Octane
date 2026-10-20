@@ -144,9 +144,10 @@ describe('transaction wired actions', () => {
         const timeout = screen.getByLabelText('timeout seconds');
 
         fireEvent.change(timeout, { target: { value: '5' } });
-        expect(baseProps.validate()).toBe(false);
         fireEvent.blur(timeout);
-        expect(timeout).toHaveValue(30);
+        // The number field takes the value back into 30..3600 when it is left, so there is nothing invalid to validate.
+        expect((timeout as HTMLInputElement).value).toBe('30');
+        expect(baseProps.validate()).toBe(true);
         baseProps.save();
 
         expect(setIntParams).toHaveBeenLastCalledWith([1, 12, 0, -10, 1, 30]);

@@ -1,6 +1,6 @@
 import { CreateLinkEvent } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { getQuestDescription, getQuestImageUrl, getQuestName, getQuestProgressPercent, localizeWithFallback } from '../../api';
+import { getQuestDescription, getQuestImageUrl, getQuestName, getQuestProgressPercent, getQuestWaitSecondsLeft, localizeWithFallback } from '../../api';
 import { LayoutProgressBar } from '../../common';
 import { useQuests } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
@@ -16,7 +16,7 @@ const NEXT_QUEST_TIMEOUT_MS = 600;
  * accepted: quest name, image, description, progress bar and the "more info" link (in room only).
  */
 export const QuestTrackerView: FC<{}> = () => {
-    const { trackedQuest = null, completion = null, isInRoom = false, requestNextQuest = null, clearTrackedQuest = null } = useQuests();
+    const { trackedQuest = null, completion = null, isInRoom = false, requestNextQuest = null, clearTrackedQuest = null, questClock = 0 } = useQuests();
     const [frame, setFrame] = useState(-1);
 
     const completing = completion && trackedQuest && completion.quest.id === trackedQuest.id;
@@ -68,7 +68,8 @@ export const QuestTrackerView: FC<{}> = () => {
 
     if (!trackedQuest || !isInRoom || (!trackedQuest.accepted && !completing)) return null;
 
-    if (trackedQuest.waitPeriodSeconds > 0) return null;
+    // A delayed quest belongs to the next quest timer until its wait is over (QuestTracker.onQuest).
+    if (getQuestWaitSecondsLeft(trackedQuest, questClock) > 0) return null;
 
     const percent = completing ? 100 : getQuestProgressPercent(trackedQuest.completedSteps, trackedQuest.totalSteps);
 

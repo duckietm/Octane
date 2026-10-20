@@ -44,11 +44,12 @@ import { NavigatorView } from './navigator/NavigatorView';
 import { OctanebubbleHiddenView } from './octanebubblehidden/OctanebubbleHiddenView';
 import { OctanepediaView } from './octanepedia/OctanepediaView';
 import { ExternalPluginLoader } from './plugins/ExternalPluginLoader';
-import { DailyTasksView, QuestCompletedView, QuestsView, QuestTrackerView, RewardTrackView } from './quests';
+import { DailyTasksView, NextQuestTimerView, QuestCompletedView, QuestsView, QuestTrackerView, RewardTrackView } from './quests';
 import { RadioView } from './radio/RadioView';
 import { RareValuesView } from './rare-values/RareValuesView';
 import { RightSideView } from './right-side/RightSideView';
 import { RoomView } from './room/RoomView';
+import { RoomQueueWidgetView } from './room/widgets/room-queue/RoomQueueWidgetView';
 import { SoundboardView } from './soundboard/SoundboardView';
 import { ToolbarView } from './toolbar/ToolbarView';
 import { TranslationBootstrap } from './translation/TranslationBootstrap';
@@ -191,6 +192,7 @@ export const MainView: FC<{}> = (props) =>
             <WiredCreatorToolsView />
             <VariablesExplorerView />
             <RoomView />
+            <RoomQueueWidgetView />
             <ChatHistoryView />
             <CustomizeNickIconView />
             <WiredView />
@@ -212,6 +214,7 @@ export const MainView: FC<{}> = (props) =>
             <VaultView />
             <QuestsView />
             <QuestTrackerView />
+            <NextQuestTimerView />
             <QuestCompletedView />
             <DailyTasksView />
             <RewardTrackView />

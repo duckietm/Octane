@@ -323,11 +323,13 @@ export class MentionsPageEvent extends MessageEvent {}
 // Navigator event classes — MessageEvent subclasses needed by useNavigatorStore
 // ---------------------------------------------------------------------------
 
+export class CanCreateRoomEvent extends MessageEvent {}
 export class CanCreateRoomEventEvent extends MessageEvent {}
 export class CategoriesWithVisitorCountEvent extends MessageEvent {}
 export class FavouriteChangedEvent extends MessageEvent {}
 export class FavouritesEvent extends MessageEvent {}
 export class FlatCreatedEvent extends MessageEvent {}
+export class RoomSettingsSavedEvent extends MessageEvent {}
 export class NavigatorHomeRoomEvent extends MessageEvent {}
 export class NavigatorMetadataEvent extends MessageEvent {}
 export class AvatarEffectsEvent extends MessageEvent {}
@@ -362,6 +364,8 @@ export class BadgeReceivedEvent extends MessageEvent {}
 export class ChestNotificationEvent extends MessageEvent {}
 export class WiredTransactionFailEvent extends MessageEvent {}
 export class WiredTradeErrorEvent extends MessageEvent {}
+export class LtdRaffleEnteredMessageEvent extends MessageEvent {}
+export class LtdRaffleResultMessageEvent extends MessageEvent {}
 
 // Wired trade constants with the renderer's real values (WiredTradeOpenMessageParser / WiredTradeRuleParser).
 export const WIRED_TRADE_REQUIREMENT_ANY_COINS = 0;
@@ -430,6 +434,12 @@ export class SetObjectDataMessageComposer {
         public readonly objectId: number,
         public readonly data: Map<string, string>
     ) {}
+}
+export class GetSecondsUntilMessageComposer {
+    constructor(public readonly timingCode: string) {}
+}
+export class GuideSessionIsTypingMessageComposer {
+    constructor(public readonly isTyping: boolean) {}
 }
 export class FurnitureMultiStateComposer {
     constructor(
@@ -531,6 +541,7 @@ export class PurchaseSnowWarGameTokensOfferComposer extends StubClass {}
 export class Game2GetAccountGameStatusMessageComposer extends StubClass {}
 export class AddFavouriteRoomMessageComposer extends StubClass {}
 export class FurnitureStackHeightComposer extends StubClass {}
+export class FurnitureAdjacentStackHeightComposer extends StubClass {}
 export class AvatarEffectActivatedComposer extends StubClass {}
 export class AvatarEffectSelectedComposer extends StubClass {}
 export class DeleteFavouriteRoomMessageComposer extends StubClass {}
@@ -958,6 +969,7 @@ export class RewardTracksMessageEvent extends MessageEvent {}
 export class RewardTrackClaimResultMessageEvent extends MessageEvent {}
 export class RewardTrackProgressMessageEvent extends MessageEvent {}
 export class RewardTrackPremiumPurchaseResultMessageEvent extends MessageEvent {}
+export class SecondsUntilMessageEvent extends MessageEvent {}
 export class QuestMessageData extends StubClass {}
 export class DailyTaskData extends StubClass {
     public static STATUS_IN_PROGRESS = 0;

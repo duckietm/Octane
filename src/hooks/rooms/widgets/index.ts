@@ -24,3 +24,4 @@ export * from './useUserChooserWidget';
 export * from './useWordQuizWidget';
 export * from './useFurniPickupGuard';
 export * from './useObjectRemoveConfirm';
+export * from './useRoomQueueWidget';

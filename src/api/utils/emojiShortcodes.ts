@@ -1,40 +1,83 @@
+import { loadEmojiMartData } from './emojiData';
+
+type ShortcodeSource = {
+    emojis: Record<string, { id: string; skins: { native: string }[] }>;
+    aliases?: Record<string, string>;
+};
+
 /**
  * `:sob:` and `:)` in chat become the emoji they stand for, the way the old
- * emoji-toolkit conversion did. The names and smileys come from emoji-mart's
- * data, the same set the chat bar picker shows, and that bundle is fetched on
- * demand the first time a room needs it, so nothing lands in the initial
- * payload. Until it arrives, text passes through untouched.
+ * emoji-toolkit conversion did. The names come from the emoji data, the same
+ * set the chat bar picker shows, and that data is fetched on demand the first
+ * time a room needs it, so nothing lands in the initial payload. Until it
+ * arrives, text passes through untouched.
  */
-
-type EmojiMartEmoji = { id: string; emoticons?: string[]; skins: { native: string }[] };
-type EmojiMartData = { emojis: Record<string, EmojiMartEmoji>; aliases?: Record<string, string> };
 
 /**
- * Several emoji claim the same smiley in the data; pick the one people mean.
+ * The smileys that turn into an emoji. They are listed here and not read from
+ * the emoji data: datasets disagree on which emoji a smiley means and on which
+ * smileys exist, and an update of the data must not change what chat says.
  */
-const PREFERRED_EMOTICONS: Record<string, string> = {
-    ':)': 'slightly_smiling_face',
-    ':-)': 'slightly_smiling_face',
-    '(:': 'slightly_smiling_face',
-    ':D': 'smile',
-    ':-D': 'smile',
-    ':(': 'disappointed',
-    ':-(': 'disappointed',
-    '):': 'disappointed',
-    ":'(": 'sob',
-    '<3': 'heart'
-};
+const EMOTICONS = new Map<string, string>([
+    [ ':)', '🙂' ],
+    [ ':-)', '🙂' ],
+    [ '(:', '🙂' ],
+    [ '=)', '😃' ],
+    [ '=-)', '😃' ],
+    [ ':D', '😄' ],
+    [ ':-D', '😄' ],
+    [ 'C:', '😄' ],
+    [ 'c:', '😄' ],
+    [ ':(', '😞' ],
+    [ ':-(', '😞' ],
+    [ '):', '😞' ],
+    [ ":'(", '😭' ],
+    [ ':>', '😆' ],
+    [ ':->', '😆' ],
+    [ ';)', '😉' ],
+    [ ';-)', '😉' ],
+    [ ':P', '😛' ],
+    [ ':p', '😛' ],
+    [ ':b', '😛' ],
+    [ ':-P', '😛' ],
+    [ ':-p', '😛' ],
+    [ ':-b', '😛' ],
+    [ ';P', '😜' ],
+    [ ';p', '😜' ],
+    [ ';b', '😜' ],
+    [ ';-P', '😜' ],
+    [ ';-p', '😜' ],
+    [ ';-b', '😜' ],
+    [ ':*', '😘' ],
+    [ ':-*', '😘' ],
+    [ ':/', '😕' ],
+    [ ':\\', '😕' ],
+    [ ':-/', '😕' ],
+    [ ':-\\', '😕' ],
+    [ ':|', '😐' ],
+    [ ':-|', '😐' ],
+    [ '-_-', '😑' ],
+    [ ':O', '😮' ],
+    [ ':o', '😮' ],
+    [ ':-O', '😮' ],
+    [ ':-o', '😮' ],
+    [ 'D:', '😧' ],
+    [ '>:(', '😠' ],
+    [ '>:-(', '😠' ],
+    [ '8)', '😎' ],
+    [ ':o)', '🐵' ],
+    [ '<3', '❤️' ],
+    [ '</3', '💔' ]
+]);
 
 const SHORTCODE_PATTERN = /:([a-z0-9_+-]+):/gi;
 const TOKEN_PATTERN = /(^|\s)(\S+)(?=\s|$)/g;
 
 let shortcodes: Map<string, string> = null;
-let emoticons: Map<string, string> = null;
 let loading: Promise<void> = null;
 
-export const registerEmojiShortcodes = (data: EmojiMartData): void => {
+export const registerEmojiShortcodes = (data: ShortcodeSource): void => {
     const nextShortcodes = new Map<string, string>();
-    const nextEmoticons = new Map<string, string>();
 
     for (const emoji of Object.values(data.emojis ?? {})) {
         const native = emoji.skins?.[0]?.native;
@@ -42,12 +85,6 @@ export const registerEmojiShortcodes = (data: EmojiMartData): void => {
         if (!native) continue;
 
         nextShortcodes.set(emoji.id.toLowerCase(), native);
-
-        for (const emoticon of emoji.emoticons ?? []) {
-            const preferred = PREFERRED_EMOTICONS[emoticon];
-
-            if (preferred ? preferred === emoji.id : !nextEmoticons.has(emoticon)) nextEmoticons.set(emoticon, native);
-        }
     }
 
     for (const [alias, id] of Object.entries(data.aliases ?? {})) {
@@ -57,12 +94,10 @@ export const registerEmojiShortcodes = (data: EmojiMartData): void => {
     }
 
     shortcodes = nextShortcodes;
-    emoticons = nextEmoticons;
 };
 
 export const resetEmojiShortcodes = (): void => {
     shortcodes = null;
-    emoticons = null;
     loading = null;
 };
 
@@ -72,8 +107,8 @@ export const loadEmojiShortcodes = (): Promise<void> => {
     if (shortcodes) return Promise.resolve();
 
     if (!loading) {
-        loading = import('@emoji-mart/data')
-            .then((module) => registerEmojiShortcodes(((module as { default?: EmojiMartData }).default ?? module) as EmojiMartData))
+        loading = loadEmojiMartData()
+            .then(registerEmojiShortcodes)
             .catch(() => {
                 loading = null;
             });
@@ -88,7 +123,7 @@ export const convertEmojiShortcodes = (text: string): string => {
     let result = text.replace(SHORTCODE_PATTERN, (match, id: string) => shortcodes.get(id.toLowerCase()) ?? match);
 
     result = result.replace(TOKEN_PATTERN, (match, lead: string, token: string) => {
-        const native = emoticons.get(token);
+        const native = EMOTICONS.get(token);
 
         return native ? `${lead}${native}` : match;
     });

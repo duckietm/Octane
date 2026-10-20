@@ -338,6 +338,106 @@
     font-size: 12px;
 }
 
+/* ---- next quest timer (NextQuestTimer.xml, 195x116, docked where the tracker sits) ---- */
+
+.octane-next-quest-timer {
+    position: fixed;
+    right: 10px;
+    bottom: 62px;
+    width: 195px;
+    height: 25px;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    z-index: 30;
+}
+
+.octane-next-quest-timer[data-expanded='true'] {
+    height: 116px;
+}
+
+.octane-next-quest-timer-bg {
+    position: absolute;
+    inset: 0;
+    width: 195px;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Without the questing image library the bitmap falls back to the tracker panel look. */
+.octane-next-quest-timer[data-missing-art='true'] {
+    border: 2px solid #4b4b4b;
+    border-radius: 8px;
+    background: rgba(35, 35, 35, 0.92);
+}
+
+.octane-next-quest-timer[data-missing-art='true'] .octane-next-quest-timer-bg {
+    display: none;
+}
+
+.octane-next-quest-timer-toggle {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-next-quest-timer-header {
+    position: absolute;
+    top: 2px;
+    left: 54px;
+    max-width: 136px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    line-height: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+}
+
+.octane-next-quest-timer-pic {
+    position: absolute;
+    top: 32px;
+    left: 9px;
+    width: 54px;
+    height: 46px;
+    object-fit: none;
+    pointer-events: none;
+}
+
+.octane-next-quest-timer-desc {
+    position: absolute;
+    top: 27px;
+    left: 71px;
+    width: 115px;
+    height: 61px;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 15px;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+}
+
+.octane-next-quest-timer-moreinfo {
+    position: absolute;
+    top: 86px;
+    left: 15px;
+    width: 162px;
+    height: 18px;
+    padding: 0 0 0 13px;
+    border: 0;
+    background: transparent;
+    color: #23c5ff;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 /* ---- completed dialog ---- */
 
 .octane-quest-completed {
