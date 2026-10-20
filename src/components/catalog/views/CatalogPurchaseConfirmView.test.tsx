@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CatalogPurchaseConfirmView } from './CatalogPurchaseConfirmView';
+import { act } from 'react';
+import { CatalogPurchaseConfirmView, nextRaffleDots } from './CatalogPurchaseConfirmView';
 
 vi.mock('../../../api', async () => {
     const actual = await vi.importActual<typeof import('../../../api')>('../../../api');
@@ -71,6 +72,33 @@ describe('catalog purchase confirmation', () => {
         expect(screen.getByRole('status').firstElementChild?.tagName).toBe('SPAN');
         expect(screen.getByRole('status')).toHaveTextContent(/^unique\.items\.left 7 \/ unique\.items\.number\.sold 100$/);
         expect(screen.queryByText(/catalog\.limited\.items\.left/)).not.toBeInTheDocument();
+    });
+
+    it('swaps the limited line for the AIR raffling line with growing dots while the raffle runs', () => {
+        vi.useFakeTimers();
+
+        try {
+            const limitedOffer = { ...offer, product: { ...offer.product, isUniqueLimitedItem: true, uniqueLimitedItemsLeft: 3, uniqueLimitedItemSeriesSize: 10 } } as any;
+
+            render(<CatalogPurchaseConfirmView isRaffling isSubmitting offer={limitedOffer} quantity={1} onCancel={() => undefined} onConfirm={() => undefined} />);
+
+            const status = screen.getByRole('status');
+
+            expect(status).toHaveClass('octane-catalog-purchase-confirm-limited', 'is-raffling');
+            expect(status.textContent).toMatch(/[^.]\.$/);
+            expect(status).not.toHaveTextContent(/unique\.items\.left/);
+
+            act(() => vi.advanceTimersByTime(300));
+            expect(status.textContent).toMatch(/[^.]\.\.\.$/);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it('cycles the raffling dots from one to fourteen', () => {
+        expect(nextRaffleDots(1)).toBe(2);
+        expect(nextRaffleDots(13)).toBe(14);
+        expect(nextRaffleDots(14)).toBe(1);
     });
 
     it('moves the focus into the dialog and restores it to the opener when closed', async () => {

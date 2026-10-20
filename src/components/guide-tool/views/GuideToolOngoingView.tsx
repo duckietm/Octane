@@ -9,7 +9,7 @@ import {
 import { FC, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { GuideToolMessageGroup, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, Text } from '../../../common';
-import { useMessageEvent } from '../../../hooks';
+import { useGuideSessionTyping, useMessageEvent } from '../../../hooks';
 import { classNames, OctaneInput } from '../../../layout';
 
 interface GuideToolOngoingViewProps {
@@ -19,14 +19,16 @@ interface GuideToolOngoingViewProps {
     userFigure: string;
     isTyping: boolean;
     messageGroups: GuideToolMessageGroup[];
+    onReport?: () => void;
 }
 
 export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
     const scrollDiv = useRef<HTMLDivElement>(null);
 
-    const { isGuide = false, userId = 0, userName = null, userFigure = null, isTyping = false, messageGroups = [] } = props;
+    const { isGuide = false, userId = 0, userName = null, userFigure = null, isTyping = false, messageGroups = [], onReport = null } = props;
 
     const [messageText, setMessageText] = useState<string>('');
+    const { restart: restartTyping } = useGuideSessionTyping(messageText.length);
 
     useEffect(() => {
         scrollDiv.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
@@ -55,7 +57,8 @@ export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
 
         SendMessageComposer(new GuideSessionMessageMessageComposer(messageText));
         setMessageText('');
-    }, [messageText]);
+        restartTyping();
+    }, [messageText, restartTyping]);
 
     const onKeyDown = useCallback(
         (event: KeyboardEvent<HTMLInputElement>) => {
@@ -85,7 +88,7 @@ export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
                         <Text>{LocalizeText('guide.help.request.user.ongoing.guide.desc')}</Text>
                     </Column>
                 )}
-                <Button disabled variant="danger">
+                <Button disabled={!onReport} variant="danger" onClick={() => onReport?.()}>
                     {LocalizeText('guide.help.common.report.link')}
                 </Button>
             </Flex>

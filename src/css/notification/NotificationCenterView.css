@@ -1168,3 +1168,255 @@
 .octane-swf-notification-bubble .octane-club-gift-notification__later:hover {
     color: #bae1f9 !important;
 }
+
+/*
+ * AIR's new feature notifications (new_feature_notification_xml 192x92, _promo_xml 192x34,
+ * _countdown_xml 192x76) on the border_9 skin, which the hotel can recolour (notifications.new_feature.color).
+ */
+.octane-new-feature-notification {
+    position: relative;
+    display: block;
+    width: 192px;
+    height: 92px;
+    isolation: isolate;
+    color: #ffffff;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 14px;
+}
+
+.octane-new-feature-notification[data-type="promo"] {
+    height: auto;
+    min-height: 34px;
+}
+
+.octane-new-feature-notification[data-type="countdown"] {
+    height: 76px;
+}
+
+.octane-new-feature-notification__border {
+    position: absolute;
+    inset: 0;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 7px 7px 8px 7px;
+    border-image: url("@/assets/images/notifications/notification_border_9.png") 7 7 8 7 fill / 7px 7px 8px 7px stretch;
+    image-rendering: var(--octane-pixel-art, pixelated);
+    pointer-events: none;
+}
+
+/* A hotel colour other than the skin's own 0x686661 takes the border's hue, keeping its shading. */
+.octane-new-feature-notification__border[data-tinted="true"]::after {
+    position: absolute;
+    inset: -7px -7px -8px -7px;
+    border-radius: 6px;
+    background: var(--octane-new-feature-color);
+    mix-blend-mode: color;
+    content: "";
+}
+
+.octane-new-feature-notification__image {
+    position: absolute;
+    top: 5px;
+    left: 6px;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.octane-new-feature-notification__image img {
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-new-feature-notification__desc {
+    position: absolute;
+    top: 7px;
+    left: 67px;
+    width: 113px;
+    height: 45px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+}
+
+.octane-new-feature-notification__open {
+    position: absolute;
+    top: 54px;
+    left: 133px;
+    min-width: 51px;
+    height: 28px;
+    padding: 0 6px;
+    border: 5px solid transparent !important;
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-default.png") !important;
+    border-image-slice: 5 fill !important;
+    border-image-width: 5px !important;
+    border-image-repeat: stretch !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    cursor: pointer;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-new-feature-notification__open:hover {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-hover.png") !important;
+}
+
+.octane-new-feature-notification__open:active {
+    border-image-source: url("@/assets/images/habbicons/slices/button-shiny-black-pressed.png") !important;
+}
+
+/* cancel_link_region (8,60 155x17): underlined white link, 0xBAE1F9 while hovered. */
+.octane-new-feature-notification__cancel-link {
+    position: absolute;
+    top: 60px;
+    left: 8px;
+    max-width: 155px;
+    min-height: 0;
+    padding: 0;
+    border: 0 !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    font-family: Ubuntu, sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.octane-new-feature-notification__cancel-link:hover {
+    color: #bae1f9 !important;
+}
+
+/* promo / countdown: the whole box is main_region (brightness_and_shadow_under_gentle). */
+.octane-new-feature-notification__main-region {
+    position: relative;
+    display: block;
+    width: 192px;
+    min-height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.octane-new-feature-notification[data-type="promo"] .octane-new-feature-notification__main-region {
+    min-height: 34px;
+    padding: 7px 0 9px;
+}
+
+.octane-new-feature-notification[data-type="countdown"] .octane-new-feature-notification__main-region {
+    height: 76px;
+}
+
+.octane-new-feature-notification__main-region:hover {
+    filter: brightness(1.08) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+.octane-new-feature-notification__main-region .octane-new-feature-notification__image {
+    top: 7px;
+    left: 8px;
+    width: 20px;
+    height: 20px;
+}
+
+.octane-new-feature-notification__main-region .octane-new-feature-notification__desc {
+    position: relative;
+    top: 0;
+    left: 0;
+    display: block;
+    margin-left: 30px;
+    width: auto;
+    max-width: 148px;
+    height: auto;
+    text-decoration: underline;
+}
+
+.octane-new-feature-notification[data-type="countdown"] .octane-new-feature-notification__desc {
+    position: absolute;
+    top: 7px;
+    left: 14px;
+    margin-left: 0;
+    width: 154px;
+    max-width: 154px;
+}
+
+/* NewFeatureNotification: hovering a promo / countdown lights its text up (LINK_COLOR_HIGHLIGHT). */
+.octane-new-feature-notification:hover .octane-new-feature-notification__main-region .octane-new-feature-notification__desc {
+    color: #bae1f9;
+}
+
+/* cancel_link_region of promo (174,12) and countdown (174,9): common_close_x at 0.55. */
+.octane-new-feature-notification__cancel-region {
+    position: absolute;
+    top: 12px;
+    left: 174px;
+    width: 10px;
+    height: 10px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.octane-new-feature-notification[data-type="countdown"] .octane-new-feature-notification__cancel-region {
+    top: 9px;
+}
+
+.octane-new-feature-notification__cancel-region img {
+    display: block;
+    opacity: 0.55;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+/* countdown_widget (46,33 99x37): three counters, value over unit, colon separated. */
+.octane-new-feature-notification__countdown {
+    position: absolute;
+    top: 33px;
+    left: 46px;
+    width: 99px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.octane-new-feature-notification__counter {
+    display: flex;
+    align-items: center;
+}
+
+.octane-new-feature-notification__separator {
+    padding: 0 1px;
+    font-weight: bold;
+}
+
+.octane-new-feature-notification__counter-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 26px;
+    padding: 2px 1px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.octane-new-feature-notification__counter-value {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 16px;
+}
+
+.octane-new-feature-notification__counter-unit {
+    font-size: 9px;
+    line-height: 10px;
+}

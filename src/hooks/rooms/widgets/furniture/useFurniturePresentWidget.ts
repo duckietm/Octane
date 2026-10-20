@@ -10,7 +10,7 @@ import {
     RoomSessionPresentEvent,
     Vector3d
 } from '@octane/renderer';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { IsOwnerOfFurniture, LocalizeText, ProductTypeEnum } from '../../../../api';
 import { useOctaneEvent } from '../../../events';
 import { useFurniRemovedEvent } from '../../engine';
@@ -34,8 +34,12 @@ const useFurniturePresentWidgetState = () => {
     const [placedInRoom, setPlacedInRoom] = useState(false);
     const [imageUrl, setImageUrl] = useState<string>(null);
     const { roomSession = null } = useRoom();
+    // Official `PresentFurniWidget` only shows the contents of the present it is opening itself, so the
+    // `PresentOpened` answer to an Ecotron box (the same packet) stays with the Ecotron card.
+    const openingRef = useRef(false);
 
     const onClose = () => {
+        openingRef.current = false;
         setObjectId(-1);
         setClassId(-1);
         setItemType(null);
@@ -52,6 +56,7 @@ const useFurniturePresentWidgetState = () => {
     const openPresent = () => {
         if (objectId === -1) return;
 
+        openingRef.current = true;
         roomSession.openGift(objectId);
 
         GetRoomEngine().changeObjectModelData(
@@ -80,6 +85,10 @@ const useFurniturePresentWidgetState = () => {
     }, []);
 
     useOctaneEvent<RoomSessionPresentEvent>(RoomSessionPresentEvent.RSPE_PRESENT_OPENED, (event) => {
+        if (!openingRef.current) return;
+
+        openingRef.current = false;
+
         let furniData: IFurnitureData = null;
 
         if (event.itemType === ProductTypeEnum.FLOOR) {
@@ -218,7 +227,13 @@ const useFurniturePresentWidgetState = () => {
     });
 
     useFurniRemovedEvent(objectId !== -1, (event) => {
-        if (event.id === objectId) onClose();
+        if (event.id === objectId) {
+            // The server may remove the opened present before its `PresentOpened` arrives; keep waiting for it.
+            const wasOpening = openingRef.current;
+
+            onClose();
+            openingRef.current = wasOpening;
+        }
 
         if (event.id === placedItemId) {
             if (placedInRoom) setPlacedInRoom(false);

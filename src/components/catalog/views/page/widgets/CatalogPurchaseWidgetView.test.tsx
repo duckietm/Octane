@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GetClubMemberLevel } from '../../../../../api';
 import {
@@ -14,6 +14,8 @@ import { CatalogPurchaseWidgetView } from './CatalogPurchaseWidgetView';
 
 vi.mock('@octane/renderer', () => ({
     CreateLinkEvent: vi.fn(),
+    LtdRaffleEnteredMessageEvent: class LtdRaffleEnteredMessageEvent {},
+    LtdRaffleResultMessageEvent: class LtdRaffleResultMessageEvent {},
     PurchaseFromCatalogComposer: class {}
 }));
 
@@ -25,7 +27,7 @@ vi.mock('../../../../../api', () => ({
     GetClubMemberLevel: vi.fn(() => 0),
     GetConfigurationValue: vi.fn((_key: string, fallback: unknown) => fallback),
     LocalizeText: (key: string) => key,
-    NotificationBubbleType: {},
+    NotificationBubbleType: { LTD: 'ltd' },
     Offer: { PRICING_MODEL_SINGLE: 'single' },
     OpenUrl: vi.fn(),
     ProductTypeEnum: { FLOOR: 's', HABBICON: 'h', WALL: 'i' },
@@ -52,7 +54,13 @@ vi.mock('../../../../../events', () => ({
     CatalogPurchaseSoldOutEvent: { SOLD_OUT: 'purchase-sold-out' }
 }));
 
+const messageHandlers = vi.hoisted(() => new Map<string, (event: unknown) => void>());
+const confirmProps = vi.hoisted(() => ({ current: null as any }));
+
 vi.mock('../../../../../hooks', () => ({
+    useMessageEvent: (eventType: { name: string }, handler: (event: unknown) => void) => {
+        messageHandlers.set(eventType.name, handler);
+    },
     useCatalogActions: vi.fn(),
     useCatalogBundleDiscountRuleset: vi.fn(),
     useCatalogData: vi.fn(),
@@ -63,7 +71,13 @@ vi.mock('../../../../../hooks', () => ({
     useUiEvent: vi.fn()
 }));
 
-vi.mock('../../CatalogPurchaseConfirmView', () => ({ CatalogPurchaseConfirmView: () => null }));
+vi.mock('../../CatalogPurchaseConfirmView', () => ({
+    CatalogPurchaseConfirmView: (props: any) => {
+        confirmProps.current = props;
+
+        return null;
+    }
+}));
 
 const makeOffer = (overrides: Record<string, unknown> = {}) => ({
     activityPointType: 0,
@@ -90,6 +104,8 @@ afterEach(cleanup);
 
 beforeEach(() => {
     vi.clearAllMocks();
+    messageHandlers.clear();
+    confirmProps.current = null;
     habbiconCatalog.entries = [];
     vi.mocked(GetClubMemberLevel).mockReturnValue(0);
     vi.mocked(useCatalogActions).mockReturnValue({
@@ -181,5 +197,62 @@ describe('catalog purchase widget', () => {
 
         expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.gift' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' })).toBeDisabled();
+    });
+
+    describe('LTD raffle (AIR PurchaseConfirmationDialog raffle_container)', () => {
+        const startLimitedPurchase = () => {
+            setOffer(makeOffer({ product: { isUniqueLimitedItem: true, uniqueLimitedItemsLeft: 2, productClassId: 10, productType: 's' } }));
+
+            const view = render(<CatalogPurchaseWidgetView />);
+
+            fireEvent.click(screen.getByRole('button', { name: 'catalog.purchase_confirmation.buy' }));
+            act(() => confirmProps.current.onConfirm());
+            act(() => messageHandlers.get('LtdRaffleEnteredMessageEvent')({}));
+
+            return view;
+        };
+
+        it('keeps the confirmation open with the raffling line once the purchase enters the raffle', () => {
+            startLimitedPurchase();
+
+            expect(confirmProps.current.isRaffling).toBe(true);
+            expect(confirmProps.current.isSubmitting).toBe(true);
+        });
+
+        it('closes the dialog without a note when the draw result arrives', () => {
+            const { showSingleBubble } = vi.mocked(useNotification)();
+
+            startLimitedPurchase();
+            confirmProps.current = null;
+            act(() => messageHandlers.get('LtdRaffleResultMessageEvent')({}));
+
+            expect(confirmProps.current).toBeNull();
+            expect(showSingleBubble).not.toHaveBeenCalled();
+        });
+
+        it('leaves the ongoing note when the dialog is closed while the raffle runs', () => {
+            const { showSingleBubble } = vi.mocked(useNotification)();
+
+            startLimitedPurchase();
+            act(() => confirmProps.current.onCancel());
+
+            expect(showSingleBubble).toHaveBeenCalledWith('This LTD purchase has not been processed yet!', 'ltd');
+        });
+
+        it('leaves the ongoing note when the catalog closes while the raffle runs', () => {
+            const { showSingleBubble } = vi.mocked(useNotification)();
+            const { unmount } = startLimitedPurchase();
+
+            unmount();
+
+            expect(showSingleBubble).toHaveBeenCalledWith('This LTD purchase has not been processed yet!', 'ltd');
+        });
+
+        it('ignores a raffle entry for a purchase this widget did not send', () => {
+            render(<CatalogPurchaseWidgetView />);
+            act(() => messageHandlers.get('LtdRaffleEnteredMessageEvent')({}));
+
+            expect(confirmProps.current).toBeNull();
+        });
     });
 });

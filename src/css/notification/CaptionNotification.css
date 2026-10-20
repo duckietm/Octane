@@ -68,3 +68,55 @@
 .octane-caption-notification--wired .octane-caption-notification__text {
     text-align: center;
 }
+
+/* notification_treasurehunt: the 50x50 icon slot (the winner's head) and, without an icon, the
+   treasure_hunt_image key: mysterybox_key_base tinted 0xf0b834 under mysterybox_key_overlay, both
+   rotated 270 degrees. */
+.octane-caption-notification--treasure_hunt .octane-caption-notification__row {
+    gap: 1px;
+    padding: 5px 13px 6px 6px;
+}
+
+.octane-caption-notification--treasure_hunt .octane-caption-notification__icon {
+    width: 50px;
+    height: 50px;
+}
+
+.octane-caption-notification--treasure_hunt .octane-caption-notification__text {
+    min-height: 52px;
+}
+
+.octane-caption-notification__treasure-key {
+    position: relative;
+    flex: none;
+    width: 39px;
+    height: 39px;
+    margin: 3px 8px 0 3px;
+    transform: rotate(-90deg);
+}
+
+.octane-caption-notification__treasure-key-base,
+.octane-caption-notification__treasure-key-overlay {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    image-rendering: var(--octane-pixel-art, pixelated);
+}
+
+.octane-caption-notification__treasure-key-base {
+    background-image: url('../../assets/images/notifications/treasurehunt/mysterybox_key_base.png');
+}
+
+.octane-caption-notification__treasure-key-base::after {
+    position: absolute;
+    inset: 0;
+    background-color: #f0b834;
+    content: '';
+    mix-blend-mode: multiply;
+    mask-image: url('../../assets/images/notifications/treasurehunt/mysterybox_key_base.png');
+    mask-repeat: no-repeat;
+}
+
+.octane-caption-notification__treasure-key-overlay {
+    background-image: url('../../assets/images/notifications/treasurehunt/mysterybox_key_overlay.png');
+}

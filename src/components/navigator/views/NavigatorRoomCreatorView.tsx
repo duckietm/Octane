@@ -8,7 +8,7 @@ import popupArrowDown from '../../../assets/images/navigator/air/popup-arrow-dow
 import tileIconBlack from '../../../assets/images/navigator/air/tile-icon-black.png';
 import tileIconWhite from '../../../assets/images/navigator/air/tile-icon-white.png';
 import { DraggableWindow } from '../../../common';
-import { useNavigatorData, useNavigatorUiStore, useUserDataSnapshot, useUserPermissions } from '../../../hooks';
+import { useNavigatorData, useNavigatorUiStore, useRoomCreateLimitAlert, useUserDataSnapshot, useUserPermissions } from '../../../hooks';
 import { useRoomCreatorStore } from './navigatorRoomCreatorStore';
 import { BaseButton } from '../../../common/BaseButton';
 import { ListSelect } from '../../../common/ListSelect';
@@ -74,6 +74,8 @@ export const NavigatorRoomCreatorView: FC = () => {
 
     const hcDisabled = GetConfigurationValue<boolean>('hc.disabled', false);
     const effectiveClubLevel = hcDisabled ? 2 : clubLevel;
+
+    useRoomCreateLimitAlert(effectiveClubLevel >= 2, () => useRoomCreatorStore.getState().endCreate());
 
     const [name, setName] = useState('');
     const [nameTouched, setNameTouched] = useState(false);

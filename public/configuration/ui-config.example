@@ -20,6 +20,7 @@
     "furni.descriptions.enabled": true,
     "furni.location.enabled": true,
     "furni.location.require.access": true,
+    "trading.warning.enabled": true,
 	"furni.plant.classnames": [
         "jungle_c16_flowera1", "jungle_c16_flowera2", "jungle_c16_flowera3",
         "jungle_c16_flowerb1", "jungle_c16_flowerb2", "jungle_c16_flowerb3",
@@ -1386,6 +1387,11 @@
             "enabled": true
         }
     ],
+    "notifications.new_feature.active": "rewardtrack_intro",
+    "notifications.new_feature.type.rewardtrack_intro": "promo",
+    "notifications.new_feature.condition.rewardtrack_intro": "reward_track_incomplete:introduction",
+    "notifications.new_feature.image.rewardtrack_intro": "reward_track_small_icon",
+    "notifications.new_feature.internal_link.rewardtrack_intro": "reward_track/open/introduction",
     "notification": {
         "notification.admin.transient": {
             "display": "POP_UP",

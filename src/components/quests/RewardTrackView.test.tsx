@@ -8,22 +8,35 @@ const mocks = vi.hoisted(() => ({
     claimPrize: vi.fn(),
     purchasePremium: vi.fn(),
     requestTracks: vi.fn(),
+    copyTrackId: vi.fn(),
+    copyTaskId: vi.fn(),
+    securityLevel: 0,
+    tracksVersion: 1,
     isEditor: false,
     tracks: [] as unknown[]
 }));
 
-vi.mock('../../hooks', () => ({
-    useHasPermission: () => mocks.isEditor,
-    useNotification: () => ({ simpleAlert: null }),
-    useRewardTracks: () => ({
-        tracks: mocks.tracks,
-        reloadCount: 0,
-        pendingPurchase: null,
-        requestTracks: mocks.requestTracks,
-        claimPrize: mocks.claimPrize,
-        purchasePremium: mocks.purchasePremium
-    })
-}));
+vi.mock('../../hooks', async () => {
+    const progressBar = await import('../../hooks/quests/useRewardTrackProgressBar');
+
+    return {
+        ...progressBar,
+        useHasPermission: () => mocks.isEditor,
+        useNotification: () => ({ simpleAlert: null }),
+        useUserDataSnapshot: () => ({ securityLevel: mocks.securityLevel }),
+        useRewardTracks: () => ({
+            tracks: mocks.tracks,
+            reloadCount: 0,
+            tracksVersion: mocks.tracksVersion,
+            pendingPurchase: null,
+            requestTracks: mocks.requestTracks,
+            claimPrize: mocks.claimPrize,
+            purchasePremium: mocks.purchasePremium,
+            copyTrackId: mocks.copyTrackId,
+            copyTaskId: mocks.copyTaskId
+        })
+    };
+});
 
 vi.mock('../../common', () => ({
     Button: ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => <button onClick={onClick}>{children}</button>,
@@ -71,10 +84,12 @@ vi.mock('../../api/octane', () => ({ GetConfigurationValue: (_key: string, fallb
 vi.mock('../../api', async () => {
     const quests = await import('../../api/quests/QuestUtilities');
     const layout = await import('../../api/quests/RewardTrackLayout');
+    const animation = await import('../../api/quests/RewardTrackProgressAnimation');
 
     return {
         ...quests,
         ...layout,
+        ...animation,
         GetConfigurationValue: (_key: string, fallback: unknown) => fallback,
         NotificationAlertType: { DEFAULT: 'default' },
         localizeWithFallback: localize
@@ -148,6 +163,8 @@ const prizeElement = (badge: string) => screen.getByTestId(`badge-${badge}`).clo
 
 beforeEach(() => {
     mocks.isEditor = false;
+    mocks.securityLevel = 0;
+    mocks.tracksVersion = 1;
 });
 
 afterEach(() => {
@@ -293,6 +310,84 @@ describe('RewardTrackView', () => {
         openTrack();
         expect(second.container.querySelector('.octane-reward-track-tip-premium')).toBeNull();
         expect(second.container.querySelector('.octane-reward-track-tip-frank')).toBeTruthy();
+    });
+
+    it('lets staff (security 4+) copy the track id from the title and the task id from the task name', () => {
+        mocks.tracks = [makeTrack(60)];
+        const { container, unmount } = render(<RewardTrackView />);
+
+        openTrack();
+        expect(container.querySelector('.octane-reward-track-copy-region')).toBeNull();
+        unmount();
+
+        mocks.securityLevel = 4;
+        const staff = render(<RewardTrackView />);
+
+        openTrack();
+
+        const regions = staff.container.querySelectorAll('.octane-reward-track-copy-region');
+
+        expect(regions.length).toBe(2);
+        fireEvent.click(staff.container.querySelector('.octane-reward-track-title'));
+        expect(mocks.copyTrackId).toHaveBeenCalledWith('introduction');
+        fireEvent.click(staff.container.querySelector('.octane-reward-track-task-info-name'));
+        expect(mocks.copyTaskId).toHaveBeenCalledWith('visit_rooms');
+    });
+
+    it('animates the bars on progress while open and snaps them on a new track list', () => {
+        const frames: FrameRequestCallback[] = [];
+        let now = 0;
+
+        vi.spyOn(performance, 'now').mockImplementation(() => now);
+        vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => frames.push(callback));
+        vi.stubGlobal('cancelAnimationFrame', () => undefined);
+
+        const flush = (ms: number) => {
+            now += ms;
+
+            const pending = frames.splice(0);
+
+            act(() => pending.forEach((callback) => callback(now)));
+        };
+
+        const track = makeTrack(60);
+
+        mocks.tracks = [track];
+        const { container, rerender } = render(<RewardTrackView />);
+
+        openTrack();
+
+        const progress = () => (container.querySelector('.octane-reward-track-bar-progress') as HTMLElement).style.width;
+        const taskBar = () => container.querySelectorAll('.octane-reward-track-task .octane-reward-track-mini-bar-progress')[1] as HTMLElement;
+        const taskFill = () => container.querySelectorAll('.octane-reward-track-task .octane-reward-track-mini-bar-fill')[1] as HTMLElement;
+
+        expect(progress()).toBe('60px');
+        expect(taskBar().style.width).toBe('0px');
+
+        // RewardTrackProgressMessageEvent: 100 points and wave_at_user 5 / 5, same track list.
+        const updated = { ...track, points: 100, tasks: [track.tasks[0], makeTask('wave_at_user', 'wave', 5, 5)] };
+
+        mocks.tracks = [updated];
+        rerender(<RewardTrackView />);
+
+        expect(progress()).toBe('60px');
+        flush(16);
+        expect(parseInt(progress(), 10)).toBeGreaterThan(60);
+
+        for (let frame = 0; frame < 120; frame++) flush(16);
+
+        expect(progress()).not.toBe('60px');
+        expect(taskBar().style.width).toBe('200px');
+        expect(taskFill().style.backgroundColor).toBe('rgb(113, 175, 36)');
+
+        // A new RewardTracksMessageEvent rebuilds the views: the bar jumps.
+        mocks.tracksVersion = 2;
+        mocks.tracks = [{ ...updated, points: 60 }];
+        rerender(<RewardTrackView />);
+        expect(progress()).toBe('60px');
+
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
     });
 
     it('keeps the staff gear for acc_rewardtrack', () => {

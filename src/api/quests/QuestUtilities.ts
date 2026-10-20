@@ -29,8 +29,8 @@ export const getQuestImageName = (campaignCode: string, localizationCode: string
     return `${campaignCode}_${localizationCode}${imageVersion || ''}${prompt}`.toLowerCase();
 };
 
-export const getQuestImageUrl = (quest: QuestMessageData): string =>
-    getQuestingImageUrl(getQuestImageName(quest.campaignCode, quest.localizationCode, quest.imageVersion, quest.waitPeriodSeconds > 0));
+export const getQuestImageUrl = (quest: QuestMessageData, waiting: boolean = quest.waitPeriodSeconds > 0): string =>
+    getQuestingImageUrl(getQuestImageName(quest.campaignCode, quest.localizationCode, quest.imageVersion, waiting));
 
 export const getCampaignImageUrl = (campaignCode: string): string => getQuestingImageUrl(campaignCode);
 
@@ -81,6 +81,59 @@ export const getActivityPointName = (activityPointType: number): string => {
 
 /** The currency icon type of `LayoutCurrencyIcon`: credits use -1 in the client sprite set. */
 export const getActivityPointIconType = (activityPointType: number): number => activityPointType;
+
+// ---------------------------------------------------------------- next quest timer
+
+/** NextQuestTimer.REFRESH_PERIOD_IN_MSECS: the countdown is redrawn once a second. */
+export const NEXT_QUEST_TIMER_REFRESH_MS = 1000;
+
+const FRIENDLY_TIME_UNITS: { name: string; seconds: number; fallback: string }[] = [
+    { name: 'years', seconds: 365 * 86400, fallback: '%amount% years' },
+    { name: 'months', seconds: 30 * 86400, fallback: '%amount% months' },
+    { name: 'days', seconds: 86400, fallback: '%amount% days' },
+    { name: 'hours', seconds: 3600, fallback: '%amount% hours' },
+    { name: 'minutes', seconds: 60, fallback: '%amount% min' }
+];
+
+/**
+ * FriendlyTime.getFriendlyTime of the official client: the largest unit the time exceeds three
+ * times, rounded, as `friendlytime.<unit>` with `%amount%`.
+ */
+export const getFriendlyTimeParts = (seconds: number, threshold: number = 3): { key: string; amount: number; fallback: string } => {
+    for (const unit of FRIENDLY_TIME_UNITS) {
+        if (seconds > threshold * unit.seconds) return { key: `friendlytime.${unit.name}`, amount: Math.round(seconds / unit.seconds), fallback: unit.fallback };
+    }
+
+    return { key: 'friendlytime.seconds', amount: Math.round(seconds), fallback: '%amount% sec' };
+};
+
+export const formatQuestWaitTime = (seconds: number): string => {
+    const { key, amount, fallback } = getFriendlyTimeParts(Math.max(0, seconds));
+    const value = String(amount);
+
+    return localizeWithFallback(key, fallback.replace('%amount%', value), ['amount', 'AMOUNT'], [value, value]);
+};
+
+/**
+ * The wait left on a quest. `QuestMessageData.waitPeriodSeconds` counts itself down from the moment
+ * the packet arrived; `clock` is the caller's tick so a memoizing render re-reads it every second.
+ */
+export const getQuestWaitSecondsLeft = (quest: QuestMessageData, clock: number): number => {
+    if (!quest || !Number.isFinite(clock)) return 0;
+
+    return Math.max(0, quest.waitPeriodSeconds || 0);
+};
+
+/** `quests.<campaign>.delayedmsg`, the text of the expanded timer. */
+export const getQuestDelayedMessageKey = (quest: QuestMessageData): string => `${getCampaignLocalizationKey(quest.campaignCode)}.delayedmsg`;
+
+export const getNextQuestTimerCaption = (expanded: boolean, time: string): string =>
+    expanded
+        ? localizeWithFallback('quests.nextquesttimer.caption.expanded', 'Time until next Quest')
+        : localizeWithFallback('quests.nextquesttimer.caption.contracted', `Next Quest: ${time}`, ['time'], [time]);
+
+export const getNextQuestTimerMessage = (quest: QuestMessageData, time: string): string =>
+    localizeWithFallback(getQuestDelayedMessageKey(quest), `Your next Quest is available in <b>${time}</b>`, ['time'], [time]);
 
 // ---------------------------------------------------------------- daily tasks
 

@@ -1,6 +1,7 @@
 import { MouseEventType } from '@octane/renderer';
 import { FC, MouseEvent, useState } from 'react';
-import { attemptItemPlacement, GroupItem } from '../../../../api';
+import { attemptItemPlacement, getWiredChestOverlayColor, GroupItem } from '../../../../api';
+import { LayoutLimitedEditionStyledNumberView } from '../../../../common';
 import { classNames, InfiniteGrid } from '../../../../layout';
 
 export const InventoryFurnitureItemView: FC<{
@@ -32,6 +33,8 @@ export const InventoryFurnitureItemView: FC<{
     };
 
     const count = groupItem.getUnlockedCount();
+    // AIR GroupItem.updateItemImageVisual: a chest tile shows its contents count on a gold (coins) or brown (furni) plaque.
+    const chestColor = getWiredChestOverlayColor(groupItem.category, groupItem.stuffData);
 
     return (
         <InfiniteGrid.Item
@@ -46,9 +49,17 @@ export const InventoryFurnitureItemView: FC<{
             onMouseOut={onMouseEvent}
             onMouseUp={onMouseEvent}
         >
+            {chestColor && <div aria-hidden className={`octane-inventory-thumb-chest-background is-${ chestColor }`} />}
             {groupItem.stuffData.uniqueNumber <= 0 && (
                 <div className="octane-inventory-thumb-image">
                     {groupItem.iconUrl && <img src={groupItem.iconUrl} alt="" draggable={false} />}
+                </div>
+            )}
+            {chestColor && (
+                <div aria-hidden className={`octane-inventory-thumb-chest is-${ chestColor }`}>
+                    <div className="octane-inventory-thumb-chest-count">
+                        <LayoutLimitedEditionStyledNumberView value={Math.max(0, groupItem.stuffData.contentsCount ?? 0)} />
+                    </div>
                 </div>
             )}
         </InfiniteGrid.Item>

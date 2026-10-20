@@ -1779,3 +1779,16 @@
 .air-bot-skill-button--save:active {
     border-image-source: var(--habbo-skin-shiny-thick-green-pressed);
 }
+
+/* Official RoomQueueWidget (room_queue layout): 229 px frame, bold centred position, 154 px exit button. */
+.octane-room-queue-widget {
+    width: 229px;
+
+    .octane-room-queue-info {
+        width: 100%;
+    }
+
+    .octane-room-queue-button {
+        width: 154px;
+    }
+}

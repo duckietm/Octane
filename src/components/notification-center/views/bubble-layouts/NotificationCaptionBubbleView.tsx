@@ -39,6 +39,13 @@ export const NotificationCaptionBubbleView: FC<NotificationCaptionBubbleViewProp
             <div className="octane-caption-notification__caption">{localizeWithFallback(style.caption[0], style.caption[1])}</div>
             <div className="octane-caption-notification__row">
                 {icon && <img alt="" className="octane-caption-notification__icon" src={icon} draggable={false} />}
+                {/* treasure_hunt_image: the gold key the official layout shows while the bubble has no icon. */}
+                {!icon && item.notificationType === NotificationBubbleType.TREASURE_HUNT && (
+                    <div aria-hidden className="octane-caption-notification__treasure-key">
+                        <div className="octane-caption-notification__treasure-key-base" />
+                        <div className="octane-caption-notification__treasure-key-overlay" />
+                    </div>
+                )}
                 <span className="octane-caption-notification__text" dangerouslySetInnerHTML={{ __html: SanitizeHtml(htmlText) }} />
             </div>
         </LayoutNotificationBubbleView>

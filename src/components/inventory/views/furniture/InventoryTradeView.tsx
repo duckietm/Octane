@@ -3,12 +3,15 @@ import { FC, useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaLock, FaUnlock } from 'react-icons/fa';
 import {
     FurniCategory,
+    GetConfigurationValue,
     GroupItem,
     getGuildFurniType,
+    getTradeOfferSummary,
     IFurnitureItem,
     LocalizeText,
     localizeWithFallback,
     NotificationAlertType,
+    isTradeOfferingCredits,
     SendMessageComposer,
     TradeState
 } from '../../../../api';
@@ -174,6 +177,26 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
     else if (!ownUser.canTrade) tradeBlockedWarning = localizeWithFallback('inventory.trading.warning.own_account_disabled', 'Your account can not trade right now.');
     else if (!otherUser.canTrade) tradeBlockedWarning = localizeWithFallback('inventory.trading.warning.others_account_disabled', `${otherUser.userName} can not trade right now.`, ['otherusername'], [otherUser.userName]);
 
+    // AIR TradingView.showOfferInfo / updateActionState: with trading.warning.enabled each side shows its item count and
+    // credit value, and an orange line warns that credit furni turns into wallet credits once either side offers some.
+    const tradeWarningEnabled = GetConfigurationValue<boolean>('trading.warning.enabled', true) !== false;
+    const offerSummary = (user: typeof ownUser) => {
+        if (!tradeWarningEnabled) return null;
+
+        const summary = getTradeOfferSummary(user);
+
+        return (
+            <div className="octane-trade-offer-summary flex flex-col text-xs text-black">
+                <span className="is-items">{summary.items}</span>
+                <span className="is-credits">{summary.credits}</span>
+            </div>
+        );
+    };
+    const creditWarning =
+        tradeWarningEnabled && isTradeOfferingCredits(ownUser, otherUser)
+            ? localizeWithFallback('inventory.trading.warning.credits', 'Credit furni will be converted to credits in your purse')
+            : null;
+
     return (
         <>
             {tradeBlockedWarning && <div className="mb-1 rounded bg-[#ffe6b3] px-2 py-1 text-xs text-black">{tradeBlockedWarning}</div>}
@@ -269,6 +292,7 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
                                 })}
                             </AutoGrid>
                             <div className="badge bg-muted w-full">{ownGroupItem ? ownGroupItem.name : LocalizeText('catalog_selectproduct')}</div>
+                            {offerSummary(ownUser)}
                         </Column>
                         <Column overflow="hidden" size={6}>
                             <div className="flex justify-between items-center">
@@ -298,8 +322,14 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
                                 })}
                             </AutoGrid>
                             <div className="badge bg-muted w-full">{otherGroupItem ? otherGroupItem.name : LocalizeText('catalog_selectproduct')}</div>
+                            {offerSummary(otherUser)}
                         </Column>
                     </Grid>
+                    {creditWarning && (
+                        <div className="octane-trade-credit-warning mb-1 rounded border border-[#fc9228] bg-[#fc9228] px-[5px] py-[5px] text-xs text-black" role="status">
+                            {creditWarning}
+                        </div>
+                    )}
                     <div className="flex grow! justify-between">
                         <Button variant="danger" onClick={cancelTrade}>
                             {LocalizeText('generic.cancel')}
