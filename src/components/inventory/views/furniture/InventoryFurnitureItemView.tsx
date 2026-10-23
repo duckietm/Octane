@@ -3,6 +3,7 @@ import { FC, MouseEvent, useState } from 'react';
 import { attemptItemPlacement, getWiredChestOverlayColor, GroupItem } from '../../../../api';
 import { LayoutLimitedEditionStyledNumberView } from '../../../../common';
 import { classNames, InfiniteGrid } from '../../../../layout';
+import { useRecyclerStore } from '../../../../state/recyclerStore';
 
 export const InventoryFurnitureItemView: FC<{
     groupItem: GroupItem;
@@ -11,6 +12,7 @@ export const InventoryFurnitureItemView: FC<{
 }> = (props) => {
     const { groupItem = null, isActive = false, onSelect = null } = props;
     const [isMouseDown, setMouseDown] = useState(false);
+    const offerToRecycler = useRecyclerStore((state) => state.offerGroup);
 
     const onMouseEvent = (event: MouseEvent) => {
         switch (event.type) {
@@ -27,6 +29,10 @@ export const InventoryFurnitureItemView: FC<{
                 attemptItemPlacement(groupItem);
                 return;
             case 'dblclick':
+                // AIR RecyclerModel.running: while the recycler page is open a double-clicked recyclable furni goes
+                // into a free slot instead of into the room.
+                if (offerToRecycler && groupItem.items.some((item) => item.recyclable) && offerToRecycler(groupItem)) return;
+
                 attemptItemPlacement(groupItem);
                 return;
         }
