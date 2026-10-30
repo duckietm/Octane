@@ -11,7 +11,8 @@ const downloadDocument = (document: string) => {
     link.href = url;
     link.download = CATALOG_FILE_NAME;
     link.click();
-    URL.revokeObjectURL(url);
+    // Revoked at once, the URL could be gone before the browser started the download.
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
 export const CatalogStudioTransferPanel: FC = () => {
