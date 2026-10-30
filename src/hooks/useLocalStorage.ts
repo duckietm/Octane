@@ -4,6 +4,27 @@ import { GetLocalStorage, SetLocalStorage } from '../api';
 
 const userId = new URLSearchParams(window.location.search).get('userid') || 0;
 
+const storageKeyOf = (key: string): string => (userId ? `${key}.${userId}` : key);
+
+// The live hooks of every storage key: discardLocalStorage resets them, so a value cleared at logout is not written
+// back by a pending write, by the flush on page hide, or by the next update built on the old in-memory list.
+const liveResets = new Map<string, Set<() => void>>();
+
+/** Removes the stored values of these keys and resets every live hook on them to its initial value. */
+export const discardLocalStorage = (keys: string[]): void => {
+    for (const key of keys) {
+        const storageKey = storageKeyOf(key);
+
+        liveResets.get(storageKey)?.forEach((reset) => reset());
+
+        try {
+            window.localStorage.removeItem(storageKey);
+        } catch {
+            /* storage blocked: nothing to remove */
+        }
+    }
+};
+
 const STORAGE_WRITE_DEBOUNCE_MS = 250;
 const QUOTA_TRIM_FACTOR = 0.5; // on quota error, keep the newest 50%.
 const MIN_RETAINED_ENTRIES = 50;
@@ -35,7 +56,7 @@ interface UseLocalStorageOptions<T> {
 }
 
 const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocalStorageOptions<T> = {}): [T, Dispatch<SetStateAction<T>>] => {
-    key = userId ? `${key}.${userId}` : key;
+    key = storageKeyOf(key);
 
     const [storedValue, setStoredValue] = useState<T>(() => {
         try {
@@ -123,6 +144,27 @@ const useLocalStorageState = <T>(key: string, initialValue: T, options: UseLocal
             window.removeEventListener('beforeunload', flushOnLeave);
         };
     }, []);
+
+    const initialValueRef = useRef(initialValue);
+
+    useEffect(() => {
+        const reset = () => {
+            if (writeTimerRef.current) clearTimeout(writeTimerRef.current);
+            writeTimerRef.current = null;
+            pendingWriteRef.current = null;
+            storedValueRef.current = initialValueRef.current;
+            setStoredValue(initialValueRef.current);
+        };
+        const resets = liveResets.get(key) ?? new Set<() => void>();
+
+        resets.add(reset);
+        liveResets.set(key, resets);
+
+        return () => {
+            resets.delete(reset);
+            if (!resets.size) liveResets.delete(key);
+        };
+    }, [key]);
 
     const setValue: Dispatch<SetStateAction<T>> = (value) => {
         try {

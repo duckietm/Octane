@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { ChatEntryType, ChatHistoryCurrentDate, IChatEntry, IRoomHistoryEntry, MessengerHistoryCurrentDate } from '../../api';
 import { useMessageEvent, useOctaneEvent } from '../events';
-import { useLocalStorage } from '../useLocalStorage';
+import { discardLocalStorage, useLocalStorage } from '../useLocalStorage';
 
 const ROOM_HISTORY_MAX = 10;
 const CHAT_HISTORY_MAX = 1000;
@@ -16,12 +16,9 @@ export const ClearStoredChatHistory = () => {
     CHAT_HISTORY_COUNTER = 0;
     MESSENGER_HISTORY_COUNTER = 0;
 
-    try {
-        window.localStorage.removeItem('chatHistory');
-        window.localStorage.removeItem('roomHistory');
-        window.localStorage.removeItem('messengerHistory');
-        window.localStorage.removeItem('needsRoomInsert');
-    } catch {}
+    // Through the hook's own keys (per user id when one is set) and its live state: removing the bare keys missed the
+    // per-user ones, and the in-memory history was written back by the next pending write.
+    discardLocalStorage(['chatHistory', 'roomHistory', 'messengerHistory', 'needsRoomInsert']);
 };
 
 /**

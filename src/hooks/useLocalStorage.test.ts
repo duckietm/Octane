@@ -2,9 +2,11 @@
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../api', () => ({ GetLocalStorage: () => undefined, SetLocalStorage: vi.fn() }));
+const setLocalStorage = vi.hoisted(() => vi.fn());
 
-const { useLocalStorage } = await import('./useLocalStorage');
+vi.mock('../api', () => ({ GetLocalStorage: () => undefined, SetLocalStorage: setLocalStorage }));
+
+const { discardLocalStorage, useLocalStorage } = await import('./useLocalStorage');
 
 afterEach(cleanup);
 
@@ -25,5 +27,22 @@ describe('useLocalStorage', () =>
         act(() => staleSetter(value => [ ...value, 3 ]));
 
         expect(result.current[0]).toEqual([ 1, 2, 3 ]);
+    });
+
+    it('a discard resets the live value and drops the write still waiting', () =>
+    {
+        vi.useFakeTimers();
+        setLocalStorage.mockClear();
+
+        const { result } = renderHook(() => useLocalStorage<string[]>('discard-test', []));
+
+        act(() => result.current[1]([ 'hello' ]));
+        act(() => discardLocalStorage([ 'discard-test' ]));
+        act(() => vi.advanceTimersByTime(1000));
+
+        expect(result.current[0]).toEqual([]);
+        expect(setLocalStorage).not.toHaveBeenCalled();
+
+        vi.useRealTimers();
     });
 });
