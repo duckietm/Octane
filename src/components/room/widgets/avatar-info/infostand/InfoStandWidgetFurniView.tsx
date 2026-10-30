@@ -19,7 +19,7 @@ import {
     SongInfoReceivedEvent,
     UpdateFurniturePositionComposer
 } from '@octane/renderer';
-import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FaEraser, FaTimes } from 'react-icons/fa';
 import { GrFormNextLink, GrRotateLeft, GrRotateRight } from 'react-icons/gr';
 import {
@@ -71,7 +71,7 @@ import statXIcon from '../../../../../assets/images/infostand/stat-x.png';
 import statYIcon from '../../../../../assets/images/infostand/stat-y.png';
 import chestLockedIcon from '../../../../../assets/images/groups/native/forum_forum_locked.png';
 import { ImagePositionEditorView } from './ImagePositionEditorView';
-import { BRANDING_NUMBER_RANGES, brandingSaveMap, infostandFurniOwnerText, infostandFurniPanelClass, parseBrandingOptions } from './infostandFurni.helpers';
+import { BRANDING_NUMBER_RANGES, brandingSaveMap, infostandFurniOwnerText, infostandFurniPanelClass, parseBrandingOptions, parseFurniHeight } from './infostandFurni.helpers';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NumberInput } from '../../../../../common/NumberInput';
 import { Hint } from '../../../../../common/Tooltip';
@@ -319,31 +319,48 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         [avatarInfo]
     );
 
+    // Typing "12.5" used to move the furni at "1", "12", "12." and "12.5": the height now goes out once the
+    // field has rested, and at once when it loses focus.
+    const heightSendTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+    useEffect(() => () => clearTimeout(heightSendTimer.current), []);
+
     const handleHeightChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
-            let newZ = parseFloat(event.target.value);
+            const newZ = parseFurniHeight(event.target.value);
 
-            if (isNaN(newZ) || newZ < 0) newZ = 0;
-            else if (newZ > 40) newZ = 40;
+            clearTimeout(heightSendTimer.current);
+
+            // An empty field is someone typing, not a move to the floor.
+            if (newZ === null) {
+                setFurniLocationZ(null);
+                return;
+            }
 
             setFurniLocationZ(newZ);
-            sendUpdate(0, 0, newZ, 0);
+            heightSendTimer.current = setTimeout(() => sendUpdate(0, 0, newZ, 0), 300);
         },
         [sendUpdate]
     );
 
     const handleHeightBlur = useCallback(
         (event: React.FocusEvent<HTMLInputElement>) => {
-            let newZ = parseFloat(event.target.value);
+            clearTimeout(heightSendTimer.current);
 
-            if (isNaN(newZ) || newZ < 0) newZ = 0;
-            else if (newZ > 40) newZ = 40;
+            const newZ = parseFurniHeight(event.target.value);
 
-            newZ = parseFloat(newZ.toFixed(4));
+            // Left empty: the field shows where the furni really is again, and nothing moves.
+            if (newZ === null) {
+                const roomObject = avatarInfo ? GetRoomEngine().getRoomObject(GetRoomEngine().activeRoomId, avatarInfo.id, avatarInfo.category) : null;
+
+                setFurniLocationZ(roomObject ? roomObject.getLocation().z : null);
+                return;
+            }
+
             setFurniLocationZ(newZ);
             sendUpdate(0, 0, newZ, 0);
         },
-        [sendUpdate]
+        [avatarInfo, sendUpdate]
     );
 
     const adjustHeight = useCallback(

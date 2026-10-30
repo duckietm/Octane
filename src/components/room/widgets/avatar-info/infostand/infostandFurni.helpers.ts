@@ -56,3 +56,20 @@ export const brandingSaveMap = (keys: string[], values: string[]): Map<string, s
 
     return map;
 };
+
+/** The highest a furni can be placed from the infostand height field. */
+export const MAX_FURNI_HEIGHT = 40;
+
+/**
+ * The height typed in the infostand field, held between 0 and the maximum with 4 decimals, or null while the
+ * field is empty or not a number: an empty field used to move the furni to the floor.
+ */
+export const parseFurniHeight = (raw: string): number | null => {
+    if (raw == null || raw.trim() === '') return null;
+
+    const value = parseFloat(raw);
+
+    if (Number.isNaN(value)) return null;
+
+    return parseFloat(Math.min(MAX_FURNI_HEIGHT, Math.max(0, value)).toFixed(4));
+};
