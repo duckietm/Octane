@@ -1,6 +1,7 @@
 import { GetTargetedOfferComposer, PurchaseTargetedOfferComposer, TargetedOfferData } from '@octane/renderer';
 import { useMemo, useState } from 'react';
 import {
+    clampTargetedOfferQuantity,
     FriendlyTime,
     GetConfigurationValue,
     getTargetedOfferPurchaseBlock,
@@ -21,16 +22,18 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
 
     const { getCurrencyAmount } = usePurse();
 
-    const [amount, setAmount] = useState<number>(1);
+    const [chosenAmount, setAmount] = useState<number>(1);
+    // Held inside 1..purchaseLimit: an emptied field (NaN) or a value past the limit was sent as typed.
+    const amount = clampTargetedOfferQuantity(chosenAmount, offer?.purchaseLimit ?? 1);
 
-    // An offer priced only in activity points needs no credits.
+    // An offer priced only in activity points needs no credits; the price is per offer, so it scales with the amount.
     const purchaseBlock = useMemo(
-        () => getTargetedOfferPurchaseBlock(offer, getCurrencyAmount(-1), getCurrencyAmount(offer.activityPointType)),
-        [offer, getCurrencyAmount]
+        () => (offer ? getTargetedOfferPurchaseBlock(offer, getCurrencyAmount(-1), getCurrencyAmount(offer.activityPointType), amount) : 'limit'),
+        [offer, getCurrencyAmount, amount]
     );
 
     const buyOffer = () => {
-        if (isBuyingOffer) return;
+        if (isBuyingOffer || purchaseBlock !== null) return;
 
         isBuyingOffer = true;
 
@@ -86,14 +89,14 @@ export const OfferWindowView = (props: { offer: TargetedOfferData; secondsLeft: 
                         <Text>{LocalizeText('targeted.offer.price.label')}</Text>
                         {offer.priceInCredits > 0 && (
                             <div className="flex gap-1">
-                                <Text variant="light">{offer.priceInCredits}</Text>
+                                <Text variant="light">{offer.priceInCredits * amount}</Text>
                                 <LayoutCurrencyIcon type={-1} />
                             </div>
                         )}
                         {offer.priceInActivityPoints > 0 && (
                             <div className="flex gap-1">
                                 <Text className="ubuntu-bold" variant="light">
-                                    +{offer.priceInActivityPoints}
+                                    +{offer.priceInActivityPoints * amount}
                                 </Text>{' '}
                                 <LayoutCurrencyIcon type={offer.activityPointType} />
                             </div>
