@@ -1,6 +1,6 @@
 import { GetCfhStatusMessageComposer, GetMyReportsStatusMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
-import { CreateLinkEvent, DispatchUiEvent, GetConfigurationValue, localizeWithFallback, ReportState, ReportType, SendMessageComposer } from '../../../api';
+import { CreateLinkEvent, DispatchUiEvent, GetConfigurationValue, isSafeExternalUrl, localizeWithFallback, ReportState, ReportType, SendMessageComposer } from '../../../api';
 import bullyImage from '../../../assets/images/help/help-bully.png';
 import confusedImage from '../../../assets/images/help/help-confused.png';
 import needHelpImage from '../../../assets/images/help/help-need-help.png';
@@ -38,7 +38,8 @@ export const HelpIndexView: FC<{}> = () => {
         const url = GetConfigurationValue<string>('habboway.url', '');
 
         if (GetConfigurationValue<boolean>('habboway.enabled', true) || !url) CreateLinkEvent('help/habboway');
-        else window.open(url, 'habboMain');
+        // A plain web URL only, opened without a handle back to the client (no window.opener for the page).
+        else if (isSafeExternalUrl(url)) window.open(url, 'habboMain', 'noopener,noreferrer');
 
         CreateLinkEvent('help/hide');
     };
