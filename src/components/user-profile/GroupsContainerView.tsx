@@ -1,5 +1,5 @@
 import { GroupInformationComposer, GroupInformationEvent, GroupInformationParser, HabboGroupEntryData } from '@octane/renderer';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { LocalizeText, SanitizeHtml, SendMessageComposer, ToggleFavoriteGroup } from '../../api';
 import { Column, GridProps, LayoutBadgeImageView, LayoutGridItem } from '../../common';
 import { NativeTextTree } from '../../common/native-text/NativeTextTree';
@@ -15,6 +15,8 @@ interface GroupsContainerViewProps extends GridProps {
 export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
     const { itsMe = null, groups = null, onLeaveGroup = null } = props;
     const [selectedGroupId, setSelectedGroupId] = useState<number>(null);
+    const selectedGroupIdRef = useRef<number>(null);
+    selectedGroupIdRef.current = selectedGroupId;
     const [groupInformation, setGroupInformation] = useState<GroupInformationParser>(null);
 
     useMessageEvent<GroupInformationEvent>(GroupInformationEvent, (event) => {
@@ -35,13 +37,13 @@ export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
         setGroupInformation(null);
 
         if (groups.length > 0) {
-            setSelectedGroupId((prevValue) => {
-                if (prevValue === groups[0].groupId) {
-                    SendMessageComposer(new GroupInformationComposer(groups[0].groupId, false));
-                }
+            // The same group again does not change the state, so the effect above will not ask: ask here, outside the
+            // updater, which may run twice (StrictMode).
+            if (selectedGroupIdRef.current === groups[0].groupId) {
+                SendMessageComposer(new GroupInformationComposer(groups[0].groupId, false));
+            }
 
-                return groups[0].groupId;
-            });
+            setSelectedGroupId(groups[0].groupId);
         }
     }, [groups]);
 

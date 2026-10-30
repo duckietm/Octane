@@ -29,6 +29,8 @@ const useFortuneWheelState = () => {
     const [recentWins, setRecentWins] = useState<IWheelRecentWin[]>([]);
     const [pendingPrizeId, setPendingPrizeId] = useState<number>(-1);
     const [isSpinning, setIsSpinning] = useState(false);
+    const isSpinningRef = useRef(false);
+    isSpinningRef.current = isSpinning;
     const [adminPrizes, setAdminPrizes] = useState<IWheelAdminPrize[]>([]);
 
     // While the wheel is animating we hold back the recent-wins refresh: the
@@ -71,11 +73,9 @@ const useFortuneWheelState = () => {
     });
 
     const open = useCallback(() => SendMessageComposer(new WheelOpenComposer()), []);
+    // Read from a ref, not inside a state updater: an updater may run twice (StrictMode) and sent the spin twice.
     const spin = useCallback(() => {
-        setIsSpinning((prev) => {
-            if (!prev) SendMessageComposer(new WheelSpinComposer());
-            return prev;
-        });
+        if (!isSpinningRef.current) SendMessageComposer(new WheelSpinComposer());
     }, []);
     const buySpin = useCallback(() => SendMessageComposer(new WheelBuySpinComposer()), []);
     const finishSpin = useCallback(() => {
