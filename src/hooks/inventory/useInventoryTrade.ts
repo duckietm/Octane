@@ -19,7 +19,7 @@ import {
     TradingUnacceptComposer,
     TradingYouAreNotAllowedEvent
 } from '@octane/renderer';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import {
     CloneObject,
@@ -57,6 +57,8 @@ export const unlockAllGroups = (groupItems: GroupItem[]): GroupItem[] =>
 
 const useInventoryTradeState = () => {
     const [ownUser, setOwnUser] = useState<TradeUserData>(null);
+    const ownUserRef = useRef<TradeUserData>(null);
+    ownUserRef.current = ownUser;
     const [otherUser, setOtherUser] = useState<TradeUserData>(null);
     const [tradeState, setTradeState] = useState(TradeState.TRADING_STATE_READY);
     const { groupItems = [], setGroupItems = null, activate = null, deactivate = null } = useInventoryFurni();
@@ -189,27 +191,30 @@ const useInventoryTradeState = () => {
             // Every change to the offer clears both acceptances on the server, which does not say so.
             newValue.accepts = false;
 
-            const tradeIds: number[] = [];
+            return newValue;
+        });
 
-            for (const groupItem of newValue.userItems.getValues()) {
-                let i = 0;
+        // The own offer locks its items in the inventory. Worked out here, not inside the updater above: a state
+        // update inside another updater runs again whenever that updater does.
+        const ownItems = ownUserRef.current?.userId === parser.firstUserID ? firstUserItems : secondUserItems;
+        const tradeIds: number[] = [];
 
-                while (i < groupItem.getTotalCount()) {
-                    const item = groupItem.getItemByIndex(i);
+        for (const groupItem of ownItems.getValues()) {
+            let i = 0;
 
-                    if (item) tradeIds.push(item.ref);
+            while (i < groupItem.getTotalCount()) {
+                const item = groupItem.getItemByIndex(i);
 
-                    i++;
-                }
+                if (item) tradeIds.push(item.ref);
+
+                i++;
             }
+        }
 
-            setGroupItems((prevValue) => {
-                const newValue = [...prevValue];
+        setGroupItems((prevValue) => {
+            const newValue = [...prevValue];
 
-                for (const groupItem of newValue) groupItem.lockItemIds(tradeIds);
-
-                return newValue;
-            });
+            for (const groupItem of newValue) groupItem.lockItemIds(tradeIds);
 
             return newValue;
         });

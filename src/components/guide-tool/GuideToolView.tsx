@@ -17,7 +17,7 @@ import {
     PerkEnum,
     RemoveLinkEventTracker
 } from '@octane/renderer';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, guardianText, GuideSessionState, GuideToolMessage, GuideToolMessageGroup, LocalizeText, SendMessageComposer } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { GuideToolEvent } from '../../events';
@@ -44,6 +44,8 @@ export const GuideToolView: FC<{}> = (props) => {
     const [sessionState, setSessionState] = useState<string>(GuideSessionState.GUIDE_TOOL_MENU);
 
     const [isOnDuty, setIsOnDuty] = useState<boolean>(false);
+    const isOnDutyRef = useRef(false);
+    isOnDutyRef.current = isOnDuty;
     const [isHandlingBullyReports, setIsHandlingBullyReports] = useState<boolean>(false);
     const [isHandlingGuideRequests, setIsHandlingGuideRequests] = useState<boolean>(false);
     const [isHandlingHelpRequests, setIsHandlingHelpRequests] = useState<boolean>(false);
@@ -334,17 +336,18 @@ export const GuideToolView: FC<{}> = (props) => {
                         return;
                     }
 
-                    setIsOnDuty((v) => {
-                        SendMessageComposer(
-                            new GuideSessionOnDutyUpdateMessageComposer(
-                                !v,
-                                v ? false : isHandlingGuideRequests,
-                                v ? false : isHandlingHelpRequests,
-                                v ? false : isHandlingBullyReports
-                            )
-                        );
-                        return !v;
-                    });
+                    // Toggled from a ref, not inside a state updater: an updater may run twice (StrictMode).
+                    const wasOnDuty = isOnDutyRef.current;
+                    isOnDutyRef.current = !wasOnDuty;
+                    setIsOnDuty(!wasOnDuty);
+                    SendMessageComposer(
+                        new GuideSessionOnDutyUpdateMessageComposer(
+                            !wasOnDuty,
+                            wasOnDuty ? false : isHandlingGuideRequests,
+                            wasOnDuty ? false : isHandlingHelpRequests,
+                            wasOnDuty ? false : isHandlingBullyReports
+                        )
+                    );
 
                     return;
                 case 'forum_link':

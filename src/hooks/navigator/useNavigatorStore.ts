@@ -37,7 +37,7 @@ import {
     UserInfoEvent,
     UserPermissionsEvent
 } from '@octane/renderer';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
     CreateRoomSession,
     GenericErrorCode,
@@ -92,6 +92,9 @@ export const useNavigatorStore = () => {
         currentRoomRating: 0,
         canRate: true
     });
+
+    // Whether the navigator settings of this connection have arrived; the first ones forward the user to a room.
+    const settingsReceivedRef = useRef(false);
 
     const { simpleAlert = null } = useNotification();
 
@@ -316,6 +319,7 @@ export const useNavigatorStore = () => {
     useOctaneEvent(
         OctaneEventType.SOCKET_RECONNECTING,
         useCallback(() => {
+            settingsReceivedRef.current = false;
             setNavigatorData((prev) => ({ ...prev, settingsReceived: false }));
         }, [])
     );
@@ -324,12 +328,11 @@ export const useNavigatorStore = () => {
         NavigatorHomeRoomEvent,
         useCallback((event) => {
             const parser = event.getParser();
-            let prevSettingsReceived = false;
-            setNavigatorData((prev) => {
-                prevSettingsReceived = prev.settingsReceived;
-                return { ...prev, homeRoomId: parser.homeRoomId, settingsReceived: true };
-            });
-            if (prevSettingsReceived) return;
+            // Read from a ref: a value copied out of an updater is stale when React runs the updater later.
+            const firstSettings = !settingsReceivedRef.current;
+            settingsReceivedRef.current = true;
+            setNavigatorData((prev) => ({ ...prev, homeRoomId: parser.homeRoomId, settingsReceived: true }));
+            if (!firstSettings) return;
             if (GetRoomSessionManager().viewerSession) return;
 
             let forwardType = -1;

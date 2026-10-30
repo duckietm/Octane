@@ -20,6 +20,8 @@ const TABS: string[] = [
 
 export const NavigatorRoomSettingsView: FC<{}> = (props) => {
     const [roomData, setRoomData] = useState<IRoomData>(null);
+    const latestRoomData = useRef<IRoomData>(null);
+    latestRoomData.current = roomData;
     const [currentTab, setCurrentTab] = useState(TABS[0]);
     const [fieldErrors, setFieldErrors] = useState<RoomSettingsSaveErrorResult['errors']>({});
     // AIR's _savedFlatId: a save error is shown only for a save this window sent.
@@ -100,143 +102,146 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
         setFieldErrors({});
         if (roomData) pendingSaveRoomId.current = roomData.roomId;
 
-        setRoomData((prevValue) => {
-            const newValue = { ...prevValue };
+        // The new settings are worked out here and sent once: an updater may run twice (StrictMode) or later.
+        const prevValue = latestRoomData.current;
+        if (!prevValue) return;
 
-            switch (field) {
-                case 'name':
-                    newValue.roomName = String(value);
-                    break;
-                case 'description':
-                    newValue.roomDescription = String(value);
-                    break;
-                case 'category':
-                    newValue.categoryId = Number(value);
-                    break;
-                case 'max_visitors':
-                    newValue.userCount = Number(value);
-                    break;
-                case 'trade_state':
-                    newValue.tradeState = Number(value);
-                    break;
-                case 'tags':
-                    newValue.tags = value as Array<string>;
-                    break;
-                case 'allow_walkthrough':
-                    newValue.allowWalkthrough = Boolean(value);
-                    break;
-                case 'allow_underpass':
-                    newValue.allowUnderpass = Boolean(value);
-                    break;
-                case 'mute_all_pets':
-                    newValue.muteAllPets = Boolean(value);
-                    break;
-                case 'leave_on_door_tile_enabled':
-                    newValue.leaveOnDoorTileEnabled = Boolean(value);
-                    break;
-                case 'idle_sleep_enabled':
-                    newValue.idleSleepEnabled = Boolean(value);
-                    break;
-                case 'idle_sleep_timeout_seconds':
-                    newValue.idleSleepTimeoutSeconds = Number(value);
-                    break;
-                case 'idle_autokick_enabled':
-                    newValue.idleAutokickEnabled = Boolean(value);
-                    break;
-                case 'idle_autokick_timeout_seconds':
-                    newValue.idleAutokickTimeoutSeconds = Number(value);
-                    break;
-                case 'allow_pets':
-                    newValue.allowPets = Boolean(value);
-                    break;
-                case 'allow_pets_eat':
-                    newValue.allowPetsEat = Boolean(value);
-                    break;
-                case 'hide_walls':
-                    newValue.hideWalls = Boolean(value);
-                    break;
-                case 'wall_thickness':
-                    newValue.wallThickness = Number(value);
-                    break;
-                case 'floor_thickness':
-                    newValue.floorThickness = Number(value);
-                    break;
-                case 'lock_state':
-                    newValue.lockState = Number(value);
-                    break;
-                case 'password':
-                    newValue.lockState = RoomDataParser.PASSWORD_STATE;
-                    newValue.password = String(value);
-                    break;
-                case 'moderation_mute':
-                    newValue.moderationSettings.allowMute = Number(value);
-                    break;
-                case 'moderation_kick':
-                    newValue.moderationSettings.allowKick = Number(value);
-                    break;
-                case 'moderation_ban':
-                    newValue.moderationSettings.allowBan = Number(value);
-                    break;
-                case 'bubble_mode':
-                    newValue.chatSettings.mode = Number(value);
-                    break;
-                case 'chat_weight':
-                    newValue.chatSettings.weight = Number(value);
-                    break;
-                case 'bubble_speed':
-                    newValue.chatSettings.speed = Number(value);
-                    break;
-                case 'flood_protection':
-                    newValue.chatSettings.protection = Number(value);
-                    break;
-                case 'chat_distance':
-                    newValue.chatSettings.distance = Number(value);
-                    break;
-            }
+        const newValue = { ...prevValue };
 
-            SendMessageComposer(
-                new SaveRoomSettingsComposer(
-                    newValue.roomId,
-                    newValue.roomName,
-                    newValue.roomDescription,
-                    newValue.lockState,
-                    newValue.password,
-                    Math.max(1, Math.min(200, Number(newValue.userCount) || 1)),
-                    newValue.categoryId,
-                    newValue.tags.length,
-                    newValue.tags,
-                    newValue.tradeState,
-                    newValue.allowPets,
-                    newValue.allowPetsEat,
-                    newValue.allowWalkthrough,
-                    newValue.hideWalls,
-                    newValue.wallThickness,
-                    newValue.floorThickness,
-                    newValue.moderationSettings.allowMute,
-                    newValue.moderationSettings.allowKick,
-                    newValue.moderationSettings.allowBan,
-                    newValue.chatSettings.mode,
-                    newValue.chatSettings.weight,
-                    newValue.chatSettings.speed,
-                    Math.max(1, Math.min(99, Number(newValue.chatSettings.distance) || 1)),
-                    newValue.chatSettings.protection,
-                    newValue.allowUnderpass,
-                    newValue.muteAllPets,
-                    newValue.leaveOnDoorTileEnabled,
-                    newValue.idleSleepEnabled,
-                    newValue.idleSleepEnabled ? Math.max(30, Math.min(3600, Number(newValue.idleSleepTimeoutSeconds) || 30)) : 0,
-                    newValue.idleAutokickEnabled,
-                    newValue.idleAutokickEnabled
-                        ? Math.max(
-                              newValue.idleSleepEnabled ? (Number(newValue.idleSleepTimeoutSeconds) || 30) + 30 : 60,
-                              Math.min(36000, Number(newValue.idleAutokickTimeoutSeconds) || 60)
-                          )
-                        : 0
-                )
-            );
+        switch (field) {
+            case 'name':
+                newValue.roomName = String(value);
+                break;
+            case 'description':
+                newValue.roomDescription = String(value);
+                break;
+            case 'category':
+                newValue.categoryId = Number(value);
+                break;
+            case 'max_visitors':
+                newValue.userCount = Number(value);
+                break;
+            case 'trade_state':
+                newValue.tradeState = Number(value);
+                break;
+            case 'tags':
+                newValue.tags = value as Array<string>;
+                break;
+            case 'allow_walkthrough':
+                newValue.allowWalkthrough = Boolean(value);
+                break;
+            case 'allow_underpass':
+                newValue.allowUnderpass = Boolean(value);
+                break;
+            case 'mute_all_pets':
+                newValue.muteAllPets = Boolean(value);
+                break;
+            case 'leave_on_door_tile_enabled':
+                newValue.leaveOnDoorTileEnabled = Boolean(value);
+                break;
+            case 'idle_sleep_enabled':
+                newValue.idleSleepEnabled = Boolean(value);
+                break;
+            case 'idle_sleep_timeout_seconds':
+                newValue.idleSleepTimeoutSeconds = Number(value);
+                break;
+            case 'idle_autokick_enabled':
+                newValue.idleAutokickEnabled = Boolean(value);
+                break;
+            case 'idle_autokick_timeout_seconds':
+                newValue.idleAutokickTimeoutSeconds = Number(value);
+                break;
+            case 'allow_pets':
+                newValue.allowPets = Boolean(value);
+                break;
+            case 'allow_pets_eat':
+                newValue.allowPetsEat = Boolean(value);
+                break;
+            case 'hide_walls':
+                newValue.hideWalls = Boolean(value);
+                break;
+            case 'wall_thickness':
+                newValue.wallThickness = Number(value);
+                break;
+            case 'floor_thickness':
+                newValue.floorThickness = Number(value);
+                break;
+            case 'lock_state':
+                newValue.lockState = Number(value);
+                break;
+            case 'password':
+                newValue.lockState = RoomDataParser.PASSWORD_STATE;
+                newValue.password = String(value);
+                break;
+            case 'moderation_mute':
+                newValue.moderationSettings.allowMute = Number(value);
+                break;
+            case 'moderation_kick':
+                newValue.moderationSettings.allowKick = Number(value);
+                break;
+            case 'moderation_ban':
+                newValue.moderationSettings.allowBan = Number(value);
+                break;
+            case 'bubble_mode':
+                newValue.chatSettings.mode = Number(value);
+                break;
+            case 'chat_weight':
+                newValue.chatSettings.weight = Number(value);
+                break;
+            case 'bubble_speed':
+                newValue.chatSettings.speed = Number(value);
+                break;
+            case 'flood_protection':
+                newValue.chatSettings.protection = Number(value);
+                break;
+            case 'chat_distance':
+                newValue.chatSettings.distance = Number(value);
+                break;
+        }
 
-            return newValue;
-        });
+        latestRoomData.current = newValue;
+        setRoomData(newValue);
+
+        SendMessageComposer(
+            new SaveRoomSettingsComposer(
+                newValue.roomId,
+                newValue.roomName,
+                newValue.roomDescription,
+                newValue.lockState,
+                newValue.password,
+                Math.max(1, Math.min(200, Number(newValue.userCount) || 1)),
+                newValue.categoryId,
+                newValue.tags.length,
+                newValue.tags,
+                newValue.tradeState,
+                newValue.allowPets,
+                newValue.allowPetsEat,
+                newValue.allowWalkthrough,
+                newValue.hideWalls,
+                newValue.wallThickness,
+                newValue.floorThickness,
+                newValue.moderationSettings.allowMute,
+                newValue.moderationSettings.allowKick,
+                newValue.moderationSettings.allowBan,
+                newValue.chatSettings.mode,
+                newValue.chatSettings.weight,
+                newValue.chatSettings.speed,
+                Math.max(1, Math.min(99, Number(newValue.chatSettings.distance) || 1)),
+                newValue.chatSettings.protection,
+                newValue.allowUnderpass,
+                newValue.muteAllPets,
+                newValue.leaveOnDoorTileEnabled,
+                newValue.idleSleepEnabled,
+                newValue.idleSleepEnabled ? Math.max(30, Math.min(3600, Number(newValue.idleSleepTimeoutSeconds) || 30)) : 0,
+                newValue.idleAutokickEnabled,
+                newValue.idleAutokickEnabled
+                    ? Math.max(
+                          newValue.idleSleepEnabled ? (Number(newValue.idleSleepTimeoutSeconds) || 30) + 30 : 60,
+                          Math.min(36000, Number(newValue.idleAutokickTimeoutSeconds) || 60)
+                      )
+                    : 0
+            )
+        );
     };
 
     if (!roomData) return null;
