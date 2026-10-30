@@ -7,6 +7,26 @@ const TEXT_STYLE_PROPERTIES = new Set(['color', 'background-color', 'font-weight
 
 // True while SanitizeHtml runs, so its stricter rules stay out of SanitizePageHtml, which shares the DOMPurify instance.
 let strictPass = false;
+// True while SanitizePageHtml runs: help pages keep their layout styles, but not a position that takes them out of
+// their window (fixed or sticky), which could lay an overlay over the whole client.
+let pagePass = false;
+
+/** A page style without fixed or sticky positioning; every other declaration is kept as written. */
+export const pageStyle = (style: string): string =>
+    style
+        .split(';')
+        .map((declaration) => declaration.trim())
+        .filter((declaration) => {
+            const colon = declaration.indexOf(':');
+
+            if (colon <= 0) return false;
+
+            const property = declaration.slice(0, colon).trim().toLowerCase();
+            const value = declaration.slice(colon + 1).trim().toLowerCase();
+
+            return !(property === 'position' && /^(fixed|sticky)\b/.test(value));
+        })
+        .join('; ');
 
 const textOnlyStyle = (style: string): string =>
     style
@@ -81,6 +101,17 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
         }
     }
 
+    if (pagePass) {
+        const style = element.getAttribute('style');
+
+        if (style !== null) {
+            const kept = pageStyle(style);
+
+            if (kept.length) element.setAttribute('style', kept);
+            else element.removeAttribute('style');
+        }
+    }
+
     if (element.tagName === 'A' && element.getAttribute('target')) {
         element.setAttribute('rel', 'noopener noreferrer');
     }
@@ -106,9 +137,15 @@ export const SanitizeHtml = (html: string): string => {
 
 /** Help pages (habbopages) are richer HTML: keep layout tags, drop scripts, handlers, forms and frames. */
 export const SanitizePageHtml = (html: string): string => {
-    return DOMPurify.sanitize(html, {
-        FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select', 'iframe', 'object', 'embed', 'svg', 'math'],
-        FORBID_ATTR: ['srcset'],
-        ALLOW_DATA_ATTR: false
-    });
+    pagePass = true;
+
+    try {
+        return DOMPurify.sanitize(html, {
+            FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select', 'iframe', 'object', 'embed', 'svg', 'math'],
+            FORBID_ATTR: ['srcset'],
+            ALLOW_DATA_ATTR: false
+        });
+    } finally {
+        pagePass = false;
+    }
 };
