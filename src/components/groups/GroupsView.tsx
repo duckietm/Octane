@@ -15,6 +15,7 @@ import {
     getGroupFailureTitleKey,
     GetRoomSession,
     localizeWithFallback,
+    parsePositiveId,
     SendMessageComposer,
     TryVisitRoom
 } from '../../api';
@@ -84,12 +85,15 @@ export const GroupsView: FC<{}> = (props) => {
                     case 'create':
                         setCreatorVisible(true);
                         return;
-                    case 'manage':
-                        if (!parts[2]) return;
+                    case 'manage': {
+                        const groupId = parsePositiveId(parts[2]);
+
+                        if (groupId === null) return;
 
                         setCreatorVisible(false);
-                        SendMessageComposer(new GroupSettingsComposer(Number(parts[2])));
+                        SendMessageComposer(new GroupSettingsComposer(groupId));
                         return;
+                    }
                 }
             },
             eventUrlPrefix: 'groups/'
