@@ -102,6 +102,8 @@ const MAX_SECURE_SESSION_TTL_MS = 60 * 60 * 1000;
 let secureSessionTtlMs = DEFAULT_SECURE_SESSION_TTL_MS;
 // After a failed bootstrap the client works in the clear until this time, then tries again.
 let secureUnavailableUntil = 0;
+// Set once a bootstrap succeeded: from then on the login endpoints never fall back to the clear.
+let secureSessionEstablished = false;
 const SECURE_RETRY_MS = 5 * 60 * 1000;
 const REKEY_ENDPOINTS = new Set(['/api/auth/login', '/api/auth/remember', '/api/auth/logout']);
 
@@ -281,6 +283,7 @@ const createSecureSession = async (): Promise<SecureSession> => {
     const derived = await deriveAesKey(pair.privateKey, serverKey);
 
     secureSessionCreatedAt = Date.now();
+    secureSessionEstablished = true;
 
     return { publicKey: clientPublicKey, key: derived.key, fingerprint: derived.fingerprint };
 };
@@ -411,11 +414,22 @@ const encryptBytes = async (session: SecureSession, clear: ArrayBuffer): Promise
     return bytesToHex(out);
 };
 
+/** An /api/ call to the configured API server only: the session key and the envelope never go to another origin. */
 const isApiUrl = (requestUrl: string): boolean => {
     try {
-        return new URL(requestUrl, window.location.href).pathname.startsWith('/api/');
+        const url = new URL(requestUrl, window.location.href);
+
+        return url.origin === new URL(getApiBase(), window.location.href).origin && url.pathname.startsWith('/api/');
     } catch {
-        return requestUrl.startsWith('/api/');
+        return false;
+    }
+};
+
+const isAuthApiUrl = (requestUrl: string): boolean => {
+    try {
+        return new URL(requestUrl, window.location.href).pathname.startsWith('/api/auth/');
+    } catch {
+        return false;
     }
 };
 
@@ -518,7 +532,12 @@ export const installSecureFetch = (): void => {
             const method = (init?.method || (input instanceof Request ? input.method : 'GET')).toUpperCase();
             const session = await getSecureSessionOrPlain();
 
-            if (!session) return nativeFetch(input, init);
+            if (!session) {
+                // The server spoke encrypted earlier in this page: credentials are not sent in the clear on a failure.
+                if (secureSessionEstablished && isAuthApiUrl(requestUrl)) throw new Error('Secure API unavailable: login request not sent in the clear.');
+
+                return nativeFetch(input, init);
+            }
 
             const headers = new Headers(init?.headers || (input instanceof Request ? input.headers : undefined));
             const clearBody = await readRequestBody(input, init, method);
