@@ -1,5 +1,5 @@
 import { RoomEngineObjectEvent, RoomObjectCategory, RoomSessionChatEvent } from '@octane/renderer';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOctaneEvent } from '../../events';
 import { useObjectSelectedEvent } from '../engine';
 import { useRoom } from '../useRoom';
@@ -17,6 +17,13 @@ import { useRoom } from '../useRoom';
  *                        outgoing sendChatTypingMessage only fires on
  *                        state edges (start / stop), not every render.
  */
+/** The seconds of a flood block the server sent, rounded up; 0 for a message that is not a positive number. */
+export const floodBlockSeconds = (message: string): number => {
+    const seconds = Number.parseFloat(message);
+
+    return Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : 0;
+};
+
 export const useChatInputState = () => {
     const [selectedUsername, setSelectedUsername] = useState('');
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -24,11 +31,19 @@ export const useChatInputState = () => {
     const [isIdle, setIsIdle] = useState(false);
     const [floodBlocked, setFloodBlocked] = useState(false);
     const [floodBlockedSeconds, setFloodBlockedSeconds] = useState(0);
+    // The countdown itself: it was worked out inside a state updater and read right after, which React does not
+    // promise to have run, and a message that was not a number (NaN) ended the block at once.
+    const floodRemainingRef = useRef(0);
     const { roomSession = null } = useRoom();
 
     useOctaneEvent<RoomSessionChatEvent>(RoomSessionChatEvent.FLOOD_EVENT, (event) => {
+        const seconds = floodBlockSeconds(event.message);
+
+        if (seconds <= 0) return;
+
+        floodRemainingRef.current = seconds;
+        setFloodBlockedSeconds(seconds);
         setFloodBlocked(true);
-        setFloodBlockedSeconds(parseFloat(event.message));
     });
 
     useObjectSelectedEvent((event) => {
@@ -46,16 +61,11 @@ export const useChatInputState = () => {
     useEffect(() => {
         if (!floodBlocked) return;
 
-        let seconds = 0;
-
         const interval = setInterval(() => {
-            setFloodBlockedSeconds((prevValue) => {
-                seconds = (prevValue || 0) - 1;
+            floodRemainingRef.current -= 1;
+            setFloodBlockedSeconds(Math.max(0, floodRemainingRef.current));
 
-                return seconds;
-            });
-
-            if (seconds < 0) {
+            if (floodRemainingRef.current <= 0) {
                 clearInterval(interval);
 
                 setFloodBlocked(false);
