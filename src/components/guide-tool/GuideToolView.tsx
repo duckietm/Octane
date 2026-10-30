@@ -18,7 +18,7 @@ import {
     RemoveLinkEventTracker
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { GetConfigurationValue, guardianText, GuideSessionState, GuideToolMessage, GuideToolMessageGroup, LocalizeText, SendMessageComposer } from '../../api';
+import { GetConfigurationValue, guardianText, GuideSessionState, GuideToolMessage, GuideToolMessageGroup, isSafeExternalUrl, LocalizeText, SendMessageComposer } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { GuideToolEvent } from '../../events';
 import { useGuardianChatReview, useMessageEvent, useNotification, useUiEvent } from '../../hooks';
@@ -355,7 +355,8 @@ export const GuideToolView: FC<{}> = (props) => {
                         '%groupid%',
                         GetConfigurationValue<string>('guide.help.alpha.groupid', '0')
                     );
-                    window.open(url, '_blank', 'noopener,noreferrer');
+                    // A hotel without a group homepage set opened an empty tab; only a web URL is opened.
+                    if (isSafeExternalUrl(url)) window.open(url, '_blank', 'noopener,noreferrer');
                     return;
             }
         },

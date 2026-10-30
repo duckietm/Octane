@@ -56,4 +56,21 @@ describe('useGuideSessionTyping', () => {
 
         expect(typingStates()).toEqual([]);
     });
+
+    it('a new session sends its first typing even when the last one ended while typing', () => {
+        const { rerender } = renderHook(({ length, active }) => useGuideSessionTyping(length, active), {
+            initialProps: { length: 0, active: true }
+        });
+
+        rerender({ length: 3, active: true });
+        act(() => vi.advanceTimersByTime(GUIDE_TYPING_POLL_MS));
+        expect(typingStates()).toEqual([true]);
+
+        rerender({ length: 3, active: false });
+        rerender({ length: 3, active: true });
+        rerender({ length: 7, active: true });
+        act(() => vi.advanceTimersByTime(GUIDE_TYPING_POLL_MS));
+
+        expect(typingStates()).toEqual([true, true]);
+    });
 });
