@@ -8,6 +8,9 @@ import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
 import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
+/** The longest word the server keeps (RoomWordFilterModifyEvent cuts anything longer). */
+export const MAX_WORD_LENGTH = 25;
+
 export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
     const [word, setWord] = useState<string>('bobba');
     const [selectedWord, setSelectedWord] = useState<string>('');
@@ -56,7 +59,7 @@ export const RoomFilterWordsWidgetView: FC<{}> = (props) => {
                 <OctaneCardHeaderView headerText={LocalizeText('navigator.roomsettings.roomfilter')} onCloseClick={() => onClose()} />
                 <OctaneCardContentView className="text-black">
                     <Grid className="flex items-center gap-2 justify-end">
-                        <OctaneInput maxLength={255} type="text" value={word} onChange={(event) => onTyping(event.target.value)} />
+                        <OctaneInput maxLength={MAX_WORD_LENGTH} type="text" value={word} onChange={(event) => onTyping(event.target.value)} />
                         <Button variant="secondary" onClick={() => processAction(true)}>{LocalizeText('navigator.roomsettings.roomfilter.addword')}</Button>
                     </Grid>
                     <Column
