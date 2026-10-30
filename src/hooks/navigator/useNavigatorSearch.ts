@@ -6,6 +6,20 @@ import { useNavigatorUiStore } from './navigatorUiStore';
 
 const NAVIGATOR_USER_COUNT_REFRESH_MS = 15000;
 const MY_ROOMS_TAB_CODE = 'myworld_view';
+/** The server keeps the first 64 characters of a search and echoes those back. */
+const SERVER_MAX_QUERY_LENGTH = 64;
+
+/**
+ * Whether a search reply answers the search on screen: same tab and same filter. Only the tab was compared, so while
+ * typing a reply for an older filter (or a poll sent before the change) could replace the newer results.
+ */
+export const isReplyForSearch = (code: string, data: string, tabCode: string, filter: string): boolean => {
+    if (!tabCode || code !== tabCode) return false;
+
+    const expected = (filter ?? '').slice(0, SERVER_MAX_QUERY_LENGTH);
+
+    return (data ?? '') === expected;
+};
 
 export const useNavigatorSearch = () => {
     const tabCode = useNavigatorUiStore((s) => s.currentTabCode);
@@ -46,7 +60,7 @@ export const useNavigatorSearch = () => {
         const result = event.getParser()?.result;
         if (!result) return;
 
-        if (!tabCode || result.code !== tabCode) return;
+        if (!isReplyForSearch(result.code, result.data, tabCode, filter)) return;
 
         setSearchResult(result);
         setIsFetching(false);
