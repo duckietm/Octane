@@ -58,7 +58,8 @@ const useFurnitureStackHeightWidgetState = () => {
 
         setHeight(parseFloat(height.toFixed(2)));
 
-        if (!server) setPendingHeight(height * 100);
+        // Rounded: 1.15 * 100 is 114.999..., which the send below truncated to 114.
+        if (!server) setPendingHeight(Math.round(height * 100));
     };
 
     useMessageEvent<FurnitureStackHeightEvent>(FurnitureStackHeightEvent, (event) => {
