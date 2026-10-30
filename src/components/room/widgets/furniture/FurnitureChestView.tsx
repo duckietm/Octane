@@ -64,6 +64,7 @@ import { useWiredToolsState } from '../../../../hooks/wired-tools/useWiredToolsS
 import { ChestButton } from './ChestButton';
 import { ChestAppearanceFields, ChestSelect, ChestSettingsSection } from './ChestSettingsFields';
 import { ChestFurniGroup, chestFurniDisplayName, groupStoredFurni } from './chestFurniGrouping';
+import { clampUpgradeQuantity } from './chestUpgradeQuantity';
 import { FurniChestGridItem } from './FurniChestGridItem';
 import { FurniChestSearchBar } from './FurniChestSearchBar';
 import { Checkbox } from '../../../../common/Checkbox';
@@ -175,7 +176,7 @@ export const FurnitureChestView: FC = () => {
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [showLog, setShowLog] = useState(false);
     const [logRows, setLogRows] = useState<ChestLogRow[]>([]);
-    const [upgradeQty, setUpgradeQty] = useState(1);
+    const [chosenUpgradeQty, setUpgradeQty] = useState(1);
     const [confirmWithdrawAll, setConfirmWithdrawAll] = useState(false);
     const [confirmLock, setConfirmLock] = useState<null | boolean>(null);
     const [showLockInfo, setShowLockInfo] = useState(false);
@@ -505,6 +506,7 @@ export const FurnitureChestView: FC = () => {
         { length: Math.min(upgradesLeft, MAX_UPGRADES_PER_PURCHASE) },
         (unused, index) => index + 1,
     );
+    const upgradeQty = clampUpgradeQuantity(chosenUpgradeQty, upgradesLeft, MAX_UPGRADES_PER_PURCHASE);
 
     /** The reason the buy button is off, in the official's own order: capacity first, then money. */
     const upgradeError = !upgradesLeft
