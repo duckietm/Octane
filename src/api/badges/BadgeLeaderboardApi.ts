@@ -1,4 +1,4 @@
-import { GetConfiguration } from '@octane/renderer';
+import { GetConfiguration, GetSessionDataManager } from '@octane/renderer';
 import { getAccessToken } from '../auth';
 
 export type BadgeRarityKey = 'common' | 'rare' | 'epic' | 'legendary' | 'mythical' | 'unique';
@@ -94,6 +94,17 @@ const throwOnError = async (response: Response): Promise<void> => {
 
 let cachePromise: Promise<BadgeLeaderboardResponse> = null;
 let cacheValue: BadgeLeaderboardResponse = null;
+// The user the cache was loaded for: the reply carries that viewer's own rank, and a second account logged in
+// without a reload was shown the first one's.
+let cacheViewer: number | null = null;
+
+const currentViewer = (): number | null => {
+    try {
+        return GetSessionDataManager()?.userId ?? null;
+    } catch {
+        return null;
+    }
+};
 
 const buildStatsMap = (response: BadgeLeaderboardResponse | null): Map<string, BadgeLeaderboardStat> => {
     const map = new Map<string, BadgeLeaderboardStat>();
@@ -116,12 +127,18 @@ const FAILED_RETRY_DELAY_MS = 30_000;
 let lastFailureAt = 0;
 
 export const fetchBadgeLeaderboard = async (force = false): Promise<BadgeLeaderboardResponse> => {
+    const viewer = currentViewer();
+
+    if (viewer !== cacheViewer) resetBadgeLeaderboardCache();
+
     if (!force) {
         if (cacheValue) return cacheValue;
         if (cachePromise) return cachePromise;
     }
 
-    cachePromise = (async () => {
+    cacheViewer = viewer;
+
+    const request = (async () => {
         const response = await fetch(getUrl(), {
             method: 'GET',
             credentials: 'include',
@@ -132,21 +149,36 @@ export const fetchBadgeLeaderboard = async (force = false): Promise<BadgeLeaderb
 
         const payload = await parseJson<BadgeLeaderboardResponse>(response);
 
-        cacheValue = payload;
-        cacheStatsMap = buildStatsMap(payload);
+        // A reply for a viewer that is no longer the one logged in is not kept.
+        if (cacheViewer === viewer) {
+            cacheValue = payload;
+            cacheStatsMap = buildStatsMap(payload);
+        }
 
         return payload;
     })();
 
+    cachePromise = request;
+
     try {
-        return await cachePromise;
+        return await request;
     } catch (error) {
         lastFailureAt = Date.now();
 
         throw error;
     } finally {
-        cachePromise = null;
+        // A newer (forced) request may have replaced this one meanwhile: only this request's own promise is dropped.
+        if (cachePromise === request) cachePromise = null;
     }
+};
+
+/** Forgets the loaded leaderboard and any request in flight (another account, or a logout). */
+export const resetBadgeLeaderboardCache = (): void => {
+    cachePromise = null;
+    cacheValue = null;
+    cacheViewer = null;
+    cacheStatsMap = new Map();
+    lastFailureAt = 0;
 };
 
 export const getCachedBadgeLeaderboard = (): BadgeLeaderboardResponse => {
