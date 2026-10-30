@@ -9,6 +9,7 @@ import {
     catalogPageKey,
     cloneCachedCatalogPages,
     dropCatalogCache,
+    invalidateAllCatalogIndexes,
     invalidateCatalogIndex,
     invalidateCatalogPage,
     isOfferAllowedInCatalogType,
@@ -160,6 +161,14 @@ describe('cache helpers', () => {
         expect(client.getQueryState(catalogIndexKey(CatalogType.NORMAL)).isInvalidated).toBe(true);
 
         invalidateCatalogPage(CatalogType.NORMAL, 3);
+        expect(client.getQueryState(catalogPageKey(CatalogType.NORMAL, 3)).isInvalidated).toBe(true);
+
+        // A publish invalidates the index of every catalog type, not only the one open.
+        client.setQueryData(catalogIndexKey(CatalogType.NORMAL), index);
+        client.setQueryData(catalogIndexKey(CatalogType.BUILDER), index);
+        invalidateAllCatalogIndexes();
+        expect(client.getQueryState(catalogIndexKey(CatalogType.NORMAL)).isInvalidated).toBe(true);
+        expect(client.getQueryState(catalogIndexKey(CatalogType.BUILDER)).isInvalidated).toBe(true);
         expect(client.getQueryState(catalogPageKey(CatalogType.NORMAL, 3)).isInvalidated).toBe(true);
 
         dropCatalogCache();
