@@ -2,6 +2,7 @@ import { FC, useRef } from 'react';
 import { useDraggableLoginWindow } from '../hooks/useDraggableLoginWindow';
 import { BaseButton } from '../../../common/BaseButton';
 import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
+import { resolveNewsLink } from '../utils/news';
 
 interface LoginWidgetSlotProps {
     slotKey: string;
@@ -37,7 +38,9 @@ export const LoginWidgetSlot: FC<LoginWidgetSlotProps> = ({ slotKey, type, image
                             type="button"
                             className="login-widget-button"
                             onClick={() => {
-                                if (buttonLink) window.location.href = buttonLink;
+                                // The link comes from the CMS: only a web URL or a path on this site is followed.
+                                const target = resolveNewsLink(buttonLink);
+                                if (target) window.location.href = target;
                             }}
                         >
                             {buttonText}
