@@ -4,6 +4,7 @@ import { registerSharedHook, useSharedHook } from '@/state/useSharedHook';
 import { GetConfigurationValue, SendMessageComposer, UnseenItemCategory } from '../../api';
 import { rememberBadgeRarityFromPacket, rememberReceivedBadgeRarity } from '../../api/badges/badgeRarity';
 import { useMessageEvent } from '../events';
+import { createTrailingSender } from './badgeWearSender';
 import { useSharedVisibility } from '../useSharedVisibility';
 import { useInventoryUnseenTracker } from './useInventoryUnseenTracker';
 
@@ -38,14 +39,21 @@ const useInventoryBadgesState = () => {
         SendMessageComposer(composer);
     };
 
+    const sendActiveBadgesRef = useRef(sendActiveBadges);
+    sendActiveBadgesRef.current = sendActiveBadges;
+    const [wearSender] = useState(() => createTrailingSender<(string | null)[]>((slots) => sendActiveBadgesRef.current(slots)));
+
+    // A change still waiting is sent when the hook goes away, not dropped.
+    useEffect(() => () => wearSender.flush(), [wearSender]);
+
     /**
-     * Keeps and sends a new set of worn badges. Every change is worked out from a ref, not inside a state updater:
-     * an updater may run twice (StrictMode) and sent the set twice.
+     * Keeps a new set of worn badges at once and sends the last of a quick run of changes. Every change is worked out
+     * from a ref, not inside a state updater: an updater may run twice (StrictMode) and sent the set twice.
      */
     const wearBadges = (slots: (string | null)[]) => {
         activeBadgeCodesRef.current = slots;
         setActiveBadgeCodes(slots);
-        sendActiveBadges(slots);
+        wearSender.push(slots);
     };
 
     const toggleBadge = (badgeCode: string) => {
@@ -98,8 +106,8 @@ const useInventoryBadgesState = () => {
         // leaked (incremented on every edit, never decremented), which then
         // silently dropped legitimate later BadgesEvent updates. The server is
         // authoritative here (edits are already persisted), so always apply it.
-        const serverBadges = parser.getActiveBadgeCodes();
-        setActiveBadgeCodes(toFixedSlots(serverBadges));
+        // A set the user changed and is not sent yet wins over this older one.
+        if (!wearSender.isPending()) setActiveBadgeCodes(toFixedSlots(parser.getActiveBadgeCodes()));
 
         setBadgeCodes(allBadgeCodes);
     });
