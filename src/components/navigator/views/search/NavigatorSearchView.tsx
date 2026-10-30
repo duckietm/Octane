@@ -64,7 +64,16 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = (props) => {
 
     const refreshSearch = () => {
         if (!tabCode) return;
-        SendMessageComposer(new NavigatorSearchComposer(tabCode, currentFilter || buildQuery(searchFilterIndex, inputText)));
+
+        const query = currentFilter || buildQuery(searchFilterIndex, inputText);
+
+        // A typed search that was never submitted goes through the store, so its reply matches the filter on screen.
+        if (query !== currentFilter) {
+            useNavigatorUiStore.getState().setFilter(query);
+            return;
+        }
+
+        SendMessageComposer(new NavigatorSearchComposer(tabCode, query));
     };
 
     const clearSearch = () => {
