@@ -67,4 +67,21 @@ describe('loadTurnstileScript', () => {
         await expect(loadTurnstileScript()).resolves.toBe(true);
         expect(scriptTag()).toBeNull();
     });
+
+    it('retries with a fresh script after a failed load', async () => {
+        const first = loadTurnstileScript();
+        const failed = scriptTag();
+        failed.dispatchEvent(new Event('error'));
+        await expect(first).resolves.toBe(false);
+        expect(scriptTag()).toBeNull();
+
+        const retry = loadTurnstileScript();
+        const fresh = scriptTag();
+        expect(fresh).not.toBe(failed);
+
+        window.turnstile = { render: vi.fn(), reset: vi.fn(), remove: vi.fn() };
+        fresh.dispatchEvent(new Event('load'));
+
+        await expect(retry).resolves.toBe(true);
+    });
 });
