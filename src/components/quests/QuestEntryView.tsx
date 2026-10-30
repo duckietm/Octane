@@ -14,7 +14,8 @@ import {
     getQuestWaitSecondsLeft,
     isQuestRewardVisible,
     localizeWithFallback,
-    NEXT_QUEST_TIMER_REFRESH_MS
+    NEXT_QUEST_TIMER_REFRESH_MS,
+    SanitizeHtml
 } from '../../api';
 import { Button, LayoutCurrencyIcon, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
@@ -92,7 +93,7 @@ export const QuestEntryView: FC<QuestEntryViewProps> = (props) => {
                                 </>
                             )}
                             {!waiting && <Text className="octane-quest-desc">{description}</Text>}
-                            {!waiting && hint.length > 0 && <Text className="octane-quest-hint" dangerouslySetInnerHTML={{ __html: hint }} />}
+                            {!waiting && hint.length > 0 && <Text className="octane-quest-hint" dangerouslySetInnerHTML={{ __html: SanitizeHtml(hint) }} />}
                             {isQuestRewardVisible(quest.activityPointType, quest.rewardCurrencyAmount) && !waiting && (
                                 <div className="octane-quest-reward">
                                     <span>{localizeWithFallback('quests.list.rewardcaption', 'Reward:')}</span>

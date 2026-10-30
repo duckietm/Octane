@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { CreateLinkEvent } from '@octane/renderer';
-import { GetConfigurationValue, LocalizeText } from '../../../api';
+import { GetConfigurationValue, LocalizeText, SanitizeHtml } from '../../../api';
 import { Button, Column, Flex, Text } from '../../../common';
 import { BaseButton } from '../../../common/BaseButton';
 import { Checkbox } from '../../../common/Checkbox';
@@ -75,10 +75,10 @@ export const GuideToolMenuView: FC<GuideToolMenuViewProps> = (props) => {
                 <div className="flex justify-enter items-center gap-2">
                     <div className="info-icon" />
                     <div className="flex flex-col gap-1">
-                        <div dangerouslySetInnerHTML={{ __html: LocalizeText('guide.help.guide.tool.guidesonduty', ['amount'], [guidesOnDuty.toString()]) }} />
-                        <div dangerouslySetInnerHTML={{ __html: LocalizeText('guide.help.guide.tool.helpersonduty', ['amount'], [helpersOnDuty.toString()]) }} />
+                        <div dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('guide.help.guide.tool.guidesonduty', ['amount'], [guidesOnDuty.toString()])) }} />
+                        <div dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('guide.help.guide.tool.helpersonduty', ['amount'], [helpersOnDuty.toString()])) }} />
                         <div
-                            dangerouslySetInnerHTML={{ __html: LocalizeText('guide.help.guide.tool.guardiansonduty', ['amount'], [guardiansOnDuty.toString()]) }}
+                            dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('guide.help.guide.tool.guardiansonduty', ['amount'], [guardiansOnDuty.toString()])) }}
                         />
                     </div>
                 </div>

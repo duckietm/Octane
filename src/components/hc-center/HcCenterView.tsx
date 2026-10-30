@@ -10,7 +10,7 @@ import {
     ScrSendKickbackInfoMessageEvent
 } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
-import { ClubStatus, FriendlyTime, GetClubBadge, GetConfigurationRecord, LocalizeText, SendMessageComposer } from '../../api';
+import { ClubStatus, FriendlyTime, GetClubBadge, GetConfigurationRecord, LocalizeText, SanitizeHtml, SendMessageComposer } from '../../api';
 import benefitsBg from '../../assets/images/hc-center/benefits.png';
 import clockIcon from '../../assets/images/hc-center/clock.png';
 import hcLogo from '../../assets/images/hc-center/hc_logo.gif';
@@ -179,7 +179,7 @@ export const HcCenterView: FC<{}> = (props) => {
                         <LayoutBadgeImageView badgeCode={badgeCode} className="shrink-0" />
                         <Column gap={0} className="min-h-[48px] leading-4">
                             <Text bold className="octane-hc-center__status-title">{LocalizeText('hccenter.status.' + clubStatus)}</Text>
-                            <Text className="octane-hc-center__status-info" dangerouslySetInnerHTML={{ __html: getInfoText() }} />
+                            <Text className="octane-hc-center__status-info" dangerouslySetInnerHTML={{ __html: SanitizeHtml(getInfoText()) }} />
                         </Column>
                     </Flex>
                     {GetConfigurationRecord('hc.center')['payday.info'] && (
@@ -241,10 +241,11 @@ export const HcCenterView: FC<{}> = (props) => {
                                     variant="white"
                                     className="octane-hc-center__info"
                                     dangerouslySetInnerHTML={{
-                                        __html:
+                                        __html: SanitizeHtml(
                                             unclaimedGifts > 0
                                                 ? LocalizeText('hccenter.unclaimedgifts', ['unclaimedgifts'], [unclaimedGifts.toString()])
                                                 : LocalizeText('hccenter.gift.info')
+                                        )
                                     }}
                                 />
                             </Column>
@@ -266,7 +267,7 @@ export const HcCenterView: FC<{}> = (props) => {
                             <Text bold variant={null} className="octane-hc-center__title octane-hc-center__title--blue">
                                 {LocalizeText('hccenter.general.title')}
                             </Text>
-                            <Text className="octane-hc-center__info" dangerouslySetInnerHTML={{ __html: LocalizeText('hccenter.general.info') }} />
+                            <Text className="octane-hc-center__info" dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('hccenter.general.info')) }} />
                             <BaseButton type="button"
                                 className="octane-hc-center__link octane-hc-center__link--blue cursor-pointer mt-1"
                                 onClick={() => CreateLinkEvent('habbopages/' + GetConfigurationRecord('hc.center')['benefits.habbopage'])}
