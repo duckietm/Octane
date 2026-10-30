@@ -62,13 +62,25 @@ const useInventoryFurniState = () => {
         return null;
     };
 
+    // The reducers queue side effects (placement cancel, "furni added" events). They run on the latest list here, in
+    // the event handler, and the result is committed once: inside a state updater React may run them twice.
+    const groupItemsRef = useRef(groupItems);
+    groupItemsRef.current = groupItems;
+
+    const commitGroupItems = (next: GroupItem[]) => {
+        if (next === groupItemsRef.current) return;
+
+        groupItemsRef.current = next;
+        setGroupItems(next);
+    };
+
     const buildContext = (): FurniReducerContext => ({
         isUnseen,
         dispatchAdded: (id, type, category) => queueMicrotask(() => DispatchUiEvent(new InventoryFurniAddedEvent(id, type, category)))
     });
 
     useMessageEvent<FurnitureListAddOrUpdateEvent>(FurnitureListAddOrUpdateEvent, (event) => {
-        setGroupItems((prev) => applyFurnitureListAddOrUpdate(prev, event, buildContext()));
+        commitGroupItems(applyFurnitureListAddOrUpdate(groupItemsRef.current, event, buildContext()));
     });
 
     useMessageEvent<FurnitureListEvent>(FurnitureListEvent, (event) => {
@@ -87,7 +99,7 @@ const useInventoryFurniState = () => {
 
         const context = buildContext();
 
-        setGroupItems((prev) => applyMergedFurnitureList(prev, merged, context));
+        commitGroupItems(applyMergedFurnitureList(groupItemsRef.current, merged, context));
     });
 
     useMessageEvent<FurnitureListInvalidateEvent>(FurnitureListInvalidateEvent, () => {
@@ -95,13 +107,13 @@ const useInventoryFurniState = () => {
     });
 
     useMessageEvent<FurnitureListRemovedEvent>(FurnitureListRemovedEvent, (event) => {
-        setGroupItems((prev) => applyFurnitureListRemoved(prev, event));
+        commitGroupItems(applyFurnitureListRemoved(groupItemsRef.current, event));
     });
 
     useMessageEvent<FurnitureListRemoveMultipleEvent>(FurnitureListRemoveMultipleEvent, (event) => {
         const itemIds = event.getParser().stripIds;
 
-        setGroupItems((prev) => applyFurnitureListRemovedMany(prev, itemIds));
+        commitGroupItems(applyFurnitureListRemovedMany(groupItemsRef.current, itemIds));
     });
 
     useEffect(() => {

@@ -9,7 +9,8 @@ import { describe, expect, it } from 'vitest';
  */
 const SOURCE = join(process.cwd(), 'src');
 const UPDATER = /\bset[A-Z]\w*\(\s*\(?\s*\w+\s*(?::[^)=]*)?\)?\s*=>\s*\{/g;
-const SENDS = /SendMessageComposer\(|\.connection\.send\(|\bsendActiveBadges\(/;
+// Packets, and the room-placement and link side effects the inventory used to run from its updaters.
+const SENDS = /SendMessageComposer\(|\.connection\.send\(|\bsendActiveBadges\(|\bcancelRoomObjectPlacement\(|\battemptItemPlacement\(|\bCreateLinkEvent\(/;
 
 const sourceFiles = (directory: string): string[] =>
     readdirSync(directory).flatMap((name) => {
