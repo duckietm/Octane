@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useRoom, useWiredLabelEvents, useWiredLabelStore, useWiredTools } from '../../../../hooks';
 import { WiredLabelBubbleView } from './WiredLabelBubbleView';
 import { WiredLabelSettingsView } from './WiredLabelSettingsView';
@@ -25,20 +26,22 @@ export const WiredLabelOverlayView: FC<{}> = () => {
     const settingsLabel = settingsId ? labels[settingsId] : null;
 
     return (
-        <>
-            <div className="octane-wired-label-overlay" data-testid="wired-label-overlay">
-                {Object.values(labels).map((label) => (
-                    <WiredLabelBubbleView
-                        key={label.furnitureId}
-                        roomId={roomSession.roomId}
-                        label={label}
-                        open={openIds.includes(label.furnitureId)}
-                        hovered={hoveredId === label.furnitureId}
-                        canModify={canModify}
-                        onClose={() => close(label.furnitureId)} />
-                ))}
-            </div>
-            {settingsLabel && canModify && <WiredLabelSettingsView label={settingsLabel} onClose={closeSettings} />}
-        </>
+        <NativeTextTree>
+            <>
+                <div className="octane-wired-label-overlay" data-testid="wired-label-overlay">
+                    {Object.values(labels).map((label) => (
+                        <WiredLabelBubbleView
+                            key={label.furnitureId}
+                            roomId={roomSession.roomId}
+                            label={label}
+                            open={openIds.includes(label.furnitureId)}
+                            hovered={hoveredId === label.furnitureId}
+                            canModify={canModify}
+                            onClose={() => close(label.furnitureId)} />
+                    ))}
+                </div>
+                {settingsLabel && canModify && <WiredLabelSettingsView label={settingsLabel} onClose={closeSettings} />}
+            </>
+        </NativeTextTree>
     );
 };

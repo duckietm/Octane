@@ -1,6 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { AddAnimationTickerCallback, GetRoomObjectBounds, GetRoomSession } from '../../../../api';
 import { BaseProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface ObjectLocationViewProps extends BaseProps<HTMLDivElement> {
     objectId: number;
@@ -50,11 +51,13 @@ export const ObjectLocationView: FC<ObjectLocationViewProps> = (props) => {
     }, [objectId, category, noFollow]);
 
     return (
-        <div
-            ref={elementRef}
-            className="object-location absolute"
-            style={{ left: pos.x, top: pos.y, visibility: pos.x + (elementRef.current ? elementRef.current.offsetWidth : 0) > -1 ? 'visible' : 'hidden' }}
-            {...rest}
-        />
+        <NativeTextTree>
+            <div
+                ref={elementRef}
+                className="object-location absolute"
+                style={{ left: pos.x, top: pos.y, visibility: pos.x + (elementRef.current ? elementRef.current.offsetWidth : 0) > -1 ? 'visible' : 'hidden' }}
+                {...rest}
+            />
+        </NativeTextTree>
     );
 };

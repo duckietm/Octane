@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredIconRadioGroup } from '../WiredMoveIconRadios';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -26,25 +27,27 @@ export const WiredConditionActorIsTeamMemberView: FC = () => {
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
-                <WiredIconRadioGroup
-                    columns={2}
-                    name="selectedTeam"
-                    options={[
-                        { value: 0, label: LocalizeText('wiredfurni.params.team.any'), newLine: true },
-                        ...TEAM_IDS.map((value) => ({ value, label: LocalizeText(`wiredfurni.params.team.${value}`) }))
-                    ]}
-                    value={selectedTeam}
-                    onChange={setSelectedTeam}
-                />
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
+                    <WiredIconRadioGroup
+                        columns={2}
+                        name="selectedTeam"
+                        options={[
+                            { value: 0, label: LocalizeText('wiredfurni.params.team.any'), newLine: true },
+                            ...TEAM_IDS.map((value) => ({ value, label: LocalizeText(`wiredfurni.params.team.${value}`) }))
+                        ]}
+                        value={selectedTeam}
+                        onChange={setSelectedTeam}
+                    />
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

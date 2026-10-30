@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { IPurchasableOffer } from '../../../../../api';
 import { getCatalogBundlePrice, ICatalogBundlePrice } from '../../../../../api/catalog/CatalogBundleDiscount';
 import { LayoutCurrencyIcon, Text } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogBundleDiscountRuleset, useCatalogUiState } from '../../../../../hooks';
 
 interface CatalogPriceDisplayWidgetViewProps {
@@ -28,20 +29,22 @@ export const CatalogPriceDisplayWidgetView: FC<CatalogPriceDisplayWidgetViewProp
     );
 
     return (
-        <div className="octane-catalog-standard-price-display">
-            {offer.priceInCredits > 0 && (
-                <div className="octane-catalog-standard-price-pill is-credits" data-currency-type="-1">
-                    <Price price={credits} />
-                    <LayoutCurrencyIcon type={-1} />
-                </div>
-            )}
-            {separator && offer.priceInCredits > 0 && offer.priceInActivityPoints > 0 && <Text className="octane-catalog-standard-price-plus">+</Text>}
-            {offer.priceInActivityPoints > 0 && (
-                <div className="octane-catalog-standard-price-pill is-activity-points" data-currency-type={offer.activityPointType}>
-                    <Price price={activityPoints} />
-                    <LayoutCurrencyIcon type={offer.activityPointType} />
-                </div>
-            )}
-        </div>
+        <NativeTextTree>
+            <div className="octane-catalog-standard-price-display">
+                {offer.priceInCredits > 0 && (
+                    <div className="octane-catalog-standard-price-pill is-credits" data-currency-type="-1">
+                        <Price price={credits} />
+                        <LayoutCurrencyIcon type={-1} />
+                    </div>
+                )}
+                {separator && offer.priceInCredits > 0 && offer.priceInActivityPoints > 0 && <Text className="octane-catalog-standard-price-plus">+</Text>}
+                {offer.priceInActivityPoints > 0 && (
+                    <div className="octane-catalog-standard-price-pill is-activity-points" data-currency-type={offer.activityPointType}>
+                        <Price price={activityPoints} />
+                        <LayoutCurrencyIcon type={offer.activityPointType} />
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

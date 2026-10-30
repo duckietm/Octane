@@ -15,6 +15,7 @@ import { Button, LayoutBadgeImageView, Text } from '../../../common';
 import { useGroupLeave, useNotification } from '../../../hooks';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const STATES: string[] = ['regular', 'exclusive', 'private'];
 
@@ -122,89 +123,91 @@ export const GroupInformationView: FC<GroupInformationViewProps> = (props) => {
     if (!groupInformation) return null;
 
     return (
-        <div className="octane-extended-profile-group-info">
-            <div className="octane-extended-profile-group-info__badge-column">
-                <div className="octane-extended-profile-group-info__badge-wrap group-badge">
-                    <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} scale={2.1} />
-                </div>
-                <div className="octane-extended-profile-group-info__meta">
-                    <BaseButton
-                        className="octane-extended-profile-group-info__member-link"
-                        type="button"
-                        onMouseDown={(event) => event.stopPropagation()}
-                        onClick={(event) => { event.stopPropagation(); handleAction('members'); }}
-                    >
-                        {LocalizeText('group.membercount', ['totalMembers'], [groupInformation.membersCount.toString()])}
-                    </BaseButton>
-                    {groupInformation.pendingRequestsCount > 0 && (
+        <NativeTextTree>
+            <div className="octane-extended-profile-group-info">
+                <div className="octane-extended-profile-group-info__badge-column">
+                    <div className="octane-extended-profile-group-info__badge-wrap group-badge">
+                        <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} scale={2.1} />
+                    </div>
+                    <div className="octane-extended-profile-group-info__meta">
                         <BaseButton
                             className="octane-extended-profile-group-info__member-link"
                             type="button"
                             onMouseDown={(event) => event.stopPropagation()}
-                            onClick={(event) => { event.stopPropagation(); handleAction('members_pending'); }}
+                            onClick={(event) => { event.stopPropagation(); handleAction('members'); }}
                         >
-                            {LocalizeText('group.pendingmembercount', ['amount'], [groupInformation.pendingRequestsCount.toString()])}
+                            {LocalizeText('group.membercount', ['totalMembers'], [groupInformation.membersCount.toString()])}
                         </BaseButton>
-                    )}
-                </div>
-                <div className="octane-extended-profile-group-info__role" aria-hidden="true">{getRoleIcon()}</div>
-            </div>
-            <div className="octane-extended-profile-group-info__content">
-                <div className="octane-extended-profile-group-info__header-copy">
-                    <div className="flex items-center gap-2">
-                        <Text bold>{groupInformation.title}</Text>
-                        <div className="flex gap-1">
-                            <i
-                                className={'octane-icon icon-group-type-' + groupInformation.type}
-                                title={LocalizeText(`group.edit.settings.type.${STATES[groupInformation.type]}.help`)}
-                            />
-                            {groupInformation.canMembersDecorate && (
-                                <Hint content={LocalizeText('group.memberscandecorate')}><i aria-label={LocalizeText('group.memberscandecorate')} className="octane-icon icon-group-decorate" role="img" /></Hint>
-                            )}
-                        </div>
+                        {groupInformation.pendingRequestsCount > 0 && (
+                            <BaseButton
+                                className="octane-extended-profile-group-info__member-link"
+                                type="button"
+                                onMouseDown={(event) => event.stopPropagation()}
+                                onClick={(event) => { event.stopPropagation(); handleAction('members_pending'); }}
+                            >
+                                {LocalizeText('group.pendingmembercount', ['amount'], [groupInformation.pendingRequestsCount.toString()])}
+                            </BaseButton>
+                        )}
                     </div>
-                    <Text small>{LocalizeText('group.created', ['date', 'owner'], [groupInformation.createdAt, groupInformation.ownerName])}</Text>
+                    <div className="octane-extended-profile-group-info__role" aria-hidden="true">{getRoleIcon()}</div>
                 </div>
-                <Text small className="octane-extended-profile-group-info__description" overflow="auto">
-                    {groupInformation.description}
-                </Text>
-                <div className="octane-extended-profile-group-info__links">
-                    <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('homeroom')}>
-                        {LocalizeText('group.linktobase')}
+                <div className="octane-extended-profile-group-info__content">
+                    <div className="octane-extended-profile-group-info__header-copy">
+                        <div className="flex items-center gap-2">
+                            <Text bold>{groupInformation.title}</Text>
+                            <div className="flex gap-1">
+                                <i
+                                    className={'octane-icon icon-group-type-' + groupInformation.type}
+                                    title={LocalizeText(`group.edit.settings.type.${STATES[groupInformation.type]}.help`)}
+                                />
+                                {groupInformation.canMembersDecorate && (
+                                    <Hint content={LocalizeText('group.memberscandecorate')}><i aria-label={LocalizeText('group.memberscandecorate')} className="octane-icon icon-group-decorate" role="img" /></Hint>
+                                )}
+                            </div>
+                        </div>
+                        <Text small>{LocalizeText('group.created', ['date', 'owner'], [groupInformation.createdAt, groupInformation.ownerName])}</Text>
+                    </div>
+                    <Text small className="octane-extended-profile-group-info__description" overflow="auto">
+                        {groupInformation.description}
                     </Text>
-                    <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('furniture')}>
-                        {LocalizeText('group.buyfurni')}
-                    </Text>
-                    <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('popular_groups')}>
-                        {LocalizeText('group.showgroups')}
-                    </Text>
-                    {groupInformation.hasForum && (
-                        <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('forum')}>
-                            {LocalizeText('group.showforum')}
+                    <div className="octane-extended-profile-group-info__links">
+                        <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('homeroom')}>
+                            {LocalizeText('group.linktobase')}
                         </Text>
-                    )}
-                    {groupInformation.isOwner && (
-                        <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('manage')}>
-                            {LocalizeText('group.manage')}
+                        <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('furniture')}>
+                            {LocalizeText('group.buyfurni')}
                         </Text>
-                    )}
-                    {canDelete && (
-                        <Text component={BaseButton} type="button" pointer small underline onClick={deleteGroup}>
-                            {LocalizeText('group.delete')}
+                        <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('popular_groups')}>
+                            {LocalizeText('group.showgroups')}
                         </Text>
+                        {groupInformation.hasForum && (
+                            <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('forum')}>
+                                {LocalizeText('group.showforum')}
+                            </Text>
+                        )}
+                        {groupInformation.isOwner && (
+                            <Text component={BaseButton} type="button" pointer small underline onClick={() => handleAction('manage')}>
+                                {LocalizeText('group.manage')}
+                            </Text>
+                        )}
+                        {canDelete && (
+                            <Text component={BaseButton} type="button" pointer small underline onClick={deleteGroup}>
+                                {LocalizeText('group.delete')}
+                            </Text>
+                        )}
+                    </div>
+                    {(groupInformation.type !== GroupType.PRIVATE ||
+                        (groupInformation.type === GroupType.PRIVATE && groupInformation.membershipType === GroupMembershipType.MEMBER)) && (
+                        <Button
+                            className="octane-extended-profile-group-info__button"
+                            disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING || isRealOwner}
+                            onClick={handleButtonClick}
+                        >
+                            {LocalizeText(getButtonText())}
+                        </Button>
                     )}
                 </div>
-                {(groupInformation.type !== GroupType.PRIVATE ||
-                    (groupInformation.type === GroupType.PRIVATE && groupInformation.membershipType === GroupMembershipType.MEMBER)) && (
-                    <Button
-                        className="octane-extended-profile-group-info__button"
-                        disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING || isRealOwner}
-                        onClick={handleButtonClick}
-                    >
-                        {LocalizeText(getButtonText())}
-                    </Button>
-                )}
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

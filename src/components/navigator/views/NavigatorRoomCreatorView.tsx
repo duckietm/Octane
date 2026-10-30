@@ -13,6 +13,7 @@ import { useRoomCreatorStore } from './navigatorRoomCreatorStore';
 import { BaseButton } from '../../../common/BaseButton';
 import { ListSelect } from '../../../common/ListSelect';
 import { ToggleButton } from '../../../common/ToggleButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const AIR_TRADE_KEYS = ['navigator.roomsettings.trade_not_allowed', 'navigator.roomsettings.trade_not_with_Controller', 'navigator.roomsettings.trade_allowed'];
 
@@ -41,26 +42,28 @@ const RoomCreatorDropmenu: FC<RoomCreatorDropmenuProps> = (props) => {
     const rootRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={rootRef} className={`octane-room-creator-air__dropmenu ${className}${open ? ' is-open' : ''}`}>
-            <ListSelect
-                aria-label={label}
-                container={rootRef}
-                itemClassName="octane-room-creator-air__dropmenu-option"
-                options={options.map((option, index) => ({ value: String(index), label: option }))}
-                popupClassName="octane-room-creator-air__dropmenu-list"
-                sideOffset={-1}
-                triggerClassName="octane-room-creator-air__dropmenu-button"
-                value={String(value)}
-                renderTrigger={(current) => (
-                    <>
-                        <span>{current?.label ?? ''}</span>
-                        <img src={dropmenuArrow} alt="" width={16} height={16} />
-                    </>
-                )}
-                onOpenChange={setOpen}
-                onValueChange={(next) => onChange(Number(next))}
-            />
-        </div>
+        <NativeTextTree>
+            <div ref={rootRef} className={`octane-room-creator-air__dropmenu ${className}${open ? ' is-open' : ''}`}>
+                <ListSelect
+                    aria-label={label}
+                    container={rootRef}
+                    itemClassName="octane-room-creator-air__dropmenu-option"
+                    options={options.map((option, index) => ({ value: String(index), label: option }))}
+                    popupClassName="octane-room-creator-air__dropmenu-list"
+                    sideOffset={-1}
+                    triggerClassName="octane-room-creator-air__dropmenu-button"
+                    value={String(value)}
+                    renderTrigger={(current) => (
+                        <>
+                            <span>{current?.label ?? ''}</span>
+                            <img src={dropmenuArrow} alt="" width={16} height={16} />
+                        </>
+                    )}
+                    onOpenChange={setOpen}
+                    onValueChange={(next) => onChange(Number(next))}
+                />
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -156,133 +159,140 @@ export const NavigatorRoomCreatorView: FC = () => {
     const showVipPromo = effectiveClubLevel < 2 && !hcDisabled;
 
     return (
-        <DraggableWindow uniqueKey="navigator-room-creator" handleSelector=".octane-room-creator-air__caption">
-            <div className="octane-room-creator-air" data-air-frame="ubuntu-3">
-                <div className="octane-room-creator-air__skin" aria-hidden="true" />
-                <div className="octane-room-creator-air__caption">
-                    <span className="octane-room-creator-air__title">{LocalizeText('navigator.createroom.title')}</span>
-                    <BaseButton type="button" className="octane-room-creator-air__close" aria-label={LocalizeText('generic.close')} onClick={closeCreator} />
-                </div>
-
-                <span className="octane-room-creator-air__label octane-room-creator-air__label--name">{LocalizeText('navigator.roomname')}</span>
-                <div className={`octane-room-creator-air__field octane-room-creator-air__field--name${nameError ? ' is-invalid' : ''}`}>
-                    <input
-                        className="octane-room-creator-air__input"
-                        maxLength={25}
-                        type="text"
-                        value={nameTouched ? name : namePlaceholder}
-                        onFocus={() => {
-                            if (nameTouched) return;
-                            setNameTouched(true);
-                            setNameError(null);
-                        }}
-                        onChange={(event) => setName(event.target.value)}
-                    />
-                </div>
-                {nameError && (
-                    <div className="octane-room-creator-air__error" role="alert">
-                        <div className="octane-room-creator-air__error-border">
-                            <span>{nameError}</span>
-                        </div>
-                        <img className="octane-room-creator-air__error-arrow" src={popupArrowDown} alt="" width={11} height={11} />
+        <NativeTextTree>
+            <DraggableWindow uniqueKey="navigator-room-creator" handleSelector=".octane-room-creator-air__caption">
+                <div className="octane-room-creator-air" data-air-frame="ubuntu-3">
+                    <div className="octane-room-creator-air__skin" aria-hidden="true" />
+                    <div className="octane-room-creator-air__caption">
+                        <span className="octane-room-creator-air__title">{LocalizeText('navigator.createroom.title')}</span>
+                        <BaseButton
+                            type="button"
+                            className="octane-room-creator-air__close"
+                            aria-label={LocalizeText('generic.close')}
+                            onClick={closeCreator}
+                        />
                     </div>
-                )}
 
-                <span className="octane-room-creator-air__label octane-room-creator-air__label--desc">{LocalizeText('navigator.roomdesc')}</span>
-                <div className="octane-room-creator-air__field octane-room-creator-air__field--desc">
-                    <textarea
-                        className="octane-room-creator-air__input octane-room-creator-air__input--multiline"
-                        maxLength={128}
-                        value={descriptionTouched ? description : descriptionPlaceholder}
-                        onFocus={() => setDescriptionTouched(true)}
-                        onChange={(event) => setDescription(event.target.value)}
-                    />
-                </div>
-
-                <span className="octane-room-creator-air__label octane-room-creator-air__label--category">{LocalizeText('navigator.category')}</span>
-                <RoomCreatorDropmenu
-                    className="octane-room-creator-air__dropmenu--category"
-                    label={LocalizeText('navigator.category')}
-                    options={selectableCategories.map((category) => LocalizeText(category.name))}
-                    value={safeCategoryIndex}
-                    onChange={setCategoryIndex}
-                />
-
-                <span className="octane-room-creator-air__label octane-room-creator-air__label--visitors">{LocalizeText('navigator.maxvisitors')}</span>
-                <RoomCreatorDropmenu
-                    className="octane-room-creator-air__dropmenu--visitors"
-                    label={LocalizeText('navigator.maxvisitors')}
-                    options={visitorOptions}
-                    value={safeVisitorsIndex}
-                    onChange={setVisitorsIndex}
-                />
-
-                <span className="octane-room-creator-air__label octane-room-creator-air__label--trade">{LocalizeText('navigator.tradesettings')}</span>
-                <RoomCreatorDropmenu
-                    className="octane-room-creator-air__dropmenu--trade"
-                    label={LocalizeText('navigator.tradesettings')}
-                    options={AIR_TRADE_KEYS.map((key) => LocalizeText(key))}
-                    value={tradeIndex}
-                    onChange={setTradeIndex}
-                />
-
-                <BaseButton type="button" className="octane-room-creator-air__button octane-room-creator-air__button--create" onClick={createRoom}>
-                    {LocalizeText('navigator.createroom.create')}
-                </BaseButton>
-                <BaseButton type="button" className="octane-room-creator-air__button octane-room-creator-air__button--cancel" onClick={closeCreator}>
-                    {LocalizeText('generic.cancel')}
-                </BaseButton>
-
-                <span className="octane-room-creator-air__label octane-room-creator-air__label--layout">
-                    {LocalizeText('navigator.createroom.chooselayoutcaption')}
-                </span>
-                <div className="octane-room-creator-air__layouts has-classic-scrollbar">
-                    <div className="octane-room-creator-air__layout-rows">
-                        {visibleModels.map((model) => {
-                            const isSelected = selectedModelName === model.name;
-
-                            return (
-                                <ToggleButton
-                                    key={model.name}
-                                    type="button"
-                                    className={`octane-room-creator-air__thumbnail${isSelected ? ' is-selected' : ''}`}
-                                    pressed={isSelected}
-                                    onClick={() => selectModel(model)}
-                                >
-                                    <span className="octane-room-creator-air__thumbnail-bg" aria-hidden="true" />
-                                    <img className="octane-room-creator-air__thumbnail-pic" src={getRoomModelImage(model.name)} alt="" />
-                                    <img
-                                        className="octane-room-creator-air__thumbnail-tile-icon"
-                                        src={isSelected ? tileIconWhite : tileIconBlack}
-                                        alt=""
-                                        width={18}
-                                        height={10}
-                                    />
-                                    <span className="octane-room-creator-air__thumbnail-tiles">
-                                        {model.tileSize} {tileSizeLabel}
-                                    </span>
-                                    {model.clubLevel > 0 && (
-                                        <img className="octane-room-creator-air__thumbnail-club" src={vipIconSmall} alt="" width={19} height={10} />
-                                    )}
-                                </ToggleButton>
-                            );
-                        })}
-                        {showVipPromo && (
-                            <div className="octane-room-creator-air__vip-promo">
-                                <img className="octane-room-creator-air__vip-promo-icon" src={vipIconBig} alt="" width={37} height={37} />
-                                <span className="octane-room-creator-air__vip-promo-text">{LocalizeText('navigator.createroom.vippromo.text')}</span>
-                                <BaseButton
-                                    type="button"
-                                    className="octane-room-creator-air__vip-promo-link"
-                                    onClick={() => CreateLinkEvent('habboUI/open/hccenter')}
-                                >
-                                    {LocalizeText('navigator.createroom.vippromo.link')}
-                                </BaseButton>
+                    <span className="octane-room-creator-air__label octane-room-creator-air__label--name">{LocalizeText('navigator.roomname')}</span>
+                    <div className={`octane-room-creator-air__field octane-room-creator-air__field--name${nameError ? ' is-invalid' : ''}`}>
+                        <input
+                            className="octane-room-creator-air__input"
+                            maxLength={25}
+                            type="text"
+                            value={nameTouched ? name : namePlaceholder}
+                            onFocus={() => {
+                                if (nameTouched) return;
+                                setNameTouched(true);
+                                setNameError(null);
+                            }}
+                            onChange={(event) => setName(event.target.value)}
+                        />
+                    </div>
+                    {nameError && (
+                        <div className="octane-room-creator-air__error" role="alert">
+                            <div className="octane-room-creator-air__error-border">
+                                <span>{nameError}</span>
                             </div>
-                        )}
+                            <img className="octane-room-creator-air__error-arrow" src={popupArrowDown} alt="" width={11} height={11} />
+                        </div>
+                    )}
+
+                    <span className="octane-room-creator-air__label octane-room-creator-air__label--desc">{LocalizeText('navigator.roomdesc')}</span>
+                    <div className="octane-room-creator-air__field octane-room-creator-air__field--desc">
+                        <textarea
+                            className="octane-room-creator-air__input octane-room-creator-air__input--multiline"
+                            maxLength={128}
+                            value={descriptionTouched ? description : descriptionPlaceholder}
+                            onFocus={() => setDescriptionTouched(true)}
+                            onChange={(event) => setDescription(event.target.value)}
+                        />
+                    </div>
+
+                    <span className="octane-room-creator-air__label octane-room-creator-air__label--category">{LocalizeText('navigator.category')}</span>
+                    <RoomCreatorDropmenu
+                        className="octane-room-creator-air__dropmenu--category"
+                        label={LocalizeText('navigator.category')}
+                        options={selectableCategories.map((category) => LocalizeText(category.name))}
+                        value={safeCategoryIndex}
+                        onChange={setCategoryIndex}
+                    />
+
+                    <span className="octane-room-creator-air__label octane-room-creator-air__label--visitors">{LocalizeText('navigator.maxvisitors')}</span>
+                    <RoomCreatorDropmenu
+                        className="octane-room-creator-air__dropmenu--visitors"
+                        label={LocalizeText('navigator.maxvisitors')}
+                        options={visitorOptions}
+                        value={safeVisitorsIndex}
+                        onChange={setVisitorsIndex}
+                    />
+
+                    <span className="octane-room-creator-air__label octane-room-creator-air__label--trade">{LocalizeText('navigator.tradesettings')}</span>
+                    <RoomCreatorDropmenu
+                        className="octane-room-creator-air__dropmenu--trade"
+                        label={LocalizeText('navigator.tradesettings')}
+                        options={AIR_TRADE_KEYS.map((key) => LocalizeText(key))}
+                        value={tradeIndex}
+                        onChange={setTradeIndex}
+                    />
+
+                    <BaseButton type="button" className="octane-room-creator-air__button octane-room-creator-air__button--create" onClick={createRoom}>
+                        {LocalizeText('navigator.createroom.create')}
+                    </BaseButton>
+                    <BaseButton type="button" className="octane-room-creator-air__button octane-room-creator-air__button--cancel" onClick={closeCreator}>
+                        {LocalizeText('generic.cancel')}
+                    </BaseButton>
+
+                    <span className="octane-room-creator-air__label octane-room-creator-air__label--layout">
+                        {LocalizeText('navigator.createroom.chooselayoutcaption')}
+                    </span>
+                    <div className="octane-room-creator-air__layouts has-classic-scrollbar">
+                        <div className="octane-room-creator-air__layout-rows">
+                            {visibleModels.map((model) => {
+                                const isSelected = selectedModelName === model.name;
+
+                                return (
+                                    <ToggleButton
+                                        key={model.name}
+                                        type="button"
+                                        className={`octane-room-creator-air__thumbnail${isSelected ? ' is-selected' : ''}`}
+                                        pressed={isSelected}
+                                        onClick={() => selectModel(model)}
+                                    >
+                                        <span className="octane-room-creator-air__thumbnail-bg" aria-hidden="true" />
+                                        <img className="octane-room-creator-air__thumbnail-pic" src={getRoomModelImage(model.name)} alt="" />
+                                        <img
+                                            className="octane-room-creator-air__thumbnail-tile-icon"
+                                            src={isSelected ? tileIconWhite : tileIconBlack}
+                                            alt=""
+                                            width={18}
+                                            height={10}
+                                        />
+                                        <span className="octane-room-creator-air__thumbnail-tiles">
+                                            {model.tileSize} {tileSizeLabel}
+                                        </span>
+                                        {model.clubLevel > 0 && (
+                                            <img className="octane-room-creator-air__thumbnail-club" src={vipIconSmall} alt="" width={19} height={10} />
+                                        )}
+                                    </ToggleButton>
+                                );
+                            })}
+                            {showVipPromo && (
+                                <div className="octane-room-creator-air__vip-promo">
+                                    <img className="octane-room-creator-air__vip-promo-icon" src={vipIconBig} alt="" width={37} height={37} />
+                                    <span className="octane-room-creator-air__vip-promo-text">{LocalizeText('navigator.createroom.vippromo.text')}</span>
+                                    <BaseButton
+                                        type="button"
+                                        className="octane-room-creator-air__vip-promo-link"
+                                        onClick={() => CreateLinkEvent('habboUI/open/hccenter')}
+                                    >
+                                        {LocalizeText('navigator.createroom.vippromo.link')}
+                                    </BaseButton>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </DraggableWindow>
+            </DraggableWindow>
+        </NativeTextTree>
     );
 };

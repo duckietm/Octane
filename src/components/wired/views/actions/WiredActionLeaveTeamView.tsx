@@ -4,6 +4,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredActionLeaveTeamView: FC<{}> = (props) => {
     const { trigger = null, setIntParams = null, setSourceTypes = null } = useWired();
@@ -27,11 +28,13 @@ export const WiredActionLeaveTeamView: FC<{}> = (props) => {
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={showSource ? <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} /> : null}
-        />
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={showSource ? <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} /> : null}
+            />
+        </NativeTextTree>
     );
 };

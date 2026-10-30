@@ -23,6 +23,7 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Habbo's "movement curve" (wf_xtra_mov_curve): how high the furni the stack moves jump, typed or
@@ -173,84 +174,86 @@ export const WiredExtraMovementCurveView: FC<{}> = () => {
     );
 
     return (
-        <WiredExtraBaseView
-            footer={footer}
-            hasSpecialInput={true}
-            requiresFurni={picksFurni ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={() => !(isJump && fromVariable && !variableToken)}
-        >
-            <div className="octane-wired__give-var">
-                <div className={`octane-wired__give-var-section ${isJump ? '' : 'opacity-50 pointer-events-none'}`}>
-                    <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.movement_curve', 'Movement curve:')}</div>
-                    <label className="octane-wired__change-var-radio">
-                        <Radio checked={!fromVariable} onCheckedChange={() => setFromVariable(false)} />
-                        <Text>{LocalizeText('wiredfurni.params.variables.reference_value.set_value')}</Text>
-                        <OctaneInput
-                            className="octane-wired__give-var-number"
-                            max={STRENGTH_MAX}
-                            min={STRENGTH_MIN}
-                            type="number"
-                            value={strengthInput}
-                            onChange={(event) => setStrengthInput(event.target.value)}
-                        />
-                    </label>
-
-                    <div className="octane-wired__change-var-reference-block">
+        <NativeTextTree>
+            <WiredExtraBaseView
+                footer={footer}
+                hasSpecialInput={true}
+                requiresFurni={picksFurni ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={() => !(isJump && fromVariable && !variableToken)}
+            >
+                <div className="octane-wired__give-var">
+                    <div className={`octane-wired__give-var-section ${isJump ? '' : 'opacity-50 pointer-events-none'}`}>
+                        <div className="octane-wired__give-var-section-title">{localizeWithFallback('wiredfurni.params.movement_curve', 'Movement curve:')}</div>
                         <label className="octane-wired__change-var-radio">
-                            <Radio checked={fromVariable} onCheckedChange={() => setFromVariable(true)} />
-                            <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-                            <div className="octane-wired__give-var-targets">
-                                {TARGETS.map((button) => (
-                                    <BaseButton
-                                        key={button.key}
-                                        className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${target === button.key ? 'is-active' : ''}`}
-                                        disabled={!fromVariable}
-                                        type="button"
-                                        onClick={() => chooseTarget(button.key)}
-                                    >
-                                        <img alt={button.key} src={button.icon} />
-                                    </BaseButton>
-                                ))}
-                            </div>
+                            <Radio checked={!fromVariable} onCheckedChange={() => setFromVariable(false)} />
+                            <Text>{LocalizeText('wiredfurni.params.variables.reference_value.set_value')}</Text>
+                            <OctaneInput
+                                className="octane-wired__give-var-number"
+                                max={STRENGTH_MAX}
+                                min={STRENGTH_MIN}
+                                type="number"
+                                value={strengthInput}
+                                onChange={(event) => setStrengthInput(event.target.value)}
+                            />
                         </label>
 
-                        <div className={fromVariable ? '' : 'opacity-50 pointer-events-none'}>
-                            <WiredVariablePicker
-                                entries={entries}
-                                recentScope="movement-curve-reference"
-                                selectedToken={variableToken}
-                                onSelect={(entry) => setVariableToken(entry.token)}
-                            />
+                        <div className="octane-wired__change-var-reference-block">
+                            <label className="octane-wired__change-var-radio">
+                                <Radio checked={fromVariable} onCheckedChange={() => setFromVariable(true)} />
+                                <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
+                                <div className="octane-wired__give-var-targets">
+                                    {TARGETS.map((button) => (
+                                        <BaseButton
+                                            key={button.key}
+                                            className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${target === button.key ? 'is-active' : ''}`}
+                                            disabled={!fromVariable}
+                                            type="button"
+                                            onClick={() => chooseTarget(button.key)}
+                                        >
+                                            <img alt={button.key} src={button.icon} />
+                                        </BaseButton>
+                                    ))}
+                                </div>
+                            </label>
+
+                            <div className={fromVariable ? '' : 'opacity-50 pointer-events-none'}>
+                                <WiredVariablePicker
+                                    entries={entries}
+                                    recentScope="movement-curve-reference"
+                                    selectedToken={variableToken}
+                                    onSelect={(entry) => setVariableToken(entry.token)}
+                                />
+                            </div>
                         </div>
                     </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <div className={fromVariable && isJump ? '' : 'opacity-50 pointer-events-none'}>
+                        <WiredFurniSelectionSourceRow
+                            options={sourceOptions}
+                            selectionActive={true}
+                            selectionCount={furniIds.length}
+                            selectionEnabledValues={[VARIABLE_PICK_SOURCE]}
+                            selectionKind="primary"
+                            selectionLimit={trigger?.maximumItemSelectionCount ?? 0}
+                            showSelectionToggle={false}
+                            title="wiredfurni.params.sources.merged.title.variables_reference"
+                            value={sourceValue}
+                            onChange={(value) => {
+                                if (target === 'furni') {
+                                    setFurniSource(value);
+                                    if (value !== VARIABLE_PICK_SOURCE) setFurniIds([]);
+                                    return;
+                                }
+
+                                if (target === 'user') setUserSource(value);
+                            }}
+                        />
+                    </div>
                 </div>
-
-                <div className="octane-wired__divider" />
-
-                <div className={fromVariable && isJump ? '' : 'opacity-50 pointer-events-none'}>
-                    <WiredFurniSelectionSourceRow
-                        options={sourceOptions}
-                        selectionActive={true}
-                        selectionCount={furniIds.length}
-                        selectionEnabledValues={[VARIABLE_PICK_SOURCE]}
-                        selectionKind="primary"
-                        selectionLimit={trigger?.maximumItemSelectionCount ?? 0}
-                        showSelectionToggle={false}
-                        title="wiredfurni.params.sources.merged.title.variables_reference"
-                        value={sourceValue}
-                        onChange={(value) => {
-                            if (target === 'furni') {
-                                setFurniSource(value);
-                                if (value !== VARIABLE_PICK_SOURCE) setFurniIds([]);
-                                return;
-                            }
-
-                            if (target === 'user') setUserSource(value);
-                        }}
-                    />
-                </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

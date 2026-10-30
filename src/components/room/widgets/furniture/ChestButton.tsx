@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, FC } from 'react';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export type ChestButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     /** Footer / dialog buttons with longer captions (auto width, min 73px). */
@@ -35,8 +36,10 @@ export const ChestButton: FC<ChestButtonProps> = ({
         .join(' ');
 
     return (
-        <BaseButton type={type} className={classes} {...rest}>
-            {children}
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton type={type} className={classes} {...rest}>
+                {children}
+            </BaseButton>
+        </NativeTextTree>
     );
 };

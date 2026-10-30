@@ -40,6 +40,7 @@ import { CatalogAdminOfferPriceView } from './CatalogAdminOfferPriceView';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type CatalogAdminOffer = Parameters<NonNullable<ReturnType<typeof useCatalogAdmin>>['setEditingOffer']>[0];
 type ManagerTab = 'catalog' | 'sql' | 'history';
@@ -427,163 +428,165 @@ export const CatalogAdminManagerView: FC<{}> = () => {
         const isHidden = !selectedNode.isVisible;
 
         return (
-            <div className="octane-catalog-admin-detail-inner">
-                <div className="octane-catalog-admin-detail-head">
-                    <span className="octane-catalog-admin-detail-icon">
-                        {selectedNode.iconId > 0 ? <CatalogIconView icon={selectedNode.iconId} /> : <span className="octane-catalog-admin-tree-icon-empty" />}
-                    </span>
-                    <div className="octane-catalog-admin-detail-titles">
-                        <span className="octane-catalog-admin-detail-title">{nodeName(selectedNode)}</span>
-                        <span className="octane-catalog-admin-detail-sub">
-                            Page ID {selectedNode.pageId} · {selectedNode.children.length} sub-page(s) · {offers.length} offer(s)
+            <NativeTextTree>
+                <div className="octane-catalog-admin-detail-inner">
+                    <div className="octane-catalog-admin-detail-head">
+                        <span className="octane-catalog-admin-detail-icon">
+                            {selectedNode.iconId > 0 ? <CatalogIconView icon={selectedNode.iconId} /> : <span className="octane-catalog-admin-tree-icon-empty" />}
                         </span>
-                    </div>
-                </div>
-
-                <div className="octane-catalog-admin-detail-actions">
-                    <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
-                        <FaEdit /> <span>Edit page</span>
-                    </BaseButton>
-                    <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
-                        <FaPlus /> <span>Add sub-page</span>
-                    </BaseButton>
-                    <BaseButton
-                        className="octane-catalog-admin-btn"
-                        onClick={() =>
-                            catalogAdmin.togglePageVisible(selectedNode.pageId, isHidden, `${isHidden ? 'Showed' : 'Hidden'} page: ${nodeName(selectedNode)}`)
-                        }
-                    >
-                        {isHidden ? <FaEye /> : <FaEyeSlash />} <span>{isHidden ? 'Show' : 'Hide'}</span>
-                    </BaseButton>
-                    <BaseButton className="octane-catalog-admin-btn" disabled={index <= 0} onClick={() => movePage(selectedNode, -1)}>
-                        <FaArrowUp /> <span>Move up</span>
-                    </BaseButton>
-                    <BaseButton className="octane-catalog-admin-btn" disabled={index < 0 || index >= siblings.length - 1} onClick={() => movePage(selectedNode, 1)}>
-                        <FaArrowDown /> <span>Move down</span>
-                    </BaseButton>
-                    <BaseButton className="octane-catalog-admin-btn is-danger" onClick={() => deletePage(selectedNode)}>
-                        <FaTrash /> <span>Delete</span>
-                    </BaseButton>
-                </div>
-
-                <div className="octane-catalog-admin-offers">
-                    {isReadOnlyPage ? (
-                        <div className="octane-catalog-admin-placeholder is-small">
-                            This page lists each user's own recent purchases ({selectedPageLayout}), so it has no editable
-                            offers. You can still edit the page settings.
+                        <div className="octane-catalog-admin-detail-titles">
+                            <span className="octane-catalog-admin-detail-title">{nodeName(selectedNode)}</span>
+                            <span className="octane-catalog-admin-detail-sub">
+                                Page ID {selectedNode.pageId} · {selectedNode.children.length} sub-page(s) · {offers.length} offer(s)
+                            </span>
                         </div>
-                    ) : (
-                    <>
-                    <div className="octane-catalog-admin-offers-head">
-                        <span className="octane-catalog-admin-offers-title">Offers ({offers.length})</span>
-                        <BaseButton className="octane-catalog-admin-btn is-primary" disabled={!currentPage} onClick={newOffer}>
-                            <FaPlus /> <span>New offer</span>
+                    </div>
+
+                    <div className="octane-catalog-admin-detail-actions">
+                        <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
+                            <FaEdit /> <span>Edit page</span>
+                        </BaseButton>
+                        <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
+                            <FaPlus /> <span>Add sub-page</span>
+                        </BaseButton>
+                        <BaseButton
+                            className="octane-catalog-admin-btn"
+                            onClick={() =>
+                                catalogAdmin.togglePageVisible(selectedNode.pageId, isHidden, `${isHidden ? 'Showed' : 'Hidden'} page: ${nodeName(selectedNode)}`)
+                            }
+                        >
+                            {isHidden ? <FaEye /> : <FaEyeSlash />} <span>{isHidden ? 'Show' : 'Hide'}</span>
+                        </BaseButton>
+                        <BaseButton className="octane-catalog-admin-btn" disabled={index <= 0} onClick={() => movePage(selectedNode, -1)}>
+                            <FaArrowUp /> <span>Move up</span>
+                        </BaseButton>
+                        <BaseButton className="octane-catalog-admin-btn" disabled={index < 0 || index >= siblings.length - 1} onClick={() => movePage(selectedNode, 1)}>
+                            <FaArrowDown /> <span>Move down</span>
+                        </BaseButton>
+                        <BaseButton className="octane-catalog-admin-btn is-danger" onClick={() => deletePage(selectedNode)}>
+                            <FaTrash /> <span>Delete</span>
                         </BaseButton>
                     </div>
-                    <div className="octane-catalog-admin-offers-list">
-                        {!currentPage && <div className="octane-catalog-admin-placeholder is-small">Loading offers…</div>}
-                        {currentPage && offers.length === 0 && <div className="octane-catalog-admin-placeholder is-small">No offers on this page</div>}
-                        {offers.map((offer, index) => {
-                            const iconUrl = getOfferIconUrl(offer);
-                            const isSelected = currentOffer?.offerId === offer.offerId;
-                            const editableProducts = (offer.products?.length ? offer.products : [ offer.product ]).filter(
-                                (product) =>
-                                    product?.productClassId > 0 &&
-                                    (product.productType === ProductTypeEnum.FLOOR || product.productType === ProductTypeEnum.WALL)
-                            );
 
-                            return (
-                                <div
-                                    key={offer.offerId}
-                                    className={`octane-catalog-admin-offer-row ${isSelected ? 'is-selected' : ''} ${dragOverOfferIndex === index ? 'is-drag-over' : ''}`}
-                                    draggable
-                                    role="option"
-                                    tabIndex={0}
-                                    aria-selected={isSelected}
-                                    onClick={() => setCurrentOffer(offer)}
-                                    onKeyDown={(event) => {
-                                        if (event.key !== 'Enter' && event.key !== ' ') return;
-                                        event.preventDefault();
-                                        setCurrentOffer(offer);
-                                    }}
-                                    onDragLeave={handleOfferDragLeave}
-                                    onDragOver={(event) => handleOfferDragOver(event, index)}
-                                    onDragStart={(event) => handleOfferDragStart(event, index)}
-                                    onDrop={(event) => handleOfferDrop(event, index)}
-                                >
-                                    <Hint content="Drag to reorder">
-                                        <span aria-label="Drag to reorder" className="octane-catalog-admin-offer-drag" role="img">
-                                            <FaArrowsAlt />
+                    <div className="octane-catalog-admin-offers">
+                        {isReadOnlyPage ? (
+                            <div className="octane-catalog-admin-placeholder is-small">
+                                This page lists each user's own recent purchases ({selectedPageLayout}), so it has no editable
+                                offers. You can still edit the page settings.
+                            </div>
+                        ) : (
+                        <>
+                        <div className="octane-catalog-admin-offers-head">
+                            <span className="octane-catalog-admin-offers-title">Offers ({offers.length})</span>
+                            <BaseButton className="octane-catalog-admin-btn is-primary" disabled={!currentPage} onClick={newOffer}>
+                                <FaPlus /> <span>New offer</span>
+                            </BaseButton>
+                        </div>
+                        <div className="octane-catalog-admin-offers-list">
+                            {!currentPage && <div className="octane-catalog-admin-placeholder is-small">Loading offers…</div>}
+                            {currentPage && offers.length === 0 && <div className="octane-catalog-admin-placeholder is-small">No offers on this page</div>}
+                            {offers.map((offer, index) => {
+                                const iconUrl = getOfferIconUrl(offer);
+                                const isSelected = currentOffer?.offerId === offer.offerId;
+                                const editableProducts = (offer.products?.length ? offer.products : [ offer.product ]).filter(
+                                    (product) =>
+                                        product?.productClassId > 0 &&
+                                        (product.productType === ProductTypeEnum.FLOOR || product.productType === ProductTypeEnum.WALL)
+                                );
+
+                                return (
+                                    <div
+                                        key={offer.offerId}
+                                        className={`octane-catalog-admin-offer-row ${isSelected ? 'is-selected' : ''} ${dragOverOfferIndex === index ? 'is-drag-over' : ''}`}
+                                        draggable
+                                        role="option"
+                                        tabIndex={0}
+                                        aria-selected={isSelected}
+                                        onClick={() => setCurrentOffer(offer)}
+                                        onKeyDown={(event) => {
+                                            if (event.key !== 'Enter' && event.key !== ' ') return;
+                                            event.preventDefault();
+                                            setCurrentOffer(offer);
+                                        }}
+                                        onDragLeave={handleOfferDragLeave}
+                                        onDragOver={(event) => handleOfferDragOver(event, index)}
+                                        onDragStart={(event) => handleOfferDragStart(event, index)}
+                                        onDrop={(event) => handleOfferDrop(event, index)}
+                                    >
+                                        <Hint content="Drag to reorder">
+                                            <span aria-label="Drag to reorder" className="octane-catalog-admin-offer-drag" role="img">
+                                                <FaArrowsAlt />
+                                            </span>
+                                        </Hint>
+                                        <div className="octane-catalog-admin-manager-reorder">
+                                            <Hint content="Move up"><BaseButton aria-label="Move up" disabled={index === 0} onClick={() => moveOffer(index, -1)}>
+                                                <FaArrowUp />
+                                            </BaseButton></Hint>
+                                            <Hint content="Move down"><BaseButton aria-label="Move down" disabled={index === offers.length - 1} onClick={() => moveOffer(index, 1)}>
+                                                <FaArrowDown />
+                                            </BaseButton></Hint>
+                                        </div>
+                                        <span className="octane-catalog-admin-offer-icon">
+                                            {iconUrl ? (
+                                                <img
+                                                    alt=""
+                                                    draggable={false}
+                                                    src={iconUrl}
+                                                    onError={(event) => {
+                                                        const fallback = offer.product?.getIconUrl(offer);
+                                                        if (fallback && event.currentTarget.src !== fallback) event.currentTarget.src = fallback;
+                                                        else event.currentTarget.style.visibility = 'hidden';
+                                                    }}
+                                                />
+                                            ) : (
+                                                <span className="octane-catalog-admin-offer-icon-empty" />
+                                            )}
                                         </span>
-                                    </Hint>
-                                    <div className="octane-catalog-admin-manager-reorder">
-                                        <Hint content="Move up"><BaseButton aria-label="Move up" disabled={index === 0} onClick={() => moveOffer(index, -1)}>
-                                            <FaArrowUp />
-                                        </BaseButton></Hint>
-                                        <Hint content="Move down"><BaseButton aria-label="Move down" disabled={index === offers.length - 1} onClick={() => moveOffer(index, 1)}>
-                                            <FaArrowDown />
-                                        </BaseButton></Hint>
-                                    </div>
-                                    <span className="octane-catalog-admin-offer-icon">
-                                        {iconUrl ? (
-                                            <img
-                                                alt=""
-                                                draggable={false}
-                                                src={iconUrl}
-                                                onError={(event) => {
-                                                    const fallback = offer.product?.getIconUrl(offer);
-                                                    if (fallback && event.currentTarget.src !== fallback) event.currentTarget.src = fallback;
-                                                    else event.currentTarget.style.visibility = 'hidden';
-                                                }}
-                                            />
-                                        ) : (
-                                            <span className="octane-catalog-admin-offer-icon-empty" />
-                                        )}
-                                    </span>
-                                    <span className="octane-catalog-admin-offer-name" title={offer.localizationName}>
-                                        {offer.localizationName || `#${offer.offerId}`}
-                                    </span>
-                                    <CatalogAdminOfferPriceView
-                                        credits={offer.priceInCredits}
-                                        points={offer.priceInActivityPoints}
-                                        pointsType={offer.activityPointType}
-                                    />
-                                    <div className="octane-catalog-admin-manager-controls">
-                                        {editableProducts.map((product, productIndex) => {
-                                            const productLabel = product.furnitureData?.className || `#${product.productClassId}`;
+                                        <span className="octane-catalog-admin-offer-name" title={offer.localizationName}>
+                                            {offer.localizationName || `#${offer.offerId}`}
+                                        </span>
+                                        <CatalogAdminOfferPriceView
+                                            credits={offer.priceInCredits}
+                                            points={offer.priceInActivityPoints}
+                                            pointsType={offer.activityPointType}
+                                        />
+                                        <div className="octane-catalog-admin-manager-controls">
+                                            {editableProducts.map((product, productIndex) => {
+                                                const productLabel = product.furnitureData?.className || `#${product.productClassId}`;
 
-                                            return <Hint key={`${product.productType}-${product.productClassId}-${productIndex}`} content={`Edit Furni: ${productLabel}`}>
-                                                <BaseButton
-                                                                                                aria-label={`Edit Furni ${productLabel}`}
-                                                                                                onClick={() => window.dispatchEvent(new CustomEvent('furni-editor:open', {
-                                                                                                    detail: { spriteId: product.productClassId }
-                                                                                                }))}
-                                                                                            >
-                                                                                                <FaWrench />
-                                                                                            </BaseButton>
-                                            </Hint>;
-                                        })}
-                                        <Hint content="Edit offer">
-                                            <BaseButton aria-label="Edit offer" onClick={() => {
-                                                catalogAdmin.setEditingOffer(offer);
-                                            }}>
-                                                <FaEdit />
-                                            </BaseButton>
-                                        </Hint>
-                                        <Hint content="Delete offer">
-                                            <BaseButton aria-label="Delete offer" className="danger" onClick={() => deleteOffer(offer)}>
-                                                <FaTrash />
-                                            </BaseButton>
-                                        </Hint>
+                                                return <Hint key={`${product.productType}-${product.productClassId}-${productIndex}`} content={`Edit Furni: ${productLabel}`}>
+                                                    <BaseButton
+                                                                                                    aria-label={`Edit Furni ${productLabel}`}
+                                                                                                    onClick={() => window.dispatchEvent(new CustomEvent('furni-editor:open', {
+                                                                                                        detail: { spriteId: product.productClassId }
+                                                                                                    }))}
+                                                                                                >
+                                                                                                    <FaWrench />
+                                                                                                </BaseButton>
+                                                </Hint>;
+                                            })}
+                                            <Hint content="Edit offer">
+                                                <BaseButton aria-label="Edit offer" onClick={() => {
+                                                    catalogAdmin.setEditingOffer(offer);
+                                                }}>
+                                                    <FaEdit />
+                                                </BaseButton>
+                                            </Hint>
+                                            <Hint content="Delete offer">
+                                                <BaseButton aria-label="Delete offer" className="danger" onClick={() => deleteOffer(offer)}>
+                                                    <FaTrash />
+                                                </BaseButton>
+                                            </Hint>
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
+                        </>
+                        )}
                     </div>
-                    </>
-                    )}
                 </div>
-            </div>
+            </NativeTextTree>
         );
     };
 
@@ -593,30 +596,32 @@ export const CatalogAdminManagerView: FC<{}> = () => {
         }
 
         return (
-            <aside className="octane-catalog-admin-inspector">
-                <div className="octane-catalog-admin-inspector-head">
-                    <strong>Inspector</strong>
-                    <span>Page #{selectedNode.pageId}</span>
-                </div>
-                <dl className="octane-catalog-admin-inspector-data">
-                    <div><dt>Name</dt><dd title={nodeName(selectedNode)}>{nodeName(selectedNode)}</dd></div>
-                    <div><dt>Sub-pages</dt><dd>{selectedNode.children.length}</dd></div>
-                    <div><dt>Offers</dt><dd>{offers.length}</dd></div>
-                    <div><dt>Visibility</dt><dd className={selectedNode.isVisible ? 'is-positive' : 'is-muted'}>{selectedNode.isVisible ? 'Visible' : 'Hidden'}</dd></div>
-                    <div><dt>Revision</dt><dd>{studio.revision}</dd></div>
-                </dl>
-                <div className="octane-catalog-admin-inspector-actions">
-                    <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
-                        <FaEdit /> Edit
-                    </BaseButton>
-                    <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
-                        <FaPlus /> Sub-page
-                    </BaseButton>
-                    <BaseButton className="octane-catalog-admin-btn" disabled={isReadOnlyPage} onClick={newOffer}>
-                        <FaPlus /> Offer
-                    </BaseButton>
-                </div>
-            </aside>
+            <NativeTextTree>
+                <aside className="octane-catalog-admin-inspector">
+                    <div className="octane-catalog-admin-inspector-head">
+                        <strong>Inspector</strong>
+                        <span>Page #{selectedNode.pageId}</span>
+                    </div>
+                    <dl className="octane-catalog-admin-inspector-data">
+                        <div><dt>Name</dt><dd title={nodeName(selectedNode)}>{nodeName(selectedNode)}</dd></div>
+                        <div><dt>Sub-pages</dt><dd>{selectedNode.children.length}</dd></div>
+                        <div><dt>Offers</dt><dd>{offers.length}</dd></div>
+                        <div><dt>Visibility</dt><dd className={selectedNode.isVisible ? 'is-positive' : 'is-muted'}>{selectedNode.isVisible ? 'Visible' : 'Hidden'}</dd></div>
+                        <div><dt>Revision</dt><dd>{studio.revision}</dd></div>
+                    </dl>
+                    <div className="octane-catalog-admin-inspector-actions">
+                        <BaseButton className="octane-catalog-admin-btn is-primary" onClick={() => editPage(selectedNode, false)}>
+                            <FaEdit /> Edit
+                        </BaseButton>
+                        <BaseButton className="octane-catalog-admin-btn" onClick={() => createCategory(selectedNode)}>
+                            <FaPlus /> Sub-page
+                        </BaseButton>
+                        <BaseButton className="octane-catalog-admin-btn" disabled={isReadOnlyPage} onClick={newOffer}>
+                            <FaPlus /> Offer
+                        </BaseButton>
+                    </div>
+                </aside>
+            </NativeTextTree>
         );
     };
 
@@ -680,50 +685,52 @@ export const CatalogAdminManagerView: FC<{}> = () => {
     const tabs = getCatalogStudioWorkspaceTabs().map(id => ({ id, ...tabPresentation[id] }));
 
     return (
-        <OctaneCardView classNames={['octane-catalog-admin-manager']} uniqueKey="catalog-admin-manager">
-            <OctaneCardHeaderView headerText="Catalog Admin Editor" onCloseClick={() => catalogAdmin.setAdminMode(false)} />
-            <OctaneCardContentView classNames={['octane-catalog-admin-manager-body']}>
-                <div aria-live="polite" className={`octane-catalog-admin-command-bar is-${commandState.phase}`}>
-                    <div className="octane-catalog-admin-command-title">
-                        <strong>Catalog Manager</strong>
-                        <span>Direct live catalog controls</span>
+        <NativeTextTree>
+            <OctaneCardView classNames={['octane-catalog-admin-manager']} uniqueKey="catalog-admin-manager">
+                <OctaneCardHeaderView headerText="Catalog Admin Editor" onCloseClick={() => catalogAdmin.setAdminMode(false)} />
+                <OctaneCardContentView classNames={['octane-catalog-admin-manager-body']}>
+                    <div aria-live="polite" className={`octane-catalog-admin-command-bar is-${commandState.phase}`}>
+                        <div className="octane-catalog-admin-command-title">
+                            <strong>Catalog Manager</strong>
+                            <span>Direct live catalog controls</span>
+                        </div>
+                        <div className="octane-catalog-admin-command-stats">
+                            <span className={validationIssueCount > 0 ? 'has-error' : validationCurrent ? 'is-valid' : 'has-warning'}>
+                                {validationCurrent && validationIssueCount === 0 ? <FaCheckCircle /> : <FaExclamationTriangle />}
+                                {commandState.validationLabel}
+                            </span>
+                        </div>
                     </div>
-                    <div className="octane-catalog-admin-command-stats">
-                        <span className={validationIssueCount > 0 ? 'has-error' : validationCurrent ? 'is-valid' : 'has-warning'}>
-                            {validationCurrent && validationIssueCount === 0 ? <FaCheckCircle /> : <FaExclamationTriangle />}
-                            {commandState.validationLabel}
-                        </span>
-                    </div>
-                </div>
-                {catalogAdmin.lastError && (
-                    <div className="octane-catalog-admin-operation-error" role="alert">
-                        <FaExclamationTriangle />
-                        <span>{catalogAdmin.lastError}</span>
-                    </div>
-                )}
-                <TabBar className="octane-catalog-admin-tabs" aria-label="Catalog Studio sections" value={activeTab}>
-                    {tabs.map((tab) => (
-                        <TabBarTab
-                            key={tab.id}
-                            id={`catalog-studio-tab-${tab.id}`}
-                            value={tab.id}
-                            aria-controls="catalog-studio-active-panel"
-                            className={`octane-catalog-admin-tab ${activeTab === tab.id ? 'is-active' : ''}`}
-                            onClick={() => setActiveTab(tab.id)}
-                        >
-                            {tab.icon}
-                            <span>{tab.label}</span>
-                            {tab.count > 0 && <span className="octane-catalog-admin-tab-count">{tab.count}</span>}
-                        </TabBarTab>
-                    ))}
-                </TabBar>
+                    {catalogAdmin.lastError && (
+                        <div className="octane-catalog-admin-operation-error" role="alert">
+                            <FaExclamationTriangle />
+                            <span>{catalogAdmin.lastError}</span>
+                        </div>
+                    )}
+                    <TabBar className="octane-catalog-admin-tabs" aria-label="Catalog Studio sections" value={activeTab}>
+                        {tabs.map((tab) => (
+                            <TabBarTab
+                                key={tab.id}
+                                id={`catalog-studio-tab-${tab.id}`}
+                                value={tab.id}
+                                aria-controls="catalog-studio-active-panel"
+                                className={`octane-catalog-admin-tab ${activeTab === tab.id ? 'is-active' : ''}`}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                {tab.icon}
+                                <span>{tab.label}</span>
+                                {tab.count > 0 && <span className="octane-catalog-admin-tab-count">{tab.count}</span>}
+                            </TabBarTab>
+                        ))}
+                    </TabBar>
 
-                <div id="catalog-studio-active-panel" className="octane-catalog-admin-panel" role="tabpanel" aria-labelledby={`catalog-studio-tab-${activeTab}`}>
-                    {activeTab === 'catalog' && renderPagesTab()}
-                    {activeTab === 'sql' && <CatalogStudioTransferPanel />}
-                    {activeTab === 'history' && renderHistoryTab()}
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <div id="catalog-studio-active-panel" className="octane-catalog-admin-panel" role="tabpanel" aria-labelledby={`catalog-studio-tab-${activeTab}`}>
+                        {activeTab === 'catalog' && renderPagesTab()}
+                        {activeTab === 'sql' && <CatalogStudioTransferPanel />}
+                        {activeTab === 'history' && renderHistoryTab()}
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

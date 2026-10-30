@@ -1,6 +1,7 @@
 import { SelectClubGiftComposer } from '@octane/renderer';
 import { FC, useCallback, useMemo } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../../api';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { useClubGifts, useNotification, usePurse } from '../../../../../../hooks';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { ClubGiftText, getGiftRequirementText, getPastClubDaysText } from './clubGifts.helpers';
@@ -75,26 +76,28 @@ export const CatalogLayoutVipGiftsView: FC<CatalogLayoutProps> = (props) => {
     // AIR layout_club_gifts_xml (360 x 460): the info text, the gift list and the past club days under it
     // (past_vip_days is in the layout but hidden).
     return (
-        <div className="octane-catalog-club-gifts">
-            <div className="octane-catalog-club-gifts__info">{giftsAvailable()}</div>
-            <div className="octane-catalog-club-gifts__list">
-                {clubGifts &&
-                    sortGifts.map((offer) => {
-                        const giftData = clubGifts.getOfferExtraData(offer.offerId);
+        <NativeTextTree>
+            <div className="octane-catalog-club-gifts">
+                <div className="octane-catalog-club-gifts__info">{giftsAvailable()}</div>
+                <div className="octane-catalog-club-gifts__list">
+                    {clubGifts &&
+                        sortGifts.map((offer) => {
+                            const giftData = clubGifts.getOfferExtraData(offer.offerId);
 
-                        return (
-                            <VipGiftItem
-                                key={offer.offerId}
-                                isAvailable={giftData.isSelectable && clubGifts.giftsAvailable > 0}
-                                isVip={giftData.isVip}
-                                offer={offer}
-                                requirementText={purse ? localizeClubGiftText(getGiftRequirementText(giftData, purse, clubGifts.giftsAvailable)) : ''}
-                                onSelect={selectGift}
-                            />
-                        );
-                    })}
+                            return (
+                                <VipGiftItem
+                                    key={offer.offerId}
+                                    isAvailable={giftData.isSelectable && clubGifts.giftsAvailable > 0}
+                                    isVip={giftData.isVip}
+                                    offer={offer}
+                                    requirementText={purse ? localizeClubGiftText(getGiftRequirementText(giftData, purse, clubGifts.giftsAvailable)) : ''}
+                                    onSelect={selectGift}
+                                />
+                            );
+                        })}
+                </div>
+                <div className="octane-catalog-club-gifts__past">{pastClubDaysText}</div>
             </div>
-            <div className="octane-catalog-club-gifts__past">{pastClubDaysText}</div>
-        </div>
+        </NativeTextTree>
     );
 };

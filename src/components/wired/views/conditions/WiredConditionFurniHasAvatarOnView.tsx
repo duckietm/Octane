@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface WiredConditionFurniHasAvatarOnViewProps {
     negative?: boolean;
@@ -37,21 +38,23 @@ export const WiredConditionFurniHasAvatarOnView: FC<WiredConditionFurniHasAvatar
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID;
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.requireall')}</Text>
-                {options.map((value, index) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <Radio checked={requireAll === value} name="furniHasAvatarRequireAll" onCheckedChange={() => setRequireAll(value)} />
-                        <Text>{LocalizeText(`wiredfurni.params.${negative ? 'not_requireall' : 'requireall'}.${index + 2}`)}</Text>
-                    </label>
-                ))}
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.requireall')}</Text>
+                    {options.map((value, index) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio checked={requireAll === value} name="furniHasAvatarRequireAll" onCheckedChange={() => setRequireAll(value)} />
+                            <Text>{LocalizeText(`wiredfurni.params.${negative ? 'not_requireall' : 'requireall'}.${index + 2}`)}</Text>
+                        </label>
+                    ))}
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

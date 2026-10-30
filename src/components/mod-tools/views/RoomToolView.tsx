@@ -14,6 +14,7 @@ import roomToolXml from '../../../assets/mod-tools/xml/roomtool_frame.xml?raw';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Border, Native0Button, Native0Checkbox, Native0Dropmenu, Native0Frame, Native0Input, Native0Text } from '../native/NativeWindow0';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SPACING = 5;
@@ -157,101 +158,103 @@ export const RoomToolView: FC<RoomToolProps> = ({ roomId, x, y, settings, curren
     };
 
     return (
-        <NativeWindowShell type="roomTool" windowKey={`${roomId}`} x={x} y={y}>
-            <Native0Frame caption={nativeCaption(root)} height={frameHeight} width={nativeNumber(root, 'width')} onClose={onClose}>
-                {/* the boxes (230 wide) are wider than the client area and the window clips them at the client's right edge (the dark right border does not show) */}
-                <div style={{ position: 'absolute', left: 0, top: 0, width: nativeNumber(root, 'width') - 12, height: 2000, overflow: 'hidden' }}>
-                    {(!data || exists) && (
-                        <Native0Border {...roomCont} height={roomContHeight} y={row.room}>
-                            {data && exists && (
-                                <div style={{ position: 'absolute', left: roomData.x, top: roomData.y, width: roomData.width, height: stackHeight }}>
-                                    <Native0Text bold text={data.room.name} wrap width={220} x={0} y={0} onSize={(size) => setNameHeight(size.height)} />
-                                    <Native0Text color={0x808080} text={data.room.desc} wrap width={220} x={0} y={nameHeight} onSize={(size) => setDescHeight(size.height)} />
-                                    {tags.length > 0 && (
-                                        <div style={{ position: 'absolute', left: 0, top: nameHeight + descHeight }}>
-                                            <Native0Text bold text="Tags:" width={40} x={0} y={0} />
-                                            <Native0Text bold text={tags.join(', ')} wrap width={178} x={39} y={0} onSize={(size) => setTagsHeight(size.height)} />
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </Native0Border>
-                    )}
-                    <Native0Border {...info} y={row.info}>
-                        <Native0Text bold text="Room owner:" width={80} x={5} y={2} />
-                        <Native0Text bold text="Users in room:" width={90} x={5} y={15} />
-                        <Native0Text bold text="Owner in room:" width={90} x={5} y={28} />
-                        <Native0Text bold text="Has event:" width={90} x={5} y={41} />
-                        <Native0Text text={data ? data.ownerName : 'sulka'} underline width={71} x={85} y={2} onClick={data ? () => onOpenUserInfo(data.ownerId) : undefined} />
-                        <Native0Text text={data ? `${data.userCount}` : '18'} width={40} x={100} y={15} />
-                        <Native0Text text={data ? (data.ownerInRoom ? 'Yes' : 'No') : 'yes'} width={40} x={100} y={28} />
-                        <Native0Text text="no" width={40} x={100} y={41} />
-                        <Native0Button height={21} label="Enter room" width={70} x={155} y={4} onClick={() => data && TryVisitRoom(data.flatId)} />
-                        <Native0Button enabled={settings.chatlogsPermission} height={21} label="Chatlog" width={70} x={155} y={26} onClick={() => data && onOpenChatlog(data.flatId)} />
-                        <Native0Button
-                            height={21}
-                            label="Edit in HK"
-                            width={70}
-                            x={155}
-                            y={48}
-                            onClick={() => {
-                                const prefix = GetConfiguration().getValue<string>('roomadmin.url');
+        <NativeTextTree>
+            <NativeWindowShell type="roomTool" windowKey={`${roomId}`} x={x} y={y}>
+                <Native0Frame caption={nativeCaption(root)} height={frameHeight} width={nativeNumber(root, 'width')} onClose={onClose}>
+                    {/* the boxes (230 wide) are wider than the client area and the window clips them at the client's right edge (the dark right border does not show) */}
+                    <div style={{ position: 'absolute', left: 0, top: 0, width: nativeNumber(root, 'width') - 12, height: 2000, overflow: 'hidden' }}>
+                        {(!data || exists) && (
+                            <Native0Border {...roomCont} height={roomContHeight} y={row.room}>
+                                {data && exists && (
+                                    <div style={{ position: 'absolute', left: roomData.x, top: roomData.y, width: roomData.width, height: stackHeight }}>
+                                        <Native0Text bold text={data.room.name} wrap width={220} x={0} y={0} onSize={(size) => setNameHeight(size.height)} />
+                                        <Native0Text color={0x808080} text={data.room.desc} wrap width={220} x={0} y={nameHeight} onSize={(size) => setDescHeight(size.height)} />
+                                        {tags.length > 0 && (
+                                            <div style={{ position: 'absolute', left: 0, top: nameHeight + descHeight }}>
+                                                <Native0Text bold text="Tags:" width={40} x={0} y={0} />
+                                                <Native0Text bold text={tags.join(', ')} wrap width={178} x={39} y={0} onSize={(size) => setTagsHeight(size.height)} />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </Native0Border>
+                        )}
+                        <Native0Border {...info} y={row.info}>
+                            <Native0Text bold text="Room owner:" width={80} x={5} y={2} />
+                            <Native0Text bold text="Users in room:" width={90} x={5} y={15} />
+                            <Native0Text bold text="Owner in room:" width={90} x={5} y={28} />
+                            <Native0Text bold text="Has event:" width={90} x={5} y={41} />
+                            <Native0Text text={data ? data.ownerName : 'sulka'} underline width={71} x={85} y={2} onClick={data ? () => onOpenUserInfo(data.ownerId) : undefined} />
+                            <Native0Text text={data ? `${data.userCount}` : '18'} width={40} x={100} y={15} />
+                            <Native0Text text={data ? (data.ownerInRoom ? 'Yes' : 'No') : 'yes'} width={40} x={100} y={28} />
+                            <Native0Text text="no" width={40} x={100} y={41} />
+                            <Native0Button height={21} label="Enter room" width={70} x={155} y={4} onClick={() => data && TryVisitRoom(data.flatId)} />
+                            <Native0Button enabled={settings.chatlogsPermission} height={21} label="Chatlog" width={70} x={155} y={26} onClick={() => data && onOpenChatlog(data.flatId)} />
+                            <Native0Button
+                                height={21}
+                                label="Edit in HK"
+                                width={70}
+                                x={155}
+                                y={48}
+                                onClick={() => {
+                                    const prefix = GetConfiguration().getValue<string>('roomadmin.url');
 
-                                if (data && prefix) OpenUrl(`${prefix}${data.flatId}`);
+                                    if (data && prefix) OpenUrl(`${prefix}${data.flatId}`);
+                                }}
+                            />
+                        </Native0Border>
+                        <Native0Border {...eventCont} y={row.event}>
+                            <Native0Text color={0x808080} text={localizeWithFallback('modtools.native.roomid', `Room id: ${roomId}`, ['id'], [`${roomId}`])} width={150} x={5} y={1} />
+                            <Native0Text bold text={localizeWithFallback('modtools.native.refresh', 'Refresh')} underline width={60} x={170} y={1} onClick={refresh} />
+                        </Native0Border>
+                        <Native0Border {...actCont} y={row.act}>
+                            <Native0Checkbox checked={kick} enabled={settings.roomKickPermission} x={5} y={5} onToggle={() => setKick((value) => !value)} />
+                            <Native0Checkbox checked={lock} x={5} y={30} onToggle={() => setLock((value) => !value)} />
+                            <Native0Checkbox checked={changeName} x={5} y={54} onToggle={() => setChangeName((value) => !value)} />
+                            <Native0Text text={nativeCaption(act.children[3])} wrap width={199} x={24} y={5} />
+                            <Native0Text text={nativeCaption(act.children[4])} width={199} x={24} y={31} />
+                            <Native0Text text={nativeCaption(act.children[5])} wrap width={199} x={24} y={48} />
+                        </Native0Border>
+                        <Native0Input
+                            active={inputActive}
+                            height={input.height}
+                            value={message}
+                            width={input.width}
+                            x={0}
+                            y={row.input}
+                            onChange={(value) => setMessage(value)}
+                            onFocus={() => {
+                                // _r2dd96fef5d4368: the first focus clears the placeholder text
+                                if (isPlaceholder) {
+                                    setMessage('');
+                                    setIsPlaceholder(false);
+                                }
+
+                                setInputActive(true);
                             }}
                         />
-                    </Native0Border>
-                    <Native0Border {...eventCont} y={row.event}>
-                        <Native0Text color={0x808080} text={localizeWithFallback('modtools.native.roomid', `Room id: ${roomId}`, ['id'], [`${roomId}`])} width={150} x={5} y={1} />
-                        <Native0Text bold text={localizeWithFallback('modtools.native.refresh', 'Refresh')} underline width={60} x={170} y={1} onClick={refresh} />
-                    </Native0Border>
-                    <Native0Border {...actCont} y={row.act}>
-                        <Native0Checkbox checked={kick} enabled={settings.roomKickPermission} x={5} y={5} onToggle={() => setKick((value) => !value)} />
-                        <Native0Checkbox checked={lock} x={5} y={30} onToggle={() => setLock((value) => !value)} />
-                        <Native0Checkbox checked={changeName} x={5} y={54} onToggle={() => setChangeName((value) => !value)} />
-                        <Native0Text text={nativeCaption(act.children[3])} wrap width={199} x={24} y={5} />
-                        <Native0Text text={nativeCaption(act.children[4])} width={199} x={24} y={31} />
-                        <Native0Text text={nativeCaption(act.children[5])} wrap width={199} x={24} y={48} />
-                    </Native0Border>
-                    <Native0Input
-                        active={inputActive}
-                        height={input.height}
-                        value={message}
-                        width={input.width}
-                        x={0}
-                        y={row.input}
-                        onChange={(value) => setMessage(value)}
-                        onFocus={() => {
-                            // _r2dd96fef5d4368: the first focus clears the placeholder text
-                            if (isPlaceholder) {
-                                setMessage('');
+                        <div style={{ position: 'absolute', left: 0, top: row.footer }}>
+                            <Native0Button enabled={canAct} height={21} label="Send Caution" width={97} x={0} y={0} onClick={() => send(true)} />
+                            <Native0Button enabled={canAct} height={21} label="Send message" width={97} x={131} y={0} onClick={() => send(false)} />
+                        </div>
+                        <Native0Dropmenu
+                            caption={selectedTemplate >= 0 ? templates[selectedTemplate] : menuCaption}
+                            height={menu.height}
+                            items={templates}
+                            width={menu.width}
+                            x={0}
+                            y={row.menu}
+                            onSelect={(index) => {
+                                // _rd853b7a3367fa7: choosing a template puts its text in the message field
+                                setSelectedTemplate(index);
+                                setMessage(templates[index]);
                                 setIsPlaceholder(false);
-                            }
-
-                            setInputActive(true);
-                        }}
-                    />
-                    <div style={{ position: 'absolute', left: 0, top: row.footer }}>
-                        <Native0Button enabled={canAct} height={21} label="Send Caution" width={97} x={0} y={0} onClick={() => send(true)} />
-                        <Native0Button enabled={canAct} height={21} label="Send message" width={97} x={131} y={0} onClick={() => send(false)} />
+                                setInputActive(true);
+                            }}
+                        />
                     </div>
-                    <Native0Dropmenu
-                        caption={selectedTemplate >= 0 ? templates[selectedTemplate] : menuCaption}
-                        height={menu.height}
-                        items={templates}
-                        width={menu.width}
-                        x={0}
-                        y={row.menu}
-                        onSelect={(index) => {
-                            // _rd853b7a3367fa7: choosing a template puts its text in the message field
-                            setSelectedTemplate(index);
-                            setMessage(templates[index]);
-                            setIsPlaceholder(false);
-                            setInputActive(true);
-                        }}
-                    />
-                </div>
-            </Native0Frame>
-        </NativeWindowShell>
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

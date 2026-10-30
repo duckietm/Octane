@@ -1,5 +1,6 @@
 import { FC, useEffect, useRef } from 'react';
 import { localizeWithFallback, SanitizeHtml } from '../../../../../api';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 export const CatalogLayoutInformationView: FC<CatalogLayoutProps> = ({ page, hideNavigation }) => {
@@ -17,9 +18,11 @@ export const CatalogLayoutInformationView: FC<CatalogLayoutProps> = ({ page, hid
 
     if (!images.length && !texts.length) {
         return (
-            <div className="octane-catalog-specialized-state" role="status">
-                {localizeWithFallback('catalog.layout.info.empty', 'Information will be available here soon.')}
-            </div>
+            <NativeTextTree>
+                <div className="octane-catalog-specialized-state" role="status">
+                    {localizeWithFallback('catalog.layout.info.empty', 'Information will be available here soon.')}
+                </div>
+            </NativeTextTree>
         );
     }
 

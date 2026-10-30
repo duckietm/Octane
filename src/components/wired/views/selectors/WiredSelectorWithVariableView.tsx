@@ -21,6 +21,7 @@ import { readWiredVariableToken, toWiredVariableId, wiredVariableIdList } from '
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type ReferenceMode = 'constant' | 'variable';
@@ -304,93 +305,95 @@ export const WiredSelectorWithVariableView: FC<WiredSelectorWithVariableViewProp
     };
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} hideDelay={true} cardStyle={{ width: 260 }}>
-            <div className="octane-wired__give-var">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <WiredVariablePicker
-                        entries={resolvedMainEntries}
-                        recentScope={`variable-selectors-${selectorTarget}`}
-                        selectedToken={variableToken}
-                        onSelect={(entry) => setVariableToken(entry.token)}
-                    />
-                </div>
-
-                <div className="octane-wired__divider" />
-
-                <label className="flex items-center gap-2">
-                    <Checkbox checked={selectByValue} disabled={!canSelectByValue} onCheckedChange={ nextChecked => setSelectByValue(nextChecked) } />
-                    <Text small>{LocalizeText('wiredfurni.params.variables.value_settings.select_by_value')}</Text>
-                </label>
-
-                <div className={`flex flex-col gap-2 ${valueSelectionDisabled ? 'opacity-60' : ''}`}>
-                    <div className="octane-wired__divider" />
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} hideDelay={true} cardStyle={{ width: 260 }}>
+                <div className="octane-wired__give-var">
                     <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                        <div className="flex flex-wrap items-center gap-2">
-                            {COMPARISON_OPTIONS.map((option) => (
-                                <label key={option.value} className="flex items-center gap-1">
-                                    <Radio checked={comparison === option.value} disabled={valueSelectionDisabled} onCheckedChange={ () => setComparison(option.value) } />
-                                    <Text>{option.label}</Text>
-                                </label>
-                            ))}
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <WiredVariablePicker
+                            entries={resolvedMainEntries}
+                            recentScope={`variable-selectors-${selectorTarget}`}
+                            selectedToken={variableToken}
+                            onSelect={(entry) => setVariableToken(entry.token)}
+                        />
+                    </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <label className="flex items-center gap-2">
+                        <Checkbox checked={selectByValue} disabled={!canSelectByValue} onCheckedChange={ nextChecked => setSelectByValue(nextChecked) } />
+                        <Text small>{LocalizeText('wiredfurni.params.variables.value_settings.select_by_value')}</Text>
+                    </label>
+
+                    <div className={`flex flex-col gap-2 ${valueSelectionDisabled ? 'opacity-60' : ''}`}>
+                        <div className="octane-wired__divider" />
+                        <div className="flex flex-col gap-1">
+                            <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                            <div className="flex flex-wrap items-center gap-2">
+                                {COMPARISON_OPTIONS.map((option) => (
+                                    <label key={option.value} className="flex items-center gap-1">
+                                        <Radio checked={comparison === option.value} disabled={valueSelectionDisabled} onCheckedChange={ () => setComparison(option.value) } />
+                                        <Text>{option.label}</Text>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="octane-wired__divider" />
+                        <div className="octane-wired__give-var-section">
+                            <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
+                            <WiredValueOrVariableInput
+                                disabled={valueSelectionDisabled}
+                                entries={resolvedReferenceEntries}
+                                isVariable={referenceMode === 'variable'}
+                                label={LocalizeText('wiredfurni.params.variables.reference_value')}
+                                literal={referenceConstantValueInput}
+                                primaryTarget={selectorTarget}
+                                sameHolder={sameHolder}
+                                target={referenceTargetType}
+                                targets={REFERENCE_TARGETS}
+                                token={referenceVariableToken}
+                                renderSource={({ typeSelector, locked }) => (
+                                    // AIR WithVariable: the reference value section claims merged slot 0 (isInputSourceDisabled: a
+                                    // disabled section or the same holder locks it).
+                                    <fieldset className="octane-wired__value-popup-locked" disabled={locked || valueSelectionDisabled}>
+                                        <WiredFurniSelectionSourceRow
+                                            headerContent={typeSelector}
+                                            options={referenceSourceOptions}
+                                            selectionActive={true}
+                                            selectionCount={referenceSelectionEnabled ? furniIds.length : referenceFurniIds.length}
+                                            selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                                            selectionKind="primary"
+                                            selectionLimit={selectionLimit}
+                                            showSelectionToggle={false}
+                                            title="wiredfurni.params.sources.merged.title.variables"
+                                            value={selectedReferenceSourceValue}
+                                            onChange={(value) => {
+                                                if (referenceTargetType === 'furni') {
+                                                    if (referenceFurniSource === SOURCE_SECONDARY_SELECTED) setReferenceFurniIds([...furniIds]);
+
+                                                    setReferenceFurniSource(value);
+                                                    setFurniIds(value === SOURCE_SECONDARY_SELECTED ? [...referenceFurniIds] : []);
+                                                    return;
+                                                }
+
+                                                if (referenceTargetType === 'user') setReferenceUserSource(value);
+                                            }}
+                                        />
+                                    </fieldset>
+                                )}
+                                onIsVariableChange={(isVariable) => setReferenceMode(isVariable ? 'variable' : 'constant')}
+                                onLiteralChange={setReferenceConstantValueInput}
+                                onSameHolderChange={setSameHolder}
+                                onTargetChange={handleReferenceTargetChange}
+                                onTokenChange={setReferenceVariableToken}
+                                onValidityChange={setReferenceValid}
+                            />
                         </div>
                     </div>
 
-                    <div className="octane-wired__divider" />
-                    <div className="octane-wired__give-var-section">
-                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.variables.reference_value')}</div>
-                        <WiredValueOrVariableInput
-                            disabled={valueSelectionDisabled}
-                            entries={resolvedReferenceEntries}
-                            isVariable={referenceMode === 'variable'}
-                            label={LocalizeText('wiredfurni.params.variables.reference_value')}
-                            literal={referenceConstantValueInput}
-                            primaryTarget={selectorTarget}
-                            sameHolder={sameHolder}
-                            target={referenceTargetType}
-                            targets={REFERENCE_TARGETS}
-                            token={referenceVariableToken}
-                            renderSource={({ typeSelector, locked }) => (
-                                // AIR WithVariable: the reference value section claims merged slot 0 (isInputSourceDisabled: a
-                                // disabled section or the same holder locks it).
-                                <fieldset className="octane-wired__value-popup-locked" disabled={locked || valueSelectionDisabled}>
-                                    <WiredFurniSelectionSourceRow
-                                        headerContent={typeSelector}
-                                        options={referenceSourceOptions}
-                                        selectionActive={true}
-                                        selectionCount={referenceSelectionEnabled ? furniIds.length : referenceFurniIds.length}
-                                        selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                                        selectionKind="primary"
-                                        selectionLimit={selectionLimit}
-                                        showSelectionToggle={false}
-                                        title="wiredfurni.params.sources.merged.title.variables"
-                                        value={selectedReferenceSourceValue}
-                                        onChange={(value) => {
-                                            if (referenceTargetType === 'furni') {
-                                                if (referenceFurniSource === SOURCE_SECONDARY_SELECTED) setReferenceFurniIds([...furniIds]);
-
-                                                setReferenceFurniSource(value);
-                                                setFurniIds(value === SOURCE_SECONDARY_SELECTED ? [...referenceFurniIds] : []);
-                                                return;
-                                            }
-
-                                            if (referenceTargetType === 'user') setReferenceUserSource(value);
-                                        }}
-                                    />
-                                </fieldset>
-                            )}
-                            onIsVariableChange={(isVariable) => setReferenceMode(isVariable ? 'variable' : 'constant')}
-                            onLiteralChange={setReferenceConstantValueInput}
-                            onSameHolderChange={setSameHolder}
-                            onTargetChange={handleReferenceTargetChange}
-                            onTokenChange={setReferenceVariableToken}
-                            onValidityChange={setReferenceValid}
-                        />
-                    </div>
                 </div>
-
-            </div>
-        </WiredSelectorBaseView>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredDateToString, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
@@ -51,29 +52,31 @@ export const WiredConditionDateRangeView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.startdate')}</Text>
-                <OctaneInput
-                    aria-label={LocalizeText('wiredfurni.params.startdate')}
-                    maxLength={DATE_MAX_LENGTH}
-                    placeholder={DATE_PLACEHOLDER}
-                    type="text"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.enddate')}</Text>
-                <OctaneInput
-                    aria-label={LocalizeText('wiredfurni.params.enddate')}
-                    maxLength={DATE_MAX_LENGTH}
-                    placeholder={DATE_PLACEHOLDER}
-                    type="text"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                />
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.startdate')}</Text>
+                    <OctaneInput
+                        aria-label={LocalizeText('wiredfurni.params.startdate')}
+                        maxLength={DATE_MAX_LENGTH}
+                        placeholder={DATE_PLACEHOLDER}
+                        type="text"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.enddate')}</Text>
+                    <OctaneInput
+                        aria-label={LocalizeText('wiredfurni.params.enddate')}
+                        maxLength={DATE_MAX_LENGTH}
+                        placeholder={DATE_PLACEHOLDER}
+                        type="text"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

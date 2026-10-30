@@ -7,6 +7,7 @@ import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const POINTS_TYPE_OPTIONS = [
     { value: 0, key: 'wiredfurni.params.points_type.0', label: 'Pixels / Duckets' },
@@ -37,26 +38,28 @@ export const WiredActionGivePointsTypeView: FC<{}> = (props) => {
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.choose_type')}</Text>
-                <Select className="form-select form-select-sm" value={pointsType} onChange={(event) => setPointsType(parseInt(event.target.value, 10) || 0)}>
-                    {POINTS_TYPE_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {localizeWithFallback(option.key, option.label)}
-                        </option>
-                    ))}
-                </Select>
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.setpoints', ['points'], [amount.toString()])}</Text>
-                <NumberInput className="form-control form-control-sm" min={1} max={1000} value={amount} onChange={(event) => setAmount(parseInt(event.target.value, 10) || 0)} />
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.choose_type')}</Text>
+                    <Select className="form-select form-select-sm" value={pointsType} onChange={(event) => setPointsType(parseInt(event.target.value, 10) || 0)}>
+                        {POINTS_TYPE_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {localizeWithFallback(option.key, option.label)}
+                            </option>
+                        ))}
+                    </Select>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.setpoints', ['points'], [amount.toString()])}</Text>
+                    <NumberInput className="form-control form-control-sm" min={1} max={1000} value={amount} onChange={(event) => setAmount(parseInt(event.target.value, 10) || 0)} />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

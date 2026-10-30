@@ -16,6 +16,7 @@ import { HousekeepingButton } from '../common/HousekeepingParts';
 import { HousekeepingStatsView } from './HousekeepingStatsView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const AUTO_REFRESH_MS = 30_000;
 const STALE_AFTER_MS = 60_000;
@@ -51,17 +52,19 @@ const StatCard: FC<StatCardProps> = ({ icon, label, value, subtle, tone = 'sky',
     const Root: ElementType = interactive ? BaseButton : 'div';
 
     return (
-        <Root
-            onClick={onClick}
-            className={`flex w-full items-center gap-2.5 rounded-lg p-2.5 border bg-gradient-to-br text-left shadow-sm ${TONE_BG[tone]} ${interactive ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
-        >
-            <div className={`${TONE_ICON[tone]} shrink-0 rounded-md p-1.5`}>{icon}</div>
-            <div className="flex flex-col grow min-w-0">
-                <span className="text-[11px] text-[#666666]">{label}</span>
-                <span className="text-xl font-bold leading-tight tabular-nums">{value}</span>
-                {subtle && <span className="text-[10px] text-zinc-500 truncate">{subtle}</span>}
-            </div>
-        </Root>
+        <NativeTextTree>
+            <Root
+                onClick={onClick}
+                className={`flex w-full items-center gap-2.5 rounded-lg p-2.5 border bg-gradient-to-br text-left shadow-sm ${TONE_BG[tone]} ${interactive ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            >
+                <div className={`${TONE_ICON[tone]} shrink-0 rounded-md p-1.5`}>{icon}</div>
+                <div className="flex flex-col grow min-w-0">
+                    <span className="text-[11px] text-[#666666]">{label}</span>
+                    <span className="text-xl font-bold leading-tight tabular-nums">{value}</span>
+                    {subtle && <span className="text-[10px] text-zinc-500 truncate">{subtle}</span>}
+                </div>
+            </Root>
+        </NativeTextTree>
     );
 };
 
@@ -134,180 +137,182 @@ export const HousekeepingDashboardTab: FC = () => {
     };
 
     return (
-        <div className="flex flex-col gap-2.5">
-            <div className="flex items-center justify-between">
-                <h3 className="hk-air-heading m-0 text-[14px] font-bold text-black flex items-center gap-1">
-                    <FaChartLine size={10} />
-                    {LocalizeText('housekeeping.dashboard.title')}
-                </h3>
-                <div className="flex items-center gap-1.5">
-                    <span
-                        title={refreshedAt ? new Date(refreshedAt).toLocaleTimeString() : ''}
-                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium border ${isStale ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}
-                    >
-                        <FaCircle size={6} className={isStale ? '' : 'animate-pulse'} />
-                        {isStale ? `stale · ${ageLabel}` : `live · ${ageLabel}`}
-                    </span>
-                    <HousekeepingButton size="sm" variant="secondary" disabled={isDashboardLoading} onClick={() => refreshDashboard()}>
-                        <FaSync size={9} className={isDashboardLoading ? 'animate-spin' : ''} />
-                        <span className="ml-1 text-white">{LocalizeText('housekeeping.dashboard.refresh')}</span>
-                    </HousekeepingButton>
+        <NativeTextTree>
+            <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between">
+                    <h3 className="hk-air-heading m-0 text-[14px] font-bold text-black flex items-center gap-1">
+                        <FaChartLine size={10} />
+                        {LocalizeText('housekeeping.dashboard.title')}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                        <span
+                            title={refreshedAt ? new Date(refreshedAt).toLocaleTimeString() : ''}
+                            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium border ${isStale ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}
+                        >
+                            <FaCircle size={6} className={isStale ? '' : 'animate-pulse'} />
+                            {isStale ? `stale · ${ageLabel}` : `live · ${ageLabel}`}
+                        </span>
+                        <HousekeepingButton size="sm" variant="secondary" disabled={isDashboardLoading} onClick={() => refreshDashboard()}>
+                            <FaSync size={9} className={isDashboardLoading ? 'animate-spin' : ''} />
+                            <span className="ml-1 text-white">{LocalizeText('housekeeping.dashboard.refresh')}</span>
+                        </HousekeepingButton>
+                    </div>
                 </div>
-            </div>
 
-            {!dashboard && isDashboardLoading && (
-                <div className="grid grid-cols-2 gap-1.5">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="rounded-lg border bg-zinc-50 animate-pulse h-16" />
-                    ))}
-                </div>
-            )}
+                {!dashboard && isDashboardLoading && (
+                    <div className="grid grid-cols-2 gap-1.5">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="rounded-lg border bg-zinc-50 animate-pulse h-16" />
+                        ))}
+                    </div>
+                )}
 
-            {!dashboard && !isDashboardLoading && (
-                <div className="flex items-center gap-2 rounded border border-dashed border-zinc-300 bg-zinc-50/50 p-3 text-xs text-zinc-500 italic">
-                    <FaExclamationTriangle size={12} />
-                    {LocalizeText('housekeeping.dashboard.unavailable')}
-                </div>
-            )}
+                {!dashboard && !isDashboardLoading && (
+                    <div className="flex items-center gap-2 rounded border border-dashed border-zinc-300 bg-zinc-50/50 p-3 text-xs text-zinc-500 italic">
+                        <FaExclamationTriangle size={12} />
+                        {LocalizeText('housekeeping.dashboard.unavailable')}
+                    </div>
+                )}
 
-            {dashboard && (
-                <>
-                    <div className="relative overflow-hidden rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-3 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="rounded-full bg-emerald-100 p-2 flex items-center justify-center">
-                                    <span className="octane-icon octane-icon-hk-hero icon-modtools" />
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider opacity-60 font-semibold">
-                                        <FaCircle size={6} className="text-emerald-500 animate-pulse" />
-                                        {LocalizeText('housekeeping.dashboard.online')}
+                {dashboard && (
+                    <>
+                        <div className="relative overflow-hidden rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-3 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="rounded-full bg-emerald-100 p-2 flex items-center justify-center">
+                                        <span className="octane-icon octane-icon-hk-hero icon-modtools" />
                                     </div>
-                                    <div className="text-3xl font-bold leading-none tabular-nums">{formatCompactNumber(dashboard.onlineUsers)}</div>
-                                    <div className="text-[11px] text-zinc-500">
-                                        {LocalizeText('housekeeping.dashboard.total_users', ['count'], [dashboard.totalUsers.toLocaleString()])}
+                                    <div>
+                                        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider opacity-60 font-semibold">
+                                            <FaCircle size={6} className="text-emerald-500 animate-pulse" />
+                                            {LocalizeText('housekeeping.dashboard.online')}
+                                        </div>
+                                        <div className="text-3xl font-bold leading-none tabular-nums">{formatCompactNumber(dashboard.onlineUsers)}</div>
+                                        <div className="text-[11px] text-zinc-500">
+                                            {LocalizeText('housekeeping.dashboard.total_users', ['count'], [dashboard.totalUsers.toLocaleString()])}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="text-right">
-                                <div className="text-[10px] uppercase tracking-wider opacity-60 font-semibold flex items-center gap-1 justify-end">
-                                    <FaCrown size={9} className="text-amber-500" />
-                                    {LocalizeText('housekeeping.dashboard.peak_today')}
-                                </div>
-                                <div className="text-xl font-semibold tabular-nums">{formatCompactNumber(dashboard.peakOnlineToday)}</div>
-                                <div className="text-[10px] text-zinc-500">
-                                    {LocalizeText('housekeeping.dashboard.peak_alltime', ['count'], [formatCompactNumber(dashboard.peakOnlineAllTime)])}
+                                <div className="text-right">
+                                    <div className="text-[10px] uppercase tracking-wider opacity-60 font-semibold flex items-center gap-1 justify-end">
+                                        <FaCrown size={9} className="text-amber-500" />
+                                        {LocalizeText('housekeeping.dashboard.peak_today')}
+                                    </div>
+                                    <div className="text-xl font-semibold tabular-nums">{formatCompactNumber(dashboard.peakOnlineToday)}</div>
+                                    <div className="text-[10px] text-zinc-500">
+                                        {LocalizeText('housekeeping.dashboard.peak_alltime', ['count'], [formatCompactNumber(dashboard.peakOnlineAllTime)])}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Rooms, tickets and server side by side */}
-                    <div className="grid grid-cols-3 gap-1.5">
-                        <StatCard
-                            icon={<FaHome size={14} />}
-                            label={LocalizeText('housekeeping.dashboard.rooms_active')}
-                            value={formatCompactNumber(dashboard.activeRooms)}
-                            subtle={LocalizeText('housekeeping.dashboard.total_rooms', ['count'], [dashboard.totalRooms.toLocaleString()])}
-                            tone="sky"
-                            onClick={() => setActiveTab(HousekeepingTabId.ROOMS)}
-                        />
-                        <StatCard
-                            icon={<FaTicketAlt size={14} />}
-                            label={LocalizeText('housekeeping.dashboard.pending_tickets')}
-                            value={formatCompactNumber(dashboard.pendingTickets)}
-                            subtle={LocalizeText('housekeeping.dashboard.sanctions_24h', ['count'], [String(dashboard.sanctionsLast24h)])}
-                            tone={dashboard.pendingTickets > 0 ? 'rose' : 'emerald'}
-                        />
-                        <StatCard
-                            icon={<FaServer size={14} />}
-                            label={LocalizeText('housekeeping.dashboard.server')}
-                            value={formatUptime(dashboard.serverUptimeSeconds)}
-                            subtle={dashboard.serverVersion}
-                            tone="violet"
-                        />
-                    </div>
-
-                    <HousekeepingStatsView />
-
-                    <form onSubmit={onSubmitAlert} className="flex flex-col gap-1.5 rounded-lg border border-amber-200 bg-amber-50/40 p-2.5">
-                        <label className="text-[10px] uppercase tracking-wider font-semibold opacity-60 flex items-center gap-1">
-                            <FaBolt size={9} className="text-amber-500" />
-                            {LocalizeText('housekeeping.hotel.alert.label')}
-                        </label>
-                        <div className="flex items-center gap-1.5">
-                            <input
-                                type="text"
-                                value={alertMessage}
-                                onChange={(e) => setAlertMessage(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && canSendAlert) {
-                                        e.preventDefault();
-                                        onSubmitAlert(e as unknown as FormEvent);
-                                    }
-                                }}
-                                placeholder={LocalizeText('housekeeping.hotel.alert.placeholder')}
-                                className="grow rounded border border-amber-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-black placeholder:italic"
-                                maxLength={280}
+                        {/* Rooms, tickets and server side by side */}
+                        <div className="grid grid-cols-3 gap-1.5">
+                            <StatCard
+                                icon={<FaHome size={14} />}
+                                label={LocalizeText('housekeeping.dashboard.rooms_active')}
+                                value={formatCompactNumber(dashboard.activeRooms)}
+                                subtle={LocalizeText('housekeeping.dashboard.total_rooms', ['count'], [dashboard.totalRooms.toLocaleString()])}
+                                tone="sky"
+                                onClick={() => setActiveTab(HousekeepingTabId.ROOMS)}
                             />
-                            <HousekeepingButton
-                                size="sm"
-                                variant="primary"
-                                disabled={!canSendAlert}
-                                onClick={() => onSubmitAlert({ preventDefault: () => {} } as FormEvent)}
-                            >
-                                <FaPaperPlane size={9} className={isSendingAlert ? 'animate-pulse' : ''} />
-                                <span className="ml-1">{LocalizeText('housekeeping.hotel.alert.send')}</span>
-                            </HousekeepingButton>
+                            <StatCard
+                                icon={<FaTicketAlt size={14} />}
+                                label={LocalizeText('housekeeping.dashboard.pending_tickets')}
+                                value={formatCompactNumber(dashboard.pendingTickets)}
+                                subtle={LocalizeText('housekeeping.dashboard.sanctions_24h', ['count'], [String(dashboard.sanctionsLast24h)])}
+                                tone={dashboard.pendingTickets > 0 ? 'rose' : 'emerald'}
+                            />
+                            <StatCard
+                                icon={<FaServer size={14} />}
+                                label={LocalizeText('housekeeping.dashboard.server')}
+                                value={formatUptime(dashboard.serverUptimeSeconds)}
+                                subtle={dashboard.serverVersion}
+                                tone="violet"
+                            />
                         </div>
-                    </form>
-                </>
-            )}
 
-            {recentSanctions.length > 0 && (
-                <div className="flex flex-col gap-1">
-                    <h4 className="m-0 text-xs font-bold text-black pt-1">
-                        {LocalizeText('housekeeping.dashboard.recent_sanctions')}
-                    </h4>
-                    <ul className="flex flex-col gap-0.5 rounded-lg border bg-white/50 divide-y divide-zinc-100">
-                        {recentSanctions.map((entry) => (
-                            <li key={entry.id} className="flex items-center gap-2 text-[11px] px-2 py-1 hover:bg-zinc-50">
-                                <span className="text-zinc-400 tabular-nums w-14 shrink-0">{formatRelativePast(entry.timestamp)}</span>
-                                <span className="font-semibold truncate" title={entry.actorName}>
-                                    {entry.actorName}
-                                </span>
-                                <span className="text-zinc-400">→</span>
-                                <span className="truncate" title={entry.detail}>
-                                    {resolveHousekeepingTarget(entry)}
-                                </span>
-                                <span className="ml-auto px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-medium shrink-0 text-[10px]" title={entry.action}>
-                                    {localizeHousekeepingAction(entry.action)}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+                        <HousekeepingStatsView />
 
-            {recentLookups.length > 0 && (
-                <div className="flex flex-col gap-1">
-                    <h4 className="m-0 text-xs font-bold text-black pt-1">
-                        {LocalizeText('housekeeping.dashboard.recent_lookups')}
-                    </h4>
-                    <div className="flex flex-wrap gap-1">
-                        {recentLookups.map((entry, index) => (
-                            <Hint key={`${entry.kind}-${entry.id}-${index}`} content={`${entry.kind} #${entry.id}`}><BaseButton
-                                type="button"
-                                onClick={() => onRecentClick(entry)}
-                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] border transition-colors ${entry.kind === 'user' ? 'bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100' : 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100'}`}
-                            >
-                                <span className="opacity-60 font-bold">{entry.kind === 'user' ? 'U' : 'R'}</span>
-                                <span className="font-medium">{entry.label}</span>
-                            </BaseButton></Hint>
-                        ))}
+                        <form onSubmit={onSubmitAlert} className="flex flex-col gap-1.5 rounded-lg border border-amber-200 bg-amber-50/40 p-2.5">
+                            <label className="text-[10px] uppercase tracking-wider font-semibold opacity-60 flex items-center gap-1">
+                                <FaBolt size={9} className="text-amber-500" />
+                                {LocalizeText('housekeeping.hotel.alert.label')}
+                            </label>
+                            <div className="flex items-center gap-1.5">
+                                <input
+                                    type="text"
+                                    value={alertMessage}
+                                    onChange={(e) => setAlertMessage(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && canSendAlert) {
+                                            e.preventDefault();
+                                            onSubmitAlert(e as unknown as FormEvent);
+                                        }
+                                    }}
+                                    placeholder={LocalizeText('housekeeping.hotel.alert.placeholder')}
+                                    className="grow rounded border border-amber-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-black placeholder:italic"
+                                    maxLength={280}
+                                />
+                                <HousekeepingButton
+                                    size="sm"
+                                    variant="primary"
+                                    disabled={!canSendAlert}
+                                    onClick={() => onSubmitAlert({ preventDefault: () => {} } as FormEvent)}
+                                >
+                                    <FaPaperPlane size={9} className={isSendingAlert ? 'animate-pulse' : ''} />
+                                    <span className="ml-1">{LocalizeText('housekeeping.hotel.alert.send')}</span>
+                                </HousekeepingButton>
+                            </div>
+                        </form>
+                    </>
+                )}
+
+                {recentSanctions.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                        <h4 className="m-0 text-xs font-bold text-black pt-1">
+                            {LocalizeText('housekeeping.dashboard.recent_sanctions')}
+                        </h4>
+                        <ul className="flex flex-col gap-0.5 rounded-lg border bg-white/50 divide-y divide-zinc-100">
+                            {recentSanctions.map((entry) => (
+                                <li key={entry.id} className="flex items-center gap-2 text-[11px] px-2 py-1 hover:bg-zinc-50">
+                                    <span className="text-zinc-400 tabular-nums w-14 shrink-0">{formatRelativePast(entry.timestamp)}</span>
+                                    <span className="font-semibold truncate" title={entry.actorName}>
+                                        {entry.actorName}
+                                    </span>
+                                    <span className="text-zinc-400">→</span>
+                                    <span className="truncate" title={entry.detail}>
+                                        {resolveHousekeepingTarget(entry)}
+                                    </span>
+                                    <span className="ml-auto px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-medium shrink-0 text-[10px]" title={entry.action}>
+                                        {localizeHousekeepingAction(entry.action)}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+
+                {recentLookups.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                        <h4 className="m-0 text-xs font-bold text-black pt-1">
+                            {LocalizeText('housekeeping.dashboard.recent_lookups')}
+                        </h4>
+                        <div className="flex flex-wrap gap-1">
+                            {recentLookups.map((entry, index) => (
+                                <Hint key={`${entry.kind}-${entry.id}-${index}`} content={`${entry.kind} #${entry.id}`}><BaseButton
+                                    type="button"
+                                    onClick={() => onRecentClick(entry)}
+                                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] border transition-colors ${entry.kind === 'user' ? 'bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100' : 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100'}`}
+                                >
+                                    <span className="opacity-60 font-bold">{entry.kind === 'user' ? 'U' : 'R'}</span>
+                                    <span className="font-medium">{entry.label}</span>
+                                </BaseButton></Hint>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

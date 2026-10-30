@@ -9,6 +9,7 @@ import { variableTokenFromId, WIRED_FIXED_HOLDER_SOURCE, WiredValueOrVariableFie
 import { readWiredVariableToken, toWiredVariableId, wiredVariableIdList } from '../WiredVariableIds';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Habbo's progress-reward-track action (`wf_act_progress_reward_track`): moves one task of a reward
@@ -74,57 +75,59 @@ export const WiredActionProgressRewardTrackView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            footerCollapsible={false}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={() => trackId.length > 0 && taskId.length > 0 && valueValid && (!isVariable || getCustomVariableItemId(valueToken) > 0)}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.progress.ids', 'Reward track')}</Text>
-                <input
-                    aria-label="track"
-                    className="form-control form-control-sm"
-                    maxLength={REWARD_TRACK_ID_MAX_LENGTH}
-                    placeholder={localizeWithFallback('wiredfurni.params.reward_track.track_id', 'Track ID')}
-                    value={trackId}
-                    onChange={(event) => setTrackId(normalizeRewardTrackId(event.target.value))}
-                />
-                <input
-                    aria-label="task"
-                    className="form-control form-control-sm"
-                    maxLength={REWARD_TRACK_ID_MAX_LENGTH}
-                    placeholder={localizeWithFallback('wiredfurni.params.reward_track.task_id', 'Task ID')}
-                    value={taskId}
-                    onChange={(event) => setTaskId(normalizeRewardTrackId(event.target.value))}
-                />
-            </div>
-            <label className="flex items-center gap-1">
-                <Checkbox checked={addToExisting} onCheckedChange={(nextChecked) => setAddToExisting(nextChecked)} />
-                <Text>{localizeWithFallback('wiredfurni.params.reward_track.add_to_existing_score', 'Add to the existing score')}</Text>
-            </label>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.score', 'Score')}</Text>
-                {/* AIR ProgressRewardTrack: createValueOrVariableSection(0, mergedSourceOptions(0), score, 1, int max) with the
-                    claimed merged slot 0 in the popup. The server reads the variable on a room or context holder only. */}
-                <WiredValueOrVariableField
-                    holderSource={WIRED_FIXED_HOLDER_SOURCE}
-                    isVariable={isVariable}
-                    label={localizeWithFallback('wiredfurni.params.reward_track.score', 'Score')}
-                    literal={amount}
-                    min={1}
-                    target={valueTarget}
-                    targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
-                    token={valueToken}
-                    onIsVariableChange={setIsVariable}
-                    onLiteralChange={setAmount}
-                    onTargetChange={setValueTarget}
-                    onTokenChange={setValueToken}
-                    onValidityChange={setValueValid}
-                />
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                footerCollapsible={false}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={() => trackId.length > 0 && taskId.length > 0 && valueValid && (!isVariable || getCustomVariableItemId(valueToken) > 0)}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.progress.ids', 'Reward track')}</Text>
+                    <input
+                        aria-label="track"
+                        className="form-control form-control-sm"
+                        maxLength={REWARD_TRACK_ID_MAX_LENGTH}
+                        placeholder={localizeWithFallback('wiredfurni.params.reward_track.track_id', 'Track ID')}
+                        value={trackId}
+                        onChange={(event) => setTrackId(normalizeRewardTrackId(event.target.value))}
+                    />
+                    <input
+                        aria-label="task"
+                        className="form-control form-control-sm"
+                        maxLength={REWARD_TRACK_ID_MAX_LENGTH}
+                        placeholder={localizeWithFallback('wiredfurni.params.reward_track.task_id', 'Task ID')}
+                        value={taskId}
+                        onChange={(event) => setTaskId(normalizeRewardTrackId(event.target.value))}
+                    />
+                </div>
+                <label className="flex items-center gap-1">
+                    <Checkbox checked={addToExisting} onCheckedChange={(nextChecked) => setAddToExisting(nextChecked)} />
+                    <Text>{localizeWithFallback('wiredfurni.params.reward_track.add_to_existing_score', 'Add to the existing score')}</Text>
+                </label>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.reward_track.score', 'Score')}</Text>
+                    {/* AIR ProgressRewardTrack: createValueOrVariableSection(0, mergedSourceOptions(0), score, 1, int max) with the
+                        claimed merged slot 0 in the popup. The server reads the variable on a room or context holder only. */}
+                    <WiredValueOrVariableField
+                        holderSource={WIRED_FIXED_HOLDER_SOURCE}
+                        isVariable={isVariable}
+                        label={localizeWithFallback('wiredfurni.params.reward_track.score', 'Score')}
+                        literal={amount}
+                        min={1}
+                        target={valueTarget}
+                        targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
+                        token={valueToken}
+                        onIsVariableChange={setIsVariable}
+                        onLiteralChange={setAmount}
+                        onTargetChange={setValueTarget}
+                        onTokenChange={setValueToken}
+                        onValidityChange={setValueValid}
+                    />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

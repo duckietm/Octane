@@ -27,6 +27,7 @@ import { LayoutCurrencyIcon, OctaneCardContentView, OctaneCardHeaderView, Octane
 import { useMessageEvent, useNotification } from '../../hooks';
 import { hasClaimableEarnings, useEarningsIndicatorStore } from '../../state/earningsIndicatorStore';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -220,72 +221,74 @@ export const VaultView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <OctaneCardView
-            className="octane-vault min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
-            theme="primary-slim"
-            uniqueKey="vault"
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('earnings.title', 'Guadagni')} onCloseClick={() => setIsVisible(false)} />
-            <OctaneCardContentView className="octane-vault-content flex flex-col gap-[3px] text-black">
-                {visibleEarningCategories(entriesByKey).map((category) => {
-                    const entry = entriesByKey.get(category.key) ?? null;
-                    const canClaim = !!entry && entry.enabled && entry.claimable;
-                    const rewards = entry?.rewards ?? [];
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-vault min-w-0 w-[min(430px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                theme="primary-slim"
+                uniqueKey="vault"
+            >
+                <OctaneCardHeaderView headerText={localizeWithFallback('earnings.title', 'Guadagni')} onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardContentView className="octane-vault-content flex flex-col gap-[3px] text-black">
+                    {visibleEarningCategories(entriesByKey).map((category) => {
+                        const entry = entriesByKey.get(category.key) ?? null;
+                        const canClaim = !!entry && entry.enabled && entry.claimable;
+                        const rewards = entry?.rewards ?? [];
 
-                    return (
-                        <div key={category.key} className="flex items-center gap-2">
-                            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[5px] border border-[#9aa0a8] bg-white px-1.5 py-1">
-                                <span className="flex h-[24px] w-[24px] shrink-0 items-center justify-center rounded border border-black/15 bg-white">
-                                    <img src={category.img} alt="" className="max-h-[20px] max-w-[20px] object-contain image-rendering-pixelated" />
-                                </span>
-                                <Text bold className="truncate octane-vault__label">
-                                    {localizeWithFallback(category.textKey, category.label)}
-                                </Text>
-                            </div>
-                            <div className="flex min-w-[92px] shrink-0 items-center justify-end gap-2.5">
-                                {rewards.length > 0
-                                    ? rewards.map((reward, index) => {
-                                          const currencyType = rewardCurrencyType(reward);
-                                          return (
+                        return (
+                            <div key={category.key} className="flex items-center gap-2">
+                                <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[5px] border border-[#9aa0a8] bg-white px-1.5 py-1">
+                                    <span className="flex h-[24px] w-[24px] shrink-0 items-center justify-center rounded border border-black/15 bg-white">
+                                        <img src={category.img} alt="" className="max-h-[20px] max-w-[20px] object-contain image-rendering-pixelated" />
+                                    </span>
+                                    <Text bold className="truncate octane-vault__label">
+                                        {localizeWithFallback(category.textKey, category.label)}
+                                    </Text>
+                                </div>
+                                <div className="flex min-w-[92px] shrink-0 items-center justify-end gap-2.5">
+                                    {rewards.length > 0
+                                        ? rewards.map((reward, index) => {
+                                              const currencyType = rewardCurrencyType(reward);
+                                              return (
+                                                  <span key={index} className="flex items-center gap-1">
+                                                      {currencyType !== null && <LayoutCurrencyIcon type={currencyType} />}
+                                                      <Text bold className="octane-vault__value">
+                                                          {reward.amount}
+                                                      </Text>
+                                                  </span>
+                                              );
+                                          })
+                                        : category.fallbackCurrencies.map((currency, index) => (
                                               <span key={index} className="flex items-center gap-1">
-                                                  {currencyType !== null && <LayoutCurrencyIcon type={currencyType} />}
+                                                  <LayoutCurrencyIcon type={currency} />
                                                   <Text bold className="octane-vault__value">
-                                                      {reward.amount}
+                                                      0
                                                   </Text>
                                               </span>
-                                          );
-                                      })
-                                    : category.fallbackCurrencies.map((currency, index) => (
-                                          <span key={index} className="flex items-center gap-1">
-                                              <LayoutCurrencyIcon type={currency} />
-                                              <Text bold className="octane-vault__value">
-                                                  0
-                                              </Text>
-                                          </span>
-                                      ))}
+                                          ))}
+                                </div>
+                                <BaseButton
+                                    type="button"
+                                    disabled={!canClaim}
+                                    onClick={canClaim ? () => claimOne(category.key) : undefined}
+                                    className="octane-vault__claim shrink-0"
+                                >
+                                    {localizeWithFallback('earnings.claim.button', 'Riscatta')}
+                                </BaseButton>
                             </div>
-                            <BaseButton
-                                type="button"
-                                disabled={!canClaim}
-                                onClick={canClaim ? () => claimOne(category.key) : undefined}
-                                className="octane-vault__claim shrink-0"
-                            >
-                                {localizeWithFallback('earnings.claim.button', 'Riscatta')}
-                            </BaseButton>
-                        </div>
-                    );
-                })}
-                <div className="flex justify-center pt-1">
-                    <BaseButton
-                        type="button"
-                        disabled={!anyClaimable}
-                        onClick={anyClaimable ? claimAll : undefined}
-                        className="octane-vault__claim-all"
-                    >
-                        {localizeWithFallback('earnings.claim.all', 'Richiedili Tutti')}
-                    </BaseButton>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        );
+                    })}
+                    <div className="flex justify-center pt-1">
+                        <BaseButton
+                            type="button"
+                            disabled={!anyClaimable}
+                            onClick={anyClaimable ? claimAll : undefined}
+                            className="octane-vault__claim-all"
+                        >
+                            {localizeWithFallback('earnings.claim.all', 'Richiedili Tutti')}
+                        </BaseButton>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

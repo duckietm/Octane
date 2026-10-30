@@ -1,6 +1,7 @@
 import { FC, useEffect } from 'react';
 import { SanitizeHtml } from '../../../../../api';
 import { LayoutRoomPreviewerView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData } from '../../../../../hooks';
 import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
 import { CatalogProductDetailsView } from '../widgets/CatalogProductDetailsView';
@@ -26,29 +27,31 @@ export const CatalogLayoutPetCustomizationView: FC<CatalogLayoutProps> = ({ page
     }, [roomPreviewer, selectedOffer]);
 
     return (
-        <div className="octane-catalog-pet-customization-layout">
-            <div className="octane-catalog-pet-customization-preview">
-                {selectedOffer ? (
-                    <>
-                        <LayoutRoomPreviewerView height={240} roomPreviewer={roomPreviewer} />
-                        <div className="octane-catalog-pet-customization-copy">
-                            <CatalogProductDetailsView offer={selectedOffer} />
-                        </div>
-                        <div className="octane-catalog-pet-customization-price">
-                            <CatalogTotalPriceWidget />
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        {!!page.localization.getImage(1) && <img alt="" src={page.localization.getImage(1)} />}
-                        {!!page.localization.getText(0) && <div dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(0)) }} />}
-                    </>
-                )}
+        <NativeTextTree>
+            <div className="octane-catalog-pet-customization-layout">
+                <div className="octane-catalog-pet-customization-preview">
+                    {selectedOffer ? (
+                        <>
+                            <LayoutRoomPreviewerView height={240} roomPreviewer={roomPreviewer} />
+                            <div className="octane-catalog-pet-customization-copy">
+                                <CatalogProductDetailsView offer={selectedOffer} />
+                            </div>
+                            <div className="octane-catalog-pet-customization-price">
+                                <CatalogTotalPriceWidget />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            {!!page.localization.getImage(1) && <img alt="" src={page.localization.getImage(1)} />}
+                            {!!page.localization.getText(0) && <div dangerouslySetInnerHTML={{ __html: SanitizeHtml(page.localization.getText(0)) }} />}
+                        </>
+                    )}
+                </div>
+                <div className="octane-catalog-pet-customization-grid">
+                    <CatalogItemGridWidgetView columnCount={6} columnMinHeight={74} columnMinWidth={53} />
+                </div>
+                <div className="octane-catalog-pet-customization-purchase">{selectedOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
             </div>
-            <div className="octane-catalog-pet-customization-grid">
-                <CatalogItemGridWidgetView columnCount={6} columnMinHeight={74} columnMinWidth={53} />
-            </div>
-            <div className="octane-catalog-pet-customization-purchase">{selectedOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
-        </div>
+        </NativeTextTree>
     );
 };

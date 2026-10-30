@@ -13,6 +13,7 @@ import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText, UseProductI
 import { Button, Column, Flex, LayoutPetImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { useRoom } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface AvatarInfoUseProductConfirmViewProps {
     item: UseProductItem;
@@ -72,13 +73,15 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
                 }
 
                 return (
-                    <LayoutPetImageView
-                        customParts={petFigureData.customParts}
-                        direction={2}
-                        paletteId={paletteId}
-                        petColor={petFigureData.color}
-                        typeId={petFigureData.typeId}
-                    />
+                    <NativeTextTree>
+                        <LayoutPetImageView
+                            customParts={petFigureData.customParts}
+                            direction={2}
+                            paletteId={paletteId}
+                            petColor={petFigureData.color}
+                            typeId={petFigureData.typeId}
+                        />
+                    </NativeTextTree>
                 );
             }
             case FurniCategory.PET_CUSTOM_PART: {
@@ -106,13 +109,15 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
                 }
 
                 return (
-                    <LayoutPetImageView
-                        customParts={newCustomParts}
-                        direction={2}
-                        paletteId={petFigureData.paletteId}
-                        petColor={petFigureData.color}
-                        typeId={petFigureData.typeId}
-                    />
+                    <NativeTextTree>
+                        <LayoutPetImageView
+                            customParts={newCustomParts}
+                            direction={2}
+                            paletteId={petFigureData.paletteId}
+                            petColor={petFigureData.color}
+                            typeId={petFigureData.typeId}
+                        />
+                    </NativeTextTree>
                 );
             }
             case FurniCategory.PET_CUSTOM_PART_SHAMPOO: {
@@ -139,13 +144,15 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
                 }
 
                 return (
-                    <LayoutPetImageView
-                        customParts={newCustomParts}
-                        direction={2}
-                        paletteId={petFigureData.paletteId}
-                        petColor={petFigureData.color}
-                        typeId={petFigureData.typeId}
-                    />
+                    <NativeTextTree>
+                        <LayoutPetImageView
+                            customParts={newCustomParts}
+                            direction={2}
+                            paletteId={petFigureData.paletteId}
+                            petColor={petFigureData.color}
+                            typeId={petFigureData.typeId}
+                        />
+                    </NativeTextTree>
                 );
             }
             case FurniCategory.PET_SADDLE: {
@@ -172,13 +179,15 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
                 }
 
                 return (
-                    <LayoutPetImageView
-                        customParts={newCustomParts}
-                        direction={2}
-                        paletteId={petFigureData.paletteId}
-                        petColor={petFigureData.color}
-                        typeId={petFigureData.typeId}
-                    />
+                    <NativeTextTree>
+                        <LayoutPetImageView
+                            customParts={newCustomParts}
+                            direction={2}
+                            paletteId={petFigureData.paletteId}
+                            petColor={petFigureData.color}
+                            typeId={petFigureData.typeId}
+                        />
+                    </NativeTextTree>
                 );
             }
             case FurniCategory.MONSTERPLANT_REBREED:
@@ -200,14 +209,16 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
                 }
 
                 return (
-                    <LayoutPetImageView
-                        customParts={petFigureData.customParts}
-                        direction={2}
-                        paletteId={petFigureData.paletteId}
-                        petColor={petFigureData.color}
-                        posture={posture}
-                        typeId={petFigureData.typeId}
-                    />
+                    <NativeTextTree>
+                        <LayoutPetImageView
+                            customParts={petFigureData.customParts}
+                            direction={2}
+                            paletteId={petFigureData.paletteId}
+                            petColor={petFigureData.color}
+                            posture={posture}
+                            typeId={petFigureData.typeId}
+                        />
+                    </NativeTextTree>
                 );
             }
         }
@@ -256,71 +267,73 @@ export const AvatarInfoUseProductConfirmView: FC<AvatarInfoUseProductConfirmView
     if (!petData) return null;
 
     return (
-        <OctaneCardView className="octane-use-product-confirmation">
-            <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title', ['name'], [petData.name])} onCloseClick={onClose} />
-            <OctaneCardContentView center>
-                <Flex gap={2} overflow="hidden">
-                    <div className="flex flex-col">
-                        <BaseButton type="button" className="product-preview cursor-pointer" onClick={selectRoomObject}>
-                            {getPetImage}
-                        </BaseButton>
-                    </div>
-                    <Column justifyContent="between" overflow="auto">
-                        <Column gap={2}>
-                            {mode === PRODUCT_PAGE_SHAMPOO && (
-                                <>
-                                    <Text>{LocalizeText('useproduct.widget.text.shampoo', ['productName'], [furniData.name])}</Text>
-                                    <Text>{LocalizeText('useproduct.widget.info.shampoo')}</Text>
-                                </>
-                            )}
-                            {mode === PRODUCT_PAGE_CUSTOM_PART && (
-                                <>
-                                    <Text>{LocalizeText('useproduct.widget.text.custompart', ['productName'], [furniData.name])}</Text>
-                                    <Text>{LocalizeText('useproduct.widget.info.custompart')}</Text>
-                                </>
-                            )}
-                            {mode === PRODUCT_PAGE_CUSTOM_PART_SHAMPOO && (
-                                <>
-                                    <Text>{LocalizeText('useproduct.widget.text.custompartshampoo', ['productName'], [furniData.name])}</Text>
-                                    <Text>{LocalizeText('useproduct.widget.info.custompartshampoo')}</Text>
-                                </>
-                            )}
-                            {mode === PRODUCT_PAGE_SADDLE && (
-                                <>
-                                    <Text>{LocalizeText('useproduct.widget.text.saddle', ['productName'], [furniData.name])}</Text>
-                                    <Text>{LocalizeText('useproduct.widget.info.saddle')}</Text>
-                                </>
-                            )}
-                            {mode === PRODUCT_PAGE_REVIVE && (
-                                <>
-                                    <Text>{LocalizeText('useproduct.widget.text.revive_monsterplant', ['productName'], [furniData.name])}</Text>
-                                    <Text>{LocalizeText('useproduct.widget.info.revive_monsterplant')}</Text>
-                                </>
-                            )}
-                            {mode === PRODUCT_PAGE_REBREED && (
-                                <>
-                                    <Text>{LocalizeText('useproduct.widget.text.rebreed_monsterplant', ['productName'], [furniData.name])}</Text>
-                                    <Text>{LocalizeText('useproduct.widget.info.rebreed_monsterplant')}</Text>
-                                </>
-                            )}
-                            {mode === PRODUCT_PAGE_FERTILIZE && (
-                                <>
-                                    <Text>{LocalizeText('useproduct.widget.text.fertilize_monsterplant', ['productName'], [furniData.name])}</Text>
-                                    <Text>{LocalizeText('useproduct.widget.info.fertilize_monsterplant')}</Text>
-                                </>
-                            )}
-                        </Column>
-                        <div className="flex items-center justify-between">
-                            <Button variant="danger" onClick={onClose}>
-                                {LocalizeText('useproduct.widget.cancel')}
-                            </Button>
-                            <Button variant="success" onClick={useProduct}>
-                                {LocalizeText('useproduct.widget.use')}
-                            </Button>
+        <NativeTextTree>
+            <OctaneCardView className="octane-use-product-confirmation">
+                <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title', ['name'], [petData.name])} onCloseClick={onClose} />
+                <OctaneCardContentView center>
+                    <Flex gap={2} overflow="hidden">
+                        <div className="flex flex-col">
+                            <BaseButton type="button" className="product-preview cursor-pointer" onClick={selectRoomObject}>
+                                {getPetImage}
+                            </BaseButton>
                         </div>
-                    </Column>
-                </Flex>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        <Column justifyContent="between" overflow="auto">
+                            <Column gap={2}>
+                                {mode === PRODUCT_PAGE_SHAMPOO && (
+                                    <>
+                                        <Text>{LocalizeText('useproduct.widget.text.shampoo', ['productName'], [furniData.name])}</Text>
+                                        <Text>{LocalizeText('useproduct.widget.info.shampoo')}</Text>
+                                    </>
+                                )}
+                                {mode === PRODUCT_PAGE_CUSTOM_PART && (
+                                    <>
+                                        <Text>{LocalizeText('useproduct.widget.text.custompart', ['productName'], [furniData.name])}</Text>
+                                        <Text>{LocalizeText('useproduct.widget.info.custompart')}</Text>
+                                    </>
+                                )}
+                                {mode === PRODUCT_PAGE_CUSTOM_PART_SHAMPOO && (
+                                    <>
+                                        <Text>{LocalizeText('useproduct.widget.text.custompartshampoo', ['productName'], [furniData.name])}</Text>
+                                        <Text>{LocalizeText('useproduct.widget.info.custompartshampoo')}</Text>
+                                    </>
+                                )}
+                                {mode === PRODUCT_PAGE_SADDLE && (
+                                    <>
+                                        <Text>{LocalizeText('useproduct.widget.text.saddle', ['productName'], [furniData.name])}</Text>
+                                        <Text>{LocalizeText('useproduct.widget.info.saddle')}</Text>
+                                    </>
+                                )}
+                                {mode === PRODUCT_PAGE_REVIVE && (
+                                    <>
+                                        <Text>{LocalizeText('useproduct.widget.text.revive_monsterplant', ['productName'], [furniData.name])}</Text>
+                                        <Text>{LocalizeText('useproduct.widget.info.revive_monsterplant')}</Text>
+                                    </>
+                                )}
+                                {mode === PRODUCT_PAGE_REBREED && (
+                                    <>
+                                        <Text>{LocalizeText('useproduct.widget.text.rebreed_monsterplant', ['productName'], [furniData.name])}</Text>
+                                        <Text>{LocalizeText('useproduct.widget.info.rebreed_monsterplant')}</Text>
+                                    </>
+                                )}
+                                {mode === PRODUCT_PAGE_FERTILIZE && (
+                                    <>
+                                        <Text>{LocalizeText('useproduct.widget.text.fertilize_monsterplant', ['productName'], [furniData.name])}</Text>
+                                        <Text>{LocalizeText('useproduct.widget.info.fertilize_monsterplant')}</Text>
+                                    </>
+                                )}
+                            </Column>
+                            <div className="flex items-center justify-between">
+                                <Button variant="danger" onClick={onClose}>
+                                    {LocalizeText('useproduct.widget.cancel')}
+                                </Button>
+                                <Button variant="success" onClick={useProduct}>
+                                    {LocalizeText('useproduct.widget.use')}
+                                </Button>
+                            </div>
+                        </Column>
+                    </Flex>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

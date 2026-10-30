@@ -5,6 +5,7 @@ import { useMessageEvent } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { NameChangeLayoutViewProps } from './NameChangeView.types';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const AVAILABLE: number = 0;
 const TOO_SHORT: number = 2;
@@ -69,38 +70,40 @@ export const NameChangeInputView: FC<NameChangeLayoutViewProps> = (props) => {
     });
 
     return (
-        <div className="flex flex-col h-full gap-3">
-            <div>{LocalizeText('tutorial.name_change.info.select')}</div>
-            <div className="flex gap-2">
-                <OctaneInput type="text" value={newUsername} onChange={(event) => handleUsernameChange(event.target.value)} />
-                <BaseButton className="habbo-btn-secondary" disabled={newUsername === '' || isChecking} onClick={check}>
-                    {LocalizeText('tutorial.name_change.check')}
-                </BaseButton>
-            </div>
-            {!errorCode && !canProceed && <div className="octane-card-panel p-2 text-center">{LocalizeText('help.tutorial.name.info')}</div>}
-            {errorCode && (
-                <div className="p-2 text-center text-white rounded bg-danger">{LocalizeText(`help.tutorial.name.${errorCode}`, ['name'], [newUsername])}</div>
-            )}
-            {canProceed && (
-                <div className="p-2 text-center text-white rounded bg-success">{LocalizeText('help.tutorial.name.available', ['name'], [newUsername])}</div>
-            )}
-            {suggestions && (
-                <div className="flex flex-col gap-2">
-                    {suggestions.map((suggestion, index) => (
-                        <BaseButton key={index} className="octane-card-row p-1 cursor-pointer col w-full text-left" onClick={() => handleUsernameChange(suggestion)}>
-                            {suggestion}
-                        </BaseButton>
-                    ))}
+        <NativeTextTree>
+            <div className="flex flex-col h-full gap-3">
+                <div>{LocalizeText('tutorial.name_change.info.select')}</div>
+                <div className="flex gap-2">
+                    <OctaneInput type="text" value={newUsername} onChange={(event) => handleUsernameChange(event.target.value)} />
+                    <BaseButton className="habbo-btn-secondary" disabled={newUsername === '' || isChecking} onClick={check}>
+                        {LocalizeText('tutorial.name_change.check')}
+                    </BaseButton>
                 </div>
-            )}
-            <div className="flex gap-2">
-                <BaseButton className="w-full habbo-btn-secondary" disabled={!canProceed} onClick={() => onAction('confirmation', newUsername)}>
-                    {LocalizeText('tutorial.name_change.pick')}
-                </BaseButton>
-                <BaseButton className="w-full habbo-btn-secondary" onClick={() => onAction('close')}>
-                    {LocalizeText('cancel')}
-                </BaseButton>
+                {!errorCode && !canProceed && <div className="octane-card-panel p-2 text-center">{LocalizeText('help.tutorial.name.info')}</div>}
+                {errorCode && (
+                    <div className="p-2 text-center text-white rounded bg-danger">{LocalizeText(`help.tutorial.name.${errorCode}`, ['name'], [newUsername])}</div>
+                )}
+                {canProceed && (
+                    <div className="p-2 text-center text-white rounded bg-success">{LocalizeText('help.tutorial.name.available', ['name'], [newUsername])}</div>
+                )}
+                {suggestions && (
+                    <div className="flex flex-col gap-2">
+                        {suggestions.map((suggestion, index) => (
+                            <BaseButton key={index} className="octane-card-row p-1 cursor-pointer col w-full text-left" onClick={() => handleUsernameChange(suggestion)}>
+                                {suggestion}
+                            </BaseButton>
+                        ))}
+                    </div>
+                )}
+                <div className="flex gap-2">
+                    <BaseButton className="w-full habbo-btn-secondary" disabled={!canProceed} onClick={() => onAction('confirmation', newUsername)}>
+                        {LocalizeText('tutorial.name_change.pick')}
+                    </BaseButton>
+                    <BaseButton className="w-full habbo-btn-secondary" onClick={() => onAction('close')}>
+                        {LocalizeText('cancel')}
+                    </BaseButton>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

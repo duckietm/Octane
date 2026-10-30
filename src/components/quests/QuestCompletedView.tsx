@@ -5,6 +5,7 @@ import { Button, DraggableWindowPosition } from '../../common';
 import { useQuests } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** The official dialog waits two seconds after the completion packet before it appears. */
 const SHOW_DELAY_MS = 2000;
@@ -55,58 +56,60 @@ export const QuestCompletedView: FC<{}> = () => {
     };
 
     return (
-        <OctaneCard className="octane-quest-completed" uniqueKey="quest-completed" windowPosition={DraggableWindowPosition.CENTER}>
-            <OctaneCard.Header
-                headerText={
-                    lastQuestInCampaign
-                        ? localizeWithFallback('quests.completed.campaign.title', '%category% completed!', ['category'], [campaignName])
-                        : localizeWithFallback('quests.completed.quest.title', '%category% quest completed', ['category'], [campaignName])
-                }
-                onCloseClick={onNextQuest}
-            />
-            <OctaneCard.Content className="octane-quest-completed-content">
-                <div className="octane-quest-completed-banner">
-                    <div className="octane-quest-completed-icon" data-campaign={lastQuestInCampaign}>
-                        {lastQuestInCampaign && <img src={getCampaignImageUrl(quest.campaignCode)} alt="" draggable={false} />}
-                    </div>
-                    <div className="octane-quest-completed-texts">
-                        <div className="octane-quest-completed-congrats">
-                            {lastQuestInCampaign
-                                ? localizeWithFallback('quests.completed.campaign.caption', 'Campaign completed!')
-                                : localizeWithFallback('quests.completed.quest.caption', 'Quest completed!')}
+        <NativeTextTree>
+            <OctaneCard className="octane-quest-completed" uniqueKey="quest-completed" windowPosition={DraggableWindowPosition.CENTER}>
+                <OctaneCard.Header
+                    headerText={
+                        lastQuestInCampaign
+                            ? localizeWithFallback('quests.completed.campaign.title', '%category% completed!', ['category'], [campaignName])
+                            : localizeWithFallback('quests.completed.quest.title', '%category% quest completed', ['category'], [campaignName])
+                    }
+                    onCloseClick={onNextQuest}
+                />
+                <OctaneCard.Content className="octane-quest-completed-content">
+                    <div className="octane-quest-completed-banner">
+                        <div className="octane-quest-completed-icon" data-campaign={lastQuestInCampaign}>
+                            {lastQuestInCampaign && <img src={getCampaignImageUrl(quest.campaignCode)} alt="" draggable={false} />}
                         </div>
-                        <div className="octane-quest-completed-desc">{getQuestCompletedText(quest)}</div>
-                        {rewardVisible && (
-                            <div className="octane-quest-completed-reward">
-                                {localizeWithFallback(
-                                    'quests.completed.reward',
-                                    'You earned %amount% %currencyname%!',
-                                    ['amount', 'currencyname'],
-                                    [String(quest.rewardCurrencyAmount), currencyName]
-                                )}
+                        <div className="octane-quest-completed-texts">
+                            <div className="octane-quest-completed-congrats">
+                                {lastQuestInCampaign
+                                    ? localizeWithFallback('quests.completed.campaign.caption', 'Campaign completed!')
+                                    : localizeWithFallback('quests.completed.quest.caption', 'Quest completed!')}
                             </div>
+                            <div className="octane-quest-completed-desc">{getQuestCompletedText(quest)}</div>
+                            {rewardVisible && (
+                                <div className="octane-quest-completed-reward">
+                                    {localizeWithFallback(
+                                        'quests.completed.reward',
+                                        'You earned %amount% %currencyname%!',
+                                        ['amount', 'currencyname'],
+                                        [String(quest.rewardCurrencyAmount), currencyName]
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="octane-quest-completed-actions">
+                        {!lastQuestInCampaign && rewardVisible && (
+                            <BaseButton className="octane-quest-link" onClick={onCatalog}>
+                                {localizeWithFallback('quests.completed.cataloglink', 'Spend your %currencyname%', ['currencyname'], [currencyName])}
+                            </BaseButton>
+                        )}
+                        <div className="grow" />
+                        {lastQuestInCampaign && (
+                            <Button variant="secondary" className="octane-quest-completed-button" onClick={onMoreQuests}>
+                                {localizeWithFallback('quests.campaigncompleted.more', 'More quests')}
+                            </Button>
+                        )}
+                        {!lastQuestInCampaign && (
+                            <Button variant="secondary" className="octane-quest-completed-button" onClick={onNextQuest}>
+                                {localizeWithFallback('quests.completed.next', 'Next quest')}
+                            </Button>
                         )}
                     </div>
-                </div>
-                <div className="octane-quest-completed-actions">
-                    {!lastQuestInCampaign && rewardVisible && (
-                        <BaseButton className="octane-quest-link" onClick={onCatalog}>
-                            {localizeWithFallback('quests.completed.cataloglink', 'Spend your %currencyname%', ['currencyname'], [currencyName])}
-                        </BaseButton>
-                    )}
-                    <div className="grow" />
-                    {lastQuestInCampaign && (
-                        <Button variant="secondary" className="octane-quest-completed-button" onClick={onMoreQuests}>
-                            {localizeWithFallback('quests.campaigncompleted.more', 'More quests')}
-                        </Button>
-                    )}
-                    {!lastQuestInCampaign && (
-                        <Button variant="secondary" className="octane-quest-completed-button" onClick={onNextQuest}>
-                            {localizeWithFallback('quests.completed.next', 'Next quest')}
-                        </Button>
-                    )}
-                </div>
-            </OctaneCard.Content>
-        </OctaneCard>
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { CreateLinkEvent, PetRespectComposer, PetType } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { ConvertSeconds, GetConfigurationRecord, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutCounterTimeView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useRoom, useSessionInfo } from '../../../../../hooks';
 import { InfoStandHeaderView } from './InfoStandHeaderView';
 import { InfoStandUnitIdView } from './InfoStandUnitIdView';
@@ -40,13 +41,15 @@ interface InfoStandWidgetPetViewProps {
 }
 
 const PetHeader: FC<{ name: string; petType: number; petBreed: number; onClose: () => void }> = ({ name, petType, petBreed, onClose }) => (
-    <div className="flex flex-col gap-1">
-        <InfoStandHeaderView name={name} onClose={onClose} />
-        <Text small wrap variant="white">
-            {LocalizeText(`pet.breed.${petType}.${petBreed}`)}
-        </Text>
-        <div className="octane-infostand__rule" />
-    </div>
+    <NativeTextTree>
+        <div className="flex flex-col gap-1">
+            <InfoStandHeaderView name={name} onClose={onClose} />
+            <Text small wrap variant="white">
+                {LocalizeText(`pet.breed.${petType}.${petBreed}`)}
+            </Text>
+            <div className="octane-infostand__rule" />
+        </div>
+    </NativeTextTree>
 );
 
 const MonsterplantStats: FC<{
@@ -118,68 +121,73 @@ const MonsterplantStats: FC<{
 
 // Sub-component: Regular Pet Stats
 const RegularPetStats: FC<{ avatarInfo: AvatarInfoPet }> = ({ avatarInfo }) => (
-    <>
-        <div className="flex flex-col gap-1">
-            <div className="flex gap-1">
-                <Column fullWidth className="body-image pet p-1" overflow="hidden">
-                    <LayoutPetImageView direction={4} figure={avatarInfo.petFigure} posture={avatarInfo.posture} />
-                </Column>
-                <Column grow gap={1}>
-                    <Text center small wrap variant="white">
-                        {LocalizeText('pet.level', ['level', 'maxlevel'], [avatarInfo.level.toString(), avatarInfo.maximumLevel.toString()])}
-                    </Text>
-                    <Column alignItems="center" gap={1}>
-                        <Text small truncate variant="white">
-                            {LocalizeText('infostand.pet.text.happiness')}
-                        </Text>
-                        <div className="bg-light-dark rounded relative overflow-hidden w-full">
-                            <div className="flex justify-center items-center size-full absolute">
-                                <Text small variant="white">
-                                    {avatarInfo.happyness + '/' + avatarInfo.maximumHappyness}
-                                </Text>
-                            </div>
-                            <div className="bg-info rounded pet-stats" style={{ width: (avatarInfo.happyness / avatarInfo.maximumHappyness) * 100 + '%' }} />
-                        </div>
+    <NativeTextTree>
+        <>
+            <div className="flex flex-col gap-1">
+                <div className="flex gap-1">
+                    <Column fullWidth className="body-image pet p-1" overflow="hidden">
+                        <LayoutPetImageView direction={4} figure={avatarInfo.petFigure} posture={avatarInfo.posture} />
                     </Column>
-                    <Column alignItems="center" gap={1}>
-                        <Text small truncate variant="white">
-                            {LocalizeText('infostand.pet.text.experience')}
+                    <Column grow gap={1}>
+                        <Text center small wrap variant="white">
+                            {LocalizeText('pet.level', ['level', 'maxlevel'], [avatarInfo.level.toString(), avatarInfo.maximumLevel.toString()])}
                         </Text>
-                        <div className="bg-light-dark rounded relative overflow-hidden w-full">
-                            <div className="flex justify-center items-center size-full absolute">
-                                <Text small variant="white">
-                                    {avatarInfo.experience + '/' + avatarInfo.levelExperienceGoal}
-                                </Text>
+                        <Column alignItems="center" gap={1}>
+                            <Text small truncate variant="white">
+                                {LocalizeText('infostand.pet.text.happiness')}
+                            </Text>
+                            <div className="bg-light-dark rounded relative overflow-hidden w-full">
+                                <div className="flex justify-center items-center size-full absolute">
+                                    <Text small variant="white">
+                                        {avatarInfo.happyness + '/' + avatarInfo.maximumHappyness}
+                                    </Text>
+                                </div>
+                                <div
+                                    className="bg-info rounded pet-stats"
+                                    style={{ width: (avatarInfo.happyness / avatarInfo.maximumHappyness) * 100 + '%' }}
+                                />
                             </div>
-                            <div
-                                className="bg-purple rounded pet-stats"
-                                style={{ width: (avatarInfo.experience / avatarInfo.levelExperienceGoal) * 100 + '%' }}
-                            />
-                        </div>
-                    </Column>
-                    <Column alignItems="center" gap={1}>
-                        <Text small truncate variant="white">
-                            {LocalizeText('infostand.pet.text.energy')}
-                        </Text>
-                        <div className="bg-light-dark rounded relative overflow-hidden w-full">
-                            <div className="flex justify-center items-center size-full absolute">
-                                <Text small variant="white">
-                                    {avatarInfo.energy + '/' + avatarInfo.maximumEnergy}
-                                </Text>
+                        </Column>
+                        <Column alignItems="center" gap={1}>
+                            <Text small truncate variant="white">
+                                {LocalizeText('infostand.pet.text.experience')}
+                            </Text>
+                            <div className="bg-light-dark rounded relative overflow-hidden w-full">
+                                <div className="flex justify-center items-center size-full absolute">
+                                    <Text small variant="white">
+                                        {avatarInfo.experience + '/' + avatarInfo.levelExperienceGoal}
+                                    </Text>
+                                </div>
+                                <div
+                                    className="bg-purple rounded pet-stats"
+                                    style={{ width: (avatarInfo.experience / avatarInfo.levelExperienceGoal) * 100 + '%' }}
+                                />
                             </div>
-                            <div className="bg-success rounded pet-stats" style={{ width: (avatarInfo.energy / avatarInfo.maximumEnergy) * 100 + '%' }} />
-                        </div>
+                        </Column>
+                        <Column alignItems="center" gap={1}>
+                            <Text small truncate variant="white">
+                                {LocalizeText('infostand.pet.text.energy')}
+                            </Text>
+                            <div className="bg-light-dark rounded relative overflow-hidden w-full">
+                                <div className="flex justify-center items-center size-full absolute">
+                                    <Text small variant="white">
+                                        {avatarInfo.energy + '/' + avatarInfo.maximumEnergy}
+                                    </Text>
+                                </div>
+                                <div className="bg-success rounded pet-stats" style={{ width: (avatarInfo.energy / avatarInfo.maximumEnergy) * 100 + '%' }} />
+                            </div>
+                        </Column>
                     </Column>
-                </Column>
+                </div>
+                <div className="octane-infostand__rule" />
             </div>
-            <div className="octane-infostand__rule" />
-        </div>
-        <div className="flex flex-col gap-1">
-            <div className="octane-infostand__score">{LocalizeText('infostand.text.petrespect', ['count'], [avatarInfo.respect.toString()])}</div>
-            <div className="octane-infostand__score">{LocalizeText('pet.age', ['age'], [avatarInfo.age.toString()])}</div>
-            <div className="octane-infostand__rule" />
-        </div>
-    </>
+            <div className="flex flex-col gap-1">
+                <div className="octane-infostand__score">{LocalizeText('infostand.text.petrespect', ['count'], [avatarInfo.respect.toString()])}</div>
+                <div className="octane-infostand__score">{LocalizeText('pet.age', ['age'], [avatarInfo.age.toString()])}</div>
+                <div className="octane-infostand__rule" />
+            </div>
+        </>
+    </NativeTextTree>
 );
 
 export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatarInfo, onClose }) => {
@@ -276,36 +284,38 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = ({ avatar
     if (!avatarInfo) return <Text variant="white">{LocalizeText('generic.loading')}</Text>;
 
     return (
-        <Column alignItems="end" gap={1}>
-            <Column className="octane-infostand rounded">
-                <Column className="container-fluid content-area" gap={1} overflow="visible">
-                    <PetHeader name={avatarInfo.name} petType={avatarInfo.petType} petBreed={avatarInfo.petBreed} onClose={onClose} />
-                    {avatarInfo.petType === PetType.MONSTERPLANT ? (
-                        <MonsterplantStats avatarInfo={avatarInfo} remainingGrowTime={remainingGrowTime} remainingTimeToLive={remainingTimeToLive} />
-                    ) : (
-                        <RegularPetStats avatarInfo={avatarInfo} />
-                    )}
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1">
-                            <UserProfileIconView userId={avatarInfo.ownerId} />
-                            <Text small wrap variant="white">
-                                {LocalizeText('infostand.text.petowner', ['name'], [avatarInfo.ownerName])}
-                            </Text>
+        <NativeTextTree>
+            <Column alignItems="end" gap={1}>
+                <Column className="octane-infostand rounded">
+                    <Column className="container-fluid content-area" gap={1} overflow="visible">
+                        <PetHeader name={avatarInfo.name} petType={avatarInfo.petType} petBreed={avatarInfo.petBreed} onClose={onClose} />
+                        {avatarInfo.petType === PetType.MONSTERPLANT ? (
+                            <MonsterplantStats avatarInfo={avatarInfo} remainingGrowTime={remainingGrowTime} remainingTimeToLive={remainingTimeToLive} />
+                        ) : (
+                            <RegularPetStats avatarInfo={avatarInfo} />
+                        )}
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1">
+                                <UserProfileIconView userId={avatarInfo.ownerId} />
+                                <Text small wrap variant="white">
+                                    {LocalizeText('infostand.text.petowner', ['name'], [avatarInfo.ownerName])}
+                                </Text>
+                            </div>
+                            <InfoStandUnitIdView id={avatarInfo.id} ownerId={avatarInfo.ownerId} />
                         </div>
-                        <InfoStandUnitIdView id={avatarInfo.id} ownerId={avatarInfo.ownerId} />
-                    </div>
+                    </Column>
                 </Column>
+                <Flex gap={1} justifyContent="end">
+                    {buttons.map(
+                        (button) =>
+                            button.condition && (
+                                <Button key={button.action} variant="dark" onClick={() => processButtonAction(button.action)}>
+                                    {button.label}
+                                </Button>
+                            )
+                    )}
+                </Flex>
             </Column>
-            <Flex gap={1} justifyContent="end">
-                {buttons.map(
-                    (button) =>
-                        button.condition && (
-                            <Button key={button.action} variant="dark" onClick={() => processButtonAction(button.action)}>
-                                {button.label}
-                            </Button>
-                        )
-                )}
-            </Flex>
-        </Column>
+        </NativeTextTree>
     );
 };

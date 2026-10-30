@@ -5,6 +5,7 @@ import { useUserGroups, useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const GROUP_CURRENT_ROOM = 0;
 const GROUP_SELECTED = 1;
@@ -42,35 +43,37 @@ export const WiredSelectorUsersGroupView: FC<{}> = () => {
     };
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.groupselection')}</Text>
-                    {[GROUP_CURRENT_ROOM, GROUP_SELECTED].map((value) => (
-                        <label key={value} className="flex items-center gap-1">
-                            <Radio checked={groupType === value} name="usersGroupSelectorType" onCheckedChange={() => setGroupType(value)} />
-                            <Text>{LocalizeText(`wiredfurni.params.grouptype.${value}`)}</Text>
-                        </label>
-                    ))}
-                </div>
-
-                {groupType === GROUP_SELECTED && (
-                    <Select
-                        aria-label={LocalizeText('wiredfurni.tooltip.group')}
-                        className="form-select form-select-sm"
-                        value={selectedGroupId}
-                        onChange={(event) => setSelectedGroupId(parseInt(event.target.value))}
-                    >
-                        {!selectedGroupOptions.length && <option value={0}>-</option>}
-                        {selectedGroupOptions.map((group) => (
-                            <option key={group.value} value={group.value}>
-                                {group.label}
-                            </option>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.groupselection')}</Text>
+                        {[GROUP_CURRENT_ROOM, GROUP_SELECTED].map((value) => (
+                            <label key={value} className="flex items-center gap-1">
+                                <Radio checked={groupType === value} name="usersGroupSelectorType" onCheckedChange={() => setGroupType(value)} />
+                                <Text>{LocalizeText(`wiredfurni.params.grouptype.${value}`)}</Text>
+                            </label>
                         ))}
-                    </Select>
-                )}
+                    </div>
 
-            </div>
-        </WiredSelectorBaseView>
+                    {groupType === GROUP_SELECTED && (
+                        <Select
+                            aria-label={LocalizeText('wiredfurni.tooltip.group')}
+                            className="form-select form-select-sm"
+                            value={selectedGroupId}
+                            onChange={(event) => setSelectedGroupId(parseInt(event.target.value))}
+                        >
+                            {!selectedGroupOptions.length && <option value={0}>-</option>}
+                            {selectedGroupOptions.map((group) => (
+                                <option key={group.value} value={group.value}>
+                                    {group.label}
+                                </option>
+                            ))}
+                        </Select>
+                    )}
+
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,4 +1,5 @@
 import { FC, useMemo } from 'react';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { tileToScreen } from '../hooks/usePointerToTile';
 import { TILE_SIZE } from '../state/constants';
 import { tileFill } from '../state/selectors';
@@ -153,8 +154,10 @@ export const FloorplanPreviewSVG: FC<{ state: FloorplanState }> = ({ state }) =>
     const viewBox = useMemo(() => fitViewBox(state), [state]);
 
     return (
-        <svg viewBox={viewBox} preserveAspectRatio="xMidYMid meet" className="w-full h-full bg-black" data-testid="floorplan-preview-svg">
-            {elements}
-        </svg>
+        <NativeTextTree>
+            <svg viewBox={viewBox} preserveAspectRatio="xMidYMid meet" className="w-full h-full bg-black" data-testid="floorplan-preview-svg">
+                {elements}
+            </svg>
+        </NativeTextTree>
     );
 };

@@ -6,6 +6,7 @@ import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
 import { FURNI_SOURCES, USER_SOURCES } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const SOURCE_TRIGGER = 0;
 const SOURCE_SELECTED = 100;
@@ -173,68 +174,70 @@ export const WiredActionSendSignalView: FC<{}> = () =>
     const selectionLimit = trigger?.maximumItemSelectionCount ?? 0;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
-            cardStyle={ { width: '400px' } }
-            save={ save }
-            selectionPreview={
-                <div className="flex flex-col gap-2">
-                    <WiredFurniSelectionSourceRow
-                        title={ localizeWithFallback('wiredfurni.params.sources.furni.title.signal_antenna', 'Antenne:') }
-                        titleIsLiteral={ true }
-                        options={ [ { value: SOURCE_SELECTED, label: 'wiredfurni.params.sources.furni.100' } ] }
-                        value={ SOURCE_SELECTED }
-                        selectionKind="primary"
-                        selectionActive={ selectionMode === 'antenna' }
-                        selectionCount={ antennaIds.length }
-                        selectionLimit={ selectionLimit }
-                        selectionEnabledValues={ [ SOURCE_SELECTED ] }
-                        onChange={ () =>
-                        {} }
-                        onSelectionActivate={ () => switchSelection('antenna') } />
-                    <WiredFurniSelectionSourceRow
-                        title={ localizeWithFallback('wiredfurni.params.sources.furni.title.signal_forward', 'Furni to forward:') }
-                        titleIsLiteral={ true }
-                        options={ FURNI_SOURCES }
-                        value={ furniSource }
-                        selectionKind="secondary"
-                        selectionActive={ selectionMode === 'furni' }
-                        selectionCount={ forwardFurniIds.length }
-                        selectionLimit={ selectionLimit }
-                        selectionEnabledValues={ [ SOURCE_SELECTED ] }
-                        onChange={ onChangeFurniSource }
-                        onSelectionActivate={ () => switchSelection('furni') } />
-                    <WiredFurniSelectionSourceRow
-                        title={ localizeWithFallback('wiredfurni.params.sources.users.title.signal_forward', 'Users to forward:') }
-                        titleIsLiteral={ true }
-                        options={ USER_SOURCES }
-                        value={ userSource }
-                        selectionKind="secondary"
-                        selectionActive={ false }
-                        selectionCount={ 0 }
-                        selectionLimit={ 0 }
-                        selectionEnabledValues={ [] }
-                        showSelectionToggle={ false }
-                        onChange={ setUserSource } />
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
+                cardStyle={ { width: '400px' } }
+                save={ save }
+                selectionPreview={
+                    <div className="flex flex-col gap-2">
+                        <WiredFurniSelectionSourceRow
+                            title={ localizeWithFallback('wiredfurni.params.sources.furni.title.signal_antenna', 'Antenne:') }
+                            titleIsLiteral={ true }
+                            options={ [ { value: SOURCE_SELECTED, label: 'wiredfurni.params.sources.furni.100' } ] }
+                            value={ SOURCE_SELECTED }
+                            selectionKind="primary"
+                            selectionActive={ selectionMode === 'antenna' }
+                            selectionCount={ antennaIds.length }
+                            selectionLimit={ selectionLimit }
+                            selectionEnabledValues={ [ SOURCE_SELECTED ] }
+                            onChange={ () =>
+                            {} }
+                            onSelectionActivate={ () => switchSelection('antenna') } />
+                        <WiredFurniSelectionSourceRow
+                            title={ localizeWithFallback('wiredfurni.params.sources.furni.title.signal_forward', 'Furni to forward:') }
+                            titleIsLiteral={ true }
+                            options={ FURNI_SOURCES }
+                            value={ furniSource }
+                            selectionKind="secondary"
+                            selectionActive={ selectionMode === 'furni' }
+                            selectionCount={ forwardFurniIds.length }
+                            selectionLimit={ selectionLimit }
+                            selectionEnabledValues={ [ SOURCE_SELECTED ] }
+                            onChange={ onChangeFurniSource }
+                            onSelectionActivate={ () => switchSelection('furni') } />
+                        <WiredFurniSelectionSourceRow
+                            title={ localizeWithFallback('wiredfurni.params.sources.users.title.signal_forward', 'Users to forward:') }
+                            titleIsLiteral={ true }
+                            options={ USER_SOURCES }
+                            value={ userSource }
+                            selectionKind="secondary"
+                            selectionActive={ false }
+                            selectionCount={ 0 }
+                            selectionLimit={ 0 }
+                            selectionEnabledValues={ [] }
+                            showSelectionToggle={ false }
+                            onChange={ setUserSource } />
+                    </div>
+                }
+            >
+                <div className="flex flex-col gap-3">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.signal.send_options', LocalizeText('wiredfurni.params.signal.options')) }</Text>
+                    <div className="form-check">
+                        <Checkbox id="signal-per-furni" checked={ signalPerFurni } onCheckedChange={(nextChecked) => confirmSplit(nextChecked, setSignalPerFurni)} />
+                        <label className="form-check-label" htmlFor="signal-per-furni">
+                            <Text small>{ LocalizeText('wiredfurni.params.signal.split_furni') }</Text>
+                        </label>
+                    </div>
+                    <div className="form-check">
+                        <Checkbox id="signal-per-user" checked={ signalPerUser } onCheckedChange={(nextChecked) => confirmSplit(nextChecked, setSignalPerUser)} />
+                        <label className="form-check-label" htmlFor="signal-per-user">
+                            <Text small>{ LocalizeText('wiredfurni.params.signal.split_users') }</Text>
+                        </label>
+                    </div>
                 </div>
-            }
-        >
-            <div className="flex flex-col gap-3">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.signal.send_options', LocalizeText('wiredfurni.params.signal.options')) }</Text>
-                <div className="form-check">
-                    <Checkbox id="signal-per-furni" checked={ signalPerFurni } onCheckedChange={(nextChecked) => confirmSplit(nextChecked, setSignalPerFurni)} />
-                    <label className="form-check-label" htmlFor="signal-per-furni">
-                        <Text small>{ LocalizeText('wiredfurni.params.signal.split_furni') }</Text>
-                    </label>
-                </div>
-                <div className="form-check">
-                    <Checkbox id="signal-per-user" checked={ signalPerUser } onCheckedChange={(nextChecked) => confirmSplit(nextChecked, setSignalPerUser)} />
-                    <label className="form-check-label" htmlFor="signal-per-user">
-                        <Text small>{ LocalizeText('wiredfurni.params.signal.split_users') }</Text>
-                    </label>
-                </div>
-            </div>
-        </WiredActionBaseView>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

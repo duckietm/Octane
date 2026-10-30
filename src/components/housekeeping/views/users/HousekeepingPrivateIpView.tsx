@@ -4,6 +4,7 @@ import { HousekeepingApi, housekeepingFailureKey, LocalizeText } from '../../../
 import { useHasPermission } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * The user's IP as the server sends it (masked), with a reveal for operators holding
@@ -37,30 +38,34 @@ export const HousekeepingPrivateIpView: FC<{ userId: number; masked: string }> =
 
     if (revealed) {
         return (
-            <span
-                className="truncate"
-                title={LocalizeText('housekeeping.user.private.ips', ['login', 'register'], [revealed.login || '-', revealed.register || '-'])}
-            >
-                {revealed.login || '-'}
-            </span>
+            <NativeTextTree>
+                <span
+                    className="truncate"
+                    title={LocalizeText('housekeeping.user.private.ips', ['login', 'register'], [revealed.login || '-', revealed.register || '-'])}
+                >
+                    {revealed.login || '-'}
+                </span>
+            </NativeTextTree>
         );
     }
 
     return (
-        <span className="flex min-w-0 items-center gap-1">
-            <span className="truncate" title={error ? LocalizeText(error) : undefined}>
-                {masked || '-'}
+        <NativeTextTree>
+            <span className="flex min-w-0 items-center gap-1">
+                <span className="truncate" title={error ? LocalizeText(error) : undefined}>
+                    {masked || '-'}
+                </span>
+                {canReveal && masked && (
+                    <Hint content={LocalizeText('housekeeping.user.private.reveal')}><BaseButton aria-label={LocalizeText('housekeeping.user.private.reveal')}
+                        className="shrink-0 text-zinc-400 hover:text-sky-600 disabled:opacity-40"
+                        disabled={isLoading}
+                        type="button"
+                        onClick={reveal}
+                    >
+                        <FaEye size={9} />
+                    </BaseButton></Hint>
+                )}
             </span>
-            {canReveal && masked && (
-                <Hint content={LocalizeText('housekeeping.user.private.reveal')}><BaseButton aria-label={LocalizeText('housekeeping.user.private.reveal')}
-                    className="shrink-0 text-zinc-400 hover:text-sky-600 disabled:opacity-40"
-                    disabled={isLoading}
-                    type="button"
-                    onClick={reveal}
-                >
-                    <FaEye size={9} />
-                </BaseButton></Hint>
-            )}
-        </span>
+        </NativeTextTree>
     );
 };

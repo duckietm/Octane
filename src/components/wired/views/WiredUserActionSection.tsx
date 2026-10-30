@@ -10,6 +10,7 @@ import {
 } from '../../../api';
 import { Text } from '../../../common';
 import { Checkbox } from '../../../common/Checkbox';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { Select } from '../../../common/Select';
 
 /**
@@ -36,21 +37,23 @@ export const WiredUserActionSection: FC<{ choice: WiredUserActionChoice; onChang
     );
 
     return (
-        <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.action_selection', 'Action') }</Text>
-                <Select className="form-select form-select-sm" title={ localizeWithFallback('wiredfurni.tooltip.action', '') } value={ choice.action } onChange={ event => patch({ action: parseInt(event.target.value, 10) }) }>
-                    { WIRED_USER_ACTIONS.map(action => <option key={ action.code } value={ action.code }>{ localizeWithFallback(`wiredfurni.params.action.${ action.code }`, action.name) }</option>) }
-                </Select>
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.action_selection', 'Action') }</Text>
+                    <Select className="form-select form-select-sm" title={ localizeWithFallback('wiredfurni.tooltip.action', '') } value={ choice.action } onChange={ event => patch({ action: parseInt(event.target.value, 10) }) }>
+                        { WIRED_USER_ACTIONS.map(action => <option key={ action.code } value={ action.code }>{ localizeWithFallback(`wiredfurni.params.action.${ action.code }`, action.name) }</option>) }
+                    </Select>
+                </div>
+                { choice.action === WIRED_USER_ACTION_SIGN && extraSection(
+                    'wiredfurni.params.sign_selection', 'wiredfurni.params.sign_filter', 'wiredfurni.tooltip.sign',
+                    choice.signFilter, choice.signId, WIRED_USER_ACTION_SIGNS, value => `wiredfurni.params.action.sign.${ value }`,
+                    on => patch({ signFilter: on }), value => patch({ signId: value })) }
+                { choice.action === WIRED_USER_ACTION_DANCE && extraSection(
+                    'wiredfurni.params.dance_selection', 'wiredfurni.params.dance_filter', 'wiredfurni.tooltip.dance',
+                    choice.danceFilter, choice.danceId, WIRED_USER_ACTION_DANCES, value => `wiredfurni.params.action.dance.${ value }`,
+                    on => patch({ danceFilter: on }), value => patch({ danceId: value })) }
             </div>
-            { choice.action === WIRED_USER_ACTION_SIGN && extraSection(
-                'wiredfurni.params.sign_selection', 'wiredfurni.params.sign_filter', 'wiredfurni.tooltip.sign',
-                choice.signFilter, choice.signId, WIRED_USER_ACTION_SIGNS, value => `wiredfurni.params.action.sign.${ value }`,
-                on => patch({ signFilter: on }), value => patch({ signId: value })) }
-            { choice.action === WIRED_USER_ACTION_DANCE && extraSection(
-                'wiredfurni.params.dance_selection', 'wiredfurni.params.dance_filter', 'wiredfurni.tooltip.dance',
-                choice.danceFilter, choice.danceId, WIRED_USER_ACTION_DANCES, value => `wiredfurni.params.action.dance.${ value }`,
-                on => patch({ danceFilter: on }), value => patch({ danceId: value })) }
-        </div>
+        </NativeTextTree>
     );
 };

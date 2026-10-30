@@ -15,6 +15,7 @@ import { BaseButton } from '../../common/BaseButton';
 import { useHasPermission } from '../../hooks';
 import { CalendarItemView } from './CalendarItemView';
 import '../../css/campaign/CampaignCalendarView.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface CalendarViewProps {
     onClose(): void;
@@ -95,62 +96,64 @@ export const CalendarView: FC<CalendarViewProps> = (props) => {
     };
 
     return (
-        <OctaneCardView className="octane-campaign-calendar" theme="primary-slim" style={{ width: spinnerWidth }}>
-            <OctaneCardHeaderView
-                headerText={localizeWithFallback(`campaign.calendar.${campaignName}.title`, localizeWithFallback('campaign.calendar.title', 'Calendar'))}
-                onCloseClick={onClose}
-            />
-            <OctaneCardContentView className="octane-campaign-calendar__content" overflow="hidden">
-                <div className="octane-campaign-calendar__info">
-                    <div className="octane-campaign-calendar__icon" />
-                    <div className="octane-campaign-calendar__texts">
-                        <div className="octane-campaign-calendar__heading">
-                            {receivedProduct
-                                ? LocalizeText('campaign.calendar.heading.product.received')
-                                : LocalizeText('campaign.calendar.heading.day', ['number'], [(selectedDay + 1).toString()])}
+        <NativeTextTree>
+            <OctaneCardView className="octane-campaign-calendar" theme="primary-slim" style={{ width: spinnerWidth }}>
+                <OctaneCardHeaderView
+                    headerText={localizeWithFallback(`campaign.calendar.${campaignName}.title`, localizeWithFallback('campaign.calendar.title', 'Calendar'))}
+                    onCloseClick={onClose}
+                />
+                <OctaneCardContentView className="octane-campaign-calendar__content" overflow="hidden">
+                    <div className="octane-campaign-calendar__info">
+                        <div className="octane-campaign-calendar__icon" />
+                        <div className="octane-campaign-calendar__texts">
+                            <div className="octane-campaign-calendar__heading">
+                                {receivedProduct
+                                    ? LocalizeText('campaign.calendar.heading.product.received')
+                                    : LocalizeText('campaign.calendar.heading.day', ['number'], [(selectedDay + 1).toString()])}
+                            </div>
+                            <div className="octane-campaign-calendar__body">{receivedProduct ? getCalendarRewardName(receivedProduct) : dayMessage()}</div>
                         </div>
-                        <div className="octane-campaign-calendar__body">{receivedProduct ? getCalendarRewardName(receivedProduct) : dayMessage()}</div>
+                        {isModerator && (
+                            <Button
+                                className="octane-campaign-calendar__force-open"
+                                disabled={selectedState === CalendarItemState.STATE_UNLOCKED}
+                                variant="danger"
+                                onClick={forceOpen}
+                            >
+                                Force open
+                            </Button>
+                        )}
                     </div>
-                    {isModerator && (
-                        <Button
-                            className="octane-campaign-calendar__force-open"
-                            disabled={selectedState === CalendarItemState.STATE_UNLOCKED}
-                            variant="danger"
-                            onClick={forceOpen}
-                        >
-                            Force open
-                        </Button>
-                    )}
-                </div>
-                <div className="octane-campaign-calendar__spinner" data-testid="calendar-spinner">
-                    <div className="octane-campaign-calendar__track" style={{ transform: `translateX(${spinner.offset}px)` }}>
-                        {Array.from({ length: numDays }, (_, day) => (
-                            <CalendarItemView
-                                key={day}
-                                active={selectedDay === day}
-                                itemId={day}
-                                product={receivedProducts?.get(day) ?? openedRewards?.get(day) ?? null}
-                                state={getDayState(day)}
-                                onClick={onClickItem}
-                            />
-                        ))}
+                    <div className="octane-campaign-calendar__spinner" data-testid="calendar-spinner">
+                        <div className="octane-campaign-calendar__track" style={{ transform: `translateX(${spinner.offset}px)` }}>
+                            {Array.from({ length: numDays }, (_, day) => (
+                                <CalendarItemView
+                                    key={day}
+                                    active={selectedDay === day}
+                                    itemId={day}
+                                    product={receivedProducts?.get(day) ?? openedRewards?.get(day) ?? null}
+                                    state={getDayState(day)}
+                                    onClick={onClickItem}
+                                />
+                            ))}
+                        </div>
+                        <div className="octane-campaign-calendar__shade is-left" style={{ width: spinner.leftShade }} />
+                        <div className="octane-campaign-calendar__shade is-right" style={{ width: spinner.rightShade }} />
                     </div>
-                    <div className="octane-campaign-calendar__shade is-left" style={{ width: spinner.leftShade }} />
-                    <div className="octane-campaign-calendar__shade is-right" style={{ width: spinner.rightShade }} />
-                </div>
-                <BaseButton
-                    aria-label="previous"
-                    className="octane-campaign-calendar__arrow is-back"
-                    disabled={selectedDay <= 0}
-                    onClick={() => select(selectedDay - 1)}
-                />
-                <BaseButton
-                    aria-label="next"
-                    className="octane-campaign-calendar__arrow is-forward"
-                    disabled={selectedDay >= numDays - 1}
-                    onClick={() => select(selectedDay + 1)}
-                />
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <BaseButton
+                        aria-label="previous"
+                        className="octane-campaign-calendar__arrow is-back"
+                        disabled={selectedDay <= 0}
+                        onClick={() => select(selectedDay - 1)}
+                    />
+                    <BaseButton
+                        aria-label="next"
+                        className="octane-campaign-calendar__arrow is-forward"
+                        disabled={selectedDay >= numDays - 1}
+                        onClick={() => select(selectedDay + 1)}
+                    />
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

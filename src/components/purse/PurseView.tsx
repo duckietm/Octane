@@ -25,6 +25,7 @@ import { CurrencyView } from './views/CurrencyView';
 import { SeasonalView } from './views/SeasonalView';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const PurseView: FC<{}> = (props) => {
     const { purse = null, hcDisabled = false } = usePurse();
@@ -192,113 +193,121 @@ export const PurseView: FC<{}> = (props) => {
     const showClubPromo = isClubPromoVisible(purse, hcDisabled);
 
     return (
-        <Column alignItems="end" className="octane-purse-container" gap={0}>
-            <div className="octane-purse">
-                <div className="octane-purse__chrome" aria-hidden="true" />
-                <div className="octane-purse__body">
-                    <div className="octane-purse__currencies">
-                        {hasDiamonds && (
-                            <CurrencyView
-                                type={5}
-                                amount={purse.activityPoints.get(5) || 0}
-                                short={currencyDisplayNumberShort}
-                                onClick={() => CreateLinkEvent('catalog/open/loyalty_info')}
-                            />
-                        )}
-                        <CurrencyView type={-1} amount={purse.credits} short={currencyDisplayNumberShort} onClick={openCredits} />
-                        {hasDuckets && (
-                            <CurrencyView
-                                type={0}
-                                amount={purse.activityPoints.get(0) || 0}
-                                short={currencyDisplayNumberShort}
-                                onClick={() => CreateLinkEvent('catalog/open/ducket_info')}
-                            />
-                        )}
-                    </div>
-                    <div className="octane-purse__col octane-purse__col--primary subscription-container">
-                        {!hcDisabled && (
-                            <Hint content={clubTooltip}>
+        <NativeTextTree>
+            <Column alignItems="end" className="octane-purse-container" gap={0}>
+                <div className="octane-purse">
+                    <div className="octane-purse__chrome" aria-hidden="true" />
+                    <div className="octane-purse__body">
+                        <div className="octane-purse__currencies">
+                            {hasDiamonds && (
+                                <CurrencyView
+                                    type={5}
+                                    amount={purse.activityPoints.get(5) || 0}
+                                    short={currencyDisplayNumberShort}
+                                    onClick={() => CreateLinkEvent('catalog/open/loyalty_info')}
+                                />
+                            )}
+                            <CurrencyView type={-1} amount={purse.credits} short={currencyDisplayNumberShort} onClick={openCredits} />
+                            {hasDuckets && (
+                                <CurrencyView
+                                    type={0}
+                                    amount={purse.activityPoints.get(0) || 0}
+                                    short={currencyDisplayNumberShort}
+                                    onClick={() => CreateLinkEvent('catalog/open/ducket_info')}
+                                />
+                            )}
+                        </div>
+                        <div className="octane-purse__col octane-purse__col--primary subscription-container">
+                            {!hcDisabled && (
+                                <Hint content={clubTooltip}>
+                                    <BaseButton
+                                        type="button"
+                                        className={`octane-purse__btn octane-purse__btn--join octane-purse-subscription club-text${clubBouncing ? ' is-bouncing' : ''}`}
+                                        onClick={openClub}
+                                    >
+                                        <img src={hcIcon} alt="" className="octane-purse__btn-img" />
+                                        <span>{clubLabel}</span>
+                                    </BaseButton>
+                                </Hint>
+                            )}
+                            <Hint content={earningsLabel}>
                                 <BaseButton
                                     type="button"
-                                    className={`octane-purse__btn octane-purse__btn--join octane-purse-subscription club-text${clubBouncing ? ' is-bouncing' : ''}`}
-                                    onClick={openClub}
+                                    className="octane-purse__btn octane-purse__btn--earnings octane-purse-subscription club-text"
+                                    onClick={openEarnings}
                                 >
-                                    <img src={hcIcon} alt="" className="octane-purse__btn-img" />
-                                    <span>{clubLabel}</span>
+                                    <img src={earningsIcon} alt="" className="octane-purse__btn-img" />
+                                    <span>{earningsLabel}</span>
+                                    {earningsUnseen && <img src={earningsUnseenIcon} alt="" className="octane-purse__earnings-unseen" />}
                                 </BaseButton>
                             </Hint>
-                        )}
-                        <Hint content={earningsLabel}>
-                            <BaseButton
-                                type="button"
-                                className="octane-purse__btn octane-purse__btn--earnings octane-purse-subscription club-text"
-                                onClick={openEarnings}
-                            >
-                                <img src={earningsIcon} alt="" className="octane-purse__btn-img" />
-                                <span>{earningsLabel}</span>
-                                {earningsUnseen && <img src={earningsUnseenIcon} alt="" className="octane-purse__earnings-unseen" />}
-                            </BaseButton>
-                        </Hint>
-                    </div>
-                    <div className="octane-purse__divider" aria-hidden="true" />
-                    <div className="octane-purse__col octane-purse__col--actions">
-                        <Hint content={helpLabel}>
-                            <BaseButton
-                                type="button"
-                                className="octane-purse__btn octane-purse__btn--help octane-purse-right-button help"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    CreateLinkEvent('help/show');
-                                }}
-                            >
-                                <span>{helpLabel}</span>
-                            </BaseButton>
-                        </Hint>
-                        <Hint content={logoutLabel}>
-                            <BaseButton
-                                aria-label={logoutLabel}
-                                type="button"
-                                className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--logout octane-purse-right-button disconnect"
-                                onClick={handleLogout}
-                            >
-                                <img src={logoutIcon} alt="" className="octane-purse__btn-img" />
-                            </BaseButton>
-                        </Hint>
-                        <Hint content={settingsLabel}>
-                            <BaseButton
-                                aria-label={settingsLabel}
-                                aria-expanded={settingsMenuOpen}
-                                type="button"
-                                className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--settings octane-purse-right-button settings"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    setSettingsMenuOpen((value) => !value);
-                                }}
-                            >
-                                <img src={settingsIcon} alt="" className="octane-purse__btn-img" />
-                            </BaseButton>
-                        </Hint>
+                        </div>
+                        <div className="octane-purse__divider" aria-hidden="true" />
+                        <div className="octane-purse__col octane-purse__col--actions">
+                            <Hint content={helpLabel}>
+                                <BaseButton
+                                    type="button"
+                                    className="octane-purse__btn octane-purse__btn--help octane-purse-right-button help"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        CreateLinkEvent('help/show');
+                                    }}
+                                >
+                                    <span>{helpLabel}</span>
+                                </BaseButton>
+                            </Hint>
+                            <Hint content={logoutLabel}>
+                                <BaseButton
+                                    aria-label={logoutLabel}
+                                    type="button"
+                                    className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--logout octane-purse-right-button disconnect"
+                                    onClick={handleLogout}
+                                >
+                                    <img src={logoutIcon} alt="" className="octane-purse__btn-img" />
+                                </BaseButton>
+                            </Hint>
+                            <Hint content={settingsLabel}>
+                                <BaseButton
+                                    aria-label={settingsLabel}
+                                    aria-expanded={settingsMenuOpen}
+                                    type="button"
+                                    className="octane-purse__btn octane-purse__btn--icon octane-purse__btn--settings octane-purse-right-button settings"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        setSettingsMenuOpen((value) => !value);
+                                    }}
+                                >
+                                    <img src={settingsIcon} alt="" className="octane-purse__btn-img" />
+                                </BaseButton>
+                            </Hint>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {showClubPromo && <ClubPromoView purse={purse} />}
-            <ClubExtendView />
-            {settingsMenuOpen && (
-                <div className="octane-purse-menu" role="menu">
-                    {settingsMenuRows.map((row) => (
-                        <BaseButton key={row.link} type="button" role="menuitem" className="octane-purse-menu__item" onClick={() => openSettingsLink(row.link)}>
-                            {row.label}
-                        </BaseButton>
-                    ))}
-                </div>
-            )}
-            {otherCurrencies.length > 0 && (
-                <div className="octane-purse__other">
-                    {otherCurrencies.map((type) => (
-                        <SeasonalView key={type} type={type} amount={purse.activityPoints.get(type) || 0} />
-                    ))}
-                </div>
-            )}
-        </Column>
+                {showClubPromo && <ClubPromoView purse={purse} />}
+                <ClubExtendView />
+                {settingsMenuOpen && (
+                    <div className="octane-purse-menu" role="menu">
+                        {settingsMenuRows.map((row) => (
+                            <BaseButton
+                                key={row.link}
+                                type="button"
+                                role="menuitem"
+                                className="octane-purse-menu__item"
+                                onClick={() => openSettingsLink(row.link)}
+                            >
+                                {row.label}
+                            </BaseButton>
+                        ))}
+                    </div>
+                )}
+                {otherCurrencies.length > 0 && (
+                    <div className="octane-purse__other">
+                        {otherCurrencies.map((type) => (
+                            <SeasonalView key={type} type={type} amount={purse.activityPoints.get(type) || 0} />
+                        ))}
+                    </div>
+                )}
+            </Column>
+        </NativeTextTree>
     );
 };

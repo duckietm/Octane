@@ -6,6 +6,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MAX_NAME_LENGTH = 40;
 /** AIR wired context SHARED_VARIABLE_LIST: the shared variables of the owner's other rooms. */
@@ -155,70 +156,72 @@ export const WiredExtraVariableReferenceView: FC<{}> = () => {
     const validate = () => !!normalizeVariableName(variableName).length && !!variableId;
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 400 }}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <OctaneInput
-                        disabled={disabled}
-                        maxLength={MAX_NAME_LENGTH}
-                        type="text"
-                        value={variableName}
-                        onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
-                        onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
-                    />
-                </div>
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 400 }}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
+                        <OctaneInput
+                            disabled={disabled}
+                            maxLength={MAX_NAME_LENGTH}
+                            type="text"
+                            value={variableName}
+                            onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
+                            onKeyDown={(event) => handleVariableNameKeyDown(event, setVariableName)}
+                        />
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.room_selection')}</Text>
-                    <Select
-                        aria-label={LocalizeText('wiredfurni.params.variables.room_selection.tooltip')}
-                        className="form-select form-select-sm"
-                        disabled={disabled}
-                        value={roomId}
-                        onChange={(event) => selectRoom(parseInt(event.target.value, 10))}
-                    >
-                        <option value={-1}>{LocalizeText('wiredfurni.params.variables.room_selection.tooltip')}</option>
-                        {rooms.map((room) => (
-                            <option key={room.roomId} value={room.roomId}>
-                                {room.roomName}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.room_selection')}</Text>
+                        <Select
+                            aria-label={LocalizeText('wiredfurni.params.variables.room_selection.tooltip')}
+                            className="form-select form-select-sm"
+                            disabled={disabled}
+                            value={roomId}
+                            onChange={(event) => selectRoom(parseInt(event.target.value, 10))}
+                        >
+                            <option value={-1}>{LocalizeText('wiredfurni.params.variables.room_selection.tooltip')}</option>
+                            {rooms.map((room) => (
+                                <option key={room.roomId} value={room.roomId}>
+                                    {room.roomName}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_ref_selection')}</Text>
-                    <Select
-                        aria-label={LocalizeText('wiredfurni.params.variables.variable_selection.tooltip')}
-                        className="form-select form-select-sm"
-                        disabled={disabled}
-                        value={variableId}
-                        onChange={(event) => selectVariable(event.target.value)}
-                    >
-                        <option value="">{LocalizeText('wiredfurni.params.variables.variable_selection.tooltip')}</option>
-                        {roomVariables.map((variable) => (
-                            <option key={variable.variableId} value={variable.variableId}>
-                                {variable.variableName}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_ref_selection')}</Text>
+                        <Select
+                            aria-label={LocalizeText('wiredfurni.params.variables.variable_selection.tooltip')}
+                            className="form-select form-select-sm"
+                            disabled={disabled}
+                            value={variableId}
+                            onChange={(event) => selectVariable(event.target.value)}
+                        >
+                            <option value="">{LocalizeText('wiredfurni.params.variables.variable_selection.tooltip')}</option>
+                            {roomVariables.map((variable) => (
+                                <option key={variable.variableId} value={variable.variableId}>
+                                    {variable.variableName}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Checkbox checked={readOnly} disabled={disabled} onCheckedChange={(nextChecked) => setReadOnly(nextChecked)} />
-                        <Text>{LocalizeText('wiredfurni.params.variables.settings.read_only')}</Text>
-                    </label>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.settings')}</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Checkbox checked={readOnly} disabled={disabled} onCheckedChange={(nextChecked) => setReadOnly(nextChecked)} />
+                            <Text>{LocalizeText('wiredfurni.params.variables.settings.read_only')}</Text>
+                        </label>
+                    </div>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

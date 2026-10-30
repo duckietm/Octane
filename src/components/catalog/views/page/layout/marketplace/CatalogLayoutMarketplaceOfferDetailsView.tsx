@@ -9,6 +9,7 @@ import {
     ProductTypeEnum
 } from '../../../../../../api';
 import { Button, LayoutFurniImageView, LayoutLimitedEditionCompactPlateView, Text } from '../../../../../../common';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { useMarketplaceConfiguration, useMarketplaceItemStats } from '../../../../../../hooks';
 import { MarketplaceChartView } from './MarketplaceChartView';
 
@@ -57,72 +58,74 @@ export const CatalogLayoutMarketplaceOfferDetailsView: FC<CatalogLayoutMarketpla
           : localizeWithFallback('catalog.marketplace.offer_details.chart_title.not_available', 'No data (at least two days of trading are needed)');
 
     return (
-        <div className="octane-marketplace-offer-details">
-            <Button className="marketplace-details-back" onClick={onBack}>
-                {localizeWithFallback('catalog.marketplace.offer_details.back', 'Back to the Marketplace')}
-            </Button>
-            <div className="marketplace-details-head">
-                <div className="marketplace-details-image">
-                    <LayoutFurniImageView
-                        direction={2}
-                        extraData={offerData.extraData}
-                        productClassId={offerData.furniId}
-                        productType={offerData.furniType === MarketplaceOfferData.TYPE_WALL ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
-                    />
-                    {offerData.isUniqueLimitedItem && (
-                        <div className="marketplace-details-unique">
-                            <LayoutLimitedEditionCompactPlateView
-                                uniqueNumber={offerData.stuffData.uniqueNumber}
-                                uniqueSeries={offerData.stuffData.uniqueSeries}
-                            />
-                        </div>
-                    )}
-                </div>
-                <div className="marketplace-details-text">
-                    <Text bold>{getMarketplaceOfferText(offerData, 'name')}</Text>
-                    <Text italics>{getMarketplaceOfferText(offerData, 'desc')}</Text>
-                    <Text className="marketplace-details-price marketplace-details-small">
-                        {localizeWithFallback(
-                            'catalog.marketplace.offer_details.price',
-                            `Cheapest price: ${offerData.price} credits`,
-                            ['price'],
-                            [offerData.price.toString()]
+        <NativeTextTree>
+            <div className="octane-marketplace-offer-details">
+                <Button className="marketplace-details-back" onClick={onBack}>
+                    {localizeWithFallback('catalog.marketplace.offer_details.back', 'Back to the Marketplace')}
+                </Button>
+                <div className="marketplace-details-head">
+                    <div className="marketplace-details-image">
+                        <LayoutFurniImageView
+                            direction={2}
+                            extraData={offerData.extraData}
+                            productClassId={offerData.furniId}
+                            productType={offerData.furniType === MarketplaceOfferData.TYPE_WALL ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR}
+                        />
+                        {offerData.isUniqueLimitedItem && (
+                            <div className="marketplace-details-unique">
+                                <LayoutLimitedEditionCompactPlateView
+                                    uniqueNumber={offerData.stuffData.uniqueNumber}
+                                    uniqueSeries={offerData.stuffData.uniqueSeries}
+                                />
+                            </div>
                         )}
-                    </Text>
-                    {stats && (
-                        <Text className="marketplace-details-small">
+                    </div>
+                    <div className="marketplace-details-text">
+                        <Text bold>{getMarketplaceOfferText(offerData, 'name')}</Text>
+                        <Text italics>{getMarketplaceOfferText(offerData, 'desc')}</Text>
+                        <Text className="marketplace-details-price marketplace-details-small">
                             {localizeWithFallback(
-                                'catalog.marketplace.offer_details.offer_count',
-                                `Offers: ${stats.offerCount}`,
-                                ['count'],
-                                [stats.offerCount.toString()]
+                                'catalog.marketplace.offer_details.price',
+                                `Cheapest price: ${offerData.price} credits`,
+                                ['price'],
+                                [offerData.price.toString()]
                             )}
                         </Text>
-                    )}
-                    <Text className="marketplace-details-small">
-                        {localizeWithFallback(
-                            'catalog.marketplace.offer_details.average_price',
-                            `Average price over the last ${averageDays} days: ${average} credits`,
-                            ['days', 'average'],
-                            [averageDays, average]
+                        {stats && (
+                            <Text className="marketplace-details-small">
+                                {localizeWithFallback(
+                                    'catalog.marketplace.offer_details.offer_count',
+                                    `Offers: ${stats.offerCount}`,
+                                    ['count'],
+                                    [stats.offerCount.toString()]
+                                )}
+                            </Text>
                         )}
-                    </Text>
-                </div>
-                <Button className="marketplace-details-buy" onClick={() => onBuy(offerData)}>
-                    {localizeWithFallback('buy', 'Buy')}
-                </Button>
-            </div>
-            <div className="marketplace-details-chart-selector">
-                {CHART_TYPES.map((type) => (
-                    <Button key={type} active={chartType === type} onClick={() => setChartType(type)}>
-                        {localizeWithFallback(`catalog.marketplace.offer_details.${type}`, CHART_FALLBACKS[type])}
+                        <Text className="marketplace-details-small">
+                            {localizeWithFallback(
+                                'catalog.marketplace.offer_details.average_price',
+                                `Average price over the last ${averageDays} days: ${average} credits`,
+                                ['days', 'average'],
+                                [averageDays, average]
+                            )}
+                        </Text>
+                    </div>
+                    <Button className="marketplace-details-buy" onClick={() => onBuy(offerData)}>
+                        {localizeWithFallback('buy', 'Buy')}
                     </Button>
-                ))}
+                </div>
+                <div className="marketplace-details-chart-selector">
+                    {CHART_TYPES.map((type) => (
+                        <Button key={type} active={chartType === type} onClick={() => setChartType(type)}>
+                            {localizeWithFallback(`catalog.marketplace.offer_details.${type}`, CHART_FALLBACKS[type])}
+                        </Button>
+                    ))}
+                </div>
+                <Text className="marketplace-details-chart-title">{chartTitle}</Text>
+                <div className="marketplace-details-chart">
+                    <MarketplaceChartView dayOffsets={chartAvailable ? stats.dayOffsets : NO_POINTS} values={chartAvailable ? values : NO_POINTS} />
+                </div>
             </div>
-            <Text className="marketplace-details-chart-title">{chartTitle}</Text>
-            <div className="marketplace-details-chart">
-                <MarketplaceChartView dayOffsets={chartAvailable ? stats.dayOffsets : NO_POINTS} values={chartAvailable ? values : NO_POINTS} />
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

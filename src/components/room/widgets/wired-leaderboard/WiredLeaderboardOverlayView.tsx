@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useRoom, useWiredLeaderboardEvents, useWiredLeaderboardStore } from '../../../../hooks';
 import { WiredLeaderboardPanelView } from './WiredLeaderboardPanelView';
 
@@ -27,51 +28,53 @@ export const WiredLeaderboardOverlayView: FC<{}> = () => {
     const relocate = (location: { tileX: number, tileY: number, offsetX: number, altitude: number }) => updateDraft(location);
 
     return (
-        <div className="octane-wired-leaderboard-overlay" data-testid="leaderboard-overlay">
-            {order.map((overlayId) => {
-                const panel = panels[overlayId];
+        <NativeTextTree>
+            <div className="octane-wired-leaderboard-overlay" data-testid="leaderboard-overlay">
+                {order.map((overlayId) => {
+                    const panel = panels[overlayId];
 
-                if (!panel) return null;
+                    if (!panel) return null;
 
-                const edited = editingPublished && overlayId === editOverlayId;
-                const descriptor = panel.descriptor;
-                const shown = edited ? draft : null;
+                    const edited = editingPublished && overlayId === editOverlayId;
+                    const descriptor = panel.descriptor;
+                    const shown = edited ? draft : null;
 
-                return (
+                    return (
+                        <WiredLeaderboardPanelView
+                            key={overlayId}
+                            roomId={roomId}
+                            title={shown ? shown.title : descriptor.title}
+                            description={shown ? shown.description : descriptor.description}
+                            columns={shown ? shown.columns : descriptor.columns}
+                            choices={descriptor.choices}
+                            pageSizeOption={shown ? shown.pageSizeOption : descriptor.pageSizeOption}
+                            location={shown ?? descriptor}
+                            variableId={panel.variableId}
+                            page={panel.page}
+                            total={panel.total}
+                            chunks={panel.chunks}
+                            dimmed={!!draft && !edited}
+                            onRelocate={edited ? relocate : null}
+                            onSelectVariable={(variableId) => selectVariable(overlayId, variableId)}
+                            onMovePage={(delta) => movePage(overlayId, delta)} />
+                    );
+                })}
+                {draft && !editingPublished && (
                     <WiredLeaderboardPanelView
-                        key={overlayId}
                         roomId={roomId}
-                        title={shown ? shown.title : descriptor.title}
-                        description={shown ? shown.description : descriptor.description}
-                        columns={shown ? shown.columns : descriptor.columns}
-                        choices={descriptor.choices}
-                        pageSizeOption={shown ? shown.pageSizeOption : descriptor.pageSizeOption}
-                        location={shown ?? descriptor}
-                        variableId={panel.variableId}
-                        page={panel.page}
-                        total={panel.total}
-                        chunks={panel.chunks}
-                        dimmed={!!draft && !edited}
-                        onRelocate={edited ? relocate : null}
-                        onSelectVariable={(variableId) => selectVariable(overlayId, variableId)}
-                        onMovePage={(delta) => movePage(overlayId, delta)} />
-                );
-            })}
-            {draft && !editingPublished && (
-                <WiredLeaderboardPanelView
-                    roomId={roomId}
-                    title={draft.title}
-                    description={draft.description}
-                    columns={draft.columns}
-                    choices={[]}
-                    pageSizeOption={draft.pageSizeOption}
-                    location={draft}
-                    variableId={null}
-                    page={0}
-                    total={0}
-                    chunks={{}}
-                    onRelocate={relocate} />
-            )}
-        </div>
+                        title={draft.title}
+                        description={draft.description}
+                        columns={draft.columns}
+                        choices={[]}
+                        pageSizeOption={draft.pageSizeOption}
+                        location={draft}
+                        variableId={null}
+                        page={0}
+                        total={0}
+                        chunks={{}}
+                        onRelocate={relocate} />
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

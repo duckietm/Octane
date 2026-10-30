@@ -30,6 +30,7 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const DIRECTION_OPTIONS: Array<{ fallback: string; value: number }> = [
     { fallback: 'the first match', value: WIRED_ARRAY_CAPTURE_DIRECTION_FIRST },
@@ -83,105 +84,107 @@ export const WiredExtraArrayCaptureView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 260 }}>
-            <div className="flex flex-col gap-2">
-                <WiredArrayDefinitionSelect
-                    definitions={payload.variableDefinitions}
-                    itemId={payload.variableItemId}
-                    variableType={payload.variableType}
-                    onChange={(variableType, itemId) => setPayload({ ...payload, variableItemId: itemId, variableType })}
-                />
-
-                {ownerSources.length > 0 && (
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
-                        <Select
-                            className="form-select form-select-sm"
-                            value={payload.ownerSource}
-                            onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
-                        >
-                            {ownerSources.map((source) => (
-                                <option key={source.value} value={source.value}>
-                                    {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
-                                </option>
-                            ))}
-                        </Select>
-                    </div>
-                )}
-
-                <div className="flex gap-2">
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={!isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_INDEX })} />
-                        <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.index', 'By index')}</Text>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_FIND })} />
-                        <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.find', 'By search')}</Text>
-                    </label>
-                </div>
-
-                {!isFind && (
-                    <WiredArrayValueField
-                        constantMin={0}
-                        label={localizeWithFallback('wiredfurni.params.arrays.index', 'Index')}
-                        recentScope="array-capture-index"
-                        value={wiredArrayAddressAsValue(payload.index)}
-                        onChange={(value) => setPayload({ ...payload, index: wiredArrayValueAsAddress(value, payload.index) })}
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 260 }}>
+                <div className="flex flex-col gap-2">
+                    <WiredArrayDefinitionSelect
+                        definitions={payload.variableDefinitions}
+                        itemId={payload.variableItemId}
+                        variableType={payload.variableType}
+                        onChange={(variableType, itemId) => setPayload({ ...payload, variableItemId: itemId, variableType })}
                     />
-                )}
 
-                {isFind && (
-                    <>
-                        <WiredArrayCriteriaEditor
-                            criteria={payload.criteria}
-                            definition={definition}
-                            onChange={(criteria) => setPayload({ ...payload, criteria })}
-                        />
-                        <label className="flex items-center gap-1 cursor-pointer">
-                            <Checkbox checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY} onCheckedChange={(nextChecked) => setPayload({ ...payload, criteriaMode: nextChecked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })} />
-                            <Text>{localizeWithFallback('wiredfurni.params.arrays.criteria.any', 'An entry counts if any rule fits')}</Text>
-                        </label>
+                    {ownerSources.length > 0 && (
                         <div className="flex flex-col gap-1">
-                            <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.direction', 'Take')}</Text>
+                            <Text bold>{localizeWithFallback('wiredfurni.params.arrays.owner', 'Whose array')}</Text>
                             <Select
                                 className="form-select form-select-sm"
-                                value={payload.findDirection}
-                                onChange={(event) => setPayload({ ...payload, findDirection: parseInt(event.target.value, 10) })}
+                                value={payload.ownerSource}
+                                onChange={(event) => setPayload({ ...payload, ownerSource: parseInt(event.target.value, 10) })}
                             >
-                                {DIRECTION_OPTIONS.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {localizeWithFallback(`wiredfurni.params.arrays.capture.direction.${option.value}`, option.fallback)}
+                                {ownerSources.map((source) => (
+                                    <option key={source.value} value={source.value}>
+                                        {localizeWithFallback(source.label, WIRED_ARRAY_OWNER_SOURCE_FALLBACKS[source.value])}
                                     </option>
                                 ))}
                             </Select>
                         </div>
-                    </>
-                )}
-
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.into', 'Store it in')}</Text>
-                    <Select
-                        className="form-select form-select-sm"
-                        value={payload.contextVariableItemId}
-                        onChange={(event) => setPayload({ ...payload, contextVariableItemId: parseInt(event.target.value, 10) })}
-                    >
-                        <option value={0}>{localizeWithFallback('wiredfurni.params.arrays.capture.into.none', 'Choose a Context variable…')}</option>
-                        {contextTargets.map((entry) => (
-                            <option key={entry.itemId} value={entry.itemId}>
-                                {entry.name}
-                            </option>
-                        ))}
-                    </Select>
-                    {!contextTargets.length && (
-                        <Text small className="text-black/60">
-                            {localizeWithFallback(
-                                'wiredfurni.params.arrays.capture.into.empty',
-                                'Place a Context variable box holding a value first - the capturer writes into one, it does not make one.'
-                            )}
-                        </Text>
                     )}
+
+                    <div className="flex gap-2">
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={!isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_INDEX })} />
+                            <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.index', 'By index')}</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={isFind} name="wiredArrayCaptureMode" onCheckedChange={() => setPayload({ ...payload, captureMode: WIRED_ARRAY_CAPTURE_MODE_FIND })} />
+                            <Text>{localizeWithFallback('wiredfurni.params.arrays.capture.find', 'By search')}</Text>
+                        </label>
+                    </div>
+
+                    {!isFind && (
+                        <WiredArrayValueField
+                            constantMin={0}
+                            label={localizeWithFallback('wiredfurni.params.arrays.index', 'Index')}
+                            recentScope="array-capture-index"
+                            value={wiredArrayAddressAsValue(payload.index)}
+                            onChange={(value) => setPayload({ ...payload, index: wiredArrayValueAsAddress(value, payload.index) })}
+                        />
+                    )}
+
+                    {isFind && (
+                        <>
+                            <WiredArrayCriteriaEditor
+                                criteria={payload.criteria}
+                                definition={definition}
+                                onChange={(criteria) => setPayload({ ...payload, criteria })}
+                            />
+                            <label className="flex items-center gap-1 cursor-pointer">
+                                <Checkbox checked={payload.criteriaMode === WIRED_ARRAY_CRITERIA_ANY} onCheckedChange={(nextChecked) => setPayload({ ...payload, criteriaMode: nextChecked ? WIRED_ARRAY_CRITERIA_ANY : WIRED_ARRAY_CRITERIA_ALL })} />
+                                <Text>{localizeWithFallback('wiredfurni.params.arrays.criteria.any', 'An entry counts if any rule fits')}</Text>
+                            </label>
+                            <div className="flex flex-col gap-1">
+                                <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.direction', 'Take')}</Text>
+                                <Select
+                                    className="form-select form-select-sm"
+                                    value={payload.findDirection}
+                                    onChange={(event) => setPayload({ ...payload, findDirection: parseInt(event.target.value, 10) })}
+                                >
+                                    {DIRECTION_OPTIONS.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {localizeWithFallback(`wiredfurni.params.arrays.capture.direction.${option.value}`, option.fallback)}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
+                        </>
+                    )}
+
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeWithFallback('wiredfurni.params.arrays.capture.into', 'Store it in')}</Text>
+                        <Select
+                            className="form-select form-select-sm"
+                            value={payload.contextVariableItemId}
+                            onChange={(event) => setPayload({ ...payload, contextVariableItemId: parseInt(event.target.value, 10) })}
+                        >
+                            <option value={0}>{localizeWithFallback('wiredfurni.params.arrays.capture.into.none', 'Choose a Context variable…')}</option>
+                            {contextTargets.map((entry) => (
+                                <option key={entry.itemId} value={entry.itemId}>
+                                    {entry.name}
+                                </option>
+                            ))}
+                        </Select>
+                        {!contextTargets.length && (
+                            <Text small className="text-black/60">
+                                {localizeWithFallback(
+                                    'wiredfurni.params.arrays.capture.into.empty',
+                                    'Place a Context variable box holding a value first - the capturer writes into one, it does not make one.'
+                                )}
+                            </Text>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

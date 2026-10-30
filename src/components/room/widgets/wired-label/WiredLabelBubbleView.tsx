@@ -1,6 +1,7 @@
 import { GetRoomEngine, IWiredLabel, RoomObjectCategory, WiredLabelSaveTextComposer } from '@octane/renderer';
 import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AddAnimationTickerCallback, GetRoomObjectBounds, GetRoomObjectScreenLocation, localizeWithFallback, SendMessageComposer } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export interface WiredLabelBubbleViewProps {
     roomId: number;
@@ -164,31 +165,33 @@ export const WiredLabelBubbleView: FC<WiredLabelBubbleViewProps> = (props) => {
     const placeholder = shown && canModify && !text.length;
 
     return (
-        <div
-            ref={elementRef}
-            className={`octane-wired-label${ shown ? '' : ' is-preview' }${ interactive ? ' is-interactive' : '' }`}
-            style={{ visibility: 'hidden', ['--octane-wired-label-color' as string]: wiredLabelCss(label.color) }}
-            data-testid="wired-label"
-            onMouseEnter={() => setOverBubble(true)}
-            onMouseLeave={() => setOverBubble(false)}
-            onKeyDown={(event) => {
-                if (event.key === 'Escape') onClose();
-            }}>
-            <textarea
-                ref={inputRef}
-                className="octane-wired-label__text"
-                value={text}
-                readOnly={!editable}
-                maxLength={MAX_CHARS}
-                tabIndex={interactive ? 0 : -1}
-                spellCheck={false}
-                placeholder={placeholder ? localizeWithFallback('widget.furniture_label.placeholder', 'Write something here...') : ''}
-                onChange={(event) => setText(event.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => {
-                    setFocused(false);
-                    save();
-                }} />
-        </div>
+        <NativeTextTree>
+            <div
+                ref={elementRef}
+                className={`octane-wired-label${ shown ? '' : ' is-preview' }${ interactive ? ' is-interactive' : '' }`}
+                style={{ visibility: 'hidden', ['--octane-wired-label-color' as string]: wiredLabelCss(label.color) }}
+                data-testid="wired-label"
+                onMouseEnter={() => setOverBubble(true)}
+                onMouseLeave={() => setOverBubble(false)}
+                onKeyDown={(event) => {
+                    if (event.key === 'Escape') onClose();
+                }}>
+                <textarea
+                    ref={inputRef}
+                    className="octane-wired-label__text"
+                    value={text}
+                    readOnly={!editable}
+                    maxLength={MAX_CHARS}
+                    tabIndex={interactive ? 0 : -1}
+                    spellCheck={false}
+                    placeholder={placeholder ? localizeWithFallback('widget.furniture_label.placeholder', 'Write something here...') : ''}
+                    onChange={(event) => setText(event.target.value)}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => {
+                        setFocused(false);
+                        save();
+                    }} />
+            </div>
+        </NativeTextTree>
     );
 };

@@ -18,6 +18,7 @@ import {
 } from '../../api';
 import { Button, LayoutCurrencyIcon, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface QuestEntryViewProps {
     quest: QuestMessageData;
@@ -53,71 +54,73 @@ export const QuestEntryView: FC<QuestEntryViewProps> = (props) => {
     }, [waiting]);
 
     return (
-        <div className="octane-quest-entry" data-accepted={accepted} data-completed={completedCampaign}>
-            <div className="octane-quest-campaign">
-                <div className="octane-quest-campaign-header">{getCampaignName(quest.campaignCode)}</div>
-                <img className="octane-quest-campaign-image" src={getCampaignImageUrl(quest.campaignCode)} alt="" draggable={false} />
-                <div className={`octane-quest-campaign-counter octane-quest-campaign-counter-${counterStyle}`}>
-                    {quest.completedQuestsInCampaign}/{quest.questCountInCampaign}
+        <NativeTextTree>
+            <div className="octane-quest-entry" data-accepted={accepted} data-completed={completedCampaign}>
+                <div className="octane-quest-campaign">
+                    <div className="octane-quest-campaign-header">{getCampaignName(quest.campaignCode)}</div>
+                    <img className="octane-quest-campaign-image" src={getCampaignImageUrl(quest.campaignCode)} alt="" draggable={false} />
+                    <div className={`octane-quest-campaign-counter octane-quest-campaign-counter-${counterStyle}`}>
+                        {quest.completedQuestsInCampaign}/{quest.questCountInCampaign}
+                    </div>
                 </div>
+                {completedCampaign && (
+                    <div className="octane-quest-block octane-quest-block-completed">
+                        <Text className="octane-quest-completed-text">
+                            {localizeWithFallback('quests.list.completed', 'You have completed all the quests of this campaign!')}
+                        </Text>
+                        <div className="octane-quest-completed-image" />
+                    </div>
+                )}
+                {!completedCampaign && (
+                    <div className="octane-quest-block">
+                        <div className="octane-quest-block-header">
+                            <span className="octane-quest-block-title">
+                                {waiting ? localizeWithFallback('quests.list.questdelayed', 'Next quest') : getQuestName(quest)}
+                            </span>
+                            {quest.isSeasonal && quest.secondsLeft > 0 && (
+                                <span className="octane-quest-block-timeleft">{formatFriendlySeconds(quest.secondsLeft)}</span>
+                            )}
+                        </div>
+                        <img className="octane-quest-block-image" src={getQuestImageUrl(quest, waiting)} alt="" draggable={false} />
+                        <div className="octane-quest-block-body">
+                            {waiting && (
+                                <>
+                                    <Text className="octane-quest-delay-desc">{localizeWithFallback('quests.list.nextquestavailable', 'The next quest will be available in')}</Text>
+                                    <Text bold className="octane-quest-delay">
+                                        {formatQuestWaitTime(waitSeconds)}
+                                    </Text>
+                                </>
+                            )}
+                            {!waiting && <Text className="octane-quest-desc">{description}</Text>}
+                            {!waiting && hint.length > 0 && <Text className="octane-quest-hint" dangerouslySetInnerHTML={{ __html: hint }} />}
+                            {isQuestRewardVisible(quest.activityPointType, quest.rewardCurrencyAmount) && !waiting && (
+                                <div className="octane-quest-reward">
+                                    <span>{localizeWithFallback('quests.list.rewardcaption', 'Reward:')}</span>
+                                    <span className="font-bold">{quest.rewardCurrencyAmount}</span>
+                                    <LayoutCurrencyIcon type={getActivityPointIconType(quest.activityPointType)} />
+                                </div>
+                            )}
+                        </div>
+                        <div className="octane-quest-block-actions">
+                            {!accepted && !waiting && (
+                                <Button variant="secondary" className="octane-quest-accept" onClick={() => onAccept && onAccept(quest)}>
+                                    {localizeWithFallback('quests.list.accept', 'Accept quest')}
+                                </Button>
+                            )}
+                            {accepted && (
+                                <BaseButton className="octane-quest-link" onClick={() => onReject && onReject(quest)}>
+                                    {localizeWithFallback('quests.list.reject', 'Cancel quest')}
+                                </BaseButton>
+                            )}
+                            {onDetails && !showHint && (
+                                <BaseButton className="octane-quest-link" onClick={() => onDetails(quest)}>
+                                    {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
+                                </BaseButton>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
-            {completedCampaign && (
-                <div className="octane-quest-block octane-quest-block-completed">
-                    <Text className="octane-quest-completed-text">
-                        {localizeWithFallback('quests.list.completed', 'You have completed all the quests of this campaign!')}
-                    </Text>
-                    <div className="octane-quest-completed-image" />
-                </div>
-            )}
-            {!completedCampaign && (
-                <div className="octane-quest-block">
-                    <div className="octane-quest-block-header">
-                        <span className="octane-quest-block-title">
-                            {waiting ? localizeWithFallback('quests.list.questdelayed', 'Next quest') : getQuestName(quest)}
-                        </span>
-                        {quest.isSeasonal && quest.secondsLeft > 0 && (
-                            <span className="octane-quest-block-timeleft">{formatFriendlySeconds(quest.secondsLeft)}</span>
-                        )}
-                    </div>
-                    <img className="octane-quest-block-image" src={getQuestImageUrl(quest, waiting)} alt="" draggable={false} />
-                    <div className="octane-quest-block-body">
-                        {waiting && (
-                            <>
-                                <Text className="octane-quest-delay-desc">{localizeWithFallback('quests.list.nextquestavailable', 'The next quest will be available in')}</Text>
-                                <Text bold className="octane-quest-delay">
-                                    {formatQuestWaitTime(waitSeconds)}
-                                </Text>
-                            </>
-                        )}
-                        {!waiting && <Text className="octane-quest-desc">{description}</Text>}
-                        {!waiting && hint.length > 0 && <Text className="octane-quest-hint" dangerouslySetInnerHTML={{ __html: hint }} />}
-                        {isQuestRewardVisible(quest.activityPointType, quest.rewardCurrencyAmount) && !waiting && (
-                            <div className="octane-quest-reward">
-                                <span>{localizeWithFallback('quests.list.rewardcaption', 'Reward:')}</span>
-                                <span className="font-bold">{quest.rewardCurrencyAmount}</span>
-                                <LayoutCurrencyIcon type={getActivityPointIconType(quest.activityPointType)} />
-                            </div>
-                        )}
-                    </div>
-                    <div className="octane-quest-block-actions">
-                        {!accepted && !waiting && (
-                            <Button variant="secondary" className="octane-quest-accept" onClick={() => onAccept && onAccept(quest)}>
-                                {localizeWithFallback('quests.list.accept', 'Accept quest')}
-                            </Button>
-                        )}
-                        {accepted && (
-                            <BaseButton className="octane-quest-link" onClick={() => onReject && onReject(quest)}>
-                                {localizeWithFallback('quests.list.reject', 'Cancel quest')}
-                            </BaseButton>
-                        )}
-                        {onDetails && !showHint && (
-                            <BaseButton className="octane-quest-link" onClick={() => onDetails(quest)}>
-                                {localizeWithFallback('quests.tracker.moreinfo', 'More info')}
-                            </BaseButton>
-                        )}
-                    </div>
-                </div>
-            )}
-        </div>
+        </NativeTextTree>
     );
 };

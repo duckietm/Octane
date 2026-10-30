@@ -7,6 +7,7 @@ import { resolveConditionTimezone, useWiredRoomTimezone, WiredConditionTimezoneS
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MODE_SKIP = 0;
 const MODE_EXACT = 1;
@@ -42,7 +43,9 @@ const InlineNumberInput: FC<{ value: number; min: number; max: number; onChange:
     const { value = 0, min = 0, max = 0, onChange = null } = props;
 
     return (
-        <NumberInput className="form-control form-control-sm text-center" max={max} min={min} style={{ width: 72 }} value={value} onChange={(event) => onChange(parseInputValue(event, min, max))} />
+        <NativeTextTree>
+            <NumberInput className="form-control form-control-sm text-center" max={max} min={min} style={{ width: 72 }} value={value} onChange={(event) => onChange(parseInputValue(event, min, max))} />
+        </NativeTextTree>
     );
 };
 
@@ -74,25 +77,27 @@ const MatchDateSection: FC<MatchDateSectionProps> = (props) => {
     } = props;
 
     return (
-        <div className="flex flex-col gap-2">
-            <Text bold>{LocalizeText(titleKey)}</Text>
-            <div className="flex items-center gap-1">
-                <Radio checked={mode === MODE_SKIP} id={`${sectionId}0`} name={sectionId} onCheckedChange={() => onModeChange(MODE_SKIP)} />
-                <Text>{LocalizeText('wiredfurni.params.time.skip')}</Text>
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                <Text bold>{LocalizeText(titleKey)}</Text>
+                <div className="flex items-center gap-1">
+                    <Radio checked={mode === MODE_SKIP} id={`${sectionId}0`} name={sectionId} onCheckedChange={() => onModeChange(MODE_SKIP)} />
+                    <Text>{LocalizeText('wiredfurni.params.time.skip')}</Text>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Radio checked={mode === MODE_EXACT} id={`${sectionId}1`} name={sectionId} onCheckedChange={() => onModeChange(MODE_EXACT)} />
+                    <Text>{LocalizeText('wiredfurni.params.time.exact')}</Text>
+                    <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
+                </div>
+                <div className="flex items-center gap-2">
+                    <Radio checked={mode === MODE_RANGE} id={`${sectionId}2`} name={sectionId} onCheckedChange={() => onModeChange(MODE_RANGE)} />
+                    <Text>{LocalizeText('wiredfurni.params.time.range')}</Text>
+                    <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
+                    <Text>-</Text>
+                    <InlineNumberInput max={max} min={min} value={toValue} onChange={onToChange} />
+                </div>
             </div>
-            <div className="flex items-center gap-2">
-                <Radio checked={mode === MODE_EXACT} id={`${sectionId}1`} name={sectionId} onCheckedChange={() => onModeChange(MODE_EXACT)} />
-                <Text>{LocalizeText('wiredfurni.params.time.exact')}</Text>
-                <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
-            </div>
-            <div className="flex items-center gap-2">
-                <Radio checked={mode === MODE_RANGE} id={`${sectionId}2`} name={sectionId} onCheckedChange={() => onModeChange(MODE_RANGE)} />
-                <Text>{LocalizeText('wiredfurni.params.time.range')}</Text>
-                <InlineNumberInput max={max} min={min} value={fromValue} onChange={onFromChange} />
-                <Text>-</Text>
-                <InlineNumberInput max={max} min={min} value={toValue} onChange={onToChange} />
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -147,64 +152,66 @@ export const WiredConditionMatchDateView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-2">
-                    <Text bold>{LocalizeText('wiredfurni.params.time.weekday_selection')}</Text>
-                    <div className="flex flex-wrap gap-2">
-                        {WEEKDAY_OPTIONS.map((value) => {
-                            const checked = (weekdayMask & (1 << value)) !== 0;
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
+                        <Text bold>{LocalizeText('wiredfurni.params.time.weekday_selection')}</Text>
+                        <div className="flex flex-wrap gap-2">
+                            {WEEKDAY_OPTIONS.map((value) => {
+                                const checked = (weekdayMask & (1 << value)) !== 0;
 
-                            return (
-                                <label key={value} className="flex items-center gap-1">
-                                    <Checkbox checked={checked} onCheckedChange={(nextChecked) => setWeekdayMask(toggleMaskValue(weekdayMask, value, nextChecked))} />
-                                    <Text>{LocalizeText(`wiredfurni.params.time.weekday.${value}`)}</Text>
-                                </label>
-                            );
-                        })}
+                                return (
+                                    <label key={value} className="flex items-center gap-1">
+                                        <Checkbox checked={checked} onCheckedChange={(nextChecked) => setWeekdayMask(toggleMaskValue(weekdayMask, value, nextChecked))} />
+                                        <Text>{LocalizeText(`wiredfurni.params.time.weekday.${value}`)}</Text>
+                                    </label>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-                <MatchDateSection
-                    fromValue={dayFrom}
-                    max={31}
-                    min={1}
-                    mode={dayMode}
-                    sectionId="matchDateDay"
-                    titleKey="wiredfurni.params.time.day_selection"
-                    toValue={dayTo}
-                    onFromChange={(value) => setDayFrom(clampValue(value, 1, 31))}
-                    onModeChange={setDayMode}
-                    onToChange={(value) => setDayTo(clampValue(value, 1, 31))}
-                />
-                <div className="flex flex-col gap-2">
-                    <Text bold>{LocalizeText('wiredfurni.params.time.month_selection')}</Text>
-                    <div className="flex flex-wrap gap-2">
-                        {MONTH_OPTIONS.map((value) => {
-                            const checked = (monthMask & (1 << value)) !== 0;
+                    <MatchDateSection
+                        fromValue={dayFrom}
+                        max={31}
+                        min={1}
+                        mode={dayMode}
+                        sectionId="matchDateDay"
+                        titleKey="wiredfurni.params.time.day_selection"
+                        toValue={dayTo}
+                        onFromChange={(value) => setDayFrom(clampValue(value, 1, 31))}
+                        onModeChange={setDayMode}
+                        onToChange={(value) => setDayTo(clampValue(value, 1, 31))}
+                    />
+                    <div className="flex flex-col gap-2">
+                        <Text bold>{LocalizeText('wiredfurni.params.time.month_selection')}</Text>
+                        <div className="flex flex-wrap gap-2">
+                            {MONTH_OPTIONS.map((value) => {
+                                const checked = (monthMask & (1 << value)) !== 0;
 
-                            return (
-                                <label key={value} className="flex items-center gap-1">
-                                    <Checkbox checked={checked} onCheckedChange={(nextChecked) => setMonthMask(toggleMaskValue(monthMask, value, nextChecked))} />
-                                    <Text>{LocalizeText(`wiredfurni.params.time.month.${value}`)}</Text>
-                                </label>
-                            );
-                        })}
+                                return (
+                                    <label key={value} className="flex items-center gap-1">
+                                        <Checkbox checked={checked} onCheckedChange={(nextChecked) => setMonthMask(toggleMaskValue(monthMask, value, nextChecked))} />
+                                        <Text>{LocalizeText(`wiredfurni.params.time.month.${value}`)}</Text>
+                                    </label>
+                                );
+                            })}
+                        </div>
                     </div>
+                    <MatchDateSection
+                        fromValue={yearFrom}
+                        max={9999}
+                        min={0}
+                        mode={yearMode}
+                        sectionId="matchDateYear"
+                        titleKey="wiredfurni.params.time.year_selection"
+                        toValue={yearTo}
+                        onFromChange={(value) => setYearFrom(clampValue(value, 0, 9999))}
+                        onModeChange={setYearMode}
+                        onToChange={(value) => setYearTo(clampValue(value, 0, 9999))}
+                    />
+                    <WiredConditionTimezoneSection value={timezone} onChange={setTimezone} />
                 </div>
-                <MatchDateSection
-                    fromValue={yearFrom}
-                    max={9999}
-                    min={0}
-                    mode={yearMode}
-                    sectionId="matchDateYear"
-                    titleKey="wiredfurni.params.time.year_selection"
-                    toValue={yearTo}
-                    onFromChange={(value) => setYearFrom(clampValue(value, 0, 9999))}
-                    onModeChange={setYearMode}
-                    onToChange={(value) => setYearTo(clampValue(value, 0, 9999))}
-                />
-                <WiredConditionTimezoneSection value={timezone} onChange={setTimezone} />
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

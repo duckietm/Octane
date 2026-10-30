@@ -6,6 +6,7 @@ import emptySlotSrc from '../../assets/images/avatareditor/wardrobe-empty-slot.p
 import { LayoutAvatarImageView } from '../../common';
 import { useAvatarEditor } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const SLOTS_PER_COL = 7;
 const HC_SLOT_LIMIT = 5;
@@ -72,58 +73,60 @@ export const AvatarEditorWardrobeView: FC<{}> = () => {
     );
 
     return (
-        <aside className="octane-avatar-editor-wardrobe" aria-label={LocalizeText('avatareditor.wardrobe.title')}>
-            <div className="octane-avatar-editor-wardrobe-header">
-                <span className="octane-avatar-editor-wardrobe-title">{LocalizeText('avatareditor.wardrobe.title')}</span>
-                <img src={hcIconSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-hc" />
-            </div>
-            <div className="octane-avatar-editor-wardrobe-slots">
-                {columns.map((column, columnIndex) => (
-                    <div className="octane-avatar-editor-wardrobe-column" key={`wardrobe-col-${columnIndex}`}>
-                        {column.map((item, rowIndex) => {
-                            const index = columnIndex * SLOTS_PER_COL + rowIndex;
-                            const [figureContainer, slotGender] = item;
-                            const enabled = isWardrobeSlotEnabled(index + 1);
-                            const figureString = figureContainer?.getFigureString() ?? '';
+        <NativeTextTree>
+            <aside className="octane-avatar-editor-wardrobe" aria-label={LocalizeText('avatareditor.wardrobe.title')}>
+                <div className="octane-avatar-editor-wardrobe-header">
+                    <span className="octane-avatar-editor-wardrobe-title">{LocalizeText('avatareditor.wardrobe.title')}</span>
+                    <img src={hcIconSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-hc" />
+                </div>
+                <div className="octane-avatar-editor-wardrobe-slots">
+                    {columns.map((column, columnIndex) => (
+                        <div className="octane-avatar-editor-wardrobe-column" key={`wardrobe-col-${columnIndex}`}>
+                            {column.map((item, rowIndex) => {
+                                const index = columnIndex * SLOTS_PER_COL + rowIndex;
+                                const [figureContainer, slotGender] = item;
+                                const enabled = isWardrobeSlotEnabled(index + 1);
+                                const figureString = figureContainer?.getFigureString() ?? '';
 
-                            return (
-                                <div className={`octane-avatar-editor-wardrobe-slot${enabled ? '' : ' is-locked'}`} key={`wardrobe-slot-${index}`}>
-                                    <div className="octane-avatar-editor-wardrobe-slot-shade" />
-                                    {enabled && (
+                                return (
+                                    <div className={`octane-avatar-editor-wardrobe-slot${enabled ? '' : ' is-locked'}`} key={`wardrobe-slot-${index}`}>
+                                        <div className="octane-avatar-editor-wardrobe-slot-shade" />
+                                        {enabled && (
+                                            <BaseButton
+                                                type="button"
+                                                className="octane-avatar-editor-wardrobe-slot-set"
+                                                aria-label={LocalizeText('avatareditor.wardrobe.save')}
+                                                onClick={() => saveFigureAtWardrobeIndex(index)}
+                                            />
+                                        )}
+                                        {enabled && figureContainer && (
+                                            <BaseButton
+                                                type="button"
+                                                className="octane-avatar-editor-wardrobe-slot-get"
+                                                aria-label={LocalizeText('widget.generic_usable.button.use')}
+                                                onClick={() => wearFigureAtIndex(index)}
+                                            />
+                                        )}
                                         <BaseButton
                                             type="button"
-                                            className="octane-avatar-editor-wardrobe-slot-set"
-                                            aria-label={LocalizeText('avatareditor.wardrobe.save')}
-                                            onClick={() => saveFigureAtWardrobeIndex(index)}
-                                        />
-                                    )}
-                                    {enabled && figureContainer && (
-                                        <BaseButton
-                                            type="button"
-                                            className="octane-avatar-editor-wardrobe-slot-get"
+                                            className="octane-avatar-editor-wardrobe-slot-figure"
+                                            disabled={!enabled || !figureContainer}
                                             aria-label={LocalizeText('widget.generic_usable.button.use')}
                                             onClick={() => wearFigureAtIndex(index)}
-                                        />
-                                    )}
-                                    <BaseButton
-                                        type="button"
-                                        className="octane-avatar-editor-wardrobe-slot-figure"
-                                        disabled={!enabled || !figureContainer}
-                                        aria-label={LocalizeText('widget.generic_usable.button.use')}
-                                        onClick={() => wearFigureAtIndex(index)}
-                                    >
-                                        {figureContainer ? (
-                                            <LayoutAvatarImageView direction={4} figure={figureString} gender={slotGender} fit small />
-                                        ) : (
-                                            <img src={emptySlotSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-empty" />
-                                        )}
-                                    </BaseButton>
-                                </div>
-                            );
-                        })}
-                    </div>
-                ))}
-            </div>
-        </aside>
+                                        >
+                                            {figureContainer ? (
+                                                <LayoutAvatarImageView direction={4} figure={figureString} gender={slotGender} fit small />
+                                            ) : (
+                                                <img src={emptySlotSrc} alt="" draggable={false} className="octane-avatar-editor-wardrobe-empty" />
+                                            )}
+                                        </BaseButton>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+            </aside>
+        </NativeTextTree>
     );
 };

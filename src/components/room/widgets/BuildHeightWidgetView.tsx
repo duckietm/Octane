@@ -4,6 +4,7 @@ import { Button, Column, Flex, OctaneCardContentView, OctaneCardHeaderView, Octa
 import { useBuildHeight } from '../../../hooks';
 import { Checkbox } from '../../../common/Checkbox';
 import '../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const STEP = 0.1;
 
@@ -25,39 +26,41 @@ export const BuildHeightWidgetView: FC<{}> = () => {
     const clamp = (value: number) => Math.min(maxHeight, Math.max(minHeight, Math.round(value / STEP) * STEP));
 
     return (
-        <OctaneCardView className="octane-build-height-widget" theme="primary-slim" uniqueKey="build-height">
-            <OctaneCardHeaderView headerText={LocalizeText('widget.buildheight.title')} onCloseClick={close} />
-            <OctaneCardContentView className="gap-2">
-                <Text center>{LocalizeText('widget.buildheight.description')}</Text>
-                <Flex alignItems="center" justifyContent="center" gap={2}>
-                    <Button variant="secondary" onClick={() => applyHeight(clamp(height - STEP))}>-</Button>
-                    <Text bold variant="black" className="build-height-value">{format(height)}</Text>
-                    <Button variant="secondary" onClick={() => applyHeight(clamp(height + STEP))}>+</Button>
-                </Flex>
-                <Slider
-                    min={minHeight}
-                    max={maxHeight}
-                    step={STEP}
-                    value={height}
-                    onChange={(value: number) => applyHeight(clamp(value))}
-                />
-                <Column gap={1}>
-                    <Flex justifyContent="between">
-                        <Text>{format(minHeight)}</Text>
-                        <Text>{format(maxHeight)}</Text>
+        <NativeTextTree>
+            <OctaneCardView className="octane-build-height-widget" theme="primary-slim" uniqueKey="build-height">
+                <OctaneCardHeaderView headerText={LocalizeText('widget.buildheight.title')} onCloseClick={close} />
+                <OctaneCardContentView className="gap-2">
+                    <Text center>{LocalizeText('widget.buildheight.description')}</Text>
+                    <Flex alignItems="center" justifyContent="center" gap={2}>
+                        <Button variant="secondary" onClick={() => applyHeight(clamp(height - STEP))}>-</Button>
+                        <Text bold variant="black" className="build-height-value">{format(height)}</Text>
+                        <Button variant="secondary" onClick={() => applyHeight(clamp(height + STEP))}>+</Button>
                     </Flex>
-                    <Flex
-                        alignItems="center"
-                        gap={1}
-                        className={underpassAllowed ? undefined : 'opacity-50'}
-                        title={underpassAllowed ? undefined : LocalizeText('widget.buildheight.underpass.min_height', ['height'], [format(UNDERPASS_MIN_HEIGHT)])}
-                    >
-                        <Checkbox checked={underpass && underpassAllowed} disabled={!underpassAllowed} onCheckedChange={(nextChecked) => toggleUnderpass(nextChecked)} />
-                        <Text>{LocalizeText('widget.buildheight.underpass')}</Text>
-                    </Flex>
-                    <Button variant="secondary" onClick={close}>{LocalizeText('widget.buildheight.reset')}</Button>
-                </Column>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <Slider
+                        min={minHeight}
+                        max={maxHeight}
+                        step={STEP}
+                        value={height}
+                        onChange={(value: number) => applyHeight(clamp(value))}
+                    />
+                    <Column gap={1}>
+                        <Flex justifyContent="between">
+                            <Text>{format(minHeight)}</Text>
+                            <Text>{format(maxHeight)}</Text>
+                        </Flex>
+                        <Flex
+                            alignItems="center"
+                            gap={1}
+                            className={underpassAllowed ? undefined : 'opacity-50'}
+                            title={underpassAllowed ? undefined : LocalizeText('widget.buildheight.underpass.min_height', ['height'], [format(UNDERPASS_MIN_HEIGHT)])}
+                        >
+                            <Checkbox checked={underpass && underpassAllowed} disabled={!underpassAllowed} onCheckedChange={(nextChecked) => toggleUnderpass(nextChecked)} />
+                            <Text>{LocalizeText('widget.buildheight.underpass')}</Text>
+                        </Flex>
+                        <Button variant="secondary" onClick={close}>{LocalizeText('widget.buildheight.reset')}</Button>
+                    </Column>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

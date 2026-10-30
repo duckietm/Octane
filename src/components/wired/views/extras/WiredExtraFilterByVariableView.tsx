@@ -23,6 +23,7 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 type AmountMode = 'constant' | 'variable';
@@ -267,106 +268,108 @@ export const WiredExtraFilterByVariableView: FC<WiredExtraFilterByVariableViewPr
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 260 }}>
-            <div className="octane-wired__give-var">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <WiredVariablePicker
-                        entries={resolvedMainEntries}
-                        recentScope={`variable-extra-${target}`}
-                        selectedToken={variableToken}
-                        onSelect={(entry) => setVariableToken(entry.token)}
-                    />
-                </div>
-
-                <div className="octane-wired__divider" />
-
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.sort_by')}</Text>
-                    <Select className="form-select form-select-sm" value={sortBy} onChange={(event) => setSortBy(parseInt(event.target.value, 10) || 0)}>
-                        {SORT_OPTIONS.map((option) => (
-                            <option key={option} value={option}>
-                                {LocalizeText(`wiredfurni.params.variables.sort_by.${option}`)}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
-
-                <div className="octane-wired__divider" />
-
-                <div className="octane-wired__give-var-section">
-                    <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.setfilter')}</div>
-                    <label className="octane-wired__change-var-radio">
-                        <Radio checked={amountMode === 'constant'} onCheckedChange={() => setAmountMode('constant')} />
-                        <Text>{LocalizeText('wiredfurni.params.variables.reference_value.set_value')}</Text>
-                        <OctaneInput
-                            className="octane-wired__give-var-number"
-                            type="number"
-                            min={1}
-                            max={1000}
-                            value={amountInput}
-                            onChange={(event) => setAmountInput(event.target.value)}
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save} validate={validate} cardStyle={{ width: 260 }}>
+                <div className="octane-wired__give-var">
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <WiredVariablePicker
+                            entries={resolvedMainEntries}
+                            recentScope={`variable-extra-${target}`}
+                            selectedToken={variableToken}
+                            onSelect={(entry) => setVariableToken(entry.token)}
                         />
-                    </label>
+                    </div>
 
-                    <div className="octane-wired__change-var-reference-block">
+                    <div className="octane-wired__divider" />
+
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.sort_by')}</Text>
+                        <Select className="form-select form-select-sm" value={sortBy} onChange={(event) => setSortBy(parseInt(event.target.value, 10) || 0)}>
+                            {SORT_OPTIONS.map((option) => (
+                                <option key={option} value={option}>
+                                    {LocalizeText(`wiredfurni.params.variables.sort_by.${option}`)}
+                                </option>
+                            ))}
+                        </Select>
+                    </div>
+
+                    <div className="octane-wired__divider" />
+
+                    <div className="octane-wired__give-var-section">
+                        <div className="octane-wired__give-var-section-title">{LocalizeText('wiredfurni.params.setfilter')}</div>
                         <label className="octane-wired__change-var-radio">
-                            <Radio checked={amountMode === 'variable'} onCheckedChange={() => setAmountMode('variable')} />
-                            <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-                            <div className="octane-wired__give-var-targets">
-                                {TARGET_BUTTONS.map((button) => (
-                                    <BaseButton
-                                        key={`reference-${button.key}`}
-                                        type="button"
-                                        disabled={button.disabled || amountMode !== 'variable'}
-                                        className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
-                                        onClick={() => handleReferenceTargetChange(button.key)}
-                                    >
-                                        <img src={button.icon} alt={button.key} />
-                                    </BaseButton>
-                                ))}
-                            </div>
+                            <Radio checked={amountMode === 'constant'} onCheckedChange={() => setAmountMode('constant')} />
+                            <Text>{LocalizeText('wiredfurni.params.variables.reference_value.set_value')}</Text>
+                            <OctaneInput
+                                className="octane-wired__give-var-number"
+                                type="number"
+                                min={1}
+                                max={1000}
+                                value={amountInput}
+                                onChange={(event) => setAmountInput(event.target.value)}
+                            />
                         </label>
 
-                        {amountMode === 'variable' && (
-                            <WiredVariablePicker
-                                entries={resolvedReferenceEntries}
-                                recentScope={`variable-extra-reference-${target}`}
-                                selectedToken={referenceVariableToken}
-                                onSelect={(entry) => setReferenceVariableToken(entry.token)}
-                            />
-                        )}
+                        <div className="octane-wired__change-var-reference-block">
+                            <label className="octane-wired__change-var-radio">
+                                <Radio checked={amountMode === 'variable'} onCheckedChange={() => setAmountMode('variable')} />
+                                <Text>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
+                                <div className="octane-wired__give-var-targets">
+                                    {TARGET_BUTTONS.map((button) => (
+                                        <BaseButton
+                                            key={`reference-${button.key}`}
+                                            type="button"
+                                            disabled={button.disabled || amountMode !== 'variable'}
+                                            className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${referenceTargetType === button.key ? 'is-active' : ''}`}
+                                            onClick={() => handleReferenceTargetChange(button.key)}
+                                        >
+                                            <img src={button.icon} alt={button.key} />
+                                        </BaseButton>
+                                    ))}
+                                </div>
+                            </label>
+
+                            {amountMode === 'variable' && (
+                                <WiredVariablePicker
+                                    entries={resolvedReferenceEntries}
+                                    recentScope={`variable-extra-reference-${target}`}
+                                    selectedToken={referenceVariableToken}
+                                    onSelect={(entry) => setReferenceVariableToken(entry.token)}
+                                />
+                            )}
+                        </div>
                     </div>
+
+                    {amountMode === 'variable' && (
+                        <>
+                            <div className="octane-wired__divider" />
+                            <WiredFurniSelectionSourceRow
+                                title="wiredfurni.params.sources.merged.title.variables_reference"
+                                options={referenceSourceOptions}
+                                value={selectedReferenceSourceValue}
+                                selectionKind="primary"
+                                selectionActive={true}
+                                selectionCount={referenceSelectionEnabled ? furniIds.length : referenceFurniIds.length}
+                                selectionLimit={selectionLimit}
+                                selectionEnabledValues={[VARIABLE_PICK_SOURCE]}
+                                showSelectionToggle={false}
+                                onChange={(value) => {
+                                    if (referenceTargetType === 'furni') {
+                                        if (referenceFurniSource === VARIABLE_PICK_SOURCE) setReferenceFurniIds([...furniIds]);
+
+                                        setReferenceFurniSource(value);
+                                        setFurniIds(value === VARIABLE_PICK_SOURCE ? [...referenceFurniIds] : []);
+                                        return;
+                                    }
+
+                                    if (referenceTargetType === 'user') setReferenceUserSource(value);
+                                }}
+                            />
+                        </>
+                    )}
                 </div>
-
-                {amountMode === 'variable' && (
-                    <>
-                        <div className="octane-wired__divider" />
-                        <WiredFurniSelectionSourceRow
-                            title="wiredfurni.params.sources.merged.title.variables_reference"
-                            options={referenceSourceOptions}
-                            value={selectedReferenceSourceValue}
-                            selectionKind="primary"
-                            selectionActive={true}
-                            selectionCount={referenceSelectionEnabled ? furniIds.length : referenceFurniIds.length}
-                            selectionLimit={selectionLimit}
-                            selectionEnabledValues={[VARIABLE_PICK_SOURCE]}
-                            showSelectionToggle={false}
-                            onChange={(value) => {
-                                if (referenceTargetType === 'furni') {
-                                    if (referenceFurniSource === VARIABLE_PICK_SOURCE) setReferenceFurniIds([...furniIds]);
-
-                                    setReferenceFurniSource(value);
-                                    setFurniIds(value === VARIABLE_PICK_SOURCE ? [...referenceFurniIds] : []);
-                                    return;
-                                }
-
-                                if (referenceTargetType === 'user') setReferenceUserSource(value);
-                            }}
-                        />
-                    </>
-                )}
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

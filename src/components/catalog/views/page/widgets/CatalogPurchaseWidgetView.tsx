@@ -41,6 +41,7 @@ import { CatalogPurchaseConfirmView } from '../../CatalogPurchaseConfirmView';
 import { CatalogClubUpgradeButton } from './CatalogClubUpgradeButton';
 import { canPurchaseCatalogOffer } from './catalogPurchase.helpers';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface CatalogPurchaseWidgetViewProps {
     disabled?: boolean;
@@ -415,9 +416,11 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
 
         if (habbiconOwned)
             return (
-                <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
-                    {localizeWithFallback('generic.owned', 'Owned')}
-                </BaseButton>
+                <NativeTextTree>
+                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                        {localizeWithFallback('generic.owned', 'Owned')}
+                    </BaseButton>
+                </NativeTextTree>
             );
 
         if (isBuildersClubPlaceable) {
@@ -434,151 +437,169 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = (pr
             };
 
             return (
-                <div className="octane-builders-widget">
-                    <span className="octane-builders-widget-hint">{LocalizeText('builder.placement_widget.hint')}</span>
-                    {builderError && (
-                        <div className="octane-builders-widget-error" data-error={builderError.icon} role="status">
-                            <span aria-hidden="true" className="octane-builders-widget-error-icon" />
-                            <span className="octane-builders-widget-error-message">{LocalizeText(builderError.text)}</span>
-                        </div>
-                    )}
-                    <BaseButton
-                        type="button"
-                        className="octane-builders-place-button is-one"
-                        disabled={isDisabled}
-                        onClick={() => startBuilderPlacement(false)}
-                    >
-                        {LocalizeText('builder.placement_widget.place_one')}
-                    </BaseButton>
-                    <BaseButton
-                        type="button"
-                        className="octane-builders-place-button is-many"
-                        disabled={isDisabled}
-                        onClick={() => startBuilderPlacement(true)}
-                    >
-                        {LocalizeText('builder.placement_widget.place_many')}
-                    </BaseButton>
-                </div>
+                <NativeTextTree>
+                    <div className="octane-builders-widget">
+                        <span className="octane-builders-widget-hint">{LocalizeText('builder.placement_widget.hint')}</span>
+                        {builderError && (
+                            <div className="octane-builders-widget-error" data-error={builderError.icon} role="status">
+                                <span aria-hidden="true" className="octane-builders-widget-error-icon" />
+                                <span className="octane-builders-widget-error-message">{LocalizeText(builderError.text)}</span>
+                            </div>
+                        )}
+                        <BaseButton
+                            type="button"
+                            className="octane-builders-place-button is-one"
+                            disabled={isDisabled}
+                            onClick={() => startBuilderPlacement(false)}
+                        >
+                            {LocalizeText('builder.placement_widget.place_one')}
+                        </BaseButton>
+                        <BaseButton
+                            type="button"
+                            className="octane-builders-place-button is-many"
+                            disabled={isDisabled}
+                            onClick={() => startBuilderPlacement(true)}
+                        >
+                            {LocalizeText('builder.placement_widget.place_many')}
+                        </BaseButton>
+                    </div>
+                </NativeTextTree>
             );
         }
 
         if (isOfferUnavailable)
             return (
-                <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
-                    {currentOffer.isLazy ? LocalizeText('generic.loading') : LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
-                </BaseButton>
+                <NativeTextTree>
+                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                        {currentOffer.isLazy ? LocalizeText('generic.loading') : LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
+                    </BaseButton>
+                </NativeTextTree>
             );
 
         if (isLimitedSoldOut)
             return (
-                <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
-                    {LocalizeText('catalog.alert.limited_edition_sold_out.title')}
-                </BaseButton>
+                <NativeTextTree>
+                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                        {LocalizeText('catalog.alert.limited_edition_sold_out.title')}
+                    </BaseButton>
+                </NativeTextTree>
             );
 
         switch (purchaseState) {
             case CatalogPurchaseState.CONFIRM:
                 return (
-                    <BaseButton type="button" className={`${purchaseButtonClassNames.join(' ')} pointer-events-none`}>
-                        {LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
-                    </BaseButton>
+                    <NativeTextTree>
+                        <BaseButton type="button" className={`${purchaseButtonClassNames.join(' ')} pointer-events-none`}>
+                            {LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
+                        </BaseButton>
+                    </NativeTextTree>
                 );
             case CatalogPurchaseState.PURCHASE:
                 return (
-                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
-                        <LayoutLoadingSpinnerView />
-                    </BaseButton>
+                    <NativeTextTree>
+                        <BaseButton type="button" className={purchaseButtonClassNames.join(' ')} disabled>
+                            <LayoutLoadingSpinnerView />
+                        </BaseButton>
+                    </NativeTextTree>
                 );
             case CatalogPurchaseState.FAILED:
                 return (
-                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')}>
-                        {LocalizeText('generic.failed')}
-                    </BaseButton>
+                    <NativeTextTree>
+                        <BaseButton type="button" className={purchaseButtonClassNames.join(' ')}>
+                            {LocalizeText('generic.failed')}
+                        </BaseButton>
+                    </NativeTextTree>
                 );
             case CatalogPurchaseState.SOLD_OUT:
                 return (
-                    <BaseButton type="button" className={purchaseButtonClassNames.join(' ')}>
-                        {LocalizeText('generic.failed') + ' - ' + LocalizeText('catalog.alert.limited_edition_sold_out.title')}
-                    </BaseButton>
+                    <NativeTextTree>
+                        <BaseButton type="button" className={purchaseButtonClassNames.join(' ')}>
+                            {LocalizeText('generic.failed') + ' - ' + LocalizeText('catalog.alert.limited_edition_sold_out.title')}
+                        </BaseButton>
+                    </NativeTextTree>
                 );
             case CatalogPurchaseState.NONE:
             default:
                 return (
-                    <BaseButton
-                        type="button"
-                        className={purchaseButtonClassNames.join(' ')}
-                        disabled={disabled || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))}
-                        onClick={() => {
-                            if (catalogSkipPurchaseConfirmation && !isLimitedEditionOffer) {
-                                confirmationOpenRef.current = false;
-                                setPurchaseWillBeGift(false);
-                                purchase();
+                    <NativeTextTree>
+                        <BaseButton
+                            type="button"
+                            className={purchaseButtonClassNames.join(' ')}
+                            disabled={disabled || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))}
+                            onClick={() => {
+                                if (catalogSkipPurchaseConfirmation && !isLimitedEditionOffer) {
+                                    confirmationOpenRef.current = false;
+                                    setPurchaseWillBeGift(false);
+                                    purchase();
 
-                                return;
-                            }
+                                    return;
+                                }
 
-                            if (!showInsufficientBalanceAlert()) {
-                                confirmationOpenRef.current = true;
-                                setPurchaseWillBeGift(false);
-                                setPurchaseState(CatalogPurchaseState.CONFIRM);
-                            }
-                        }}
-                    >
-                        {LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
-                    </BaseButton>
+                                if (!showInsufficientBalanceAlert()) {
+                                    confirmationOpenRef.current = true;
+                                    setPurchaseWillBeGift(false);
+                                    setPurchaseState(CatalogPurchaseState.CONFIRM);
+                                }
+                            }}
+                        >
+                            {LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy'))}
+                        </BaseButton>
+                    </NativeTextTree>
                 );
         }
     };
 
     return (
-        <>
-            {isClubLocked && <CatalogClubUpgradeButton />}
-            {!isClubLocked && !isBuildersClubOffer && !noGiftOption && !currentOffer.isRentOffer && (
-                <BaseButton
-                    type="button"
-                    className="octane-catalog-standard-button octane-catalog-standard-gift-button"
-                    disabled={
-                        disabled ||
-                        purchaseOptions.quantity > 1 ||
-                        isOfferUnavailable ||
-                        !currentOffer.giftable ||
-                        currentOffer.product?.productType === ProductTypeEnum.HABBICON ||
-                        isLimitedSoldOut ||
-                        (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))
-                    }
-                    onClick={() => {
-                        if (showInsufficientBalanceAlert()) return;
+        <NativeTextTree>
+            <>
+                {isClubLocked && <CatalogClubUpgradeButton />}
+                {!isClubLocked && !isBuildersClubOffer && !noGiftOption && !currentOffer.isRentOffer && (
+                    <BaseButton
+                        type="button"
+                        className="octane-catalog-standard-button octane-catalog-standard-gift-button"
+                        disabled={
+                            disabled ||
+                            purchaseOptions.quantity > 1 ||
+                            isOfferUnavailable ||
+                            !currentOffer.giftable ||
+                            currentOffer.product?.productType === ProductTypeEnum.HABBICON ||
+                            isLimitedSoldOut ||
+                            (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))
+                        }
+                        onClick={() => {
+                            if (showInsufficientBalanceAlert()) return;
 
-                        confirmationOpenRef.current = true;
-                        setPurchaseWillBeGift(true);
-                        setPurchaseState(CatalogPurchaseState.CONFIRM);
-                    }}
-                >
-                    {LocalizeText('catalog.purchase_confirmation.gift')}
-                </BaseButton>
-            )}
-            {!isClubLocked && <PurchaseButton />}
-            {confirmationOpenRef.current && (purchaseState === CatalogPurchaseState.CONFIRM || purchaseState === CatalogPurchaseState.PURCHASE) && (
-                <CatalogPurchaseConfirmView
-                    isGift={purchaseWillBeGift}
-                    isRaffling={isRaffling}
-                    isSubmitting={purchaseState === CatalogPurchaseState.PURCHASE}
-                    bundleDiscountRuleset={bundleDiscountRuleset}
-                    offer={currentOffer}
-                    quantity={purchaseOptions.quantity}
-                    onCancel={() => {
-                        // The raffle result still arrives later; this dialog just stops waiting for it.
-                        if (rafflingRef.current) resetPurchaseGuard();
+                            confirmationOpenRef.current = true;
+                            setPurchaseWillBeGift(true);
+                            setPurchaseState(CatalogPurchaseState.CONFIRM);
+                        }}
+                    >
+                        {LocalizeText('catalog.purchase_confirmation.gift')}
+                    </BaseButton>
+                )}
+                {!isClubLocked && <PurchaseButton />}
+                {confirmationOpenRef.current && (purchaseState === CatalogPurchaseState.CONFIRM || purchaseState === CatalogPurchaseState.PURCHASE) && (
+                    <CatalogPurchaseConfirmView
+                        isGift={purchaseWillBeGift}
+                        isRaffling={isRaffling}
+                        isSubmitting={purchaseState === CatalogPurchaseState.PURCHASE}
+                        bundleDiscountRuleset={bundleDiscountRuleset}
+                        offer={currentOffer}
+                        quantity={purchaseOptions.quantity}
+                        onCancel={() => {
+                            // The raffle result still arrives later; this dialog just stops waiting for it.
+                            if (rafflingRef.current) resetPurchaseGuard();
 
-                        notifyRaffleOngoing();
-                        confirmationOpenRef.current = false;
-                        resetPlacedOfferData?.();
-                        setPurchaseWillBeGift(false);
-                        setPurchaseState(CatalogPurchaseState.NONE);
-                    }}
-                    onConfirm={() => purchase(purchaseWillBeGift)}
-                />
-            )}
-        </>
+                            notifyRaffleOngoing();
+                            confirmationOpenRef.current = false;
+                            resetPlacedOfferData?.();
+                            setPurchaseWillBeGift(false);
+                            setPurchaseState(CatalogPurchaseState.NONE);
+                        }}
+                        onConfirm={() => purchase(purchaseWillBeGift)}
+                    />
+                )}
+            </>
+        </NativeTextTree>
     );
 };

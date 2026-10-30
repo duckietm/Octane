@@ -4,6 +4,7 @@ import { Button, DraggableWindow, LayoutAvatarImageView, OctaneCardContentView, 
 import { useFurnitureFriendFurniWidget } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsBAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const formatEngravingDate = (value: string) => {
     if (!value) return value;
@@ -37,26 +38,28 @@ export const FurnitureFriendFurniView: FC<{}> = (props) => {
         const lockStage = partnerConfirmed ? 2 : stage;
 
         return (
-            <OctaneCardView className="octane-engraving-lock octane-furni-lock-confirm" theme="primary-slim">
-                <OctaneCardHeaderView headerText={LocalizeText('friend.furniture.confirm.lock.caption')} onCloseClick={cancelLock ?? onClose} />
-                <OctaneCardContentView>
-                    <h5 className="octane-furni-lock-confirm__subtitle text-black text-center font-bold mt-2 mb-2">{LocalizeText('friend.furniture.confirm.lock.subtitle')}</h5>
-                    <div className="flex justify-center mb-2">
-                        <div className={`engraving-lock-stage-${lockStage}`} />
-                    </div>
-                    {(stage === 2 || partnerConfirmed) && (
-                        <div className="octane-furni-lock-confirm__message text-black text-center mb-2">{LocalizeText('friend.furniture.confirm.lock.other.locked')}</div>
-                    )}
-                    <div className="flex gap-1">
-                        <Button fullWidth onClick={() => (cancelLock ?? onClose)()}>
-                            {LocalizeText('friend.furniture.confirm.lock.button.cancel')}
-                        </Button>
-                        <Button fullWidth variant="success" onClick={() => respond(true)}>
-                            {LocalizeText('friend.furniture.confirm.lock.button.confirm')}
-                        </Button>
-                    </div>
-                </OctaneCardContentView>
-            </OctaneCardView>
+            <NativeTextTree>
+                <OctaneCardView className="octane-engraving-lock octane-furni-lock-confirm" theme="primary-slim">
+                    <OctaneCardHeaderView headerText={LocalizeText('friend.furniture.confirm.lock.caption')} onCloseClick={cancelLock ?? onClose} />
+                    <OctaneCardContentView>
+                        <h5 className="octane-furni-lock-confirm__subtitle text-black text-center font-bold mt-2 mb-2">{LocalizeText('friend.furniture.confirm.lock.subtitle')}</h5>
+                        <div className="flex justify-center mb-2">
+                            <div className={`engraving-lock-stage-${lockStage}`} />
+                        </div>
+                        {(stage === 2 || partnerConfirmed) && (
+                            <div className="octane-furni-lock-confirm__message text-black text-center mb-2">{LocalizeText('friend.furniture.confirm.lock.other.locked')}</div>
+                        )}
+                        <div className="flex gap-1">
+                            <Button fullWidth onClick={() => (cancelLock ?? onClose)()}>
+                                {LocalizeText('friend.furniture.confirm.lock.button.cancel')}
+                            </Button>
+                            <Button fullWidth variant="success" onClick={() => respond(true)}>
+                                {LocalizeText('friend.furniture.confirm.lock.button.confirm')}
+                            </Button>
+                        </div>
+                    </OctaneCardContentView>
+                </OctaneCardView>
+            </NativeTextTree>
         );
     }
 
@@ -64,21 +67,23 @@ export const FurnitureFriendFurniView: FC<{}> = (props) => {
         const engravingTypeClass = type === 3 || type === 4 ? `engraving-lock-${type}` : '';
 
         return (
-            <DraggableWindow handleSelector=".octane-engraving-lock-view">
-                <div className={`octane-engraving-lock-view octane-furni-lovelock ${engravingTypeClass}`.trim()}>
-                    <BaseButton type="button" className="engraving-lock-close" onClick={onClose} aria-label="Close" />
-                    <div className="engraving-lock-avatar engraving-lock-avatar--left">
-                        <LayoutAvatarImageView direction={2} figure={figures[0]} />
+            <NativeTextTree>
+                <DraggableWindow handleSelector=".octane-engraving-lock-view">
+                    <div className={`octane-engraving-lock-view octane-furni-lovelock ${engravingTypeClass}`.trim()}>
+                        <BaseButton type="button" className="engraving-lock-close" onClick={onClose} aria-label="Close" />
+                        <div className="engraving-lock-avatar engraving-lock-avatar--left">
+                            <LayoutAvatarImageView direction={2} figure={figures[0]} />
+                        </div>
+                        <div className="engraving-lock-avatar engraving-lock-avatar--right">
+                            <LayoutAvatarImageView direction={4} figure={figures[1]} />
+                        </div>
+                        <div className="engraving-lock-header">{getEngravingCaption(type)}</div>
+                        <div className="engraving-lock-date">{formatEngravingDate(date)}</div>
+                        <div className="engraving-lock-name engraving-lock-name--left">{usernames[0]}</div>
+                        <div className="engraving-lock-name engraving-lock-name--right">{usernames[1]}</div>
                     </div>
-                    <div className="engraving-lock-avatar engraving-lock-avatar--right">
-                        <LayoutAvatarImageView direction={4} figure={figures[1]} />
-                    </div>
-                    <div className="engraving-lock-header">{getEngravingCaption(type)}</div>
-                    <div className="engraving-lock-date">{formatEngravingDate(date)}</div>
-                    <div className="engraving-lock-name engraving-lock-name--left">{usernames[0]}</div>
-                    <div className="engraving-lock-name engraving-lock-name--right">{usernames[1]}</div>
-                </div>
-            </DraggableWindow>
+                </DraggableWindow>
+            </NativeTextTree>
         );
     }
 

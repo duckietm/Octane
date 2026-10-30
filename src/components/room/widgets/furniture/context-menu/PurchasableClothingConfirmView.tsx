@@ -9,6 +9,7 @@ import {
 import { FC, useEffect, useState } from 'react';
 import { BuildPurchasableClothingFigure, GetFurnitureDataForRoomObject, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, LayoutAvatarImageView, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useRoom } from '../../../../../hooks';
 
 interface PurchasableClothingConfirmViewProps {
@@ -74,31 +75,33 @@ export const PurchasableClothingConfirmView: FC<PurchasableClothingConfirmViewPr
     if (mode === MODE_DEFAULT) return null;
 
     return (
-        <OctaneCardView className="octane-use-product-confirmation">
-            <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.bind_clothing')} onCloseClick={onClose} />
-            <OctaneCardContentView center>
-                <div className="flex overflow-hidden gap-2">
-                    <div className="flex flex-col">
-                        <div className="mannequin-preview">
-                            <LayoutAvatarImageView direction={2} figure={newFigure} />
+        <NativeTextTree>
+            <OctaneCardView className="octane-use-product-confirmation">
+                <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.bind_clothing')} onCloseClick={onClose} />
+                <OctaneCardContentView center>
+                    <div className="flex overflow-hidden gap-2">
+                        <div className="flex flex-col">
+                            <div className="mannequin-preview">
+                                <LayoutAvatarImageView direction={2} figure={newFigure} />
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-between overflow-auto">
+                            <Column gap={2}>
+                                <Text>{LocalizeText('useproduct.widget.text.bind_clothing')}</Text>
+                                <Text>{LocalizeText('useproduct.widget.info.bind_clothing')}</Text>
+                            </Column>
+                            <div className="flex items-center justify-between">
+                                <Button variant="danger" onClick={onClose}>
+                                    {LocalizeText('useproduct.widget.cancel')}
+                                </Button>
+                                <Button variant="success" onClick={useProduct}>
+                                    {LocalizeText('useproduct.widget.bind_clothing')}
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                    <div className="flex flex-col justify-between overflow-auto">
-                        <Column gap={2}>
-                            <Text>{LocalizeText('useproduct.widget.text.bind_clothing')}</Text>
-                            <Text>{LocalizeText('useproduct.widget.info.bind_clothing')}</Text>
-                        </Column>
-                        <div className="flex items-center justify-between">
-                            <Button variant="danger" onClick={onClose}>
-                                {LocalizeText('useproduct.widget.cancel')}
-                            </Button>
-                            <Button variant="success" onClick={useProduct}>
-                                {LocalizeText('useproduct.widget.bind_clothing')}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

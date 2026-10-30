@@ -1,6 +1,7 @@
 import { FC, useEffect } from 'react';
 import { localizeWithFallback, NotificationAlertType } from '../../../../api';
 import { WIRED_LINK_FALLBACKS } from '../../../../api/wired/WiredLink';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useNotification } from '../../../../hooks';
 import { useWiredLinkEvents, useWiredLinkStore } from '../../../../hooks/rooms/widgets/useWiredLinkState';
 import { WiredLinkConnectionsView } from './WiredLinkConnectionsView';
@@ -34,9 +35,11 @@ export const WiredLinkWidgetView: FC<{}> = () =>
     }, [ showReceiveLocalInfo, simpleAlert ]);
 
     return (
-        <>
-            { isOpen && <WiredLinkView /> }
-            { isOpen && hasConnections && <WiredLinkConnectionsView /> }
-        </>
+        <NativeTextTree>
+            <>
+                { isOpen && <WiredLinkView /> }
+                { isOpen && hasConnections && <WiredLinkConnectionsView /> }
+            </>
+        </NativeTextTree>
     );
 };

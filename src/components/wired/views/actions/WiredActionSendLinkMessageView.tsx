@@ -7,6 +7,7 @@ import { WiredPlaceholderInsert } from '../WiredPlaceholderInsert';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const FROM_TRIGGER = 0;
 const CUSTOM_MESSAGE = 1;
@@ -55,28 +56,30 @@ export const WiredActionSendLinkMessageView: FC<{}> = () =>
     const custom = (source === CUSTOM_MESSAGE);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
-            save={ save }
-            validate={ validate }
-            footer={ <WiredSourcesSelector showFurni={ true } furniSource={ furniSource } furniSources={ LINK_SOURCES } furniTitle={ localizeWithFallback('wiredfurni.params.link.endpoints', 'WIRED Links') } onChangeFurni={ setFurniSource } /> }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.link.message_source', 'Message source') }</Text>
-                { [ FROM_TRIGGER, CUSTOM_MESSAGE ].map(value => (
-                    <label key={ value } className="flex cursor-pointer items-center gap-1">
-                        <Radio checked={ source === value } name="sendLinkMessageSource" onCheckedChange={ () => setSource(value) } />
-                        <Text small>{ (value === FROM_TRIGGER) ? localizeWithFallback('wiredfurni.params.link.from_trigger', 'From WIRED trigger') : localizeWithFallback('wiredfurni.params.link.custom_message', 'Custom message') }</Text>
-                    </label>
-                )) }
-            </div>
-            <div className={ `flex flex-col gap-1 ${ custom ? '' : 'opacity-50' }` }>
-                <Text bold>{ localizeWithFallback('wiredfurni.params.message', 'Message') }</Text>
-                <textarea className="form-control form-control-sm octane-wired__resizable-textarea" disabled={ !custom } rows={ 4 } value={ message } onChange={ event => setMessage(event.target.value) } />
-                <Text small className={ (utf8Length(message) > LINK_MESSAGE_MAX_BYTES) ? 'text-[#ad3434]' : 'text-[#777]' }>{ `${ utf8Length(message) } / ${ LINK_MESSAGE_MAX_BYTES }` }</Text>
-                { custom && <WiredPlaceholderInsert trigger={ trigger } onInsert={ token => setMessage(current => current + token) } /> }
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
+                save={ save }
+                validate={ validate }
+                footer={ <WiredSourcesSelector showFurni={ true } furniSource={ furniSource } furniSources={ LINK_SOURCES } furniTitle={ localizeWithFallback('wiredfurni.params.link.endpoints', 'WIRED Links') } onChangeFurni={ setFurniSource } /> }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.link.message_source', 'Message source') }</Text>
+                    { [ FROM_TRIGGER, CUSTOM_MESSAGE ].map(value => (
+                        <label key={ value } className="flex cursor-pointer items-center gap-1">
+                            <Radio checked={ source === value } name="sendLinkMessageSource" onCheckedChange={ () => setSource(value) } />
+                            <Text small>{ (value === FROM_TRIGGER) ? localizeWithFallback('wiredfurni.params.link.from_trigger', 'From WIRED trigger') : localizeWithFallback('wiredfurni.params.link.custom_message', 'Custom message') }</Text>
+                        </label>
+                    )) }
+                </div>
+                <div className={ `flex flex-col gap-1 ${ custom ? '' : 'opacity-50' }` }>
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.message', 'Message') }</Text>
+                    <textarea className="form-control form-control-sm octane-wired__resizable-textarea" disabled={ !custom } rows={ 4 } value={ message } onChange={ event => setMessage(event.target.value) } />
+                    <Text small className={ (utf8Length(message) > LINK_MESSAGE_MAX_BYTES) ? 'text-[#ad3434]' : 'text-[#777]' }>{ `${ utf8Length(message) } / ${ LINK_MESSAGE_MAX_BYTES }` }</Text>
+                    { custom && <WiredPlaceholderInsert trigger={ trigger } onInsert={ token => setMessage(current => current + token) } /> }
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

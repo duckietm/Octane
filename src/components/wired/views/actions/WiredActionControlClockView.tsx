@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Game timers and the football, Banzai and Freeze counters as well as the clock counter.
 
@@ -42,23 +43,25 @@ export const WiredActionControlClockView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.clock_control')}</Text>
-                {CONTROL_OPTIONS.map((option) => {
-                    return (
-                        <div key={option.value} className="flex items-center gap-1">
-                            <Radio checked={control === option.value} id={`controlClock${option.value}`} name="controlClock" onCheckedChange={() => setControl(option.value)} />
-                            <Text>{LocalizeText(option.label)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.clock_control')}</Text>
+                    {CONTROL_OPTIONS.map((option) => {
+                        return (
+                            <div key={option.value} className="flex items-center gap-1">
+                                <Radio checked={control === option.value} id={`controlClock${option.value}`} name="controlClock" onCheckedChange={() => setControl(option.value)} />
+                                <Text>{LocalizeText(option.label)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

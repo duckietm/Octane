@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MINUTES_MIN = 0;
 const MINUTES_MAX = 99;
@@ -64,37 +65,39 @@ export const WiredActionAdjustClockView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.choose_type')}</Text>
-                {OPERATOR_OPTIONS.map((option) => {
-                    return (
-                        <div key={option.value} className="flex items-center gap-1">
-                            <Radio checked={operator === option.value} id={`adjustClockOperator${option.value}`} name="adjustClockOperator" onCheckedChange={() => setOperator(option.value)} />
-                            <Text>{LocalizeText(option.label)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.clock_minutes', LocalizeText('wiredfurni.params.time.minute_selection'), ['minutes'], [minutes.toString()])}</Text>
-                <Slider max={MINUTES_MAX} min={MINUTES_MIN} step={1} value={minutes} onChange={(event) => setMinutes(normalizeMinutes(event as number))} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.clock_seconds', LocalizeText('wiredfurni.params.time.second_selection'), ['seconds'], [secondsLabel])}</Text>
-                <Slider
-                    max={HALF_SECONDS_MAX}
-                    min={HALF_SECONDS_MIN}
-                    step={1}
-                    value={halfSeconds}
-                    onChange={(event) => setHalfSeconds(normalizeHalfSeconds(event as number))}
-                />
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.choose_type')}</Text>
+                    {OPERATOR_OPTIONS.map((option) => {
+                        return (
+                            <div key={option.value} className="flex items-center gap-1">
+                                <Radio checked={operator === option.value} id={`adjustClockOperator${option.value}`} name="adjustClockOperator" onCheckedChange={() => setOperator(option.value)} />
+                                <Text>{LocalizeText(option.label)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.clock_minutes', LocalizeText('wiredfurni.params.time.minute_selection'), ['minutes'], [minutes.toString()])}</Text>
+                    <Slider max={MINUTES_MAX} min={MINUTES_MIN} step={1} value={minutes} onChange={(event) => setMinutes(normalizeMinutes(event as number))} />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.clock_seconds', LocalizeText('wiredfurni.params.time.second_selection'), ['seconds'], [secondsLabel])}</Text>
+                    <Slider
+                        max={HALF_SECONDS_MAX}
+                        min={HALF_SECONDS_MIN}
+                        step={1}
+                        value={halfSeconds}
+                        onChange={(event) => setHalfSeconds(normalizeHalfSeconds(event as number))}
+                    />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

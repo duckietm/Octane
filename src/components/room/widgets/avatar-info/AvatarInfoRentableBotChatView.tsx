@@ -4,6 +4,7 @@ import { BotSkillsEnum, GetConfigurationValue, LocalizeText, OpenUrl, RoomWidget
 import { AvatarInfoBotSkillButtonsView, AvatarInfoBotSkillWindowView } from './AvatarInfoBotSkillWindowView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface AvatarInfoRentableBotChatViewProps {
     chatEvent: RoomWidgetUpdateRentableBotChatEvent;
@@ -33,47 +34,49 @@ export const AvatarInfoRentableBotChatView: FC<AvatarInfoRentableBotChatViewProp
     };
 
     return (
-        <AvatarInfoBotSkillWindowView
-            category={chatEvent.category}
-            layout="chatter"
-            objectId={chatEvent.objectId}
-            title={LocalizeText('bot.skill.chatter.configuration.title')}
-        >
-            <div className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.chat.text')}</div>
-            <textarea
-                className="air-bot-skill-input air-bot-skill-chat-text"
-                maxLength={CHAT_TEXT_MAX_CHARS}
-                placeholder={LocalizeText('bot.skill.chatter.configuration.text.placeholder')}
-                value={newText}
-                onChange={(event) => setNewText(event.target.value)}
-            />
-            <label className="air-bot-skill-row">
-                <span className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.automatic.chat')}</span>
-                <Checkbox checked={automaticChat} className="air-bot-skill-checkbox" onCheckedChange={ nextChecked => setAutomaticChat(nextChecked) } />
-            </label>
-            <label className="air-bot-skill-row">
-                <span className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.markov')}</span>
-                <Checkbox checked={mixSentences} className="air-bot-skill-checkbox" onCheckedChange={ nextChecked => setMixSentences(nextChecked) } />
-            </label>
-            <label className="air-bot-skill-row">
-                <span className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.chat.delay')}</span>
-                <input
-                    className="air-bot-skill-input air-bot-skill-chat-delay"
-                    inputMode="numeric"
-                    type="text"
-                    value={chatDelay}
-                    onChange={(event) => setChatDelay(event.target.value.replace(/[^0-9]/g, ''))}
-                />
-            </label>
-            <BaseButton
-                className="air-bot-skill-help-link"
-                disabled={!helpUrl}
-                type="button"
-                onClick={() => OpenUrl(helpUrl)}
+        <NativeTextTree>
+            <AvatarInfoBotSkillWindowView
+                category={chatEvent.category}
+                layout="chatter"
+                objectId={chatEvent.objectId}
+                title={LocalizeText('bot.skill.chatter.configuration.title')}
             >
-                {LocalizeText('bot.skill.chatter.configuration.help.link')}
-            </BaseButton>
-            <AvatarInfoBotSkillButtonsView cancelLabel={LocalizeText('cancel')} saveLabel={LocalizeText('save')} onCancel={onClose} onSave={save} />
-        </AvatarInfoBotSkillWindowView>
+                <div className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.chat.text')}</div>
+                <textarea
+                    className="air-bot-skill-input air-bot-skill-chat-text"
+                    maxLength={CHAT_TEXT_MAX_CHARS}
+                    placeholder={LocalizeText('bot.skill.chatter.configuration.text.placeholder')}
+                    value={newText}
+                    onChange={(event) => setNewText(event.target.value)}
+                />
+                <label className="air-bot-skill-row">
+                    <span className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.automatic.chat')}</span>
+                    <Checkbox checked={automaticChat} className="air-bot-skill-checkbox" onCheckedChange={ nextChecked => setAutomaticChat(nextChecked) } />
+                </label>
+                <label className="air-bot-skill-row">
+                    <span className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.markov')}</span>
+                    <Checkbox checked={mixSentences} className="air-bot-skill-checkbox" onCheckedChange={ nextChecked => setMixSentences(nextChecked) } />
+                </label>
+                <label className="air-bot-skill-row">
+                    <span className="air-bot-skill-label">{LocalizeText('bot.skill.chatter.configuration.chat.delay')}</span>
+                    <input
+                        className="air-bot-skill-input air-bot-skill-chat-delay"
+                        inputMode="numeric"
+                        type="text"
+                        value={chatDelay}
+                        onChange={(event) => setChatDelay(event.target.value.replace(/[^0-9]/g, ''))}
+                    />
+                </label>
+                <BaseButton
+                    className="air-bot-skill-help-link"
+                    disabled={!helpUrl}
+                    type="button"
+                    onClick={() => OpenUrl(helpUrl)}
+                >
+                    {LocalizeText('bot.skill.chatter.configuration.help.link')}
+                </BaseButton>
+                <AvatarInfoBotSkillButtonsView cancelLabel={LocalizeText('cancel')} saveLabel={LocalizeText('save')} onCancel={onClose} onSave={save} />
+            </AvatarInfoBotSkillWindowView>
+        </NativeTextTree>
     );
 };

@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { localizeWithFallback } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { AirSettingsVolumeRow } from './AirSettingsVolumeRow';
 
 interface SoundboardVolumeControlProps {
@@ -12,14 +13,16 @@ export const SoundboardVolumeControl: FC<SoundboardVolumeControlProps> = ({ valu
     const label = localizeWithFallback('widget.memenu.settings.volume.soundboard', 'Soundboard');
 
     return (
-        <AirSettingsVolumeRow
-            id="volumeSoundboard"
-            label={label}
-            maximumLabel={localizeWithFallback('widget.memenu.settings.volume.maximum', 'Maximum volume')}
-            muteLabel={localizeWithFallback('widget.memenu.settings.volume.mute', 'Mute')}
-            value={value}
-            onChange={onChange}
-            onCommit={onCommit}
-        />
+        <NativeTextTree>
+            <AirSettingsVolumeRow
+                id="volumeSoundboard"
+                label={label}
+                maximumLabel={localizeWithFallback('widget.memenu.settings.volume.maximum', 'Maximum volume')}
+                muteLabel={localizeWithFallback('widget.memenu.settings.volume.mute', 'Mute')}
+                value={value}
+                onChange={onChange}
+                onCommit={onCommit}
+            />
+        </NativeTextTree>
     );
 };

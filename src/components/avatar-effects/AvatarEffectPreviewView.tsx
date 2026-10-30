@@ -1,6 +1,7 @@
 import { GetRoomEngine, RoomPreviewer } from '@octane/renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import { LayoutRoomPreviewerView, PIXEL_ART_RENDERING } from '../../common';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface AvatarEffectPreviewViewProps {
     figure: string;
@@ -71,10 +72,12 @@ export const AvatarEffectPreviewView: FC<AvatarEffectPreviewViewProps> = (props)
     };
 
     return (
-        <div style={outerStyle}>
-            <div style={innerStyle}>
-                <LayoutRoomPreviewerView roomPreviewer={roomPreviewer} height={renderHeight} />
+        <NativeTextTree>
+            <div style={outerStyle}>
+                <div style={innerStyle}>
+                    <LayoutRoomPreviewerView roomPreviewer={roomPreviewer} height={renderHeight} />
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

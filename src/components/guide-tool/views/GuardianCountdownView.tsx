@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface GuardianCountdownViewProps {
     seconds: number;
@@ -33,8 +34,10 @@ export const GuardianCountdownView: FC<GuardianCountdownViewProps> = ({ seconds,
     const rest = left % 60;
 
     return (
-        <div className="octane-guardian-countdown" role="timer">
-            {`${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`}
-        </div>
+        <NativeTextTree>
+            <div className="octane-guardian-countdown" role="timer">
+                {`${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`}
+            </div>
+        </NativeTextTree>
     );
 };

@@ -14,6 +14,7 @@ import {
 } from '@octane/renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetRoomSession, LocalizeText, localizeWithFallback, SendMessageComposer, TryVisitRoom } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import {
     MOD_WINDOW_SIZE,
     useHasPermission,
@@ -237,182 +238,184 @@ export const ModToolsView: FC<{}> = () => {
     const enterRoom = (roomId: number) => TryVisitRoom(roomId);
 
     return (
-        <>
-            {isVisible && settings && (
-                <StartPanelView
-                    canUseChatlog={isInRoom && chatlogEnabled}
-                    canUseRoomTool={isInRoom}
-                    canUseTicketQueue={ticketQueueEnabled}
-                    canUseUserInfo={!!selectedUser}
-                    noResultsText={LocalizeText('generic.no_results_found')}
-                    noRoomHint={localizeWithFallback('modtools.window.no.room', 'Enter a room first')}
-                    openIssueCount={openIssueCount}
-                    searchPlaceholder={LocalizeText('generic.search')}
-                    searchQuery={userQuery}
-                    searchResults={userResults}
-                    selectedUser={selectedUser ? { ...selectedUser, present: isSelectedUserPresent } : null}
-                    userCaption={selectedUser ? `User info: ${selectedUser.username}` : 'User info:'}
-                    x={startPanel.x}
-                    y={startPanel.y}
-                    onChatlog={() => CreateLinkEvent(`mod-tools/toggle-room-chatlog/${currentRoomId}`)}
-                    onClearUser={() => setSelectedUser(null)}
-                    onClose={() => setIsVisible(false)}
-                    onMove={(x, y) => setStartPanel({ ...startPanel, x, y })}
-                    onPickUser={pickUser}
-                    onRoomTool={() => CreateLinkEvent(`mod-tools/toggle-room-info/${currentRoomId}`)}
-                    onSearchQuery={setUserQuery}
-                    onTicketQueue={() => showWindow({ type: 'issueBrowser', key: 'main', ...MOD_WINDOW_SIZE.issueBrowser, parent: null })}
-                    onUserInfo={() => selectedUser && CreateLinkEvent(`mod-tools/toggle-user-info/${selectedUser.userId}`)}
-                />
-            )}
-            {/* every window reads the moderator's permissions and templates: nothing opens before the init message */}
-            {settings && windows.map((entry) => {
-                if (entry.hidden) return null;
+        <NativeTextTree>
+            <>
+                {isVisible && settings && (
+                    <StartPanelView
+                        canUseChatlog={isInRoom && chatlogEnabled}
+                        canUseRoomTool={isInRoom}
+                        canUseTicketQueue={ticketQueueEnabled}
+                        canUseUserInfo={!!selectedUser}
+                        noResultsText={LocalizeText('generic.no_results_found')}
+                        noRoomHint={localizeWithFallback('modtools.window.no.room', 'Enter a room first')}
+                        openIssueCount={openIssueCount}
+                        searchPlaceholder={LocalizeText('generic.search')}
+                        searchQuery={userQuery}
+                        searchResults={userResults}
+                        selectedUser={selectedUser ? { ...selectedUser, present: isSelectedUserPresent } : null}
+                        userCaption={selectedUser ? `User info: ${selectedUser.username}` : 'User info:'}
+                        x={startPanel.x}
+                        y={startPanel.y}
+                        onChatlog={() => CreateLinkEvent(`mod-tools/toggle-room-chatlog/${currentRoomId}`)}
+                        onClearUser={() => setSelectedUser(null)}
+                        onClose={() => setIsVisible(false)}
+                        onMove={(x, y) => setStartPanel({ ...startPanel, x, y })}
+                        onPickUser={pickUser}
+                        onRoomTool={() => CreateLinkEvent(`mod-tools/toggle-room-info/${currentRoomId}`)}
+                        onSearchQuery={setUserQuery}
+                        onTicketQueue={() => showWindow({ type: 'issueBrowser', key: 'main', ...MOD_WINDOW_SIZE.issueBrowser, parent: null })}
+                        onUserInfo={() => selectedUser && CreateLinkEvent(`mod-tools/toggle-user-info/${selectedUser.userId}`)}
+                    />
+                )}
+                {/* every window reads the moderator's permissions and templates: nothing opens before the init message */}
+                {settings && windows.map((entry) => {
+                    if (entry.hidden) return null;
 
-                const key = `${entry.type}:${entry.key}:${entry.revision}`;
+                    const key = `${entry.type}:${entry.key}:${entry.revision}`;
 
-                if (entry.type === 'roomTool') {
-                    return (
-                        <RoomToolView
-                            key={key}
-                            currentRoomId={isInRoom ? currentRoomId : 0}
-                            roomId={Number(entry.key)}
-                            settings={settings}
-                            x={entry.x}
-                            y={entry.y}
-                            onClose={() => closeWindow('roomTool', entry.key)}
-                            onOpenChatlog={(id) => showWindow({ type: 'roomChatlog', key: `${id}`, ...MOD_WINDOW_SIZE.roomChatlog, parent: entry, toggle: true })}
-                            onOpenUserInfo={(id) => showWindow({ type: 'userInfo', key: `${id}`, ...MOD_WINDOW_SIZE.userInfo, parent: entry, toggle: true })}
-                        />
-                    );
-                }
+                    if (entry.type === 'roomTool') {
+                        return (
+                            <RoomToolView
+                                key={key}
+                                currentRoomId={isInRoom ? currentRoomId : 0}
+                                roomId={Number(entry.key)}
+                                settings={settings}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => closeWindow('roomTool', entry.key)}
+                                onOpenChatlog={(id) => showWindow({ type: 'roomChatlog', key: `${id}`, ...MOD_WINDOW_SIZE.roomChatlog, parent: entry, toggle: true })}
+                                onOpenUserInfo={(id) => showWindow({ type: 'userInfo', key: `${id}`, ...MOD_WINDOW_SIZE.userInfo, parent: entry, toggle: true })}
+                            />
+                        );
+                    }
 
-                if (entry.type === 'userInfo') {
-                    return (
-                        <UserInfoView
-                            key={key}
-                            settings={settings}
-                            userId={Number(entry.key)}
-                            x={entry.x}
-                            y={entry.y}
-                            onClose={() => closeWindow('userInfo', entry.key)}
-                            onOpenChatlog={() => showWindow({ type: 'userChatlog', key: entry.key, ...MOD_WINDOW_SIZE.userChatlog, parent: entry, below: true, toggle: true })}
-                            onOpenModAction={(userName) =>
-                                showWindow({ type: 'modAction', key: userName, ...MOD_WINDOW_SIZE.modAction, parent: entry, below: true, toggle: true, params: { userId: Number(entry.key) } })
-                            }
-                            onOpenRoomVisits={() => showWindow({ type: 'roomVisits', key: entry.key, ...MOD_WINDOW_SIZE.roomVisits, parent: entry, below: true, toggle: true })}
-                            onOpenSendMessage={(userName) =>
-                                showWindow({ type: 'sendMessage', key: userName, ...MOD_WINDOW_SIZE.sendMessage, parent: entry, below: true, toggle: true, params: { userId: Number(entry.key) } })
-                            }
-                        />
-                    );
-                }
+                    if (entry.type === 'userInfo') {
+                        return (
+                            <UserInfoView
+                                key={key}
+                                settings={settings}
+                                userId={Number(entry.key)}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => closeWindow('userInfo', entry.key)}
+                                onOpenChatlog={() => showWindow({ type: 'userChatlog', key: entry.key, ...MOD_WINDOW_SIZE.userChatlog, parent: entry, below: true, toggle: true })}
+                                onOpenModAction={(userName) =>
+                                    showWindow({ type: 'modAction', key: userName, ...MOD_WINDOW_SIZE.modAction, parent: entry, below: true, toggle: true, params: { userId: Number(entry.key) } })
+                                }
+                                onOpenRoomVisits={() => showWindow({ type: 'roomVisits', key: entry.key, ...MOD_WINDOW_SIZE.roomVisits, parent: entry, below: true, toggle: true })}
+                                onOpenSendMessage={(userName) =>
+                                    showWindow({ type: 'sendMessage', key: userName, ...MOD_WINDOW_SIZE.sendMessage, parent: entry, below: true, toggle: true, params: { userId: Number(entry.key) } })
+                                }
+                            />
+                        );
+                    }
 
-                if (entry.type === 'userChatlog' || entry.type === 'roomChatlog' || entry.type === 'cfhChatlog') {
-                    return (
-                        <EvidenceChatlogView
-                            key={key}
-                            height={entry.height}
-                            id={Number(entry.key)}
-                            kind={entry.type === 'userChatlog' ? 'user' : entry.type === 'roomChatlog' ? 'room' : 'cfh'}
-                            width={entry.width}
-                            x={entry.x}
-                            y={entry.y}
-                            onClose={() => closeWindow(entry.type, entry.key)}
-                            onEnterRoom={enterRoom}
-                            onOpenRoomTool={(roomId) => showWindow({ type: 'roomTool', key: `${roomId}`, ...MOD_WINDOW_SIZE.roomTool, parent: entry, toggle: true })}
-                            onOpenUserInfo={(userId) => showWindow({ type: 'userInfo', key: `${userId}`, ...MOD_WINDOW_SIZE.userInfo, parent: entry, toggle: true })}
-                            onResize={(width, height) => resizeWindow(entry.type, entry.key, width, height)}
-                        />
-                    );
-                }
+                    if (entry.type === 'userChatlog' || entry.type === 'roomChatlog' || entry.type === 'cfhChatlog') {
+                        return (
+                            <EvidenceChatlogView
+                                key={key}
+                                height={entry.height}
+                                id={Number(entry.key)}
+                                kind={entry.type === 'userChatlog' ? 'user' : entry.type === 'roomChatlog' ? 'room' : 'cfh'}
+                                width={entry.width}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => closeWindow(entry.type, entry.key)}
+                                onEnterRoom={enterRoom}
+                                onOpenRoomTool={(roomId) => showWindow({ type: 'roomTool', key: `${roomId}`, ...MOD_WINDOW_SIZE.roomTool, parent: entry, toggle: true })}
+                                onOpenUserInfo={(userId) => showWindow({ type: 'userInfo', key: `${userId}`, ...MOD_WINDOW_SIZE.userInfo, parent: entry, toggle: true })}
+                                onResize={(width, height) => resizeWindow(entry.type, entry.key, width, height)}
+                            />
+                        );
+                    }
 
-                if (entry.type === 'userClassification') {
-                    return (
-                        <UserClassificationView
-                            key={key}
-                            entries={classifications}
-                            height={entry.height}
-                            width={entry.width}
-                            x={entry.x}
-                            y={entry.y}
-                            onClose={() => closeWindow('userClassification', entry.key)}
-                            onOpenUserInfo={(userId) => showWindow({ type: 'userInfo', key: `${userId}`, ...MOD_WINDOW_SIZE.userInfo, parent: entry, toggle: true })}
-                            onResize={(width, height) => resizeWindow('userClassification', entry.key, width, height)}
-                        />
-                    );
-                }
+                    if (entry.type === 'userClassification') {
+                        return (
+                            <UserClassificationView
+                                key={key}
+                                entries={classifications}
+                                height={entry.height}
+                                width={entry.width}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => closeWindow('userClassification', entry.key)}
+                                onOpenUserInfo={(userId) => showWindow({ type: 'userInfo', key: `${userId}`, ...MOD_WINDOW_SIZE.userInfo, parent: entry, toggle: true })}
+                                onResize={(width, height) => resizeWindow('userClassification', entry.key, width, height)}
+                            />
+                        );
+                    }
 
-                if (entry.type === 'roomVisits') {
-                    return (
-                        <RoomVisitsView
-                            key={key}
-                            height={entry.height}
-                            userId={Number(entry.key)}
-                            width={entry.width}
-                            x={entry.x}
-                            y={entry.y}
-                            onClose={() => closeWindow('roomVisits', entry.key)}
-                            onEnterRoom={enterRoom}
-                            onOpenRoomTool={(roomId) => showWindow({ type: 'roomTool', key: `${roomId}`, ...MOD_WINDOW_SIZE.roomTool, parent: entry, toggle: true })}
-                            onResize={(width, height) => resizeWindow('roomVisits', entry.key, width, height)}
-                        />
-                    );
-                }
+                    if (entry.type === 'roomVisits') {
+                        return (
+                            <RoomVisitsView
+                                key={key}
+                                height={entry.height}
+                                userId={Number(entry.key)}
+                                width={entry.width}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => closeWindow('roomVisits', entry.key)}
+                                onEnterRoom={enterRoom}
+                                onOpenRoomTool={(roomId) => showWindow({ type: 'roomTool', key: `${roomId}`, ...MOD_WINDOW_SIZE.roomTool, parent: entry, toggle: true })}
+                                onResize={(width, height) => resizeWindow('roomVisits', entry.key, width, height)}
+                            />
+                        );
+                    }
 
-                if (entry.type === 'issueBrowser') {
-                    return (
-                        <IssueBrowserView
-                            key={key}
-                            context={issueContext}
-                            height={entry.height}
-                            localize={LocalizeText}
-                            width={entry.width}
-                            x={entry.x}
-                            y={entry.y}
-                            onClose={() => hideWindow('issueBrowser', entry.key)}
-                            onResize={(width, height) => resizeWindow('issueBrowser', entry.key, width, height)}
-                        />
-                    );
-                }
+                    if (entry.type === 'issueBrowser') {
+                        return (
+                            <IssueBrowserView
+                                key={key}
+                                context={issueContext}
+                                height={entry.height}
+                                localize={LocalizeText}
+                                width={entry.width}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => hideWindow('issueBrowser', entry.key)}
+                                onResize={(width, height) => resizeWindow('issueBrowser', entry.key, width, height)}
+                            />
+                        );
+                    }
 
-                if (entry.type === 'issueHandler') {
-                    return (
-                        <IssueHandlerView
-                            key={key}
-                            bundleId={Number(entry.key)}
-                            categories={cfhCategories}
-                            context={issueContext}
-                            height={entry.height}
-                            localize={LocalizeText}
-                            settings={settings}
-                            width={entry.width}
-                            x={entry.x}
-                            y={entry.y}
-                            onClose={() => closeWindow('issueHandler', entry.key)}
-                            onEnterRoom={enterRoom}
-                            onOpenChatlog={(userId) => showWindow({ type: 'userChatlog', key: `${userId}`, ...MOD_WINDOW_SIZE.userChatlog, parent: entry, toggle: true })}
-                            onOpenModAction={(userId, userName) => showWindow({ type: 'modAction', key: userName, ...MOD_WINDOW_SIZE.modAction, parent: entry, toggle: true, params: { userId } })}
-                            onOpenRoomTool={(roomId) => showWindow({ type: 'roomTool', key: `${roomId}`, ...MOD_WINDOW_SIZE.roomTool, parent: null, toggle: true })}
-                            onOpenRoomVisits={(userId) => showWindow({ type: 'roomVisits', key: `${userId}`, ...MOD_WINDOW_SIZE.roomVisits, parent: entry, toggle: true })}
-                            onOpenSendMessage={(userId, userName) => showWindow({ type: 'sendMessage', key: userName, ...MOD_WINDOW_SIZE.sendMessage, parent: entry, toggle: true, params: { userId } })}
-                            onOpenUserInfo={(userId, parent) => showWindow({ type: 'userInfo', key: `${userId}`, ...MOD_WINDOW_SIZE.userInfo, parent, toggle: true })}
-                            onResize={(width, height) => resizeWindow('issueHandler', entry.key, width, height)}
-                        />
-                    );
-                }
+                    if (entry.type === 'issueHandler') {
+                        return (
+                            <IssueHandlerView
+                                key={key}
+                                bundleId={Number(entry.key)}
+                                categories={cfhCategories}
+                                context={issueContext}
+                                height={entry.height}
+                                localize={LocalizeText}
+                                settings={settings}
+                                width={entry.width}
+                                x={entry.x}
+                                y={entry.y}
+                                onClose={() => closeWindow('issueHandler', entry.key)}
+                                onEnterRoom={enterRoom}
+                                onOpenChatlog={(userId) => showWindow({ type: 'userChatlog', key: `${userId}`, ...MOD_WINDOW_SIZE.userChatlog, parent: entry, toggle: true })}
+                                onOpenModAction={(userId, userName) => showWindow({ type: 'modAction', key: userName, ...MOD_WINDOW_SIZE.modAction, parent: entry, toggle: true, params: { userId } })}
+                                onOpenRoomTool={(roomId) => showWindow({ type: 'roomTool', key: `${roomId}`, ...MOD_WINDOW_SIZE.roomTool, parent: null, toggle: true })}
+                                onOpenRoomVisits={(userId) => showWindow({ type: 'roomVisits', key: `${userId}`, ...MOD_WINDOW_SIZE.roomVisits, parent: entry, toggle: true })}
+                                onOpenSendMessage={(userId, userName) => showWindow({ type: 'sendMessage', key: userName, ...MOD_WINDOW_SIZE.sendMessage, parent: entry, toggle: true, params: { userId } })}
+                                onOpenUserInfo={(userId, parent) => showWindow({ type: 'userInfo', key: `${userId}`, ...MOD_WINDOW_SIZE.userInfo, parent, toggle: true })}
+                                onResize={(width, height) => resizeWindow('issueHandler', entry.key, width, height)}
+                            />
+                        );
+                    }
 
-                if (entry.type === 'modAction') {
-                    return <ModActionView key={key} settings={settings} userId={Number(entry.params.userId)} userName={entry.key} x={entry.x} y={entry.y} onClose={() => closeWindow('modAction', entry.key)} />;
-                }
+                    if (entry.type === 'modAction') {
+                        return <ModActionView key={key} settings={settings} userId={Number(entry.params.userId)} userName={entry.key} x={entry.x} y={entry.y} onClose={() => closeWindow('modAction', entry.key)} />;
+                    }
 
-                if (entry.type === 'sendMessage') {
-                    return <SendMessageView key={key} settings={settings} userId={Number(entry.params.userId)} userName={entry.key} x={entry.x} y={entry.y} onClose={() => closeWindow('sendMessage', entry.key)} />;
-                }
+                    if (entry.type === 'sendMessage') {
+                        return <SendMessageView key={key} settings={settings} userId={Number(entry.params.userId)} userName={entry.key} x={entry.x} y={entry.y} onClose={() => closeWindow('sendMessage', entry.key)} />;
+                    }
 
-                return null;
-            })}
-            <NativeAlertView />
-        </>
+                    return null;
+                })}
+                <NativeAlertView />
+            </>
+        </NativeTextTree>
     );
 };

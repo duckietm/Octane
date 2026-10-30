@@ -1,6 +1,7 @@
 import { GetEventDispatcher, OctaneToolbarAnimateIconEvent, RoomPreviewer, TextureUtils, ToolbarIconEnum } from '@octane/renderer';
 import { FC, useRef } from 'react';
 import { LayoutRoomPreviewerView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { CatalogPurchasedEvent } from '../../../../events';
 import { useUiEvent } from '../../../../hooks';
 
@@ -40,8 +41,10 @@ export const CatalogRoomPreviewerView: FC<{
     });
 
     return (
-        <div ref={elementRef}>
-            <LayoutRoomPreviewerView {...props} />
-        </div>
+        <NativeTextTree>
+            <div ref={elementRef}>
+                <LayoutRoomPreviewerView {...props} />
+            </div>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 
@@ -20,18 +21,20 @@ export const WiredConditionUserOnceView: FC<WiredConditionUserOnceViewProps> = (
     };
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <Text small className="text-black/60">
-                {daily
-                    ? localizeWithFallback(
-                          'wiredfurni.params.daily_trigger.info',
-                          'Each user passes this condition once per day. Picking the box up forgets everyone.'
-                      )
-                    : localizeWithFallback(
-                          'wiredfurni.params.first_trigger.info',
-                          'Each user passes this condition only the first time, ever. Picking the box up forgets everyone.'
-                      )}
-            </Text>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <Text small className="text-black/60">
+                    {daily
+                        ? localizeWithFallback(
+                              'wiredfurni.params.daily_trigger.info',
+                              'Each user passes this condition once per day. Picking the box up forgets everyone.'
+                          )
+                        : localizeWithFallback(
+                              'wiredfurni.params.first_trigger.info',
+                              'Each user passes this condition only the first time, ever. Picking the box up forgets everyone.'
+                          )}
+                </Text>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

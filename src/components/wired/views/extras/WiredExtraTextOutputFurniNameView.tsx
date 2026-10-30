@@ -7,6 +7,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const TYPE_SINGLE = 1;
 const TYPE_MULTIPLE = 2;
@@ -84,48 +85,50 @@ export const WiredExtraTextOutputFurniNameView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            cardStyle={{ width: 400 }}
-            footerCollapsible={false}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={(value) => setFurniSource(normalizeFurniSource(value))} />}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.texts.placeholder_name')}</Text>
-                    <OctaneInput
-                        maxLength={MAX_PLACEHOLDER_NAME_LENGTH}
-                        type="text"
-                        value={placeholderName}
-                        onChange={(event) => setPlaceholderName(normalizePlaceholderName(event.target.value))}
-                    />
-                </div>
-                <WiredPlaceholderPreview previewHtml={previewHtml} previewToken={previewToken} />
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type')}</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={placeholderType === TYPE_SINGLE} name="wiredTextOutputFurniNameType" onCheckedChange={() => setPlaceholderType(TYPE_SINGLE)} />
-                        <Text>{localizeWithFallback('wiredfurni.params.texts.placeholder_type.furni.1', LocalizeText('wiredfurni.params.texts.placeholder_type.1'))}</Text>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={placeholderType === TYPE_MULTIPLE} name="wiredTextOutputFurniNameType" onCheckedChange={() => setPlaceholderType(TYPE_MULTIPLE)} />
-                        <Text>{localizeWithFallback('wiredfurni.params.texts.placeholder_type.furni.2', LocalizeText('wiredfurni.params.texts.placeholder_type.2'))}</Text>
-                    </label>
-                </div>
-                {placeholderType === TYPE_MULTIPLE && (
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                cardStyle={{ width: 400 }}
+                footerCollapsible={false}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={(value) => setFurniSource(normalizeFurniSource(value))} />}
+            >
+                <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-1">
-                        <Text>{LocalizeText('wiredfurni.params.texts.select_delimiter')}</Text>
+                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_name')}</Text>
                         <OctaneInput
-                            maxLength={MAX_DELIMITER_LENGTH}
+                            maxLength={MAX_PLACEHOLDER_NAME_LENGTH}
                             type="text"
-                            value={delimiter}
-                            onChange={(event) => setDelimiter(normalizeDelimiter(event.target.value))}
+                            value={placeholderName}
+                            onChange={(event) => setPlaceholderName(normalizePlaceholderName(event.target.value))}
                         />
                     </div>
-                )}
-            </div>
-        </WiredExtraBaseView>
+                    <WiredPlaceholderPreview previewHtml={previewHtml} previewToken={previewToken} />
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type')}</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={placeholderType === TYPE_SINGLE} name="wiredTextOutputFurniNameType" onCheckedChange={() => setPlaceholderType(TYPE_SINGLE)} />
+                            <Text>{localizeWithFallback('wiredfurni.params.texts.placeholder_type.furni.1', LocalizeText('wiredfurni.params.texts.placeholder_type.1'))}</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={placeholderType === TYPE_MULTIPLE} name="wiredTextOutputFurniNameType" onCheckedChange={() => setPlaceholderType(TYPE_MULTIPLE)} />
+                            <Text>{localizeWithFallback('wiredfurni.params.texts.placeholder_type.furni.2', LocalizeText('wiredfurni.params.texts.placeholder_type.2'))}</Text>
+                        </label>
+                    </div>
+                    {placeholderType === TYPE_MULTIPLE && (
+                        <div className="flex flex-col gap-1">
+                            <Text>{LocalizeText('wiredfurni.params.texts.select_delimiter')}</Text>
+                            <OctaneInput
+                                maxLength={MAX_DELIMITER_LENGTH}
+                                type="text"
+                                value={delimiter}
+                                onChange={(event) => setDelimiter(normalizeDelimiter(event.target.value))}
+                            />
+                        </div>
+                    )}
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

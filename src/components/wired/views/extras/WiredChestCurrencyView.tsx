@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Currency type convention (matches server InteractionWiredChestCurrency): -1 = credits, >=0 = points type.
 const CURRENCY_OPTIONS: { value: number; label: string }[] = [
@@ -31,20 +32,22 @@ export const WiredChestCurrencyView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>Currency type</Text>
-                <div className="flex flex-col gap-1">
-                    {CURRENCY_OPTIONS.map((option) => (
-                        <label key={option.value} className="flex items-center gap-2">
-                            <Radio name="chestCurrencyType" checked={currencyType === option.value} onCheckedChange={() => setCurrencyType(option.value)} />
-                            <Text small>{option.label}</Text>
-                        </label>
-                    ))}
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>Currency type</Text>
+                    <div className="flex flex-col gap-1">
+                        {CURRENCY_OPTIONS.map((option) => (
+                            <label key={option.value} className="flex items-center gap-2">
+                                <Radio name="chestCurrencyType" checked={currencyType === option.value} onCheckedChange={() => setCurrencyType(option.value)} />
+                                <Text small>{option.label}</Text>
+                            </label>
+                        ))}
+                    </div>
+                    <Text bold>Amount stored</Text>
+                    <NumberInput min={0} className="form-control form-control-sm" value={amount} onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))} />
                 </div>
-                <Text bold>Amount stored</Text>
-                <NumberInput min={0} className="form-control form-control-sm" value={amount} onChange={(event) => setAmount(Math.max(0, parseInt(event.target.value, 10) || 0))} />
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

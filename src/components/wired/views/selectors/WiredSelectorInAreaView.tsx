@@ -2,6 +2,7 @@ import { GetRoomEngine, RoomAreaSelectionManager } from '@octane/renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Button, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 
@@ -67,21 +68,23 @@ export const WiredSelectorInAreaView: FC<{}> = () => {
     };
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: '385px' }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.area_selection')}</Text>
-                <Text small>{LocalizeText('wiredfurni.params.area_selection.info')}</Text>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: '385px' }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.area_selection')}</Text>
+                    <Text small>{LocalizeText('wiredfurni.params.area_selection.info')}</Text>
 
-                <div className="flex gap-1">
-                    <Button disabled={!isActive || isSelecting} fullWidth variant="primary" onClick={startSelecting}>
-                        {LocalizeText('wiredfurni.params.area_selection.select')}
-                    </Button>
-                    <Button disabled={!isActive} fullWidth variant="secondary" onClick={() => GetRoomEngine().areaSelectionManager.clearHighlight()}>
-                        {LocalizeText('wiredfurni.params.area_selection.clear')}
-                    </Button>
+                    <div className="flex gap-1">
+                        <Button disabled={!isActive || isSelecting} fullWidth variant="primary" onClick={startSelecting}>
+                            {LocalizeText('wiredfurni.params.area_selection.select')}
+                        </Button>
+                        <Button disabled={!isActive} fullWidth variant="secondary" onClick={() => GetRoomEngine().areaSelectionManager.clearHighlight()}>
+                            {LocalizeText('wiredfurni.params.area_selection.clear')}
+                        </Button>
+                    </div>
+
                 </div>
-
-            </div>
-        </WiredSelectorBaseView>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

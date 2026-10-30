@@ -1,4 +1,5 @@
 import { CSSProperties, FC } from 'react';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * AIR stroked text: every outlined SnowWar caption is two text windows, a
@@ -11,8 +12,10 @@ export const SnowWarStrokeText: FC<{ text: string | number; stroke?: string; cla
     const value = String(text);
 
     return (
-        <span className={ `snowwar-stroke ${ className }`.trim() } data-text={ value } style={ { '--snowwar-stroke': stroke } as CSSProperties }>
-            { value }
-        </span>
+        <NativeTextTree>
+            <span className={ `snowwar-stroke ${ className }`.trim() } data-text={ value } style={ { '--snowwar-stroke': stroke } as CSSProperties }>
+                { value }
+            </span>
+        </NativeTextTree>
     );
 };

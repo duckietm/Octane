@@ -6,6 +6,7 @@ import sendMessagesXml from '../../../assets/mod-tools/xml/send_msgs.xml?raw';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Button, Native0Dropmenu, Native0Frame, Native0Input, Native0Text } from '../native/NativeWindow0';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 /** `$pe._rfaec9bccb2e7a4`: the topic id the free message carries. */
@@ -52,50 +53,52 @@ export const SendMessageView: FC<SendMessageProps> = ({ userId, userName, settin
     };
 
     return (
-        <NativeWindowShell type="sendMessage" windowKey={userName} x={x} y={y}>
-            <Native0Frame caption={`Msg To: ${userName}`} height={nativeNumber(root, 'height')} width={nativeNumber(root, 'width')} onClose={onClose}>
-                <Native0Input
-                    active={inputActive}
-                    height={nativeNumber(input, 'height')}
-                    value={message}
-                    width={nativeNumber(input, 'width')}
-                    x={nativeNumber(input, 'x')}
-                    y={nativeNumber(input, 'y')}
-                    onChange={(value) => setMessage(value)}
-                    onFocus={() => {
-                        if (isHint) {
-                            setMessage('');
-                            setIsHint(false);
-                        }
-
-                        setInputActive(true);
-                    }}
-                />
-                {!isHint && (
-                    <Native0Text
-                        color={0xffffff}
-                        text={localizeWithFallback('modtools.native.chars', `${message.trim().length} characters`, ['count'], [`${message.trim().length}`])}
+        <NativeTextTree>
+            <NativeWindowShell type="sendMessage" windowKey={userName} x={x} y={y}>
+                <Native0Frame caption={`Msg To: ${userName}`} height={nativeNumber(root, 'height')} width={nativeNumber(root, 'width')} onClose={onClose}>
+                    <Native0Input
+                        active={inputActive}
+                        height={nativeNumber(input, 'height')}
+                        value={message}
                         width={nativeNumber(input, 'width')}
                         x={nativeNumber(input, 'x')}
-                        y={nativeNumber(input, 'y') + nativeNumber(input, 'height') + 4}
+                        y={nativeNumber(input, 'y')}
+                        onChange={(value) => setMessage(value)}
+                        onFocus={() => {
+                            if (isHint) {
+                                setMessage('');
+                                setIsHint(false);
+                            }
+
+                            setInputActive(true);
+                        }}
                     />
-                )}
-                <Native0Button height={nativeNumber(send, 'height')} label={nativeCaption(send)} width={nativeNumber(send, 'width')} x={nativeNumber(send, 'x')} y={nativeNumber(send, 'y')} onClick={onSend} />
-                <Native0Dropmenu
-                    caption={selectedTemplate >= 0 ? templates[selectedTemplate] : nativeCaption(findNativeNode(root, 'msgTemplatesSelect'))}
-                    height={menu.height}
-                    items={templates}
-                    width={menu.width}
-                    x={menu.x}
-                    y={menu.y}
-                    onSelect={(index) => {
-                        setSelectedTemplate(index);
-                        setMessage(templates[index]);
-                        setIsHint(false);
-                        setInputActive(true);
-                    }}
-                />
-            </Native0Frame>
-        </NativeWindowShell>
+                    {!isHint && (
+                        <Native0Text
+                            color={0xffffff}
+                            text={localizeWithFallback('modtools.native.chars', `${message.trim().length} characters`, ['count'], [`${message.trim().length}`])}
+                            width={nativeNumber(input, 'width')}
+                            x={nativeNumber(input, 'x')}
+                            y={nativeNumber(input, 'y') + nativeNumber(input, 'height') + 4}
+                        />
+                    )}
+                    <Native0Button height={nativeNumber(send, 'height')} label={nativeCaption(send)} width={nativeNumber(send, 'width')} x={nativeNumber(send, 'x')} y={nativeNumber(send, 'y')} onClick={onSend} />
+                    <Native0Dropmenu
+                        caption={selectedTemplate >= 0 ? templates[selectedTemplate] : nativeCaption(findNativeNode(root, 'msgTemplatesSelect'))}
+                        height={menu.height}
+                        items={templates}
+                        width={menu.width}
+                        x={menu.x}
+                        y={menu.y}
+                        onSelect={(index) => {
+                            setSelectedTemplate(index);
+                            setMessage(templates[index]);
+                            setIsHint(false);
+                            setInputActive(true);
+                        }}
+                    />
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

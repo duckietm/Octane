@@ -2,6 +2,7 @@ import { RedeemVoucherMessageComposer, VoucherRedeemErrorMessageEvent, VoucherRe
 import { FC, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useNotification } from '../../../../../hooks';
 import { OctaneInput } from '../../../../../layout';
 
@@ -56,11 +57,13 @@ export const CatalogRedeemVoucherView: FC<CatalogRedeemVoucherViewProps> = (prop
     });
 
     return (
-        <div className="flex gap-1">
-            <OctaneInput placeholder={text} value={voucher} onChange={(event) => setVoucher(event.target.value)} />
-            <Button classNames={['octane-catalog-redeem-button']} disabled={isWaiting} onClick={redeemVoucher}>
-                {LocalizeText('redeem')}
-            </Button>
-        </div>
+        <NativeTextTree>
+            <div className="flex gap-1">
+                <OctaneInput placeholder={text} value={voucher} onChange={(event) => setVoucher(event.target.value)} />
+                <Button classNames={['octane-catalog-redeem-button']} disabled={isWaiting} onClick={redeemVoucher}>
+                    {LocalizeText('redeem')}
+                </Button>
+            </div>
+        </NativeTextTree>
     );
 };

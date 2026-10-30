@@ -14,6 +14,7 @@ import { useMessageEvent, useNotification } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type ResolutionView =
     | { kind: 'picker'; stuffId: number; achievements: AchievementResolutionData[]; endsAt: number }
@@ -80,15 +81,17 @@ export const AchievementResolutionView: FC = () => {
 
     if (view.kind === 'completed') {
         return (
-            <OctaneCardView className="octane-resolution" theme="primary-slim">
-                <OctaneCardHeaderView headerText={localizeWithFallback('resolution.completed.title', 'New Year resolution')} onCloseClick={close} />
-                <OctaneCardContentView center gap={2}>
-                    <LayoutBadgeImageView badgeCode={view.badgeCode} />
-                    <Text bold className="octane-resolution__title">{localizeWithFallback('resolution.completed.header', 'Yay, you made it!')}</Text>
-                    <Text center small>{localizeWithFallback('resolution.completed.description', '')}</Text>
-                    <Button variant="secondary" onClick={close}>{localizeWithFallback('resolution.completed.close', 'Close window')}</Button>
-                </OctaneCardContentView>
-            </OctaneCardView>
+            <NativeTextTree>
+                <OctaneCardView className="octane-resolution" theme="primary-slim">
+                    <OctaneCardHeaderView headerText={localizeWithFallback('resolution.completed.title', 'New Year resolution')} onCloseClick={close} />
+                    <OctaneCardContentView center gap={2}>
+                        <LayoutBadgeImageView badgeCode={view.badgeCode} />
+                        <Text bold className="octane-resolution__title">{localizeWithFallback('resolution.completed.header', 'Yay, you made it!')}</Text>
+                        <Text center small>{localizeWithFallback('resolution.completed.description', '')}</Text>
+                        <Button variant="secondary" onClick={close}>{localizeWithFallback('resolution.completed.close', 'Close window')}</Button>
+                    </OctaneCardContentView>
+                </OctaneCardView>
+            </NativeTextTree>
         );
     }
 
@@ -109,31 +112,33 @@ export const AchievementResolutionView: FC = () => {
             );
 
         return (
-            <OctaneCardView className="octane-resolution" theme="primary-slim">
-                <OctaneCardHeaderView headerText={localizeWithFallback('resolution.progress.title', 'New Year resolution')} onCloseClick={close} />
-                <OctaneCardContentView gap={2}>
-                    <div className="flex items-center gap-2">
-                        <LayoutBadgeImageView badgeCode={view.badgeCode} />
-                        <div className="min-w-0">
-                            <Text bold className="octane-resolution__name">{LocalizeBadgeName(view.badgeCode)}</Text>
-                            <Text small>{LocalizeBadgeDescription(view.badgeCode)}</Text>
+            <NativeTextTree>
+                <OctaneCardView className="octane-resolution" theme="primary-slim">
+                    <OctaneCardHeaderView headerText={localizeWithFallback('resolution.progress.title', 'New Year resolution')} onCloseClick={close} />
+                    <OctaneCardContentView gap={2}>
+                        <div className="flex items-center gap-2">
+                            <LayoutBadgeImageView badgeCode={view.badgeCode} />
+                            <div className="min-w-0">
+                                <Text bold className="octane-resolution__name">{LocalizeBadgeName(view.badgeCode)}</Text>
+                                <Text small>{LocalizeBadgeDescription(view.badgeCode)}</Text>
+                            </div>
                         </div>
-                    </div>
-                    <div className="h-[14px] rounded bg-black/20 overflow-hidden">
-                        <div className="h-full bg-[#3c8a1e]" style={{ width: `${percent}%` }} />
-                    </div>
-                    <Text small className="octane-resolution__progress">
-                        {localizeWithFallback('resolution.progress.progress', `Your progress ${view.progress}/${view.total}`, ['progress', 'total'], [view.progress.toString(), view.total.toString()])}
-                    </Text>
-                    <Text small className="octane-resolution__time-left">
-                        {localizeWithFallback('resolution.progress.time.left', 'Time left:')} {timeLeft(view.endsAt)}
-                    </Text>
-                    <div className="flex justify-between mt-auto">
-                        <Button variant="secondary" onClick={reset}>{localizeWithFallback('resolution.progress.reset', 'Re-select achievement')}</Button>
-                        <Button variant="secondary" onClick={close}>{localizeWithFallback('generic.close', 'Close')}</Button>
-                    </div>
-                </OctaneCardContentView>
-            </OctaneCardView>
+                        <div className="h-[14px] rounded bg-black/20 overflow-hidden">
+                            <div className="h-full bg-[#3c8a1e]" style={{ width: `${percent}%` }} />
+                        </div>
+                        <Text small className="octane-resolution__progress">
+                            {localizeWithFallback('resolution.progress.progress', `Your progress ${view.progress}/${view.total}`, ['progress', 'total'], [view.progress.toString(), view.total.toString()])}
+                        </Text>
+                        <Text small className="octane-resolution__time-left">
+                            {localizeWithFallback('resolution.progress.time.left', 'Time left:')} {timeLeft(view.endsAt)}
+                        </Text>
+                        <div className="flex justify-between mt-auto">
+                            <Button variant="secondary" onClick={reset}>{localizeWithFallback('resolution.progress.reset', 'Re-select achievement')}</Button>
+                            <Button variant="secondary" onClick={close}>{localizeWithFallback('generic.close', 'Close')}</Button>
+                        </div>
+                    </OctaneCardContentView>
+                </OctaneCardView>
+            </NativeTextTree>
         );
     }
 
@@ -158,49 +163,51 @@ export const AchievementResolutionView: FC = () => {
     };
 
     return (
-        <OctaneCardView className="octane-resolution octane-resolution--picker" theme="primary-slim">
-            <OctaneCardHeaderView headerText={localizeWithFallback('resolution.title', 'Set yourself a New Year resolution!')} onCloseClick={close} />
-            <OctaneCardContentView gap={2} overflow="hidden">
-                <Text small>{localizeWithFallback('resolution.header', 'Pick an achievement and see what level you need to reach.')}</Text>
-                <div className="grid grid-cols-6 gap-1 overflow-auto max-h-[150px] p-1 rounded bg-black/10">
-                    {view.achievements.map((achievement) => (
-                        <Hint key={achievement.achievementId} content={LocalizeBadgeName(achievement.badgeId)}>
-                            <BaseButton aria-label={LocalizeBadgeName(achievement.badgeId)}
-                                className={`p-0.5 rounded border-2 bg-transparent cursor-pointer ${achievement.achievementId === selectedId ? 'border-[#1e7295]' : 'border-transparent'} ${achievement.state === STATE_SELECTABLE ? '' : 'opacity-40'}`}
-                                type="button"
-                                onClick={() => setSelectedId(achievement.achievementId)}
-                            >
-                                <LayoutBadgeImageView badgeCode={achievement.badgeId} />
-                            </BaseButton>
-                        </Hint>
-                    ))}
-                </div>
-                {selected && (
-                    <div className="flex flex-col gap-0.5">
-                        <Text bold className="octane-resolution__name">{LocalizeBadgeName(selectedBadge)}</Text>
-                        <Text small>{LocalizeBadgeDescription(selectedBadge)}</Text>
-                        <Text small>
-                            {localizeWithFallback('resolution.achievement.level', 'Your current level')}:{' '}
-                            {localizeWithFallback('resolution.achievement.level.value', `Level ${selected.level}`, ['level'], [selected.level.toString()])}
-                        </Text>
-                        {selected.state === STATE_SELECTABLE ? (
-                            <Text small bold>
-                                {localizeWithFallback('resolution.achievement.target', 'Target level')}:{' '}
-                                {localizeWithFallback('resolution.achievement.target.value', `Level ${selected.requiredLevel}`, ['level'], [selected.requiredLevel.toString()])}
-                            </Text>
-                        ) : (
-                            <Text small className="octane-resolution__disabled text-[#a81a12]">{localizeWithFallback(`resolution.disabled.${selected.state}`, '')}</Text>
-                        )}
+        <NativeTextTree>
+            <OctaneCardView className="octane-resolution octane-resolution--picker" theme="primary-slim">
+                <OctaneCardHeaderView headerText={localizeWithFallback('resolution.title', 'Set yourself a New Year resolution!')} onCloseClick={close} />
+                <OctaneCardContentView gap={2} overflow="hidden">
+                    <Text small>{localizeWithFallback('resolution.header', 'Pick an achievement and see what level you need to reach.')}</Text>
+                    <div className="grid grid-cols-6 gap-1 overflow-auto max-h-[150px] p-1 rounded bg-black/10">
+                        {view.achievements.map((achievement) => (
+                            <Hint key={achievement.achievementId} content={LocalizeBadgeName(achievement.badgeId)}>
+                                <BaseButton aria-label={LocalizeBadgeName(achievement.badgeId)}
+                                    className={`p-0.5 rounded border-2 bg-transparent cursor-pointer ${achievement.achievementId === selectedId ? 'border-[#1e7295]' : 'border-transparent'} ${achievement.state === STATE_SELECTABLE ? '' : 'opacity-40'}`}
+                                    type="button"
+                                    onClick={() => setSelectedId(achievement.achievementId)}
+                                >
+                                    <LayoutBadgeImageView badgeCode={achievement.badgeId} />
+                                </BaseButton>
+                            </Hint>
+                        ))}
                     </div>
-                )}
-                <Text small variant="muted">
-                    {localizeWithFallback('resolution.progress.time.left', 'Time left:')} {timeLeft(view.endsAt)}
-                </Text>
-                <div className="flex justify-between mt-auto gap-1">
-                    <Button variant="secondary" onClick={close}>{localizeWithFallback('resolution.button.cancel', 'No thanks, maybe later!')}</Button>
-                    <Button variant="secondary" disabled={!canPick} onClick={pick}>{localizeWithFallback('resolution.button.ok', 'Make the resolution!')}</Button>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    {selected && (
+                        <div className="flex flex-col gap-0.5">
+                            <Text bold className="octane-resolution__name">{LocalizeBadgeName(selectedBadge)}</Text>
+                            <Text small>{LocalizeBadgeDescription(selectedBadge)}</Text>
+                            <Text small>
+                                {localizeWithFallback('resolution.achievement.level', 'Your current level')}:{' '}
+                                {localizeWithFallback('resolution.achievement.level.value', `Level ${selected.level}`, ['level'], [selected.level.toString()])}
+                            </Text>
+                            {selected.state === STATE_SELECTABLE ? (
+                                <Text small bold>
+                                    {localizeWithFallback('resolution.achievement.target', 'Target level')}:{' '}
+                                    {localizeWithFallback('resolution.achievement.target.value', `Level ${selected.requiredLevel}`, ['level'], [selected.requiredLevel.toString()])}
+                                </Text>
+                            ) : (
+                                <Text small className="octane-resolution__disabled text-[#a81a12]">{localizeWithFallback(`resolution.disabled.${selected.state}`, '')}</Text>
+                            )}
+                        </div>
+                    )}
+                    <Text small variant="muted">
+                        {localizeWithFallback('resolution.progress.time.left', 'Time left:')} {timeLeft(view.endsAt)}
+                    </Text>
+                    <div className="flex justify-between mt-auto gap-1">
+                        <Button variant="secondary" onClick={close}>{localizeWithFallback('resolution.button.cancel', 'No thanks, maybe later!')}</Button>
+                        <Button variant="secondary" disabled={!canPick} onClick={pick}>{localizeWithFallback('resolution.button.ok', 'Make the resolution!')}</Button>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

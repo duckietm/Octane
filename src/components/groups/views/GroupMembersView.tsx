@@ -41,6 +41,7 @@ import { Select } from '../../../common/Select';
 import { NumberInput } from '../../../common/NumberInput';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const MEMBERS_REQUEST_INTERVAL_MS = 550;
 
@@ -272,142 +273,144 @@ export const GroupMembersView: FC<{}> = (props) => {
     if (groupId === -1 || !membersData) return null;
 
     return (
-        <OctaneCardView className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
-            <OctaneCardHeaderView
-                headerText={LocalizeText('group.members.title', ['groupName'], [membersData ? membersData.groupTitle : ''])}
-                onCloseClick={(event) => setGroupId(-1)}
-            />
-            <OctaneCardContentView className="octane-groups-content" overflow="hidden">
-                <div className="octane-group-members-search flex gap-2">
-                    <Flex center className="group-badge octane-group-members-search__badge">
-                        <LayoutBadgeImageView badgeCode={membersData.badge} className="mx-auto block" isGroup={true} />
-                    </Flex>
-                    <Column fullWidth gap={1} className="octane-group-members-search__controls">
-                        <input
-                            className="octane-groups-input min-h-[calc(1.5em+.5rem+2px)] px-[.5rem] py-[.25rem] text-[.7875rem] rounded-[.2rem] w-full"
-                            placeholder={LocalizeText('group.members.searchinfo')}
-                            type="text"
-                            value={searchQuery}
-                            onChange={(event) => setSearchQuery(event.target.value)}
-                        />
-                        <Select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
-                            <option value="0">{LocalizeText('group.members.search.all')}</option>
-                            <option value="1">{LocalizeText('group.members.search.admins')}</option>
-                            {membersData.admin && <option value="2">{LocalizeText('group.members.search.pending')}</option>}
-                            {membersData.admin && blockingEnabled && <option value="3">{localizeWithFallback('group.members.search.blocked', 'Show blocked users')}</option>}
-                        </Select>
-                    </Column>
-                </div>
-                <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
-                    {membersData.result.map((member, index) => {
-                        return (
-                            <Flex key={index} alignItems="center" className="octane-group-member-row" gap={0} overflow="hidden">
-                                <BaseButton type="button" className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
-                                    <LayoutAvatarImageView
-                                        className="octane-group-member-row__head"
-                                        direction={2}
-                                        figure={member.figure}
-                                        headOnly={true}
-                                        compactHead
-                                        compactHeadSize={40}
-                                        compactHeadPadding={0}
-                                    />
-                                </BaseButton>
-                                <Column className="octane-group-member-row__copy" grow gap={0}>
-                                    <Text component={BaseButton} type="button" bold pointer small className="octane-group-member-row__name" onClick={(event) => GetUserProfile(member.id)}>
-                                        {member.name}
-                                    </Text>
-                                    {member.rank !== GroupRank.REQUESTED && (
-                                        <Text italics small variant="muted" className="octane-group-member-row__since">
-                                            {LocalizeText('group.members.since', ['date'], [member.joinedAt])}
-                                        </Text>
-                                    )}
-                                </Column>
-                                <div className="octane-group-member-row__actions">
-                                    {member.rank !== GroupRank.REQUESTED && member.rank !== GroupRank.BLOCKED && (
-                                        <div className="flex items-center justify-center">
-                                            <Hint content={LocalizeText(getRankDescription(member))}><BaseButton type="button" aria-label={LocalizeText(getRankDescription(member))}
-                                                className={classNames(
-                                                    `octane-icon icon-group-small-${member.rank === GroupRank.OWNER ? 'owner' : member.rank === GroupRank.ADMIN ? 'admin' : membersData.admin && member.rank === GroupRank.MEMBER ? 'not-admin' : ''}`,
-                                                    membersData.admin && 'cursor-pointer'
-                                                )}
-                                                onClick={(event) => toggleAdmin(member)}
-                                            /></Hint>
-                                        </div>
-                                    )}
-                                    {membersData.admin && member.rank === GroupRank.REQUESTED && (
-                                        <Flex alignItems="center">
-                                            <Hint content={LocalizeText('group.members.accept')}><BaseButton type="button" aria-label={LocalizeText('group.members.accept')}
-                                                className="cursor-pointer octane-friends-spritesheet icon-accept"
-                                                onClick={(event) => acceptMembership(member)}
-                                            /></Hint>
-                                        </Flex>
-                                    )}
-                                    {membersData.admin && member.rank === GroupRank.BLOCKED && (
-                                        <Flex alignItems="center">
-                                            <Hint content={localizeWithFallback('group.members.unblock', 'Unblock')}><BaseButton aria-label={localizeWithFallback('group.members.unblock', 'Unblock')}
-                                                className="octane-group-member-row__action cursor-pointer text-[#1e7295] hover:text-[#0d4a63]"
-                                                type="button"
-                                                onClick={() => unblockMember(member)}
-                                            >
-                                                <FaUndo size={11} />
-                                            </BaseButton></Hint>
-                                        </Flex>
-                                    )}
-                                    {membersData.admin && blockingEnabled && (member.rank === GroupRank.MEMBER || member.rank === GroupRank.ADMIN) && member.id !== GetSessionDataManager().userId && (
-                                        <Flex alignItems="center">
-                                            <Hint content={localizeWithFallback('group.members.block', 'Block from group')}><BaseButton aria-label={localizeWithFallback('group.members.block', 'Block from group')}
-                                                className="octane-group-member-row__action cursor-pointer text-[#a81a12] hover:text-[#6f0f0a]"
-                                                type="button"
-                                                onClick={() => blockMember(member)}
-                                            >
-                                                <FaBan size={11} />
-                                            </BaseButton></Hint>
-                                        </Flex>
-                                    )}
-                                    {membersData.admin && member.rank !== GroupRank.OWNER && member.rank !== GroupRank.BLOCKED && member.id !== GetSessionDataManager().userId && (
-                                        <Flex alignItems="center">
-                                            <Hint content={LocalizeText(member.rank === GroupRank.REQUESTED ? 'group.members.reject' : 'group.members.kick')}><BaseButton type="button" aria-label={LocalizeText(member.rank === GroupRank.REQUESTED ? 'group.members.reject' : 'group.members.kick')}
-                                                className="cursor-pointer octane-friends-spritesheet icon-deny"
-                                                onClick={(event) => removeMemberOrDeclineMembership(member)}
-                                            /></Hint>
-                                        </Flex>
-                                    )}
-                                </div>
-                            </Flex>
-                        );
-                    })}
-                </Grid>
-                {membersData.admin && levelId === 2 && membersData.result.length > 0 && (
-                    <Button className="octane-groups-button" onClick={acceptAllMemberships}>
-                        {localizeWithFallback('group.members.acceptall', 'Accept all')}
-                    </Button>
-                )}
-                <Flex alignItems="center" gap={1} justifyContent="between" className="octane-groups-footer octane-group-members-footer">
-                    <Button className="octane-groups-button octane-groups-button--pager" disabled={pageId <= 0} onClick={(event) => setPageId((prevValue) => Math.max(0, prevValue - 1))}>
-                        <FaChevronLeft className="fa-icon" />
-                    </Button>
-                    <div className="octane-group-members-footer__page">
-                        <Text small className="octane-group-members-footer__label">
-                            {localizeWithFallback('group.members.members', `Members (${membersData.totalMembersCount})`, ['count'], [membersData.totalMembersCount.toString()])}
-                        </Text>
-                        <NumberInput className="octane-group-members-footer__input" min={1} max={Math.max(1, totalPages)} value={membersData.pageIndex + 1} onChange={(event) => {
-                                const value = Math.min(Math.max(parseInt(event.target.value) || 1, 1), Math.max(1, totalPages));
-                                setPageId(value - 1);
-                            }} />
-                        <Text small className="octane-group-members-footer__total">
-                            / {Math.max(1, totalPages)}
-                        </Text>
+        <NativeTextTree>
+            <OctaneCardView className="octane-groups-window octane-group-members" theme="primary-slim" isResizable={false}>
+                <OctaneCardHeaderView
+                    headerText={LocalizeText('group.members.title', ['groupName'], [membersData ? membersData.groupTitle : ''])}
+                    onCloseClick={(event) => setGroupId(-1)}
+                />
+                <OctaneCardContentView className="octane-groups-content" overflow="hidden">
+                    <div className="octane-group-members-search flex gap-2">
+                        <Flex center className="group-badge octane-group-members-search__badge">
+                            <LayoutBadgeImageView badgeCode={membersData.badge} className="mx-auto block" isGroup={true} />
+                        </Flex>
+                        <Column fullWidth gap={1} className="octane-group-members-search__controls">
+                            <input
+                                className="octane-groups-input min-h-[calc(1.5em+.5rem+2px)] px-[.5rem] py-[.25rem] text-[.7875rem] rounded-[.2rem] w-full"
+                                placeholder={LocalizeText('group.members.searchinfo')}
+                                type="text"
+                                value={searchQuery}
+                                onChange={(event) => setSearchQuery(event.target.value)}
+                            />
+                            <Select className="octane-groups-select form-select form-select-sm w-full" value={levelId} onChange={(event) => setLevelId(parseInt(event.target.value))}>
+                                <option value="0">{LocalizeText('group.members.search.all')}</option>
+                                <option value="1">{LocalizeText('group.members.search.admins')}</option>
+                                {membersData.admin && <option value="2">{LocalizeText('group.members.search.pending')}</option>}
+                                {membersData.admin && blockingEnabled && <option value="3">{localizeWithFallback('group.members.search.blocked', 'Show blocked users')}</option>}
+                            </Select>
+                        </Column>
                     </div>
-                    <Button
-                        className="octane-groups-button octane-groups-button--pager"
-                        disabled={totalPages === 0 || pageId >= totalPages - 1}
-                        onClick={(event) => setPageId((prevValue) => Math.min(totalPages - 1, prevValue + 1))}
-                    >
-                        <FaChevronRight className="fa-icon" />
-                    </Button>
-                </Flex>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <Grid className="octane-group-members-list-grid" columnCount={2} overflow="auto">
+                        {membersData.result.map((member, index) => {
+                            return (
+                                <Flex key={index} alignItems="center" className="octane-group-member-row" gap={0} overflow="hidden">
+                                    <BaseButton type="button" className="octane-group-member-row__avatar cursor-pointer" onClick={() => GetUserProfile(member.id)}>
+                                        <LayoutAvatarImageView
+                                            className="octane-group-member-row__head"
+                                            direction={2}
+                                            figure={member.figure}
+                                            headOnly={true}
+                                            compactHead
+                                            compactHeadSize={40}
+                                            compactHeadPadding={0}
+                                        />
+                                    </BaseButton>
+                                    <Column className="octane-group-member-row__copy" grow gap={0}>
+                                        <Text component={BaseButton} type="button" bold pointer small className="octane-group-member-row__name" onClick={(event) => GetUserProfile(member.id)}>
+                                            {member.name}
+                                        </Text>
+                                        {member.rank !== GroupRank.REQUESTED && (
+                                            <Text italics small variant="muted" className="octane-group-member-row__since">
+                                                {LocalizeText('group.members.since', ['date'], [member.joinedAt])}
+                                            </Text>
+                                        )}
+                                    </Column>
+                                    <div className="octane-group-member-row__actions">
+                                        {member.rank !== GroupRank.REQUESTED && member.rank !== GroupRank.BLOCKED && (
+                                            <div className="flex items-center justify-center">
+                                                <Hint content={LocalizeText(getRankDescription(member))}><BaseButton type="button" aria-label={LocalizeText(getRankDescription(member))}
+                                                    className={classNames(
+                                                        `octane-icon icon-group-small-${member.rank === GroupRank.OWNER ? 'owner' : member.rank === GroupRank.ADMIN ? 'admin' : membersData.admin && member.rank === GroupRank.MEMBER ? 'not-admin' : ''}`,
+                                                        membersData.admin && 'cursor-pointer'
+                                                    )}
+                                                    onClick={(event) => toggleAdmin(member)}
+                                                /></Hint>
+                                            </div>
+                                        )}
+                                        {membersData.admin && member.rank === GroupRank.REQUESTED && (
+                                            <Flex alignItems="center">
+                                                <Hint content={LocalizeText('group.members.accept')}><BaseButton type="button" aria-label={LocalizeText('group.members.accept')}
+                                                    className="cursor-pointer octane-friends-spritesheet icon-accept"
+                                                    onClick={(event) => acceptMembership(member)}
+                                                /></Hint>
+                                            </Flex>
+                                        )}
+                                        {membersData.admin && member.rank === GroupRank.BLOCKED && (
+                                            <Flex alignItems="center">
+                                                <Hint content={localizeWithFallback('group.members.unblock', 'Unblock')}><BaseButton aria-label={localizeWithFallback('group.members.unblock', 'Unblock')}
+                                                    className="octane-group-member-row__action cursor-pointer text-[#1e7295] hover:text-[#0d4a63]"
+                                                    type="button"
+                                                    onClick={() => unblockMember(member)}
+                                                >
+                                                    <FaUndo size={11} />
+                                                </BaseButton></Hint>
+                                            </Flex>
+                                        )}
+                                        {membersData.admin && blockingEnabled && (member.rank === GroupRank.MEMBER || member.rank === GroupRank.ADMIN) && member.id !== GetSessionDataManager().userId && (
+                                            <Flex alignItems="center">
+                                                <Hint content={localizeWithFallback('group.members.block', 'Block from group')}><BaseButton aria-label={localizeWithFallback('group.members.block', 'Block from group')}
+                                                    className="octane-group-member-row__action cursor-pointer text-[#a81a12] hover:text-[#6f0f0a]"
+                                                    type="button"
+                                                    onClick={() => blockMember(member)}
+                                                >
+                                                    <FaBan size={11} />
+                                                </BaseButton></Hint>
+                                            </Flex>
+                                        )}
+                                        {membersData.admin && member.rank !== GroupRank.OWNER && member.rank !== GroupRank.BLOCKED && member.id !== GetSessionDataManager().userId && (
+                                            <Flex alignItems="center">
+                                                <Hint content={LocalizeText(member.rank === GroupRank.REQUESTED ? 'group.members.reject' : 'group.members.kick')}><BaseButton type="button" aria-label={LocalizeText(member.rank === GroupRank.REQUESTED ? 'group.members.reject' : 'group.members.kick')}
+                                                    className="cursor-pointer octane-friends-spritesheet icon-deny"
+                                                    onClick={(event) => removeMemberOrDeclineMembership(member)}
+                                                /></Hint>
+                                            </Flex>
+                                        )}
+                                    </div>
+                                </Flex>
+                            );
+                        })}
+                    </Grid>
+                    {membersData.admin && levelId === 2 && membersData.result.length > 0 && (
+                        <Button className="octane-groups-button" onClick={acceptAllMemberships}>
+                            {localizeWithFallback('group.members.acceptall', 'Accept all')}
+                        </Button>
+                    )}
+                    <Flex alignItems="center" gap={1} justifyContent="between" className="octane-groups-footer octane-group-members-footer">
+                        <Button className="octane-groups-button octane-groups-button--pager" disabled={pageId <= 0} onClick={(event) => setPageId((prevValue) => Math.max(0, prevValue - 1))}>
+                            <FaChevronLeft className="fa-icon" />
+                        </Button>
+                        <div className="octane-group-members-footer__page">
+                            <Text small className="octane-group-members-footer__label">
+                                {localizeWithFallback('group.members.members', `Members (${membersData.totalMembersCount})`, ['count'], [membersData.totalMembersCount.toString()])}
+                            </Text>
+                            <NumberInput className="octane-group-members-footer__input" min={1} max={Math.max(1, totalPages)} value={membersData.pageIndex + 1} onChange={(event) => {
+                                    const value = Math.min(Math.max(parseInt(event.target.value) || 1, 1), Math.max(1, totalPages));
+                                    setPageId(value - 1);
+                                }} />
+                            <Text small className="octane-group-members-footer__total">
+                                / {Math.max(1, totalPages)}
+                            </Text>
+                        </div>
+                        <Button
+                            className="octane-groups-button octane-groups-button--pager"
+                            disabled={totalPages === 0 || pageId >= totalPages - 1}
+                            onClick={(event) => setPageId((prevValue) => Math.min(totalPages - 1, prevValue + 1))}
+                        >
+                            <FaChevronRight className="fa-icon" />
+                        </Button>
+                    </Flex>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

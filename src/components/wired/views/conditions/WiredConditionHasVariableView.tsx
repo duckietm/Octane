@@ -17,6 +17,7 @@ import {
 import { readWiredVariableToken, toWiredVariableId, wiredVariableIdList } from '../WiredVariableIds';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type ConditionVariableTargetType = 'user' | 'furni' | 'context';
 
@@ -174,65 +175,67 @@ export const WiredConditionHasVariableView: FC = () => {
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            validate={validate}
-            footerCollapsible={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <WiredFurniSelectionSourceRow
-                        title={getSourceTitle(targetType)}
-                        titleIsLiteral={true}
-                        options={sourceOptions}
-                        value={sourceValue}
-                        selectionKind="primary"
-                        selectionActive={requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-                        selectionCount={furniIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        showSelectionToggle={false}
-                        onChange={(value) => {
-                            if (targetType === 'furni') {
-                                setFurniSource(value);
-                                return;
-                            }
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                validate={validate}
+                footerCollapsible={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <WiredFurniSelectionSourceRow
+                            title={getSourceTitle(targetType)}
+                            titleIsLiteral={true}
+                            options={sourceOptions}
+                            value={sourceValue}
+                            selectionKind="primary"
+                            selectionActive={requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                            selectionCount={furniIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            showSelectionToggle={false}
+                            onChange={(value) => {
+                                if (targetType === 'furni') {
+                                    setFurniSource(value);
+                                    return;
+                                }
 
-                            if (targetType === 'user') {
-                                setUserSource(value);
-                                return;
-                            }
-                        }}
+                                if (targetType === 'user') {
+                                    setUserSource(value);
+                                    return;
+                                }
+                            }}
+                        />
+                    </div>
+                }
+            >
+                <div className="octane-wired__give-var">
+                    <div className="octane-wired__give-var-heading">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <div className="octane-wired__give-var-targets">
+                            {TARGET_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    disabled={button.disabled}
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
+                                    onClick={() => handleTargetChange(button.key)}
+                                >
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
+                        </div>
+                    </div>
+
+                    <WiredVariablePicker
+                        entries={resolvedVariableEntries}
+                        recentScope="variable-conditions"
+                        selectedToken={variableToken}
+                        onSelect={(entry) => setVariableToken(entry.token)}
                     />
                 </div>
-            }
-        >
-            <div className="octane-wired__give-var">
-                <div className="octane-wired__give-var-heading">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="octane-wired__give-var-targets">
-                        {TARGET_BUTTONS.map((button) => (
-                            <BaseButton
-                                key={button.key}
-                                type="button"
-                                disabled={button.disabled}
-                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
-                                onClick={() => handleTargetChange(button.key)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </BaseButton>
-                        ))}
-                    </div>
-                </div>
-
-                <WiredVariablePicker
-                    entries={resolvedVariableEntries}
-                    recentScope="variable-conditions"
-                    selectedToken={variableToken}
-                    onSelect={(entry) => setVariableToken(entry.token)}
-                />
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

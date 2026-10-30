@@ -1,4 +1,4 @@
-import { CSSProperties, DetailedHTMLProps, FC, HTMLAttributes, useLayoutEffect, useRef, useState } from 'react';
+import { CSSProperties, DetailedHTMLProps, FC, HTMLAttributes, memo, useLayoutEffect, useRef, useState } from 'react';
 import { NativeText } from './NativeText';
 import { isNativeTextEnabled } from './nativeTextEnabled';
 import { CssNativeFont, resolveCssNativeFont } from './resolveCssNativeFont';
@@ -28,7 +28,20 @@ interface Measurement {
     align?: 'left' | 'center' | 'right';
 }
 
+// The host takes the text's own style even where a sheet sets every element (`.octane-login-view * { font-family: Volter }`).
+const INHERIT: CSSProperties = {
+    font: 'inherit',
+    color: 'inherit',
+    letterSpacing: 'inherit',
+    textTransform: 'inherit',
+    whiteSpace: 'inherit',
+    textAlign: 'inherit'
+};
+
 const ALIGN: Record<string, Measurement['align']> = { center: 'center', right: 'right', end: 'right', left: 'left', start: 'left' };
+
+// Width changes this small are a scrollbar coming or going, not a resized container.
+const SCROLLBAR_SLACK = 24;
 
 // The width the browser wraps in: the parent's content box (the label is an inline run inside it).
 const contentWidth = (element: HTMLElement) => {
@@ -45,7 +58,7 @@ const countLines = (host: HTMLElement) => new Set(Array.from(host.getClientRects
  * raster takes its place, each line centred in the CSS line height. The raster's 2 px TextField gutter is folded away so the text stays
  * where the CSS put it. Anything the native fonts cannot draw stays browser text.
  */
-export const NativeLabel: FC<NativeLabelProps> = ({ text, stateKey }) => {
+const NativeLabelView: FC<NativeLabelProps> = ({ text, stateKey }) => {
     const hostRef = useRef<HTMLElement>(null);
     const [measurement, setMeasurement] = useState<Measurement | null>(null);
     const [resizeTick, setResizeTick] = useState(0);
@@ -63,7 +76,19 @@ export const NativeLabel: FC<NativeLabelProps> = ({ text, stateKey }) => {
         }
 
         const css = getComputedStyle(host);
-        const font = resolveCssNativeFont(css);
+        // text-decoration is not inherited: the underline belongs to the element that holds the text.
+        const decoration = host.parentElement ? getComputedStyle(host.parentElement).textDecorationLine : css.textDecorationLine;
+        const font = resolveCssNativeFont({
+            fontFamily: css.fontFamily,
+            fontSize: css.fontSize,
+            fontWeight: css.fontWeight,
+            fontStyle: css.fontStyle,
+            color: css.color,
+            letterSpacing: css.letterSpacing,
+            textTransform: css.textTransform,
+            textDecorationLine: decoration,
+            whiteSpace: css.whiteSpace
+        });
         const lines = countLines(host);
         const lineHeight = parseFloat(css.lineHeight);
 
@@ -77,32 +102,39 @@ export const NativeLabel: FC<NativeLabelProps> = ({ text, stateKey }) => {
         });
     }, [key, measurement?.key]);
 
-    // A wrapped label follows its container's width: when that changes, the browser lays the text out again.
-    const wrapped = current?.maxWidth !== undefined;
+    // A wrapped label follows its container's width: when that really changes, the browser lays the text out again. Changes up to a
+    // scrollbar's width are left alone: the raster's own height can show or hide a scrollbar, and measuring again on that would
+    // swap browser text and raster back and forth for ever.
+    const wrapWidth = current?.maxWidth === undefined ? undefined : current.maxWidth - 4;
 
     useLayoutEffect(() => {
         const parent = hostRef.current?.parentElement;
 
-        if (!wrapped || !parent || typeof ResizeObserver === 'undefined') return;
+        if (wrapWidth === undefined || !parent || typeof ResizeObserver === 'undefined') return;
 
-        let width = parent.clientWidth;
         const observer = new ResizeObserver(() => {
-            if (Math.abs(parent.clientWidth - width) < 1) return;
+            if (Math.abs(contentWidth(parent) - wrapWidth) <= SCROLLBAR_SLACK) return;
 
-            width = parent.clientWidth;
+            observer.disconnect();
             setResizeTick((tick) => tick + 1);
         });
 
         observer.observe(parent);
 
         return () => observer.disconnect();
-    }, [wrapped]);
+    }, [wrapWidth]);
 
-    if (!current?.font) return <octane-label ref={hostRef}>{text}</octane-label>;
+    if (!current?.font)
+        return (
+            <octane-label ref={hostRef} style={INHERIT}>
+                {text}
+            </octane-label>
+        );
 
     const { font, maxWidth, lineHeight, align } = current;
     const label = font.transform === 'uppercase' ? text.toUpperCase() : font.transform === 'lowercase' ? text.toLowerCase() : text;
     const hostStyle: CSSProperties = {
+        ...INHERIT,
         display: 'inline-flex',
         alignItems: 'center',
         verticalAlign: 'top',
@@ -111,7 +143,19 @@ export const NativeLabel: FC<NativeLabelProps> = ({ text, stateKey }) => {
 
     return (
         <octane-label ref={hostRef} className="octane-native-label" style={hostStyle}>
-            <NativeText align={align} background={null} lineHeight={lineHeight} maxWidth={maxWidth} overrides={font.style} text={label} textStyle="u_regular" />
+            <NativeText
+                align={align}
+                background={null}
+                lineHeight={lineHeight}
+                maxWidth={maxWidth}
+                overrides={font.style}
+                style={{ font: 'inherit', color: 'inherit' }}
+                text={label}
+                textStyle="u_regular"
+            />
         </octane-label>
     );
 };
+
+/** Memoised: the trees around a label re-render often (a dragged window), the label only when its text or state changes. */
+export const NativeLabel = memo(NativeLabelView);

@@ -5,6 +5,7 @@ import { useVariablesExplorerStore } from '../../state/variablesExplorer';
 import { VariablesExplorerConnectView } from './VariablesExplorerConnectView';
 import { VariablesExplorerMainView } from './VariablesExplorerMainView';
 import '../../css/variables-explorer/VariablesExplorer.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface ExplorerSession {
     connection: ExplorerConnection;
@@ -31,25 +32,27 @@ export const VariablesExplorerView: FC = () => {
     const activeSession = session?.openCount === openCount ? session : null;
 
     return (
-        <WidgetErrorBoundary name="VariablesExplorer">
-            {activeSession ? (
-                <VariablesExplorerMainView
-                    connection={activeSession.connection}
-                    initialVariables={activeSession.variables}
-                    onDisconnect={() => {
-                        setDisconnected({ roomId: activeSession.connection.roomId, openCount });
-                        setSession(null);
-                    }}
-                    onClose={closeExplorer}
-                />
-            ) : (
-                <VariablesExplorerConnectView
-                    key={openCount}
-                    prefill={disconnected?.openCount === openCount ? { roomId: disconnected.roomId } : prefill}
-                    onConnected={(connection, variables) => setSession({ connection, variables, openCount })}
-                    onClose={closeExplorer}
-                />
-            )}
-        </WidgetErrorBoundary>
+        <NativeTextTree>
+            <WidgetErrorBoundary name="VariablesExplorer">
+                {activeSession ? (
+                    <VariablesExplorerMainView
+                        connection={activeSession.connection}
+                        initialVariables={activeSession.variables}
+                        onDisconnect={() => {
+                            setDisconnected({ roomId: activeSession.connection.roomId, openCount });
+                            setSession(null);
+                        }}
+                        onClose={closeExplorer}
+                    />
+                ) : (
+                    <VariablesExplorerConnectView
+                        key={openCount}
+                        prefill={disconnected?.openCount === openCount ? { roomId: disconnected.roomId } : prefill}
+                        onConnected={(connection, variables) => setSession({ connection, variables, openCount })}
+                        onClose={closeExplorer}
+                    />
+                )}
+            </WidgetErrorBoundary>
+        </NativeTextTree>
     );
 };

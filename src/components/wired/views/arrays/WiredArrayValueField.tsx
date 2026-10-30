@@ -17,6 +17,7 @@ import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries, createFallbackVariableEntry, flattenWiredVariablePickerEntries, WiredVariablePickerTarget } from '../WiredVariablePickerData';
 import { Radio } from '../../../../common/Radio';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WIRED_ARRAY_TARGETS: Array<{ label: string; target: WiredVariablePickerTarget; type: number }> = [
     { label: 'wiredfurni.params.variables.furni', target: 'furni', type: WIRED_ARRAY_TYPE_FURNI },
@@ -83,44 +84,46 @@ export const WiredArrayValueField: FC<WiredArrayValueFieldProps> = (props) => {
     const isVariable = value.mode === WIRED_ARRAY_MODE_VARIABLE;
 
     return (
-        <div className="flex flex-col gap-1">
-            <Text bold>{label}</Text>
-            <div className="flex gap-2">
-                <label className="flex items-center gap-1 cursor-pointer">
-                    <Radio checked={!isVariable} name={`${recentScope}-mode`} onCheckedChange={() => onChange({ ...value, mode: WIRED_ARRAY_MODE_CONSTANT })} />
-                    <Text>{localizeWithFallback('wiredfurni.params.arrays.value.constant', 'Number')}</Text>
-                </label>
-                <label className="flex items-center gap-1 cursor-pointer">
-                    <Radio checked={isVariable} name={`${recentScope}-mode`} onCheckedChange={() => onChange({ ...value, mode: WIRED_ARRAY_MODE_VARIABLE })} />
-                    <Text>{localizeWithFallback('wiredfurni.params.arrays.value.variable', 'Variable')}</Text>
-                </label>
+        <NativeTextTree>
+            <div className="flex flex-col gap-1">
+                <Text bold>{label}</Text>
+                <div className="flex gap-2">
+                    <label className="flex items-center gap-1 cursor-pointer">
+                        <Radio checked={!isVariable} name={`${recentScope}-mode`} onCheckedChange={() => onChange({ ...value, mode: WIRED_ARRAY_MODE_CONSTANT })} />
+                        <Text>{localizeWithFallback('wiredfurni.params.arrays.value.constant', 'Number')}</Text>
+                    </label>
+                    <label className="flex items-center gap-1 cursor-pointer">
+                        <Radio checked={isVariable} name={`${recentScope}-mode`} onCheckedChange={() => onChange({ ...value, mode: WIRED_ARRAY_MODE_VARIABLE })} />
+                        <Text>{localizeWithFallback('wiredfurni.params.arrays.value.variable', 'Variable')}</Text>
+                    </label>
+                </div>
+
+                {!isVariable && (
+                    <NumberInput className="form-control form-control-sm" min={constantMin} style={{ maxWidth: 160 }} value={value.value} onChange={(event) => onChange({ ...value, value: event.target.value })} />
+                )}
+
+                {isVariable && (
+                    <>
+                        <div className="flex flex-wrap gap-2">
+                            {WIRED_ARRAY_TARGETS.map((entry) => (
+                                <label key={entry.type} className="flex items-center gap-1 cursor-pointer">
+                                    <Radio checked={value.variableType === entry.type} name={`${recentScope}-target`} onCheckedChange={() => onChange({ ...value, variableItemId: 0, variableToken: '', variableType: entry.type })} />
+                                    <Text>{localizeWithFallback(entry.label, FALLBACK_TARGET_LABELS[entry.type])}</Text>
+                                </label>
+                            ))}
+                        </div>
+                        <WiredVariablePicker
+                            entries={resolvedEntries}
+                            recentScope={recentScope}
+                            selectedToken={value.variableToken}
+                            onSelect={(entry) =>
+                                onChange({ ...value, variableItemId: wiredArrayTokenItemId(entry.token, value.variableItemId), variableToken: entry.token })
+                            }
+                        />
+                    </>
+                )}
             </div>
-
-            {!isVariable && (
-                <NumberInput className="form-control form-control-sm" min={constantMin} style={{ maxWidth: 160 }} value={value.value} onChange={(event) => onChange({ ...value, value: event.target.value })} />
-            )}
-
-            {isVariable && (
-                <>
-                    <div className="flex flex-wrap gap-2">
-                        {WIRED_ARRAY_TARGETS.map((entry) => (
-                            <label key={entry.type} className="flex items-center gap-1 cursor-pointer">
-                                <Radio checked={value.variableType === entry.type} name={`${recentScope}-target`} onCheckedChange={() => onChange({ ...value, variableItemId: 0, variableToken: '', variableType: entry.type })} />
-                                <Text>{localizeWithFallback(entry.label, FALLBACK_TARGET_LABELS[entry.type])}</Text>
-                            </label>
-                        ))}
-                    </div>
-                    <WiredVariablePicker
-                        entries={resolvedEntries}
-                        recentScope={recentScope}
-                        selectedToken={value.variableToken}
-                        onSelect={(entry) =>
-                            onChange({ ...value, variableItemId: wiredArrayTokenItemId(entry.token, value.variableItemId), variableToken: entry.token })
-                        }
-                    />
-                </>
-            )}
-        </div>
+        </NativeTextTree>
     );
 };
 

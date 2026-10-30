@@ -1,4 +1,5 @@
 import { FC, useCallback, useEffect, useState } from 'react';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredHandItemField } from '../WiredHandItemField';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
@@ -20,10 +21,12 @@ export const WiredSelectorUsersHandItemView: FC<{}> = () => {
     }, [handItemId, setIntParams]);
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <WiredHandItemField handItemId={handItemId} onChange={setHandItemId} showCopyButton={true} />
-            </div>
-        </WiredSelectorBaseView>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <WiredHandItemField handItemId={handItemId} onChange={setHandItemId} showCopyButton={true} />
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

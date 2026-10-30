@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { FaVolumeUp } from 'react-icons/fa';
 import { localizeWithFallback, NotificationBubbleItem, SanitizeHtml } from '../../../../api';
 import { Flex, LayoutNotificationBubbleView, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface NotificationSoundboardBubbleViewProps {
     item: NotificationBubbleItem;
@@ -17,16 +18,18 @@ export const NotificationSoundboardBubbleView: FC<NotificationSoundboardBubbleVi
     const htmlText = (item?.message || '').replace(/\r\n|\r|\n/g, '<br />');
 
     return (
-        <LayoutNotificationBubbleView alignItems="center" gap={2} onClose={onClose}>
-            <Flex center className="w-[36px] h-[36px] shrink-0 rounded-full bg-sky-600/40" data-testid="soundboard-icon">
-                <FaVolumeUp className="text-white" size={15} />
-            </Flex>
-            <div className="flex flex-col min-w-0">
-                <span className="text-[.6rem] uppercase tracking-wide text-white/70">
-                    {localizeWithFallback('notifications.title.soundboard', 'Soundboard')}
-                </span>
-                <Text wrap dangerouslySetInnerHTML={{ __html: SanitizeHtml(htmlText) }} variant="white" />
-            </div>
-        </LayoutNotificationBubbleView>
+        <NativeTextTree>
+            <LayoutNotificationBubbleView alignItems="center" gap={2} onClose={onClose}>
+                <Flex center className="w-[36px] h-[36px] shrink-0 rounded-full bg-sky-600/40" data-testid="soundboard-icon">
+                    <FaVolumeUp className="text-white" size={15} />
+                </Flex>
+                <div className="flex flex-col min-w-0">
+                    <span className="text-[.6rem] uppercase tracking-wide text-white/70">
+                        {localizeWithFallback('notifications.title.soundboard', 'Soundboard')}
+                    </span>
+                    <Text wrap dangerouslySetInnerHTML={{ __html: SanitizeHtml(htmlText) }} variant="white" />
+                </div>
+            </LayoutNotificationBubbleView>
+        </NativeTextTree>
     );
 };

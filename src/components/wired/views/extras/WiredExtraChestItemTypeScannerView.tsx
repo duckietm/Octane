@@ -10,6 +10,7 @@ import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries, getCustomVariableItemId, IWiredVariablePickerEntry } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const SOURCE_SELECTED = 100;
 const SOURCE_SECONDARY_SELECTED = 101;
@@ -185,67 +186,69 @@ export const WiredExtraChestItemTypeScannerView: FC<{}> = () => {
     // AIR forceHidePickFurniInstructions: the two source rows are the whole selection, in the advanced section that
     // addon 18 always shows open (advancedAlwaysVisible).
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 400 }}
-            showSelection={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.item_types"
-                        options={FURNI_SOURCES}
-                        value={typeSource}
-                        selectionKind="primary"
-                        selectionActive={selectionMode === 'types'}
-                        selectionCount={typeIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        onChange={setTypeSource}
-                        onSelectionActivate={() => switchSelection('types')}
-                    />
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.chests"
-                        options={CHEST_SOURCES}
-                        value={chestSource}
-                        selectionKind="secondary"
-                        selectionActive={selectionMode === 'chests'}
-                        selectionCount={chestIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                        onChange={(value) => setChestSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
-                        onSelectionActivate={() => switchSelection('chests')}
-                    />
-                </div>
-            }
-        >
-            <div className="flex flex-col gap-2">
-                <Text small className="whitespace-pre-line">{LocalizeText('wiredfurni.params.chest_item_type_scanner.info').replace(/\\n/g, '\n')}</Text>
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <WiredVariablePicker
-                        entries={variableEntries as IWiredVariablePickerEntry[]}
-                        recentScope="chest-item-type-scanner"
-                        selectedToken={variableToken}
-                        onSelect={(entry) => setVariableToken(entry.token)}
-                    />
-                </div>
-                <details>
-                    <summary>
-                        <Text bold>{LocalizeText('wiredfurni.params.chest_item_type_scanner')}</Text>
-                    </summary>
-                    <div className="flex flex-col gap-1 pt-1">
-                        {SCAN_MODES.map((value) => (
-                            <label key={value} className="flex items-center gap-1">
-                                <Radio name="chestItemTypeScannerMode" checked={mode === value} onCheckedChange={ () => setMode(value) } />
-                                <Text>{LocalizeText(`wiredfurni.params.chest_item_type_scanner.${value}`)}</Text>
-                            </label>
-                        ))}
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 400 }}
+                showSelection={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.item_types"
+                            options={FURNI_SOURCES}
+                            value={typeSource}
+                            selectionKind="primary"
+                            selectionActive={selectionMode === 'types'}
+                            selectionCount={typeIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            onChange={setTypeSource}
+                            onSelectionActivate={() => switchSelection('types')}
+                        />
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.chests"
+                            options={CHEST_SOURCES}
+                            value={chestSource}
+                            selectionKind="secondary"
+                            selectionActive={selectionMode === 'chests'}
+                            selectionCount={chestIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                            onChange={(value) => setChestSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
+                            onSelectionActivate={() => switchSelection('chests')}
+                        />
                     </div>
-                </details>
-            </div>
-        </WiredExtraBaseView>
+                }
+            >
+                <div className="flex flex-col gap-2">
+                    <Text small className="whitespace-pre-line">{LocalizeText('wiredfurni.params.chest_item_type_scanner.info').replace(/\\n/g, '\n')}</Text>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <WiredVariablePicker
+                            entries={variableEntries as IWiredVariablePickerEntry[]}
+                            recentScope="chest-item-type-scanner"
+                            selectedToken={variableToken}
+                            onSelect={(entry) => setVariableToken(entry.token)}
+                        />
+                    </div>
+                    <details>
+                        <summary>
+                            <Text bold>{LocalizeText('wiredfurni.params.chest_item_type_scanner')}</Text>
+                        </summary>
+                        <div className="flex flex-col gap-1 pt-1">
+                            {SCAN_MODES.map((value) => (
+                                <label key={value} className="flex items-center gap-1">
+                                    <Radio name="chestItemTypeScannerMode" checked={mode === value} onCheckedChange={ () => setMode(value) } />
+                                    <Text>{LocalizeText(`wiredfurni.params.chest_item_type_scanner.${value}`)}</Text>
+                                </label>
+                            ))}
+                        </div>
+                    </details>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

@@ -15,6 +15,7 @@ import {
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Official WiredActionMoveFurni: one 4-column group, "no movement" on its own row, then the
@@ -71,20 +72,22 @@ export const WiredActionMoveFurniView: FC<{}> = (props) => {
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.movefurni')}</Text>
-                <WiredIconRadioGroup name="movement" options={movementOptions} value={movement} onChange={setMovement} />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.rotatefurni')}</Text>
-                <WiredIconRadioGroup columns={1} name="rotation" options={rotationRadioOptions} value={rotation} onChange={setRotation} />
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.movefurni')}</Text>
+                    <WiredIconRadioGroup name="movement" options={movementOptions} value={movement} onChange={setMovement} />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.rotatefurni')}</Text>
+                    <WiredIconRadioGroup columns={1} name="rotation" options={rotationRadioOptions} value={rotation} onChange={setRotation} />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

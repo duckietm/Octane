@@ -6,6 +6,7 @@ import { bundlesFor, IssueBundle, IssueManagerContext, IssueTab, pickBundle, pic
 import { findNativeNode, nativeCaption, nativeFollow, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Border, Native0Button, Native0Frame, Native0Rows, Native0Scrollbar, Native0Tab, Native0Text } from '../native/NativeWindow0';
 import { NativeWindowShell } from '../native/NativeWindowShell';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xb2e6fa;
@@ -108,70 +109,72 @@ export const IssueBrowserView: FC<IssueBrowserProps> = ({ x, y, width, height, c
     const label = (node: NativeNode) => nativeCaption(node);
 
     return (
-        <NativeWindowShell type="issueBrowser" windowKey="main" x={x} y={y}>
-            <Native0Frame caption={nativeCaption(root)} height={height} width={width} onClose={onClose} onResize={onResize}>
-                <Native0Border {...panel} />
-                {TABS.map((entry) => {
-                    const node = findNativeNode(root, entry.name);
+        <NativeTextTree>
+            <NativeWindowShell type="issueBrowser" windowKey="main" x={x} y={y}>
+                <Native0Frame caption={nativeCaption(root)} height={height} width={width} onClose={onClose} onResize={onResize}>
+                    <Native0Border {...panel} />
+                    {TABS.map((entry) => {
+                        const node = findNativeNode(root, entry.name);
 
-                    return (
-                        <Native0Tab
-                            key={entry.tab}
-                            height={nativeNumber(node, 'height')}
-                            label={label(node)}
-                            selected={tab === entry.tab}
-                            width={nativeNumber(node, 'width')}
-                            x={context0.x + 6 + nativeNumber(node, 'x')}
-                            y={context0.y + nativeNumber(node, 'y')}
-                            onClick={() => {
-                                setTab(entry.tab);
-                                setOffset(0);
-                            }}
-                        />
-                    );
-                })}
-                {/* the tab's content is clipped by the panel's inner edge (the bottom "release all" button loses its lower border row) */}
-                <div style={{ position: 'absolute', left: base.x, top: base.y, width: panel.x + panel.width - 1 - base.x, height: panel.y + panel.height - 1 - base.y, overflow: 'hidden' }}>
-                    {header.children.map((node, index) => (
-                        <Native0Text key={index} bold text={label(node)} width={nativeNumber(node, 'width')} x={nativeNumber(node, 'x') + (movesRight(node) ? stretchX : 0) - (label(node) === 'Msgs' ? 1 : 0)} y={nativeNumber(node, 'y')} />
-                    ))}
-                    <div className="native0-list" style={{ left: listRect.x, top: listRect.y, width: listRect.width, height: listRect.height }} onWheel={(event) => setOffset(Math.max(0, Math.min(Math.max(0, contentHeight - listRect.height), clamped + event.deltaY * 0.75)))}>
-                        <div style={{ position: 'absolute', left: 0, top: -clamped, width: listRect.width, height: contentHeight }}>
-                            <Native0Rows colors={rowColors} height={contentHeight} rowHeight={ROW_HEIGHT} width={listRect.width} />
-                            {bundles.map((bundle, index) => (
-                                <div key={bundle.id} style={{ position: 'absolute', left: 0, top: index * ROW_HEIGHT, width: listRect.width, height: ROW_HEIGHT }}>
-                                    <div style={{ position: 'absolute', left: rectOf(texts).x, top: rectOf(texts).y, width: rectOf(texts).width + (nativeFollow(texts, 'x') === 'stretch' ? stretchX : 0), height: rectOf(texts).height, overflow: 'hidden' }}>
-                                        <Native0Text clip height={17} text={`${bundle.priority}`} width={field('score').width} x={field('score').x} y={field('score').y} />
-                                        <Native0Text clip height={17} text={categoryOf(bundle)} width={field('category').width} x={field('category').x} y={field('category').y} />
-                                        <Native0Text clip height={19} text={sourceOf(bundle)} width={field('source').width} x={field('source').x} y={field('source').y} />
-                                        {(
-                                            <Native0Text clip height={19} text={bundle.primary?.issue.reportedUserId ? (bundle.primary.issue.reportedUserName ?? '') : ''} width={field('target_name').width} x={field('target_name').x} y={field('target_name').y} />
+                        return (
+                            <Native0Tab
+                                key={entry.tab}
+                                height={nativeNumber(node, 'height')}
+                                label={label(node)}
+                                selected={tab === entry.tab}
+                                width={nativeNumber(node, 'width')}
+                                x={context0.x + 6 + nativeNumber(node, 'x')}
+                                y={context0.y + nativeNumber(node, 'y')}
+                                onClick={() => {
+                                    setTab(entry.tab);
+                                    setOffset(0);
+                                }}
+                            />
+                        );
+                    })}
+                    {/* the tab's content is clipped by the panel's inner edge (the bottom "release all" button loses its lower border row) */}
+                    <div style={{ position: 'absolute', left: base.x, top: base.y, width: panel.x + panel.width - 1 - base.x, height: panel.y + panel.height - 1 - base.y, overflow: 'hidden' }}>
+                        {header.children.map((node, index) => (
+                            <Native0Text key={index} bold text={label(node)} width={nativeNumber(node, 'width')} x={nativeNumber(node, 'x') + (movesRight(node) ? stretchX : 0) - (label(node) === 'Msgs' ? 1 : 0)} y={nativeNumber(node, 'y')} />
+                        ))}
+                        <div className="native0-list" style={{ left: listRect.x, top: listRect.y, width: listRect.width, height: listRect.height }} onWheel={(event) => setOffset(Math.max(0, Math.min(Math.max(0, contentHeight - listRect.height), clamped + event.deltaY * 0.75)))}>
+                            <div style={{ position: 'absolute', left: 0, top: -clamped, width: listRect.width, height: contentHeight }}>
+                                <Native0Rows colors={rowColors} height={contentHeight} rowHeight={ROW_HEIGHT} width={listRect.width} />
+                                {bundles.map((bundle, index) => (
+                                    <div key={bundle.id} style={{ position: 'absolute', left: 0, top: index * ROW_HEIGHT, width: listRect.width, height: ROW_HEIGHT }}>
+                                        <div style={{ position: 'absolute', left: rectOf(texts).x, top: rectOf(texts).y, width: rectOf(texts).width + (nativeFollow(texts, 'x') === 'stretch' ? stretchX : 0), height: rectOf(texts).height, overflow: 'hidden' }}>
+                                            <Native0Text clip height={17} text={`${bundle.priority}`} width={field('score').width} x={field('score').x} y={field('score').y} />
+                                            <Native0Text clip height={17} text={categoryOf(bundle)} width={field('category').width} x={field('category').x} y={field('category').y} />
+                                            <Native0Text clip height={19} text={sourceOf(bundle)} width={field('source').width} x={field('source').x} y={field('source').y} />
+                                            {(
+                                                <Native0Text clip height={19} text={bundle.primary?.issue.reportedUserId ? (bundle.primary.issue.reportedUserName ?? '') : ''} width={field('target_name').width} x={field('target_name').x} y={field('target_name').y} />
+                                            )}
+                                            <img alt="" src={bundle.primary?.issue.reportedUserId ? userIcon : roomIcon} style={{ position: 'absolute', left: field('target_icon').x, top: field('target_icon').y, width: 20, height: 20, imageRendering: 'pixelated' }} />
+                                            <Native0Text height={19} text={bundle.openTime()} width={field('time').width} x={field('time').x} y={field('time').y} />
+                                            {tab === 'my' && <Native0Text height={19} text={`${bundle.messageCount}`} width={field('msgs').width} x={field('msgs').x} y={field('msgs').y} />}
+                                            {tab === 'picked' && <Native0Text clip height={19} text={bundle.pickerName} width={field('picker').width} x={field('picker').x} y={field('picker').y} />}
+                                        </div>
+                                        {tab === 'open' && (
+                                            <Native0Button height={rectOf(buttonOf('pick_button')).height} label={label(buttonOf('pick_button'))} width={60} x={rectOf(buttonOf('pick_button')).x + stretchX} y={rectOf(buttonOf('pick_button')).y} onClick={() => guardedPick(`bundle:${bundle.id}`, () => pickBundle(bundle.id, 'pick button', context))} />
                                         )}
-                                        <img alt="" src={bundle.primary?.issue.reportedUserId ? userIcon : roomIcon} style={{ position: 'absolute', left: field('target_icon').x, top: field('target_icon').y, width: 20, height: 20, imageRendering: 'pixelated' }} />
-                                        <Native0Text height={19} text={bundle.openTime()} width={field('time').width} x={field('time').x} y={field('time').y} />
-                                        {tab === 'my' && <Native0Text height={19} text={`${bundle.messageCount}`} width={field('msgs').width} x={field('msgs').x} y={field('msgs').y} />}
-                                        {tab === 'picked' && <Native0Text clip height={19} text={bundle.pickerName} width={field('picker').width} x={field('picker').x} y={field('picker').y} />}
+                                        {tab === 'my' && (
+                                            <>
+                                                <Native0Button height={rectOf(buttonOf('handle_button')).height} label={label(buttonOf('handle_button'))} width={60} x={rectOf(buttonOf('handle_button')).x + stretchX} y={rectOf(buttonOf('handle_button')).y} onClick={() => context.openHandler(bundle.id)} />
+                                                <Native0Button height={rectOf(buttonOf('release_button')).height} label={label(buttonOf('release_button'))} width={60} x={rectOf(buttonOf('release_button')).x + stretchX} y={rectOf(buttonOf('release_button')).y} onClick={() => releaseBundle(bundle.id, context)} />
+                                            </>
+                                        )}
                                     </div>
-                                    {tab === 'open' && (
-                                        <Native0Button height={rectOf(buttonOf('pick_button')).height} label={label(buttonOf('pick_button'))} width={60} x={rectOf(buttonOf('pick_button')).x + stretchX} y={rectOf(buttonOf('pick_button')).y} onClick={() => guardedPick(`bundle:${bundle.id}`, () => pickBundle(bundle.id, 'pick button', context))} />
-                                    )}
-                                    {tab === 'my' && (
-                                        <>
-                                            <Native0Button height={rectOf(buttonOf('handle_button')).height} label={label(buttonOf('handle_button'))} width={60} x={rectOf(buttonOf('handle_button')).x + stretchX} y={rectOf(buttonOf('handle_button')).y} onClick={() => context.openHandler(bundle.id)} />
-                                            <Native0Button height={rectOf(buttonOf('release_button')).height} label={label(buttonOf('release_button'))} width={60} x={rectOf(buttonOf('release_button')).x + stretchX} y={rectOf(buttonOf('release_button')).y} onClick={() => releaseBundle(bundle.id, context)} />
-                                        </>
-                                    )}
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
+                        <Native0Scrollbar contentHeight={contentHeight} height={listRect.height} offset={clamped} viewHeight={listRect.height} x={rectOf(scroller).x + stretchX} y={rectOf(scroller).y} onOffset={setOffset} />
+                        {tab === 'my' && releaseAllNode && (
+                            <Native0Button height={rectOf(releaseAllNode).height} label={label(releaseAllNode)} width={rectOf(releaseAllNode).width} x={rectOf(releaseAllNode).x + stretchX} y={rectOf(releaseAllNode).y + stretchY} onClick={() => releaseAll(context)} />
+                        )}
                     </div>
-                    <Native0Scrollbar contentHeight={contentHeight} height={listRect.height} offset={clamped} viewHeight={listRect.height} x={rectOf(scroller).x + stretchX} y={rectOf(scroller).y} onOffset={setOffset} />
-                    {tab === 'my' && releaseAllNode && (
-                        <Native0Button height={rectOf(releaseAllNode).height} label={label(releaseAllNode)} width={rectOf(releaseAllNode).width} x={rectOf(releaseAllNode).x + stretchX} y={rectOf(releaseAllNode).y + stretchY} onClick={() => releaseAll(context)} />
-                    )}
-                </div>
-                <Native0Button height={rectOf(autoPick).height} label={label(autoPick)} width={rectOf(autoPick).width} x={rectOf(autoPick).x} y={rectOf(autoPick).y + frameChangeY} onClick={() => guardedPick('next', () => pickNext('issue browser pick next', context))} />
-            </Native0Frame>
-        </NativeWindowShell>
+                    <Native0Button height={rectOf(autoPick).height} label={label(autoPick)} width={rectOf(autoPick).width} x={rectOf(autoPick).x} y={rectOf(autoPick).y + frameChangeY} onClick={() => guardedPick('next', () => pickNext('issue browser pick next', context))} />
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

@@ -7,6 +7,7 @@ import { useWiredPageRequests } from '../../hooks/wired-tools/useWiredPageReques
 import { VariableManageEntry, VariablesElementType } from './WiredCreatorTools.types';
 import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
 import { HOLDER_TYPE_FURNI, HOLDER_TYPE_ROOM, HOLDER_TYPE_USER, WiredHolderDescription, WiredVariableOwnersPanel } from './WiredVariableOwnersPanel';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export { HOLDER_TYPE_FURNI, HOLDER_TYPE_ROOM, HOLDER_TYPE_USER };
 export type { WiredHolderDescription };
@@ -160,21 +161,23 @@ export const WiredVariableOwnersView = (props: WiredVariableOwnersViewProps) => 
     };
 
     return (
-        <WiredVariableOwnersPanel
-            variableName={variableName}
-            variablesType={variablesType}
-            hasValue={hasValue}
-            holders={page?.elements ?? []}
-            describeHolder={describeHolder}
-            currentPage={currentPage}
-            totalEntries={page?.totalEntries ?? 0}
-            lastPage={lastPage}
-            requests={requests}
-            scrollResetKey={scrollKey}
-            filters={variablesType === 'user' ? [userTypeFilter, sortFilter] : [sortFilter]}
-            onManage={(holder) => onManage(toManageEntry(holder))}
-            onOpenUserProfile={(entityId) => GetUserProfile(entityId)}
-            onClose={onClose}
-        />
+        <NativeTextTree>
+            <WiredVariableOwnersPanel
+                variableName={variableName}
+                variablesType={variablesType}
+                hasValue={hasValue}
+                holders={page?.elements ?? []}
+                describeHolder={describeHolder}
+                currentPage={currentPage}
+                totalEntries={page?.totalEntries ?? 0}
+                lastPage={lastPage}
+                requests={requests}
+                scrollResetKey={scrollKey}
+                filters={variablesType === 'user' ? [userTypeFilter, sortFilter] : [sortFilter]}
+                onManage={(holder) => onManage(toManageEntry(holder))}
+                onOpenUserProfile={(entityId) => GetUserProfile(entityId)}
+                onClose={onClose}
+            />
+        </NativeTextTree>
     );
 };

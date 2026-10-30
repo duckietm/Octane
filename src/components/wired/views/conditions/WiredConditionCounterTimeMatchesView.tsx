@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MINUTES_MIN = 0;
 const MINUTES_MAX = 99;
@@ -61,39 +62,41 @@ export const WiredConditionCounterTimeMatchesView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                {COMPARISON_OPTIONS.map((option) => {
-                    return (
-                        <div key={option.value} className="flex items-center gap-1">
-                            <Radio checked={comparison === option.value} id={`counterComparison${option.value}`} name="counterComparison" onCheckedChange={() => setComparison(option.value)} />
-                            <Text>{LocalizeText(option.label)}</Text>
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.clock_minutes_elapsed', ['minutes'], [minutes.toString()])}</Text>
-                <Slider max={MINUTES_MAX} min={MINUTES_MIN} step={1} value={minutes} onChange={(event) => setMinutes(normalizeMinutes(event as number))} />
-                <Text small>{minutes}</Text>
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.clock_seconds_elapsed', ['seconds'], [secondsLabel])}</Text>
-                <Slider
-                    max={HALF_SECONDS_MAX}
-                    min={HALF_SECONDS_MIN}
-                    step={1}
-                    value={halfSeconds}
-                    onChange={(event) => setHalfSeconds(normalizeHalfSeconds(event as number))}
-                />
-                <Text small>{secondsLabel}</Text>
-            </div>
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                    {COMPARISON_OPTIONS.map((option) => {
+                        return (
+                            <div key={option.value} className="flex items-center gap-1">
+                                <Radio checked={comparison === option.value} id={`counterComparison${option.value}`} name="counterComparison" onCheckedChange={() => setComparison(option.value)} />
+                                <Text>{LocalizeText(option.label)}</Text>
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.clock_minutes_elapsed', ['minutes'], [minutes.toString()])}</Text>
+                    <Slider max={MINUTES_MAX} min={MINUTES_MIN} step={1} value={minutes} onChange={(event) => setMinutes(normalizeMinutes(event as number))} />
+                    <Text small>{minutes}</Text>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.clock_seconds_elapsed', ['seconds'], [secondsLabel])}</Text>
+                    <Slider
+                        max={HALF_SECONDS_MAX}
+                        min={HALF_SECONDS_MIN}
+                        step={1}
+                        value={halfSeconds}
+                        onChange={(event) => setHalfSeconds(normalizeHalfSeconds(event as number))}
+                    />
+                    <Text small>{secondsLabel}</Text>
+                </div>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

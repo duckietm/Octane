@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { localizeWithFallback } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useCatalogNewAdditionsStore } from '../../hooks/catalog/catalogNewAdditionsStore';
 import { isNewAdditionsNotificationEnabled } from '../../hooks/catalog/useCatalogNewAdditions';
 
@@ -14,8 +15,10 @@ export const ToolbarNewAdditionsLabel: FC = () => {
     if (!available || !isNewAdditionsNotificationEnabled()) return null;
 
     return (
-        <span aria-hidden className="octane-toolbar-new-additions pointer-events-none">
-            {localizeWithFallback('toolbar.new_additions.notification', 'New')}
-        </span>
+        <NativeTextTree>
+            <span aria-hidden className="octane-toolbar-new-additions pointer-events-none">
+                {localizeWithFallback('toolbar.new_additions.notification', 'New')}
+            </span>
+        </NativeTextTree>
     );
 };

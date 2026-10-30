@@ -6,6 +6,7 @@ import { useHelp, useNavigatorData, useNavigatorFavourite, useNavigatorRoomInfoP
 import { classNames } from '../../../../layout';
 import { InlineDialog } from '../../../../common/InlineDialog';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const getTradeModeText = (tradeMode: number) => {
     switch (tradeMode) {
@@ -46,135 +47,141 @@ export const NavigatorRoomInfoPopupView: FC<{}> = () => {
     const bubbleStyle = { left: x, top: y, width: 374, transform: 'translateY(-50%)' };
 
     return (
-        <InlineDialog
-            aria-label={LocalizeText('navigator.room.info.popup.title')}
-            onClose={closePopup}
-            className="octane-navigator-air__room-bubble"
-            style={bubbleStyle}
-            onMouseEnter={() => useNavigatorRoomInfoPopupStore.getState().setHovered(true)}
-            onMouseLeave={() => useNavigatorRoomInfoPopupStore.getState().setHovered(false)}
-            onClick={(event) => event.stopPropagation()}
-        >
-            <div className="octane-navigator-air__room-bubble-content">
-                <div className="octane-navigator-air__room-popover-header">
-                    <LayoutRoomThumbnailView className="octane-navigator-air__room-popover-thumbnail" customUrl={room.officialRoomPicRef} roomId={room.roomId}>
-                        {hasGroup && <LayoutBadgeImageView badgeCode={room.groupBadgeCode} className="octane-navigator-air__room-badge" isGroup={true} />}
-                    </LayoutRoomThumbnailView>
-                    <div className="octane-navigator-air__room-popover-copy">
-                        <div className="octane-navigator-air__room-popover-title">{room.roomName}</div>
-                        {room.description && <div className="octane-navigator-air__room-popover-description">{room.description}</div>}
-                    </div>
-                </div>
-                {(showOwner || hasGroup) && (
-                    <div className="octane-navigator-air__room-popover-owner-row">
-                        {showOwner && (
-                            <BaseButton
-                                type="button"
-                                className="octane-navigator-air__room-owner"
-                                onClick={() => {
-                                    GetUserProfile(room.ownerId);
-                                    closePopup();
-                                }}
-                            >
-                                <UserProfileIconView userId={room.ownerId} />
-                                <span>{room.ownerName}</span>
-                            </BaseButton>
-                        )}
-                        {hasGroup && (
-                            <BaseButton
-                                type="button"
-                                className="octane-navigator-air__room-group"
-                                onClick={() => {
-                                    GetGroupInformation(room.habboGroupId);
-                                    closePopup();
-                                }}
-                            >
-                                <i className="octane-navigator-air__group" />
-                                <span>{room.groupName}</span>
-                            </BaseButton>
-                        )}
-                    </div>
-                )}
-                <div className="octane-navigator-air__room-popover-details">
-                    <div className="octane-navigator-air__room-popover-properties">
-                        <span className="is-label">{LocalizeText('navigator.roompopup.property.trading')}</span>
-                        <span>{getTradeModeText(room.tradeMode)}</span>
-                        {rankingEnabled && (
-                            <>
-                                <span className="is-label">{LocalizeText('navigator.roompopup.property.ranking')}</span>
-                                <span>{room.ranking}</span>
-                            </>
-                        )}
-                        <span className="is-label">{LocalizeText('navigator.roompopup.property.max_users')}</span>
-                        <span>{room.maxUserCount}</span>
-                    </div>
-                    <div className="octane-navigator-air__room-popover-actions">
-                        <BaseButton type="button" onClick={() => toggleFavourite()}>
-                            <i className={classNames('icon icon-navigator-favorite-room', isFavourite ? 'active' : '')} />
-                            <span>{LocalizeText('navigator.room.popup.room.info.favorite')}</span>
-                        </BaseButton>
-                        <BaseButton
-                            type="button"
-                            onClick={() => {
-                                if (navigatorData?.homeRoomId !== room.roomId) {
-                                    SendMessageComposer(new UpdateHomeRoomMessageComposer(room.roomId));
-                                }
-                            }}
+        <NativeTextTree>
+            <InlineDialog
+                aria-label={LocalizeText('navigator.room.info.popup.title')}
+                onClose={closePopup}
+                className="octane-navigator-air__room-bubble"
+                style={bubbleStyle}
+                onMouseEnter={() => useNavigatorRoomInfoPopupStore.getState().setHovered(true)}
+                onMouseLeave={() => useNavigatorRoomInfoPopupStore.getState().setHovered(false)}
+                onClick={(event) => event.stopPropagation()}
+            >
+                <div className="octane-navigator-air__room-bubble-content">
+                    <div className="octane-navigator-air__room-popover-header">
+                        <LayoutRoomThumbnailView
+                            className="octane-navigator-air__room-popover-thumbnail"
+                            customUrl={room.officialRoomPicRef}
+                            roomId={room.roomId}
                         >
-                            <i className={classNames('icon icon-navigator-my-room', navigatorData?.homeRoomId === room.roomId ? 'active' : '')} />
-                            <span>{LocalizeText('navigator.room.popup.room.info.home')}</span>
-                        </BaseButton>
-                        {isOwner && (
-                            <BaseButton
-                                type="button"
-                                onClick={() => {
-                                    SendMessageComposer(new RoomSettingsComposer(room.roomId));
-                                    closePopup();
-                                }}
-                            >
-                                <i className="icon icon-navigator-room-settings" />
-                                <span>{LocalizeText('navigator.room.popup.info.room.settings')}</span>
-                            </BaseButton>
-                        )}
-                        {roomReportingEnabled && !isOwner && (
-                            <BaseButton
-                                type="button"
-                                onClick={() => {
-                                    report?.(ReportType.ROOM, { roomId: room.roomId, roomName: room.roomName });
-                                    closePopup();
-                                }}
-                            >
-                                <i className="icon icon-navigator-room-report" />
-                                <span>{LocalizeText('navigator.room.popup.report.room')}</span>
-                            </BaseButton>
-                        )}
-                    </div>
-                </div>
-                {room.tags && room.tags.length > 0 && (
-                    <div className="octane-navigator-air__room-popover-tags">
-                        {room.tags.map((tag) => (
-                            <BaseButton key={tag} type="button" className="octane-navigator-air__tag" onClick={() => searchTag(tag)}>
-                                #{tag}
-                            </BaseButton>
-                        ))}
-                    </div>
-                )}
-                {hasActiveRoomAd && (
-                    <div className="octane-navigator-air__room-popover-event">
-                        <i className="octane-navigator-air__room-popover-event-icon" aria-hidden="true" />
-                        <div className="octane-navigator-air__room-popover-event-copy">
-                            <span className="octane-navigator-air__room-popover-event-name">
-                                {LocalizeText('navigator.eventsettings.name')}: {room.roomAdName}
-                            </span>
-                            <span className="octane-navigator-air__room-popover-event-description">
-                                {LocalizeText('navigator.eventsettings.desc')}: {room.roomAdDescription}
-                                <br />
-                                {LocalizeText('roomad.event.expiration_time')} {FriendlyTime.format(room.roomAdExpiresInMin * 60)}
-                            </span>
+                            {hasGroup && <LayoutBadgeImageView badgeCode={room.groupBadgeCode} className="octane-navigator-air__room-badge" isGroup={true} />}
+                        </LayoutRoomThumbnailView>
+                        <div className="octane-navigator-air__room-popover-copy">
+                            <div className="octane-navigator-air__room-popover-title">{room.roomName}</div>
+                            {room.description && <div className="octane-navigator-air__room-popover-description">{room.description}</div>}
                         </div>
                     </div>
-                )}
-            </div>
-        </InlineDialog>
+                    {(showOwner || hasGroup) && (
+                        <div className="octane-navigator-air__room-popover-owner-row">
+                            {showOwner && (
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__room-owner"
+                                    onClick={() => {
+                                        GetUserProfile(room.ownerId);
+                                        closePopup();
+                                    }}
+                                >
+                                    <UserProfileIconView userId={room.ownerId} />
+                                    <span>{room.ownerName}</span>
+                                </BaseButton>
+                            )}
+                            {hasGroup && (
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__room-group"
+                                    onClick={() => {
+                                        GetGroupInformation(room.habboGroupId);
+                                        closePopup();
+                                    }}
+                                >
+                                    <i className="octane-navigator-air__group" />
+                                    <span>{room.groupName}</span>
+                                </BaseButton>
+                            )}
+                        </div>
+                    )}
+                    <div className="octane-navigator-air__room-popover-details">
+                        <div className="octane-navigator-air__room-popover-properties">
+                            <span className="is-label">{LocalizeText('navigator.roompopup.property.trading')}</span>
+                            <span>{getTradeModeText(room.tradeMode)}</span>
+                            {rankingEnabled && (
+                                <>
+                                    <span className="is-label">{LocalizeText('navigator.roompopup.property.ranking')}</span>
+                                    <span>{room.ranking}</span>
+                                </>
+                            )}
+                            <span className="is-label">{LocalizeText('navigator.roompopup.property.max_users')}</span>
+                            <span>{room.maxUserCount}</span>
+                        </div>
+                        <div className="octane-navigator-air__room-popover-actions">
+                            <BaseButton type="button" onClick={() => toggleFavourite()}>
+                                <i className={classNames('icon icon-navigator-favorite-room', isFavourite ? 'active' : '')} />
+                                <span>{LocalizeText('navigator.room.popup.room.info.favorite')}</span>
+                            </BaseButton>
+                            <BaseButton
+                                type="button"
+                                onClick={() => {
+                                    if (navigatorData?.homeRoomId !== room.roomId) {
+                                        SendMessageComposer(new UpdateHomeRoomMessageComposer(room.roomId));
+                                    }
+                                }}
+                            >
+                                <i className={classNames('icon icon-navigator-my-room', navigatorData?.homeRoomId === room.roomId ? 'active' : '')} />
+                                <span>{LocalizeText('navigator.room.popup.room.info.home')}</span>
+                            </BaseButton>
+                            {isOwner && (
+                                <BaseButton
+                                    type="button"
+                                    onClick={() => {
+                                        SendMessageComposer(new RoomSettingsComposer(room.roomId));
+                                        closePopup();
+                                    }}
+                                >
+                                    <i className="icon icon-navigator-room-settings" />
+                                    <span>{LocalizeText('navigator.room.popup.info.room.settings')}</span>
+                                </BaseButton>
+                            )}
+                            {roomReportingEnabled && !isOwner && (
+                                <BaseButton
+                                    type="button"
+                                    onClick={() => {
+                                        report?.(ReportType.ROOM, { roomId: room.roomId, roomName: room.roomName });
+                                        closePopup();
+                                    }}
+                                >
+                                    <i className="icon icon-navigator-room-report" />
+                                    <span>{LocalizeText('navigator.room.popup.report.room')}</span>
+                                </BaseButton>
+                            )}
+                        </div>
+                    </div>
+                    {room.tags && room.tags.length > 0 && (
+                        <div className="octane-navigator-air__room-popover-tags">
+                            {room.tags.map((tag) => (
+                                <BaseButton key={tag} type="button" className="octane-navigator-air__tag" onClick={() => searchTag(tag)}>
+                                    #{tag}
+                                </BaseButton>
+                            ))}
+                        </div>
+                    )}
+                    {hasActiveRoomAd && (
+                        <div className="octane-navigator-air__room-popover-event">
+                            <i className="octane-navigator-air__room-popover-event-icon" aria-hidden="true" />
+                            <div className="octane-navigator-air__room-popover-event-copy">
+                                <span className="octane-navigator-air__room-popover-event-name">
+                                    {LocalizeText('navigator.eventsettings.name')}: {room.roomAdName}
+                                </span>
+                                <span className="octane-navigator-air__room-popover-event-description">
+                                    {LocalizeText('navigator.eventsettings.desc')}: {room.roomAdDescription}
+                                    <br />
+                                    {LocalizeText('roomad.event.expiration_time')} {FriendlyTime.format(room.roomAdExpiresInMin * 60)}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </InlineDialog>
+        </NativeTextTree>
     );
 };

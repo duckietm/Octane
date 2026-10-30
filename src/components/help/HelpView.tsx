@@ -15,6 +15,7 @@ import { SanctionSatusView } from './views/SanctionStatusView';
 import { SelectReportedChatsView } from './views/SelectReportedChatsView';
 import { SelectReportedUserView } from './views/SelectReportedUserView';
 import { SelectTopicView } from './views/SelectTopicView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const HelpView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -92,30 +93,32 @@ export const HelpView: FC<{}> = (props) => {
     };
 
     return (
-        <>
-            {isVisible && (
-                <OctaneCardView
-                    className={`octane-help min-w-0 ${isReporting ? 'w-[min(448px,calc(100vw-16px))]' : 'w-[min(420px,calc(100vw-16px))]'} max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]`}
-                    theme="primary-slim"
-                >
-                    <OctaneCardHeaderView headerText={LocalizeText('help.button.cfh')} onCloseClick={onClose} />
-                    <OctaneCardContentView className="text-black">
-                        {isReporting ? (
-                            <Column grow className="octane-help-report" gap={2} justifyContent="between" overflow="hidden">
+        <NativeTextTree>
+            <>
+                {isVisible && (
+                    <OctaneCardView
+                        className={`octane-help min-w-0 ${isReporting ? 'w-[min(448px,calc(100vw-16px))]' : 'w-[min(420px,calc(100vw-16px))]'} max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]`}
+                        theme="primary-slim"
+                    >
+                        <OctaneCardHeaderView headerText={LocalizeText('help.button.cfh')} onCloseClick={onClose} />
+                        <OctaneCardContentView className="text-black">
+                            {isReporting ? (
+                                <Column grow className="octane-help-report" gap={2} justifyContent="between" overflow="hidden">
+                                    <CurrentStepView />
+                                </Column>
+                            ) : (
                                 <CurrentStepView />
-                            </Column>
-                        ) : (
-                            <CurrentStepView />
-                        )}
-                    </OctaneCardContentView>
-                </OctaneCardView>
-            )}
-            <ChatReviewReporterFeedbackView />
-            <PendingBullyReportView />
-            <SanctionSatusView />
-            <MyReportsStatusView />
-            <NameChangeView />
-            <HabboWayWindowsView />
-        </>
+                            )}
+                        </OctaneCardContentView>
+                    </OctaneCardView>
+                )}
+                <ChatReviewReporterFeedbackView />
+                <PendingBullyReportView />
+                <SanctionSatusView />
+                <MyReportsStatusView />
+                <NameChangeView />
+                <HabboWayWindowsView />
+            </>
+        </NativeTextTree>
     );
 };

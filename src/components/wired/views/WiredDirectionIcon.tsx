@@ -7,6 +7,7 @@ import iconWiredDirS from '../../../assets/images/wired/icon_wired_dir_s.png';
 import iconWiredDirSe from '../../../assets/images/wired/icon_wired_dir_se.png';
 import iconWiredDirSw from '../../../assets/images/wired/icon_wired_dir_sw.png';
 import iconWiredDirW from '../../../assets/images/wired/icon_wired_dir_w.png';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 export const WIRED_DIRECTION_GRID = [
     [7, 0, 1, 2],
@@ -37,9 +38,15 @@ export const WiredDirectionIcon: FC<WiredDirectionIconProps> = (props) => {
     const icon = iconSrc ?? DIRECTION_ICON_MAP[direction];
 
     return (
-        <span className="inline-flex flex-col items-center justify-center leading-none">
-            {showImage && <img alt="" className={`h-auto w-auto object-contain ${selected ? 'brightness-100' : 'opacity-90'}`} draggable={false} src={icon} />}
-            {debugValue !== null && debugValue !== undefined && <span className={`${showImage ? 'mt-[1px]' : ''} text-[9px] text-black`}>{debugValue}</span>}
-        </span>
+        <NativeTextTree>
+            <span className="inline-flex flex-col items-center justify-center leading-none">
+                {showImage && (
+                    <img alt="" className={`h-auto w-auto object-contain ${selected ? 'brightness-100' : 'opacity-90'}`} draggable={false} src={icon} />
+                )}
+                {debugValue !== null && debugValue !== undefined && (
+                    <span className={`${showImage ? 'mt-[1px]' : ''} text-[9px] text-black`}>{debugValue}</span>
+                )}
+            </span>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { InfiniteGrid } from '@layout/InfiniteGrid';
 import { CSSProperties, FC, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { CatalogType, IPurchasableOffer } from '../../../../../api';
 import { AutoGrid, AutoGridProps, ClassicScrollAreaView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogData, useCatalogUiState, useInventoryFurni, useScrollWindow } from '../../../../../hooks';
 import { replaceCatalogPageOffers } from '../../../../../hooks/catalog/useCatalog.helpers';
 import { useCatalogAdmin } from '../../../CatalogAdminContext';
@@ -183,71 +184,77 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = (pr
 
     if (usesAirMixedGridTemplate) {
         return (
-            <ClassicScrollAreaView className="octane-catalog-item-grid-scroll-area h-full min-h-0" viewportRef={elementRef}>
-                <div
-                    aria-label="Catalog items"
-                    className={`octane-catalog-air-mixed-grid ${gridClassName}`}
-                    role="listbox"
-                    style={{ ...airGridStyle, width: mixedLayout.width, minWidth: '100%', height: mixedLayout.height }}
-                    onDragEnd={adminMode ? handleDragEnd : undefined}
-                >
-                    {renderedMixedEntries.map(({ offer, index, ...position }) => renderOfferTile(offer, index, position))}
-                    {children}
-                </div>
-            </ClassicScrollAreaView>
+            <NativeTextTree>
+                <ClassicScrollAreaView className="octane-catalog-item-grid-scroll-area h-full min-h-0" viewportRef={elementRef}>
+                    <div
+                        aria-label="Catalog items"
+                        className={`octane-catalog-air-mixed-grid ${gridClassName}`}
+                        role="listbox"
+                        style={{ ...airGridStyle, width: mixedLayout.width, minWidth: '100%', height: mixedLayout.height }}
+                        onDragEnd={adminMode ? handleDragEnd : undefined}
+                    >
+                        {renderedMixedEntries.map(({ offer, index, ...position }) => renderOfferTile(offer, index, position))}
+                        {children}
+                    </div>
+                </ClassicScrollAreaView>
+            </NativeTextTree>
         );
     }
 
     if (useVirtualGrid) {
         return (
-            <div
-                aria-label="Catalog items"
-                className={`octane-catalog-grid-virtual h-full min-h-0 ${gridClassName}`.trim()}
-                role="listbox"
-                onDragEnd={adminMode ? handleDragEnd : undefined}
-                style={
-                    {
-                        '--octane-grid-column-min-height': `${effectiveColumnMinHeight}px`,
-                        '--octane-grid-column-min-width': `${effectiveColumnMinWidth}px`,
-                        ...airGridStyle
-                    } as CSSProperties
-                }
-            >
-                <InfiniteGrid
-                    classicScrollbar
-                    airColumnAdmission={isAirStandardDensity}
-                    columnGap={3}
-                    columnCount={columnCount}
-                    estimateSize={effectiveColumnMinHeight}
-                    itemMinWidth={effectiveColumnMinWidth}
-                    items={offers}
-                    overscan={4}
-                    rowGap={isAirStandardDensity ? 0 : 3}
-                    onColumnCountChange={isAirStandardDensity ? setAirColumnCount : undefined}
-                    itemRender={(offer, index) => (offer ? renderOfferTile(offer, index) : <></>)}
-                />
-                {children}
-            </div>
+            <NativeTextTree>
+                <div
+                    aria-label="Catalog items"
+                    className={`octane-catalog-grid-virtual h-full min-h-0 ${gridClassName}`.trim()}
+                    role="listbox"
+                    onDragEnd={adminMode ? handleDragEnd : undefined}
+                    style={
+                        {
+                            '--octane-grid-column-min-height': `${effectiveColumnMinHeight}px`,
+                            '--octane-grid-column-min-width': `${effectiveColumnMinWidth}px`,
+                            ...airGridStyle
+                        } as CSSProperties
+                    }
+                >
+                    <InfiniteGrid
+                        classicScrollbar
+                        airColumnAdmission={isAirStandardDensity}
+                        columnGap={3}
+                        columnCount={columnCount}
+                        estimateSize={effectiveColumnMinHeight}
+                        itemMinWidth={effectiveColumnMinWidth}
+                        items={offers}
+                        overscan={4}
+                        rowGap={isAirStandardDensity ? 0 : 3}
+                        onColumnCountChange={isAirStandardDensity ? setAirColumnCount : undefined}
+                        itemRender={(offer, index) => (offer ? renderOfferTile(offer, index) : <></>)}
+                    />
+                    {children}
+                </div>
+            </NativeTextTree>
         );
     }
 
     return (
-        <ClassicScrollAreaView className="octane-catalog-item-grid-scroll-area h-full min-h-0" viewportRef={elementRef}>
-            <AutoGrid
-                aria-label="Catalog items"
-                className={gridClassName}
-                columnCount={columnCount}
-                columnMinHeight={effectiveColumnMinHeight}
-                columnMinWidth={effectiveColumnMinWidth}
-                fullHeight={false}
-                overflow="visible"
-                role="listbox"
-                style={airGridStyle}
-                {...rest}
-            >
-                {offers.length > 0 && offers.map((offer, index) => renderOfferTile(offer, index))}
-                {children}
-            </AutoGrid>
-        </ClassicScrollAreaView>
+        <NativeTextTree>
+            <ClassicScrollAreaView className="octane-catalog-item-grid-scroll-area h-full min-h-0" viewportRef={elementRef}>
+                <AutoGrid
+                    aria-label="Catalog items"
+                    className={gridClassName}
+                    columnCount={columnCount}
+                    columnMinHeight={effectiveColumnMinHeight}
+                    columnMinWidth={effectiveColumnMinWidth}
+                    fullHeight={false}
+                    overflow="visible"
+                    role="listbox"
+                    style={airGridStyle}
+                    {...rest}
+                >
+                    {offers.length > 0 && offers.map((offer, index) => renderOfferTile(offer, index))}
+                    {children}
+                </AutoGrid>
+            </ClassicScrollAreaView>
+        </NativeTextTree>
     );
 };

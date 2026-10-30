@@ -13,6 +13,7 @@ import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
     const { currentOffer = null, roomPreviewer = null } = useCatalogData();
@@ -47,47 +48,55 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = () => {
     }, [groupColors]);
 
     return (
-        <>
-            {!!groupColors && <CatalogGuildFurniRecolorFilter colorA={groupColors.colorA} colorB={groupColors.colorB} />}
-            <CatalogFirstProductSelectorWidgetView />
-            <Column fullHeight gap={1} overflow="hidden">
-                {!!currentOffer && (
-                    <div className="relative shrink-0 overflow-hidden">
-                        <BaseButton
-                            aria-label="Rotate preview"
-                            className="octane-catalog-preview-btn octane-catalog-preview-rotate"
-                            type="button"
-                            onClick={() => roomPreviewer?.changeRoomObjectDirection()}
-                        >
-                            <FaSyncAlt />
-                        </BaseButton>
-                        <BaseButton
-                            aria-label="Change preview state"
-                            className="octane-catalog-preview-btn octane-catalog-preview-state"
-                            type="button"
-                            onClick={() => roomPreviewer?.changeRoomObjectState()}
-                        >
-                            <FaExchangeAlt />
-                        </BaseButton>
-                        <CatalogViewProductWidgetView height={210} />
-                        <div className="absolute bottom-1 left-1 z-10">
-                            <CatalogGuildBadgeWidgetView />
+        <NativeTextTree>
+            <>
+                {!!groupColors && <CatalogGuildFurniRecolorFilter colorA={groupColors.colorA} colorB={groupColors.colorB} />}
+                <CatalogFirstProductSelectorWidgetView />
+                <Column fullHeight gap={1} overflow="hidden">
+                    {!!currentOffer && (
+                        <div className="relative shrink-0 overflow-hidden">
+                            <BaseButton
+                                aria-label="Rotate preview"
+                                className="octane-catalog-preview-btn octane-catalog-preview-rotate"
+                                type="button"
+                                onClick={() => roomPreviewer?.changeRoomObjectDirection()}
+                            >
+                                <FaSyncAlt />
+                            </BaseButton>
+                            <BaseButton
+                                aria-label="Change preview state"
+                                className="octane-catalog-preview-btn octane-catalog-preview-state"
+                                type="button"
+                                onClick={() => roomPreviewer?.changeRoomObjectState()}
+                            >
+                                <FaExchangeAlt />
+                            </BaseButton>
+                            <CatalogViewProductWidgetView height={210} />
+                            <div className="absolute bottom-1 left-1 z-10">
+                                <CatalogGuildBadgeWidgetView />
+                            </div>
+                            <div className="octane-catalog-preview-price absolute bottom-1 right-1">
+                                <CatalogTotalPriceWidget alignItems="end" />
+                            </div>
                         </div>
-                        <div className="octane-catalog-preview-price absolute bottom-1 right-1">
-                            <CatalogTotalPriceWidget alignItems="end" />
+                    )}
+                    <div className="grow! min-h-0 overflow-auto">
+                        <CatalogItemGridWidgetView
+                            className="octane-catalog-grid"
+                            columnCount={6}
+                            columnMinHeight={80}
+                            columnMinWidth={55}
+                            tintColor={tintColor}
+                        />
+                    </div>
+                    {!!currentOffer && (
+                        <div className="flex shrink-0 flex-col gap-1">
+                            <CatalogGuildSelectorWidgetView />
+                            {hasGroups && <CatalogPurchaseWidgetView noGiftOption={true} />}
                         </div>
-                    </div>
-                )}
-                <div className="grow! min-h-0 overflow-auto">
-                    <CatalogItemGridWidgetView className="octane-catalog-grid" columnCount={6} columnMinHeight={80} columnMinWidth={55} tintColor={tintColor} />
-                </div>
-                {!!currentOffer && (
-                    <div className="flex shrink-0 flex-col gap-1">
-                        <CatalogGuildSelectorWidgetView />
-                        {hasGroups && <CatalogPurchaseWidgetView noGiftOption={true} />}
-                    </div>
-                )}
-            </Column>
-        </>
+                    )}
+                </Column>
+            </>
+        </NativeTextTree>
     );
 };

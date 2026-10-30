@@ -1,6 +1,7 @@
 import { CSSProperties, FC } from 'react';
 import { AchievementUtilities, IAchievementCategory } from '../../../api';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface AchievementCategoryListItemViewProps {
     category: IAchievementCategory;
@@ -13,13 +14,15 @@ export const AchievementsCategoryListItemView: FC<AchievementCategoryListItemVie
 
     if (!category) {
         return (
-            <div
-                className="air-achievements-category-tile air-achievements-category-tile--empty"
-                style={{
-                    backgroundImage: `url(${AchievementUtilities.getAchievementImageUrl('achievement_category_bkg_empty_3')})`
-                }}
-                aria-hidden="true"
-            />
+            <NativeTextTree>
+                <div
+                    className="air-achievements-category-tile air-achievements-category-tile--empty"
+                    style={{
+                        backgroundImage: `url(${AchievementUtilities.getAchievementImageUrl('achievement_category_bkg_empty_3')})`
+                    }}
+                    aria-hidden="true"
+                />
+            </NativeTextTree>
         );
     }
 
@@ -33,18 +36,20 @@ export const AchievementsCategoryListItemView: FC<AchievementCategoryListItemVie
     } as CSSProperties;
 
     return (
-        <BaseButton
-            type="button"
-            className={`air-achievements-category-tile${!AchievementUtilities.hasBundledCategoryImage(category) ? ' is-legacy-category' : ''}${selectedCategoryCode === category.code ? ' is-active' : ''}`}
-            style={style}
-            onClick={() => setSelectedCategoryCode(category.code)}
-        >
-            <span className="air-achievements-category-title">{AchievementUtilities.getAchievementCategoryName(category)}</span>
-            <img className="air-achievements-category-art" src={getCategoryImage} alt="" draggable={false} />
-            <span className="air-achievements-category-completion">
-                {progress}/{maxProgress}
-            </span>
-            {getTotalUnseen > 0 && <span className="air-achievements-unseen-count">{getTotalUnseen}</span>}
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton
+                type="button"
+                className={`air-achievements-category-tile${!AchievementUtilities.hasBundledCategoryImage(category) ? ' is-legacy-category' : ''}${selectedCategoryCode === category.code ? ' is-active' : ''}`}
+                style={style}
+                onClick={() => setSelectedCategoryCode(category.code)}
+            >
+                <span className="air-achievements-category-title">{AchievementUtilities.getAchievementCategoryName(category)}</span>
+                <img className="air-achievements-category-art" src={getCategoryImage} alt="" draggable={false} />
+                <span className="air-achievements-category-completion">
+                    {progress}/{maxProgress}
+                </span>
+                {getTotalUnseen > 0 && <span className="air-achievements-unseen-count">{getTotalUnseen}</span>}
+            </BaseButton>
+        </NativeTextTree>
     );
 };

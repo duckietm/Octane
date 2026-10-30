@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { Text } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface WiredPlaceholderPreviewProps {
     previewHtml: string;
@@ -58,8 +59,10 @@ export const WiredPlaceholderPreview: FC<WiredPlaceholderPreviewProps> = (props)
     };
 
     return (
-        <BaseButton type="button" className={`octane-wired__placeholder-preview ${copied ? 'is-copied' : ''}`} onClick={handleCopy}>
-            <Text dangerouslySetInnerHTML={{ __html: previewHtml }} />
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton type="button" className={`octane-wired__placeholder-preview ${copied ? 'is-copied' : ''}`} onClick={handleCopy}>
+                <Text dangerouslySetInnerHTML={{ __html: previewHtml }} />
+            </BaseButton>
+        </NativeTextTree>
     );
 };

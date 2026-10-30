@@ -3,6 +3,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { GetConfigurationValue, OpenUrl, resolveHabboPageUrl, SanitizePageHtml } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import '../../css/octanepedia/OctanepediaAirText.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { getClickedAnchor } from './getClickedAnchor';
 
 const NEW_LINE_REGEX = /\n\r|\n|\r/gm;
@@ -97,14 +98,16 @@ export const OctanepediaView: FC<{}> = (props) => {
     if (!content) return null;
 
     return (
-        <OctaneCardView
-            className="octanepedia w-[450px] h-[400px] max-w-[90vw] max-h-[85vh]"
-            style={dimensions ? { width: dimensions.width, height: dimensions.height } : {}}
-            theme="primary-slim">
-            <OctaneCardHeaderView headerText={header} onCloseClick={() => setContent(null)} />
-            <OctaneCardContentView>
-                <div ref={elementRef} className="octanepedia__page text-black size-full" dangerouslySetInnerHTML={{ __html: content }} />
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView
+                className="octanepedia w-[450px] h-[400px] max-w-[90vw] max-h-[85vh]"
+                style={dimensions ? { width: dimensions.width, height: dimensions.height } : {}}
+                theme="primary-slim">
+                <OctaneCardHeaderView headerText={header} onCloseClick={() => setContent(null)} />
+                <OctaneCardContentView>
+                    <div ref={elementRef} className="octanepedia__page text-black size-full" dangerouslySetInnerHTML={{ __html: content }} />
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

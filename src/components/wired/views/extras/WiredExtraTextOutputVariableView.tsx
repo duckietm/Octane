@@ -23,6 +23,7 @@ import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
 import { Radio } from '../../../../common/Radio';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'global' | 'context';
 
@@ -254,49 +255,55 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     const footer = useMemo(() => {
         if (targetType === 'global') {
             return (
-                <WiredFurniSelectionSourceRow
-                    title="wiredfurni.params.sources.merged.title.variables"
-                    options={[{ value: 0, label: 'wiredfurni.params.sources.global' }]}
-                    value={0}
-                    selectionKind="primary"
-                    selectionActive={false}
-                    selectionCount={0}
-                    selectionLimit={0}
-                    selectionEnabledValues={[]}
-                    showSelectionToggle={false}
-                    onChange={() => null}
-                />
+                <NativeTextTree>
+                    <WiredFurniSelectionSourceRow
+                        title="wiredfurni.params.sources.merged.title.variables"
+                        options={[{ value: 0, label: 'wiredfurni.params.sources.global' }]}
+                        value={0}
+                        selectionKind="primary"
+                        selectionActive={false}
+                        selectionCount={0}
+                        selectionLimit={0}
+                        selectionEnabledValues={[]}
+                        showSelectionToggle={false}
+                        onChange={() => null}
+                    />
+                </NativeTextTree>
             );
         }
 
         if (targetType === 'context') {
             return (
-                <WiredFurniSelectionSourceRow
-                    title="wiredfurni.params.sources.merged.title.variables"
-                    options={[{ value: 0, label: localizeWithFallback('wiredfurni.params.sources.context', 'Current execution') }]}
-                    value={0}
-                    selectionKind="primary"
-                    selectionActive={false}
-                    selectionCount={0}
-                    selectionLimit={0}
-                    selectionEnabledValues={[]}
-                    showSelectionToggle={false}
-                    onChange={() => null}
-                />
+                <NativeTextTree>
+                    <WiredFurniSelectionSourceRow
+                        title="wiredfurni.params.sources.merged.title.variables"
+                        options={[{ value: 0, label: localizeWithFallback('wiredfurni.params.sources.context', 'Current execution') }]}
+                        value={0}
+                        selectionKind="primary"
+                        selectionActive={false}
+                        selectionCount={0}
+                        selectionLimit={0}
+                        selectionEnabledValues={[]}
+                        showSelectionToggle={false}
+                        onChange={() => null}
+                    />
+                </NativeTextTree>
             );
         }
 
         return (
-            <WiredSourcesSelector
-                showFurni={targetType === 'furni'}
-                showUsers={targetType === 'user'}
-                furniSource={furniSource}
-                userSource={userSource}
-                furniTitle="wiredfurni.params.sources.merged.title.variables"
-                usersTitle="wiredfurni.params.sources.merged.title.variables"
-                onChangeFurni={(value) => setFurniSource(normalizeFurniSource(value))}
-                onChangeUsers={(value) => setUserSource(normalizeUserSource(value))}
-            />
+            <NativeTextTree>
+                <WiredSourcesSelector
+                    showFurni={targetType === 'furni'}
+                    showUsers={targetType === 'user'}
+                    furniSource={furniSource}
+                    userSource={userSource}
+                    furniTitle="wiredfurni.params.sources.merged.title.variables"
+                    usersTitle="wiredfurni.params.sources.merged.title.variables"
+                    onChangeFurni={(value) => setFurniSource(normalizeFurniSource(value))}
+                    onChangeUsers={(value) => setUserSource(normalizeUserSource(value))}
+                />
+            </NativeTextTree>
         );
     }, [furniSource, targetType, userSource]);
 
@@ -322,91 +329,93 @@ export const WiredExtraTextOutputVariableView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={
-                targetType === 'furni' ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT : WiredFurniType.STUFF_SELECTION_OPTION_NONE
-            }
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 400 }}
-            footerCollapsible={false}
-            footer={footer}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.texts.placeholder_name')}</Text>
-                    <OctaneInput
-                        maxLength={MAX_PLACEHOLDER_NAME_LENGTH}
-                        type="text"
-                        value={placeholderName}
-                        onChange={(event) => setPlaceholderName(normalizePlaceholderName(event.target.value))}
-                    />
-                </div>
-
-                <WiredPlaceholderPreview previewHtml={previewHtml} previewToken={previewToken} />
-
-                <div className="octane-wired__give-var-heading">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <div className="octane-wired__give-var-targets">
-                        {TARGET_BUTTONS.map((button) => (
-                            <BaseButton
-                                key={button.key}
-                                type="button"
-                                disabled={button.disabled}
-                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
-                                onClick={() => handleTargetChange(button.key)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </BaseButton>
-                        ))}
-                    </div>
-                </div>
-
-                <WiredVariablePicker
-                    entries={resolvedVariableEntries}
-                    recentScope="variable-text-output"
-                    selectedToken={variableToken}
-                    onSelect={(entry) => handleVariableSelect(entry.token)}
-                />
-
-                <div className="octane-wired__give-var-section">
-                    <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type')}</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={displayType === DISPLAY_NUMERIC} name="wiredTextOutputVariableDisplayType" onCheckedChange={() => setDisplayType(DISPLAY_NUMERIC)} />
-                        <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.1')}</Text>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={displayType === DISPLAY_TEXTUAL} disabled={!textDisplayAllowed} name="wiredTextOutputVariableDisplayType" onCheckedChange={() => setDisplayType(DISPLAY_TEXTUAL)} />
-                        <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.2')}</Text>
-                    </label>
-                    <Text small>{LocalizeText('wiredfurni.params.texts.variable_display_type.2.info')}</Text>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type')}</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={placeholderType === TYPE_SINGLE} name="wiredTextOutputVariablePlaceholderType" onCheckedChange={() => setPlaceholderType(TYPE_SINGLE)} />
-                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.1')}</Text>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={placeholderType === TYPE_MULTIPLE} disabled={isSingleValueTarget(targetType)} name="wiredTextOutputVariablePlaceholderType" onCheckedChange={() => setPlaceholderType(TYPE_MULTIPLE)} />
-                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.2')}</Text>
-                    </label>
-                </div>
-
-                {placeholderType === TYPE_MULTIPLE && (
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={
+                    targetType === 'furni' ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT : WiredFurniType.STUFF_SELECTION_OPTION_NONE
+                }
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 400 }}
+                footerCollapsible={false}
+                footer={footer}
+            >
+                <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-1">
-                        <Text>{LocalizeText('wiredfurni.params.texts.select_delimiter')}</Text>
+                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_name')}</Text>
                         <OctaneInput
-                            maxLength={MAX_DELIMITER_LENGTH}
+                            maxLength={MAX_PLACEHOLDER_NAME_LENGTH}
                             type="text"
-                            value={delimiter}
-                            onChange={(event) => setDelimiter(normalizeDelimiter(event.target.value))}
+                            value={placeholderName}
+                            onChange={(event) => setPlaceholderName(normalizePlaceholderName(event.target.value))}
                         />
                     </div>
-                )}
-            </div>
-        </WiredExtraBaseView>
+
+                    <WiredPlaceholderPreview previewHtml={previewHtml} previewToken={previewToken} />
+
+                    <div className="octane-wired__give-var-heading">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <div className="octane-wired__give-var-targets">
+                            {TARGET_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    disabled={button.disabled}
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
+                                    onClick={() => handleTargetChange(button.key)}
+                                >
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
+                        </div>
+                    </div>
+
+                    <WiredVariablePicker
+                        entries={resolvedVariableEntries}
+                        recentScope="variable-text-output"
+                        selectedToken={variableToken}
+                        onSelect={(entry) => handleVariableSelect(entry.token)}
+                    />
+
+                    <div className="octane-wired__give-var-section">
+                        <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type')}</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={displayType === DISPLAY_NUMERIC} name="wiredTextOutputVariableDisplayType" onCheckedChange={() => setDisplayType(DISPLAY_NUMERIC)} />
+                            <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.1')}</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={displayType === DISPLAY_TEXTUAL} disabled={!textDisplayAllowed} name="wiredTextOutputVariableDisplayType" onCheckedChange={() => setDisplayType(DISPLAY_TEXTUAL)} />
+                            <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.2')}</Text>
+                        </label>
+                        <Text small>{LocalizeText('wiredfurni.params.texts.variable_display_type.2.info')}</Text>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type')}</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={placeholderType === TYPE_SINGLE} name="wiredTextOutputVariablePlaceholderType" onCheckedChange={() => setPlaceholderType(TYPE_SINGLE)} />
+                            <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.1')}</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={placeholderType === TYPE_MULTIPLE} disabled={isSingleValueTarget(targetType)} name="wiredTextOutputVariablePlaceholderType" onCheckedChange={() => setPlaceholderType(TYPE_MULTIPLE)} />
+                            <Text>{LocalizeText('wiredfurni.params.texts.placeholder_type.2')}</Text>
+                        </label>
+                    </div>
+
+                    {placeholderType === TYPE_MULTIPLE && (
+                        <div className="flex flex-col gap-1">
+                            <Text>{LocalizeText('wiredfurni.params.texts.select_delimiter')}</Text>
+                            <OctaneInput
+                                maxLength={MAX_DELIMITER_LENGTH}
+                                type="text"
+                                value={delimiter}
+                                onChange={(event) => setDelimiter(normalizeDelimiter(event.target.value))}
+                            />
+                        </div>
+                    )}
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

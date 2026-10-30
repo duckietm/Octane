@@ -24,6 +24,7 @@ import {
 } from '../../assets/images/leaderboard_badge';
 import { Column, DraggableWindow, DraggableWindowPosition, Flex, LayoutAvatarImageView, ListSelect, Text } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 type LeaderboardPage =
     | { key: 'totalBadges'; board: BadgeLeaderboardBoard; frame: string; emblem: string; title: () => string; info: () => string; option: () => string }
@@ -206,110 +207,112 @@ export const BadgeLeaderboardView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <div className="octane-badge-leaderboard fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
-            <DraggableWindow
-                uniqueKey="badge-leaderboard"
-                handleSelector=".octane-badge-leaderboard__drag-handle"
-                windowPosition={DraggableWindowPosition.CENTER}
-            >
-                <div
-                    className="octane-badge-leaderboard__window pointer-events-auto"
-                    style={{ '--badge-leaderboard-frame': `url(${currentPage?.frame || frameLeaderboardTotal})` } as CSSProperties}
+        <NativeTextTree>
+            <div className="octane-badge-leaderboard fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
+                <DraggableWindow
+                    uniqueKey="badge-leaderboard"
+                    handleSelector=".octane-badge-leaderboard__drag-handle"
+                    windowPosition={DraggableWindowPosition.CENTER}
                 >
-                    <div className="octane-badge-leaderboard__frame" aria-hidden="true" />
-                    <div className="octane-badge-leaderboard__drag-handle" />
-                    <BaseButton
-                        className="octane-badge-leaderboard__close"
-                        type="button"
-                        onPointerDown={(event) => event.stopPropagation()}
-                        onClick={() => setIsVisible(false)}
-                        aria-label="Close"
+                    <div
+                        className="octane-badge-leaderboard__window pointer-events-auto"
+                        style={{ '--badge-leaderboard-frame': `url(${currentPage?.frame || frameLeaderboardTotal})` } as CSSProperties}
                     >
-                        <span className="octane-badge-leaderboard__close-icon" style={{ backgroundImage: `url(${leaderboardButtonCloseSwf})` }} />
-                    </BaseButton>
-                    <div className="octane-badge-leaderboard__header">
-                        <div onPointerDown={(event) => event.stopPropagation()}>
-                            <ListSelect
-                                aria-label={LocalizeText('badge_leaderboard.title.total_badges')}
-                                itemClassName="octane-badge-leaderboard__category-option"
-                                options={pages.map((page) => ({ value: page.key, label: page.option() }))}
-                                popupClassName="octane-badge-leaderboard__category-menu"
-                                positionerClassName="octane-badge-leaderboard__category-positioner"
-                                renderTrigger={() => (
-                                    <>
-                                        <Text className="octane-badge-leaderboard__header-title">
-                                            {currentPage?.title() || LocalizeText('badge_leaderboard.title.total_badges')}
-                                        </Text>
-                                        <img className="octane-badge-leaderboard__header-arrow" src={leaderboardDropdownOpener} alt="" />
-                                    </>
-                                )}
-                                side="bottom"
-                                sideOffset={-2}
-                                triggerClassName="octane-badge-leaderboard__category-button"
-                                value={currentPage?.key ?? ''}
-                                align="center"
-                                onValueChange={(key) => {
-                                    const index = pages.findIndex((page) => page.key === key);
+                        <div className="octane-badge-leaderboard__frame" aria-hidden="true" />
+                        <div className="octane-badge-leaderboard__drag-handle" />
+                        <BaseButton
+                            className="octane-badge-leaderboard__close"
+                            type="button"
+                            onPointerDown={(event) => event.stopPropagation()}
+                            onClick={() => setIsVisible(false)}
+                            aria-label="Close"
+                        >
+                            <span className="octane-badge-leaderboard__close-icon" style={{ backgroundImage: `url(${leaderboardButtonCloseSwf})` }} />
+                        </BaseButton>
+                        <div className="octane-badge-leaderboard__header">
+                            <div onPointerDown={(event) => event.stopPropagation()}>
+                                <ListSelect
+                                    aria-label={LocalizeText('badge_leaderboard.title.total_badges')}
+                                    itemClassName="octane-badge-leaderboard__category-option"
+                                    options={pages.map((page) => ({ value: page.key, label: page.option() }))}
+                                    popupClassName="octane-badge-leaderboard__category-menu"
+                                    positionerClassName="octane-badge-leaderboard__category-positioner"
+                                    renderTrigger={() => (
+                                        <>
+                                            <Text className="octane-badge-leaderboard__header-title">
+                                                {currentPage?.title() || LocalizeText('badge_leaderboard.title.total_badges')}
+                                            </Text>
+                                            <img className="octane-badge-leaderboard__header-arrow" src={leaderboardDropdownOpener} alt="" />
+                                        </>
+                                    )}
+                                    side="bottom"
+                                    sideOffset={-2}
+                                    triggerClassName="octane-badge-leaderboard__category-button"
+                                    value={currentPage?.key ?? ''}
+                                    align="center"
+                                    onValueChange={(key) => {
+                                        const index = pages.findIndex((page) => page.key === key);
 
-                                    if (index >= 0) setCategoryIndex(index);
-                                }}
-                            />
+                                        if (index >= 0) setCategoryIndex(index);
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className="octane-badge-leaderboard__content">
+                            {isLoading && !leaderboard && <div className="octane-badge-leaderboard__state">{LocalizeText('generic.loading')}</div>}
+                            {loadError && !leaderboard && <div className="octane-badge-leaderboard__state octane-badge-leaderboard__state--error">{loadError}</div>}
+                            {currentPage && (
+                                <>
+                                    <div className="octane-badge-leaderboard__info-card">
+                                        <img className="octane-badge-leaderboard__info-icon" src={currentPage.emblem} alt="" />
+                                        <Text className="octane-badge-leaderboard__info-text" small wrap>
+                                            {currentPage.info()}
+                                        </Text>
+                                    </div>
+                                    <div className="octane-badge-leaderboard__list">
+                                        {pageEntries.map((entry, index) => (
+                                            <LeaderboardRow
+                                                key={`${currentPage.key}-${entry.userId}`}
+                                                entry={entry}
+                                                emblem={currentPage.emblem}
+                                                rowIndex={pageStart + index}
+                                                isCurrentUser={isViewer(entry)}
+                                            />
+                                        ))}
+                                        {showViewerEntry && (
+                                            <LeaderboardRow entry={viewerEntry} emblem={currentPage.emblem} rowIndex={pageStart + pageEntries.length} isCurrentUser={true} />
+                                        )}
+                                    </div>
+                                    <img className="octane-badge-leaderboard__divider" src={leaderboardDivider} alt="" />
+                                    <Flex className="octane-badge-leaderboard__footer" justifyContent="between" alignItems="center">
+                                        <BaseButton
+                                            className="octane-badge-leaderboard__nav-button is-previous"
+                                            disabled={clampedEntryPageIndex <= 0}
+                                            onClick={() => setEntryPageIndex((value) => Math.max(0, value - 1))}
+                                        >
+                                            {LocalizeText('badge_leaderboard.previous')}
+                                        </BaseButton>
+                                        <Column gap={0} alignItems="center">
+                                            <Text small bold>
+                                                {currentPage.option()}
+                                            </Text>
+                                            <Text className="opacity-70" small>{`${clampedEntryPageIndex + 1} / ${totalEntryPages}`}</Text>
+                                        </Column>
+                                        <BaseButton
+                                            className="octane-badge-leaderboard__nav-button is-next"
+                                            disabled={clampedEntryPageIndex >= totalEntryPages - 1}
+                                            onClick={() => setEntryPageIndex((value) => Math.min(totalEntryPages - 1, value + 1))}
+                                        >
+                                            {LocalizeText('badge_leaderboard.next')}
+                                        </BaseButton>
+                                    </Flex>
+                                </>
+                            )}
                         </div>
                     </div>
-                    <div className="octane-badge-leaderboard__content">
-                        {isLoading && !leaderboard && <div className="octane-badge-leaderboard__state">{LocalizeText('generic.loading')}</div>}
-                        {loadError && !leaderboard && <div className="octane-badge-leaderboard__state octane-badge-leaderboard__state--error">{loadError}</div>}
-                        {currentPage && (
-                            <>
-                                <div className="octane-badge-leaderboard__info-card">
-                                    <img className="octane-badge-leaderboard__info-icon" src={currentPage.emblem} alt="" />
-                                    <Text className="octane-badge-leaderboard__info-text" small wrap>
-                                        {currentPage.info()}
-                                    </Text>
-                                </div>
-                                <div className="octane-badge-leaderboard__list">
-                                    {pageEntries.map((entry, index) => (
-                                        <LeaderboardRow
-                                            key={`${currentPage.key}-${entry.userId}`}
-                                            entry={entry}
-                                            emblem={currentPage.emblem}
-                                            rowIndex={pageStart + index}
-                                            isCurrentUser={isViewer(entry)}
-                                        />
-                                    ))}
-                                    {showViewerEntry && (
-                                        <LeaderboardRow entry={viewerEntry} emblem={currentPage.emblem} rowIndex={pageStart + pageEntries.length} isCurrentUser={true} />
-                                    )}
-                                </div>
-                                <img className="octane-badge-leaderboard__divider" src={leaderboardDivider} alt="" />
-                                <Flex className="octane-badge-leaderboard__footer" justifyContent="between" alignItems="center">
-                                    <BaseButton
-                                        className="octane-badge-leaderboard__nav-button is-previous"
-                                        disabled={clampedEntryPageIndex <= 0}
-                                        onClick={() => setEntryPageIndex((value) => Math.max(0, value - 1))}
-                                    >
-                                        {LocalizeText('badge_leaderboard.previous')}
-                                    </BaseButton>
-                                    <Column gap={0} alignItems="center">
-                                        <Text small bold>
-                                            {currentPage.option()}
-                                        </Text>
-                                        <Text className="opacity-70" small>{`${clampedEntryPageIndex + 1} / ${totalEntryPages}`}</Text>
-                                    </Column>
-                                    <BaseButton
-                                        className="octane-badge-leaderboard__nav-button is-next"
-                                        disabled={clampedEntryPageIndex >= totalEntryPages - 1}
-                                        onClick={() => setEntryPageIndex((value) => Math.min(totalEntryPages - 1, value + 1))}
-                                    >
-                                        {LocalizeText('badge_leaderboard.next')}
-                                    </BaseButton>
-                                </Flex>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </DraggableWindow>
-        </div>
+                </DraggableWindow>
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -328,18 +331,20 @@ const LeaderboardRow: FC<LeaderboardRowProps> = (props) => {
     const rankClassName = entry.rank === 1 ? 'is-rank-1' : entry.rank === 2 ? 'is-rank-2' : entry.rank === 3 ? 'is-rank-3' : '';
 
     return (
-        <div className={`octane-badge-leaderboard__row ${isCurrentUser ? 'is-current-user' : ''} ${rowIndex % 2 === 0 ? 'is-even' : 'is-odd'}`}>
-            <div className={`octane-badge-leaderboard__rank ${rankClassName}`}>{entry.rank}</div>
-            <div className="octane-badge-leaderboard__avatar">
-                <LayoutAvatarImageView figure={entry.figure} headOnly direction={2} />
+        <NativeTextTree>
+            <div className={`octane-badge-leaderboard__row ${isCurrentUser ? 'is-current-user' : ''} ${rowIndex % 2 === 0 ? 'is-even' : 'is-odd'}`}>
+                <div className={`octane-badge-leaderboard__rank ${rankClassName}`}>{entry.rank}</div>
+                <div className="octane-badge-leaderboard__avatar">
+                    <LayoutAvatarImageView figure={entry.figure} headOnly direction={2} />
+                </div>
+                <Text className="octane-badge-leaderboard__username" bold>
+                    {entry.username}
+                </Text>
+                <Text className="octane-badge-leaderboard__score" bold>
+                    {entry.score}
+                </Text>
+                <img className="octane-badge-leaderboard__row-emblem" src={emblem} alt="" />
             </div>
-            <Text className="octane-badge-leaderboard__username" bold>
-                {entry.username}
-            </Text>
-            <Text className="octane-badge-leaderboard__score" bold>
-                {entry.score}
-            </Text>
-            <img className="octane-badge-leaderboard__row-emblem" src={emblem} alt="" />
-        </div>
+        </NativeTextTree>
     );
 };

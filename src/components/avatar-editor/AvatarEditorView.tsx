@@ -33,6 +33,7 @@ import { AvatarEditorWardrobeView } from './AvatarEditorWardrobeView';
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const MAIN_TAB_ICONS: Record<string, string> = {
     [AvatarEditorFigureCategory.GENERIC]: mainGenericSrc,
@@ -196,107 +197,109 @@ export const AvatarEditorView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <OctaneCardView
-            className={`octane-avatar-editor${isWardrobeOpen ? ' is-wardrobe-open' : ''}`}
-            frameStyle={3}
-            isResizable={false}
-            uniqueKey="avatar-editor"
-        >
-            <OctaneCardHeaderView
-                headerText={LocalizeText(clothingChangeData ? 'widget.furni.clothingchange.editor.title' : 'avatareditor.title')}
-                onCloseClick={(event) => setIsVisible(false)}
-            />
-            <OctaneCardContentView className="octane-avatar-editor-content">
-                <div className="octane-avatar-editor-stage">
-                    <div className="octane-avatar-editor-nameplate">
-                        <span>{GetSessionDataManager().userName}</span>
-                    </div>
-                    <div className="octane-avatar-editor-tab-row">
-                        <OctaneCardTabsView classNames={['avatar-editor-tabs']}>
-                            {orderedModelKeys.map((modelKey) => (
-                                <OctaneCardTabsItemView
-                                    key={modelKey}
-                                    classNames={['octane-avatar-editor-main-tab', `is-${modelKey}`]}
-                                    isActive={activeModelKey === modelKey}
-                                    onClick={() => selectMainTab(modelKey)}
-                                >
-                                    <img className="octane-avatar-editor-main-tab-icon" src={MAIN_TAB_ICONS[modelKey]} alt="" draggable={false} />
-                                </OctaneCardTabsItemView>
-                            ))}
-                        </OctaneCardTabsView>
-                    </div>
-                    {canUseWardrobe && (
-                        <ToggleButton
-                            type="button"
-                            className={`octane-avatar-editor-wardrobe-toggle${isWardrobeOpen ? ' is-open' : ''}`} pressed={isWardrobeOpen}
-                            aria-label={LocalizeText('avatareditor.wardrobe.title')}
-                            onClick={() => setIsWardrobeOpen((open) => !open)}
-                        >
-                            <img alt="" draggable={false} src={wardrobeHangerSrc} />
-                        </ToggleButton>
-                    )}
-                    <div className="octane-avatar-editor-main">
-                        {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && !isEffectsOpen && !isHotLooksOpen && avatarModels[activeModelKey] && (
-                            <AvatarEditorModelView categories={avatarModels[activeModelKey]} name={activeModelKey} />
-                        )}
-                        {isPetsOpen && <AvatarEditorPetView categories={avatarModels[activeModelKey]} />}
-                        {isNftOpen && (
-                            <AvatarEditorNftOutfitsView
-                                outfits={nftWardrobe.outfits}
-                                selectedOutfit={nftWardrobe.selectedOutfit}
-                                wornOutfit={nftWardrobe.wornOutfit}
-                                onSelect={nftWardrobe.selectOutfit}
-                            />
-                        )}
-                        {isHotLooksOpen && (
-                            <AvatarEditorHotLooksView
-                                hotLooks={hotLooks[gender === AvatarFigurePartType.FEMALE ? 'F' : 'M']}
-                                onSelect={(look) => loadAvatarData(look.figure, look.gender)}
-                            />
-                        )}
-                        {isEffectsOpen && (
-                            <AvatarEditorEffectsView selectedType={effectSelection ?? (activeEffectType > 0 ? activeEffectType : -1)} onSelect={setEffectSelection} />
-                        )}
-                        <AvatarEditorFigurePreviewView effectType={effectSelection ?? 0} />
-                        {isNftOpen && <AvatarEditorNftOutfitInfoView outfit={nftWardrobe.selectedOutfit} />}
-                        {!clothingChangeData && !isNftOpen && (
-                            <div className="octane-avatar-editor-secondary-actions">
-                                <Hint content="Reset avatar">
-                                    <BaseButton
-                                        type="button"
-                                        aria-label="Reset avatar"
-                                        onClick={() => processAction(AvatarEditorAction.ACTION_RESET)}
+        <NativeTextTree>
+            <OctaneCardView
+                className={`octane-avatar-editor${isWardrobeOpen ? ' is-wardrobe-open' : ''}`}
+                frameStyle={3}
+                isResizable={false}
+                uniqueKey="avatar-editor"
+            >
+                <OctaneCardHeaderView
+                    headerText={LocalizeText(clothingChangeData ? 'widget.furni.clothingchange.editor.title' : 'avatareditor.title')}
+                    onCloseClick={(event) => setIsVisible(false)}
+                />
+                <OctaneCardContentView className="octane-avatar-editor-content">
+                    <div className="octane-avatar-editor-stage">
+                        <div className="octane-avatar-editor-nameplate">
+                            <span>{GetSessionDataManager().userName}</span>
+                        </div>
+                        <div className="octane-avatar-editor-tab-row">
+                            <OctaneCardTabsView classNames={['avatar-editor-tabs']}>
+                                {orderedModelKeys.map((modelKey) => (
+                                    <OctaneCardTabsItemView
+                                        key={modelKey}
+                                        classNames={['octane-avatar-editor-main-tab', `is-${modelKey}`]}
+                                        isActive={activeModelKey === modelKey}
+                                        onClick={() => selectMainTab(modelKey)}
                                     >
-                                        <FaRedo className="fa-icon" />
-                                    </BaseButton>
-                                </Hint>
-                                <Hint content="Clear avatar">
-                                    <BaseButton
-                                        type="button"
-                                        aria-label="Clear avatar"
-                                        onClick={() => processAction(AvatarEditorAction.ACTION_CLEAR)}
-                                    >
-                                        <FaTrash className="fa-icon" />
-                                    </BaseButton>
-                                </Hint>
-                                <Hint content="Randomize avatar">
-                                    <BaseButton
-                                        type="button"
-                                        aria-label="Randomize avatar"
-                                        onClick={() => processAction(AvatarEditorAction.ACTION_RANDOMIZE)}
-                                    >
-                                        <FaDice className="fa-icon" />
-                                    </BaseButton>
-                                </Hint>
-                            </div>
+                                        <img className="octane-avatar-editor-main-tab-icon" src={MAIN_TAB_ICONS[modelKey]} alt="" draggable={false} />
+                                    </OctaneCardTabsItemView>
+                                ))}
+                            </OctaneCardTabsView>
+                        </div>
+                        {canUseWardrobe && (
+                            <ToggleButton
+                                type="button"
+                                className={`octane-avatar-editor-wardrobe-toggle${isWardrobeOpen ? ' is-open' : ''}`} pressed={isWardrobeOpen}
+                                aria-label={LocalizeText('avatareditor.wardrobe.title')}
+                                onClick={() => setIsWardrobeOpen((open) => !open)}
+                            >
+                                <img alt="" draggable={false} src={wardrobeHangerSrc} />
+                            </ToggleButton>
                         )}
-                        <BaseButton type="button" className="octane-avatar-editor-save" onClick={() => processAction(AvatarEditorAction.ACTION_SAVE)}>
-                            {LocalizeText('avatareditor.save')}
-                        </BaseButton>
+                        <div className="octane-avatar-editor-main">
+                            {activeModelKey.length > 0 && !isPetsOpen && !isNftOpen && !isEffectsOpen && !isHotLooksOpen && avatarModels[activeModelKey] && (
+                                <AvatarEditorModelView categories={avatarModels[activeModelKey]} name={activeModelKey} />
+                            )}
+                            {isPetsOpen && <AvatarEditorPetView categories={avatarModels[activeModelKey]} />}
+                            {isNftOpen && (
+                                <AvatarEditorNftOutfitsView
+                                    outfits={nftWardrobe.outfits}
+                                    selectedOutfit={nftWardrobe.selectedOutfit}
+                                    wornOutfit={nftWardrobe.wornOutfit}
+                                    onSelect={nftWardrobe.selectOutfit}
+                                />
+                            )}
+                            {isHotLooksOpen && (
+                                <AvatarEditorHotLooksView
+                                    hotLooks={hotLooks[gender === AvatarFigurePartType.FEMALE ? 'F' : 'M']}
+                                    onSelect={(look) => loadAvatarData(look.figure, look.gender)}
+                                />
+                            )}
+                            {isEffectsOpen && (
+                                <AvatarEditorEffectsView selectedType={effectSelection ?? (activeEffectType > 0 ? activeEffectType : -1)} onSelect={setEffectSelection} />
+                            )}
+                            <AvatarEditorFigurePreviewView effectType={effectSelection ?? 0} />
+                            {isNftOpen && <AvatarEditorNftOutfitInfoView outfit={nftWardrobe.selectedOutfit} />}
+                            {!clothingChangeData && !isNftOpen && (
+                                <div className="octane-avatar-editor-secondary-actions">
+                                    <Hint content="Reset avatar">
+                                        <BaseButton
+                                            type="button"
+                                            aria-label="Reset avatar"
+                                            onClick={() => processAction(AvatarEditorAction.ACTION_RESET)}
+                                        >
+                                            <FaRedo className="fa-icon" />
+                                        </BaseButton>
+                                    </Hint>
+                                    <Hint content="Clear avatar">
+                                        <BaseButton
+                                            type="button"
+                                            aria-label="Clear avatar"
+                                            onClick={() => processAction(AvatarEditorAction.ACTION_CLEAR)}
+                                        >
+                                            <FaTrash className="fa-icon" />
+                                        </BaseButton>
+                                    </Hint>
+                                    <Hint content="Randomize avatar">
+                                        <BaseButton
+                                            type="button"
+                                            aria-label="Randomize avatar"
+                                            onClick={() => processAction(AvatarEditorAction.ACTION_RANDOMIZE)}
+                                        >
+                                            <FaDice className="fa-icon" />
+                                        </BaseButton>
+                                    </Hint>
+                                </div>
+                            )}
+                            <BaseButton type="button" className="octane-avatar-editor-save" onClick={() => processAction(AvatarEditorAction.ACTION_SAVE)}>
+                                {LocalizeText('avatareditor.save')}
+                            </BaseButton>
+                        </div>
                     </div>
-                </div>
-                {isWardrobeOpen && canUseWardrobe && <AvatarEditorWardrobeView />}
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    {isWardrobeOpen && canUseWardrobe && <AvatarEditorWardrobeView />}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

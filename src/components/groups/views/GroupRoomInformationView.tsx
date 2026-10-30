@@ -14,6 +14,7 @@ import groupBaseIcon from '../../../assets/images/groups/swf/group_base_icon.png
 import { Button, Flex, LayoutBadgeImageView, Text } from '../../../common';
 import { useGroupLeave, useMessageEvent } from '../../../hooks';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 export const GroupRoomInformationView: FC<{}> = (props) => {
     const expectedGroupIdRef = useRef<number>(0);
@@ -144,36 +145,38 @@ export const GroupRoomInformationView: FC<{}> = (props) => {
     if (!groupInformation) return null;
 
     return (
-        <div className={`octane-group-room-info pointer-events-auto ml-auto mt-[6px] overflow-hidden ${isOpen ? 'is-open' : 'is-closed'}`}>
-            <BaseButton type="button" className="octane-group-room-info__contracted" onClick={() => setIsOpen((value) => !value)}>
-                <img src={groupBaseIcon} alt="" className="octane-group-room-info__base-icon" draggable={false} />
-                <Text variant="white" className="octane-group-room-info__title">
-                    {LocalizeText('group.homeroominfo.title')}
-                </Text>
-                <span className="octane-group-room-info__toggle" />
-            </BaseButton>
-            <div className="octane-group-room-info__content">
-                <Flex component={BaseButton} type="button" pointer alignItems="center" className="octane-group-room-info__main" onClick={() => GetGroupInformation(groupInformation.id)}>
-                    <div className="octane-group-room-info__badge">
-                        <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} />
-                    </div>
-                    <Text wrap variant="white" className="octane-group-room-info__group-name">
-                        {groupInformation.title}
+        <NativeTextTree>
+            <div className={`octane-group-room-info pointer-events-auto ml-auto mt-[6px] overflow-hidden ${isOpen ? 'is-open' : 'is-closed'}`}>
+                <BaseButton type="button" className="octane-group-room-info__contracted" onClick={() => setIsOpen((value) => !value)}>
+                    <img src={groupBaseIcon} alt="" className="octane-group-room-info__base-icon" draggable={false} />
+                    <Text variant="white" className="octane-group-room-info__title">
+                        {LocalizeText('group.homeroominfo.title')}
                     </Text>
-                </Flex>
-                {(groupInformation.type !== GroupType.PRIVATE || isRealOwner) && (
-                    <div className="octane-group-room-info__button-wrap">
-                        <Button
-                            fullWidth
-                            disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING}
-                            className="octane-groups-button octane-group-room-info__button"
-                            onClick={handleButtonClick}
-                        >
-                            {LocalizeText(getButtonText())}
-                        </Button>
-                    </div>
-                )}
+                    <span className="octane-group-room-info__toggle" />
+                </BaseButton>
+                <div className="octane-group-room-info__content">
+                    <Flex component={BaseButton} type="button" pointer alignItems="center" className="octane-group-room-info__main" onClick={() => GetGroupInformation(groupInformation.id)}>
+                        <div className="octane-group-room-info__badge">
+                            <LayoutBadgeImageView badgeCode={groupInformation.badge} isGroup={true} />
+                        </div>
+                        <Text wrap variant="white" className="octane-group-room-info__group-name">
+                            {groupInformation.title}
+                        </Text>
+                    </Flex>
+                    {(groupInformation.type !== GroupType.PRIVATE || isRealOwner) && (
+                        <div className="octane-group-room-info__button-wrap">
+                            <Button
+                                fullWidth
+                                disabled={groupInformation.membershipType === GroupMembershipType.REQUEST_PENDING}
+                                className="octane-groups-button octane-group-room-info__button"
+                                onClick={handleButtonClick}
+                            >
+                                {LocalizeText(getButtonText())}
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
@@ -61,30 +62,32 @@ export const WiredExtraNamedCodeVariableView: FC<WiredExtraNamedCodeVariableView
     };
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <OctaneInput
-                        aria-label={LocalizeText('wiredfurni.params.variables.variable_name')}
-                        maxLength={MAX_NAME_LENGTH}
-                        type="text"
-                        value={variableName}
-                        onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
-                    />
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} cardStyle={{ width: 380 }}>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
+                        <OctaneInput
+                            aria-label={LocalizeText('wiredfurni.params.variables.variable_name')}
+                            maxLength={MAX_NAME_LENGTH}
+                            type="text"
+                            value={variableName}
+                            onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText(codeTitleKey)}</Text>
+                        <OctaneInput
+                            aria-label={LocalizeText(codeTitleKey)}
+                            maxLength={maxCodeLength}
+                            placeholder={placeholder}
+                            type="text"
+                            value={code}
+                            onChange={(event) => setCode(event.target.value.replace(/[\t\r\n]/g, ''))}
+                        />
+                    </div>
                 </div>
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText(codeTitleKey)}</Text>
-                    <OctaneInput
-                        aria-label={LocalizeText(codeTitleKey)}
-                        maxLength={maxCodeLength}
-                        placeholder={placeholder}
-                        type="text"
-                        value={code}
-                        onChange={(event) => setCode(event.target.value.replace(/[\t\r\n]/g, ''))}
-                    />
-                </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

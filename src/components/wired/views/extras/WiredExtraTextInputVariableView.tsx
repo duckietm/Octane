@@ -16,6 +16,7 @@ import { fromWiredVariableId, toWiredVariableId, wiredVariableIdList } from '../
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { WiredPlaceholderPreview } from './WiredPlaceholderPreview';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface IVariableDefinition {
     hasValue: boolean;
@@ -121,50 +122,52 @@ export const WiredExtraTextInputVariableView: FC<{}> = () => {
     const validate = () => !!normalizeCapturerName(capturerName).length && getCustomVariableItemId(variableToken) > 0;
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={validate}
-            cardStyle={{ width: 400 }}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.texts.capturer_name')}</Text>
-                    <OctaneInput
-                        maxLength={MAX_CAPTURER_NAME_LENGTH}
-                        type="text"
-                        value={capturerName}
-                        onChange={(event) => setCapturerName(normalizeCapturerName(event.target.value))}
-                    />
-                </div>
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={validate}
+                cardStyle={{ width: 400 }}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.texts.capturer_name')}</Text>
+                        <OctaneInput
+                            maxLength={MAX_CAPTURER_NAME_LENGTH}
+                            type="text"
+                            value={capturerName}
+                            onChange={(event) => setCapturerName(normalizeCapturerName(event.target.value))}
+                        />
+                    </div>
 
-                <WiredPlaceholderPreview previewHtml={previewHtml} previewToken={previewToken} />
+                    <WiredPlaceholderPreview previewHtml={previewHtml} previewToken={previewToken} />
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                    <WiredVariablePicker
-                        entries={resolvedVariableEntries}
-                        recentScope="variable-text-input"
-                        selectedToken={variableToken}
-                        onSelect={(entry) => setVariableToken(entry.token)}
-                    />
-                    {!targetDefinitions.length && <Text small>{'No wf_var_context variables with value found in this room.'}</Text>}
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                        <WiredVariablePicker
+                            entries={resolvedVariableEntries}
+                            recentScope="variable-text-input"
+                            selectedToken={variableToken}
+                            onSelect={(entry) => setVariableToken(entry.token)}
+                        />
+                        {!targetDefinitions.length && <Text small>{'No wf_var_context variables with value found in this room.'}</Text>}
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.texts.variable_input_type')}</Text>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={displayType === DISPLAY_NUMERIC} name="wiredTextInputVariableType" onCheckedChange={() => setDisplayType(DISPLAY_NUMERIC)} />
-                        <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.1')}</Text>
-                    </label>
-                    <label className="flex items-center gap-1 cursor-pointer">
-                        <Radio checked={displayType === DISPLAY_TEXTUAL} disabled={!canUseTextDisplay} name="wiredTextInputVariableType" onCheckedChange={() => setDisplayType(DISPLAY_TEXTUAL)} />
-                        <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.2')}</Text>
-                    </label>
-                    <Text small>{LocalizeText('wiredfurni.params.texts.variable_display_type.2.info')}</Text>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.texts.variable_input_type')}</Text>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={displayType === DISPLAY_NUMERIC} name="wiredTextInputVariableType" onCheckedChange={() => setDisplayType(DISPLAY_NUMERIC)} />
+                            <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.1')}</Text>
+                        </label>
+                        <label className="flex items-center gap-1 cursor-pointer">
+                            <Radio checked={displayType === DISPLAY_TEXTUAL} disabled={!canUseTextDisplay} name="wiredTextInputVariableType" onCheckedChange={() => setDisplayType(DISPLAY_TEXTUAL)} />
+                            <Text>{LocalizeText('wiredfurni.params.texts.variable_display_type.2')}</Text>
+                        </label>
+                        <Text small>{LocalizeText('wiredfurni.params.texts.variable_display_type.2.info')}</Text>
+                    </div>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

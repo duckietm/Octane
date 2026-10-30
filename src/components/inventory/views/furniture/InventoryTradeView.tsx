@@ -20,6 +20,7 @@ import { useInventoryTrade, useNotification } from '../../../../hooks';
 import { InventoryFurnitureSearchView } from './InventoryFurnitureSearchView';
 import { NumberInput } from '../../../../common/NumberInput';
 import { clampTradeQuantity } from '../../../../api/inventory/TradeQuantity';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface InventoryTradeViewProps {
     cancelTrade: () => void;
@@ -189,10 +190,12 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
         const summary = getTradeOfferSummary(user);
 
         return (
-            <div className="octane-trade-offer-summary flex flex-col text-xs text-black">
-                <span className="is-items">{summary.items}</span>
-                <span className="is-credits">{summary.credits}</span>
-            </div>
+            <NativeTextTree>
+                <div className="octane-trade-offer-summary flex flex-col text-xs text-black">
+                    <span className="is-items">{summary.items}</span>
+                    <span className="is-credits">{summary.credits}</span>
+                </div>
+            </NativeTextTree>
         );
     };
     const creditWarning =
@@ -201,178 +204,180 @@ export const InventoryTradeView: FC<InventoryTradeViewProps> = (props) => {
             : null;
 
     return (
-        <>
-            {tradeBlockedWarning && <div className="mb-1 rounded bg-[#ffe6b3] px-2 py-1 text-xs text-black">{tradeBlockedWarning}</div>}
-            <Grid>
-                <Column overflow="hidden" size={4}>
-                    <InventoryFurnitureSearchView groupItems={groupItems} setGroupItems={setFilteredGroupItems} />
-                    <Flex column fullHeight gap={2} justifyContent="between" overflow="hidden">
-                        <AutoGrid columnCount={3}>
-                            {filteredGroupItems &&
-                                filteredGroupItems.length > 0 &&
-                                filteredGroupItems.map((item, index) => {
-                                    const count = item.getUnlockedCount();
-
-                                    return (
-                                        <LayoutGridItem
-                                            key={index}
-                                            className={!count ? 'opacity-50 ' : ''}
-                                            component="div"
-                                            itemActive={groupItem === item}
-                                            itemCount={count}
-                                            itemImage={item.iconUrl}
-                                            itemUniqueNumber={item.stuffData.uniqueNumber}
-                                            onClick={(event) => count && setGroupItem(item)}
-                                            onDoubleClick={(event) => attemptItemOffer(1)}
-                                        >
-                                            {count > 0 && groupItem === item && (
-                                                <Button
-                                                    className="bottom-1 inset-e-1 z-[5] min-h-0 text-[8px] px-[2px] py-[1px]"
-                                                    position="absolute"
-                                                    variant="success"
-                                                    onClick={(event) => attemptItemOffer(1)}
-                                                >
-                                                    <FaChevronRight className="fa-icon" />
-                                                </Button>
-                                            )}
-                                        </LayoutGridItem>
-                                    );
-                                })}
-                        </AutoGrid>
-                        <Column alignItems="end" gap={1}>
-                            <Grid overflow="hidden">
-                                <Column overflow="hidden" size={6}>
-                                    <NumberInput
-                                        className="w-[49px] min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem] rounded-[.2rem] form-control-sm"
-                                        disabled={!groupItem}
-                                        placeholder={LocalizeText('catalog.bundlewidget.spinner.select.amount')}
-                                        value={quantity}
-                                        onChange={(event) => setQuantity(event.target.valueAsNumber)}
-                                    />
-                                </Column>
-                                <Column overflow="hidden" size={6}>
-                                    <Button className="octane-trade-button" disabled={!groupItem} variant="secondary" onClick={(event) => changeCount(groupItem.getUnlockedCount())}>
-                                        {LocalizeText('inventory.trading.areoffering')}
-                                    </Button>
-                                </Column>
-                            </Grid>
-                            <div className="badge bg-muted w-full">{groupItem ? groupItem.name : LocalizeText('catalog_selectproduct')}</div>
-                        </Column>
-                    </Flex>
-                </Column>
-                <Column overflow="hidden" size={8}>
-                    <Grid overflow="hidden">
-                        <Column overflow="hidden" size={6}>
-                            <div className="flex justify-between items-center">
-                                <Text className="octane-trade-offer-title">
-                                    <span className="octane-trade-offer-user">{LocalizeText('inventory.trading.you')}</span>{' '}
-                                    {LocalizeText('inventory.trading.areoffering')}:
-                                </Text>
-                                {getLockIcon(ownUser.accepts)}
-                            </div>
+        <NativeTextTree>
+            <>
+                {tradeBlockedWarning && <div className="mb-1 rounded bg-[#ffe6b3] px-2 py-1 text-xs text-black">{tradeBlockedWarning}</div>}
+                <Grid>
+                    <Column overflow="hidden" size={4}>
+                        <InventoryFurnitureSearchView groupItems={groupItems} setGroupItems={setFilteredGroupItems} />
+                        <Flex column fullHeight gap={2} justifyContent="between" overflow="hidden">
                             <AutoGrid columnCount={3}>
-                                {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
-                                    const item = ownUser.userItems.getWithIndex(i) || null;
+                                {filteredGroupItems &&
+                                    filteredGroupItems.length > 0 &&
+                                    filteredGroupItems.map((item, index) => {
+                                        const count = item.getUnlockedCount();
 
-                                    if (!item) return <LayoutGridItem key={i} />;
-
-                                    return (
-                                        <LayoutGridItem
-                                            key={i}
-                                            component="div"
-                                            itemActive={ownGroupItem === item}
-                                            itemCount={item.getTotalCount()}
-                                            itemImage={item.iconUrl}
-                                            itemUniqueNumber={item.stuffData.uniqueNumber}
-                                            onClick={(event) => setOwnGroupItem(item)}
-                                            onDoubleClick={(event) => removeItem(item)}
-                                        >
-                                            {ownGroupItem === item && (
-                                                <Button
-                                                    className="bottom-1 inset-s-1 z-[5] min-h-0 text-[8px] px-[2px] py-[1px]"
-                                                    position="absolute"
-                                                    variant="danger"
-                                                    onClick={(event) => removeItem(item)}
-                                                >
-                                                    <FaChevronLeft className="fa-icon" />
-                                                </Button>
-                                            )}
-                                        </LayoutGridItem>
-                                    );
-                                })}
+                                        return (
+                                            <LayoutGridItem
+                                                key={index}
+                                                className={!count ? 'opacity-50 ' : ''}
+                                                component="div"
+                                                itemActive={groupItem === item}
+                                                itemCount={count}
+                                                itemImage={item.iconUrl}
+                                                itemUniqueNumber={item.stuffData.uniqueNumber}
+                                                onClick={(event) => count && setGroupItem(item)}
+                                                onDoubleClick={(event) => attemptItemOffer(1)}
+                                            >
+                                                {count > 0 && groupItem === item && (
+                                                    <Button
+                                                        className="bottom-1 inset-e-1 z-[5] min-h-0 text-[8px] px-[2px] py-[1px]"
+                                                        position="absolute"
+                                                        variant="success"
+                                                        onClick={(event) => attemptItemOffer(1)}
+                                                    >
+                                                        <FaChevronRight className="fa-icon" />
+                                                    </Button>
+                                                )}
+                                            </LayoutGridItem>
+                                        );
+                                    })}
                             </AutoGrid>
-                            <div className="badge bg-muted w-full">{ownGroupItem ? ownGroupItem.name : LocalizeText('catalog_selectproduct')}</div>
-                            {offerSummary(ownUser)}
-                        </Column>
-                        <Column overflow="hidden" size={6}>
-                            <div className="flex justify-between items-center">
-                                <Text className="octane-trade-offer-title">
-                                    <span className="octane-trade-offer-user">{otherUser.userName}</span> {LocalizeText('inventory.trading.isoffering')}:
-                                </Text>
-                                {getLockIcon(otherUser.accepts)}
-                            </div>
-                            <AutoGrid columnCount={3}>
-                                {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
-                                    const item = otherUser.userItems.getWithIndex(i) || null;
-
-                                    if (!item) return <LayoutGridItem key={i} />;
-
-                                    return (
-                                        <LayoutGridItem
-                                            key={i}
-                                            aria-pressed={otherGroupItem === item}
-                                            component={BaseButton}
-                                            itemActive={otherGroupItem === item}
-                                            itemCount={item.getTotalCount()}
-                                            itemImage={item.iconUrl}
-                                            itemUniqueNumber={item.stuffData.uniqueNumber}
-                                            onClick={(event) => setOtherGroupItem(item)}
+                            <Column alignItems="end" gap={1}>
+                                <Grid overflow="hidden">
+                                    <Column overflow="hidden" size={6}>
+                                        <NumberInput
+                                            className="w-[49px] min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem] rounded-[.2rem] form-control-sm"
+                                            disabled={!groupItem}
+                                            placeholder={LocalizeText('catalog.bundlewidget.spinner.select.amount')}
+                                            value={quantity}
+                                            onChange={(event) => setQuantity(event.target.valueAsNumber)}
                                         />
-                                    );
-                                })}
-                            </AutoGrid>
-                            <div className="badge bg-muted w-full">{otherGroupItem ? otherGroupItem.name : LocalizeText('catalog_selectproduct')}</div>
-                            {offerSummary(otherUser)}
-                        </Column>
-                    </Grid>
-                    {creditWarning && (
-                        <div
-                            className="octane-trade-credit-warning mb-1 rounded border border-[#fc9228] bg-[#fc9228] px-[5px] py-[5px] text-xs text-black"
-                            role="status"
-                        >
-                            {creditWarning}
+                                    </Column>
+                                    <Column overflow="hidden" size={6}>
+                                        <Button className="octane-trade-button" disabled={!groupItem} variant="secondary" onClick={(event) => changeCount(groupItem.getUnlockedCount())}>
+                                            {LocalizeText('inventory.trading.areoffering')}
+                                        </Button>
+                                    </Column>
+                                </Grid>
+                                <div className="badge bg-muted w-full">{groupItem ? groupItem.name : LocalizeText('catalog_selectproduct')}</div>
+                            </Column>
+                        </Flex>
+                    </Column>
+                    <Column overflow="hidden" size={8}>
+                        <Grid overflow="hidden">
+                            <Column overflow="hidden" size={6}>
+                                <div className="flex justify-between items-center">
+                                    <Text className="octane-trade-offer-title">
+                                        <span className="octane-trade-offer-user">{LocalizeText('inventory.trading.you')}</span>{' '}
+                                        {LocalizeText('inventory.trading.areoffering')}:
+                                    </Text>
+                                    {getLockIcon(ownUser.accepts)}
+                                </div>
+                                <AutoGrid columnCount={3}>
+                                    {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
+                                        const item = ownUser.userItems.getWithIndex(i) || null;
+
+                                        if (!item) return <LayoutGridItem key={i} />;
+
+                                        return (
+                                            <LayoutGridItem
+                                                key={i}
+                                                component="div"
+                                                itemActive={ownGroupItem === item}
+                                                itemCount={item.getTotalCount()}
+                                                itemImage={item.iconUrl}
+                                                itemUniqueNumber={item.stuffData.uniqueNumber}
+                                                onClick={(event) => setOwnGroupItem(item)}
+                                                onDoubleClick={(event) => removeItem(item)}
+                                            >
+                                                {ownGroupItem === item && (
+                                                    <Button
+                                                        className="bottom-1 inset-s-1 z-[5] min-h-0 text-[8px] px-[2px] py-[1px]"
+                                                        position="absolute"
+                                                        variant="danger"
+                                                        onClick={(event) => removeItem(item)}
+                                                    >
+                                                        <FaChevronLeft className="fa-icon" />
+                                                    </Button>
+                                                )}
+                                            </LayoutGridItem>
+                                        );
+                                    })}
+                                </AutoGrid>
+                                <div className="badge bg-muted w-full">{ownGroupItem ? ownGroupItem.name : LocalizeText('catalog_selectproduct')}</div>
+                                {offerSummary(ownUser)}
+                            </Column>
+                            <Column overflow="hidden" size={6}>
+                                <div className="flex justify-between items-center">
+                                    <Text className="octane-trade-offer-title">
+                                        <span className="octane-trade-offer-user">{otherUser.userName}</span> {LocalizeText('inventory.trading.isoffering')}:
+                                    </Text>
+                                    {getLockIcon(otherUser.accepts)}
+                                </div>
+                                <AutoGrid columnCount={3}>
+                                    {Array.from(Array(MAX_ITEMS_TO_TRADE), (e, i) => {
+                                        const item = otherUser.userItems.getWithIndex(i) || null;
+
+                                        if (!item) return <LayoutGridItem key={i} />;
+
+                                        return (
+                                            <LayoutGridItem
+                                                key={i}
+                                                aria-pressed={otherGroupItem === item}
+                                                component={BaseButton}
+                                                itemActive={otherGroupItem === item}
+                                                itemCount={item.getTotalCount()}
+                                                itemImage={item.iconUrl}
+                                                itemUniqueNumber={item.stuffData.uniqueNumber}
+                                                onClick={(event) => setOtherGroupItem(item)}
+                                            />
+                                        );
+                                    })}
+                                </AutoGrid>
+                                <div className="badge bg-muted w-full">{otherGroupItem ? otherGroupItem.name : LocalizeText('catalog_selectproduct')}</div>
+                                {offerSummary(otherUser)}
+                            </Column>
+                        </Grid>
+                        {creditWarning && (
+                            <div
+                                className="octane-trade-credit-warning mb-1 rounded border border-[#fc9228] bg-[#fc9228] px-[5px] py-[5px] text-xs text-black"
+                                role="status"
+                            >
+                                {creditWarning}
+                            </div>
+                        )}
+                        <div className="flex grow! justify-between">
+                            <Button className="octane-trade-button" variant="secondary" onClick={cancelTrade}>
+                                {LocalizeText('generic.cancel')}
+                            </Button>
+                            {tradeState === TradeState.TRADING_STATE_READY && (
+                                <Button className="octane-trade-button" disabled={!ownUser.itemCount && !otherUser.itemCount} variant="secondary" onClick={progressTrade}>
+                                    {LocalizeText('inventory.trading.accept')}
+                                </Button>
+                            )}
+                            {tradeState === TradeState.TRADING_STATE_RUNNING && (
+                                <Button className="octane-trade-button" disabled={!ownUser.itemCount && !otherUser.itemCount} variant="secondary" onClick={progressTrade}>
+                                    {LocalizeText(ownUser.accepts ? 'inventory.trading.modify' : 'inventory.trading.accept')}
+                                </Button>
+                            )}
+                            {tradeState === TradeState.TRADING_STATE_COUNTDOWN && (
+                                <Button className="octane-trade-button" disabled variant="secondary">
+                                    {LocalizeText('inventory.trading.countdown', ['counter'], [countdownTick.toString()])}
+                                </Button>
+                            )}
+                            {tradeState === TradeState.TRADING_STATE_CONFIRMING && (
+                                <Button className="octane-trade-button" variant="secondary" onClick={progressTrade}>
+                                    {LocalizeText('inventory.trading.button.restore')}
+                                </Button>
+                            )}
+                            {tradeState === TradeState.TRADING_STATE_CONFIRMED && (
+                                <Button className="octane-trade-button" variant="secondary">{LocalizeText('inventory.trading.info.waiting')}</Button>
+                            )}
                         </div>
-                    )}
-                    <div className="flex grow! justify-between">
-                        <Button className="octane-trade-button" variant="secondary" onClick={cancelTrade}>
-                            {LocalizeText('generic.cancel')}
-                        </Button>
-                        {tradeState === TradeState.TRADING_STATE_READY && (
-                            <Button className="octane-trade-button" disabled={!ownUser.itemCount && !otherUser.itemCount} variant="secondary" onClick={progressTrade}>
-                                {LocalizeText('inventory.trading.accept')}
-                            </Button>
-                        )}
-                        {tradeState === TradeState.TRADING_STATE_RUNNING && (
-                            <Button className="octane-trade-button" disabled={!ownUser.itemCount && !otherUser.itemCount} variant="secondary" onClick={progressTrade}>
-                                {LocalizeText(ownUser.accepts ? 'inventory.trading.modify' : 'inventory.trading.accept')}
-                            </Button>
-                        )}
-                        {tradeState === TradeState.TRADING_STATE_COUNTDOWN && (
-                            <Button className="octane-trade-button" disabled variant="secondary">
-                                {LocalizeText('inventory.trading.countdown', ['counter'], [countdownTick.toString()])}
-                            </Button>
-                        )}
-                        {tradeState === TradeState.TRADING_STATE_CONFIRMING && (
-                            <Button className="octane-trade-button" variant="secondary" onClick={progressTrade}>
-                                {LocalizeText('inventory.trading.button.restore')}
-                            </Button>
-                        )}
-                        {tradeState === TradeState.TRADING_STATE_CONFIRMED && (
-                            <Button className="octane-trade-button" variant="secondary">{LocalizeText('inventory.trading.info.waiting')}</Button>
-                        )}
-                    </div>
-                </Column>
-            </Grid>
-        </>
+                    </Column>
+                </Grid>
+            </>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { WiredActionDefinition } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredBaseView } from '../WiredBaseView';
 import { WiredActionDelaySection } from './WiredActionDelaySection';
@@ -43,26 +44,28 @@ export const WiredActionBaseView: FC<PropsWithChildren<WiredActionBaseViewProps>
     }, [trigger, setActionDelay]);
 
     return (
-        <WiredBaseView
-            hasSpecialInput={hasSpecialInput}
-            requiresFurni={requiresFurni}
-            save={save}
-            validate={validate}
-            wiredType="action"
-            cardStyle={cardStyle}
-            footer={footer}
-            footerCollapsible={footerCollapsible}
-            selectionPreview={selectionPreview}
-            widthModifier={widthModifier}
-            allowScrolling={allowScrolling}
-            delaySection={
-                hideDelay ? null : (
-                    // Official: the delay comes after the furni picks.
-                    <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
-                )
-            }
-        >
-            {children}
-        </WiredBaseView>
+        <NativeTextTree>
+            <WiredBaseView
+                hasSpecialInput={hasSpecialInput}
+                requiresFurni={requiresFurni}
+                save={save}
+                validate={validate}
+                wiredType="action"
+                cardStyle={cardStyle}
+                footer={footer}
+                footerCollapsible={footerCollapsible}
+                selectionPreview={selectionPreview}
+                widthModifier={widthModifier}
+                allowScrolling={allowScrolling}
+                delaySection={
+                    hideDelay ? null : (
+                        // Official: the delay comes after the furni picks.
+                        <WiredActionDelaySection value={actionDelay} onChange={setActionDelay} />
+                    )
+                }
+            >
+                {children}
+            </WiredBaseView>
+        </NativeTextTree>
     );
 };

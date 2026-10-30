@@ -21,6 +21,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredVariablePicker } from '../WiredVariablePicker';
 import { buildWiredVariablePickerEntries, createCustomVariableToken, getCustomVariableItemId, IWiredVariablePickerEntry } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MAX_NAME_LENGTH = 40;
 
@@ -85,44 +86,46 @@ export const WiredExtraPointerVariableView: FC<{}> = () => {
     const validate = () => !!normalizeVariableName(variableName) && getCustomVariableItemId(accessorToken) > 0;
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 280 }}>
-            <div className="flex flex-col gap-2">
-                <div className="octane-wired__give-var-targets" role="radiogroup">
-                    {SOURCE_BUTTONS.map((button) => (
-                        <BaseButton
-                            key={button.key}
-                            type="button"
-                            aria-checked={sourceType === button.value}
-                            aria-label={button.key}
-                            role="radio"
-                            className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${sourceType === button.value ? 'is-active' : ''}`}
-                            onClick={() => setSourceType(button.value)}
-                        >
-                            <img src={button.icon} alt={button.key} />
-                        </BaseButton>
-                    ))}
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 280 }}>
+                <div className="flex flex-col gap-2">
+                    <div className="octane-wired__give-var-targets" role="radiogroup">
+                        {SOURCE_BUTTONS.map((button) => (
+                            <BaseButton
+                                key={button.key}
+                                type="button"
+                                aria-checked={sourceType === button.value}
+                                aria-label={button.key}
+                                role="radio"
+                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${sourceType === button.value ? 'is-active' : ''}`}
+                                onClick={() => setSourceType(button.value)}
+                            >
+                                <img src={button.icon} alt={button.key} />
+                            </BaseButton>
+                        ))}
+                    </div>
+                    <Text small className="whitespace-pre-line">{LocalizeText('wiredfurni.params.variables.pointer.usage_info').replace(/\\n/g, '\n')}</Text>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
+                        <OctaneInput
+                            maxLength={MAX_NAME_LENGTH}
+                            type="text"
+                            value={variableName}
+                            onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <Text>{LocalizeText('wiredfurni.params.variables.pointer.accessor')}</Text>
+                        <WiredVariablePicker
+                            entries={accessorEntries as IWiredVariablePickerEntry[]}
+                            recentScope="variable-pointer"
+                            selectedToken={accessorToken}
+                            onSelect={(entry) => setAccessorToken(entry.token)}
+                            onClear={() => setAccessorToken('')}
+                        />
+                    </div>
                 </div>
-                <Text small className="whitespace-pre-line">{LocalizeText('wiredfurni.params.variables.pointer.usage_info').replace(/\\n/g, '\n')}</Text>
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.variable_name')}</Text>
-                    <OctaneInput
-                        maxLength={MAX_NAME_LENGTH}
-                        type="text"
-                        value={variableName}
-                        onChange={(event) => setVariableName(normalizeVariableName(event.target.value))}
-                    />
-                </div>
-                <div className="flex flex-col gap-1">
-                    <Text>{LocalizeText('wiredfurni.params.variables.pointer.accessor')}</Text>
-                    <WiredVariablePicker
-                        entries={accessorEntries as IWiredVariablePickerEntry[]}
-                        recentScope="variable-pointer"
-                        selectedToken={accessorToken}
-                        onSelect={(entry) => setAccessorToken(entry.token)}
-                        onClear={() => setAccessorToken('')}
-                    />
-                </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

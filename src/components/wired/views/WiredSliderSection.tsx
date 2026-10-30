@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { formatWiredNumber, restrictWiredNumberInput, validateWiredNumberInput, WiredNumberInputError, wiredNumberInputMessage } from '../../../api/wired/WiredNumberInput';
 import { Slider, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface WiredSliderSectionProps {
     /** The section title, already localized (the official %param% already filled in). */
@@ -57,30 +58,32 @@ export const WiredSliderSection: FC<WiredSliderSectionProps> = (props) => {
     };
 
     return (
-        <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between gap-2">
-                <Text bold>{title}</Text>
-                {numberInput && (
-                    <div className="relative">
-                        <input
-                            aria-invalid={!!error}
-                            className={`form-control form-control-sm text-center octane-wired__number-input ${error ? 'is-invalid' : ''}`}
-                            inputMode="decimal"
-                            style={{ width: 64 }}
-                            type="text"
-                            value={typed}
-                            onChange={(event) => onType(event.target.value)}
-                        />
-                        {error && (
-                            <div className="octane-wired__value-input-error" role="alert">
-                                {wiredNumberInputMessage(error)}
-                            </div>
-                        )}
-                    </div>
-                )}
+        <NativeTextTree>
+            <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between gap-2">
+                    <Text bold>{title}</Text>
+                    {numberInput && (
+                        <div className="relative">
+                            <input
+                                aria-invalid={!!error}
+                                className={`form-control form-control-sm text-center octane-wired__number-input ${error ? 'is-invalid' : ''}`}
+                                inputMode="decimal"
+                                style={{ width: 64 }}
+                                type="text"
+                                value={typed}
+                                onChange={(event) => onType(event.target.value)}
+                            />
+                            {error && (
+                                <div className="octane-wired__value-input-error" role="alert">
+                                    {wiredNumberInputMessage(error)}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+                <Slider max={max} min={min} step={step} value={value} onChange={(next) => onChange(clamp(Array.isArray(next) ? next[0] : Number(next)))} />
             </div>
-            <Slider max={max} min={min} step={step} value={value} onChange={(next) => onChange(clamp(Array.isArray(next) ? next[0] : Number(next)))} />
-        </div>
+        </NativeTextTree>
     );
 };
 

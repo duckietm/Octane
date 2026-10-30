@@ -5,6 +5,7 @@ import { useFurnitureYoutubeWidget } from '../../../../hooks';
 import ReactPlayer from '../../../youtube/YoutubeReactPlayer';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsCAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface FurnitureYoutubeDisplayViewProps extends AutoGridProps {}
 
@@ -41,54 +42,56 @@ export const FurnitureYoutubeDisplayView: FC<{}> = (FurnitureYoutubeDisplayViewP
     const playing = currentVideoState === null ? true : currentVideoState === YoutubeVideoPlaybackStateEnum.PLAYING;
 
     return (
-        <OctaneCardView className="youtube-tv-widget">
-            <OctaneCardHeaderView headerText={LocalizeText('catalog.page.youtube_tvs')} onCloseClick={onClose} />
-            <OctaneCardContentView>
-                <div className="row size-full">
-                    <div className="youtube-video-container col-span-9 overflow-hidden">
-                        {videoId && videoId.length > 0 && (
-                            <ReactPlayer
-                                ref={playerRef}
-                                src={`https://www.youtube.com/watch?v=${videoId}`}
-                                width={500}
-                                height={375}
-                                playing={playing}
-                                controls={false}
-                                onPlay={handlePlay}
-                                onPause={handlePause}
-                                config={{
-                                    youtube: {
-                                        disablekb: 1,
-                                        origin: window.origin,
-                                        start: videoStart,
-                                        end: videoEnd
-                                    }
-                                }}
-                            />
-                        )}
-                        {(!videoId || videoId.length === 0) && (
-                            <div className="empty-video size-full justify-center items-center flex">{LocalizeText('widget.furni.video_viewer.no_videos')}</div>
-                        )}
+        <NativeTextTree>
+            <OctaneCardView className="youtube-tv-widget">
+                <OctaneCardHeaderView headerText={LocalizeText('catalog.page.youtube_tvs')} onCloseClick={onClose} />
+                <OctaneCardContentView>
+                    <div className="row size-full">
+                        <div className="youtube-video-container col-span-9 overflow-hidden">
+                            {videoId && videoId.length > 0 && (
+                                <ReactPlayer
+                                    ref={playerRef}
+                                    src={`https://www.youtube.com/watch?v=${videoId}`}
+                                    width={500}
+                                    height={375}
+                                    playing={playing}
+                                    controls={false}
+                                    onPlay={handlePlay}
+                                    onPause={handlePause}
+                                    config={{
+                                        youtube: {
+                                            disablekb: 1,
+                                            origin: window.origin,
+                                            start: videoStart,
+                                            end: videoEnd
+                                        }
+                                    }}
+                                />
+                            )}
+                            {(!videoId || videoId.length === 0) && (
+                                <div className="empty-video size-full justify-center items-center flex">{LocalizeText('widget.furni.video_viewer.no_videos')}</div>
+                            )}
+                        </div>
+                        <div className="playlist-container col-span-3 flex flex-col">
+                            <span className="playlist-controls justify-center flex">
+                                <BaseButton type="button" className="icon icon-youtube-prev cursor-pointer" onClick={previous} />
+                                <BaseButton type="button" className="icon icon-youtube-next cursor-pointer" onClick={next} />
+                            </span>
+                            <div className="mb-1">{LocalizeText('widget.furni.video_viewer.playlists')}</div>
+                            <AutoGrid className="mb-1" columnCount={1} columnMinHeight={100} columnMinWidth={80} overflow="auto">
+                                {playlists &&
+                                    playlists.map((entry, index) => {
+                                        return (
+                                            <LayoutGridItem component={BaseButton} type="button" key={index} itemActive={entry.video === selectedVideo} onClick={(event) => selectVideo(entry.video)}>
+                                                <b>{entry.title}</b>
+                                            </LayoutGridItem>
+                                        );
+                                    })}
+                            </AutoGrid>
+                        </div>
                     </div>
-                    <div className="playlist-container col-span-3 flex flex-col">
-                        <span className="playlist-controls justify-center flex">
-                            <BaseButton type="button" className="icon icon-youtube-prev cursor-pointer" onClick={previous} />
-                            <BaseButton type="button" className="icon icon-youtube-next cursor-pointer" onClick={next} />
-                        </span>
-                        <div className="mb-1">{LocalizeText('widget.furni.video_viewer.playlists')}</div>
-                        <AutoGrid className="mb-1" columnCount={1} columnMinHeight={100} columnMinWidth={80} overflow="auto">
-                            {playlists &&
-                                playlists.map((entry, index) => {
-                                    return (
-                                        <LayoutGridItem component={BaseButton} type="button" key={index} itemActive={entry.video === selectedVideo} onClick={(event) => selectVideo(entry.video)}>
-                                            <b>{entry.title}</b>
-                                        </LayoutGridItem>
-                                    );
-                                })}
-                        </AutoGrid>
-                    </div>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

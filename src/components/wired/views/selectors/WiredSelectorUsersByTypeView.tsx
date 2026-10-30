@@ -4,6 +4,7 @@ import { Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const USER_TYPES = [1, 2, 4];
 
@@ -25,19 +26,21 @@ export const WiredSelectorUsersByTypeView: FC<{}> = () => {
     }, [userType, setIntParams]);
 
     return (
-        <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.usertype')}</Text>
-                    {USER_TYPES.map((value) => (
-                        <label key={value} className="flex items-center gap-1">
-                            <Checkbox checked={(userType & value) !== 0} name="usersByTypeSelector" onCheckedChange={() => setUserType((current) => current ^ value)} />
-                            <Text>{LocalizeText(`wiredfurni.params.usertype.${value}`)}</Text>
-                        </label>
-                    ))}
-                </div>
+        <NativeTextTree>
+            <WiredSelectorBaseView hasSpecialInput={true} requiresFurni={0} save={save} hideDelay={true} cardStyle={{ width: 400 }}>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.usertype')}</Text>
+                        {USER_TYPES.map((value) => (
+                            <label key={value} className="flex items-center gap-1">
+                                <Checkbox checked={(userType & value) !== 0} name="usersByTypeSelector" onCheckedChange={() => setUserType((current) => current ^ value)} />
+                                <Text>{LocalizeText(`wiredfurni.params.usertype.${value}`)}</Text>
+                            </label>
+                        ))}
+                    </div>
 
-            </div>
-        </WiredSelectorBaseView>
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

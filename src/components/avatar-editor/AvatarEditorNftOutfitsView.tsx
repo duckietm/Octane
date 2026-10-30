@@ -1,6 +1,7 @@
 import { CSSProperties, FC } from 'react';
 import { localizeWithFallback } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { ToggleButton } from '../../common/ToggleButton';
 import { formatNftOutfitLabel, getNftCollectionStyle, NftOutfit } from '../../hooks';
 
@@ -39,25 +40,27 @@ export const AvatarEditorNftOutfitsView: FC<AvatarEditorNftOutfitsViewProps> = (
     const chooseText = localizeWithFallback('avatareditor.nfts.choose', 'Click to choose');
 
     return (
-        <div className="octane-avatar-editor-nfts">
-            <span className="octane-avatar-editor-nfts-title">{localizeWithFallback('avatareditor.nfts.title', 'Avatar Collectibles')}</span>
-            <span className="octane-avatar-editor-nfts-choose">{chooseText}</span>
-            <div className="octane-avatar-editor-nfts-grid">
-                {outfits.map((outfit) => (
-                    <ToggleButton
-                        key={outfit.id}
-                        type="button"
-                        className={`octane-avatar-editor-nft-outfit${wornOutfit?.id === outfit.id ? ' is-worn' : ''}`}
-                        pressed={selectedOutfit?.id === outfit.id}
-                        aria-label={formatNftOutfitLabel(collectionName(outfit), outfit)}
-                        style={frameStyle(outfit)}
-                        onClick={() => onSelect?.(outfit)}
-                    >
-                        <LayoutAvatarImageView direction={4} figure={outfit.figure} gender={outfit.gender} fit small />
-                    </ToggleButton>
-                ))}
+        <NativeTextTree>
+            <div className="octane-avatar-editor-nfts">
+                <span className="octane-avatar-editor-nfts-title">{localizeWithFallback('avatareditor.nfts.title', 'Avatar Collectibles')}</span>
+                <span className="octane-avatar-editor-nfts-choose">{chooseText}</span>
+                <div className="octane-avatar-editor-nfts-grid">
+                    {outfits.map((outfit) => (
+                        <ToggleButton
+                            key={outfit.id}
+                            type="button"
+                            className={`octane-avatar-editor-nft-outfit${wornOutfit?.id === outfit.id ? ' is-worn' : ''}`}
+                            pressed={selectedOutfit?.id === outfit.id}
+                            aria-label={formatNftOutfitLabel(collectionName(outfit), outfit)}
+                            style={frameStyle(outfit)}
+                            onClick={() => onSelect?.(outfit)}
+                        >
+                            <LayoutAvatarImageView direction={4} figure={outfit.figure} gender={outfit.gender} fit small />
+                        </ToggleButton>
+                    ))}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -68,8 +71,10 @@ export const AvatarEditorNftOutfitInfoView: FC<{ outfit: NftOutfit | null }> = (
     if (!outfit || !style) return null;
 
     return (
-        <div className="octane-avatar-editor-nft-info">
-            <span style={{ color: style.textColor }}>{formatNftOutfitLabel(collectionName(outfit), outfit)}</span>
-        </div>
+        <NativeTextTree>
+            <div className="octane-avatar-editor-nft-info">
+                <span style={{ color: style.textColor }}>{formatNftOutfitLabel(collectionName(outfit), outfit)}</span>
+            </div>
+        </NativeTextTree>
     );
 };

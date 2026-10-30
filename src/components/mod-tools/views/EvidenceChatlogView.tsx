@@ -1,5 +1,6 @@
 import { FC, useMemo, useState } from 'react';
 import { localizeWithFallback } from '../../../api';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { Native0Frame, Native0Input, Native0Text } from '../native/NativeWindow0';
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { chatlineMatches } from './chatlogFilter';
@@ -56,30 +57,32 @@ export const EvidenceChatlogView: FC<EvidenceChatlogProps> = ({ kind, id, x, y, 
 
     // the list is 420 wide at the default 480 while its scroller (at 451) shows, 22px wider (443) while the scroller is hidden
     return (
-        <NativeWindowShell type={`${kind}Chatlog` as 'userChatlog'} windowKey={`${id}`} x={x} y={y}>
-            <Native0Frame caption={evidence.caption} height={height} width={width} onClose={onClose} onResize={onResize}>
-                <Native0Input active={inputActive || currentQuery.length > 0} height={18} value={currentQuery} width={width - 80} x={0} y={0} onChange={setQuery} onFocus={() => setInputActive(true)} />
-                <Native0Text color={0xffffff} text={currentQuery.trim().length ? `${counts.kept}/${counts.total}` : `${counts.total}`} width={60} x={width - 76} y={3} />
-                <div style={{ position: 'absolute', left: 0, top: SEARCH_ROW, width: width - 12, height: listHeight - 32 }}>
-                    {/* the scroller column sits on a slightly darker blue that reaches 8px to its left; the rest of the frame is the plain frame blue */}
-                    <div className="native0-box" style={{ left: width - 37, top: 0, width: 25, height: listHeight - 32, backgroundColor: '#4184b0' }} />
-                    <EvidenceChatlogList
-                        emptyText={localizeWithFallback('modtools.native.chatlog.empty', 'No chat lines')}
-                        evidence={evidence}
-                        lineFollowsList
-                        listWidth={width - 60}
-                        noMatchText={localizeWithFallback('generic.no_results_found', 'No results found')}
-                        query={currentQuery}
-                        scrollbarHeight={listHeight - 32}
-                        scrollbarX={width - 29}
-                        viewHeight={listHeight - 35}
-                        viewportWidth={width - 37}
-                        onEnterRoom={onEnterRoom}
-                        onOpenRoomTool={onOpenRoomTool}
-                        onOpenUserInfo={onOpenUserInfo}
-                    />
-                </div>
-            </Native0Frame>
-        </NativeWindowShell>
+        <NativeTextTree>
+            <NativeWindowShell type={`${kind}Chatlog` as 'userChatlog'} windowKey={`${id}`} x={x} y={y}>
+                <Native0Frame caption={evidence.caption} height={height} width={width} onClose={onClose} onResize={onResize}>
+                    <Native0Input active={inputActive || currentQuery.length > 0} height={18} value={currentQuery} width={width - 80} x={0} y={0} onChange={setQuery} onFocus={() => setInputActive(true)} />
+                    <Native0Text color={0xffffff} text={currentQuery.trim().length ? `${counts.kept}/${counts.total}` : `${counts.total}`} width={60} x={width - 76} y={3} />
+                    <div style={{ position: 'absolute', left: 0, top: SEARCH_ROW, width: width - 12, height: listHeight - 32 }}>
+                        {/* the scroller column sits on a slightly darker blue that reaches 8px to its left; the rest of the frame is the plain frame blue */}
+                        <div className="native0-box" style={{ left: width - 37, top: 0, width: 25, height: listHeight - 32, backgroundColor: '#4184b0' }} />
+                        <EvidenceChatlogList
+                            emptyText={localizeWithFallback('modtools.native.chatlog.empty', 'No chat lines')}
+                            evidence={evidence}
+                            lineFollowsList
+                            listWidth={width - 60}
+                            noMatchText={localizeWithFallback('generic.no_results_found', 'No results found')}
+                            query={currentQuery}
+                            scrollbarHeight={listHeight - 32}
+                            scrollbarX={width - 29}
+                            viewHeight={listHeight - 35}
+                            viewportWidth={width - 37}
+                            onEnterRoom={onEnterRoom}
+                            onOpenRoomTool={onOpenRoomTool}
+                            onOpenUserInfo={onOpenUserInfo}
+                        />
+                    </div>
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

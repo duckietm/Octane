@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { LocalizeText } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface FriendsRoomInviteViewProps {
     selectedFriendsIds: number[];
@@ -13,41 +14,43 @@ export const FriendsRoomInviteView: FC<FriendsRoomInviteViewProps> = (props) => 
     const [roomInviteMessage, setRoomInviteMessage] = useState<string>('');
 
     return (
-        <OctaneCardView
-            className="octane-friends-room-invite min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
-            theme="primary-slim"
-            uniqueKey="octane-friends-room-invite"
-            isResizable={false}
-        >
-            <OctaneCardHeaderView headerText={LocalizeText('friendlist.invite.title')} onCloseClick={onCloseClick} />
-            <OctaneCardContentView className="octane-friends-room-invite-content text-black" gap={2}>
-                <Text className="octane-friends-room-invite-summary">
-                    {LocalizeText('friendlist.invite.summary', ['count'], [selectedFriendsIds.length.toString()])}
-                </Text>
-                <textarea
-                    className="octane-friends-room-invite-textarea"
-                    maxLength={255}
-                    value={roomInviteMessage}
-                    onChange={(event) => setRoomInviteMessage(event.target.value)}
-                ></textarea>
-                <Text center className="octane-friends-room-invite-note">
-                    {LocalizeText('friendlist.invite.note')}
-                </Text>
-                {/* AIR room_invite_confirm: style 0 button_thick (send) and button (cancel), both grey. */}
-                <div className="octane-friends-room-invite-actions">
-                    <Button
-                        fullWidth
-                        disabled={roomInviteMessage.length === 0 || selectedFriendsIds.length === 0}
-                        variant="secondary"
-                        onClick={() => sendRoomInvite(roomInviteMessage)}
-                    >
-                        {LocalizeText('friendlist.invite.send')}
-                    </Button>
-                    <Button fullWidth variant="secondary" onClick={onCloseClick}>
-                        {LocalizeText('generic.cancel')}
-                    </Button>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-friends-room-invite min-w-0 max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]"
+                theme="primary-slim"
+                uniqueKey="octane-friends-room-invite"
+                isResizable={false}
+            >
+                <OctaneCardHeaderView headerText={LocalizeText('friendlist.invite.title')} onCloseClick={onCloseClick} />
+                <OctaneCardContentView className="octane-friends-room-invite-content text-black" gap={2}>
+                    <Text className="octane-friends-room-invite-summary">
+                        {LocalizeText('friendlist.invite.summary', ['count'], [selectedFriendsIds.length.toString()])}
+                    </Text>
+                    <textarea
+                        className="octane-friends-room-invite-textarea"
+                        maxLength={255}
+                        value={roomInviteMessage}
+                        onChange={(event) => setRoomInviteMessage(event.target.value)}
+                    ></textarea>
+                    <Text center className="octane-friends-room-invite-note">
+                        {LocalizeText('friendlist.invite.note')}
+                    </Text>
+                    {/* AIR room_invite_confirm: style 0 button_thick (send) and button (cancel), both grey. */}
+                    <div className="octane-friends-room-invite-actions">
+                        <Button
+                            fullWidth
+                            disabled={roomInviteMessage.length === 0 || selectedFriendsIds.length === 0}
+                            variant="secondary"
+                            onClick={() => sendRoomInvite(roomInviteMessage)}
+                        >
+                            {LocalizeText('friendlist.invite.send')}
+                        </Button>
+                        <Button fullWidth variant="secondary" onClick={onCloseClick}>
+                            {LocalizeText('generic.cancel')}
+                        </Button>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

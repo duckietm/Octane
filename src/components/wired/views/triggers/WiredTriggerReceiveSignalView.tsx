@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { localizeWithFallback, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
@@ -35,18 +36,20 @@ export const WiredTriggerReceiveSignalView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredTriggerBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={FURNI_SOURCE_OPTIONS} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex items-center justify-between">
-                <Text small>{localizeWithFallback('wiredfurni.params.signal.senders_connected', 'Senders connected')}</Text>
-                <Text bold small>
-                    {senderCount}
-                </Text>
-            </div>
-        </WiredTriggerBaseView>
+        <NativeTextTree>
+            <WiredTriggerBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} furniSources={FURNI_SOURCE_OPTIONS} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex items-center justify-between">
+                    <Text small>{localizeWithFallback('wiredfurni.params.signal.senders_connected', 'Senders connected')}</Text>
+                    <Text bold small>
+                        {senderCount}
+                    </Text>
+                </div>
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

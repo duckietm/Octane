@@ -18,6 +18,7 @@ import { Button, LayoutColorSwatchView, LayoutFurniImageView, OctaneCardContentV
 import { useFurnitureRecolorWidget } from '../../../../hooks';
 import { Select } from '../../../../common/Select';
 import '../../../../css/room/FurniWindowsCAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const WHITE = 0xffffff;
 
@@ -95,45 +96,47 @@ export const FurnitureRecolorView: FC = () =>
     };
 
     return (
-        <OctaneCardView className="octane-furni-recolor" theme="primary-slim">
-            <OctaneCardHeaderView headerText={localizeWithFallback('furniture.recolor.title', 'Recolor furniture')} onCloseClick={close} />
-            <OctaneCardContentView gap={2}>
-                <Text bold small>
-                    {localizeWithFallback('furniture.recolor.preview', 'Preview')}
-                </Text>
-                <div className="flex items-center justify-center gap-3">
-                    <div className="octane-color-preview-box">
-                        <LayoutFurniImageView productClassId={typeId} productType="s" recolor={current === NO_RECOLOR ? WHITE : current} />
+        <NativeTextTree>
+            <OctaneCardView className="octane-furni-recolor" theme="primary-slim">
+                <OctaneCardHeaderView headerText={localizeWithFallback('furniture.recolor.title', 'Recolor furniture')} onCloseClick={close} />
+                <OctaneCardContentView gap={2}>
+                    <Text bold small>
+                        {localizeWithFallback('furniture.recolor.preview', 'Preview')}
+                    </Text>
+                    <div className="flex items-center justify-center gap-3">
+                        <div className="octane-color-preview-box">
+                            <LayoutFurniImageView productClassId={typeId} productType="s" recolor={current === NO_RECOLOR ? WHITE : current} />
+                        </div>
+                        <FaArrowRight className="octane-color-preview-arrow" />
+                        <div className="octane-color-preview-box">
+                            <LayoutFurniImageView productClassId={typeId} productType="s" recolor={target === NO_RECOLOR ? WHITE : target} />
+                        </div>
                     </div>
-                    <FaArrowRight className="octane-color-preview-arrow" />
-                    <div className="octane-color-preview-box">
-                        <LayoutFurniImageView productClassId={typeId} productType="s" recolor={target === NO_RECOLOR ? WHITE : target} />
+                    <Text bold small>
+                        {localizeWithFallback('furniture.recolor.palette', 'Palette')}
+                    </Text>
+                    <div className="octane-color-swatch-grid">{swatches(palette)}</div>
+                    <Text bold small>
+                        {localizeWithFallback('furniture.recolor.room_colors', 'Colors in this room')}
+                    </Text>
+                    <div className="octane-color-swatch-grid is-room">{swatches(roomColors)}</div>
+                    <Text bold small>
+                        {localizeWithFallback('furniture.recolor.scope', 'Apply to:')}
+                    </Text>
+                    <div className="flex items-center gap-2">
+                        <Select className="form-select form-select-sm grow" value={scope} onChange={(event) => setScope(Number(event.target.value))}>
+                            {RECOLOR_SCOPES.map((value) => (
+                                <option key={value} value={value}>
+                                    {localizeWithFallback(`furniture.recolor.scope.${value}`, SCOPE_FALLBACKS[value])}
+                                </option>
+                            ))}
+                        </Select>
+                        <Button disabled={target === NO_RECOLOR || (target === current && scope === RECOLOR_SCOPE_THIS)} variant="success" onClick={apply}>
+                            {localizeWithFallback('furniture.recolor.apply', 'Apply')}
+                        </Button>
                     </div>
-                </div>
-                <Text bold small>
-                    {localizeWithFallback('furniture.recolor.palette', 'Palette')}
-                </Text>
-                <div className="octane-color-swatch-grid">{swatches(palette)}</div>
-                <Text bold small>
-                    {localizeWithFallback('furniture.recolor.room_colors', 'Colors in this room')}
-                </Text>
-                <div className="octane-color-swatch-grid is-room">{swatches(roomColors)}</div>
-                <Text bold small>
-                    {localizeWithFallback('furniture.recolor.scope', 'Apply to:')}
-                </Text>
-                <div className="flex items-center gap-2">
-                    <Select className="form-select form-select-sm grow" value={scope} onChange={(event) => setScope(Number(event.target.value))}>
-                        {RECOLOR_SCOPES.map((value) => (
-                            <option key={value} value={value}>
-                                {localizeWithFallback(`furniture.recolor.scope.${value}`, SCOPE_FALLBACKS[value])}
-                            </option>
-                        ))}
-                    </Select>
-                    <Button disabled={target === NO_RECOLOR || (target === current && scope === RECOLOR_SCOPE_THIS)} variant="success" onClick={apply}>
-                        {localizeWithFallback('furniture.recolor.apply', 'Apply')}
-                    </Button>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

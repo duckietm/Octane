@@ -1,6 +1,7 @@
 import { FC, useEffect, useRef } from 'react';
 import { localizeWithFallback } from '../../../../api';
 import { LayoutAvatarImageView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { MentionSuggestion } from '../../../../hooks/rooms/widgets/useChatMentions.helpers';
 
 interface ChatInputMentionSelectorViewProps {
@@ -30,47 +31,49 @@ export const ChatInputMentionSelectorView: FC<ChatInputMentionSelectorViewProps>
     if (suggestions.length === 0) return null;
 
     return (
-        <div className="chat-input-mention-popover">
-            <div className="chat-input-mention-popover-header">
-                <span className="chat-input-mention-popover-header-dot" aria-hidden />
-                <span>{localizeWithFallback('mentions.selector.title', '@ Mention')}</span>
-            </div>
-            <div ref={listRef} className="chat-input-mention-popover-list has-classic-scrollbar" role="listbox" aria-label={localizeWithFallback('mentions.selector.title', '@ Mention')}>
-                {suggestions.map((suggestion, index) => {
-                    const isSelected = index === selectedIndex;
-                    const rowClass = ['chat-input-mention-row', isSelected ? 'is-selected' : ''].filter(Boolean).join(' ');
+        <NativeTextTree>
+            <div className="chat-input-mention-popover">
+                <div className="chat-input-mention-popover-header">
+                    <span className="chat-input-mention-popover-header-dot" aria-hidden />
+                    <span>{localizeWithFallback('mentions.selector.title', '@ Mention')}</span>
+                </div>
+                <div ref={listRef} className="chat-input-mention-popover-list has-classic-scrollbar" role="listbox" aria-label={localizeWithFallback('mentions.selector.title', '@ Mention')}>
+                    {suggestions.map((suggestion, index) => {
+                        const isSelected = index === selectedIndex;
+                        const rowClass = ['chat-input-mention-row', isSelected ? 'is-selected' : ''].filter(Boolean).join(' ');
 
-                    return (
-                        // mousedown, not click: the chat input must keep its focus while the pick is made.
-                        <div
-                            key={suggestion.key}
-                            className={rowClass}
-                            role="option"
-                            aria-selected={isSelected}
-                            onMouseDown={(event) => {
-                                event.preventDefault();
-                                onSelect(suggestion);
-                            }}
-                            onMouseEnter={() => onHover(index)}
-                        >
-                            {suggestion.kind === 'user' && suggestion.figure ? (
-                                <div className="chat-input-mention-row-tile">
-                                    <LayoutAvatarImageView figure={suggestion.figure} direction={2} headOnly />
+                        return (
+                            // mousedown, not click: the chat input must keep its focus while the pick is made.
+                            <div
+                                key={suggestion.key}
+                                className={rowClass}
+                                role="option"
+                                aria-selected={isSelected}
+                                onMouseDown={(event) => {
+                                    event.preventDefault();
+                                    onSelect(suggestion);
+                                }}
+                                onMouseEnter={() => onHover(index)}
+                            >
+                                {suggestion.kind === 'user' && suggestion.figure ? (
+                                    <div className="chat-input-mention-row-tile">
+                                        <LayoutAvatarImageView figure={suggestion.figure} direction={2} headOnly />
+                                    </div>
+                                ) : (
+                                    <div className="chat-input-mention-row-tile is-alias">@</div>
+                                )}
+                                <div className="chat-input-mention-row-body">
+                                    <span className="chat-input-mention-row-name">@{suggestion.name}</span>
+                                    {suggestion.description && <span className="chat-input-mention-row-desc">{suggestion.description}</span>}
                                 </div>
-                            ) : (
-                                <div className="chat-input-mention-row-tile is-alias">@</div>
-                            )}
-                            <div className="chat-input-mention-row-body">
-                                <span className="chat-input-mention-row-name">@{suggestion.name}</span>
-                                {suggestion.description && <span className="chat-input-mention-row-desc">{suggestion.description}</span>}
+                                <span className={`chat-input-mention-row-kind ${suggestion.kind === 'alias' ? 'is-alias' : ''}`}>
+                                    {suggestion.kind === 'alias' ? localizeWithFallback('mentions.selector.kind.alias', 'Broadcast') : localizeWithFallback('mentions.selector.kind.user', 'User')}
+                                </span>
                             </div>
-                            <span className={`chat-input-mention-row-kind ${suggestion.kind === 'alias' ? 'is-alias' : ''}`}>
-                                {suggestion.kind === 'alias' ? localizeWithFallback('mentions.selector.kind.alias', 'Broadcast') : localizeWithFallback('mentions.selector.kind.user', 'User')}
-                            </span>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

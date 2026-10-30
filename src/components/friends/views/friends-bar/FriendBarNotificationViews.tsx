@@ -4,6 +4,7 @@ import { LocalizeBadgeName, LocalizeText, localizeWithFallback } from '../../../
 import eventIcon from '../../../../assets/images/friends/air/friend_bar_event_notification_icon.png';
 import gameIcon from '../../../../assets/images/friends/air/game_center_snowball_notification_icon.png';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { FriendBarNotification, FriendNotificationType } from '../../../../hooks/friends/friendBarNotifications.helpers';
 
 export const isGameNotification = (notification: FriendBarNotification): boolean => notification.type === FriendNotificationType.PLAYING_GAME;
@@ -53,23 +54,25 @@ export const FriendBarNotificationIconView: FC<{ notification: FriendBarNotifica
     const game = isGameNotification(notification);
 
     return (
-        <motion.div
-            className="friend-bar-notification-icon-slot"
-            initial={{ y: -32, opacity: 0 }}
-            animate={{ y: 0, opacity: 1, transition: { type: 'spring', stiffness: 520, damping: 14, mass: 0.8 } }}
-            exit={{ opacity: 0, transition: { duration: 0.1 } }}
-        >
-            <BaseButton
-                className={`friend-bar-notification-icon ${game ? 'icon-game' : 'icon-notify'}`}
-                aria-label={texts.message ? `${texts.title} ${texts.message}` : texts.title}
-                onClick={(event) => {
-                    event.stopPropagation();
-                    onClick();
-                }}
+        <NativeTextTree>
+            <motion.div
+                className="friend-bar-notification-icon-slot"
+                initial={{ y: -32, opacity: 0 }}
+                animate={{ y: 0, opacity: 1, transition: { type: 'spring', stiffness: 520, damping: 14, mass: 0.8 } }}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
-                <img src={game ? gameIcon : eventIcon} alt="" />
-            </BaseButton>
-        </motion.div>
+                <BaseButton
+                    className={`friend-bar-notification-icon ${game ? 'icon-game' : 'icon-notify'}`}
+                    aria-label={texts.message ? `${texts.title} ${texts.message}` : texts.title}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onClick();
+                    }}
+                >
+                    <img src={game ? gameIcon : eventIcon} alt="" />
+                </BaseButton>
+            </motion.div>
+        </NativeTextTree>
     );
 };
 
@@ -78,9 +81,11 @@ export const FriendBarNotificationPieceView: FC<{ notification: FriendBarNotific
     const texts = friendNotificationTexts(notification);
 
     return (
-        <div className="friend-bar-notification-piece" data-type={notification.type}>
-            <div className="friend-bar-notification-title">{texts.title}</div>
-            <div className="friend-bar-notification-message">{texts.message}</div>
-        </div>
+        <NativeTextTree>
+            <div className="friend-bar-notification-piece" data-type={notification.type}>
+                <div className="friend-bar-notification-title">{texts.title}</div>
+                <div className="friend-bar-notification-message">{texts.message}</div>
+            </div>
+        </NativeTextTree>
     );
 };

@@ -5,6 +5,7 @@ import { Button, DraggableWindowPosition, LayoutBadgeImageView, LayoutCurrencyIc
 import { useDailyTasks } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** One row of the official daily tasks list (task_template 402x119). */
 const DailyTaskRowView: FC<{ task: DailyTaskData; onClaim: (task: DailyTaskData) => void }> = ({ task, onClaim }) => {
@@ -16,69 +17,71 @@ const DailyTaskRowView: FC<{ task: DailyTaskData; onClaim: (task: DailyTaskData)
     useEffect(() => setClaiming(false), [task.status]);
 
     return (
-        <div className={`octane-daily-task octane-daily-task-${style}`}>
-            <div className="octane-daily-task-left">
-                <div className="octane-daily-task-title">
-                    <span>{localizeWithFallback(task.nameLocalizationKey, task.taskCode)}</span>
-                    <Hint content={localizeWithFallback(task.hintLocalizationKey, '')}>
-                        <span aria-label={localizeWithFallback(task.hintLocalizationKey, '')} className="octane-daily-task-hint" role="img">
-                            ?
-                        </span>
-                    </Hint>
+        <NativeTextTree>
+            <div className={`octane-daily-task octane-daily-task-${style}`}>
+                <div className="octane-daily-task-left">
+                    <div className="octane-daily-task-title">
+                        <span>{localizeWithFallback(task.nameLocalizationKey, task.taskCode)}</span>
+                        <Hint content={localizeWithFallback(task.hintLocalizationKey, '')}>
+                            <span aria-label={localizeWithFallback(task.hintLocalizationKey, '')} className="octane-daily-task-hint" role="img">
+                                ?
+                            </span>
+                        </Hint>
+                    </div>
+                    <div className="octane-daily-task-body">
+                        <img className="octane-daily-task-image" src={getDailyTaskImageUrl(task)} alt="" draggable={false} />
+                        <Text className="octane-daily-task-desc">{localizeWithFallback(task.descriptionLocalizationKey, '')}</Text>
+                    </div>
+                    {inProgress && (
+                        <LayoutProgressBar
+                            className="octane-daily-task-progress"
+                            progress={getDailyTaskProgressPercent(task.repeats, task.requiredRepeats)}
+                            maxProgress={100}
+                            text={localizeWithFallback(
+                                'quests.tracker.progress',
+                                '%progress% / %limit%',
+                                ['progress', 'limit'],
+                                [String(task.repeats), String(task.requiredRepeats)]
+                            )}
+                        />
+                    )}
+                    {!inProgress && <div className="octane-daily-task-complete">{localizeWithFallback('dailytasks.task.complete', 'Task completed!')}</div>}
                 </div>
-                <div className="octane-daily-task-body">
-                    <img className="octane-daily-task-image" src={getDailyTaskImageUrl(task)} alt="" draggable={false} />
-                    <Text className="octane-daily-task-desc">{localizeWithFallback(task.descriptionLocalizationKey, '')}</Text>
-                </div>
-                {inProgress && (
-                    <LayoutProgressBar
-                        className="octane-daily-task-progress"
-                        progress={getDailyTaskProgressPercent(task.repeats, task.requiredRepeats)}
-                        maxProgress={100}
-                        text={localizeWithFallback(
-                            'quests.tracker.progress',
-                            '%progress% / %limit%',
-                            ['progress', 'limit'],
-                            [String(task.repeats), String(task.requiredRepeats)]
-                        )}
-                    />
-                )}
-                {!inProgress && <div className="octane-daily-task-complete">{localizeWithFallback('dailytasks.task.complete', 'Task completed!')}</div>}
-            </div>
-            <div className="octane-daily-task-right">
-                <div className="octane-daily-task-reward-title">{localizeWithFallback('dailytasks.reward', 'Reward')}</div>
-                <div className="octane-daily-task-rewards">
-                    {task.rewards.map((reward, index) => {
-                        const icon = getDailyTaskRewardIcon(reward);
+                <div className="octane-daily-task-right">
+                    <div className="octane-daily-task-reward-title">{localizeWithFallback('dailytasks.reward', 'Reward')}</div>
+                    <div className="octane-daily-task-rewards">
+                        {task.rewards.map((reward, index) => {
+                            const icon = getDailyTaskRewardIcon(reward);
 
-                        return (
-                            <div key={index} className="octane-daily-task-reward">
-                                {icon?.kind === 'currency' && <LayoutCurrencyIcon type={icon.type} className="octane-daily-task-reward-icon" />}
-                                {icon?.kind === 'badge' && <LayoutBadgeImageView badgeCode={icon.code} />}
-                                {icon?.kind === 'furni' && (
-                                    <LayoutFurniIconImageView productType={icon.productType} productClassId={icon.classId} className="octane-daily-task-reward-icon" />
-                                )}
-                                {!icon && <div className="octane-daily-task-reward-generic">{reward.rewardTypeId}</div>}
-                                {reward.amount > 1 && <span className="octane-daily-task-reward-amount">x{reward.amount}</span>}
-                            </div>
-                        );
-                    })}
+                            return (
+                                <div key={index} className="octane-daily-task-reward">
+                                    {icon?.kind === 'currency' && <LayoutCurrencyIcon type={icon.type} className="octane-daily-task-reward-icon" />}
+                                    {icon?.kind === 'badge' && <LayoutBadgeImageView badgeCode={icon.code} />}
+                                    {icon?.kind === 'furni' && (
+                                        <LayoutFurniIconImageView productType={icon.productType} productClassId={icon.classId} className="octane-daily-task-reward-icon" />
+                                    )}
+                                    {!icon && <div className="octane-daily-task-reward-generic">{reward.rewardTypeId}</div>}
+                                    {reward.amount > 1 && <span className="octane-daily-task-reward-amount">x{reward.amount}</span>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {!inProgress && (
+                        <Button
+                            variant="success"
+                            className="octane-daily-task-claim"
+                            disabled={claimed || claiming}
+                            onClick={() => {
+                                setClaiming(true);
+                                onClaim(task);
+                            }}
+                        >
+                            {claimed ? localizeWithFallback('dailytasks.claimed', 'Claimed') : localizeWithFallback('dailytasks.claim', 'Claim')}
+                        </Button>
+                    )}
                 </div>
-                {!inProgress && (
-                    <Button
-                        variant="success"
-                        className="octane-daily-task-claim"
-                        disabled={claimed || claiming}
-                        onClick={() => {
-                            setClaiming(true);
-                            onClaim(task);
-                        }}
-                    >
-                        {claimed ? localizeWithFallback('dailytasks.claimed', 'Claimed') : localizeWithFallback('dailytasks.claim', 'Claim')}
-                    </Button>
-                )}
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -145,60 +148,62 @@ export const DailyTasksView: FC<{}> = () => {
     const onClaim = (task: DailyTaskData) => claimTask && claimTask(task.taskId);
 
     return (
-        <>
-            <OctaneCard className="octane-daily-tasks" uniqueKey="daily-tasks" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
-                <OctaneCard.Header headerText={getDailyTasksWindowCaption(maxSecondsLeft)} onCloseClick={() => setIsVisible(false)} />
-                <OctaneCard.Content className="octane-daily-tasks-content">
-                    {unclaimedTasks.length > 0 && (
-                        <div className="octane-daily-tasks-extra">
-                            <Button
-                                variant="secondary"
-                                className="octane-daily-tasks-unclaimed-button"
-                                title={localizeWithFallback('dailytasks.unclaimed.tooltip', 'Rewards of earlier days you have not claimed yet')}
-                                onClick={() => setShowUnclaimed(true)}
-                            >
-                                {localizeWithFallback('dailytasks.unclaimed', 'Unclaimed rewards')}
-                            </Button>
-                        </div>
-                    )}
-                    <div className="octane-daily-tasks-list">
-                        {activeTasks.map((task) => (
-                            <DailyTaskRowView key={task.taskId} task={task} onClaim={onClaim} />
-                        ))}
-                    </div>
-                    <div className="octane-quests-hc-info">
-                        <Text className="octane-quests-hc-text">
-                            {hasClub
-                                ? localizeWithFallback('hc.has.double_duckets.info', 'You get double duckets as you are an HC member!')
-                                : localizeWithFallback('hc.get.double_duckets.info', 'Get HC membership to gain double duckets!')}
-                        </Text>
-                        {!hasClub && (
-                            <Button variant="success" className="octane-quests-get-hc" onClick={() => CreateLinkEvent('catalog/open/hc_membership')}>
-                                {localizeWithFallback('generic.get_hc', 'Get HC')}
-                            </Button>
-                        )}
-                    </div>
-                </OctaneCard.Content>
-            </OctaneCard>
-            {showUnclaimed && (
-                <OctaneCard
-                    className="octane-daily-tasks octane-daily-tasks-unclaimed"
-                    uniqueKey="daily-tasks-unclaimed"
-                    windowPosition={DraggableWindowPosition.CENTER}
-                >
-                    <OctaneCard.Header
-                        headerText={localizeWithFallback('dailytasks.unclaimed', 'Unclaimed rewards')}
-                        onCloseClick={() => setShowUnclaimed(false)}
-                    />
+        <NativeTextTree>
+            <>
+                <OctaneCard className="octane-daily-tasks" uniqueKey="daily-tasks" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={-30}>
+                    <OctaneCard.Header headerText={getDailyTasksWindowCaption(maxSecondsLeft)} onCloseClick={() => setIsVisible(false)} />
                     <OctaneCard.Content className="octane-daily-tasks-content">
+                        {unclaimedTasks.length > 0 && (
+                            <div className="octane-daily-tasks-extra">
+                                <Button
+                                    variant="secondary"
+                                    className="octane-daily-tasks-unclaimed-button"
+                                    title={localizeWithFallback('dailytasks.unclaimed.tooltip', 'Rewards of earlier days you have not claimed yet')}
+                                    onClick={() => setShowUnclaimed(true)}
+                                >
+                                    {localizeWithFallback('dailytasks.unclaimed', 'Unclaimed rewards')}
+                                </Button>
+                            </div>
+                        )}
                         <div className="octane-daily-tasks-list">
-                            {unclaimedTasks.map((task) => (
+                            {activeTasks.map((task) => (
                                 <DailyTaskRowView key={task.taskId} task={task} onClaim={onClaim} />
                             ))}
                         </div>
+                        <div className="octane-quests-hc-info">
+                            <Text className="octane-quests-hc-text">
+                                {hasClub
+                                    ? localizeWithFallback('hc.has.double_duckets.info', 'You get double duckets as you are an HC member!')
+                                    : localizeWithFallback('hc.get.double_duckets.info', 'Get HC membership to gain double duckets!')}
+                            </Text>
+                            {!hasClub && (
+                                <Button variant="success" className="octane-quests-get-hc" onClick={() => CreateLinkEvent('catalog/open/hc_membership')}>
+                                    {localizeWithFallback('generic.get_hc', 'Get HC')}
+                                </Button>
+                            )}
+                        </div>
                     </OctaneCard.Content>
                 </OctaneCard>
-            )}
-        </>
+                {showUnclaimed && (
+                    <OctaneCard
+                        className="octane-daily-tasks octane-daily-tasks-unclaimed"
+                        uniqueKey="daily-tasks-unclaimed"
+                        windowPosition={DraggableWindowPosition.CENTER}
+                    >
+                        <OctaneCard.Header
+                            headerText={localizeWithFallback('dailytasks.unclaimed', 'Unclaimed rewards')}
+                            onCloseClick={() => setShowUnclaimed(false)}
+                        />
+                        <OctaneCard.Content className="octane-daily-tasks-content">
+                            <div className="octane-daily-tasks-list">
+                                {unclaimedTasks.map((task) => (
+                                    <DailyTaskRowView key={task.taskId} task={task} onClaim={onClaim} />
+                                ))}
+                            </div>
+                        </OctaneCard.Content>
+                    </OctaneCard>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

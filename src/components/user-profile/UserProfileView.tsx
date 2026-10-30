@@ -24,6 +24,7 @@ import {
     SendMessageComposer
 } from '../../api';
 import { frankStop } from '../../assets/images/user-profile';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useIsUserBlocked, useMessageEvent, useNotification, useOctaneEvent } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { GroupsContainerView } from './GroupsContainerView';
@@ -138,61 +139,66 @@ export const UserProfileView: FC<{}> = () => {
     const cardBackgroundClass = cardBackgroundId ? `profile-card-background card-background-${cardBackgroundId}` : '';
 
     return (
-        <OctaneCard className="octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]" uniqueKey="octane-user-profile">
-            <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
-            <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
-                {isBlocked && (
-                    // Official blocked_container: the drama text, whose "event:profile/unblock" link
-                    // opens the unblock confirm (it carries no href, so it is never followed as a
-                    // page), and Frank's stop sign.
-                    <div className="octane-extended-profile__blocked-overlay">
-                        <div
-                            className="octane-extended-profile__blocked-text"
-                            dangerouslySetInnerHTML={{
-                                __html: SanitizeHtml(
-                                    localizeWithFallback('extendedprofile.blocked', 'You are blocking this user. <a href="event:profile/unblock">Unblock</a>')
-                                        .split(' href="event:profile/unblock"')
-                                        .join('')
-                                )
-                            }}
-                            onClick={(event) => {
-                                if (!(event.target as HTMLElement).closest('a')) return;
+        <NativeTextTree>
+            <OctaneCard className="octane-extended-profile-window w-[640px] h-[720px] max-w-[96vw] max-h-[92vh]" uniqueKey="octane-user-profile">
+                <OctaneCard.Header headerText={LocalizeText('extendedprofile.caption')} onCloseClick={onClose} />
+                <OctaneCard.Content className={`octane-extended-profile-window__content overflow-hidden !p-0 flex flex-col ${cardBackgroundClass}`}>
+                    {isBlocked && (
+                        // Official blocked_container: the drama text, whose "event:profile/unblock" link
+                        // opens the unblock confirm (it carries no href, so it is never followed as a
+                        // page), and Frank's stop sign.
+                        <div className="octane-extended-profile__blocked-overlay">
+                            <div
+                                className="octane-extended-profile__blocked-text"
+                                dangerouslySetInnerHTML={{
+                                    __html: SanitizeHtml(
+                                        localizeWithFallback(
+                                            'extendedprofile.blocked',
+                                            'You are blocking this user. <a href="event:profile/unblock">Unblock</a>'
+                                        )
+                                            .split(' href="event:profile/unblock"')
+                                            .join('')
+                                    )
+                                }}
+                                onClick={(event) => {
+                                    if (!(event.target as HTMLElement).closest('a')) return;
 
-                                event.preventDefault();
-                                toggleBlock();
-                            }}
-                        />
-                        <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
-                    </div>
-                )}
-                <div className="px-[10px] pt-[8px]">
-                    <UserContainerView
-                        userBadges={userBadges}
-                        userProfile={userProfile}
-                        userRelationships={userRelationships}
-                        isBlocked={isBlocked}
-                        onToggleBlock={toggleBlock}
-                        onOpenRooms={onOpenRooms}
-                        onClose={onClose}
-                    />
-                </div>
-                <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
-                    <div className="octane-extended-profile-window__panel h-full p-2">
-                        {isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId) ? (
-                            <p className="octane-extended-profile__hidden-notice">
-                                {localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}
-                            </p>
-                        ) : (
-                            <GroupsContainerView
-                                fullWidth
-                                groups={userProfile.groups}
-                                itsMe={userProfile.id === GetSessionDataManager().userId}
-                                onLeaveGroup={onLeaveGroup}
+                                    event.preventDefault();
+                                    toggleBlock();
+                                }}
                             />
-                        )}
+                            <img className="octane-extended-profile__blocked-frank" src={frankStop} alt="" draggable={false} />
+                        </div>
+                    )}
+                    <div className="px-[10px] pt-[8px]">
+                        <UserContainerView
+                            userBadges={userBadges}
+                            userProfile={userProfile}
+                            userRelationships={userRelationships}
+                            isBlocked={isBlocked}
+                            onToggleBlock={toggleBlock}
+                            onOpenRooms={onOpenRooms}
+                            onClose={onClose}
+                        />
                     </div>
-                </div>
-            </OctaneCard.Content>
-        </OctaneCard>
+                    <div className="octane-extended-profile-window__body octane-extended-profile-window__body--groups flex-1 overflow-hidden px-[10px] pb-[10px] pt-[6px]">
+                        <div className="octane-extended-profile-window__panel h-full p-2">
+                            {isProfileHiddenFromViewer(userProfile, GetSessionDataManager().userId) ? (
+                                <p className="octane-extended-profile__hidden-notice">
+                                    {localizeWithFallback('profile.full_profile_hidden', 'The full profile of this user is hidden')}
+                                </p>
+                            ) : (
+                                <GroupsContainerView
+                                    fullWidth
+                                    groups={userProfile.groups}
+                                    itsMe={userProfile.id === GetSessionDataManager().userId}
+                                    onLeaveGroup={onLeaveGroup}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

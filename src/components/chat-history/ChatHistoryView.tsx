@@ -4,6 +4,7 @@ import { ChatEntryType } from '../../api';
 import { useChatHistory } from '../../hooks';
 import { ChatHistoryBubbleView } from './ChatHistoryBubbleView';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const ChatHistoryView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -54,29 +55,31 @@ export const ChatHistoryView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <div className="octane-chat-history">
-            <div className="octane-chat-history-tray-bar" />
-            <div className="octane-chat-history-content">
-                <div ref={elementRef} className="octane-chat-history-scroll">
-                    {filteredChatHistory.map((row, index) => (
-                        <div key={`${row.id}-${index}`} className="octane-chat-history-row">
-                            <div className="octane-chat-history-time">{row.timestamp}</div>
-                            {row.type === ChatEntryType.TYPE_CHAT && (
-                                <div className="octane-chat-history-message">
-                                    <ChatHistoryBubbleView entry={row} />
-                                </div>
-                            )}
-                            {row.type === ChatEntryType.TYPE_ROOM_INFO && (
-                                <div className="octane-chat-history-room-info">
-                                    <i className="octane-icon icon-small-room" />
-                                    <span>{row.message || row.name}</span>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+        <NativeTextTree>
+            <div className="octane-chat-history">
+                <div className="octane-chat-history-tray-bar" />
+                <div className="octane-chat-history-content">
+                    <div ref={elementRef} className="octane-chat-history-scroll">
+                        {filteredChatHistory.map((row, index) => (
+                            <div key={`${row.id}-${index}`} className="octane-chat-history-row">
+                                <div className="octane-chat-history-time">{row.timestamp}</div>
+                                {row.type === ChatEntryType.TYPE_CHAT && (
+                                    <div className="octane-chat-history-message">
+                                        <ChatHistoryBubbleView entry={row} />
+                                    </div>
+                                )}
+                                {row.type === ChatEntryType.TYPE_ROOM_INFO && (
+                                    <div className="octane-chat-history-room-info">
+                                        <i className="octane-icon icon-small-room" />
+                                        <span>{row.message || row.name}</span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
+                <BaseButton className="octane-chat-history-handle" type="button" onClick={() => setIsVisible(false)} />
             </div>
-            <BaseButton className="octane-chat-history-handle" type="button" onClick={() => setIsVisible(false)} />
-        </div>
+        </NativeTextTree>
     );
 };

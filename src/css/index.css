@@ -2317,5 +2317,36 @@ body {
 /* NativeLabel: a drawn raster folds its 2 px TextField gutter away so the text sits where the CSS put it; the browser-text
    fallback (glyphs the native fonts lack) keeps its box. */
 .octane-native-label > [data-native-text]:not([data-native-text="fallback"]) {
-    margin: -2px;
+    margin: -2px !important;
+}
+
+/* A window's descendant rules (`.window-button span { position: absolute; top: 22px; left: 60px; overflow: hidden }`) also reach
+   the raster's own wrapper inside a NativeLabel and push the canvas out of view. Its geometry is the label's, never the window's. */
+.octane-native-label > [data-native-text] {
+    position: relative !important;
+    inset: auto !important;
+    float: none !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    overflow: visible !important;
+    transform: none !important;
+    z-index: auto !important;
+    opacity: 1 !important;
+    line-height: normal !important;
+    text-indent: 0 !important;
+}
+
+.octane-native-label > [data-native-text] > canvas {
+    position: static !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    transform: none !important;
 }

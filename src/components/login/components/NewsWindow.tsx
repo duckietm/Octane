@@ -3,6 +3,7 @@ import { useDraggableLoginWindow } from '../hooks/useDraggableLoginWindow';
 import { interpolate, t } from '../utils/i18n';
 import { resolveNewsImage, resolveNewsLink } from '../utils/news';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface NewsItem {
     id: number;
@@ -108,57 +109,59 @@ export const NewsWindow: FC<NewsWindowProps> = ({ newsUrl }) => {
     };
 
     return (
-        <div className={`login-news-stack${dragging ? ' is-dragging' : ''}`} ref={stackRef} style={dragStyle}>
-            <div className="news-card-wrapper" key={current.id}>
-                <div className="octane-login-card octane-card-shell octane-news-card">
-                    <div
-                        className="card-title octane-card-header-shell login-drag-handle"
-                        title={t('nitro.login.window.drag_hint', 'Drag to move, double-click to reset')}
-                        {...handleProps}
-                    >
-                        <span className="octane-card-title">{t('nitro.login.news.title', 'Hotel News')}</span>
-                    </div>
-                    <div className="card-body octane-card-content-shell news-body">
-                        {safeImageSrc && (
-                            <div className="news-image">
-                                <img
-                                    src={safeImageSrc}
-                                    alt={current.title || 'news'}
-                                    onError={(e) => {
-                                        e.currentTarget.style.display = 'none';
-                                    }}
-                                />
-                            </div>
-                        )}
-                        <div className="news-headline">{current.title}</div>
-                        {current.body && <div className="news-text">{current.body}</div>}
-
-                        <div className="news-footer">
-                            {current.linkText && safeLinkUrl ? (
-                                <BaseButton type="button" className="ok-button news-link-button" onClick={openLink}>
-                                    {current.linkText}
-                                </BaseButton>
-                            ) : (
-                                <span />
-                            )}
-
-                            {hasMany && (
-                                <div className="news-pager">
-                                    <BaseButton type="button" className="arrow-btn" aria-label="Previous news" onClick={prev}>
-                                        &lsaquo;
-                                    </BaseButton>
-                                    <span className="news-counter">
-                                        {index + 1}/{items.length}
-                                    </span>
-                                    <BaseButton type="button" className="arrow-btn" aria-label="Next news" onClick={next}>
-                                        &rsaquo;
-                                    </BaseButton>
+        <NativeTextTree>
+            <div className={`login-news-stack${dragging ? ' is-dragging' : ''}`} ref={stackRef} style={dragStyle}>
+                <div className="news-card-wrapper" key={current.id}>
+                    <div className="octane-login-card octane-card-shell octane-news-card">
+                        <div
+                            className="card-title octane-card-header-shell login-drag-handle"
+                            title={t('nitro.login.window.drag_hint', 'Drag to move, double-click to reset')}
+                            {...handleProps}
+                        >
+                            <span className="octane-card-title">{t('nitro.login.news.title', 'Hotel News')}</span>
+                        </div>
+                        <div className="card-body octane-card-content-shell news-body">
+                            {safeImageSrc && (
+                                <div className="news-image">
+                                    <img
+                                        src={safeImageSrc}
+                                        alt={current.title || 'news'}
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                        }}
+                                    />
                                 </div>
                             )}
+                            <div className="news-headline">{current.title}</div>
+                            {current.body && <div className="news-text">{current.body}</div>}
+
+                            <div className="news-footer">
+                                {current.linkText && safeLinkUrl ? (
+                                    <BaseButton type="button" className="ok-button news-link-button" onClick={openLink}>
+                                        {current.linkText}
+                                    </BaseButton>
+                                ) : (
+                                    <span />
+                                )}
+
+                                {hasMany && (
+                                    <div className="news-pager">
+                                        <BaseButton type="button" className="arrow-btn" aria-label="Previous news" onClick={prev}>
+                                            &lsaquo;
+                                        </BaseButton>
+                                        <span className="news-counter">
+                                            {index + 1}/{items.length}
+                                        </span>
+                                        <BaseButton type="button" className="arrow-btn" aria-label="Next news" onClick={next}>
+                                            &rsaquo;
+                                        </BaseButton>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

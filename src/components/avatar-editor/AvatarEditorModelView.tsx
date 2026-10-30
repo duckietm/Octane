@@ -8,6 +8,7 @@ import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const AvatarEditorModelView: FC<{
     name: string;
@@ -60,66 +61,68 @@ export const AvatarEditorModelView: FC<{
     if (!activeCategory) return null;
 
     return (
-        <div className="octane-avatar-editor-model">
-            <div className={`octane-avatar-editor-subcategories${name === AvatarEditorFigureCategory.GENERIC ? ' is-gender' : ''}`}>
-                {name === AvatarEditorFigureCategory.GENERIC && (
-                    <>
-                        <BaseButton type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.MALE)}>
-                            <AvatarEditorIcon icon="male" selected={gender === FigureDataContainer.MALE} />
-                            <span>{LocalizeText('avatareditor.generic.boy')}</span>
-                        </BaseButton>
-                        <BaseButton type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.FEMALE)}>
-                            <AvatarEditorIcon icon="female" selected={gender === FigureDataContainer.FEMALE} />
-                            <span>{LocalizeText('avatareditor.generic.girl')}</span>
-                        </BaseButton>
-                    </>
-                )}
-                {name !== AvatarEditorFigureCategory.GENERIC &&
-                    categories.map((category) => (
-                        <ToggleButton
-                            type="button"
-                            key={category.setType}
-                            className="category-item" pressed={resolvedSetType === category.setType}
-                            onClick={() => selectSet(category.setType)}
-                        >
-                            <AvatarEditorIcon icon={category.setType} selected={resolvedSetType === category.setType} />
-                        </ToggleButton>
-                    ))}
-            </div>
+        <NativeTextTree>
+            <div className="octane-avatar-editor-model">
+                <div className={`octane-avatar-editor-subcategories${name === AvatarEditorFigureCategory.GENERIC ? ' is-gender' : ''}`}>
+                    {name === AvatarEditorFigureCategory.GENERIC && (
+                        <>
+                            <BaseButton type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.MALE)}>
+                                <AvatarEditorIcon icon="male" selected={gender === FigureDataContainer.MALE} />
+                                <span>{LocalizeText('avatareditor.generic.boy')}</span>
+                            </BaseButton>
+                            <BaseButton type="button" className="category-item gender-category-item" onClick={() => setGender(AvatarFigurePartType.FEMALE)}>
+                                <AvatarEditorIcon icon="female" selected={gender === FigureDataContainer.FEMALE} />
+                                <span>{LocalizeText('avatareditor.generic.girl')}</span>
+                            </BaseButton>
+                        </>
+                    )}
+                    {name !== AvatarEditorFigureCategory.GENERIC &&
+                        categories.map((category) => (
+                            <ToggleButton
+                                type="button"
+                                key={category.setType}
+                                className="category-item" pressed={resolvedSetType === category.setType}
+                                onClick={() => selectSet(category.setType)}
+                            >
+                                <AvatarEditorIcon icon={category.setType} selected={resolvedSetType === category.setType} />
+                            </ToggleButton>
+                        ))}
+                </div>
 
-            <div className="octane-avatar-editor-parts-grid">
-                <AvatarEditorFigureSetView category={activeCategory} columnCount={6} />
-            </div>
+                <div className="octane-avatar-editor-parts-grid">
+                    <AvatarEditorFigureSetView category={activeCategory} columnCount={6} />
+                </div>
 
-            <BaseButton
-                type="button"
-                className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
-                onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
-            >
-                Advanced Color
-                <LayoutCurrencyIcon type="hc" />
-            </BaseButton>
+                <BaseButton
+                    type="button"
+                    className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
+                    onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
+                >
+                    Advanced Color
+                    <LayoutCurrencyIcon type="hc" />
+                </BaseButton>
 
-            <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
-                {maxPaletteCount >= 1 && (
-                    <div className="avatar-editor-palette-set-view">
-                        {advancedColorMode ? (
-                            <AvatarEditorAdvancedColorView category={activeCategory} paletteIndex={0} />
-                        ) : (
-                            <AvatarEditorPaletteSetView category={activeCategory} columnCount={maxPaletteCount === 2 ? 9 : 20} paletteIndex={0} />
-                        )}
-                    </div>
-                )}
-                {maxPaletteCount === 2 && (
-                    <div className="avatar-editor-palette-set-view">
-                        {advancedColorMode ? (
-                            <AvatarEditorAdvancedColorView category={activeCategory} paletteIndex={1} />
-                        ) : (
-                            <AvatarEditorPaletteSetView category={activeCategory} columnCount={9} paletteIndex={1} />
-                        )}
-                    </div>
-                )}
+                <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
+                    {maxPaletteCount >= 1 && (
+                        <div className="avatar-editor-palette-set-view">
+                            {advancedColorMode ? (
+                                <AvatarEditorAdvancedColorView category={activeCategory} paletteIndex={0} />
+                            ) : (
+                                <AvatarEditorPaletteSetView category={activeCategory} columnCount={maxPaletteCount === 2 ? 9 : 20} paletteIndex={0} />
+                            )}
+                        </div>
+                    )}
+                    {maxPaletteCount === 2 && (
+                        <div className="avatar-editor-palette-set-view">
+                            {advancedColorMode ? (
+                                <AvatarEditorAdvancedColorView category={activeCategory} paletteIndex={1} />
+                            ) : (
+                                <AvatarEditorPaletteSetView category={activeCategory} columnCount={9} paletteIndex={1} />
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

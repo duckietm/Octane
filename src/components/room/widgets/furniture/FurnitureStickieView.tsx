@@ -4,6 +4,7 @@ import { DraggableWindow, DraggableWindowPosition } from '../../../../common';
 import { useFurnitureStickieWidget } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsAAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // Must match PostItColor on the gameserver — YELLOW is the server-side default.
 const STICKIE_COLORS = ['FF9C9C', 'FFC69C', 'FFFF33', '9CFF9C', '9CFFE8', '9CCEFF', 'C69CFF', 'FF9CFF'];
@@ -45,50 +46,52 @@ export const FurnitureStickieView: FC<{}> = (props) => {
     const isThemed = isThemedStickie(type);
 
     return (
-        <DraggableWindow handleSelector=".drag-handler" windowPosition={DraggableWindowPosition.TOP_LEFT}>
-            <div
-                className={'octane-stickie ' + (isThemed ? 'octane-stickie-image stickie-' + getStickieTypeName(type) : 'stickie-plain')}
-                style={isThemed ? undefined : ({ '--stickie-color': getStickieColor(color) } as CSSProperties)}>
-                <div className="flex items-center stickie-header drag-handler">
-                    <div className="flex items-center grow! h-full">
-                        {canModify && (
-                            <>
-                                <BaseButton type="button" className="octane-stickie-image stickie-trash header-trash" onClick={trash}></BaseButton>
-                                {!isThemed && (
-                                    <>
-                                        {STICKIE_COLORS.map((stickieColor) => {
-                                            return (
-                                                <BaseButton type="button"
-                                                    key={stickieColor}
-                                                    className="stickie-color ms-1"
-                                                    style={{ backgroundColor: ColorUtils.makeColorHex(stickieColor) }}
-                                                    onClick={(event) => updateColor(stickieColor)}
-                                                />
-                                            );
-                                        })}
-                                    </>
-                                )}
-                            </>
+        <NativeTextTree>
+            <DraggableWindow handleSelector=".drag-handler" windowPosition={DraggableWindowPosition.TOP_LEFT}>
+                <div
+                    className={'octane-stickie ' + (isThemed ? 'octane-stickie-image stickie-' + getStickieTypeName(type) : 'stickie-plain')}
+                    style={isThemed ? undefined : ({ '--stickie-color': getStickieColor(color) } as CSSProperties)}>
+                    <div className="flex items-center stickie-header drag-handler">
+                        <div className="flex items-center grow! h-full">
+                            {canModify && (
+                                <>
+                                    <BaseButton type="button" className="octane-stickie-image stickie-trash header-trash" onClick={trash}></BaseButton>
+                                    {!isThemed && (
+                                        <>
+                                            {STICKIE_COLORS.map((stickieColor) => {
+                                                return (
+                                                    <BaseButton type="button"
+                                                        key={stickieColor}
+                                                        className="stickie-color ms-1"
+                                                        style={{ backgroundColor: ColorUtils.makeColorHex(stickieColor) }}
+                                                        onClick={(event) => updateColor(stickieColor)}
+                                                    />
+                                                );
+                                            })}
+                                        </>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                        <BaseButton type="button" className="flex items-center octane-stickie-image stickie-close header-close" onClick={onClose}></BaseButton>
+                    </div>
+                    <div className="stickie-context">
+                        {!isEditing || !canModify ? (
+                            <div className="context-text" onClick={(event) => canModify && setIsEditing(true)}>
+                                {text}
+                            </div>
+                        ) : (
+                            <textarea
+                                autoFocus
+                                className="context-text"
+                                defaultValue={text}
+                                tabIndex={0}
+                                onBlur={(event) => updateText(event.target.value)}
+                            ></textarea>
                         )}
                     </div>
-                    <BaseButton type="button" className="flex items-center octane-stickie-image stickie-close header-close" onClick={onClose}></BaseButton>
                 </div>
-                <div className="stickie-context">
-                    {!isEditing || !canModify ? (
-                        <div className="context-text" onClick={(event) => canModify && setIsEditing(true)}>
-                            {text}
-                        </div>
-                    ) : (
-                        <textarea
-                            autoFocus
-                            className="context-text"
-                            defaultValue={text}
-                            tabIndex={0}
-                            onBlur={(event) => updateText(event.target.value)}
-                        ></textarea>
-                    )}
-                </div>
-            </div>
-        </DraggableWindow>
+            </DraggableWindow>
+        </NativeTextTree>
     );
 };

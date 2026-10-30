@@ -75,6 +75,7 @@ import { BRANDING_NUMBER_RANGES, brandingSaveMap, infostandFurniOwnerText, infos
 import { BaseButton } from '../../../../../common/BaseButton';
 import { NumberInput } from '../../../../../common/NumberInput';
 import { Hint } from '../../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface InfoStandWidgetFurniViewProps {
     avatarInfo: AvatarInfoFurni;
@@ -113,24 +114,28 @@ const InfoStandStat: FC<{ icon: ReactNode; label: string; value: string | number
     const shown = copied ? '✓' : value;
 
     return (
-        <Hint content={`${tooltip ?? label}: ${value} - ${localizeWithFallback('infostand.copy.tooltip', 'Click to copy')}`}>
-            <BaseButton
-                type="button"
-                className={`group flex items-center gap-1 min-w-0 w-full rounded px-0.5 border-0 bg-transparent cursor-pointer transition-colors duration-100 hover:bg-[#ffffff14] active:bg-[#ffffff24] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#7ec8e3] ${iconAfter ? 'justify-end' : 'justify-start'}`}
-                onClick={() => void CopyToClipboard(String(value)).then((ok) => setCopied(ok))}
-            >
-                {!iconAfter && icon}
-                <Text small textBreak variant="white" className={`transition-colors duration-100 ${copied ? '!text-[#7ec8e3]' : 'group-hover:!text-[#7ec8e3]'}`}>
-                    {iconAfter ? `${shown}:` : `:${shown}`}
-                </Text>
-                {iconAfter && icon}
-            </BaseButton>
-        </Hint>
+        <NativeTextTree>
+            <Hint content={`${tooltip ?? label}: ${value} - ${localizeWithFallback('infostand.copy.tooltip', 'Click to copy')}`}>
+                <BaseButton
+                    type="button"
+                    className={`group flex items-center gap-1 min-w-0 w-full rounded px-0.5 border-0 bg-transparent cursor-pointer transition-colors duration-100 hover:bg-[#ffffff14] active:bg-[#ffffff24] focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#7ec8e3] ${iconAfter ? 'justify-end' : 'justify-start'}`}
+                    onClick={() => void CopyToClipboard(String(value)).then((ok) => setCopied(ok))}
+                >
+                    {!iconAfter && icon}
+                    <Text small textBreak variant="white" className={`transition-colors duration-100 ${copied ? '!text-[#7ec8e3]' : 'group-hover:!text-[#7ec8e3]'}`}>
+                        {iconAfter ? `${shown}:` : `:${shown}`}
+                    </Text>
+                    {iconAfter && icon}
+                </BaseButton>
+            </Hint>
+        </NativeTextTree>
     );
 };
 
 const StatIcon: FC<{ src: string }> = ({ src }) => (
-    <img alt="" className="shrink-0 w-[22px] h-[22px] -my-[1px] transition-[filter] duration-100 group-hover:brightness-150 group-active:brightness-125" draggable={false} src={src} style={{ imageRendering: PIXEL_ART_RENDERING }} />
+    <NativeTextTree>
+        <img alt="" className="shrink-0 w-[22px] h-[22px] -my-[1px] transition-[filter] duration-100 group-hover:brightness-150 group-active:brightness-125" draggable={false} src={src} style={{ imageRendering: PIXEL_ART_RENDERING }} />
+    </NativeTextTree>
 );
 
 function formatPlantDuration(totalSeconds: number): string {
@@ -760,567 +765,569 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = (prop
         : getWiredChestInfostandData(GetSessionDataManager().getFloorItemData(avatarInfo.spriteId)?.specialType ?? -1, avatarInfo.stuffData);
 
     return (
-        <Column alignItems="end" gap={1}>
-            <Column
-                className={
-                    'relative min-w-[190px] max-w-[190px] z-30 pointer-events-auto [box-shadow:inset_0_5px_#22222799,inset_0_-4px_#12121599] rounded ' +
-                    // Official colours (InfoStandFurniView.update): Builders Club 0x331C00, temporary (Wired) 0x142B44, else dark.
-                    infostandFurniPanelClass(avatarInfo)
-                }
-            >
-                <Column className="h-full p-[8px] overflow-auto" gap={1} overflow="visible">
-                    <div className="flex flex-col gap-1">
-                        <Flex alignItems="center" gap={1} justifyContent="between">
-                            <Text small wrap className="octane-infostand__name" variant="white">
-                                {avatarInfo.name}
-                            </Text>
-                            <FaTimes className="cursor-pointer fa-icon" onClick={onClose} />
-                        </Flex>
-                        {!!chestData?.chestName && (
-                            <Text small wrap className="octane-infostand-chest-name" variant="white">
-                                {chestData.chestName}
-                            </Text>
-                        )}
-                        <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                    </div>
-                    {!isBranded && (
+        <NativeTextTree>
+            <Column alignItems="end" gap={1}>
+                <Column
+                    className={
+                        'relative min-w-[190px] max-w-[190px] z-30 pointer-events-auto [box-shadow:inset_0_5px_#22222799,inset_0_-4px_#12121599] rounded ' +
+                        // Official colours (InfoStandFurniView.update): Builders Club 0x331C00, temporary (Wired) 0x142B44, else dark.
+                        infostandFurniPanelClass(avatarInfo)
+                    }
+                >
+                    <Column className="h-full p-[8px] overflow-auto" gap={1} overflow="visible">
                         <div className="flex flex-col gap-1">
-                            <Flex gap={1} position="relative">
-                                {avatarInfo.stuffData.isUnique && (
-                                    <div className="absolute inset-e-0">
-                                        <LayoutLimitedEditionCompactPlateView
-                                            uniqueNumber={avatarInfo.stuffData.uniqueNumber}
-                                            uniqueSeries={avatarInfo.stuffData.uniqueSeries}
-                                        />
-                                    </div>
-                                )}
-                                {avatarInfo.stuffData.rarityLevel > -1 && (
-                                    <div className="absolute inset-e-0">
-                                        <LayoutRarityLevelView level={avatarInfo.stuffData.rarityLevel} />
-                                    </div>
-                                )}
-                                {chestData?.wiredEnabled && (
-                                    <div className="octane-infostand-chest-wired absolute inset-e-0 top-0 z-[1] flex items-start gap-[3px]">
-                                        {chestData.locked && <img alt="" className="[image-rendering:pixelated]" draggable={false} src={chestLockedIcon} />}
-                                        <img
-                                            alt=""
-                                            className="[image-rendering:pixelated]"
-                                            draggable={false}
-                                            src={GetConfigurationValue<string>('catalog.asset.icon.url', '').replace('%name%', '80')}
-                                        />
-                                    </div>
-                                )}
-                                <Flex center fullWidth className="min-h-[74px] max-h-[86px] overflow-hidden">
-                                    {externalImagePhotoUrl ? (
-                                        <div className="bg-white p-[3px] pb-[9px] rounded-[2px] border border-[#00000080] shadow-[1px_2px_3px_rgba(0,0,0,0.5)]">
+                            <Flex alignItems="center" gap={1} justifyContent="between">
+                                <Text small wrap className="octane-infostand__name" variant="white">
+                                    {avatarInfo.name}
+                                </Text>
+                                <FaTimes className="cursor-pointer fa-icon" onClick={onClose} />
+                            </Flex>
+                            {!!chestData?.chestName && (
+                                <Text small wrap className="octane-infostand-chest-name" variant="white">
+                                    {chestData.chestName}
+                                </Text>
+                            )}
+                            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                        </div>
+                        {!isBranded && (
+                            <div className="flex flex-col gap-1">
+                                <Flex gap={1} position="relative">
+                                    {avatarInfo.stuffData.isUnique && (
+                                        <div className="absolute inset-e-0">
+                                            <LayoutLimitedEditionCompactPlateView
+                                                uniqueNumber={avatarInfo.stuffData.uniqueNumber}
+                                                uniqueSeries={avatarInfo.stuffData.uniqueSeries}
+                                            />
+                                        </div>
+                                    )}
+                                    {avatarInfo.stuffData.rarityLevel > -1 && (
+                                        <div className="absolute inset-e-0">
+                                            <LayoutRarityLevelView level={avatarInfo.stuffData.rarityLevel} />
+                                        </div>
+                                    )}
+                                    {chestData?.wiredEnabled && (
+                                        <div className="octane-infostand-chest-wired absolute inset-e-0 top-0 z-[1] flex items-start gap-[3px]">
+                                            {chestData.locked && <img alt="" className="[image-rendering:pixelated]" draggable={false} src={chestLockedIcon} />}
                                             <img
                                                 alt=""
+                                                className="[image-rendering:pixelated]"
                                                 draggable={false}
-                                                src={externalImagePhotoUrl}
-                                                style={{ width: 64, height: 64, objectFit: 'contain', imageRendering: PIXEL_ART_RENDERING }}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <LayoutRoomObjectImageView
-                                            category={avatarInfo.category}
-                                            objectId={avatarInfo.id}
-                                            roomId={roomSession.roomId}
-                                            style={{
-                                                maxWidth: 120,
-                                                maxHeight: 82,
-                                                backgroundSize: 'contain',
-                                                backgroundPosition: 'center',
-                                                backgroundRepeat: 'no-repeat',
-                                                imageRendering: 'auto'
-                                            }}
-                                        />
-                                    )}
-                                </Flex>
-                            </Flex>
-                            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                        </div>
-                    )}
-                    {avatarInfo.description && descriptionsEnabled && (
-                        <Column gap={1}>
-                            <Text fullWidth wrap textBreak variant="white" small>
-                                {avatarInfo.description}
-                            </Text>
-                            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                        </Column>
-                    )}
-                    {chestData && (
-                        <Column gap={1}>
-                            <Text fullWidth wrap small className="octane-infostand-chest-count" variant="white">
-                                {chestData.countText}
-                            </Text>
-                            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                        </Column>
-                    )}
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1">
-                            {showOwnerProfileIcon && <UserProfileIconView userId={avatarInfo.ownerId} />}
-                            {avatarInfo.isTemporary && (
-                                <img
-                                    alt=""
-                                    className="[image-rendering:pixelated]"
-                                    draggable={false}
-                                    src={GetConfigurationValue<string>('catalog.asset.icon.url', '').replace('%name%', '80')}
-                                />
-                            )}
-                            {avatarInfo.isBuildersClub && !avatarInfo.isTemporary && <i className="octane-icon icon-buildersclub shrink-0 scale-75" />}
-                            <Text small wrap variant="white">
-                                {infostandFurniOwnerText(avatarInfo)}
-                            </Text>
-                        </div>
-                        {avatarInfo.purchaseOfferId > 0 && (
-                            <Flex>
-                                <Text pointer small underline variant="white" onClick={(event) => processButtonAction('buy_one')}>
-                                    {LocalizeText('infostand.button.buy')}
-                                </Text>
-                            </Flex>
-                        )}
-                        {avatarInfo.isOwner && avatarInfo.expiration >= 0 && (
-                            <Text small wrap variant="white">
-                                {localizeWithFallback('infostand.rent.expiration', `Rental time remaining: ${FriendlyTime.format(avatarInfo.expiration)}`, ['time', 'TIME'], [FriendlyTime.format(avatarInfo.expiration), FriendlyTime.format(avatarInfo.expiration)])}
-                            </Text>
-                        )}
-                        {avatarInfo.isOwner && avatarInfo.expiration >= 0 && (avatarInfo.rentCouldBeUsedForBuyout || avatarInfo.purchaseCouldBeUsedForBuyout) && (
-                            <Flex gap={2}>
-                                {avatarInfo.rentCouldBeUsedForBuyout && (
-                                    <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`rent-furni/extend/${avatarInfo.id}/${avatarInfo.category}`)}>
-                                        {localizeWithFallback('infostand.button.extend', 'Extend')}
-                                    </Text>
-                                )}
-                                {avatarInfo.purchaseCouldBeUsedForBuyout && (
-                                    <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`rent-furni/buyout/${avatarInfo.id}/${avatarInfo.category}`)}>
-                                        {localizeWithFallback('infostand.button.buyout', 'Buy-out')}
-                                    </Text>
-                                )}
-                            </Flex>
-                        )}
-                        {avatarInfo.expiration < 0 && avatarInfo.rentOfferId > 0 && (
-                            <Flex>
-                                <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`catalog/open/offerId/${avatarInfo.rentOfferId}`)}>
-                                    {localizeWithFallback('infostand.button.rent', 'Rent one')}
-                                </Text>
-                            </Flex>
-                        )}
-                    </div>
-                    {(isJukeBox || isSongDisk) && (
-                        <div className="flex flex-col gap-1">
-                            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                            {songId === -1 && (
-                                <Text small wrap variant="white">
-                                    {LocalizeText('infostand.jukebox.text.not.playing')}
-                                </Text>
-                            )}
-                            {!!songName.length && (
-                                <div className="flex items-center gap-1">
-                                    <div className="icon disk-icon" />
-                                    <Text small wrap variant="white">
-                                        {songName}
-                                    </Text>
-                                </div>
-                            )}
-                            {!!songCreator.length && (
-                                <div className="flex items-center gap-1">
-                                    <div className="icon disk-creator" />
-                                    <Text small wrap variant="white">
-                                        {songCreator}
-                                    </Text>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                    <div className="flex flex-col gap-1">
-                        {isCrackable && (
-                            <>
-                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                <Text small wrap variant="white">
-                                    {LocalizeText(
-                                        'infostand.crackable_furni.hits_remaining',
-                                        ['hits', 'target'],
-                                        [(crackableHits ?? 0).toString(), (crackableTarget ?? 0).toString()]
-                                    )}
-                                </Text>
-                            </>
-                        )}
-                        {isPlant && (
-                            <>
-                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                {plantDead ? (
-                                    <Text small wrap variant="danger">
-                                        {LocalizeText('infostand.plant.dead')}
-                                    </Text>
-                                ) : (
-                                    <div className="flex flex-col gap-1">
-                                        <Flex alignItems="center" gap={1} justifyContent="between">
-                                            <Text small wrap variant="white">
-                                                {LocalizeText('infostand.plant.rewater')}
-                                            </Text>
-                                            <Text small wrap variant={plantWaterSeconds > 0 ? 'white' : 'success'}>
-                                                {plantWaterSeconds > 0
-                                                    ? formatPlantDuration(plantWaterSeconds)
-                                                    : LocalizeText('infostand.plant.ready')}
-                                            </Text>
-                                        </Flex>
-                                        <Flex alignItems="center" gap={1} justifyContent="between">
-                                            <Text small wrap variant="white">
-                                                {LocalizeText('infostand.plant.dies')}
-                                            </Text>
-                                            <Text small wrap variant={plantDeathSeconds > 0 ? 'white' : 'danger'}>
-                                                {plantDeathSeconds > 0
-                                                    ? formatPlantDuration(plantDeathSeconds)
-                                                    : LocalizeText('infostand.plant.needswater')}
-                                            </Text>
-                                        </Flex>
-                                    </div>
-                                )}
-                            </>
-                        )}
-                        {avatarInfo.groupId > 0 && (
-                            <>
-                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                <Flex pointer alignItems="center" gap={2} onClick={() => GetGroupInformation(avatarInfo.groupId)}>
-                                    {!!groupBadge && <LayoutBadgeImageView badgeCode={groupBadge} isGroup={true} />}
-                                    <Text underline variant="white">
-                                        {groupName}
-                                    </Text>
-                                </Flex>
-                            </>
-                        )}
-                        {(showLocation || showIds) && (
-                            <>
-                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                <div className="grid grid-cols-2 gap-x-3 gap-y-0">
-                                    {showLocation && (
-                                        <>
-                                            <InfoStandStat icon={<StatIcon src={statXIcon} />} label="X" value={itemLocation.x} />
-                                            <InfoStandStat iconAfter icon={<StatIcon src={statRotationIcon} />} label="Rotation (0-7)" value={furniDirection} />
-                                            <InfoStandStat icon={<StatIcon src={statYIcon} />} label="Y" value={itemLocation.y} />
-                                            <InfoStandStat iconAfter icon={<StatIcon src={statStateIcon} />} label="State" value={furniState} />
-                                            <InfoStandStat icon={<StatIcon src={statHeightIcon} />} label="H" value={itemLocation.z < 0.01 ? 0 : Number(itemLocation.z.toFixed(2))} />
-                                        </>
-                                    )}
-                                    {showIds && (
-                                        <div className={showLocation ? '' : 'col-span-2'}>
-                                            <InfoStandStat
-                                                iconAfter
-                                                icon={<StatIcon src={statIdIcon} />}
-                                                label="ID"
-                                                tooltip={`ID (Sprite ${furniTypeId})`}
-                                                value={avatarInfo.id}
+                                                src={GetConfigurationValue<string>('catalog.asset.icon.url', '').replace('%name%', '80')}
                                             />
                                         </div>
                                     )}
-                                </div>
-                            </>
-                        )}
-                        {rareValue && rareValue.points > 0 && (
-                            <>
-                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                <Flex alignItems="center" gap={2}>
-                                    <Text small variant="white">
-                                        {LocalizeText('rarevalues.infostand.label')}
-                                    </Text>
-                                    <Flex alignItems="center" gap={1}>
-                                        <Text small variant="white">
-                                            {rareValue.points}
-                                        </Text>
-                                        <LayoutCurrencyIcon type={rareValue.pointsType} />
+                                    <Flex center fullWidth className="min-h-[74px] max-h-[86px] overflow-hidden">
+                                        {externalImagePhotoUrl ? (
+                                            <div className="bg-white p-[3px] pb-[9px] rounded-[2px] border border-[#00000080] shadow-[1px_2px_3px_rgba(0,0,0,0.5)]">
+                                                <img
+                                                    alt=""
+                                                    draggable={false}
+                                                    src={externalImagePhotoUrl}
+                                                    style={{ width: 64, height: 64, objectFit: 'contain', imageRendering: PIXEL_ART_RENDERING }}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <LayoutRoomObjectImageView
+                                                category={avatarInfo.category}
+                                                objectId={avatarInfo.id}
+                                                roomId={roomSession.roomId}
+                                                style={{
+                                                    maxWidth: 120,
+                                                    maxHeight: 82,
+                                                    backgroundSize: 'contain',
+                                                    backgroundPosition: 'center',
+                                                    backgroundRepeat: 'no-repeat',
+                                                    imageRendering: 'auto'
+                                                }}
+                                            />
+                                        )}
                                     </Flex>
                                 </Flex>
-                            </>
-                        )}
-                        {(showEditFurni || showBuildtools) && (
-                            <>
                                 <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                {(showEditFurni || showBuildtools) && (
-                                    <div className="flex gap-1 w-full">
-                                        {showEditFurni && (
-                                            <BaseButton
-                                                className="flex-1 min-w-0 text-white text-xs bg-[#418db0] hover:bg-[#3789a8] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
-                                                onClick={() => {
-                                                    CreateLinkEvent('furni-editor/show');
-
-                                                    if (furniTypeId !== '?') window.dispatchEvent(new CustomEvent('furni-editor:open', { detail: { spriteId: furniTypeId } }));
-                                                }}
-                                            >
-                                                {localizeWithFallback('infostand.button.edit_furni', 'Edit furni')}
-                                            </BaseButton>
-                                        )}
-                                        {showBuildtools && (
-                                            <BaseButton
-                                                className="flex-1 min-w-0 text-white text-xs bg-[#2a2a3a] hover:bg-[#3a3a4a] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
-                                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                            >
-                                                {dropdownOpen
-                                                    ? localizeWithFallback('infostand.button.buildtools.close', 'Close Buildtools')
-                                                    : localizeWithFallback('infostand.button.buildtools.open', 'Open Buildtools')}
-                                            </BaseButton>
-                                        )}
+                            </div>
+                        )}
+                        {avatarInfo.description && descriptionsEnabled && (
+                            <Column gap={1}>
+                                <Text fullWidth wrap textBreak variant="white" small>
+                                    {avatarInfo.description}
+                                </Text>
+                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                            </Column>
+                        )}
+                        {chestData && (
+                            <Column gap={1}>
+                                <Text fullWidth wrap small className="octane-infostand-chest-count" variant="white">
+                                    {chestData.countText}
+                                </Text>
+                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                            </Column>
+                        )}
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1">
+                                {showOwnerProfileIcon && <UserProfileIconView userId={avatarInfo.ownerId} />}
+                                {avatarInfo.isTemporary && (
+                                    <img
+                                        alt=""
+                                        className="[image-rendering:pixelated]"
+                                        draggable={false}
+                                        src={GetConfigurationValue<string>('catalog.asset.icon.url', '').replace('%name%', '80')}
+                                    />
+                                )}
+                                {avatarInfo.isBuildersClub && !avatarInfo.isTemporary && <i className="octane-icon icon-buildersclub shrink-0 scale-75" />}
+                                <Text small wrap variant="white">
+                                    {infostandFurniOwnerText(avatarInfo)}
+                                </Text>
+                            </div>
+                            {avatarInfo.purchaseOfferId > 0 && (
+                                <Flex>
+                                    <Text pointer small underline variant="white" onClick={(event) => processButtonAction('buy_one')}>
+                                        {LocalizeText('infostand.button.buy')}
+                                    </Text>
+                                </Flex>
+                            )}
+                            {avatarInfo.isOwner && avatarInfo.expiration >= 0 && (
+                                <Text small wrap variant="white">
+                                    {localizeWithFallback('infostand.rent.expiration', `Rental time remaining: ${FriendlyTime.format(avatarInfo.expiration)}`, ['time', 'TIME'], [FriendlyTime.format(avatarInfo.expiration), FriendlyTime.format(avatarInfo.expiration)])}
+                                </Text>
+                            )}
+                            {avatarInfo.isOwner && avatarInfo.expiration >= 0 && (avatarInfo.rentCouldBeUsedForBuyout || avatarInfo.purchaseCouldBeUsedForBuyout) && (
+                                <Flex gap={2}>
+                                    {avatarInfo.rentCouldBeUsedForBuyout && (
+                                        <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`rent-furni/extend/${avatarInfo.id}/${avatarInfo.category}`)}>
+                                            {localizeWithFallback('infostand.button.extend', 'Extend')}
+                                        </Text>
+                                    )}
+                                    {avatarInfo.purchaseCouldBeUsedForBuyout && (
+                                        <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`rent-furni/buyout/${avatarInfo.id}/${avatarInfo.category}`)}>
+                                            {localizeWithFallback('infostand.button.buyout', 'Buy-out')}
+                                        </Text>
+                                    )}
+                                </Flex>
+                            )}
+                            {avatarInfo.expiration < 0 && avatarInfo.rentOfferId > 0 && (
+                                <Flex>
+                                    <Text pointer small underline variant="white" onClick={() => CreateLinkEvent(`catalog/open/offerId/${avatarInfo.rentOfferId}`)}>
+                                        {localizeWithFallback('infostand.button.rent', 'Rent one')}
+                                    </Text>
+                                </Flex>
+                            )}
+                        </div>
+                        {(isJukeBox || isSongDisk) && (
+                            <div className="flex flex-col gap-1">
+                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                {songId === -1 && (
+                                    <Text small wrap variant="white">
+                                        {LocalizeText('infostand.jukebox.text.not.playing')}
+                                    </Text>
+                                )}
+                                {!!songName.length && (
+                                    <div className="flex items-center gap-1">
+                                        <div className="icon disk-icon" />
+                                        <Text small wrap variant="white">
+                                            {songName}
+                                        </Text>
                                     </div>
                                 )}
-                                {showBuildtools && (
-                                    <>
-                                        {dropdownOpen && (
-                                            <div className="flex gap-[4px] w-full">
-                                                <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
-                                                    <Text small variant="white">
-                                                        {LocalizeText('group.edit.badge.position')}
-                                                    </Text>
-                                                    <div className="flex flex-col items-center gap-[2px]">
-                                                        <div className="flex gap-[0.6em]">
-                                                            <div
-                                                                className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[225deg]"
-                                                                onClick={() => sendUpdate(-1, 0, furniLocationZ ?? 0, 0)}
-                                                            >
-                                                                <GrFormNextLink size="1.7em" />
-                                                            </div>
-                                                            <div
-                                                                className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[315deg]"
-                                                                onClick={() => sendUpdate(0, -1, furniLocationZ ?? 0, 0)}
-                                                            >
-                                                                <GrFormNextLink size="1.7em" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex gap-[0.6em]">
-                                                            <div
-                                                                className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[135deg]"
-                                                                onClick={() => sendUpdate(0, 1, furniLocationZ ?? 0, 0)}
-                                                            >
-                                                                <GrFormNextLink size="1.7em" />
-                                                            </div>
-                                                            <div
-                                                                className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[45deg]"
-                                                                onClick={() => sendUpdate(1, 0, furniLocationZ ?? 0, 0)}
-                                                            >
-                                                                <GrFormNextLink size="1.7em" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <Text small variant="white">
-                                                        {LocalizeText('infostand.button.rotate')}
-                                                    </Text>
-                                                    <div className="flex justify-center gap-[0.6em]">
-                                                        <div
-                                                            className="bg-[#D1A245] text-black w-[28px] h-[28px] border-2 border-[#eee] cursor-pointer rounded-full flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                            onClick={() => sendUpdate(0, 0, furniLocationZ ?? 0, -1)}
-                                                        >
-                                                            <GrRotateLeft size="1.4em" />
-                                                        </div>
-                                                        <div
-                                                            className="bg-[#D1A245] text-black w-[28px] h-[28px] border-2 border-[#eee] cursor-pointer rounded-full flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                            onClick={() => sendUpdate(0, 0, furniLocationZ ?? 0, 1)}
-                                                        >
-                                                            <GrRotateRight size="1.4em" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
-                                                    <Text small variant="white">
-                                                        {LocalizeText('stack.magic.tile.height.label')}
-                                                    </Text>
-                                                    <NumberInput spellCheck={false} className="w-full text-xs bg-[#1a1a2a] text-white border border-[#ffffff44] rounded px-1 py-0.5" value={furniLocationZ !== null ? furniLocationZ.toString() : ''} onChange={handleHeightChange} onBlur={handleHeightBlur} min={0} max={40} step={0.1} />
-                                                    <div className="flex justify-center gap-1">
-                                                        <div className="flex flex-col items-center gap-[2px]">
-                                                            <div
-                                                                className="bg-[#247FD1] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                                onClick={() => adjustHeight(1)}
-                                                            >
-                                                                ↑
-                                                            </div>
-                                                            <Text small variant="white" align="center">
-                                                                █
-                                                            </Text>
-                                                            <div
-                                                                className="bg-[#44A750] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                                onClick={() => adjustHeight(-1)}
-                                                            >
-                                                                ↓
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col items-center gap-[2px]">
-                                                            <div
-                                                                className="bg-[#247FD1] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                                onClick={() => adjustHeight(0.1)}
-                                                            >
-                                                                ↑
-                                                            </div>
-                                                            <Text small variant="white" align="center">
-                                                                ▄
-                                                            </Text>
-                                                            <div
-                                                                className="bg-[#44A750] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                                onClick={() => adjustHeight(-0.1)}
-                                                            >
-                                                                ↓
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col items-center gap-[2px]">
-                                                            <div
-                                                                className="bg-[#247FD1] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                                onClick={() => adjustHeight(0.01)}
-                                                            >
-                                                                ↑
-                                                            </div>
-                                                            <Text small variant="white" align="center">
-                                                                _
-                                                            </Text>
-                                                            <div
-                                                                className="bg-[#44A750] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
-                                                                onClick={() => adjustHeight(-0.01)}
-                                                            >
-                                                                ↓
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                {!!songCreator.length && (
+                                    <div className="flex items-center gap-1">
+                                        <div className="icon disk-creator" />
+                                        <Text small wrap variant="white">
+                                            {songCreator}
+                                        </Text>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <div className="flex flex-col gap-1">
+                            {isCrackable && (
+                                <>
+                                    <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                    <Text small wrap variant="white">
+                                        {LocalizeText(
+                                            'infostand.crackable_furni.hits_remaining',
+                                            ['hits', 'target'],
+                                            [(crackableHits ?? 0).toString(), (crackableTarget ?? 0).toString()]
+                                        )}
+                                    </Text>
+                                </>
+                            )}
+                            {isPlant && (
+                                <>
+                                    <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                    {plantDead ? (
+                                        <Text small wrap variant="danger">
+                                            {LocalizeText('infostand.plant.dead')}
+                                        </Text>
+                                    ) : (
+                                        <div className="flex flex-col gap-1">
+                                            <Flex alignItems="center" gap={1} justifyContent="between">
+                                                <Text small wrap variant="white">
+                                                    {LocalizeText('infostand.plant.rewater')}
+                                                </Text>
+                                                <Text small wrap variant={plantWaterSeconds > 0 ? 'white' : 'success'}>
+                                                    {plantWaterSeconds > 0
+                                                        ? formatPlantDuration(plantWaterSeconds)
+                                                        : LocalizeText('infostand.plant.ready')}
+                                                </Text>
+                                            </Flex>
+                                            <Flex alignItems="center" gap={1} justifyContent="between">
+                                                <Text small wrap variant="white">
+                                                    {LocalizeText('infostand.plant.dies')}
+                                                </Text>
+                                                <Text small wrap variant={plantDeathSeconds > 0 ? 'white' : 'danger'}>
+                                                    {plantDeathSeconds > 0
+                                                        ? formatPlantDuration(plantDeathSeconds)
+                                                        : LocalizeText('infostand.plant.needswater')}
+                                                </Text>
+                                            </Flex>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                            {avatarInfo.groupId > 0 && (
+                                <>
+                                    <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                    <Flex pointer alignItems="center" gap={2} onClick={() => GetGroupInformation(avatarInfo.groupId)}>
+                                        {!!groupBadge && <LayoutBadgeImageView badgeCode={groupBadge} isGroup={true} />}
+                                        <Text underline variant="white">
+                                            {groupName}
+                                        </Text>
+                                    </Flex>
+                                </>
+                            )}
+                            {(showLocation || showIds) && (
+                                <>
+                                    <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                    <div className="grid grid-cols-2 gap-x-3 gap-y-0">
+                                        {showLocation && (
+                                            <>
+                                                <InfoStandStat icon={<StatIcon src={statXIcon} />} label="X" value={itemLocation.x} />
+                                                <InfoStandStat iconAfter icon={<StatIcon src={statRotationIcon} />} label="Rotation (0-7)" value={furniDirection} />
+                                                <InfoStandStat icon={<StatIcon src={statYIcon} />} label="Y" value={itemLocation.y} />
+                                                <InfoStandStat iconAfter icon={<StatIcon src={statStateIcon} />} label="State" value={furniState} />
+                                                <InfoStandStat icon={<StatIcon src={statHeightIcon} />} label="H" value={itemLocation.z < 0.01 ? 0 : Number(itemLocation.z.toFixed(2))} />
+                                            </>
+                                        )}
+                                        {showIds && (
+                                            <div className={showLocation ? '' : 'col-span-2'}>
+                                                <InfoStandStat
+                                                    iconAfter
+                                                    icon={<StatIcon src={statIdIcon} />}
+                                                    label="ID"
+                                                    tooltip={`ID (Sprite ${furniTypeId})`}
+                                                    value={avatarInfo.id}
+                                                />
                                             </div>
                                         )}
-                                    </>
-                                )}
-                                {furniKeys.length > 0 && (
-                                    <>
-                                        <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                        <div className="flex flex-col gap-1">
-                                            {furniKeys.map((key, index) => {
-                                                const range = BRANDING_NUMBER_RANGES[key];
+                                    </div>
+                                </>
+                            )}
+                            {rareValue && rareValue.points > 0 && (
+                                <>
+                                    <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                    <Flex alignItems="center" gap={2}>
+                                        <Text small variant="white">
+                                            {LocalizeText('rarevalues.infostand.label')}
+                                        </Text>
+                                        <Flex alignItems="center" gap={1}>
+                                            <Text small variant="white">
+                                                {rareValue.points}
+                                            </Text>
+                                            <LayoutCurrencyIcon type={rareValue.pointsType} />
+                                        </Flex>
+                                    </Flex>
+                                </>
+                            )}
+                            {(showEditFurni || showBuildtools) && (
+                                <>
+                                    <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                    {(showEditFurni || showBuildtools) && (
+                                        <div className="flex gap-1 w-full">
+                                            {showEditFurni && (
+                                                <BaseButton
+                                                    className="flex-1 min-w-0 text-white text-xs bg-[#418db0] hover:bg-[#3789a8] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
+                                                    onClick={() => {
+                                                        CreateLinkEvent('furni-editor/show');
 
-                                                return (
-                                                    <Flex key={index} column gap={0}>
-                                                        <Text small wrap variant="white">
-                                                            {key}
-                                                        </Text>
-                                                        {range ? (
-                                                            <NumberInput
-                                                                className="form-control form-control-sm text-black"
-                                                                style={{ color: '#000' }}
-                                                                min={range.min}
-                                                                max={range.max}
-                                                                value={furniValues[index]}
-                                                                onChange={(event) => onFurniSettingChange(index, event.target.value)}
-                                                            />
-                                                        ) : (
-                                                            <OctaneInput
-                                                                type="text"
-                                                                className="text-black"
-                                                                style={{ color: '#000' }}
-                                                                placeholder={key === 'imageUrl' || key === 'clickUrl' ? 'https://' : undefined}
-                                                                value={furniValues[index]}
-                                                                onChange={(event) => onFurniSettingChange(index, event.target.value)}
-                                                            />
-                                                        )}
-                                                    </Flex>
-                                                );
-                                            })}
+                                                        if (furniTypeId !== '?') window.dispatchEvent(new CustomEvent('furni-editor:open', { detail: { spriteId: furniTypeId } }));
+                                                    }}
+                                                >
+                                                    {localizeWithFallback('infostand.button.edit_furni', 'Edit furni')}
+                                                </BaseButton>
+                                            )}
+                                            {showBuildtools && (
+                                                <BaseButton
+                                                    className="flex-1 min-w-0 text-white text-xs bg-[#2a2a3a] hover:bg-[#3a3a4a] border border-[#ffffff33] rounded px-2 py-1 cursor-pointer transition-colors"
+                                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                                >
+                                                    {dropdownOpen
+                                                        ? localizeWithFallback('infostand.button.buildtools.close', 'Close Buildtools')
+                                                        : localizeWithFallback('infostand.button.buildtools.open', 'Open Buildtools')}
+                                                </BaseButton>
+                                            )}
                                         </div>
-                                    </>
-                                )}
-                            </>
-                        )}
-                        {customKeys.length > 0 && (
-                            <>
-                                <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
-                                <div className="flex flex-col gap-1">
-                                    {customKeys.map((key, index) => {
-                                        return (
-                                            <Flex key={index} alignItems="center" gap={1}>
-                                                <Text small wrap align="end" className="col-span-4" variant="white">
-                                                    {key}
-                                                </Text>
-                                                <OctaneInput
-                                                    type="text"
-                                                    className="text-black"
-                                                    style={{ color: '#000' }}
-                                                    value={customValues[index]}
-                                                    onChange={(event) => onCustomVariableChange(index, event.target.value)}
-                                                />
-                                            </Flex>
-                                        );
-                                    })}
-                                </div>
-                            </>
-                        )}
-                    </div>
+                                    )}
+                                    {showBuildtools && (
+                                        <>
+                                            {dropdownOpen && (
+                                                <div className="flex gap-[4px] w-full">
+                                                    <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
+                                                        <Text small variant="white">
+                                                            {LocalizeText('group.edit.badge.position')}
+                                                        </Text>
+                                                        <div className="flex flex-col items-center gap-[2px]">
+                                                            <div className="flex gap-[0.6em]">
+                                                                <div
+                                                                    className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[225deg]"
+                                                                    onClick={() => sendUpdate(-1, 0, furniLocationZ ?? 0, 0)}
+                                                                >
+                                                                    <GrFormNextLink size="1.7em" />
+                                                                </div>
+                                                                <div
+                                                                    className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[315deg]"
+                                                                    onClick={() => sendUpdate(0, -1, furniLocationZ ?? 0, 0)}
+                                                                >
+                                                                    <GrFormNextLink size="1.7em" />
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex gap-[0.6em]">
+                                                                <div
+                                                                    className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[135deg]"
+                                                                    onClick={() => sendUpdate(0, 1, furniLocationZ ?? 0, 0)}
+                                                                >
+                                                                    <GrFormNextLink size="1.7em" />
+                                                                </div>
+                                                                <div
+                                                                    className="bg-[#E55959] text-white w-[25px] h-[25px] border border-white cursor-pointer rounded-[3px] flex justify-center items-center transition-[filter] duration-300 hover:brightness-150 rotate-[45deg]"
+                                                                    onClick={() => sendUpdate(1, 0, furniLocationZ ?? 0, 0)}
+                                                                >
+                                                                    <GrFormNextLink size="1.7em" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <Text small variant="white">
+                                                            {LocalizeText('infostand.button.rotate')}
+                                                        </Text>
+                                                        <div className="flex justify-center gap-[0.6em]">
+                                                            <div
+                                                                className="bg-[#D1A245] text-black w-[28px] h-[28px] border-2 border-[#eee] cursor-pointer rounded-full flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                onClick={() => sendUpdate(0, 0, furniLocationZ ?? 0, -1)}
+                                                            >
+                                                                <GrRotateLeft size="1.4em" />
+                                                            </div>
+                                                            <div
+                                                                className="bg-[#D1A245] text-black w-[28px] h-[28px] border-2 border-[#eee] cursor-pointer rounded-full flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                onClick={() => sendUpdate(0, 0, furniLocationZ ?? 0, 1)}
+                                                            >
+                                                                <GrRotateRight size="1.4em" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-1 bg-[#3D5D63] rounded-[6px] border border-white p-[2px] flex flex-col gap-1">
+                                                        <Text small variant="white">
+                                                            {LocalizeText('stack.magic.tile.height.label')}
+                                                        </Text>
+                                                        <NumberInput spellCheck={false} className="w-full text-xs bg-[#1a1a2a] text-white border border-[#ffffff44] rounded px-1 py-0.5" value={furniLocationZ !== null ? furniLocationZ.toString() : ''} onChange={handleHeightChange} onBlur={handleHeightBlur} min={0} max={40} step={0.1} />
+                                                        <div className="flex justify-center gap-1">
+                                                            <div className="flex flex-col items-center gap-[2px]">
+                                                                <div
+                                                                    className="bg-[#247FD1] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                    onClick={() => adjustHeight(1)}
+                                                                >
+                                                                    ↑
+                                                                </div>
+                                                                <Text small variant="white" align="center">
+                                                                    █
+                                                                </Text>
+                                                                <div
+                                                                    className="bg-[#44A750] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                    onClick={() => adjustHeight(-1)}
+                                                                >
+                                                                    ↓
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col items-center gap-[2px]">
+                                                                <div
+                                                                    className="bg-[#247FD1] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                    onClick={() => adjustHeight(0.1)}
+                                                                >
+                                                                    ↑
+                                                                </div>
+                                                                <Text small variant="white" align="center">
+                                                                    ▄
+                                                                </Text>
+                                                                <div
+                                                                    className="bg-[#44A750] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                    onClick={() => adjustHeight(-0.1)}
+                                                                >
+                                                                    ↓
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col items-center gap-[2px]">
+                                                                <div
+                                                                    className="bg-[#247FD1] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                    onClick={() => adjustHeight(0.01)}
+                                                                >
+                                                                    ↑
+                                                                </div>
+                                                                <Text small variant="white" align="center">
+                                                                    _
+                                                                </Text>
+                                                                <div
+                                                                    className="bg-[#44A750] text-white w-[24px] h-[24px] border border-white cursor-pointer rounded-[3px] leading-none flex justify-center items-center transition-[filter] duration-300 hover:brightness-150"
+                                                                    onClick={() => adjustHeight(-0.01)}
+                                                                >
+                                                                    ↓
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    {furniKeys.length > 0 && (
+                                        <>
+                                            <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                            <div className="flex flex-col gap-1">
+                                                {furniKeys.map((key, index) => {
+                                                    const range = BRANDING_NUMBER_RANGES[key];
+
+                                                    return (
+                                                        <Flex key={index} column gap={0}>
+                                                            <Text small wrap variant="white">
+                                                                {key}
+                                                            </Text>
+                                                            {range ? (
+                                                                <NumberInput
+                                                                    className="form-control form-control-sm text-black"
+                                                                    style={{ color: '#000' }}
+                                                                    min={range.min}
+                                                                    max={range.max}
+                                                                    value={furniValues[index]}
+                                                                    onChange={(event) => onFurniSettingChange(index, event.target.value)}
+                                                                />
+                                                            ) : (
+                                                                <OctaneInput
+                                                                    type="text"
+                                                                    className="text-black"
+                                                                    style={{ color: '#000' }}
+                                                                    placeholder={key === 'imageUrl' || key === 'clickUrl' ? 'https://' : undefined}
+                                                                    value={furniValues[index]}
+                                                                    onChange={(event) => onFurniSettingChange(index, event.target.value)}
+                                                                />
+                                                            )}
+                                                        </Flex>
+                                                    );
+                                                })}
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                            {customKeys.length > 0 && (
+                                <>
+                                    <hr className="m-0 bg-[#0003] border-0 opacity-[.5] h-px" />
+                                    <div className="flex flex-col gap-1">
+                                        {customKeys.map((key, index) => {
+                                            return (
+                                                <Flex key={index} alignItems="center" gap={1}>
+                                                    <Text small wrap align="end" className="col-span-4" variant="white">
+                                                        {key}
+                                                    </Text>
+                                                    <OctaneInput
+                                                        type="text"
+                                                        className="text-black"
+                                                        style={{ color: '#000' }}
+                                                        value={customValues[index]}
+                                                        onChange={(event) => onCustomVariableChange(index, event.target.value)}
+                                                    />
+                                                </Flex>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </Column>
                 </Column>
+                <Flex gap={1} justifyContent="end">
+                    {showInspectButton && !roomSession?.playTestMode && (
+                        <Button variant="dark" onClick={() => openInspectionForFurni(avatarInfo.id, avatarInfo.category)}>
+                            Inspect
+                        </Button>
+                    )}
+                    {canMove && (
+                        <Button variant="dark" onClick={(event) => processButtonAction('move')}>
+                            {LocalizeText('infostand.button.move')}
+                        </Button>
+                    )}
+                    {canRotate && (
+                        <Button variant="dark" onClick={(event) => processButtonAction('rotate')}>
+                            {LocalizeText('infostand.button.rotate')}
+                        </Button>
+                    )}
+                    {hasLabel && !!roomSettings?.canModify && (
+                        <Button variant="dark" onClick={() => openLabelSettings(avatarInfo.id)}>
+                            {localizeWithFallback('infostand.button.label_settings', 'Settings')}
+                        </Button>
+                    )}
+                    {canRecolor && (
+                        <Button variant="dark" onClick={() => openRecolor && openRecolor(avatarInfo.id)}>
+                            {localizeWithFallback('infostand.button.recolor', 'Recolor')}
+                        </Button>
+                    )}
+                    {pickupMode !== PICKUP_MODE_NONE && (
+                        <Button variant="dark" onClick={(event) => processButtonAction('pickup')}>
+                            {isPlant && plantDead
+                                ? LocalizeText('generic.delete')
+                                : LocalizeText(pickupMode === PICKUP_MODE_EJECT ? 'infostand.button.eject' : 'infostand.button.pickup')}
+                        </Button>
+                    )}
+                    {canUse && (
+                        <Button variant="dark" onClick={(event) => processButtonAction('use')}>
+                            {LocalizeText('infostand.button.use')}
+                        </Button>
+                    )}
+                    {canRemoveBackground && (
+                        <Button variant="dark" onClick={(event) => processButtonAction('remove_background')}>
+                            <Flex alignItems="center" gap={1}>
+                                <FaEraser className="fa-icon" />
+                                {removeLandscapeLabel()}
+                            </Flex>
+                        </Button>
+                    )}
+                    {hasBrandingOffsets && (
+                        <Button variant="dark" onClick={() => setShowPositionEditor(true)}>
+                            {LocalizeText('image.position.editor.button')}
+                        </Button>
+                    )}
+                    {furniKeys.length > 0 && furniValues.length > 0 && furniKeys.length === furniValues.length && (
+                        <Button variant="dark" onClick={() => processButtonAction('save_branding_configuration')}>
+                            {LocalizeText('save')}
+                        </Button>
+                    )}
+                    {customKeys.length > 0 && customValues.length > 0 && customKeys.length === customValues.length && (
+                        <Button variant="dark" onClick={() => processButtonAction('save_custom_variables')}>
+                            {LocalizeText('save')}
+                        </Button>
+                    )}
+                </Flex>
+                {showPositionEditor && (
+                    <ImagePositionEditorView
+                        roomId={roomSession.roomId}
+                        objectId={avatarInfo.id}
+                        isWallItem={avatarInfo.isWallItem}
+                        initialX={getBrandingOffset('offsetX')}
+                        initialY={getBrandingOffset('offsetY')}
+                        initialZ={getBrandingOffset('offsetZ')}
+                        initialScale={getBrandingOffset('scale') || 100}
+                        initialAlpha={furniKeys.indexOf('alpha') >= 0 ? getBrandingOffset('alpha') : 100}
+                        onClose={() => setShowPositionEditor(false)}
+                        onSave={savePositionEditor}
+                    />
+                )}
             </Column>
-            <Flex gap={1} justifyContent="end">
-                {showInspectButton && !roomSession?.playTestMode && (
-                    <Button variant="dark" onClick={() => openInspectionForFurni(avatarInfo.id, avatarInfo.category)}>
-                        Inspect
-                    </Button>
-                )}
-                {canMove && (
-                    <Button variant="dark" onClick={(event) => processButtonAction('move')}>
-                        {LocalizeText('infostand.button.move')}
-                    </Button>
-                )}
-                {canRotate && (
-                    <Button variant="dark" onClick={(event) => processButtonAction('rotate')}>
-                        {LocalizeText('infostand.button.rotate')}
-                    </Button>
-                )}
-                {hasLabel && !!roomSettings?.canModify && (
-                    <Button variant="dark" onClick={() => openLabelSettings(avatarInfo.id)}>
-                        {localizeWithFallback('infostand.button.label_settings', 'Settings')}
-                    </Button>
-                )}
-                {canRecolor && (
-                    <Button variant="dark" onClick={() => openRecolor && openRecolor(avatarInfo.id)}>
-                        {localizeWithFallback('infostand.button.recolor', 'Recolor')}
-                    </Button>
-                )}
-                {pickupMode !== PICKUP_MODE_NONE && (
-                    <Button variant="dark" onClick={(event) => processButtonAction('pickup')}>
-                        {isPlant && plantDead
-                            ? LocalizeText('generic.delete')
-                            : LocalizeText(pickupMode === PICKUP_MODE_EJECT ? 'infostand.button.eject' : 'infostand.button.pickup')}
-                    </Button>
-                )}
-                {canUse && (
-                    <Button variant="dark" onClick={(event) => processButtonAction('use')}>
-                        {LocalizeText('infostand.button.use')}
-                    </Button>
-                )}
-                {canRemoveBackground && (
-                    <Button variant="dark" onClick={(event) => processButtonAction('remove_background')}>
-                        <Flex alignItems="center" gap={1}>
-                            <FaEraser className="fa-icon" />
-                            {removeLandscapeLabel()}
-                        </Flex>
-                    </Button>
-                )}
-                {hasBrandingOffsets && (
-                    <Button variant="dark" onClick={() => setShowPositionEditor(true)}>
-                        {LocalizeText('image.position.editor.button')}
-                    </Button>
-                )}
-                {furniKeys.length > 0 && furniValues.length > 0 && furniKeys.length === furniValues.length && (
-                    <Button variant="dark" onClick={() => processButtonAction('save_branding_configuration')}>
-                        {LocalizeText('save')}
-                    </Button>
-                )}
-                {customKeys.length > 0 && customValues.length > 0 && customKeys.length === customValues.length && (
-                    <Button variant="dark" onClick={() => processButtonAction('save_custom_variables')}>
-                        {LocalizeText('save')}
-                    </Button>
-                )}
-            </Flex>
-            {showPositionEditor && (
-                <ImagePositionEditorView
-                    roomId={roomSession.roomId}
-                    objectId={avatarInfo.id}
-                    isWallItem={avatarInfo.isWallItem}
-                    initialX={getBrandingOffset('offsetX')}
-                    initialY={getBrandingOffset('offsetY')}
-                    initialZ={getBrandingOffset('offsetZ')}
-                    initialScale={getBrandingOffset('scale') || 100}
-                    initialAlpha={furniKeys.indexOf('alpha') >= 0 ? getBrandingOffset('alpha') : 100}
-                    onClose={() => setShowPositionEditor(false)}
-                    onSave={savePositionEditor}
-                />
-            )}
-        </Column>
+        </NativeTextTree>
     );
 };

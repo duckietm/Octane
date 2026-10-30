@@ -5,6 +5,7 @@ import { BaseButton, Button, Column, Flex, LayoutCurrencyIcon, OctaneCardContent
 import { useRoom } from '../../../../hooks';
 import { IWiredRewardReceipt, useWiredRewardStore, WIRED_REWARD_MAX_OPEN } from '../../../../hooks/rooms/widgets/wiredRewardStore';
 import '../../../../css/room/FurniWindowsCAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** AIR RewardNotificationView: the frame is 276 px wide. */
 const REWARD_WIDTH = 276;
@@ -35,11 +36,13 @@ const EarningsText: FC = () =>
     if(!match) return <Text small>{ text.replace(/<[^>]+>/g, '') }</Text>;
 
     return (
-        <Text small className="octane-wired-chest-reward-earnings">
-            { match[1] }
-            <BaseButton className="octane-wired-chest-reward-link" onClick={ () => CreateLinkEvent(match[2]) }>{ match[3] }</BaseButton>
-            { match[4] }
-        </Text>
+        <NativeTextTree>
+            <Text small className="octane-wired-chest-reward-earnings">
+                { match[1] }
+                <BaseButton className="octane-wired-chest-reward-link" onClick={ () => CreateLinkEvent(match[2]) }>{ match[3] }</BaseButton>
+                { match[4] }
+            </Text>
+        </NativeTextTree>
     );
 };
 
@@ -49,27 +52,29 @@ const RewardWindow: FC<{ receipt: IWiredRewardReceipt; index: number; onClose: (
     const offset = wiredRewardOffset(index);
 
     return (
-        <OctaneCardView theme="primary-slim" className="octane-wired-chest-reward" uniqueKey={ `wired-reward-${ receipt.id }` } offsetLeft={ offset } offsetTop={ offset } style={ { width: REWARD_WIDTH } }>
-            <OctaneCardHeaderView headerText={ title } onCloseClick={ onClose } />
-            <OctaneCardContentView>
-                <Column gap={ 2 }>
-                    <Text>{ receipt.text || localizeWithFallback('wiredrewards.desc_default', 'Congratulations! You received some stuff :)') }</Text>
-                    <Flex gap={ 2 } className="flex-wrap">
-                        { receipt.nodes.map((node, position) =>
-                            // AIR onClickNode: coins open the earnings window, furni the inventory.
-                            <BaseButton key={ position } className="octane-wired-chest-reward-node" aria-label={ `${ node.amount }` }
-                                onClick={ () => CreateLinkEvent(node.type === WIRED_TRADE_NODE_COINS ? 'habboUI/open/vault' : 'inventory/show') }>
-                                { node.type === WIRED_TRADE_NODE_FURNI && node.itemType
-                                    ? <img alt="" width={ 40 } height={ 40 } src={ ProductImageUtility.getProductImageUrl(node.itemType.isWallItem ? FurnitureType.WALL : FurnitureType.FLOOR, node.itemType.typeId, node.itemType.legacyPosterId) } />
-                                    : <LayoutCurrencyIcon type={ -1 } /> }
-                                <Text bold>{ node.amount }</Text>
-                            </BaseButton>) }
-                    </Flex>
-                    { wiredRewardHasCredits(receipt.nodes) && <EarningsText /> }
-                    <Button onClick={ onClose }>{ localizeWithFallback('wiredrewards.ok', 'Yayy') }</Button>
-                </Column>
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView theme="primary-slim" className="octane-wired-chest-reward" uniqueKey={ `wired-reward-${ receipt.id }` } offsetLeft={ offset } offsetTop={ offset } style={ { width: REWARD_WIDTH } }>
+                <OctaneCardHeaderView headerText={ title } onCloseClick={ onClose } />
+                <OctaneCardContentView>
+                    <Column gap={ 2 }>
+                        <Text>{ receipt.text || localizeWithFallback('wiredrewards.desc_default', 'Congratulations! You received some stuff :)') }</Text>
+                        <Flex gap={ 2 } className="flex-wrap">
+                            { receipt.nodes.map((node, position) =>
+                                // AIR onClickNode: coins open the earnings window, furni the inventory.
+                                <BaseButton key={ position } className="octane-wired-chest-reward-node" aria-label={ `${ node.amount }` }
+                                    onClick={ () => CreateLinkEvent(node.type === WIRED_TRADE_NODE_COINS ? 'habboUI/open/vault' : 'inventory/show') }>
+                                    { node.type === WIRED_TRADE_NODE_FURNI && node.itemType
+                                        ? <img alt="" width={ 40 } height={ 40 } src={ ProductImageUtility.getProductImageUrl(node.itemType.isWallItem ? FurnitureType.WALL : FurnitureType.FLOOR, node.itemType.typeId, node.itemType.legacyPosterId) } />
+                                        : <LayoutCurrencyIcon type={ -1 } /> }
+                                    <Text bold>{ node.amount }</Text>
+                                </BaseButton>) }
+                        </Flex>
+                        { wiredRewardHasCredits(receipt.nodes) && <EarningsText /> }
+                        <Button onClick={ onClose }>{ localizeWithFallback('wiredrewards.ok', 'Yayy') }</Button>
+                    </Column>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };
 

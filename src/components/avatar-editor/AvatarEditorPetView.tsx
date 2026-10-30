@@ -8,6 +8,7 @@ import { AvatarEditorFigureSetView } from './figure-set';
 import { AvatarEditorAdvancedColorView, AvatarEditorPaletteSetView } from './palette-set';
 import { BaseButton } from '../../common/BaseButton';
 import { ToggleButton } from '../../common/ToggleButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const AvatarEditorPetView: FC<{
     categories: IAvatarEditorCategory[];
@@ -81,58 +82,60 @@ export const AvatarEditorPetView: FC<{
     }
 
     return (
-        <div className="octane-avatar-editor-model octane-avatar-editor-pet-model">
-            <div className="octane-avatar-editor-subcategories octane-avatar-editor-pet-subcategories">
-                <ToggleButton type="button" className="category-item" pressed>
-                    <AvatarEditorIcon icon="pt" selected />
-                </ToggleButton>
-                <div className="octane-avatar-editor-pet-equipped">
-                    {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
-                    <span>{selectedPartItem ? 'Companion equipped' : 'No companion selected'}</span>
-                    {selectedPartItem && (
-                        <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label="Remove companion" onClick={removePet}>
-                            <AvatarEditorIcon icon="clear" />
-                        </BaseButton>
-                    )}
-                </div>
-            </div>
-
-            <div className="octane-avatar-editor-parts-grid">
-                <AvatarEditorFigureSetView category={petCategory} columnCount={6} />
-            </div>
-
-            {hasColors && (
-                <>
-                    <BaseButton
-                        type="button"
-                        className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
-                        onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
-                    >
-                        Advanced Color
-                        <LayoutCurrencyIcon type="hc" />
-                    </BaseButton>
-                    <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
-                        {maxPaletteCount >= 1 && (
-                            <div className="avatar-editor-palette-set-view">
-                                {advancedColorMode ? (
-                                    <AvatarEditorAdvancedColorView category={petCategory} paletteIndex={0} />
-                                ) : (
-                                    <AvatarEditorPaletteSetView category={petCategory} columnCount={maxPaletteCount === 2 ? 9 : 20} paletteIndex={0} />
-                                )}
-                            </div>
-                        )}
-                        {maxPaletteCount === 2 && (
-                            <div className="avatar-editor-palette-set-view">
-                                {advancedColorMode ? (
-                                    <AvatarEditorAdvancedColorView category={petCategory} paletteIndex={1} />
-                                ) : (
-                                    <AvatarEditorPaletteSetView category={petCategory} columnCount={9} paletteIndex={1} />
-                                )}
-                            </div>
+        <NativeTextTree>
+            <div className="octane-avatar-editor-model octane-avatar-editor-pet-model">
+                <div className="octane-avatar-editor-subcategories octane-avatar-editor-pet-subcategories">
+                    <ToggleButton type="button" className="category-item" pressed>
+                        <AvatarEditorIcon icon="pt" selected />
+                    </ToggleButton>
+                    <div className="octane-avatar-editor-pet-equipped">
+                        {selectedPartItem && slotThumbUrl ? <img src={slotThumbUrl} alt="" draggable={false} /> : <AvatarEditorIcon icon="pt" />}
+                        <span>{selectedPartItem ? 'Companion equipped' : 'No companion selected'}</span>
+                        {selectedPartItem && (
+                            <BaseButton type="button" className="octane-avatar-editor-pet-remove" aria-label="Remove companion" onClick={removePet}>
+                                <AvatarEditorIcon icon="clear" />
+                            </BaseButton>
                         )}
                     </div>
-                </>
-            )}
-        </div>
+                </div>
+
+                <div className="octane-avatar-editor-parts-grid">
+                    <AvatarEditorFigureSetView category={petCategory} columnCount={6} />
+                </div>
+
+                {hasColors && (
+                    <>
+                        <BaseButton
+                            type="button"
+                            className={`octane-avatar-editor-advanced-color${advancedColorMode ? ' is-active' : ''}`}
+                            onClick={() => (hasHC ? setAdvancedColorMode((prev) => !prev) : CreateLinkEvent('habboUI/open/hccenter'))}
+                        >
+                            Advanced Color
+                            <LayoutCurrencyIcon type="hc" />
+                        </BaseButton>
+                        <div className={`octane-avatar-editor-palettes${maxPaletteCount === 2 ? ' dual-palette' : ''}`}>
+                            {maxPaletteCount >= 1 && (
+                                <div className="avatar-editor-palette-set-view">
+                                    {advancedColorMode ? (
+                                        <AvatarEditorAdvancedColorView category={petCategory} paletteIndex={0} />
+                                    ) : (
+                                        <AvatarEditorPaletteSetView category={petCategory} columnCount={maxPaletteCount === 2 ? 9 : 20} paletteIndex={0} />
+                                    )}
+                                </div>
+                            )}
+                            {maxPaletteCount === 2 && (
+                                <div className="avatar-editor-palette-set-view">
+                                    {advancedColorMode ? (
+                                        <AvatarEditorAdvancedColorView category={petCategory} paletteIndex={1} />
+                                    ) : (
+                                        <AvatarEditorPaletteSetView category={petCategory} columnCount={9} paletteIndex={1} />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

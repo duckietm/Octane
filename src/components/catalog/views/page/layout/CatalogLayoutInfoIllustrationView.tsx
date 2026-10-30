@@ -1,5 +1,6 @@
 import { CSSProperties, FC } from 'react';
 import { GetConfigurationValue, handleInternalLinkClick, SanitizeHtmlWithInternalLinks } from '../../../../../api';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 /** Where AIR places the description html and the illustration of an info page (pixels in the 360 x 460 page). */
@@ -37,23 +38,25 @@ const CatalogLayoutInfoIllustrationView: FC<CatalogLayoutProps & { layout: InfoI
     const { description, image } = layout;
 
     return (
-        <div className={`octane-catalog-layout-info-illustration is-${layout.name}`}>
-            <div
-                className="octane-catalog-layout-info-illustration__description"
-                style={{ left: description.x, top: description.y, width: description.width, maxHeight: description.height } as CSSProperties}
-                onClick={handleInternalLinkClick}
-                dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(0) ?? '') }}
-            />
-            {!!imageLibraryUrl && (
-                <img
-                    alt=""
-                    draggable={false}
-                    className="octane-catalog-layout-info-illustration__image"
-                    style={{ left: image.x, top: image.y, maxWidth: image.width, maxHeight: image.height }}
-                    src={`${imageLibraryUrl}${layout.illustration}`}
+        <NativeTextTree>
+            <div className={`octane-catalog-layout-info-illustration is-${layout.name}`}>
+                <div
+                    className="octane-catalog-layout-info-illustration__description"
+                    style={{ left: description.x, top: description.y, width: description.width, maxHeight: description.height } as CSSProperties}
+                    onClick={handleInternalLinkClick}
+                    dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(0) ?? '') }}
                 />
-            )}
-        </div>
+                {!!imageLibraryUrl && (
+                    <img
+                        alt=""
+                        draggable={false}
+                        className="octane-catalog-layout-info-illustration__image"
+                        style={{ left: image.x, top: image.y, maxWidth: image.width, maxHeight: image.height }}
+                        src={`${imageLibraryUrl}${layout.illustration}`}
+                    />
+                )}
+            </div>
+        </NativeTextTree>
     );
 };
 

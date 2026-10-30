@@ -13,6 +13,7 @@ import delayPreciseIcon from '../../../../assets/images/wired/delay/delay_precis
 import delayStandardIcon from '../../../../assets/images/wired/delay/delay_standard.png';
 import { Slider, Text } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
 
 interface WiredActionDelaySectionProps {
@@ -69,61 +70,63 @@ export const WiredActionDelaySection: FC<WiredActionDelaySectionProps> = ({ valu
     };
 
     return (
-        <div className="flex flex-col octane-wired__section octane-wired__section--delay">
-            <div className="octane-wired__delay-head">
-                <Text bold>{LocalizeText('wiredfurni.params.delay.seconds')}</Text>
-                <div className="relative">
-                    <input
-                        aria-invalid={!!error}
-                        className={`octane-wired__delay-input ${error ? 'is-invalid' : ''}`}
-                        inputMode="decimal"
-                        type="text"
-                        value={typed ?? formatWiredDelaySeconds(value)}
-                        onBlur={() => {
-                            // An invalid number is dropped for the stored delay, as the slider still shows it.
-                            setTyped(null);
-                            setError(null);
-                        }}
-                        onChange={(event) => onType(event.target.value)}
-                    />
-                    {error && (
-                        <div className="octane-wired__value-input-error" role="alert">
-                            {wiredNumberInputMessage(error)}
-                        </div>
-                    )}
-                </div>
-                <div className="octane-wired__delay-mode">
-                    <Hint content={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}>
-                        <BaseButton aria-label={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}
-                            type="button"
-                            className="octane-wired__delay-mode-button"
-                            onClick={() => setMenuOpen((open) => !open)}
-                        >
-                            <img src={precise ? delayPreciseIcon : delayStandardIcon} alt="" />
-                        </BaseButton>
-                    </Hint>
-                    {menuOpen && (
-                        <div className="octane-wired__delay-mode-menu">
-                            <BaseButton type="button" className={!precise ? 'is-active' : ''} onClick={() => selectMode(false)}>
-                                {LocalizeText('wiredfurni.params.delay.mode.standard')}
+        <NativeTextTree>
+            <div className="flex flex-col octane-wired__section octane-wired__section--delay">
+                <div className="octane-wired__delay-head">
+                    <Text bold>{LocalizeText('wiredfurni.params.delay.seconds')}</Text>
+                    <div className="relative">
+                        <input
+                            aria-invalid={!!error}
+                            className={`octane-wired__delay-input ${error ? 'is-invalid' : ''}`}
+                            inputMode="decimal"
+                            type="text"
+                            value={typed ?? formatWiredDelaySeconds(value)}
+                            onBlur={() => {
+                                // An invalid number is dropped for the stored delay, as the slider still shows it.
+                                setTyped(null);
+                                setError(null);
+                            }}
+                            onChange={(event) => onType(event.target.value)}
+                        />
+                        {error && (
+                            <div className="octane-wired__value-input-error" role="alert">
+                                {wiredNumberInputMessage(error)}
+                            </div>
+                        )}
+                    </div>
+                    <div className="octane-wired__delay-mode">
+                        <Hint content={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}>
+                            <BaseButton aria-label={LocalizeText(precise ? 'wiredfurni.params.delay.mode.precise' : 'wiredfurni.params.delay.mode.standard')}
+                                type="button"
+                                className="octane-wired__delay-mode-button"
+                                onClick={() => setMenuOpen((open) => !open)}
+                            >
+                                <img src={precise ? delayPreciseIcon : delayStandardIcon} alt="" />
                             </BaseButton>
-                            <BaseButton type="button" className={precise ? 'is-active' : ''} onClick={() => selectMode(true)}>
-                                {LocalizeText('wiredfurni.params.delay.mode.precise')}
-                            </BaseButton>
-                        </div>
-                    )}
+                        </Hint>
+                        {menuOpen && (
+                            <div className="octane-wired__delay-mode-menu">
+                                <BaseButton type="button" className={!precise ? 'is-active' : ''} onClick={() => selectMode(false)}>
+                                    {LocalizeText('wiredfurni.params.delay.mode.standard')}
+                                </BaseButton>
+                                <BaseButton type="button" className={precise ? 'is-active' : ''} onClick={() => selectMode(true)}>
+                                    {LocalizeText('wiredfurni.params.delay.mode.precise')}
+                                </BaseButton>
+                            </div>
+                        )}
+                    </div>
                 </div>
+                <Slider
+                    max={precise ? WIRED_ACTION_DELAY_MAX_PRECISE_STEPS : WIRED_ACTION_DELAY_MAX_PULSES}
+                    min={0}
+                    value={units}
+                    onChange={(next) => {
+                        setTyped(null);
+                        setError(null);
+                        onChange(encodeWiredDelay(next, precise));
+                    }}
+                />
             </div>
-            <Slider
-                max={precise ? WIRED_ACTION_DELAY_MAX_PRECISE_STEPS : WIRED_ACTION_DELAY_MAX_PULSES}
-                min={0}
-                value={units}
-                onChange={(next) => {
-                    setTyped(null);
-                    setError(null);
-                    onChange(encodeWiredDelay(next, precise));
-                }}
-            />
-        </div>
+        </NativeTextTree>
     );
 };

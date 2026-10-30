@@ -1,6 +1,7 @@
 import { MouseEventType } from '@octane/renderer';
 import { FC, MouseEvent, PropsWithChildren, useState } from 'react';
 import { attemptBotPlacement, IBotItem, UnseenItemCategory } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useInventoryBots, useInventoryUnseenTracker } from '../../../../hooks';
 import { InventoryBotImageView } from './InventoryBotImageView';
 
@@ -37,18 +38,20 @@ export const InventoryBotItemView: FC<
     };
 
     return (
-        <div
-            onDoubleClick={onMouseEvent}
-            onMouseDown={onMouseEvent}
-            onMouseLeave={onMouseEvent}
-            onMouseUp={onMouseEvent}
-            {...rest}
-            className={`octane-inventory-thumb${botItem === selectedBot ? ' is-selected' : ''}${unseen ? ' is-unseen' : ''}`}
-        >
-            <span className="octane-inventory-animal-thumb-image">
-                <InventoryBotImageView figure={botItem.botData.figure} gender={botItem.botData.gender} />
-            </span>
-            {children}
-        </div>
+        <NativeTextTree>
+            <div
+                onDoubleClick={onMouseEvent}
+                onMouseDown={onMouseEvent}
+                onMouseLeave={onMouseEvent}
+                onMouseUp={onMouseEvent}
+                {...rest}
+                className={`octane-inventory-thumb${botItem === selectedBot ? ' is-selected' : ''}${unseen ? ' is-unseen' : ''}`}
+            >
+                <span className="octane-inventory-animal-thumb-image">
+                    <InventoryBotImageView figure={botItem.botData.figure} gender={botItem.botData.gender} />
+                </span>
+                {children}
+            </div>
+        </NativeTextTree>
     );
 };

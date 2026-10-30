@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { getCatalogNodeKey, LocalizeText } from '../../../../api';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogUiState } from '../../../../hooks';
 
 export const CatalogBreadcrumbView: FC<{}> = () => {
@@ -9,9 +10,11 @@ export const CatalogBreadcrumbView: FC<{}> = () => {
 
     if (!activeNodes || activeNodes.length === 0) {
         return (
-            <div className="octane-catalog-breadcrumb">
-                <span>{LocalizeText('catalog.title')}</span>
-            </div>
+            <NativeTextTree>
+                <div className="octane-catalog-breadcrumb">
+                    <span>{LocalizeText('catalog.title')}</span>
+                </div>
+            </NativeTextTree>
         );
     }
 

@@ -6,6 +6,7 @@ import { GameStageView } from './views/GameStageView';
 import { GameTileView } from './views/GameTileView';
 import { SnowWarInstructionsView } from './views/snowwar/SnowWarInstructionsView';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -52,19 +53,21 @@ export const GameCenterView = () => {
     if (!isVisible || !games || !accountStatus) return;
 
     return (
-        <div className="game-center-main">
-            <div className="game-center-header">
-                <div className="game-center-header__title">{localizeWithFallback('gamecenter.game_list_title', 'Choose a game')}</div>
-                <BaseButton className="game-center-header__close" type="button" onClick={() => setIsVisible(false)}>&times;</BaseButton>
+        <NativeTextTree>
+            <div className="game-center-main">
+                <div className="game-center-header">
+                    <div className="game-center-header__title">{localizeWithFallback('gamecenter.game_list_title', 'Choose a game')}</div>
+                    <BaseButton className="game-center-header__close" type="button" onClick={() => setIsVisible(false)}>&times;</BaseButton>
+                </div>
+                {instructionsOpen
+                    ? <SnowWarInstructionsView />
+                    : (
+                        <div className="game-tile-grid">
+                            {games.map((game) => <GameTileView key={game.gameId} game={game} />)}
+                        </div>
+                    )}
+                <GameStageView />
             </div>
-            {instructionsOpen
-                ? <SnowWarInstructionsView />
-                : (
-                    <div className="game-tile-grid">
-                        {games.map((game) => <GameTileView key={game.gameId} game={game} />)}
-                    </div>
-                )}
-            <GameStageView />
-        </div>
+        </NativeTextTree>
     );
 };

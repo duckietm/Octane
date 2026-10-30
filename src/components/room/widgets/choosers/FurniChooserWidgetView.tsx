@@ -1,6 +1,7 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { chooserSelectionVisualizer, LocalizeText } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useFurniChooserWidget, useRoom } from '../../../../hooks';
 import { ChooserWidgetView } from './ChooserWidgetView';
 
@@ -29,16 +30,18 @@ export const FurniChooserWidgetView: FC<{}> = (props) => {
     if (!items) return null;
 
     return (
-        <ChooserWidgetView
-            title={LocalizeText('widget.chooser.furni.title')}
-            items={items}
-            selectItem={selectItem}
-            onClose={() => {
-                chooserSelectionVisualizer.clearAll();
-                onClose();
-            }}
-            pickallFurni={roomSession?.isRoomOwner}
-            type="furni"
-        />
+        <NativeTextTree>
+            <ChooserWidgetView
+                title={LocalizeText('widget.chooser.furni.title')}
+                items={items}
+                selectItem={selectItem}
+                onClose={() => {
+                    chooserSelectionVisualizer.clearAll();
+                    onClose();
+                }}
+                pickallFurni={roomSession?.isRoomOwner}
+                type="furni"
+            />
+        </NativeTextTree>
     );
 };

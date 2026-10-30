@@ -8,6 +8,7 @@ import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedT
 import { NO_PAGE } from './WiredPaging.helpers';
 import { NumberInput } from '../../common/NumberInput';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 export const WIRED_ARRAY_INSPECTOR_PAGE_SIZE = 25;
 const REQUEST_PAGE_RATELIMIT = 300;
@@ -153,61 +154,63 @@ export const WiredArrayInspectorView = (props: WiredArrayInspectorViewProps) => 
         : '';
 
     return (
-        <OctaneCardView
-            className="octane-wired-menu min-w-[620px] max-w-[620px] max-h-[620px]"
-            theme="primary-slim"
-            uniqueKey="wired-array-inspector"
-            windowPosition={DraggableWindowPosition.TOP_LEFT}
-            offsetLeft={540}
-            offsetTop={60}
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.arrays.title', 'Array contents')} onCloseClick={onClose} />
-            <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                    <div className="grow flex flex-col">
-                        <Text>
-                            <b>{localizeWithFallback('wiredmenu.variable_management.variable_name', 'Variable name:')}</b> {variableName}
-                        </Text>
-                        {!!data && <Text>{summary}</Text>}
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-wired-menu min-w-[620px] max-w-[620px] max-h-[620px]"
+                theme="primary-slim"
+                uniqueKey="wired-array-inspector"
+                windowPosition={DraggableWindowPosition.TOP_LEFT}
+                offsetLeft={540}
+                offsetTop={60}
+            >
+                <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.arrays.title', 'Array contents')} onCloseClick={onClose} />
+                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                    <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
+                        <div className="grow flex flex-col">
+                            <Text>
+                                <b>{localizeWithFallback('wiredmenu.variable_management.variable_name', 'Variable name:')}</b> {variableName}
+                            </Text>
+                            {!!data && <Text>{summary}</Text>}
+                        </div>
+                        <Button variant="secondary" onClick={() => requests.refresh()}>
+                            {localizeWithFallback('wiredmenu.variable_management.refresh', 'Refresh')}
+                        </Button>
                     </div>
-                    <Button variant="secondary" onClick={() => requests.refresh()}>
-                        {localizeWithFallback('wiredmenu.variable_management.refresh', 'Refresh')}
-                    </Button>
-                </div>
 
-                <label className="flex items-center gap-2 text-[12px]">
-                    <Text>{localizeWithFallback('wiredmenu.arrays.owner', 'Owner id')}:</Text>
-                    <NumberInput className="w-[110px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={ownerInput} onChange={(event) => setOwnerInput(event.target.value)} onKeyDown={(event) => {
-                            if (event.key !== 'Enter') return;
+                    <label className="flex items-center gap-2 text-[12px]">
+                        <Text>{localizeWithFallback('wiredmenu.arrays.owner', 'Owner id')}:</Text>
+                        <NumberInput className="w-[110px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]" value={ownerInput} onChange={(event) => setOwnerInput(event.target.value)} onKeyDown={(event) => {
+                                if (event.key !== 'Enter') return;
 
-                            const parsed = parseInt(ownerInput.trim(), 10);
+                                const parsed = parseInt(ownerInput.trim(), 10);
 
-                            setOwnerId(Number.isFinite(parsed) ? parsed : 0);
-                        }} />
-                    <Text small className="text-black/60">
-                        {localizeWithFallback('wiredmenu.arrays.owner.hint', 'Room arrays ignore this. Press Enter to load.')}
-                    </Text>
-                </label>
+                                setOwnerId(Number.isFinite(parsed) ? parsed : 0);
+                            }} />
+                        <Text small className="text-black/60">
+                            {localizeWithFallback('wiredmenu.arrays.owner.hint', 'Room arrays ignore this. Press Enter to load.')}
+                        </Text>
+                    </label>
 
-                {!!data && !data.hasArray && (
-                    <Text>{localizeWithFallback('wiredmenu.arrays.not_array', 'That variable is not an array, or this owner has no value for it yet.')}</Text>
-                )}
+                    {!!data && !data.hasArray && (
+                        <Text>{localizeWithFallback('wiredmenu.arrays.not_array', 'That variable is not an array, or this owner has no value for it yet.')}</Text>
+                    )}
 
-                <WiredPagedTable
-                    columns={columns}
-                    rows={data?.entries ?? []}
-                    getRowId={(entry) => String(entry.index)}
-                    getCell={getCell}
-                    currentPage={currentPage}
-                    totalEntries={data?.totalIndexes ?? 0}
-                    lastPage={lastPage}
-                    requests={requests}
-                    emptyText={localizeWithFallback('wiredmenu.arrays.empty', 'This array holds nothing yet')}
-                    scrollResetKey={scrollKey}
-                    bodyClassName="h-[320px]"
-                />
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <WiredPagedTable
+                        columns={columns}
+                        rows={data?.entries ?? []}
+                        getRowId={(entry) => String(entry.index)}
+                        getCell={getCell}
+                        currentPage={currentPage}
+                        totalEntries={data?.totalIndexes ?? 0}
+                        lastPage={lastPage}
+                        requests={requests}
+                        emptyText={localizeWithFallback('wiredmenu.arrays.empty', 'This array holds nothing yet')}
+                        scrollResetKey={scrollKey}
+                        bodyClassName="h-[320px]"
+                    />
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };
 

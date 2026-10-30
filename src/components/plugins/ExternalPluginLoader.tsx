@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { GetConfigurationValue } from '../../api';
+import { GetOptionalConfigurationValue } from '../../api/octane/GetConfigurationValue';
 import { PluginEntry, PluginScript, resolvePluginScripts } from '../../api/utils/resolvePluginScripts';
 import { subscribePlugins } from './OctanePluginApi';
 
@@ -17,9 +17,10 @@ export const ExternalPluginLoader: FC<{}> = () => {
         let entries: PluginEntry[] = [];
         let allowedHosts: string[] = [];
 
+        // Both keys are optional (no plugins is the default), so a config without them does not warn.
         try {
-            entries = GetConfigurationValue<PluginEntry[]>('external.plugins', []) || [];
-            allowedHosts = GetConfigurationValue<string[]>('external.plugins.allowed.hosts', []) || [];
+            entries = GetOptionalConfigurationValue<PluginEntry[]>('external.plugins', []) || [];
+            allowedHosts = GetOptionalConfigurationValue<string[]>('external.plugins.allowed.hosts', []) || [];
         } catch (e) {
             console.warn('[OctanePlugins] Could not read external.plugins config:', e);
             return;

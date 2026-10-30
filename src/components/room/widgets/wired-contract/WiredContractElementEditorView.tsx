@@ -19,6 +19,7 @@ import { ContractFooter, ContractFrame, ContractSection, ContractSkin, ContractT
 import { BaseButton } from '../../../../common/BaseButton';
 import { NumberInput } from '../../../../common/NumberInput';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** AIR TableView rows are 20px; only the rows in view (and a few around them) are drawn. */
 const ROW_HEIGHT = 20;
@@ -70,52 +71,54 @@ export const WiredContractElementEditorView: FC<WiredContractElementEditorViewPr
     };
 
     return (
-        <ContractFrame title={ LocalizeText(initial ? 'wiredcontracts.edit_element.title' : 'wiredcontracts.add_element.title') } width={ 420 } offsetLeft={ 375 } uniqueKey="wired-contract-element" className="wired-contract--element" onClose={ onClose }>
-            <fieldset className="wired-contract__editable" disabled={ !canWrite }>
-                <div className="wired-contract__element-top">
-                    <ContractSection title={ LocalizeText('wiredcontracts.element.type') }>
-                        { [ WIRED_CONTRACT_COIN, WIRED_CONTRACT_FURNI ].map(value =>
-                            <label className="wired-contract__choice" key={ value }>
-                                <Radio name="wired-contract-element-type" checked={ type === value } onCheckedChange={ () => setType(value) } />
-                                <ContractText text={ LocalizeText(`wiredcontracts.element.type.${ value }`) } />
-                            </label>) }
-                    </ContractSection>
-                    <ContractSection title={ LocalizeText('wiredcontracts.element.amount') }>
-                        <NumberInput className="wired-contract__input wired-contract__amount" min={ 1 } max={ WIRED_CONTRACT_MAX_COINS } aria-label={ LocalizeText('wiredcontracts.element.amount') } value={ amount } onChange={ event => setAmount(event.target.value) } />
-                    </ContractSection>
-                </div>
-                <ContractSection title={ LocalizeText('wiredcontracts.element.itemtype.selection') } disabled={ type !== WIRED_CONTRACT_FURNI }
-                    headerOption={ selected && <span className="wired-contract__selected-icon"><LayoutFurniIconImageView productType={ selected.isWallItem ? FurnitureType.WALL : FurnitureType.FLOOR } productClassId={ selected.typeId } extraData={ selected.legacyPosterId } /></span> }>
-                    <label className="wired-contract__named">
-                        <ContractText text={ LocalizeText('wiredcontracts.element.itemtype.furni_code') } />
-                        <input className="wired-contract__input wired-contract__named-input" type="text" readOnly aria-label={ LocalizeText('wiredcontracts.element.itemtype.furni_code') } placeholder={ LocalizeText('wiredcontracts.element.itemtype.furni_code.placeholder') } value={ selectedCandidate?.code ?? '' } />
-                    </label>
-                    <label className="wired-contract__named">
-                        <ContractText text={ LocalizeText('wiredcontracts.element.itemtype.search') } />
-                        <input className="wired-contract__input wired-contract__named-input" type="text" aria-label={ LocalizeText('wiredcontracts.element.itemtype.search') } maxLength={ WIRED_CONTRACT_SEARCH_MAX } value={ query } onChange={ event => { setQuery(event.target.value); setScrollTop(0); } } />
-                    </label>
-                    <div className="wired-contract__item-table">
-                        <ContractSkin type="table" width={ 404 } height={ 234 } />
-                        <div className="wired-contract__item-heading">
-                            { [ 'furni_name', 'furni_code', 'furni_type' ].map(key => <span key={ key }><ContractText text={ LocalizeText(`wiredcontracts.element.itemtype.col.${ key }`) } bold background={ 0xffffff } /></span>) }
-                        </div>
-                        <div className="wired-contract__item-scroll" onScroll={ event => setScrollTop(event.currentTarget.scrollTop) }>
-                            <div role="listbox" aria-label={ LocalizeText('wiredcontracts.element.itemtype.selection') } style={ { height: filtered.length * ROW_HEIGHT, position: 'relative' } }>
-                                { visible.map((candidate, index) =>
-                                    <BaseButton role="option" type="button" key={ wiredContractItemKey(candidate.itemType) } className="wired-contract__item-row"
-                                        aria-selected={ wiredContractItemKey(candidate.itemType) === wiredContractItemKey(selected) } data-even={ (first + index) % 2 === 0 }
-                                        style={ { top: (first + index) * ROW_HEIGHT } } onClick={ () => setSelected(candidate.itemType) }>
-                                        <span>{ candidate.name }</span>
-                                        <span>{ candidate.code }</span>
-                                        <span>{ LocalizeText(candidate.itemType.isWallItem ? 'inventory.filter.placement.wall' : 'inventory.filter.placement.floor') }</span>
-                                    </BaseButton>) }
+        <NativeTextTree>
+            <ContractFrame title={ LocalizeText(initial ? 'wiredcontracts.edit_element.title' : 'wiredcontracts.add_element.title') } width={ 420 } offsetLeft={ 375 } uniqueKey="wired-contract-element" className="wired-contract--element" onClose={ onClose }>
+                <fieldset className="wired-contract__editable" disabled={ !canWrite }>
+                    <div className="wired-contract__element-top">
+                        <ContractSection title={ LocalizeText('wiredcontracts.element.type') }>
+                            { [ WIRED_CONTRACT_COIN, WIRED_CONTRACT_FURNI ].map(value =>
+                                <label className="wired-contract__choice" key={ value }>
+                                    <Radio name="wired-contract-element-type" checked={ type === value } onCheckedChange={ () => setType(value) } />
+                                    <ContractText text={ LocalizeText(`wiredcontracts.element.type.${ value }`) } />
+                                </label>) }
+                        </ContractSection>
+                        <ContractSection title={ LocalizeText('wiredcontracts.element.amount') }>
+                            <NumberInput className="wired-contract__input wired-contract__amount" min={ 1 } max={ WIRED_CONTRACT_MAX_COINS } aria-label={ LocalizeText('wiredcontracts.element.amount') } value={ amount } onChange={ event => setAmount(event.target.value) } />
+                        </ContractSection>
+                    </div>
+                    <ContractSection title={ LocalizeText('wiredcontracts.element.itemtype.selection') } disabled={ type !== WIRED_CONTRACT_FURNI }
+                        headerOption={ selected && <span className="wired-contract__selected-icon"><LayoutFurniIconImageView productType={ selected.isWallItem ? FurnitureType.WALL : FurnitureType.FLOOR } productClassId={ selected.typeId } extraData={ selected.legacyPosterId } /></span> }>
+                        <label className="wired-contract__named">
+                            <ContractText text={ LocalizeText('wiredcontracts.element.itemtype.furni_code') } />
+                            <input className="wired-contract__input wired-contract__named-input" type="text" readOnly aria-label={ LocalizeText('wiredcontracts.element.itemtype.furni_code') } placeholder={ LocalizeText('wiredcontracts.element.itemtype.furni_code.placeholder') } value={ selectedCandidate?.code ?? '' } />
+                        </label>
+                        <label className="wired-contract__named">
+                            <ContractText text={ LocalizeText('wiredcontracts.element.itemtype.search') } />
+                            <input className="wired-contract__input wired-contract__named-input" type="text" aria-label={ LocalizeText('wiredcontracts.element.itemtype.search') } maxLength={ WIRED_CONTRACT_SEARCH_MAX } value={ query } onChange={ event => { setQuery(event.target.value); setScrollTop(0); } } />
+                        </label>
+                        <div className="wired-contract__item-table">
+                            <ContractSkin type="table" width={ 404 } height={ 234 } />
+                            <div className="wired-contract__item-heading">
+                                { [ 'furni_name', 'furni_code', 'furni_type' ].map(key => <span key={ key }><ContractText text={ LocalizeText(`wiredcontracts.element.itemtype.col.${ key }`) } bold background={ 0xffffff } /></span>) }
+                            </div>
+                            <div className="wired-contract__item-scroll" onScroll={ event => setScrollTop(event.currentTarget.scrollTop) }>
+                                <div role="listbox" aria-label={ LocalizeText('wiredcontracts.element.itemtype.selection') } style={ { height: filtered.length * ROW_HEIGHT, position: 'relative' } }>
+                                    { visible.map((candidate, index) =>
+                                        <BaseButton role="option" type="button" key={ wiredContractItemKey(candidate.itemType) } className="wired-contract__item-row"
+                                            aria-selected={ wiredContractItemKey(candidate.itemType) === wiredContractItemKey(selected) } data-even={ (first + index) % 2 === 0 }
+                                            style={ { top: (first + index) * ROW_HEIGHT } } onClick={ () => setSelected(candidate.itemType) }>
+                                            <span>{ candidate.name }</span>
+                                            <span>{ candidate.code }</span>
+                                            <span>{ LocalizeText(candidate.itemType.isWallItem ? 'inventory.filter.placement.wall' : 'inventory.filter.placement.floor') }</span>
+                                        </BaseButton>) }
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="wired-contract__count"><ContractText text={ LocalizeText('wiredcontracts.element.show_count', [ 'amount' ], [ String(filtered.length) ]) } /></div>
-                </ContractSection>
-            </fieldset>
-            <ContractFooter saveDisabled={ !canWrite } onSave={ save } onClose={ onClose } />
-        </ContractFrame>
+                        <div className="wired-contract__count"><ContractText text={ LocalizeText('wiredcontracts.element.show_count', [ 'amount' ], [ String(filtered.length) ]) } /></div>
+                    </ContractSection>
+                </fieldset>
+                <ContractFooter saveDisabled={ !canWrite } onSave={ save } onClose={ onClose } />
+            </ContractFrame>
+        </NativeTextTree>
     );
 };

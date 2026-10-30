@@ -20,6 +20,7 @@ import { getSnowWarFigure } from './SnowWarAvatarView';
 import { SnowWarSkillStars } from './SnowWarSkillStars';
 import { SnowWarStrokeText } from './SnowWarStrokeText';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const localizeWithFallback = (key: string, fallback: string) => {
     const text = LocalizeText(key);
@@ -114,12 +115,14 @@ export const SnowWarResultsView: FC = () => {
         const gender = player.gender ?? figures.get(player.userId)?.gender ?? 'M';
         if (!figure) return null;
         return (
-            <LayoutAvatarImageView
-                figure={getSnowWarFigure(figure, teamId)}
-                gender={gender}
-                direction={getTeamDirection(getOfficialTeamReference(teamId))}
-                scale={0.5}
-            />
+            <NativeTextTree>
+                <LayoutAvatarImageView
+                    figure={getSnowWarFigure(figure, teamId)}
+                    gender={gender}
+                    direction={getTeamDirection(getOfficialTeamReference(teamId))}
+                    scale={0.5}
+                />
+            </NativeTextTree>
         );
     };
 
@@ -158,79 +161,83 @@ export const SnowWarResultsView: FC = () => {
         const teamReference = getOfficialTeamReference(teamId);
 
         return (
-            <div className="snowwar-results__spotlight" style={{ color: SNOWWAR_TEAM_COLORS[teamReference] }}>
-                <div className="snowwar-results__spotlight-title">
-                    <SnowWarStrokeText stroke={SNOWWAR_TEAM_COLORS[teamReference]} text={localizeWithFallback(titleKey, titleFallback)} />
+            <NativeTextTree>
+                <div className="snowwar-results__spotlight" style={{ color: SNOWWAR_TEAM_COLORS[teamReference] }}>
+                    <div className="snowwar-results__spotlight-title">
+                        <SnowWarStrokeText stroke={SNOWWAR_TEAM_COLORS[teamReference]} text={localizeWithFallback(titleKey, titleFallback)} />
+                    </div>
+                    <div className={`snowwar-results__player-image snowwar-results__player-image--team-${teamReference}`}>{renderAvatar(player, teamId)}</div>
+                    <div className="snowwar-results__spotlight-name">{player.name}</div>
                 </div>
-                <div className={`snowwar-results__player-image snowwar-results__player-image--team-${teamReference}`}>{renderAvatar(player, teamId)}</div>
-                <div className="snowwar-results__spotlight-name">{player.name}</div>
-            </div>
+            </NativeTextTree>
         );
     };
 
     return (
-        <div className="snowwar-results">
-            <div className="snowwar-results__card">
-                {/* AIR endingInformation: white, its UbuntuThick stroke in the winner's colour (colorStrokes). */}
-                <div className="snowwar-results__title">
-                    <SnowWarStrokeText
-                        stroke={headline.color}
-                        text={headline.type === 'tie'
-                            ? localizeWithFallback('snowwar.result.tie', 'Game Was A Tie!')
-                            : localizeWithFallback(headline.textKey, headline.textKey === 'snowwar.team_1_wins' ? 'Blue Team wins!' : 'Red Team wins!')} />
-                </div>
-
-                <div className="snowwar-results__teams">
-                    {orderedTeams.map((team) => {
-                        const teamReference = getOfficialTeamReference(team.teamId);
-                        return (
-                            <div key={team.teamId} className={`snowwar-results__team snowwar-results__team--${teamReference}`}>
-                                <div className="snowwar-results__team-score">
-                                    <SnowWarStrokeText stroke={SNOWWAR_TEAM_COLORS[teamReference]} text={team.score} />
-                                </div>
-                                <div className="snowwar-results__team-list">
-                                    {[...team.players].sort((a, b) => b.score - a.score).map((player) => renderPlayer(player, team.teamId))}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {(mostHits || mostKills) && (
-                    <div className="snowwar-results__spotlights">
-                        {mostHits && renderSpotlight(mostHits, 'snowwar.most_hits', 'Most Hits')}
-                        {mostKills && renderSpotlight(mostKills, 'snowwar.most_kills', "Most K.O.'s")}
+        <NativeTextTree>
+            <div className="snowwar-results">
+                <div className="snowwar-results__card">
+                    {/* AIR endingInformation: white, its UbuntuThick stroke in the winner's colour (colorStrokes). */}
+                    <div className="snowwar-results__title">
+                        <SnowWarStrokeText
+                            stroke={headline.color}
+                            text={headline.type === 'tie'
+                                ? localizeWithFallback('snowwar.result.tie', 'Game Was A Tie!')
+                                : localizeWithFallback(headline.textKey, headline.textKey === 'snowwar.team_1_wins' ? 'Blue Team wins!' : 'Red Team wins!')} />
                     </div>
-                )}
 
-                <div className="snowwar-results__buttons">
-                    <BaseButton type="button" className="snowwar-button" disabled={rematch.kind === 'please_wait'} onClick={onRematch}>
-                        {rematch.kind === 'join_hc'
-                            ? localizeWithFallback('catalog.vip.buy.title', 'Join HC!')
-                            : localizeWithFallback(rematch.textKey, rematch.kind === 'rematch' ? 'Rematch (%seconds%)' : 'Please wait (%seconds%)').replace(
-                                  '%seconds%',
-                                  rematch.seconds.toString()
-                              )}
-                    </BaseButton>
-                    {gamesLeft.showCounter && (
-                        <BaseButton type="button" className="snowwar-results__status" onClick={openClubCenter}>
-                            <span>
-                                {localizeWithFallback('snowwar.results.games_left', 'Total Games Left:')}{' '}
-                                <span className={`snowwar-results__games-left snowwar-results__games-left--${gamesLeft.counterTone}`}>
-                                    <SnowWarStrokeText stroke={(gamesLeft.counterTone === 'red') ? '#ff0000' : '#1077ac'} text={freeGamesLeft} />
-                                </span>
-                            </span>
-                            <span className="snowwar-results__status-vip">
-                                {localizeWithFallback('snowwar.results.get_more_games', 'Become a HC member for additional free daily games')}
-                            </span>
-                        </BaseButton>
+                    <div className="snowwar-results__teams">
+                        {orderedTeams.map((team) => {
+                            const teamReference = getOfficialTeamReference(team.teamId);
+                            return (
+                                <div key={team.teamId} className={`snowwar-results__team snowwar-results__team--${teamReference}`}>
+                                    <div className="snowwar-results__team-score">
+                                        <SnowWarStrokeText stroke={SNOWWAR_TEAM_COLORS[teamReference]} text={team.score} />
+                                    </div>
+                                    <div className="snowwar-results__team-list">
+                                        {[...team.players].sort((a, b) => b.score - a.score).map((player) => renderPlayer(player, team.teamId))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {(mostHits || mostKills) && (
+                        <div className="snowwar-results__spotlights">
+                            {mostHits && renderSpotlight(mostHits, 'snowwar.most_hits', 'Most Hits')}
+                            {mostKills && renderSpotlight(mostKills, 'snowwar.most_kills', "Most K.O.'s")}
+                        </div>
                     )}
-                </div>
 
-                <BaseButton type="button" className="snowwar-results__leave" onClick={() => exitGame()}>
-                    {localizeWithFallback('snowwar.exit.yes', 'Leave game')}
-                </BaseButton>
+                    <div className="snowwar-results__buttons">
+                        <BaseButton type="button" className="snowwar-button" disabled={rematch.kind === 'please_wait'} onClick={onRematch}>
+                            {rematch.kind === 'join_hc'
+                                ? localizeWithFallback('catalog.vip.buy.title', 'Join HC!')
+                                : localizeWithFallback(rematch.textKey, rematch.kind === 'rematch' ? 'Rematch (%seconds%)' : 'Please wait (%seconds%)').replace(
+                                      '%seconds%',
+                                      rematch.seconds.toString()
+                                  )}
+                        </BaseButton>
+                        {gamesLeft.showCounter && (
+                            <BaseButton type="button" className="snowwar-results__status" onClick={openClubCenter}>
+                                <span>
+                                    {localizeWithFallback('snowwar.results.games_left', 'Total Games Left:')}{' '}
+                                    <span className={`snowwar-results__games-left snowwar-results__games-left--${gamesLeft.counterTone}`}>
+                                        <SnowWarStrokeText stroke={(gamesLeft.counterTone === 'red') ? '#ff0000' : '#1077ac'} text={freeGamesLeft} />
+                                    </span>
+                                </span>
+                                <span className="snowwar-results__status-vip">
+                                    {localizeWithFallback('snowwar.results.get_more_games', 'Become a HC member for additional free daily games')}
+                                </span>
+                            </BaseButton>
+                        )}
+                    </div>
+
+                    <BaseButton type="button" className="snowwar-results__leave" onClick={() => exitGame()}>
+                        {localizeWithFallback('snowwar.exit.yes', 'Leave game')}
+                    </BaseButton>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

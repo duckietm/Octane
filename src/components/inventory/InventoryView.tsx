@@ -48,6 +48,7 @@ import { InventoryWiredTradeView } from './views/furniture/InventoryWiredTradeVi
 import { BADGE_MAIN_ACHIEVEMENTS, BADGE_MAIN_ALL, BADGE_MAIN_NORMAL, BADGE_RARITY_ALL, InventoryCategoryFilterView } from './views/InventoryCategoryFilterView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
 import { InventoryPrefixView } from './views/prefix/InventoryPrefixView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const TAB_FURNITURE = 'inventory.furni';
 const TAB_BOTS = 'inventory.bots';
@@ -278,78 +279,80 @@ export const InventoryView: FC<{}> = () => {
     const showFilter = !isTrading && !isWiredTrading && ((section !== null && sectionGroupItems.length > 0) || currentTab === TAB_BADGES);
 
     return (
-        <>
-            <OctaneCardView
-                className={`octane-inventory-window max-w-[calc(100vw-16px)] ${!isTrading && isWiredTrading ? 'is-wired-trading' : currentTab === TAB_BADGES ? 'has-badge-controls' : currentTab === TAB_PETS ? 'has-pet-controls' : ''}`}
-                frameStyle={3}
-                resizeAxis="vertical"
-                uniqueKey="inventory"
-            >
-                <OctaneCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
-                {!isTrading && !isWiredTrading && (
-                    <>
-                        <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
-                            {TABS.map((name) => (
-                                <OctaneCardTabsItemView
-                                    key={name}
-                                    count={getTabUnseenCount(name, getCount)}
-                                    isActive={currentTab === name}
-                                    onClick={() => setCurrentTab(name)}
-                                >
-                                    <span className="octane-inventory-tab-label">{tabLabel(name)}</span>
-                                </OctaneCardTabsItemView>
-                            ))}
-                        </OctaneCardTabsView>
-                        <div className="octane-inventory-body">
-                            {showFilter && (
-                                <InventoryCategoryFilterView
-                                    currentTab={currentTab}
-                                    mainFilter={mainFilter}
-                                    typeFilter={typeFilter}
-                                    searchValue={searchValue}
-                                    onMainFilterChange={(value) => {
-                                        setMainFilter(value);
-                                        setAppliedSearch(searchValue);
-                                    }}
-                                    onTypeFilterChange={(value) => {
-                                        setTypeFilter(value);
-                                        setAppliedSearch(searchValue);
-                                    }}
-                                    onSearchChange={setSearchValue}
-                                    onSearchApply={setAppliedSearch}
-                                />
-                            )}
-                            <div className={`octane-inventory-content ${section ? 'is-furniture' : ''}`}>
-                                {section && (
-                                    <InventoryFurnitureView
-                                        filteredGroupItems={filteredGroupItems}
-                                        roomPreviewer={roomPreviewer}
-                                        roomSession={roomSession}
-                                        sectionGroupItems={sectionGroupItems}
+        <NativeTextTree>
+            <>
+                <OctaneCardView
+                    className={`octane-inventory-window max-w-[calc(100vw-16px)] ${!isTrading && isWiredTrading ? 'is-wired-trading' : currentTab === TAB_BADGES ? 'has-badge-controls' : currentTab === TAB_PETS ? 'has-pet-controls' : ''}`}
+                    frameStyle={3}
+                    resizeAxis="vertical"
+                    uniqueKey="inventory"
+                >
+                    <OctaneCardHeaderView headerText={LocalizeText('inventory.title')} onCloseClick={onClose} />
+                    {!isTrading && !isWiredTrading && (
+                        <>
+                            <OctaneCardTabsView classNames={['octane-inventory-tabs-shell']}>
+                                {TABS.map((name) => (
+                                    <OctaneCardTabsItemView
+                                        key={name}
+                                        count={getTabUnseenCount(name, getCount)}
+                                        isActive={currentTab === name}
+                                        onClick={() => setCurrentTab(name)}
+                                    >
+                                        <span className="octane-inventory-tab-label">{tabLabel(name)}</span>
+                                    </OctaneCardTabsItemView>
+                                ))}
+                            </OctaneCardTabsView>
+                            <div className="octane-inventory-body">
+                                {showFilter && (
+                                    <InventoryCategoryFilterView
+                                        currentTab={currentTab}
+                                        mainFilter={mainFilter}
+                                        typeFilter={typeFilter}
+                                        searchValue={searchValue}
+                                        onMainFilterChange={(value) => {
+                                            setMainFilter(value);
+                                            setAppliedSearch(searchValue);
+                                        }}
+                                        onTypeFilterChange={(value) => {
+                                            setTypeFilter(value);
+                                            setAppliedSearch(searchValue);
+                                        }}
+                                        onSearchChange={setSearchValue}
+                                        onSearchApply={setAppliedSearch}
                                     />
                                 )}
-                                {showsCollectibles && <InventoryCollectiblesView />}
-                                {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
-                                {currentTab === TAB_BADGES && <InventoryBadgeView filteredBadgeCodes={filteredBadgeCodes} />}
-                                {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
-                                {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
+                                <div className={`octane-inventory-content ${section ? 'is-furniture' : ''}`}>
+                                    {section && (
+                                        <InventoryFurnitureView
+                                            filteredGroupItems={filteredGroupItems}
+                                            roomPreviewer={roomPreviewer}
+                                            roomSession={roomSession}
+                                            sectionGroupItems={sectionGroupItems}
+                                        />
+                                    )}
+                                    {showsCollectibles && <InventoryCollectiblesView />}
+                                    {currentTab === TAB_PETS && <InventoryPetView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
+                                    {currentTab === TAB_BADGES && <InventoryBadgeView filteredBadgeCodes={filteredBadgeCodes} />}
+                                    {currentTab === TAB_BOTS && <InventoryBotView roomPreviewer={roomPreviewer} roomSession={roomSession} />}
+                                    {currentTab === TAB_PREFIXES && <InventoryPrefixView />}
+                                </div>
                             </div>
+                        </>
+                    )}
+                    {isTrading && (
+                        <div className="octane-inventory-body is-trade">
+                            <InventoryTradeView cancelTrade={onClose} />
                         </div>
-                    </>
-                )}
-                {isTrading && (
-                    <div className="octane-inventory-body is-trade">
-                        <InventoryTradeView cancelTrade={onClose} />
-                    </div>
-                )}
-                {!isTrading && isWiredTrading && (
-                    <div className="octane-inventory-body is-trade">
-                        <InventoryWiredTradeView />
-                    </div>
-                )}
-            </OctaneCardView>
-            <InventoryFurnitureDeleteView />
-            <InventoryTradeNameScamWarningView />
-        </>
+                    )}
+                    {!isTrading && isWiredTrading && (
+                        <div className="octane-inventory-body is-trade">
+                            <InventoryWiredTradeView />
+                        </div>
+                    )}
+                </OctaneCardView>
+                <InventoryFurnitureDeleteView />
+                <InventoryTradeNameScamWarningView />
+            </>
+        </NativeTextTree>
     );
 };

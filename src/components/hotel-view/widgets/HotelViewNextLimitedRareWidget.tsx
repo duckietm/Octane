@@ -3,6 +3,7 @@ import { FC, ReactNode, useEffect, useState } from 'react';
 import { localizeWithFallback } from '../../../api';
 import { getCountdownParts, getNextLimitedRareMode, getSecondsLeft, padCountdown } from '../../../api/hotel-view/LandingViewWidgets';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useNextLimitedRare } from '../../../hooks';
 
 /**
@@ -36,25 +37,27 @@ export const HotelViewNextLimitedRareWidget: FC<{ fallback: ReactNode; title: st
     };
 
     return (
-        <>
-            <h2>{localizeWithFallback('landing.view.next.ltd.header', title || 'Next limited rare')}</h2>
-            {body && <p>{body}</p>}
-            {mode === 'countdown' && (
-                <strong className="hotelview-countdown hotelview-ltd-countdown">
-                    <span className="hotelview-ltd-countdown-values">
-                        {padCountdown(countdown.days)}:{padCountdown(countdown.hours)}:{padCountdown(countdown.minutes)}:{padCountdown(countdown.seconds)}
-                    </span>
-                    <small>Days Hours Minutes Seconds</small>
-                </strong>
-            )}
-            {mode === 'available' && (
-                <BaseButton type="button" onClick={open}>
-                    {productName || localizeWithFallback('landing.view.next.ltd.get', 'Get it now!')}
+        <NativeTextTree>
+            <>
+                <h2>{localizeWithFallback('landing.view.next.ltd.header', title || 'Next limited rare')}</h2>
+                {body && <p>{body}</p>}
+                {mode === 'countdown' && (
+                    <strong className="hotelview-countdown hotelview-ltd-countdown">
+                        <span className="hotelview-ltd-countdown-values">
+                            {padCountdown(countdown.days)}:{padCountdown(countdown.hours)}:{padCountdown(countdown.minutes)}:{padCountdown(countdown.seconds)}
+                        </span>
+                        <small>Days Hours Minutes Seconds</small>
+                    </strong>
+                )}
+                {mode === 'available' && (
+                    <BaseButton type="button" onClick={open}>
+                        {productName || localizeWithFallback('landing.view.next.ltd.get', 'Get it now!')}
+                    </BaseButton>
+                )}
+                <BaseButton type="button" onClick={open} disabled={mode !== 'available'}>
+                    {localizeWithFallback('landing.view.next.ltd.opencatalogue', 'Open catalogue')}
                 </BaseButton>
-            )}
-            <BaseButton type="button" onClick={open} disabled={mode !== 'available'}>
-                {localizeWithFallback('landing.view.next.ltd.opencatalogue', 'Open catalogue')}
-            </BaseButton>
-        </>
+            </>
+        </NativeTextTree>
     );
 };

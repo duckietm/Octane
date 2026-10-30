@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredConditionFurniMatchesSnapshotView: FC = () => {
     const [stateFlag, setStateFlag] = useState(0);
@@ -34,31 +35,33 @@ export const WiredConditionFurniMatchesSnapshotView: FC = () => {
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID;
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.conditions')}</Text>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={!!stateFlag} id="stateFlag" onCheckedChange={(nextChecked) => setStateFlag(nextChecked ? 1 : 0)} />
-                    <Text>{LocalizeText('wiredfurni.params.condition.state')}</Text>
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={onChangeFurniSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.conditions')}</Text>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={!!stateFlag} id="stateFlag" onCheckedChange={(nextChecked) => setStateFlag(nextChecked ? 1 : 0)} />
+                        <Text>{LocalizeText('wiredfurni.params.condition.state')}</Text>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={!!directionFlag} id="directionFlag" onCheckedChange={(nextChecked) => setDirectionFlag(nextChecked ? 1 : 0)} />
+                        <Text>{LocalizeText('wiredfurni.params.condition.direction')}</Text>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={!!positionFlag} id="positionFlag" onCheckedChange={(nextChecked) => setPositionFlag(nextChecked ? 1 : 0)} />
+                        <Text>{LocalizeText('wiredfurni.params.condition.position')}</Text>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={!!altitudeFlag} id="altitudeFlag" onCheckedChange={(nextChecked) => setAltitudeFlag(nextChecked ? 1 : 0)} />
+                        <Text>{LocalizeText('wiredfurni.params.condition.altitude')}</Text>
+                    </div>
                 </div>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={!!directionFlag} id="directionFlag" onCheckedChange={(nextChecked) => setDirectionFlag(nextChecked ? 1 : 0)} />
-                    <Text>{LocalizeText('wiredfurni.params.condition.direction')}</Text>
-                </div>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={!!positionFlag} id="positionFlag" onCheckedChange={(nextChecked) => setPositionFlag(nextChecked ? 1 : 0)} />
-                    <Text>{LocalizeText('wiredfurni.params.condition.position')}</Text>
-                </div>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={!!altitudeFlag} id="altitudeFlag" onCheckedChange={(nextChecked) => setAltitudeFlag(nextChecked ? 1 : 0)} />
-                    <Text>{LocalizeText('wiredfurni.params.condition.altitude')}</Text>
-                </div>
-            </div>
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

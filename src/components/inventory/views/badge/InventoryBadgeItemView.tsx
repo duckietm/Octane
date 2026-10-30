@@ -1,6 +1,7 @@
 import { FC, PropsWithChildren, useState } from 'react';
 import { GetConfigurationValue, UnseenItemCategory } from '../../../../api';
 import { LayoutBadgeImageView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useInventoryBadges, useInventoryUnseenTracker } from '../../../../hooks';
 
 export const InventoryBadgeItemView: FC<PropsWithChildren<{ badgeCode: string }>> = (props) => {
@@ -25,17 +26,19 @@ export const InventoryBadgeItemView: FC<PropsWithChildren<{ badgeCode: string }>
     const onDragEnd = () => setIsDragging(false);
 
     return (
-        <div
-            draggable
-            className={`octane-inventory-thumb octane-inventory-badge-cell ${selectedBadgeCode === badgeCode ? 'is-selected' : ''} ${unseen ? 'is-unseen' : ''} ${isDragging ? 'is-dragging' : ''}`}
-            onDoubleClick={() => toggleBadge(badgeCode)}
-            onDragEnd={onDragEnd}
-            onDragStart={onDragStart}
-            onMouseDown={(event) => setSelectedBadgeCode(badgeCode)}
-            {...rest}
-        >
-            <LayoutBadgeImageView badgeCode={badgeCode} />
-            {children}
-        </div>
+        <NativeTextTree>
+            <div
+                draggable
+                className={`octane-inventory-thumb octane-inventory-badge-cell ${selectedBadgeCode === badgeCode ? 'is-selected' : ''} ${unseen ? 'is-unseen' : ''} ${isDragging ? 'is-dragging' : ''}`}
+                onDoubleClick={() => toggleBadge(badgeCode)}
+                onDragEnd={onDragEnd}
+                onDragStart={onDragStart}
+                onMouseDown={(event) => setSelectedBadgeCode(badgeCode)}
+                {...rest}
+            >
+                <LayoutBadgeImageView badgeCode={badgeCode} />
+                {children}
+            </div>
+        </NativeTextTree>
     );
 };

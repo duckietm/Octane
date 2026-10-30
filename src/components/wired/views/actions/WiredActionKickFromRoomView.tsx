@@ -6,6 +6,7 @@ import { OctaneInput } from '../../../../layout';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const WiredActionKickFromRoomView: FC<{}> = (props) => {
     const [message, setMessage] = useState('');
@@ -27,23 +28,25 @@ export const WiredActionKickFromRoomView: FC<{}> = (props) => {
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            {showMessage && (
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
-                    <OctaneInput
-                        maxLength={GetConfigurationValue<number>('wired.action.kick.from.room.max.length', 100)}
-                        type="text"
-                        value={message}
-                        onChange={(event) => setMessage(event.target.value)}
-                    />
-                </div>
-            )}
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                {showMessage && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
+                        <OctaneInput
+                            maxLength={GetConfigurationValue<number>('wired.action.kick.from.room.max.length', 100)}
+                            type="text"
+                            value={message}
+                            onChange={(event) => setMessage(event.target.value)}
+                        />
+                    </div>
+                )}
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

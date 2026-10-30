@@ -1,6 +1,7 @@
 import { FC, KeyboardEvent } from 'react';
 import { LocalizeText } from '../../../../api';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const FurniChestSearchBar: FC<{
     draft: string;
@@ -19,22 +20,24 @@ export const FurniChestSearchBar: FC<{
     };
 
     return (
-        <div className="octane-chest__search">
-            {!draft && (
-                <span className="octane-chest__search-placeholder">{LocalizeText('catalog.search.title')}</span>
-            )}
-            <input
-                type="text"
-                className="octane-chest__search-input"
-                value={draft}
-                onChange={(e) => onDraftChange(e.target.value)}
-                onKeyDown={onKeyDown}
-            />
-            {draft.length > 0 && (
-                <BaseButton type="button" className="octane-chest__search-clear" onClick={onClear} aria-label="Clear">
-                    ×
-                </BaseButton>
-            )}
-        </div>
+        <NativeTextTree>
+            <div className="octane-chest__search">
+                {!draft && (
+                    <span className="octane-chest__search-placeholder">{LocalizeText('catalog.search.title')}</span>
+                )}
+                <input
+                    type="text"
+                    className="octane-chest__search-input"
+                    value={draft}
+                    onChange={(e) => onDraftChange(e.target.value)}
+                    onKeyDown={onKeyDown}
+                />
+                {draft.length > 0 && (
+                    <BaseButton type="button" className="octane-chest__search-clear" onClick={onClear} aria-label="Clear">
+                        ×
+                    </BaseButton>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { FC, MouseEvent } from 'react';
 import { DisplaySoundboardSound, SoundboardTone } from '../../hooks/soundboard/soundboardPresentation';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface SoundboardPadViewProps {
     sound: DisplaySoundboardSound;
@@ -22,17 +23,19 @@ export const SOUNDBOARD_TONE_CLASSES: Record<SoundboardTone, string> = {
 
 /** The tone icon of a pad: a note, or the bars of a sound that is playing right now. */
 export const SoundboardPadIcon: FC<{ tone: SoundboardTone; playing?: boolean; className?: string }> = ({ tone, playing = false, className = '' }) => (
-    <span aria-hidden="true" className={`soundboard-pad__icon ${SOUNDBOARD_TONE_CLASSES[tone]} ${className}`}>
-        {playing ? (
-            <span className="soundboard-bars">
-                <i />
-                <i />
-                <i />
-            </span>
-        ) : (
-            '♪'
-        )}
-    </span>
+    <NativeTextTree>
+        <span aria-hidden="true" className={`soundboard-pad__icon ${SOUNDBOARD_TONE_CLASSES[tone]} ${className}`}>
+            {playing ? (
+                <span className="soundboard-bars">
+                    <i />
+                    <i />
+                    <i />
+                </span>
+            ) : (
+                '♪'
+            )}
+        </span>
+    </NativeTextTree>
 );
 
 export const SoundboardPadView: FC<SoundboardPadViewProps> = ({ sound, disabled, onPlay, hotkey, favorite = false, playing = false, onToggleFavorite }) => {
@@ -44,21 +47,23 @@ export const SoundboardPadView: FC<SoundboardPadViewProps> = ({ sound, disabled,
     };
 
     return (
-        <Hint content={sound.name}><BaseButton
-            type="button"
-            aria-label={sound.name}
-            aria-disabled={disabled}
-            data-tone={sound.tone}
-            data-favorite={favorite || undefined}
-            data-playing={playing || undefined}
-            onClick={() => !disabled && onPlay(sound)}
-            onContextMenu={toggleFavorite}
-            className="soundboard-pad"
-        >
-            <SoundboardPadIcon tone={sound.tone} playing={playing} />
-            <span className="soundboard-pad__name">{sound.name}</span>
-            {favorite && <span aria-hidden="true" className="soundboard-pad__star">★</span>}
-            {hotkey && <span aria-hidden="true" className="soundboard-pad__key">{hotkey}</span>}
-        </BaseButton></Hint>
+        <NativeTextTree>
+            <Hint content={sound.name}><BaseButton
+                type="button"
+                aria-label={sound.name}
+                aria-disabled={disabled}
+                data-tone={sound.tone}
+                data-favorite={favorite || undefined}
+                data-playing={playing || undefined}
+                onClick={() => !disabled && onPlay(sound)}
+                onContextMenu={toggleFavorite}
+                className="soundboard-pad"
+            >
+                <SoundboardPadIcon tone={sound.tone} playing={playing} />
+                <span className="soundboard-pad__name">{sound.name}</span>
+                {favorite && <span aria-hidden="true" className="soundboard-pad__star">★</span>}
+                {hotkey && <span aria-hidden="true" className="soundboard-pad__key">{hotkey}</span>}
+            </BaseButton></Hint>
+        </NativeTextTree>
     );
 };

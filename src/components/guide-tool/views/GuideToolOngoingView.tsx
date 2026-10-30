@@ -9,6 +9,7 @@ import {
 import { FC, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { GuideToolMessageGroup, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useGuideSessionTyping, useMessageEvent } from '../../../hooks';
 import { classNames, OctaneInput } from '../../../layout';
 
@@ -74,80 +75,82 @@ export const GuideToolOngoingView: FC<GuideToolOngoingViewProps> = (props) => {
     }, []);
 
     return (
-        <Column fullHeight>
-            <Flex alignItems="center" className="octane-card-panel p-2" gap={1} justifyContent="between">
-                {isGuide && (
-                    <div className="relative inline-flex align-middle">
-                        <Button onClick={visit}>{LocalizeText('guide.help.request.guide.ongoing.visit.button')}</Button>
-                        <Button onClick={invite}>{LocalizeText('guide.help.request.guide.ongoing.invite.button')}</Button>
-                    </div>
-                )}
-                {!isGuide && (
-                    <Column gap={0}>
-                        <Text bold className="octane-guide-tool__heading-2">{userName}</Text>
-                        <Text>{LocalizeText('guide.help.request.user.ongoing.guide.desc')}</Text>
-                    </Column>
-                )}
-                <Button disabled={!onReport} variant="danger" onClick={() => onReport?.()}>
-                    {LocalizeText('guide.help.common.report.link')}
-                </Button>
-            </Flex>
-            <Column className="octane-card-panel p-2 chat-messages" gap={1} overflow="hidden">
-                <Column overflow="auto">
-                    {messageGroups.map((group, index) => {
-                        return (
-                            <Flex key={index} fullWidth gap={2} justifyContent={isOwnChat(group.userId) ? 'end' : 'start'}>
-                                <div className="shrink-0 message-avatar">
-                                    {!isOwnChat(group.userId) && <LayoutAvatarImageView direction={2} figure={userFigure} />}
-                                </div>
-                                <div
-                                    className={
-                                        'octane-card-row text-black border-radius mb-2 py-1 px-2 messages-group-' + (isOwnChat(group.userId) ? 'right' : 'left')
-                                    }
-                                >
-                                    <Text bold>
-                                        {isOwnChat(group.userId) && GetSessionDataManager().userName}
-                                        {!isOwnChat(group.userId) && userName}
-                                    </Text>
-                                    {group.messages.map((chat, index) => (
-                                        <div
-                                            key={index}
-                                            className={classNames(chat.roomId ? 'text-break text-underline' : 'text-break', chat.roomId && 'cursor-pointer')}
-                                            onClick={() => (chat.roomId ? TryVisitRoom(chat.roomId) : null)}
-                                        >
-                                            {chat.message}
-                                        </div>
-                                    ))}
-                                </div>
-                                {isOwnChat(group.userId) && (
-                                    <div className="shrink-0 message-avatar">
-                                        <LayoutAvatarImageView direction={4} figure={GetSessionDataManager().figure} />
-                                    </div>
-                                )}
-                            </Flex>
-                        );
-                    })}
-                    <div ref={scrollDiv} />
-                </Column>
-            </Column>
-            <div className="flex flex-col gap-1">
-                <div className="flex gap-1">
-                    <OctaneInput
-                        placeholder={LocalizeText('guide.help.request.guide.ongoing.input.empty', ['name'], [userName])}
-                        type="text"
-                        value={messageText}
-                        onChange={(event) => setMessageText(event.target.value)}
-                        onKeyDown={onKeyDown}
-                    />
-                    <Button variant="success" onClick={sendMessage}>
-                        {LocalizeText('widgets.chatinput.say')}
+        <NativeTextTree>
+            <Column fullHeight>
+                <Flex alignItems="center" className="octane-card-panel p-2" gap={1} justifyContent="between">
+                    {isGuide && (
+                        <div className="relative inline-flex align-middle">
+                            <Button onClick={visit}>{LocalizeText('guide.help.request.guide.ongoing.visit.button')}</Button>
+                            <Button onClick={invite}>{LocalizeText('guide.help.request.guide.ongoing.invite.button')}</Button>
+                        </div>
+                    )}
+                    {!isGuide && (
+                        <Column gap={0}>
+                            <Text bold className="octane-guide-tool__heading-2">{userName}</Text>
+                            <Text>{LocalizeText('guide.help.request.user.ongoing.guide.desc')}</Text>
+                        </Column>
+                    )}
+                    <Button disabled={!onReport} variant="danger" onClick={() => onReport?.()}>
+                        {LocalizeText('guide.help.common.report.link')}
                     </Button>
+                </Flex>
+                <Column className="octane-card-panel p-2 chat-messages" gap={1} overflow="hidden">
+                    <Column overflow="auto">
+                        {messageGroups.map((group, index) => {
+                            return (
+                                <Flex key={index} fullWidth gap={2} justifyContent={isOwnChat(group.userId) ? 'end' : 'start'}>
+                                    <div className="shrink-0 message-avatar">
+                                        {!isOwnChat(group.userId) && <LayoutAvatarImageView direction={2} figure={userFigure} />}
+                                    </div>
+                                    <div
+                                        className={
+                                            'octane-card-row text-black border-radius mb-2 py-1 px-2 messages-group-' + (isOwnChat(group.userId) ? 'right' : 'left')
+                                        }
+                                    >
+                                        <Text bold>
+                                            {isOwnChat(group.userId) && GetSessionDataManager().userName}
+                                            {!isOwnChat(group.userId) && userName}
+                                        </Text>
+                                        {group.messages.map((chat, index) => (
+                                            <div
+                                                key={index}
+                                                className={classNames(chat.roomId ? 'text-break text-underline' : 'text-break', chat.roomId && 'cursor-pointer')}
+                                                onClick={() => (chat.roomId ? TryVisitRoom(chat.roomId) : null)}
+                                            >
+                                                {chat.message}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {isOwnChat(group.userId) && (
+                                        <div className="shrink-0 message-avatar">
+                                            <LayoutAvatarImageView direction={4} figure={GetSessionDataManager().figure} />
+                                        </div>
+                                    )}
+                                </Flex>
+                            );
+                        })}
+                        <div ref={scrollDiv} />
+                    </Column>
+                </Column>
+                <div className="flex flex-col gap-1">
+                    <div className="flex gap-1">
+                        <OctaneInput
+                            placeholder={LocalizeText('guide.help.request.guide.ongoing.input.empty', ['name'], [userName])}
+                            type="text"
+                            value={messageText}
+                            onChange={(event) => setMessageText(event.target.value)}
+                            onKeyDown={onKeyDown}
+                        />
+                        <Button variant="success" onClick={sendMessage}>
+                            {LocalizeText('widgets.chatinput.say')}
+                        </Button>
+                    </div>
+                    {isTyping && <Text className="octane-guide-tool__typing">{LocalizeText('guide.help.common.typing')}</Text>}
                 </div>
-                {isTyping && <Text className="octane-guide-tool__typing">{LocalizeText('guide.help.common.typing')}</Text>}
-            </div>
-            <Button fullWidth variant="success" onClick={resolve}>
-                {LocalizeText('guide.help.request.' + (isGuide ? 'guide' : 'user') + '.ongoing.close.link')}
-            </Button>
-        </Column>
+                <Button fullWidth variant="success" onClick={resolve}>
+                    {LocalizeText('guide.help.request.' + (isGuide ? 'guide' : 'user') + '.ongoing.close.link')}
+                </Button>
+            </Column>
+        </NativeTextTree>
     );
 };

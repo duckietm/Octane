@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { localizeWithFallback } from '../../../api';
 import { Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { Select } from '../../../common/Select';
 
 /** -1 keeps the room setting; 0, 1 and 2 are wide, normal and thin, as the room setting names them. */
@@ -20,14 +21,16 @@ export interface WiredBubbleWidthSelectProps {
 
 /** The bubble-width picker the official messaging boxes carry, shared by every box that talks. */
 export const WiredBubbleWidthSelect: FC<WiredBubbleWidthSelectProps> = ({ value, onChange }) => (
-    <label className="flex flex-col gap-1">
-        <Text bold>{localizeWithFallback('wiredfurni.params.show_message.bubble_width.title', 'Bubble width')}</Text>
-        <Select className="form-select form-select-sm" value={value} onChange={(event) => onChange(Number(event.target.value))}>
-            {WIRED_BUBBLE_WIDTH_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                    {localizeWithFallback(`wiredfurni.params.show_message.bubble_width.${option}`, FALLBACKS[option])}
-                </option>
-            ))}
-        </Select>
-    </label>
+    <NativeTextTree>
+        <label className="flex flex-col gap-1">
+            <Text bold>{localizeWithFallback('wiredfurni.params.show_message.bubble_width.title', 'Bubble width')}</Text>
+            <Select className="form-select form-select-sm" value={value} onChange={(event) => onChange(Number(event.target.value))}>
+                {WIRED_BUBBLE_WIDTH_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                        {localizeWithFallback(`wiredfurni.params.show_message.bubble_width.${option}`, FALLBACKS[option])}
+                    </option>
+                ))}
+            </Select>
+        </label>
+    </NativeTextTree>
 );

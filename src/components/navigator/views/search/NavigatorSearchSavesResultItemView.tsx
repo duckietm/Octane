@@ -4,6 +4,7 @@ import { LocalizeText, localizeWithFallback, SendMessageComposer } from '../../.
 import { useNavigatorUiStore } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export interface NavigatorSearchSavesResultItemViewProps {
     search: NavigatorSavedSearch;
@@ -35,18 +36,20 @@ export const NavigatorSearchSavesResultItemView: FC<NavigatorSearchSavesResultIt
     };
 
     return (
-        <div className="saved-search-row">
-            <Hint content={LocalizeText('navigator.tooltip.open.saved.search')}><BaseButton aria-label={LocalizeText('navigator.tooltip.open.saved.search')} type="button" className="saved-search-row__open" onClick={openSearch}>
-                <span className="saved-search-row__label">{title}</span>
-            </BaseButton></Hint>
-            <Hint content={LocalizeText('navigator.tooltip.remove.saved.search')}>
-                <BaseButton
-                    type="button"
-                    className="saved-search-row__delete"
-                    aria-label={`${LocalizeText('navigator.tooltip.remove.saved.search')} ${title}`}
-                    onClick={deleteSearch}
-                />
-            </Hint>
-        </div>
+        <NativeTextTree>
+            <div className="saved-search-row">
+                <Hint content={LocalizeText('navigator.tooltip.open.saved.search')}><BaseButton aria-label={LocalizeText('navigator.tooltip.open.saved.search')} type="button" className="saved-search-row__open" onClick={openSearch}>
+                    <span className="saved-search-row__label">{title}</span>
+                </BaseButton></Hint>
+                <Hint content={LocalizeText('navigator.tooltip.remove.saved.search')}>
+                    <BaseButton
+                        type="button"
+                        className="saved-search-row__delete"
+                        aria-label={`${LocalizeText('navigator.tooltip.remove.saved.search')} ${title}`}
+                        onClick={deleteSearch}
+                    />
+                </Hint>
+            </div>
+        </NativeTextTree>
     );
 };

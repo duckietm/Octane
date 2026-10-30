@@ -3,6 +3,7 @@ import { DisplaySoundboardSound } from '../../hooks/soundboard/soundboardPresent
 import { SOUNDBOARD_TONE_CLASSES } from './SoundboardPadView';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface SoundboardShelfViewProps {
     label: string;
@@ -14,23 +15,25 @@ interface SoundboardShelfViewProps {
 
 /** A short row of round buttons above the list: the pads a player reaches for most. */
 export const SoundboardShelfView: FC<SoundboardShelfViewProps> = ({ label, sounds, disabled, playingSoundId = null, onPlay }) => (
-    <div className="soundboard-shelf" data-testid="soundboard-shelf">
-        <span className="soundboard-shelf__label">{label}</span>
-        <div className="soundboard-shelf__row">
-            {sounds.map((sound) => (
-                <Hint key={sound.id} content={sound.name}>
-                    <BaseButton
-                        type="button"
-                        aria-label={sound.name}
-                        aria-disabled={disabled}
-                        data-playing={sound.id === playingSoundId || undefined}
-                        onClick={() => !disabled && onPlay(sound)}
-                        className={`soundboard-shelf__button ${SOUNDBOARD_TONE_CLASSES[sound.tone]}`}
-                    >
-                        ♪
-                    </BaseButton>
-                </Hint>
-            ))}
+    <NativeTextTree>
+        <div className="soundboard-shelf" data-testid="soundboard-shelf">
+            <span className="soundboard-shelf__label">{label}</span>
+            <div className="soundboard-shelf__row">
+                {sounds.map((sound) => (
+                    <Hint key={sound.id} content={sound.name}>
+                        <BaseButton
+                            type="button"
+                            aria-label={sound.name}
+                            aria-disabled={disabled}
+                            data-playing={sound.id === playingSoundId || undefined}
+                            onClick={() => !disabled && onPlay(sound)}
+                            className={`soundboard-shelf__button ${SOUNDBOARD_TONE_CLASSES[sound.tone]}`}
+                        >
+                            ♪
+                        </BaseButton>
+                    </Hint>
+                ))}
+            </div>
         </div>
-    </div>
+    </NativeTextTree>
 );

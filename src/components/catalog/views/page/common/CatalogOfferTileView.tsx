@@ -4,6 +4,7 @@ import { CatalogType, GetConfigurationValue, GetProductIconUrl, IPurchasableOffe
 import { LayoutAvatarImageView, LayoutChatStyleImageView, LayoutGridItem, LayoutGridItemProps, LayoutHabbiconImageView } from '../../../../../common';
 import { isAirBaseCatalogOffer } from './catalogAirGrid.helpers';
 import { Hint } from '../../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 export interface CatalogOfferTileViewProps extends LayoutGridItemProps {
     offer: IPurchasableOffer;
@@ -104,67 +105,69 @@ export const CatalogOfferTileView: FC<CatalogOfferTileViewProps> = (props) => {
     const iconUrl = iconVisible ? resolvedIconUrl : null;
 
     return (
-        <div
-            ref={tileRef}
-            aria-label={offer.localizationName || product.furnitureData?.name || ''}
-            aria-selected={itemActive}
-            role="option"
-            tabIndex={0}
-            title={showTechnicalDetails ? `ID: ${product.productClassId} | Offer: ${offer.offerId}` : offer.localizationName}
-            onKeyDown={onKeyDown}
-        >
-            <LayoutGridItem
-                component="div"
-                className={`group/tile relative ${itemActive ? 'is-active' : ''} ${priceTemplateClassName}`.trim()}
-                gap={1}
-                itemCount={offer.pricingModel === Offer.PRICING_MODEL_MULTI ? product.productCount : 1}
-                itemUniqueNumber={product.uniqueLimitedItemSeriesSize}
-                itemUniqueSoldout={!!product.uniqueLimitedItemSeriesSize && !product.uniqueLimitedItemsLeft}
-                onMouseDown={onMouseEvent}
-                onMouseOut={onMouseEvent}
-                onMouseUp={onMouseEvent}
-                {...rest}
+        <NativeTextTree>
+            <div
+                ref={tileRef}
+                aria-label={offer.localizationName || product.furnitureData?.name || ''}
+                aria-selected={itemActive}
+                role="option"
+                tabIndex={0}
+                title={showTechnicalDetails ? `ID: ${product.productClassId} | Offer: ${offer.offerId}` : offer.localizationName}
+                onKeyDown={onKeyDown}
             >
-                {iconUrl && product.productType !== ProductTypeEnum.HABBICON && product.productType !== ProductTypeEnum.ROBOT && (
-                    <img
-                        className="octane-catalog-grid-offer-icon"
-                        src={iconUrl}
-                        draggable={false}
-                        style={tintColor ? { filter: 'url(#guild-furni-recolor)', transform: 'translateZ(0)' } : undefined}
-                        onError={(event) => {
-                            const fallbackIconUrl = typeof product.getIconUrl === 'function' ? product.getIconUrl(offer) : null;
-                            if (fallbackIconUrl && event.currentTarget.src !== fallbackIconUrl) event.currentTarget.src = fallbackIconUrl;
-                        }}
-                    />
-                )}
-                {product.productType === ProductTypeEnum.HABBICON && (
-                    <LayoutHabbiconImageView className="octane-catalog-grid-habbicon-icon" id={product.productClassId} />
-                )}
-                {product.productType === ProductTypeEnum.ROBOT && <LayoutAvatarImageView direction={2} figure={product.extraParam} fit />}
-                {product.productType === ProductTypeEnum.CHAT_STYLE && (
-                    <LayoutChatStyleImageView className="octane-catalog-grid-chat-style-icon" styleId={product.extraParam} />
-                )}
-                {offer.clubLevel > 0 && (
-                    <Hint content="Habbo Club">
-                        <span aria-label="Habbo Club" className="octane-catalog-grid-club-level" role="img">
-                            <i aria-hidden="true" className="octane-icon icon-catalogue-hc_small" />
-                        </span>
-                    </Hint>
-                )}
-                {showPrices && currentType !== CatalogType.BUILDER && prices.length > 0 && (
-                    <span className={`octane-catalog-grid-price ${prices.length > 1 ? 'is-multi-price' : 'is-single-price'}`}>
-                        {prices.map((price, index) => (
-                            <span key={`${price.type}-${index}`} className="octane-catalog-grid-price-entry">
-                                {index > 0 && <span className="octane-catalog-grid-price-plus">+</span>}
-                                <span className="octane-catalog-grid-price-amount">{price.amount}</span>
-                                {!!getCurrencyIconUrl(price.type) && (
-                                    <img className="octane-catalog-grid-price-currency" src={getCurrencyIconUrl(price.type)} draggable={false} />
-                                )}
+                <LayoutGridItem
+                    component="div"
+                    className={`group/tile relative ${itemActive ? 'is-active' : ''} ${priceTemplateClassName}`.trim()}
+                    gap={1}
+                    itemCount={offer.pricingModel === Offer.PRICING_MODEL_MULTI ? product.productCount : 1}
+                    itemUniqueNumber={product.uniqueLimitedItemSeriesSize}
+                    itemUniqueSoldout={!!product.uniqueLimitedItemSeriesSize && !product.uniqueLimitedItemsLeft}
+                    onMouseDown={onMouseEvent}
+                    onMouseOut={onMouseEvent}
+                    onMouseUp={onMouseEvent}
+                    {...rest}
+                >
+                    {iconUrl && product.productType !== ProductTypeEnum.HABBICON && product.productType !== ProductTypeEnum.ROBOT && (
+                        <img
+                            className="octane-catalog-grid-offer-icon"
+                            src={iconUrl}
+                            draggable={false}
+                            style={tintColor ? { filter: 'url(#guild-furni-recolor)', transform: 'translateZ(0)' } : undefined}
+                            onError={(event) => {
+                                const fallbackIconUrl = typeof product.getIconUrl === 'function' ? product.getIconUrl(offer) : null;
+                                if (fallbackIconUrl && event.currentTarget.src !== fallbackIconUrl) event.currentTarget.src = fallbackIconUrl;
+                            }}
+                        />
+                    )}
+                    {product.productType === ProductTypeEnum.HABBICON && (
+                        <LayoutHabbiconImageView className="octane-catalog-grid-habbicon-icon" id={product.productClassId} />
+                    )}
+                    {product.productType === ProductTypeEnum.ROBOT && <LayoutAvatarImageView direction={2} figure={product.extraParam} fit />}
+                    {product.productType === ProductTypeEnum.CHAT_STYLE && (
+                        <LayoutChatStyleImageView className="octane-catalog-grid-chat-style-icon" styleId={product.extraParam} />
+                    )}
+                    {offer.clubLevel > 0 && (
+                        <Hint content="Habbo Club">
+                            <span aria-label="Habbo Club" className="octane-catalog-grid-club-level" role="img">
+                                <i aria-hidden="true" className="octane-icon icon-catalogue-hc_small" />
                             </span>
-                        ))}
-                    </span>
-                )}
-            </LayoutGridItem>
-        </div>
+                        </Hint>
+                    )}
+                    {showPrices && currentType !== CatalogType.BUILDER && prices.length > 0 && (
+                        <span className={`octane-catalog-grid-price ${prices.length > 1 ? 'is-multi-price' : 'is-single-price'}`}>
+                            {prices.map((price, index) => (
+                                <span key={`${price.type}-${index}`} className="octane-catalog-grid-price-entry">
+                                    {index > 0 && <span className="octane-catalog-grid-price-plus">+</span>}
+                                    <span className="octane-catalog-grid-price-amount">{price.amount}</span>
+                                    {!!getCurrencyIconUrl(price.type) && (
+                                        <img className="octane-catalog-grid-price-currency" src={getCurrencyIconUrl(price.type)} draggable={false} />
+                                    )}
+                                </span>
+                            ))}
+                        </span>
+                    )}
+                </LayoutGridItem>
+            </div>
+        </NativeTextTree>
     );
 };

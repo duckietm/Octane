@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren } from 'react';
 import { LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface NotificationItemLayoutViewProps extends LayoutNotificationBubbleViewProps {
     iconUrl?: string;
@@ -11,9 +12,11 @@ export const NotificationItemLayoutView: FC<PropsWithChildren<NotificationItemLa
     const { iconUrl = null, children = null, classNames = [], ...rest } = props;
 
     return (
-        <LayoutNotificationBubbleView classNames={['octane-notification-item', ...classNames]} {...rest}>
-            <div className="octane-notification-item__icon">{iconUrl && <img alt="" className="no-select" src={iconUrl} draggable={false} />}</div>
-            <div className="octane-notification-item__text">{children}</div>
-        </LayoutNotificationBubbleView>
+        <NativeTextTree>
+            <LayoutNotificationBubbleView classNames={['octane-notification-item', ...classNames]} {...rest}>
+                <div className="octane-notification-item__icon">{iconUrl && <img alt="" className="no-select" src={iconUrl} draggable={false} />}</div>
+                <div className="octane-notification-item__text">{children}</div>
+            </LayoutNotificationBubbleView>
+        </NativeTextTree>
     );
 };

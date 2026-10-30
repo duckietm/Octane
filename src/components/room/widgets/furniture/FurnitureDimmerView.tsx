@@ -18,6 +18,7 @@ import { classNames } from '../../../../layout';
 import { Checkbox } from '../../../../common/Checkbox';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsAAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const FurnitureDimmerView: FC<{}> = (props) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -57,84 +58,86 @@ export const FurnitureDimmerView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <OctaneCardView className="octane-room-widget-dimmer">
-            <OctaneCardHeaderView headerText={LocalizeText('widget.dimmer.title')} onCloseClick={onClose} />
-            {dimmerState === 1 && (
-                <OctaneCardTabsView>
-                    {presets.map((preset) => (
-                        <OctaneCardTabsItemView key={preset.id} isActive={selectedPresetId === preset.id} onClick={(event) => selectPresetId(preset.id)}>
-                            {LocalizeText(`widget.dimmer.tab.${preset.id}`)}
-                        </OctaneCardTabsItemView>
-                    ))}
-                </OctaneCardTabsView>
-            )}
-            <OctaneCardContentView>
-                {dimmerState === 0 && (
-                    <Column alignItems="center">
-                        <div className="dimmer-banner" />
-                        <Text center className="p-1 rounded bg-muted">
-                            {LocalizeText('widget.dimmer.info.off')}
-                        </Text>
-                        <Button fullWidth variant="success" onClick={() => FurnitureDimmerUtilities.changeState()}>
-                            {LocalizeText('widget.dimmer.button.on')}
-                        </Button>
-                    </Column>
-                )}
+        <NativeTextTree>
+            <OctaneCardView className="octane-room-widget-dimmer">
+                <OctaneCardHeaderView headerText={LocalizeText('widget.dimmer.title')} onCloseClick={onClose} />
                 {dimmerState === 1 && (
-                    <>
-                        <div className="flex flex-col gap-1">
-                            <Text fontWeight="bold">{LocalizeText('widget.backgroundcolor.hue')}</Text>
-                            {isFreeColorMode && (
-                                <input
-                                    className="min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem]  rounded-[.2rem]"
-                                    type="color"
-                                    value={ColorUtils.makeColorNumberHex(selectedColor)}
-                                    onChange={(event) => setSelectedColor(ColorUtils.convertFromHex(event.target.value))}
-                                />
-                            )}
-                            {!isFreeColorMode && (
-                                <Grid columnCount={7} gap={1}>
-                                    {FurnitureDimmerUtilities.AVAILABLE_COLORS.map((color, index) => {
-                                        return (
-                                            <Column component={BaseButton} type="button"
-                                                key={index}
-                                                fullWidth
-                                                pointer
-                                                className={classNames('color-swatch rounded', color === selectedColor && 'active')}
-                                                style={{ backgroundColor: FurnitureDimmerUtilities.HTML_COLORS[index] }}
-                                                onClick={() => setSelectedColor(color)}
-                                            />
-                                        );
-                                    })}
-                                </Grid>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <Text fontWeight="bold">{LocalizeText('widget.backgroundcolor.lightness')}</Text>
-                            <Slider
-                                max={FurnitureDimmerUtilities.MAX_BRIGHTNESS}
-                                min={FurnitureDimmerUtilities.MIN_BRIGHTNESS}
-                                renderThumbContent={(state) => FurnitureDimmerUtilities.scaleBrightness(state.valueNow)}
-                                thumbClassName={'thumb percent'}
-                                value={selectedBrightness}
-                                onChange={(value) => setSelectedBrightness(value)}
-                            />
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <Checkbox checked={selectedEffectId === 2} onCheckedChange={(nextChecked) => setSelectedEffectId(nextChecked ? 2 : 1)} />
-                            <Text>{LocalizeText('widget.dimmer.type.checkbox')}</Text>
-                        </div>
-                        <div className="flex gap-1">
-                            <Button fullWidth variant="danger" onClick={() => FurnitureDimmerUtilities.changeState()}>
-                                {LocalizeText('widget.dimmer.button.off')}
-                            </Button>
-                            <Button fullWidth variant="success" onClick={applyChanges}>
-                                {LocalizeText('widget.dimmer.button.apply')}
-                            </Button>
-                        </div>
-                    </>
+                    <OctaneCardTabsView>
+                        {presets.map((preset) => (
+                            <OctaneCardTabsItemView key={preset.id} isActive={selectedPresetId === preset.id} onClick={(event) => selectPresetId(preset.id)}>
+                                {LocalizeText(`widget.dimmer.tab.${preset.id}`)}
+                            </OctaneCardTabsItemView>
+                        ))}
+                    </OctaneCardTabsView>
                 )}
-            </OctaneCardContentView>
-        </OctaneCardView>
+                <OctaneCardContentView>
+                    {dimmerState === 0 && (
+                        <Column alignItems="center">
+                            <div className="dimmer-banner" />
+                            <Text center className="p-1 rounded bg-muted">
+                                {LocalizeText('widget.dimmer.info.off')}
+                            </Text>
+                            <Button fullWidth variant="success" onClick={() => FurnitureDimmerUtilities.changeState()}>
+                                {LocalizeText('widget.dimmer.button.on')}
+                            </Button>
+                        </Column>
+                    )}
+                    {dimmerState === 1 && (
+                        <>
+                            <div className="flex flex-col gap-1">
+                                <Text fontWeight="bold">{LocalizeText('widget.backgroundcolor.hue')}</Text>
+                                {isFreeColorMode && (
+                                    <input
+                                        className="min-h-[calc(1.5em+ .5rem+2px)] px-[.5rem] py-[.25rem]  rounded-[.2rem]"
+                                        type="color"
+                                        value={ColorUtils.makeColorNumberHex(selectedColor)}
+                                        onChange={(event) => setSelectedColor(ColorUtils.convertFromHex(event.target.value))}
+                                    />
+                                )}
+                                {!isFreeColorMode && (
+                                    <Grid columnCount={7} gap={1}>
+                                        {FurnitureDimmerUtilities.AVAILABLE_COLORS.map((color, index) => {
+                                            return (
+                                                <Column component={BaseButton} type="button"
+                                                    key={index}
+                                                    fullWidth
+                                                    pointer
+                                                    className={classNames('color-swatch rounded', color === selectedColor && 'active')}
+                                                    style={{ backgroundColor: FurnitureDimmerUtilities.HTML_COLORS[index] }}
+                                                    onClick={() => setSelectedColor(color)}
+                                                />
+                                            );
+                                        })}
+                                    </Grid>
+                                )}
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <Text fontWeight="bold">{LocalizeText('widget.backgroundcolor.lightness')}</Text>
+                                <Slider
+                                    max={FurnitureDimmerUtilities.MAX_BRIGHTNESS}
+                                    min={FurnitureDimmerUtilities.MIN_BRIGHTNESS}
+                                    renderThumbContent={(state) => FurnitureDimmerUtilities.scaleBrightness(state.valueNow)}
+                                    thumbClassName={'thumb percent'}
+                                    value={selectedBrightness}
+                                    onChange={(value) => setSelectedBrightness(value)}
+                                />
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <Checkbox checked={selectedEffectId === 2} onCheckedChange={(nextChecked) => setSelectedEffectId(nextChecked ? 2 : 1)} />
+                                <Text>{LocalizeText('widget.dimmer.type.checkbox')}</Text>
+                            </div>
+                            <div className="flex gap-1">
+                                <Button fullWidth variant="danger" onClick={() => FurnitureDimmerUtilities.changeState()}>
+                                    {LocalizeText('widget.dimmer.button.off')}
+                                </Button>
+                                <Button fullWidth variant="success" onClick={applyChanges}>
+                                    {LocalizeText('widget.dimmer.button.apply')}
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

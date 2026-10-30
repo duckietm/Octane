@@ -4,6 +4,7 @@ import { LocalizeText } from '../../api';
 import { useHousekeepingStore } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const COPY_CONFIRM_MS = 1600;
 
@@ -98,47 +99,49 @@ export const HousekeepingPasswordReveal: FC = () => {
               : LocalizeText('housekeeping.password.copy');
 
     return (
-        <div className="flex flex-col gap-1.5 px-2.5 py-2 border-y border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50" role="status">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-700">
-                <FaKey size={10} />
-                <span className="grow">
-                    {LocalizeText('housekeeping.password.title', ['username', 'id'], [passwordReveal.username || '-', String(passwordReveal.userId)])}
-                </span>
-                <Hint content={LocalizeText('housekeeping.password.dismiss')}>
-                    <BaseButton
-                        className="inline-flex items-center justify-center w-5 h-5 rounded text-amber-700 hover:text-amber-900 hover:bg-amber-200/60"
-                        onClick={() => clearPasswordReveal()}
-                        aria-label={LocalizeText('housekeeping.password.dismiss')}
+        <NativeTextTree>
+            <div className="flex flex-col gap-1.5 px-2.5 py-2 border-y border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50" role="status">
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-700">
+                    <FaKey size={10} />
+                    <span className="grow">
+                        {LocalizeText('housekeeping.password.title', ['username', 'id'], [passwordReveal.username || '-', String(passwordReveal.userId)])}
+                    </span>
+                    <Hint content={LocalizeText('housekeeping.password.dismiss')}>
+                        <BaseButton
+                            className="inline-flex items-center justify-center w-5 h-5 rounded text-amber-700 hover:text-amber-900 hover:bg-amber-200/60"
+                            onClick={() => clearPasswordReveal()}
+                            aria-label={LocalizeText('housekeeping.password.dismiss')}
+                        >
+                            <FaTimes size={10} />
+                        </BaseButton>
+                    </Hint>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    {/* Readonly input lets the operator triple-click + Ctrl+C
+                        as a manual fallback to the copy button. Monospace +
+                        tabular-nums keeps lookalikes (Il1, O0) visually
+                        distinct so they can read it aloud without typos. */}
+                    <input
+                        readOnly
+                        type="text"
+                        value={passwordReveal.password}
+                        className="grow font-mono tabular-nums text-sm px-2 py-1 rounded border border-amber-300 bg-white text-amber-950 focus:outline-none focus:ring-1 focus:ring-amber-400 select-all"
+                        onFocus={(event) => event.currentTarget.select()}
+                        aria-label={LocalizeText('housekeeping.password.value_label')}
+                    />
+                    <Hint content={copyLabel}><BaseButton
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold border transition-colors ${copyState === 'ok' ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : copyState === 'fail' ? 'bg-rose-100 border-rose-300 text-rose-800' : 'bg-amber-100 border-amber-300 text-amber-900 hover:bg-amber-200'}`}
+                        onClick={copyPassword}
+                        aria-label={copyLabel}
                     >
-                        <FaTimes size={10} />
-                    </BaseButton>
-                </Hint>
-            </div>
+                        {copyIcon}
+                        <span>{copyLabel}</span>
+                    </BaseButton></Hint>
+                </div>
 
-            <div className="flex items-center gap-2">
-                {/* Readonly input lets the operator triple-click + Ctrl+C
-                    as a manual fallback to the copy button. Monospace +
-                    tabular-nums keeps lookalikes (Il1, O0) visually
-                    distinct so they can read it aloud without typos. */}
-                <input
-                    readOnly
-                    type="text"
-                    value={passwordReveal.password}
-                    className="grow font-mono tabular-nums text-sm px-2 py-1 rounded border border-amber-300 bg-white text-amber-950 focus:outline-none focus:ring-1 focus:ring-amber-400 select-all"
-                    onFocus={(event) => event.currentTarget.select()}
-                    aria-label={LocalizeText('housekeeping.password.value_label')}
-                />
-                <Hint content={copyLabel}><BaseButton
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold border transition-colors ${copyState === 'ok' ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : copyState === 'fail' ? 'bg-rose-100 border-rose-300 text-rose-800' : 'bg-amber-100 border-amber-300 text-amber-900 hover:bg-amber-200'}`}
-                    onClick={copyPassword}
-                    aria-label={copyLabel}
-                >
-                    {copyIcon}
-                    <span>{copyLabel}</span>
-                </BaseButton></Hint>
+                <p className="text-[10px] text-amber-700/80 leading-snug">{LocalizeText('housekeeping.password.hint')}</p>
             </div>
-
-            <p className="text-[10px] text-amber-700/80 leading-snug">{LocalizeText('housekeeping.password.hint')}</p>
-        </div>
+        </NativeTextTree>
     );
 };

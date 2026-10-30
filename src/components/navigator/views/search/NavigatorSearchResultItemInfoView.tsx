@@ -3,6 +3,7 @@ import { FC, MouseEvent, useRef } from 'react';
 import { LocalizeText } from '../../../../api';
 import { useNavigatorRoomInfoPopupStore } from '../../../../hooks';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface NavigatorSearchResultItemInfoViewProps {
     roomData: RoomDataParser;
@@ -26,13 +27,15 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
     };
 
     return (
-        <BaseButton
-            type="button"
-            ref={elementRef}
-            className="octane-navigator-air__room-info"
-            aria-label={LocalizeText('navigator.room.popup.room.info')}
-            onClick={handleClick}
-            onMouseEnter={handleMouseEnter}
-        />
+        <NativeTextTree>
+            <BaseButton
+                type="button"
+                ref={elementRef}
+                className="octane-navigator-air__room-info"
+                aria-label={LocalizeText('navigator.room.popup.room.info')}
+                onClick={handleClick}
+                onMouseEnter={handleMouseEnter}
+            />
+        </NativeTextTree>
     );
 };

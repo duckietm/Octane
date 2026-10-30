@@ -9,6 +9,7 @@ import {
     ProductTypeEnum
 } from '../../../../../../api';
 import { BaseButton, LayoutLimitedEditionStyledNumberView, LayoutRarityLevelView } from '../../../../../../common';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 
 export interface MarketplaceItemViewProps {
     offerData: MarketplaceOfferData;
@@ -48,16 +49,18 @@ export const MarketplaceOfferImageView: FC<{ offerData: MarketplaceOfferData }> 
     const rarityLevel = offerData.stuffData?.rarityLevel ?? -1;
 
     return (
-        <div className="marketplace-row-image">
-            {offerData.isUniqueLimitedItem && <span className="marketplace-row-unique-label" />}
-            {imageUrl && !failed && <img alt="" draggable={false} src={imageUrl} onError={() => setFailed(true)} />}
-            {offerData.isUniqueLimitedItem && (
-                <span className="marketplace-row-unique-number" data-testid="marketplace-row-unique">
-                    <LayoutLimitedEditionStyledNumberView value={offerData.stuffData.uniqueNumber} />
-                </span>
-            )}
-            {rarityLevel >= 0 && <LayoutRarityLevelView className="marketplace-row-rarity" level={rarityLevel} />}
-        </div>
+        <NativeTextTree>
+            <div className="marketplace-row-image">
+                {offerData.isUniqueLimitedItem && <span className="marketplace-row-unique-label" />}
+                {imageUrl && !failed && <img alt="" draggable={false} src={imageUrl} onError={() => setFailed(true)} />}
+                {offerData.isUniqueLimitedItem && (
+                    <span className="marketplace-row-unique-number" data-testid="marketplace-row-unique">
+                        <LayoutLimitedEditionStyledNumberView value={offerData.stuffData.uniqueNumber} />
+                    </span>
+                )}
+                {rarityLevel >= 0 && <LayoutRarityLevelView className="marketplace-row-rarity" level={rarityLevel} />}
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -93,41 +96,47 @@ export const CatalogLayoutMarketplaceItemView: FC<MarketplaceItemViewProps> = (p
         const status = offerData.status;
 
         return (
-            <div className={`octane-marketplace-row is-own ${OWN_ROW_CLASS[status] ?? 'is-ongoing'}`} data-testid="marketplace-own-row">
-                <MarketplaceOfferImageView offerData={offerData} />
-                <span className="marketplace-row-name">{name}</span>
-                <span className="marketplace-row-desc">{getMarketplaceOfferText(offerData, 'desc')}</span>
-                {status !== MarketPlaceOfferState.EXPIRED && (
-                    <span className="marketplace-row-price">
-                        {marketplaceText('catalog.marketplace.offer.price_own_item').replace('%price%', String(offerData.price))}
-                    </span>
-                )}
-                <span className="marketplace-row-state">{getOwnStateText(offerData)}</span>
-                {status === MarketPlaceOfferState.ONGOING && (
-                    <BaseButton className="octane-marketplace-button marketplace-row-pick" onClick={() => onClick?.(offerData)}>
-                        {marketplaceText('catalog.marketplace.offer.pick')}
-                    </BaseButton>
-                )}
-            </div>
+            <NativeTextTree>
+                <div className={`octane-marketplace-row is-own ${OWN_ROW_CLASS[status] ?? 'is-ongoing'}`} data-testid="marketplace-own-row">
+                    <MarketplaceOfferImageView offerData={offerData} />
+                    <span className="marketplace-row-name">{name}</span>
+                    <span className="marketplace-row-desc">{getMarketplaceOfferText(offerData, 'desc')}</span>
+                    {status !== MarketPlaceOfferState.EXPIRED && (
+                        <span className="marketplace-row-price">
+                            {marketplaceText('catalog.marketplace.offer.price_own_item').replace('%price%', String(offerData.price))}
+                        </span>
+                    )}
+                    <span className="marketplace-row-state">{getOwnStateText(offerData)}</span>
+                    {status === MarketPlaceOfferState.ONGOING && (
+                        <BaseButton className="octane-marketplace-button marketplace-row-pick" onClick={() => onClick?.(offerData)}>
+                            {marketplaceText('catalog.marketplace.offer.pick')}
+                        </BaseButton>
+                    )}
+                </div>
+            </NativeTextTree>
         );
     }
 
     const average = offerData.averagePrice !== 0 ? String(offerData.averagePrice) : ' - ';
 
     return (
-        <div className="octane-marketplace-row is-public" data-testid="marketplace-public-row">
-            <MarketplaceOfferImageView offerData={offerData} />
-            <span className="marketplace-row-name">{name}</span>
-            <span className="marketplace-row-price is-public">
-                {marketplaceText('catalog.marketplace.offer.price_public_item').replace('%price%', String(offerData.price)).replace('%average%', average)}
-            </span>
-            <span className="marketplace-row-count">{marketplaceText('catalog.marketplace.offer_count').replace('%count%', String(offerData.offerCount))}</span>
-            <BaseButton className="octane-marketplace-button marketplace-row-buy" onClick={() => onClick?.(offerData)}>
-                {marketplaceText('buy')}
-            </BaseButton>
-            <BaseButton className="octane-marketplace-button marketplace-row-more" disabled={!onMore} onClick={() => onMore?.(offerData)}>
-                {marketplaceText('catalog.marketplace.view_more')}
-            </BaseButton>
-        </div>
+        <NativeTextTree>
+            <div className="octane-marketplace-row is-public" data-testid="marketplace-public-row">
+                <MarketplaceOfferImageView offerData={offerData} />
+                <span className="marketplace-row-name">{name}</span>
+                <span className="marketplace-row-price is-public">
+                    {marketplaceText('catalog.marketplace.offer.price_public_item').replace('%price%', String(offerData.price)).replace('%average%', average)}
+                </span>
+                <span className="marketplace-row-count">
+                    {marketplaceText('catalog.marketplace.offer_count').replace('%count%', String(offerData.offerCount))}
+                </span>
+                <BaseButton className="octane-marketplace-button marketplace-row-buy" onClick={() => onClick?.(offerData)}>
+                    {marketplaceText('buy')}
+                </BaseButton>
+                <BaseButton className="octane-marketplace-button marketplace-row-more" disabled={!onMore} onClick={() => onMore?.(offerData)}>
+                    {marketplaceText('catalog.marketplace.view_more')}
+                </BaseButton>
+            </div>
+        </NativeTextTree>
     );
 };

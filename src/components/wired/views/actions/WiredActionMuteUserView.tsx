@@ -7,6 +7,7 @@ import { WiredSliderSection } from '../WiredSliderSection';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MESSAGE_MAX_LENGTH = 100;
 
@@ -30,24 +31,26 @@ export const WiredActionMuteUserView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={() => message.length <= MESSAGE_MAX_LENGTH}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
-                <OctaneInput maxLength={MESSAGE_MAX_LENGTH} type="text" value={message} onChange={(event) => setMessage(event.target.value)} />
-            </div>
-            <WiredSliderSection
-                max={10}
-                min={0}
-                title={LocalizeText('wiredfurni.params.length.minutes', ['minutes'], [time.toString()])}
-                value={Math.min(10, time)}
-                onChange={setTime}
-            />
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={() => message.length <= MESSAGE_MAX_LENGTH}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.message')}</Text>
+                    <OctaneInput maxLength={MESSAGE_MAX_LENGTH} type="text" value={message} onChange={(event) => setMessage(event.target.value)} />
+                </div>
+                <WiredSliderSection
+                    max={10}
+                    min={0}
+                    title={LocalizeText('wiredfurni.params.length.minutes', ['minutes'], [time.toString()])}
+                    value={Math.min(10, time)}
+                    onChange={setTime}
+                />
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { Progress } from '@base-ui/react/progress';
 import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import { AchievementUtilities, LocalizeText } from '../../api';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 interface AirAchievementProgressBarProps {
     progress: number;
@@ -55,22 +56,24 @@ export const AirAchievementProgressBar: FC<AirAchievementProgressBarProps> = ({
     } as CSSProperties;
 
     return (
-        <Progress.Root className={`air-achievement-progress ${className}`.trim()} max={maxProgress} min={0} style={style} value={progress}>
-            <span className="air-achievement-progress__left" aria-hidden="true" />
-            <span className="air-achievement-progress__track" style={{ width }} aria-hidden="true" />
-            <span className="air-achievement-progress__right" style={{ left: width + 4 }} aria-hidden="true" />
-            <span className="air-achievement-progress__fill-background" style={{ width: animation.width + 1 }} aria-hidden="true" />
-            <span className="air-achievement-progress__fill" style={{ width: animation.width, opacity: animation.opacity }} aria-hidden="true" />
-            <span className="air-achievement-progress__fill-cap" style={{ left: animation.width + 4 }} aria-hidden="true" />
-            <span className="air-achievement-progress__text" style={{ width }}>
-                {localizationKey
-                    ? LocalizeText(
-                          localizationKey,
-                          ['progress', 'limit'],
-                          [String(animation.progress + scoreAtStartOfLevel), String(maxProgress + scoreAtStartOfLevel)]
-                      )
-                    : `${animation.progress + scoreAtStartOfLevel}/${maxProgress + scoreAtStartOfLevel}`}
-            </span>
-        </Progress.Root>
+        <NativeTextTree>
+            <Progress.Root className={`air-achievement-progress ${className}`.trim()} max={maxProgress} min={0} style={style} value={progress}>
+                <span className="air-achievement-progress__left" aria-hidden="true" />
+                <span className="air-achievement-progress__track" style={{ width }} aria-hidden="true" />
+                <span className="air-achievement-progress__right" style={{ left: width + 4 }} aria-hidden="true" />
+                <span className="air-achievement-progress__fill-background" style={{ width: animation.width + 1 }} aria-hidden="true" />
+                <span className="air-achievement-progress__fill" style={{ width: animation.width, opacity: animation.opacity }} aria-hidden="true" />
+                <span className="air-achievement-progress__fill-cap" style={{ left: animation.width + 4 }} aria-hidden="true" />
+                <span className="air-achievement-progress__text" style={{ width }}>
+                    {localizationKey
+                        ? LocalizeText(
+                              localizationKey,
+                              ['progress', 'limit'],
+                              [String(animation.progress + scoreAtStartOfLevel), String(maxProgress + scoreAtStartOfLevel)]
+                          )
+                        : `${animation.progress + scoreAtStartOfLevel}/${maxProgress + scoreAtStartOfLevel}`}
+                </span>
+            </Progress.Root>
+        </NativeTextTree>
     );
 };

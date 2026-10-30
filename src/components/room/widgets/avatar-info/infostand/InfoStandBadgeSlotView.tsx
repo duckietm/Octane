@@ -3,6 +3,7 @@ import { GetConfigurationValue, LocalizeText } from '../../../../../api';
 import { LayoutBadgeImageView, Popover, PopoverContent } from '../../../../../common';
 import { useInventoryBadges } from '../../../../../hooks';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface InfoStandBadgeSlotProps {
     slotIndex: number;
@@ -26,34 +27,36 @@ const BadgeMiniPicker: FC<{
     const filtered = search.length > 0 ? availableBadges.filter((code) => code.toLowerCase().includes(search.toLowerCase())) : availableBadges;
 
     return (
-        <div onClick={(e) => e.stopPropagation()}>
-            <input
-                autoFocus
-                className="w-full text-xs text-white bg-white/10 border border-white/20 rounded px-2 py-1 mb-2 outline-none focus:border-white/40"
-                placeholder={LocalizeText('catalog.search')}
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
-            {badgeCodes.length === 0 ? (
-                <span className="text-xs text-white/40 text-center py-2 block">{LocalizeText('generic.loading')}</span>
-            ) : (
-                <div className="grid grid-cols-4 gap-1 max-h-[160px] overflow-y-auto">
-                    {filtered.slice(0, 40).map((code) => (
-                        <BaseButton type="button"
-                            key={code}
-                            className="flex items-center justify-center w-[36px] h-[36px] cursor-pointer rounded border border-transparent hover:border-white/40 hover:bg-white/10 transition-all"
-                            onClick={() => onSelect(code)}
-                        >
-                            <LayoutBadgeImageView badgeCode={code} />
-                        </BaseButton>
-                    ))}
-                    {filtered.length === 0 && (
-                        <span className="text-xs text-white/40 col-span-4 text-center py-2">{LocalizeText('generic.no_results_found')}</span>
-                    )}
-                </div>
-            )}
-        </div>
+        <NativeTextTree>
+            <div onClick={(e) => e.stopPropagation()}>
+                <input
+                    autoFocus
+                    className="w-full text-xs text-white bg-white/10 border border-white/20 rounded px-2 py-1 mb-2 outline-none focus:border-white/40"
+                    placeholder={LocalizeText('catalog.search')}
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                {badgeCodes.length === 0 ? (
+                    <span className="text-xs text-white/40 text-center py-2 block">{LocalizeText('generic.loading')}</span>
+                ) : (
+                    <div className="grid grid-cols-4 gap-1 max-h-[160px] overflow-y-auto">
+                        {filtered.slice(0, 40).map((code) => (
+                            <BaseButton type="button"
+                                key={code}
+                                className="flex items-center justify-center w-[36px] h-[36px] cursor-pointer rounded border border-transparent hover:border-white/40 hover:bg-white/10 transition-all"
+                                onClick={() => onSelect(code)}
+                            >
+                                <LayoutBadgeImageView badgeCode={code} />
+                            </BaseButton>
+                        ))}
+                        {filtered.length === 0 && (
+                            <span className="text-xs text-white/40 col-span-4 text-center py-2">{LocalizeText('generic.no_results_found')}</span>
+                        )}
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };
 

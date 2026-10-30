@@ -3,6 +3,7 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { handleInternalLinkClick, LocalizeText, localizeWithFallback, SanitizeHtmlWithInternalLinks } from '../../../../../api';
 import { BaseButton } from '../../../../../common/BaseButton';
 import { LayoutFurniImageView } from '../../../../../common/layout/LayoutFurniImageView';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogData, useCatalogUiState } from '../../../../../hooks';
 import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView';
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
@@ -64,68 +65,70 @@ export const CatalogLayoutTrophiesView: FC<CatalogLayoutProps> = (props) => {
     const product = offer?.product;
 
     return (
-        <div className="octane-catalog-air-trophies">
-            <div
-                className="octane-catalog-air-trophies__description"
-                onClick={handleInternalLinkClick}
-                dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(0) ?? '') }}
-            />
-            <div className="octane-catalog-air-trophies__preview">
-                {!!product && (
-                    <LayoutFurniImageView
-                        direction={2}
-                        extraData={product.extraParam}
-                        productClassId={product.productClassId}
-                        productType={product.productType}
-                    />
-                )}
-                {!!offer && <CatalogTotalPriceWidget className="octane-catalog-air-trophies__price" />}
-                {showModelButtons && (
-                    <>
-                        <BaseButton
-                            aria-label={localizeWithFallback('catalog.trophies.previous', 'Previous')}
-                            className="octane-catalog-air-trophies__model is-previous"
-                            onClick={() => stepModel(-1)}
-                        >
-                            <FaChevronLeft />
-                        </BaseButton>
-                        <BaseButton
-                            aria-label={localizeWithFallback('catalog.trophies.next', 'Next')}
-                            className="octane-catalog-air-trophies__model is-next"
-                            onClick={() => stepModel(1)}
-                        >
-                            <FaChevronRight />
-                        </BaseButton>
-                    </>
-                )}
-            </div>
-            {showMetals && (
-                <div className="octane-catalog-air-trophies__metals" role="radiogroup">
-                    {TROPHY_METALS.map((value) => (
-                        <BaseButton
-                            key={value}
-                            role="radio"
-                            aria-checked={metal === value}
-                            aria-label={value}
-                            className={`octane-catalog-air-trophies__metal ${metal === value ? 'is-selected' : ''}`}
-                            style={{ backgroundColor: TROPHY_METAL_COLOURS[value] }}
-                            onClick={() => setMetal(value)}
-                        />
-                    ))}
-                </div>
-            )}
-            <div className="octane-catalog-air-trophies__inscription-label">{page?.localization?.getText(1) ?? ''}</div>
-            <div className="octane-catalog-air-trophies__inscription">
-                <textarea
-                    maxLength={200}
-                    placeholder={LocalizeText('catalog.trophies.inscription.placeholder')}
-                    value={inscription}
-                    onChange={(event) => setInscription(event.target.value)}
+        <NativeTextTree>
+            <div className="octane-catalog-air-trophies">
+                <div
+                    className="octane-catalog-air-trophies__description"
+                    onClick={handleInternalLinkClick}
+                    dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(0) ?? '') }}
                 />
+                <div className="octane-catalog-air-trophies__preview">
+                    {!!product && (
+                        <LayoutFurniImageView
+                            direction={2}
+                            extraData={product.extraParam}
+                            productClassId={product.productClassId}
+                            productType={product.productType}
+                        />
+                    )}
+                    {!!offer && <CatalogTotalPriceWidget className="octane-catalog-air-trophies__price" />}
+                    {showModelButtons && (
+                        <>
+                            <BaseButton
+                                aria-label={localizeWithFallback('catalog.trophies.previous', 'Previous')}
+                                className="octane-catalog-air-trophies__model is-previous"
+                                onClick={() => stepModel(-1)}
+                            >
+                                <FaChevronLeft />
+                            </BaseButton>
+                            <BaseButton
+                                aria-label={localizeWithFallback('catalog.trophies.next', 'Next')}
+                                className="octane-catalog-air-trophies__model is-next"
+                                onClick={() => stepModel(1)}
+                            >
+                                <FaChevronRight />
+                            </BaseButton>
+                        </>
+                    )}
+                </div>
+                {showMetals && (
+                    <div className="octane-catalog-air-trophies__metals" role="radiogroup">
+                        {TROPHY_METALS.map((value) => (
+                            <BaseButton
+                                key={value}
+                                role="radio"
+                                aria-checked={metal === value}
+                                aria-label={value}
+                                className={`octane-catalog-air-trophies__metal ${metal === value ? 'is-selected' : ''}`}
+                                style={{ backgroundColor: TROPHY_METAL_COLOURS[value] }}
+                                onClick={() => setMetal(value)}
+                            />
+                        ))}
+                    </div>
+                )}
+                <div className="octane-catalog-air-trophies__inscription-label">{page?.localization?.getText(1) ?? ''}</div>
+                <div className="octane-catalog-air-trophies__inscription">
+                    <textarea
+                        maxLength={200}
+                        placeholder={LocalizeText('catalog.trophies.inscription.placeholder')}
+                        value={inscription}
+                        onChange={(event) => setInscription(event.target.value)}
+                    />
+                </div>
+                <div className="octane-catalog-air-trophies__purchase">
+                    <CatalogPurchaseWidgetView />
+                </div>
             </div>
-            <div className="octane-catalog-air-trophies__purchase">
-                <CatalogPurchaseWidgetView />
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

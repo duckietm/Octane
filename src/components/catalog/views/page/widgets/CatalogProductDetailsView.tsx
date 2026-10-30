@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { CatalogType, getAvatarEffectDurationText, IPurchasableOffer, LocalizeText, localizeWithFallback, ProductTypeEnum } from '../../../../../api';
 import noRecycleIcon from '../../../../../assets/images/catalog/air/inventory-furni-no-recycle.png';
 import noTradeIcon from '../../../../../assets/images/catalog/air/inventory-furni-no-trade.png';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogProductMetadata, useCatalogUiState } from '../../../../../hooks';
 
 export const CatalogProductDetailsView: FC<{ offer: IPurchasableOffer }> = ({ offer }) => {
@@ -29,42 +30,44 @@ export const CatalogProductDetailsView: FC<{ offer: IPurchasableOffer }> = ({ of
     const effectDuration = product?.productType === ProductTypeEnum.EFFECT ? getAvatarEffectDurationText(product.extraParam) : null;
 
     return (
-        <div aria-label={name} className="octane-catalog-product-details" role="group">
-            <strong className="octane-catalog-product-details-name">{name}</strong>
-            <span className="octane-catalog-product-details-description">{description}</span>
-            {effectDuration && (
-                <span className="octane-catalog-product-details-duration">
-                    {effectDuration.parameter
-                        ? localizeWithFallback(effectDuration.key, effectDuration.fallback, [effectDuration.parameter], [effectDuration.value])
-                        : localizeWithFallback(effectDuration.key, effectDuration.fallback)}
-                </span>
-            )}
-            {(showNoTrade || showNoRecycle) && (
-                <div className="octane-catalog-product-details-badges" role="list">
-                    {showNoTrade && (
-                        <span
-                            aria-label={tradeableLabel}
-                            className="octane-catalog-product-capability is-no-trade"
-                            data-capability="tradeable"
-                            role="listitem"
-                            title={tradeableLabel}
-                        >
-                            <img alt="" aria-hidden="true" src={noTradeIcon} />
-                        </span>
-                    )}
-                    {showNoRecycle && (
-                        <span
-                            aria-label={recyclableLabel}
-                            className="octane-catalog-product-capability is-no-recycle"
-                            data-capability="recyclable"
-                            role="listitem"
-                            title={recyclableLabel}
-                        >
-                            <img alt="" aria-hidden="true" src={noRecycleIcon} />
-                        </span>
-                    )}
-                </div>
-            )}
-        </div>
+        <NativeTextTree>
+            <div aria-label={name} className="octane-catalog-product-details" role="group">
+                <strong className="octane-catalog-product-details-name">{name}</strong>
+                <span className="octane-catalog-product-details-description">{description}</span>
+                {effectDuration && (
+                    <span className="octane-catalog-product-details-duration">
+                        {effectDuration.parameter
+                            ? localizeWithFallback(effectDuration.key, effectDuration.fallback, [effectDuration.parameter], [effectDuration.value])
+                            : localizeWithFallback(effectDuration.key, effectDuration.fallback)}
+                    </span>
+                )}
+                {(showNoTrade || showNoRecycle) && (
+                    <div className="octane-catalog-product-details-badges" role="list">
+                        {showNoTrade && (
+                            <span
+                                aria-label={tradeableLabel}
+                                className="octane-catalog-product-capability is-no-trade"
+                                data-capability="tradeable"
+                                role="listitem"
+                                title={tradeableLabel}
+                            >
+                                <img alt="" aria-hidden="true" src={noTradeIcon} />
+                            </span>
+                        )}
+                        {showNoRecycle && (
+                            <span
+                                aria-label={recyclableLabel}
+                                className="octane-catalog-product-capability is-no-recycle"
+                                data-capability="recyclable"
+                                role="listitem"
+                                title={recyclableLabel}
+                            >
+                                <img alt="" aria-hidden="true" src={noRecycleIcon} />
+                            </span>
+                        )}
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

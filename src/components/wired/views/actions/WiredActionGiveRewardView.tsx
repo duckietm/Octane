@@ -10,6 +10,7 @@ import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type RewardType = 'badge' | 'credits' | 'pixels' | 'diamonds' | 'points' | 'furni' | 'respect';
 
@@ -258,160 +259,162 @@ export const WiredActionGiveRewardView: FC<{}> = (props) => {
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            validate={validate}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>Reward limit</Text>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={limitEnabled} id="limitEnabled" aria-label="Reward limit" onCheckedChange={(nextChecked) => setLimitEnabled(nextChecked)} />
-                    <Text>{LocalizeText('wiredfurni.params.prizelimit', ['amount'], [''])}</Text>
-                    <OctaneInput
-                        aria-label="Prize limit"
-                        className="w-[60px]"
-                        max={MAX_PRIZE_LIMIT}
-                        min={MIN_PRIZE_LIMIT}
-                        type="number"
-                        value={rewardsLimit}
-                        onChange={(event) => setRewardsLimit(clampPrizeLimit(Number(event.target.value)))}
-                    />
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                validate={validate}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>Reward limit</Text>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={limitEnabled} id="limitEnabled" aria-label="Reward limit" onCheckedChange={(nextChecked) => setLimitEnabled(nextChecked)} />
+                        <Text>{LocalizeText('wiredfurni.params.prizelimit', ['amount'], [''])}</Text>
+                        <OctaneInput
+                            aria-label="Prize limit"
+                            className="w-[60px]"
+                            max={MAX_PRIZE_LIMIT}
+                            min={MIN_PRIZE_LIMIT}
+                            type="number"
+                            value={rewardsLimit}
+                            onChange={(event) => setRewardsLimit(clampPrizeLimit(Number(event.target.value)))}
+                        />
+                    </div>
+                    {!limitEnabled && (
+                        <Text small className="text-[#cc0000]">
+                            Reward limit not set. Make sure rewards are badges or non-tradeable items.
+                        </Text>
+                    )}
                 </div>
-                {!limitEnabled && (
-                    <Text small className="text-[#cc0000]">
-                        Reward limit not set. Make sure rewards are badges or non-tradeable items.
-                    </Text>
-                )}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>How often can a user be rewarded</Text>
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1 w-fit">
-                    {REWARD_INTERVALS.map((option) => (
-                        <label key={option.value} className="flex items-center gap-1 cursor-pointer">
-                            <Radio checked={rewardTime === option.value} name="rewardInterval" onCheckedChange={() => setRewardTime(option.value)} />
-                            <Text>{option.label}</Text>
-                        </label>
-                    ))}
+                <div className="flex flex-col gap-1">
+                    <Text bold>How often can a user be rewarded</Text>
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 w-fit">
+                        {REWARD_INTERVALS.map((option) => (
+                            <label key={option.value} className="flex items-center gap-1 cursor-pointer">
+                                <Radio checked={rewardTime === option.value} name="rewardInterval" onCheckedChange={() => setRewardTime(option.value)} />
+                                <Text>{option.label}</Text>
+                            </label>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Text>n =</Text>
+                        <OctaneInput
+                            aria-label="n ="
+                            className="w-[60px]"
+                            disabled={rewardTime === 0}
+                            maxLength={4}
+                            value={limitationInterval}
+                            onChange={(event) => setLimitationInterval(event.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
+                        />
+                    </div>
                 </div>
-                <div className="flex items-center gap-1">
-                    <Text>n =</Text>
-                    <OctaneInput
-                        aria-label="n ="
-                        className="w-[60px]"
-                        disabled={rewardTime === 0}
-                        maxLength={4}
-                        value={limitationInterval}
-                        onChange={(event) => setLimitationInterval(event.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
-                    />
+                <div className="flex flex-col gap-1">
+                    <Text bold>Unique Rewards</Text>
+                    <div className="flex items-center gap-1">
+                        <Checkbox checked={uniqueRewards} id="uniqueRewards" aria-label="Unique Rewards?" onCheckedChange={(nextChecked) => setUniqueRewards(nextChecked)} />
+                        <Text>Unique Rewards?</Text>
+                    </div>
+                    <Text small>If checked each reward will be given once to each user. Probabilities are not in use.</Text>
                 </div>
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>Unique Rewards</Text>
-                <div className="flex items-center gap-1">
-                    <Checkbox checked={uniqueRewards} id="uniqueRewards" aria-label="Unique Rewards?" onCheckedChange={(nextChecked) => setUniqueRewards(nextChecked)} />
-                    <Text>Unique Rewards?</Text>
+                <div className="flex items-center justify-between">
+                    <Text bold>Rewards</Text>
+                    <Button disabled={rewards.length >= MAX_REWARDS} variant="secondary" onClick={addReward}>
+                        Add reward
+                    </Button>
                 </div>
-                <Text small>If checked each reward will be given once to each user. Probabilities are not in use.</Text>
-            </div>
-            <div className="flex items-center justify-between">
-                <Text bold>Rewards</Text>
-                <Button disabled={rewards.length >= MAX_REWARDS} variant="secondary" onClick={addReward}>
-                    Add reward
-                </Button>
-            </div>
-            <div className="flex flex-col gap-2">
-                {rewards &&
-                    rewards.map((reward, index) => {
-                        const rewardTypeOptions = reward.rewardType === 'respect' ? REWARD_TYPES : SELECTABLE_REWARD_TYPES;
+                <div className="flex flex-col gap-2">
+                    {rewards &&
+                        rewards.map((reward, index) => {
+                            const rewardTypeOptions = reward.rewardType === 'respect' ? REWARD_TYPES : SELECTABLE_REWARD_TYPES;
 
-                        return (
-                            <div key={index} className="flex flex-col gap-1 p-1 rounded bg-muted">
-                                <div className="flex items-center gap-1">
-                                    <Select
-                                        aria-label="Reward type"
-                                        className="min-w-0 grow form-select form-select-sm"
-                                        value={reward.rewardType}
-                                        onChange={(event) =>
-                                            updateReward(index, (prevValue) => ({ ...prevValue, rewardType: event.target.value as RewardType, rewardValue: '' }))
-                                        }
-                                    >
-                                        {rewardTypeOptions.map((entry) => (
-                                            <option key={entry.value} value={entry.value}>
-                                                {localizeWithFallback(entry.key, entry.label)}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                    {index > 0 && (
-                                        <Button variant="danger" onClick={() => removeReward(index)}>
-                                            <FaTrash className="fa-icon" />
-                                        </Button>
-                                    )}
-                                </div>
-                                <div className="flex flex-col gap-[2px]">
-                                    <Text small bold>
-                                        {getRewardValuePlaceholder(reward.rewardType)}
-                                    </Text>
-                                    <OctaneInput
-                                        aria-label={getRewardValuePlaceholder(reward.rewardType)}
-                                        placeholder={getRewardValuePlaceholder(reward.rewardType)}
-                                        type={reward.rewardType === 'badge' ? 'text' : 'number'}
-                                        value={reward.rewardValue}
-                                        onChange={(event) => updateReward(index, (prevValue) => ({ ...prevValue, rewardValue: event.target.value }))}
-                                    />
-                                </div>
-                                <div className="flex gap-1">
-                                    <div className="flex flex-col gap-[2px] min-w-0 grow">
-                                        <Text small bold>
-                                            Chance %
-                                        </Text>
-                                        {uniqueRewards ? (
-                                            <Text small className="px-1">
-                                                Unique
-                                            </Text>
-                                        ) : (
-                                            <OctaneInput
-                                                aria-label="Chance %"
-                                                min={0}
-                                                max={100}
-                                                type="number"
-                                                value={reward.probability}
-                                                onChange={(event) => updateReward(index, (prevValue) => ({ ...prevValue, probability: Number(event.target.value) }))}
-                                            />
+                            return (
+                                <div key={index} className="flex flex-col gap-1 p-1 rounded bg-muted">
+                                    <div className="flex items-center gap-1">
+                                        <Select
+                                            aria-label="Reward type"
+                                            className="min-w-0 grow form-select form-select-sm"
+                                            value={reward.rewardType}
+                                            onChange={(event) =>
+                                                updateReward(index, (prevValue) => ({ ...prevValue, rewardType: event.target.value as RewardType, rewardValue: '' }))
+                                            }
+                                        >
+                                            {rewardTypeOptions.map((entry) => (
+                                                <option key={entry.value} value={entry.value}>
+                                                    {localizeWithFallback(entry.key, entry.label)}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                        {index > 0 && (
+                                            <Button variant="danger" onClick={() => removeReward(index)}>
+                                                <FaTrash className="fa-icon" />
+                                            </Button>
                                         )}
                                     </div>
-                                    {reward.rewardType === 'points' && (
+                                    <div className="flex flex-col gap-[2px]">
+                                        <Text small bold>
+                                            {getRewardValuePlaceholder(reward.rewardType)}
+                                        </Text>
+                                        <OctaneInput
+                                            aria-label={getRewardValuePlaceholder(reward.rewardType)}
+                                            placeholder={getRewardValuePlaceholder(reward.rewardType)}
+                                            type={reward.rewardType === 'badge' ? 'text' : 'number'}
+                                            value={reward.rewardValue}
+                                            onChange={(event) => updateReward(index, (prevValue) => ({ ...prevValue, rewardValue: event.target.value }))}
+                                        />
+                                    </div>
+                                    <div className="flex gap-1">
                                         <div className="flex flex-col gap-[2px] min-w-0 grow">
                                             <Text small bold>
-                                                {getExtraFieldLabel(reward.rewardType)}
+                                                Chance %
                                             </Text>
-                                            <OctaneInput
-                                                aria-label={getExtraFieldLabel(reward.rewardType)}
-                                                min={0}
-                                                placeholder={getExtraFieldPlaceholder(reward.rewardType)}
-                                                type="number"
-                                                value={reward.pointsType}
-                                                onChange={(event) => updateReward(index, (prevValue) => ({ ...prevValue, pointsType: Number(event.target.value) }))}
-                                            />
+                                            {uniqueRewards ? (
+                                                <Text small className="px-1">
+                                                    Unique
+                                                </Text>
+                                            ) : (
+                                                <OctaneInput
+                                                    aria-label="Chance %"
+                                                    min={0}
+                                                    max={100}
+                                                    type="number"
+                                                    value={reward.probability}
+                                                    onChange={(event) => updateReward(index, (prevValue) => ({ ...prevValue, probability: Number(event.target.value) }))}
+                                                />
+                                            )}
                                         </div>
-                                    )}
+                                        {reward.rewardType === 'points' && (
+                                            <div className="flex flex-col gap-[2px] min-w-0 grow">
+                                                <Text small bold>
+                                                    {getExtraFieldLabel(reward.rewardType)}
+                                                </Text>
+                                                <OctaneInput
+                                                    aria-label={getExtraFieldLabel(reward.rewardType)}
+                                                    min={0}
+                                                    placeholder={getExtraFieldPlaceholder(reward.rewardType)}
+                                                    type="number"
+                                                    value={reward.pointsType}
+                                                    onChange={(event) => updateReward(index, (prevValue) => ({ ...prevValue, pointsType: Number(event.target.value) }))}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-            </div>
-            {error && (
-                <Text small className="text-red-500" data-testid="give-reward-error">
-                    {error}
-                </Text>
-            )}
-            {hasCustomCurrencyReward && (
-                <Text center small className="p-1 rounded bg-muted">
-                    Extra Currency uses Amount as the quantity and Currency Type as the purse type id. Example: amount 200 + type 105.
-                </Text>
-            )}
-        </WiredActionBaseView>
+                            );
+                        })}
+                </div>
+                {error && (
+                    <Text small className="text-red-500" data-testid="give-reward-error">
+                        {error}
+                    </Text>
+                )}
+                {hasCustomCurrencyReward && (
+                    <Text center small className="p-1 rounded bg-muted">
+                        Extra Currency uses Amount as the quantity and Currency Type as the purse type id. Example: amount 200 + type 105.
+                    </Text>
+                )}
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

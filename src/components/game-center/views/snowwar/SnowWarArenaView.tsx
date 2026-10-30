@@ -49,6 +49,7 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
 import { isTextEntryTarget } from '../../../../hooks/rooms/useRoomKeyboardMovement';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const localizeWithFallback = (key: string, fallback: string) =>
 {
@@ -1630,960 +1631,964 @@ export const SnowWarArenaView: FC = () =>
     if (!levelData)
     {
         return (
-            <div className="snowwar-arena snowwar-arena--loading">
-                <div className="snowwar-banner">{localizeWithFallback('snowwar.loading_arena', 'Going to the arena...')}</div>
-            </div>
+            <NativeTextTree>
+                <div className="snowwar-arena snowwar-arena--loading">
+                    <div className="snowwar-banner">{localizeWithFallback('snowwar.loading_arena', 'Going to the arena...')}</div>
+                </div>
+            </NativeTextTree>
         );
     }
 
     return (
-        <div className="snowwar-arena">
-            {editing ? (
-                <div className="snowwar-hud snowwar-hud--editor">
-                    <div className="snowwar-hud__clock">{formatClock(secondsLeft)}</div>
-                    <div className="snowwar-hud__actions">
-                        <input
-                            type="text"
-                            className="snowwar-hud__arena-name"
-                            value={editorArenaName}
-                            maxLength={64}
-                            aria-label={localizeWithFallback('snowwar.editor.name', 'Arena name')}
-                            onChange={event => setEditorArenaName(event.target.value)}
-                        />
-                        <BaseButton type="button" className="snowwar-button" onClick={() => saveEditor()}>
-                            {localizeWithFallback('snowwar.editor.publish', 'Publish arena')}
-                        </BaseButton>
-                        <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => stopEditing()}>
-                            {localizeWithFallback('snowwar.editor.exit', 'Exit editor')}
-                        </BaseButton>
-                    </div>
-                </div>
-            ) : (
-                <div className="snowwar-official-hud">
-                    {/* AIR snowwar_exit: the ui_exit_up / ui_exit_down bitmap button, no caption. */}
-                    <Hint content={localizeWithFallback('snowwar.exit.title', 'Leave game?')}>
-                        <BaseButton
-                            aria-label={localizeWithFallback('snowwar.exit.title', 'Leave game?')}
-                            className="snowwar-official-hud__quit"
-                            style={{ '--exit-up': `url(${getHudAssetUrl('ui_exit_up')})`, '--exit-down': `url(${getHudAssetUrl('ui_exit_down')})` } as CSSProperties}
-                            type="button"
-                            onClick={confirmExitGame}
-                        />
-                    </Hint>
-
-                    {ownAvatar && (
-                        <>
-                            <div
-                                className="snowwar-official-hud__ammo"
-                                title={localizeWithFallback('snowwar.hud.snowballs', 'Snowball inventory')}
-                            >
-                                <img
-                                    alt=""
-                                    className="snowwar-official-hud__ammo-bg"
-                                    draggable={false}
-                                    src={getHudAssetUrl('ui_ball_indicator_bg')}
-                                />
-                                {Array.from({ length: INITIAL_SNOWBALL_COUNT }, (_, index) => (
-                                    <img
-                                        key={index}
-                                        alt=""
-                                        className="snowwar-official-hud__ammo-ball"
-                                        draggable={false}
-                                        src={getHudAssetUrl('ui_ball')}
-                                        style={{ top: 10 + (index * 37), visibility: index < ownAvatar.snowballCount ? 'visible' : 'hidden' }}
-                                    />
-                                ))}
-                                {/* AIR SnowWarUI: ui_no_balls_ flashes while empty, load_ spins while making a ball. */}
-                                {(ownAvatar.snowballCount === 0) && (ownAvatar.activityState !== SNOWWAR_STATE_CREATING) && (
-                                    <img
-                                        alt=""
-                                        className="snowwar-official-hud__ammo-empty"
-                                        draggable={false}
-                                        src={getHudAssetUrl(`ui_no_balls_${getPingPongFrame(frameNow, 4, 75)}`)}
-                                    />
-                                )}
-                                {(ownAvatar.activityState === SNOWWAR_STATE_CREATING) && (
-                                    <img
-                                        alt=""
-                                        className="snowwar-official-hud__ammo-loading"
-                                        draggable={false}
-                                        src={getHudAssetUrl(`load_${getLoopFrame(frameNow, 8)}`)}
-                                    />
-                                )}
-                                <Hint content={localizeWithFallback('snowwar.make_snowball', 'Scoop up a snowball')}><BaseButton aria-label={localizeWithFallback('snowwar.make_snowball', 'Scoop up a snowball')}
-                                    type="button"
-                                    className="snowwar-official-hud__make-ball"
-                                    disabled={phase !== 'playing' || ownAvatar.snowballCount >= INITIAL_SNOWBALL_COUNT}
-                                    onClick={() => createSnowball()}
-                                /></Hint>
-                            </div>
-
-                            <div
-                                className="snowwar-official-hud__personal"
-                                title={localizeWithFallback('snowwar.hud.health', 'Energy and personal score')}
-                            >
-                                <img
-                                    alt=""
-                                    className="snowwar-official-hud__personal-bg"
-                                    draggable={false}
-                                    src={getHudAssetUrl('ui_me_bg')}
-                                />
-                                <img
-                                    alt=""
-                                    className="snowwar-official-hud__health"
-                                    draggable={false}
-                                    src={getHudAssetUrl(`ui_me_health_${healthFrame}`)}
-                                />
-                                <div className="snowwar-official-hud__head">
-                                    <LayoutAvatarImageView
-                                        compactHead
-                                        compactHeadPadding={0}
-                                        compactHeadSize={52}
-                                        direction={2}
-                                        figure={ownAvatar.figure}
-                                        gender={ownAvatar.gender}
-                                        headOnly
-                                    />
-                                </div>
-                                {(scoreFlashFrame > 0) && (
-                                    <img
-                                        alt=""
-                                        className="snowwar-official-hud__score-flash"
-                                        draggable={false}
-                                        src={getHudAssetUrl(`${scoreFlash.plus ? 'ui_me_plus_' : 'ui_me_minus_'}${scoreFlashFrame}`)}
-                                    />
-                                )}
-                                <div className="snowwar-official-hud__personal-score">{ownAvatar.score}</div>
-                            </div>
-                        </>
-                    )}
-
-                    <div className="snowwar-official-hud__scores">
-                        <img
-                            alt=""
-                            className="snowwar-official-hud__scores-bg"
-                            draggable={false}
-                            src={getHudAssetUrl('ui_timer_and_points')}
-                        />
-                        {/* AIR snowwar_team_scores / snowwar_timer: white over UbuntuThick strokes. */}
-                        <div className="snowwar-official-hud__score snowwar-official-hud__score--blue"><SnowWarStrokeText stroke="#1077ac" text={blueScore} /></div>
-                        <div className="snowwar-official-hud__score snowwar-official-hud__score--red"><SnowWarStrokeText stroke="#fd6859" text={redScore} /></div>
-                        <div className="snowwar-official-hud__timer"><SnowWarStrokeText stroke="#1077ac" text={formatClock(secondsLeft)} /></div>
-                        <div className="snowwar-official-hud__time-label">{localizeWithFallback('snowwar.hud.time_left', 'Time left')}</div>
-                    </div>
-
-                    {levelData.canEditRoom && (
-                        <BaseButton type="button" className="snowwar-button snowwar-official-hud__edit" onClick={() => startEditing()}>
-                            {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
-                        </BaseButton>
-                    )}
-                </div>
-            )}
-
-            {editing && (
-                <div className="snowwar-editor">
-                    <div className="snowwar-editor__title">
-                        <span className="snowwar-editor__title-ball" />
-                        {localizeWithFallback('snowwar.editor.title', 'SnowStorm Arena Workshop')}
-                    </div>
-                    <div className="snowwar-editor__hint">
-                        {localizeWithFallback('snowwar.editor.hint', 'Pick a piece, floor tile, or hotel furni and build directly on the arena. Select / Move and Edit let you refine placed pieces; Walk tests the finished routes.')}
-                    </div>
-                    <div className="snowwar-editor__shortcuts">
-                        <span><kbd>Ctrl / ⌘</kbd> + drag <b>Paint line</b></span>
-                        <span><kbd>Shift</kbd> + drag <b>Fill area</b></span>
-                    </div>
-                    {/* Function controls (modes + tools), grouped and separated
-                        from the furni palette below - these are actions, not furni. */}
-                    <div className="snowwar-editor__tools snowwar-editor__tools--modes">
-                        <BaseButton
-                            type="button"
-                            className={'snowwar-editor__chip' + (paletteSel === null ? ' snowwar-editor__chip--active' : '')}
-                            onClick={() => setPaletteSel(null)}
-                        >
-                            {localizeWithFallback('snowwar.editor.select', 'Select / Move')}
-                        </BaseButton>
-                        <BaseButton
-                            type="button"
-                            className={'snowwar-editor__chip' + (paletteSel === 'edit' ? ' snowwar-editor__chip--active' : '')}
-                            onClick={() => setPaletteSel('edit')}
-                        >
-                            {localizeWithFallback('snowwar.editor.edit', 'Edit')}
-                        </BaseButton>
-                        <BaseButton
-                            type="button"
-                            className={'snowwar-editor__chip' + (paletteSel === 'walk' ? ' snowwar-editor__chip--active' : '')}
-                            onClick={() => { setPaletteSel('walk'); setSelectedIndex(-1); }}
-                        >
-                            {localizeWithFallback('snowwar.editor.walk', 'Walk')}
-                        </BaseButton>
-                        <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => clearAllItems()}>
-                            {localizeWithFallback('snowwar.editor.clear', 'Clear all furni')}
-                        </BaseButton>
-                    </div>
-                    <div className="snowwar-editor__floor-plan">
-                        <div className="snowwar-editor__floor-plan-heading">
-                            <strong>{localizeWithFallback('snowwar.editor.floor_plan', 'Floor plan')}</strong>
-                            <span>{walkableTileCount} {localizeWithFallback('snowwar.editor.walkable_tiles', 'walkable tiles')}</span>
-                        </div>
-                        <div className="snowwar-editor__hint">
-                            {localizeWithFallback('snowwar.editor.floor_plan_hint', 'Open the full floor plan editor to shape the playable snowfield with its canvas, height tools, selection, undo and redo.')}
-                        </div>
-                        <div className="snowwar-editor__tools">
-                            <BaseButton type="button" className="snowwar-button" onClick={() => setFloorplanEditorVisible(true)}>
-                                {localizeWithFallback('snowwar.editor.floor_open', 'Edit floor plan')}
+        <NativeTextTree>
+            <div className="snowwar-arena">
+                {editing ? (
+                    <div className="snowwar-hud snowwar-hud--editor">
+                        <div className="snowwar-hud__clock">{formatClock(secondsLeft)}</div>
+                        <div className="snowwar-hud__actions">
+                            <input
+                                type="text"
+                                className="snowwar-hud__arena-name"
+                                value={editorArenaName}
+                                maxLength={64}
+                                aria-label={localizeWithFallback('snowwar.editor.name', 'Arena name')}
+                                onChange={event => setEditorArenaName(event.target.value)}
+                            />
+                            <BaseButton type="button" className="snowwar-button" onClick={() => saveEditor()}>
+                                {localizeWithFallback('snowwar.editor.publish', 'Publish arena')}
+                            </BaseButton>
+                            <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => stopEditing()}>
+                                {localizeWithFallback('snowwar.editor.exit', 'Exit editor')}
                             </BaseButton>
                         </div>
                     </div>
-                    {EDITOR_PALETTE.length > 0 && (
-                        <div className="snowwar-editor__palette">
-                            {EDITOR_PALETTE.map(name => (
-                                <BaseButton
-                                    key={name}
-                                    type="button"
-                                    className={'snowwar-editor__chip' + (paletteSel === name ? ' snowwar-editor__chip--active' : '')}
-                                    onClick={() => { setPaletteSel(prev => prev === name ? null : name); setSelectedIndex(-1); setHoverTile(null); }}
-                                >
-                                    {name.replace('block_', '').replace('obst_', '').replace('sw_', '')}
-                                </BaseButton>
-                            ))}
-                        </div>
-                    )}
-                    <input
-                        type="text"
-                        className="snowwar-editor__search"
-                        value={furniSearch}
-                        placeholder={localizeWithFallback('snowwar.editor.furni_search', 'Search furniture to place...')}
-                        onChange={event => setFurniSearch(event.target.value)}
-                    />
-                    {furniMatches.length > 0 && (
-                        <div className="snowwar-editor__palette snowwar-editor__palette--furni">
-                            {furniMatches.map(furni => (
-                                <Hint key={furni.id} content={furni.className}><BaseButton
-                                    type="button"
-                                    className={'snowwar-editor__chip' + (paletteSel === furni.className ? ' snowwar-editor__chip--active' : '')}
-                                    onClick={() => { setPaletteSel(prev => prev === furni.className ? null : furni.className); setSelectedIndex(-1); setHoverTile(null); }}
-                                >
-                                    {(furni.name && furni.name.trim()) || furni.className}
-                                </BaseButton></Hint>
-                            ))}
-                        </div>
-                    )}
-                    {placingFurni && (
-                        <div className="snowwar-editor__preview">
-                            <span className="snowwar-editor__preview-label">{localizeWithFallback('snowwar.editor.placing', 'Placing')}:</span>
-                            <LayoutFurniImageView direction={2} productClassId={placingFurni.id} productType="s" style={{ transform: 'scale(0.5)' }} />
-                            <span>{(placingFurni.name && placingFurni.name.trim()) || paletteSel}</span>
-                        </div>
-                    )}
-                    {selectedItem && (
-                        <div className="snowwar-editor__selected">
-                            <div className="snowwar-editor__preview">
-                                {selectedFurni
-                                    ? <LayoutFurniImageView direction={selectedItem.rotation} productClassId={selectedFurni.id} productType="s" state={selectedItem.state ?? 0} style={{ transform: 'scale(0.5)' }} />
-                                    : <div className="snowwar-furni__fallback" />}
-                                <span>{(selectedFurni?.name && selectedFurni.name.trim()) || selectedItem.name}</span>
-                            </div>
-                            <div className="snowwar-editor__tools">
-                                <BaseButton type="button" className="snowwar-button" onClick={() => rotateSelected()}>
-                                    {localizeWithFallback('snowwar.editor.rotate', 'Rotate')}
-                                </BaseButton>
-                                <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => deleteSelected()}>
-                                    {localizeWithFallback('snowwar.editor.delete', 'Delete')}
-                                </BaseButton>
-                            </div>
-                            {!selectedItem.imageUrl && selectedStateMax > 0 && (
-                                <div className="snowwar-editor__state">
-                                    <span>{localizeWithFallback('snowwar.editor.state', 'State')}</span>
-                                    <BaseButton
-                                        type="button"
-                                        className="snowwar-button snowwar-button--icon"
-                                        disabled={(selectedItem.state ?? 0) <= 0}
-                                        onClick={() => cycleState(-1)}>
-                                        &#8722;
-                                    </BaseButton>
-                                    <span className="snowwar-editor__state-value">
-                                        {(selectedItem.state ?? 0)}{selectedStateCount ? ` / ${selectedStateMax}` : ''}
-                                    </span>
-                                    <BaseButton
-                                        type="button"
-                                        className="snowwar-button snowwar-button--icon"
-                                        disabled={(selectedItem.state ?? 0) >= selectedStateMax}
-                                        onClick={() => cycleState(1)}>
-                                        +
-                                    </BaseButton>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="snowwar-editor__selected">
-                        <div className="snowwar-editor__field snowwar-editor__field--stack">
-                            <span>{localizeWithFallback('snowwar.editor.bg', 'Arena background (ads_bg)')}</span>
-                            <input
-                                type="text"
-                                className="snowwar-editor__search"
-                                value={backdropItem?.imageUrl ?? ''}
-                                placeholder={localizeWithFallback('snowwar.editor.bg_url', 'Full-screen background image URL...')}
-                                onChange={event => setBackdropUrl(event.target.value)}
+                ) : (
+                    <div className="snowwar-official-hud">
+                        {/* AIR snowwar_exit: the ui_exit_up / ui_exit_down bitmap button, no caption. */}
+                        <Hint content={localizeWithFallback('snowwar.exit.title', 'Leave game?')}>
+                            <BaseButton
+                                aria-label={localizeWithFallback('snowwar.exit.title', 'Leave game?')}
+                                className="snowwar-official-hud__quit"
+                                style={{ '--exit-up': `url(${getHudAssetUrl('ui_exit_up')})`, '--exit-down': `url(${getHudAssetUrl('ui_exit_down')})` } as CSSProperties}
+                                type="button"
+                                onClick={confirmExitGame}
                             />
+                        </Hint>
+
+                        {ownAvatar && (
+                            <>
+                                <div
+                                    className="snowwar-official-hud__ammo"
+                                    title={localizeWithFallback('snowwar.hud.snowballs', 'Snowball inventory')}
+                                >
+                                    <img
+                                        alt=""
+                                        className="snowwar-official-hud__ammo-bg"
+                                        draggable={false}
+                                        src={getHudAssetUrl('ui_ball_indicator_bg')}
+                                    />
+                                    {Array.from({ length: INITIAL_SNOWBALL_COUNT }, (_, index) => (
+                                        <img
+                                            key={index}
+                                            alt=""
+                                            className="snowwar-official-hud__ammo-ball"
+                                            draggable={false}
+                                            src={getHudAssetUrl('ui_ball')}
+                                            style={{ top: 10 + (index * 37), visibility: index < ownAvatar.snowballCount ? 'visible' : 'hidden' }}
+                                        />
+                                    ))}
+                                    {/* AIR SnowWarUI: ui_no_balls_ flashes while empty, load_ spins while making a ball. */}
+                                    {(ownAvatar.snowballCount === 0) && (ownAvatar.activityState !== SNOWWAR_STATE_CREATING) && (
+                                        <img
+                                            alt=""
+                                            className="snowwar-official-hud__ammo-empty"
+                                            draggable={false}
+                                            src={getHudAssetUrl(`ui_no_balls_${getPingPongFrame(frameNow, 4, 75)}`)}
+                                        />
+                                    )}
+                                    {(ownAvatar.activityState === SNOWWAR_STATE_CREATING) && (
+                                        <img
+                                            alt=""
+                                            className="snowwar-official-hud__ammo-loading"
+                                            draggable={false}
+                                            src={getHudAssetUrl(`load_${getLoopFrame(frameNow, 8)}`)}
+                                        />
+                                    )}
+                                    <Hint content={localizeWithFallback('snowwar.make_snowball', 'Scoop up a snowball')}><BaseButton aria-label={localizeWithFallback('snowwar.make_snowball', 'Scoop up a snowball')}
+                                        type="button"
+                                        className="snowwar-official-hud__make-ball"
+                                        disabled={phase !== 'playing' || ownAvatar.snowballCount >= INITIAL_SNOWBALL_COUNT}
+                                        onClick={() => createSnowball()}
+                                    /></Hint>
+                                </div>
+
+                                <div
+                                    className="snowwar-official-hud__personal"
+                                    title={localizeWithFallback('snowwar.hud.health', 'Energy and personal score')}
+                                >
+                                    <img
+                                        alt=""
+                                        className="snowwar-official-hud__personal-bg"
+                                        draggable={false}
+                                        src={getHudAssetUrl('ui_me_bg')}
+                                    />
+                                    <img
+                                        alt=""
+                                        className="snowwar-official-hud__health"
+                                        draggable={false}
+                                        src={getHudAssetUrl(`ui_me_health_${healthFrame}`)}
+                                    />
+                                    <div className="snowwar-official-hud__head">
+                                        <LayoutAvatarImageView
+                                            compactHead
+                                            compactHeadPadding={0}
+                                            compactHeadSize={52}
+                                            direction={2}
+                                            figure={ownAvatar.figure}
+                                            gender={ownAvatar.gender}
+                                            headOnly
+                                        />
+                                    </div>
+                                    {(scoreFlashFrame > 0) && (
+                                        <img
+                                            alt=""
+                                            className="snowwar-official-hud__score-flash"
+                                            draggable={false}
+                                            src={getHudAssetUrl(`${scoreFlash.plus ? 'ui_me_plus_' : 'ui_me_minus_'}${scoreFlashFrame}`)}
+                                        />
+                                    )}
+                                    <div className="snowwar-official-hud__personal-score">{ownAvatar.score}</div>
+                                </div>
+                            </>
+                        )}
+
+                        <div className="snowwar-official-hud__scores">
+                            <img
+                                alt=""
+                                className="snowwar-official-hud__scores-bg"
+                                draggable={false}
+                                src={getHudAssetUrl('ui_timer_and_points')}
+                            />
+                            {/* AIR snowwar_team_scores / snowwar_timer: white over UbuntuThick strokes. */}
+                            <div className="snowwar-official-hud__score snowwar-official-hud__score--blue"><SnowWarStrokeText stroke="#1077ac" text={blueScore} /></div>
+                            <div className="snowwar-official-hud__score snowwar-official-hud__score--red"><SnowWarStrokeText stroke="#fd6859" text={redScore} /></div>
+                            <div className="snowwar-official-hud__timer"><SnowWarStrokeText stroke="#1077ac" text={formatClock(secondsLeft)} /></div>
+                            <div className="snowwar-official-hud__time-label">{localizeWithFallback('snowwar.hud.time_left', 'Time left')}</div>
                         </div>
-                        {backdropItem && (
-                            <label className="snowwar-editor__field">
-                                {localizeWithFallback('snowwar.editor.overlay', 'Overlay floor tiles (hide tiles behind image)')}
-                                <Checkbox checked={(backdropItem.offsetZ ?? 0) > 0} onCheckedChange={(nextChecked) => setBackdropOffsetZ(nextChecked ? 1 : 0)} />
-                            </label>
+
+                        {levelData.canEditRoom && (
+                            <BaseButton type="button" className="snowwar-button snowwar-official-hud__edit" onClick={() => startEditing()}>
+                                {localizeWithFallback('snowwar.editor.build_custom', 'Build Custom Arena')}
+                            </BaseButton>
                         )}
                     </div>
-                </div>
-            )}
-            {editing && floorplanEditorVisible && (
-                <FloorplanEditorView
-                    externalSession={{
-                        tilemap: editHeightmap.join('\r'),
-                        occupiedTiles: floorplanOccupiedTiles,
-                        title: localizeWithFallback('snowwar.editor.floor_title', 'SnowStorm Floor Plan Editor'),
-                        onClose: () => setFloorplanEditorVisible(false),
-                        onSave: applyEditorFloorPlan,
-                    }}
-                />
-            )}
-            {(frameNow - savedAt) < 2500 && savedAt > 0 && (
-                <div className="snowwar-banner snowwar-banner--saved">
-                    {localizeWithFallback('snowwar.editor.published', 'Custom arena published to the game pool!')}
-                </div>
-            )}
+                )}
 
-            {phase === 'preparing' && !editing && (countdownFrame === 0) && (
-                <div className="snowwar-banner snowwar-banner--countdown">
-                    {localizeWithFallback('snowwar.loading.title', 'Get ready!')} {preparingSeconds > 0 ? preparingSeconds : ''}
-                </div>
-            )}
-            {/* AIR counter: digits 5..1, then the explosion as the match starts. */}
-            {!editing && (countdownFrame > 0) && (
-                <div className="snowwar-countdown" aria-hidden="true">
-                    <img
-                        alt=""
-                        draggable={false}
-                        src={getHudAssetUrl(getExplosionAssetName(countdownFrame))}
-                        style={{ left: -SNOWWAR_EXPLOSION_OFFSETS[countdownFrame][0], top: -SNOWWAR_EXPLOSION_OFFSETS[countdownFrame][1] }}
-                    />
-                </div>
-            )}
-            {(frameNow - rangeWarningAt) < 2000 && rangeWarningAt > 0 && (
-                <div className="snowwar-banner snowwar-banner--warning">
-                    {localizeWithFallback('snowwar.throw.too_far', 'Too far away! Use a long throw or move closer.')}
-                </div>
-            )}
-            {phase === 'ending' && (
-                <div className="snowwar-banner snowwar-banner--countdown">
-                    {localizeWithFallback('snowwar.time_up', 'Time is up!')}
-                </div>
-            )}
-
-            <div className="snowwar-viewport-wrap">
-            <div
-                ref={viewportRef}
-                className="snowwar-viewport"
-                onClick={onArenaClick}
-                onContextMenu={onArenaClick}
-                onPointerDown={editing ? onEditorPointerDown : undefined}
-                onPointerMove={editing ? onEditorPointerMove : undefined}
-                onPointerUp={editing ? onEditorPointerUp : undefined}
-                onPointerCancel={editing ? onEditorPointerCancel : undefined}
-                onMouseLeave={editing ? () => setHoverTile(null) : undefined}
-            >
-                <div
-                    className="snowwar-world"
-                    // Snap the camera translate to whole pixels. The easing keeps
-                    // running in floats (cam.x/cam.y), but a fractional translate here
-                    // makes the browser rasterise the whole arena subtree at a sub-pixel
-                    // offset, so every scaled sprite (furni at 0.375, avatars) samples
-                    // between pixels and looks blurry / shimmers while the camera moves.
-                    style={{ width: stageW, height: stageH, transform: `translate(${Math.round(cameraX)}px, ${Math.round(cameraY)}px)`, transformOrigin: '0 0' }}
-                >
-                    {officialBackdrop && arenaBackdrop && (
-                        <img
-                            key={officialBackdrop.file}
-                            alt=""
-                            className="snowwar-official-backdrop"
-                            draggable={false}
-                            src={backdropLibraryFailed[officialBackdrop.file] ? arenaBackdrop.imageUrl : getOfficialSnowWarAssetUrl(officialBackdrop.file)}
-                            style={officialBackdropRect ?? undefined}
-                            onLoad={event =>
-                            {
-                                const { naturalWidth, naturalHeight } = event.currentTarget;
-                                const file = officialBackdrop.file;
-                                if (naturalWidth > 0 && naturalHeight > 0) setBackdropRatios(ratios => ({ ...ratios, [file]: naturalHeight / naturalWidth }));
-                            }}
-                            onError={() =>
-                            {
-                                const file = officialBackdrop.file;
-                                setBackdropLibraryFailed(failed => (failed[file] ? failed : { ...failed, [file]: true }));
-                            }}
-                        />
-                    )}
-                    {arenaBackdrop && !officialBackdrop && !backdropOverlay && (
-                        <img
-                            alt=""
-                            className="snowwar-arena-bg"
-                            draggable={false}
-                            src={arenaBackdrop.imageUrl}
-                        />
-                    )}
-                    <div
-                        className="snowwar-floor-layer"
-                        style={{ left: floorOffsetX, top: floorOffsetY, width: canvasWidth, height: canvasHeight, transform: `scale(${zoom})`, transformOrigin: '0 0' }}
-                    >
-                        <canvas
-                            ref={canvasRef}
-                            width={canvasWidth}
-                            height={canvasHeight}
-                            className={`snowwar-floor${officialBackdrop ? ' snowwar-floor--official-backdrop' : ''}`}
-                        />
-
-                    {arenaBackdrop && !officialBackdrop && backdropOverlay && (
-                        <img
-                            alt=""
-                            className="snowwar-arena-bg-overlay"
-                            draggable={false}
-                            src={arenaBackdrop.imageUrl}
-                            style={{ width: canvasWidth, height: canvasHeight }}
-                        />
-                    )}
-
-                    {/* Classic props, above the overlay so they aren't hidden. */}
-                    <canvas ref={propsCanvasRef} width={canvasWidth} height={canvasHeight} className="snowwar-floor snowwar-floor--props" />
-
-                    {editorAreaOutline && (
-                        <svg
-                            aria-hidden="true"
-                            className="snowwar-edit-area"
-                            width={editorAreaOutline.width}
-                            height={editorAreaOutline.height}
-                            style={{ left: editorAreaOutline.left, top: editorAreaOutline.top }}
-                        >
-                            <polygon points={editorAreaOutline.points} />
-                        </svg>
-                    )}
-
-                    {displayItems
-                        .filter(item => !isClassicItem(item.name) && !item.imageUrl)
-                        // While a selected furni is being moved (its ghost is
-                        // following the cursor), hide its copy at the old tile so
-                        // it isn't shown twice.
-                        .filter(item => !(movingSelected && item === selectedItem))
-                        .map((item, index) =>
-                    {
-                        // A multi-tile furni occupies width x length tiles from its
-                        // origin (+x/+y, swapped for the 90/270 rotations) - the same
-                        // footprint the server blocks. Draw the sprite over the
-                        // footprint CENTRE (a 1x1 prop is unchanged) and depth-sort by
-                        // the FRONT (nearest-camera) tile, so a 3x3 prop sits on and
-                        // occludes its whole footprint instead of drawing over an
-                        // avatar standing beside or in front of it.
-                        const swap = item.rotation === 2 || item.rotation === 6;
-                        const effW = Math.max(1, (swap ? item.length : item.width) ?? 1);
-                        const effL = Math.max(1, (swap ? item.width : item.length) ?? 1);
-                        // Ground the furni at the FRONT (nearest-camera) corner of its
-                        // footprint and anchor the image by its BOTTOM-CENTRE there, so
-                        // its base rests on the floor (size-independent; a fixed % lift
-                        // floated tall props). Depth, however, sorts by the ORIGIN (back)
-                        // tile - the same rule Octane uses for a real floor furni - so an
-                        // avatar on the near sides (left/front) draws in front of the
-                        // furni and only one standing behind it is covered.
-                        const front = toScreen(item.x + effW - 1, item.y + effL - 1);
-                        // Depth anchor = origin tile CENTRE (+ TILE_HALF_H), matching how
-                        // avatars anchor (worldToScreen is tile-centre). Without the
-                        // half-tile offset the furni sorted half a tile behind where it
-                        // should, which tipped the overlay the wrong way for an avatar
-                        // standing right at a corner.
-                        // AIR stores furni altitude in 1600 world units per room
-                        // floor. Convert that to one rendered tile-height so the
-                        // stacked Arctic Island snow blocks keep their original
-                        // elevation instead of collapsing onto each other.
-                        const altitudePx = Math.max(0, item.offsetZ ?? 0) / 1600 * (TILE_HALF_H * 2);
-                        const originY = toScreen(item.x, item.y).y + TILE_HALF_H - altitudePx;
-
-                        // A walkable furni (walkableHeight 0 - a rug/floor tile you
-                        // stand ON) is flat on the ground and must NEVER occlude an
-                        // avatar. Depth-sorting the whole sprite by one tile lets its
-                        // front edge out-sort an avatar standing on it, so put flat
-                        // furni in a low band (above the floor + overlay, below the
-                        // machines at 90 and the avatars/solid furni at 100+). Solid
-                        // furni keep the shared depth band so they occlude correctly.
-                        const furniData = GetSessionDataManager()?.getFloorItemDataByName?.(item.name);
-                        // Flat = a walkable floor furni (rug / water / tile you stand
-                        // ON). Prefer the server's walkableHeight; for a freshly-placed
-                        // editor furni that doesn't carry it yet, fall back to the
-                        // furnidata "can stand on" flag so it's still drawn below the
-                        // avatar.
-                        const flat = item.walkableHeight != null
-                            ? item.walkableHeight === 0
-                            : !!(furniData?.canStandOn || furniData?.canLayOn);
-                        const zIndex = flat
-                            ? 3 + Math.min(80, Math.max(0, Math.round(originY / 8)))
-                            : 100 + Math.round(originY);
-                        const tree = simulation.trees.get(`${item.x},${item.y}`);
-                        const pile = simulation.piles.get(`${item.x},${item.y}`);
-                        const state = tree
-                            ? Math.min(tree.maximumHits - 1, tree.hits)
-                            : pile
-                                ? pile.maxSnowballs - pile.snowballCount
-                                : (item.state ?? 0);
-
-                        return (
-                            <div
-                                key={`furni-${index}`}
-                                className="snowwar-furni"
-                                data-snowwar-item={item.name}
-                                data-snowwar-x={item.x}
-                                data-snowwar-y={item.y}
-                                data-snowwar-count={pile?.snowballCount}
-                                style={{ left: front.x, top: front.y + (TILE_HALF_H * 2) - altitudePx, zIndex }}
-                                title={pile ? localizeWithFallback('snowwar.pile.hint', '%count% snowballs left').replace('%count%', pile.snowballCount.toString()) : undefined}
-                                onClick={pile ? event =>
-                                {
-                                    event.stopPropagation();
-                                    const candidates = [
-                                        { x: item.x, y: item.y - 1 },
-                                        { x: item.x + 1, y: item.y },
-                                        { x: item.x, y: item.y + 1 },
-                                        { x: item.x - 1, y: item.y },
-                                    ].filter(candidate =>
-                                    {
-                                        const tile = mapRows[candidate.y]?.charAt(candidate.x);
-                                        if (!tile || tile === 'x' || tile === 'X') return false;
-                                        if (levelData.machines.some(machine =>
-                                            candidate.y === machine.y && candidate.x >= machine.x && candidate.x <= machine.x + 2)) return false;
-                                        return !displayItems.some(other =>
-                                        {
-                                            if (other === item || (other.walkableHeight ?? 0) <= 0) return false;
-                                            const rotated = other.rotation === 2 || other.rotation === 6;
-                                            const width = Math.max(1, (rotated ? other.length : other.width) ?? 1);
-                                            const length = Math.max(1, (rotated ? other.width : other.length) ?? 1);
-                                            return candidate.x >= other.x && candidate.x < other.x + width
-                                                && candidate.y >= other.y && candidate.y < other.y + length;
-                                        });
-                                    });
-                                    candidates.sort((a, b) =>
-                                        (Math.abs(a.x - (ownAvatar?.tileX ?? a.x)) + Math.abs(a.y - (ownAvatar?.tileY ?? a.y)))
-                                        - (Math.abs(b.x - (ownAvatar?.tileX ?? b.x)) + Math.abs(b.y - (ownAvatar?.tileY ?? b.y))));
-                                    if (candidates[0]) walkTo(tileToWorld(candidates[0].x), tileToWorld(candidates[0].y));
-                                } : undefined}
+                {editing && (
+                    <div className="snowwar-editor">
+                        <div className="snowwar-editor__title">
+                            <span className="snowwar-editor__title-ball" />
+                            {localizeWithFallback('snowwar.editor.title', 'SnowStorm Arena Workshop')}
+                        </div>
+                        <div className="snowwar-editor__hint">
+                            {localizeWithFallback('snowwar.editor.hint', 'Pick a piece, floor tile, or hotel furni and build directly on the arena. Select / Move and Edit let you refine placed pieces; Walk tests the finished routes.')}
+                        </div>
+                        <div className="snowwar-editor__shortcuts">
+                            <span><kbd>Ctrl / ⌘</kbd> + drag <b>Paint line</b></span>
+                            <span><kbd>Shift</kbd> + drag <b>Fill area</b></span>
+                        </div>
+                        {/* Function controls (modes + tools), grouped and separated
+                            from the furni palette below - these are actions, not furni. */}
+                        <div className="snowwar-editor__tools snowwar-editor__tools--modes">
+                            <BaseButton
+                                type="button"
+                                className={'snowwar-editor__chip' + (paletteSel === null ? ' snowwar-editor__chip--active' : '')}
+                                onClick={() => setPaletteSel(null)}
                             >
-                                {item.name === 'ads_igorraygun' && !editing && (
-                                    <Hint content={localizeWithFallback('snowwar.raygun.use', 'Use Ray Gun')}>
+                                {localizeWithFallback('snowwar.editor.select', 'Select / Move')}
+                            </BaseButton>
+                            <BaseButton
+                                type="button"
+                                className={'snowwar-editor__chip' + (paletteSel === 'edit' ? ' snowwar-editor__chip--active' : '')}
+                                onClick={() => setPaletteSel('edit')}
+                            >
+                                {localizeWithFallback('snowwar.editor.edit', 'Edit')}
+                            </BaseButton>
+                            <BaseButton
+                                type="button"
+                                className={'snowwar-editor__chip' + (paletteSel === 'walk' ? ' snowwar-editor__chip--active' : '')}
+                                onClick={() => { setPaletteSel('walk'); setSelectedIndex(-1); }}
+                            >
+                                {localizeWithFallback('snowwar.editor.walk', 'Walk')}
+                            </BaseButton>
+                            <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => clearAllItems()}>
+                                {localizeWithFallback('snowwar.editor.clear', 'Clear all furni')}
+                            </BaseButton>
+                        </div>
+                        <div className="snowwar-editor__floor-plan">
+                            <div className="snowwar-editor__floor-plan-heading">
+                                <strong>{localizeWithFallback('snowwar.editor.floor_plan', 'Floor plan')}</strong>
+                                <span>{walkableTileCount} {localizeWithFallback('snowwar.editor.walkable_tiles', 'walkable tiles')}</span>
+                            </div>
+                            <div className="snowwar-editor__hint">
+                                {localizeWithFallback('snowwar.editor.floor_plan_hint', 'Open the full floor plan editor to shape the playable snowfield with its canvas, height tools, selection, undo and redo.')}
+                            </div>
+                            <div className="snowwar-editor__tools">
+                                <BaseButton type="button" className="snowwar-button" onClick={() => setFloorplanEditorVisible(true)}>
+                                    {localizeWithFallback('snowwar.editor.floor_open', 'Edit floor plan')}
+                                </BaseButton>
+                            </div>
+                        </div>
+                        {EDITOR_PALETTE.length > 0 && (
+                            <div className="snowwar-editor__palette">
+                                {EDITOR_PALETTE.map(name => (
+                                    <BaseButton
+                                        key={name}
+                                        type="button"
+                                        className={'snowwar-editor__chip' + (paletteSel === name ? ' snowwar-editor__chip--active' : '')}
+                                        onClick={() => { setPaletteSel(prev => prev === name ? null : name); setSelectedIndex(-1); setHoverTile(null); }}
+                                    >
+                                        {name.replace('block_', '').replace('obst_', '').replace('sw_', '')}
+                                    </BaseButton>
+                                ))}
+                            </div>
+                        )}
+                        <input
+                            type="text"
+                            className="snowwar-editor__search"
+                            value={furniSearch}
+                            placeholder={localizeWithFallback('snowwar.editor.furni_search', 'Search furniture to place...')}
+                            onChange={event => setFurniSearch(event.target.value)}
+                        />
+                        {furniMatches.length > 0 && (
+                            <div className="snowwar-editor__palette snowwar-editor__palette--furni">
+                                {furniMatches.map(furni => (
+                                    <Hint key={furni.id} content={furni.className}><BaseButton
+                                        type="button"
+                                        className={'snowwar-editor__chip' + (paletteSel === furni.className ? ' snowwar-editor__chip--active' : '')}
+                                        onClick={() => { setPaletteSel(prev => prev === furni.className ? null : furni.className); setSelectedIndex(-1); setHoverTile(null); }}
+                                    >
+                                        {(furni.name && furni.name.trim()) || furni.className}
+                                    </BaseButton></Hint>
+                                ))}
+                            </div>
+                        )}
+                        {placingFurni && (
+                            <div className="snowwar-editor__preview">
+                                <span className="snowwar-editor__preview-label">{localizeWithFallback('snowwar.editor.placing', 'Placing')}:</span>
+                                <LayoutFurniImageView direction={2} productClassId={placingFurni.id} productType="s" style={{ transform: 'scale(0.5)' }} />
+                                <span>{(placingFurni.name && placingFurni.name.trim()) || paletteSel}</span>
+                            </div>
+                        )}
+                        {selectedItem && (
+                            <div className="snowwar-editor__selected">
+                                <div className="snowwar-editor__preview">
+                                    {selectedFurni
+                                        ? <LayoutFurniImageView direction={selectedItem.rotation} productClassId={selectedFurni.id} productType="s" state={selectedItem.state ?? 0} style={{ transform: 'scale(0.5)' }} />
+                                        : <div className="snowwar-furni__fallback" />}
+                                    <span>{(selectedFurni?.name && selectedFurni.name.trim()) || selectedItem.name}</span>
+                                </div>
+                                <div className="snowwar-editor__tools">
+                                    <BaseButton type="button" className="snowwar-button" onClick={() => rotateSelected()}>
+                                        {localizeWithFallback('snowwar.editor.rotate', 'Rotate')}
+                                    </BaseButton>
+                                    <BaseButton type="button" className="snowwar-button snowwar-button--danger" onClick={() => deleteSelected()}>
+                                        {localizeWithFallback('snowwar.editor.delete', 'Delete')}
+                                    </BaseButton>
+                                </div>
+                                {!selectedItem.imageUrl && selectedStateMax > 0 && (
+                                    <div className="snowwar-editor__state">
+                                        <span>{localizeWithFallback('snowwar.editor.state', 'State')}</span>
                                         <BaseButton
                                             type="button"
-                                            className="snowwar-raygun-hitbox"
-                                            aria-label={localizeWithFallback('snowwar.raygun.use', 'Use Ray Gun')}
-                                            onClick={event => fireRayGun(event, item.x, item.y, item.rotation, item.width ?? 1, item.length ?? 1)}
-                                        />
-                                    </Hint>
+                                            className="snowwar-button snowwar-button--icon"
+                                            disabled={(selectedItem.state ?? 0) <= 0}
+                                            onClick={() => cycleState(-1)}>
+                                            &#8722;
+                                        </BaseButton>
+                                        <span className="snowwar-editor__state-value">
+                                            {(selectedItem.state ?? 0)}{selectedStateCount ? ` / ${selectedStateMax}` : ''}
+                                        </span>
+                                        <BaseButton
+                                            type="button"
+                                            className="snowwar-button snowwar-button--icon"
+                                            disabled={(selectedItem.state ?? 0) >= selectedStateMax}
+                                            onClick={() => cycleState(1)}>
+                                            +
+                                        </BaseButton>
+                                    </div>
                                 )}
-                                {item.name === 'snst_ballpile'
-                                    ? furniData
+                            </div>
+                        )}
+
+                        <div className="snowwar-editor__selected">
+                            <div className="snowwar-editor__field snowwar-editor__field--stack">
+                                <span>{localizeWithFallback('snowwar.editor.bg', 'Arena background (ads_bg)')}</span>
+                                <input
+                                    type="text"
+                                    className="snowwar-editor__search"
+                                    value={backdropItem?.imageUrl ?? ''}
+                                    placeholder={localizeWithFallback('snowwar.editor.bg_url', 'Full-screen background image URL...')}
+                                    onChange={event => setBackdropUrl(event.target.value)}
+                                />
+                            </div>
+                            {backdropItem && (
+                                <label className="snowwar-editor__field">
+                                    {localizeWithFallback('snowwar.editor.overlay', 'Overlay floor tiles (hide tiles behind image)')}
+                                    <Checkbox checked={(backdropItem.offsetZ ?? 0) > 0} onCheckedChange={(nextChecked) => setBackdropOffsetZ(nextChecked ? 1 : 0)} />
+                                </label>
+                            )}
+                        </div>
+                    </div>
+                )}
+                {editing && floorplanEditorVisible && (
+                    <FloorplanEditorView
+                        externalSession={{
+                            tilemap: editHeightmap.join('\r'),
+                            occupiedTiles: floorplanOccupiedTiles,
+                            title: localizeWithFallback('snowwar.editor.floor_title', 'SnowStorm Floor Plan Editor'),
+                            onClose: () => setFloorplanEditorVisible(false),
+                            onSave: applyEditorFloorPlan,
+                        }}
+                    />
+                )}
+                {(frameNow - savedAt) < 2500 && savedAt > 0 && (
+                    <div className="snowwar-banner snowwar-banner--saved">
+                        {localizeWithFallback('snowwar.editor.published', 'Custom arena published to the game pool!')}
+                    </div>
+                )}
+
+                {phase === 'preparing' && !editing && (countdownFrame === 0) && (
+                    <div className="snowwar-banner snowwar-banner--countdown">
+                        {localizeWithFallback('snowwar.loading.title', 'Get ready!')} {preparingSeconds > 0 ? preparingSeconds : ''}
+                    </div>
+                )}
+                {/* AIR counter: digits 5..1, then the explosion as the match starts. */}
+                {!editing && (countdownFrame > 0) && (
+                    <div className="snowwar-countdown" aria-hidden="true">
+                        <img
+                            alt=""
+                            draggable={false}
+                            src={getHudAssetUrl(getExplosionAssetName(countdownFrame))}
+                            style={{ left: -SNOWWAR_EXPLOSION_OFFSETS[countdownFrame][0], top: -SNOWWAR_EXPLOSION_OFFSETS[countdownFrame][1] }}
+                        />
+                    </div>
+                )}
+                {(frameNow - rangeWarningAt) < 2000 && rangeWarningAt > 0 && (
+                    <div className="snowwar-banner snowwar-banner--warning">
+                        {localizeWithFallback('snowwar.throw.too_far', 'Too far away! Use a long throw or move closer.')}
+                    </div>
+                )}
+                {phase === 'ending' && (
+                    <div className="snowwar-banner snowwar-banner--countdown">
+                        {localizeWithFallback('snowwar.time_up', 'Time is up!')}
+                    </div>
+                )}
+
+                <div className="snowwar-viewport-wrap">
+                <div
+                    ref={viewportRef}
+                    className="snowwar-viewport"
+                    onClick={onArenaClick}
+                    onContextMenu={onArenaClick}
+                    onPointerDown={editing ? onEditorPointerDown : undefined}
+                    onPointerMove={editing ? onEditorPointerMove : undefined}
+                    onPointerUp={editing ? onEditorPointerUp : undefined}
+                    onPointerCancel={editing ? onEditorPointerCancel : undefined}
+                    onMouseLeave={editing ? () => setHoverTile(null) : undefined}
+                >
+                    <div
+                        className="snowwar-world"
+                        // Snap the camera translate to whole pixels. The easing keeps
+                        // running in floats (cam.x/cam.y), but a fractional translate here
+                        // makes the browser rasterise the whole arena subtree at a sub-pixel
+                        // offset, so every scaled sprite (furni at 0.375, avatars) samples
+                        // between pixels and looks blurry / shimmers while the camera moves.
+                        style={{ width: stageW, height: stageH, transform: `translate(${Math.round(cameraX)}px, ${Math.round(cameraY)}px)`, transformOrigin: '0 0' }}
+                    >
+                        {officialBackdrop && arenaBackdrop && (
+                            <img
+                                key={officialBackdrop.file}
+                                alt=""
+                                className="snowwar-official-backdrop"
+                                draggable={false}
+                                src={backdropLibraryFailed[officialBackdrop.file] ? arenaBackdrop.imageUrl : getOfficialSnowWarAssetUrl(officialBackdrop.file)}
+                                style={officialBackdropRect ?? undefined}
+                                onLoad={event =>
+                                {
+                                    const { naturalWidth, naturalHeight } = event.currentTarget;
+                                    const file = officialBackdrop.file;
+                                    if (naturalWidth > 0 && naturalHeight > 0) setBackdropRatios(ratios => ({ ...ratios, [file]: naturalHeight / naturalWidth }));
+                                }}
+                                onError={() =>
+                                {
+                                    const file = officialBackdrop.file;
+                                    setBackdropLibraryFailed(failed => (failed[file] ? failed : { ...failed, [file]: true }));
+                                }}
+                            />
+                        )}
+                        {arenaBackdrop && !officialBackdrop && !backdropOverlay && (
+                            <img
+                                alt=""
+                                className="snowwar-arena-bg"
+                                draggable={false}
+                                src={arenaBackdrop.imageUrl}
+                            />
+                        )}
+                        <div
+                            className="snowwar-floor-layer"
+                            style={{ left: floorOffsetX, top: floorOffsetY, width: canvasWidth, height: canvasHeight, transform: `scale(${zoom})`, transformOrigin: '0 0' }}
+                        >
+                            <canvas
+                                ref={canvasRef}
+                                width={canvasWidth}
+                                height={canvasHeight}
+                                className={`snowwar-floor${officialBackdrop ? ' snowwar-floor--official-backdrop' : ''}`}
+                            />
+
+                        {arenaBackdrop && !officialBackdrop && backdropOverlay && (
+                            <img
+                                alt=""
+                                className="snowwar-arena-bg-overlay"
+                                draggable={false}
+                                src={arenaBackdrop.imageUrl}
+                                style={{ width: canvasWidth, height: canvasHeight }}
+                            />
+                        )}
+
+                        {/* Classic props, above the overlay so they aren't hidden. */}
+                        <canvas ref={propsCanvasRef} width={canvasWidth} height={canvasHeight} className="snowwar-floor snowwar-floor--props" />
+
+                        {editorAreaOutline && (
+                            <svg
+                                aria-hidden="true"
+                                className="snowwar-edit-area"
+                                width={editorAreaOutline.width}
+                                height={editorAreaOutline.height}
+                                style={{ left: editorAreaOutline.left, top: editorAreaOutline.top }}
+                            >
+                                <polygon points={editorAreaOutline.points} />
+                            </svg>
+                        )}
+
+                        {displayItems
+                            .filter(item => !isClassicItem(item.name) && !item.imageUrl)
+                            // While a selected furni is being moved (its ghost is
+                            // following the cursor), hide its copy at the old tile so
+                            // it isn't shown twice.
+                            .filter(item => !(movingSelected && item === selectedItem))
+                            .map((item, index) =>
+                        {
+                            // A multi-tile furni occupies width x length tiles from its
+                            // origin (+x/+y, swapped for the 90/270 rotations) - the same
+                            // footprint the server blocks. Draw the sprite over the
+                            // footprint CENTRE (a 1x1 prop is unchanged) and depth-sort by
+                            // the FRONT (nearest-camera) tile, so a 3x3 prop sits on and
+                            // occludes its whole footprint instead of drawing over an
+                            // avatar standing beside or in front of it.
+                            const swap = item.rotation === 2 || item.rotation === 6;
+                            const effW = Math.max(1, (swap ? item.length : item.width) ?? 1);
+                            const effL = Math.max(1, (swap ? item.width : item.length) ?? 1);
+                            // Ground the furni at the FRONT (nearest-camera) corner of its
+                            // footprint and anchor the image by its BOTTOM-CENTRE there, so
+                            // its base rests on the floor (size-independent; a fixed % lift
+                            // floated tall props). Depth, however, sorts by the ORIGIN (back)
+                            // tile - the same rule Octane uses for a real floor furni - so an
+                            // avatar on the near sides (left/front) draws in front of the
+                            // furni and only one standing behind it is covered.
+                            const front = toScreen(item.x + effW - 1, item.y + effL - 1);
+                            // Depth anchor = origin tile CENTRE (+ TILE_HALF_H), matching how
+                            // avatars anchor (worldToScreen is tile-centre). Without the
+                            // half-tile offset the furni sorted half a tile behind where it
+                            // should, which tipped the overlay the wrong way for an avatar
+                            // standing right at a corner.
+                            // AIR stores furni altitude in 1600 world units per room
+                            // floor. Convert that to one rendered tile-height so the
+                            // stacked Arctic Island snow blocks keep their original
+                            // elevation instead of collapsing onto each other.
+                            const altitudePx = Math.max(0, item.offsetZ ?? 0) / 1600 * (TILE_HALF_H * 2);
+                            const originY = toScreen(item.x, item.y).y + TILE_HALF_H - altitudePx;
+
+                            // A walkable furni (walkableHeight 0 - a rug/floor tile you
+                            // stand ON) is flat on the ground and must NEVER occlude an
+                            // avatar. Depth-sorting the whole sprite by one tile lets its
+                            // front edge out-sort an avatar standing on it, so put flat
+                            // furni in a low band (above the floor + overlay, below the
+                            // machines at 90 and the avatars/solid furni at 100+). Solid
+                            // furni keep the shared depth band so they occlude correctly.
+                            const furniData = GetSessionDataManager()?.getFloorItemDataByName?.(item.name);
+                            // Flat = a walkable floor furni (rug / water / tile you stand
+                            // ON). Prefer the server's walkableHeight; for a freshly-placed
+                            // editor furni that doesn't carry it yet, fall back to the
+                            // furnidata "can stand on" flag so it's still drawn below the
+                            // avatar.
+                            const flat = item.walkableHeight != null
+                                ? item.walkableHeight === 0
+                                : !!(furniData?.canStandOn || furniData?.canLayOn);
+                            const zIndex = flat
+                                ? 3 + Math.min(80, Math.max(0, Math.round(originY / 8)))
+                                : 100 + Math.round(originY);
+                            const tree = simulation.trees.get(`${item.x},${item.y}`);
+                            const pile = simulation.piles.get(`${item.x},${item.y}`);
+                            const state = tree
+                                ? Math.min(tree.maximumHits - 1, tree.hits)
+                                : pile
+                                    ? pile.maxSnowballs - pile.snowballCount
+                                    : (item.state ?? 0);
+
+                            return (
+                                <div
+                                    key={`furni-${index}`}
+                                    className="snowwar-furni"
+                                    data-snowwar-item={item.name}
+                                    data-snowwar-x={item.x}
+                                    data-snowwar-y={item.y}
+                                    data-snowwar-count={pile?.snowballCount}
+                                    style={{ left: front.x, top: front.y + (TILE_HALF_H * 2) - altitudePx, zIndex }}
+                                    title={pile ? localizeWithFallback('snowwar.pile.hint', '%count% snowballs left').replace('%count%', pile.snowballCount.toString()) : undefined}
+                                    onClick={pile ? event =>
+                                    {
+                                        event.stopPropagation();
+                                        const candidates = [
+                                            { x: item.x, y: item.y - 1 },
+                                            { x: item.x + 1, y: item.y },
+                                            { x: item.x, y: item.y + 1 },
+                                            { x: item.x - 1, y: item.y },
+                                        ].filter(candidate =>
+                                        {
+                                            const tile = mapRows[candidate.y]?.charAt(candidate.x);
+                                            if (!tile || tile === 'x' || tile === 'X') return false;
+                                            if (levelData.machines.some(machine =>
+                                                candidate.y === machine.y && candidate.x >= machine.x && candidate.x <= machine.x + 2)) return false;
+                                            return !displayItems.some(other =>
+                                            {
+                                                if (other === item || (other.walkableHeight ?? 0) <= 0) return false;
+                                                const rotated = other.rotation === 2 || other.rotation === 6;
+                                                const width = Math.max(1, (rotated ? other.length : other.width) ?? 1);
+                                                const length = Math.max(1, (rotated ? other.width : other.length) ?? 1);
+                                                return candidate.x >= other.x && candidate.x < other.x + width
+                                                    && candidate.y >= other.y && candidate.y < other.y + length;
+                                            });
+                                        });
+                                        candidates.sort((a, b) =>
+                                            (Math.abs(a.x - (ownAvatar?.tileX ?? a.x)) + Math.abs(a.y - (ownAvatar?.tileY ?? a.y)))
+                                            - (Math.abs(b.x - (ownAvatar?.tileX ?? b.x)) + Math.abs(b.y - (ownAvatar?.tileY ?? b.y))));
+                                        if (candidates[0]) walkTo(tileToWorld(candidates[0].x), tileToWorld(candidates[0].y));
+                                    } : undefined}
+                                >
+                                    {item.name === 'ads_igorraygun' && !editing && (
+                                        <Hint content={localizeWithFallback('snowwar.raygun.use', 'Use Ray Gun')}>
+                                            <BaseButton
+                                                type="button"
+                                                className="snowwar-raygun-hitbox"
+                                                aria-label={localizeWithFallback('snowwar.raygun.use', 'Use Ray Gun')}
+                                                onClick={event => fireRayGun(event, item.x, item.y, item.rotation, item.width ?? 1, item.length ?? 1)}
+                                            />
+                                        </Hint>
+                                    )}
+                                    {item.name === 'snst_ballpile'
+                                        ? furniData
+                                            ? <LayoutFurniImageView
+                                                direction={item.rotation}
+                                                productClassId={furniData.id}
+                                                productType="s"
+                                                state={state}
+                                                style={{ position: 'absolute', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
+                                            />
+                                            : <img
+                                                alt=""
+                                                className="snowwar-official-ballpile"
+                                                draggable={false}
+                                                src={snowballPileImage}
+                                                style={{ position: 'absolute', width: 23, height: 18, maxWidth: 'none', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
+                                            />
+                                        : furniData
                                         ? <LayoutFurniImageView
                                             direction={item.rotation}
                                             productClassId={furniData.id}
                                             productType="s"
                                             state={state}
-                                            style={{ position: 'absolute', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
+                                            style={{ position: 'absolute', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_FURNI_SCALE})` }}
                                         />
-                                        : <img
-                                            alt=""
-                                            className="snowwar-official-ballpile"
-                                            draggable={false}
-                                            src={snowballPileImage}
-                                            style={{ position: 'absolute', width: 23, height: 18, maxWidth: 'none', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
-                                        />
-                                    : furniData
-                                    ? <LayoutFurniImageView
-                                        direction={item.rotation}
-                                        productClassId={furniData.id}
-                                        productType="s"
-                                        state={state}
-                                        style={{ position: 'absolute', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_FURNI_SCALE})` }}
-                                    />
-                                    : <div className="snowwar-furni__fallback" />}
-                            </div>
-                        );
-                    })}
-
-                    {editing && ghostFurni && hoverTile && (placingFurni || movingSelected) && (() =>
-                    {
-                        const swap = ghostRotation === 2 || ghostRotation === 6;
-                        const effW = Math.max(1, (swap ? ghostFurni.tileSizeY : ghostFurni.tileSizeX) || 1);
-                        const effL = Math.max(1, (swap ? ghostFurni.tileSizeX : ghostFurni.tileSizeY) || 1);
-                        const front = toScreen(hoverTile.x + effW - 1, hoverTile.y + effL - 1);
-                        const originY = toScreen(hoverTile.x, hoverTile.y).y + TILE_HALF_H;
-                        return (
-                            <div
-                                className="snowwar-furni snowwar-furni--ghost"
-                                style={{ left: front.x, top: front.y + (TILE_HALF_H * 2), zIndex: 100 + Math.round(originY), opacity: 0.8, pointerEvents: 'none' }}
-                            >
-                                <LayoutFurniImageView
-                                    direction={ghostRotation}
-                                    productClassId={ghostFurni.id}
-                                    productType="s"
-                                    state={ghostState}
-                                    style={{ position: 'absolute', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_FURNI_SCALE})` }}
-                                />
-                            </div>
-                        );
-                    })()}
-
-                    {/* Tall classic props (trees / snowman / fences / blocks) as
-                        per-tile sprites, depth-sorted with the avatars so one
-                        standing behind a prop is occluded, like hotel furni. */}
-                    {displayItems
-                        .filter(item => isClassicItem(item.name) && !isFlatFloorProp(item.name) && !item.name.startsWith('snowball_machine'))
-                        .map((item, index) =>
-                        {
-                            const { x: screenX, y: screenY } = toScreen(item.x, item.y);
-                            return (
-                                <div
-                                    key={`classic-${index}`}
-                                    className="snowwar-classic-prop"
-                                    data-snowwar-item={item.name}
-                                    data-snowwar-x={item.x}
-                                    data-snowwar-y={item.y}
-                                    style={{ left: screenX - (PROP_BOX_W / 2), top: screenY - PROP_ANCHOR_Y, zIndex: 100 + Math.round(screenY + TILE_HALF_H) }}
-                                >
-                                    <ClassicPropSprite name={item.name} rotation={item.rotation} />
+                                        : <div className="snowwar-furni__fallback" />}
                                 </div>
                             );
                         })}
 
-                    {editing && paletteSel && isClassicItem(paletteSel) && !isFlatFloorProp(paletteSel) && !paletteSel.startsWith('snowball_machine') && hoverTile && (() =>
-                    {
-                        const { x: screenX, y: screenY } = toScreen(hoverTile.x, hoverTile.y);
-                        return (
-                            <div
-                                className="snowwar-classic-prop"
-                                style={{ left: screenX - (PROP_BOX_W / 2), top: screenY - PROP_ANCHOR_Y, zIndex: 100 + Math.round(screenY + TILE_HALF_H) }}
-                            >
-                                <ClassicPropSprite name={paletteSel} rotation={0} opacity={0.55} />
-                            </div>
-                        );
-                    })()}
-
-                    {!editing && levelData.machines.map(machine =>
-                    {
-                        const state = simulation.machines.get(machine.objectId);
-                        const { x, y } = toScreen(machine.x, machine.y);
-                        const snowballCount = Math.max(0, Math.min(5, state?.snowballCount ?? 0));
-                        const indicatorFrame = Math.floor(frameNow / 250) % 2;
-
-                        return (
-                            <div
-                                key={machine.objectId}
-                                // Depth-sort the original machine like a floor furni (origin-tile
-                                // anchor, same formula as avatars/furni) so it draws in
-                                // front of anyone behind it and behind anyone in front,
-                                // and sorts correctly against normal furniture too.
-                                className="snowwar-machine"
-                                // Depth anchor = tile CENTRE (+ TILE_HALF_H) to match the
-                                // avatar reference, so the machine sorts cleanly at corners.
-                                style={{ left: x, top: y + (TILE_HALF_H * 2), zIndex: 100 + Math.round(y + TILE_HALF_H), transform: `scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
-                                title={localizeWithFallback('snowwar.machine.hint', 'Walk here to collect snowballs')}
-                                // Clicking the machine walks you to its pickup tile (the
-                                // tile in front of its left cell), where the server's
-                                // auto-collect tops you up - it isn't an instant click
-                                // grab, so give the player the one-click "go get ammo".
-                                onClick={event =>
-                                {
-                                    event.stopPropagation();
-                                    walkTo(tileToWorld(machine.x), tileToWorld(machine.y + 1));
-                                }}
-                            >
-                                <img
-                                    alt=""
-                                    className="snowwar-machine__official-shadow"
-                                    draggable={false}
-                                    height={26}
-                                    src={getOfficialSnowWarAssetUrl('s_snowball_machine_32_sd.png')}
-                                    width={56}
-                                />
-                                <img
-                                    alt=""
-                                    className="snowwar-machine__official-body"
-                                    draggable={false}
-                                    height={57}
-                                    src={getOfficialSnowWarAssetUrl(`s_snowball_machine_32_a_0_${snowballCount}.png`)}
-                                    width={41}
-                                />
-                                <img
-                                    alt=""
-                                    className="snowwar-machine__official-indicator"
-                                    draggable={false}
-                                    height={38}
-                                    src={getOfficialSnowWarAssetUrl(`s_snowball_machine_32_b_0_${indicatorFrame}.png`)}
-                                    width={32}
-                                />
-                                <div className="snowwar-machine__count">{state?.snowballCount ?? 0}</div>
-                            </div>
-                        );
-                    })}
-
-                    {editing && editItems.map((item, index) => item.imageUrl
-                        ? (() =>
+                        {editing && ghostFurni && hoverTile && (placingFurni || movingSelected) && (() =>
                         {
-                            const { x, y } = toScreen(item.x, item.y);
-                            return <div key={`admarker-${index}`} className="snowwar-edit-admarker" style={{ left: x, top: y + TILE_HALF_H }}>🖼</div>;
-                        })()
-                        : null)}
-
-                    {editing && selectedIndex >= 0 && editItems[selectedIndex] && !movingSelected && (() =>
-                    {
-                        // Hidden while the ghost is following the cursor (a move in
-                        // progress) - the ghost is the indicator then, so the box
-                        // isn't left floating at the old/empty tile.
-                        // Outline the WHOLE footprint as one isometric parallelogram
-                        // (rotation swaps width/length) so the selection follows the
-                        // tile angle instead of a grid of axis-aligned boxes.
-                        const sel = editItems[selectedIndex];
-                        const swap = sel.rotation === 2 || sel.rotation === 6;
-                        const effW = Math.max(1, (swap ? sel.length : sel.width) ?? 1);
-                        const effL = Math.max(1, (swap ? sel.width : sel.length) ?? 1);
-                        // The four extreme tile-diamond vertices of the footprint.
-                        const topV = toScreen(sel.x, sel.y);
-                        const rightV = toScreen(sel.x + effW - 1, sel.y);
-                        const bottomV = toScreen(sel.x + effW - 1, sel.y + effL - 1);
-                        const leftV = toScreen(sel.x, sel.y + effL - 1);
-                        const corners = [
-                            { x: topV.x, y: topV.y },
-                            { x: rightV.x + TILE_HALF_W, y: rightV.y + TILE_HALF_H },
-                            { x: bottomV.x, y: bottomV.y + (TILE_HALF_H * 2) },
-                            { x: leftV.x - TILE_HALF_W, y: leftV.y + TILE_HALF_H },
-                        ];
-                        const minX = Math.min(...corners.map(c => c.x));
-                        const minY = Math.min(...corners.map(c => c.y));
-                        const boxW = Math.max(...corners.map(c => c.x)) - minX;
-                        const boxH = Math.max(...corners.map(c => c.y)) - minY;
-                        const points = corners.map(c => `${c.x - minX},${c.y - minY}`).join(' ');
-                        return (
-                            <svg className="snowwar-edit-selection" width={boxW} height={boxH} style={{ left: minX, top: minY }}>
-                                <polygon points={points} />
-                            </svg>
-                        );
-                    })()}
-
-                    {[...simulation.snowballs.values()].map(ball =>
-                    {
-                        const lx = ball.prevLocH + (ball.locH - ball.prevLocH) * alpha;
-                        const ly = ball.prevLocV + (ball.locV - ball.prevLocV) * alpha;
-                        const lh = Math.max(0, ball.prevHeight + (ball.height - ball.prevHeight) * alpha);
-                        const { x, y } = worldToScreen(lx, ly);
-                        const rise = snowballRise(lh);
-                        return (
-                            <div
-                                key={ball.objectId}
-                                className="snowwar-snowball"
-                                style={{ left: x, top: y, transform: `scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
-                            >
-                                <img alt="" className="snowwar-snowball__shadow" src={SNOWWAR_SNOWBALL_SHADOW} />
-                                <img alt="" className="snowwar-snowball__ball" src={SNOWWAR_SNOWBALL_IMAGE} style={{ transform: `translateY(${-rise}px)` }} />
-                            </div>
-                        );
-                    })}
-
-                    {splashes.map(splash =>
-                        <div
-                            key={splash.id}
-                            className="snowwar-splash"
-                            style={{ left: splash.x, top: splash.y, transform: `translate(-50%, -50%) scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
-                            onAnimationEnd={() => setSplashes(list => list.filter(item => item.id !== splash.id))}
-                        >
-                            {SNOWWAR_SPLASH_FRAMES.map((frame, index) =>
-                                <img alt="" className={`snowwar-splash__frame snowwar-splash__frame--${index + 1}`} key={frame} src={frame} />)}
-                        </div>
-                    )}
-
-                    {!editing && [...simulation.avatars.values()].map(avatar =>
-                    {
-                        const ax = avatar.prevWorldX + (avatar.worldX - avatar.prevWorldX) * alpha;
-                        const ay = avatar.prevWorldY + (avatar.worldY - avatar.prevWorldY) * alpha;
-                        const { x, y } = worldToScreen(ax, ay);
-                        const isOwn = avatar.userId === ownUserId;
-                        const walking = (avatar.worldX !== avatar.prevWorldX) || (avatar.worldY !== avatar.prevWorldY);
-                        const throwUntil = throwPoseUntilRef.current.get(avatar.objectId) ?? 0;
-                        const throwing = frameNow < throwUntil;
-                        const throwProgress = throwing ? 1 - (throwUntil - frameNow) / SNOWWAR_THROW_POSE_MS : 0;
-                        const stunned = avatar.activityState === SNOWWAR_STATE_STUNNED;
-                        const invincible = avatar.activityState === SNOWWAR_STATE_INVINCIBLE;
-                        const throwAtOpponent = (event: MouseEvent<HTMLDivElement>, trajectory: number) =>
-                        {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            if (!ownAvatar || avatar.teamId === ownAvatar.teamId) return;
-                            if (!isThrowInRange(ownAvatar.worldX, ownAvatar.worldY, avatar.worldX, avatar.worldY, trajectory))
-                            {
-                                setRangeWarningAt(Date.now());
-                                return;
-                            }
-                            throwAtPlayer(avatar.objectId, trajectory);
-                        };
-
-                        return (
-                            <div
-                                key={avatar.objectId}
-                                className={
-                                    'snowwar-avatar' +
-                                    (stunned ? ' snowwar-avatar--stunned' : '') +
-                                    (invincible ? ' snowwar-avatar--invincible' : '')
-                                }
-                                style={{ left: x, top: y, zIndex: 100 + Math.round(y) }}
-                                onClick={event =>
-                                {
-                                    if (isOwn)
-                                    {
-                                        event.stopPropagation();
-                                        createSnowball();
-                                        return;
-                                    }
-                                    throwAtOpponent(event, getAirTrajectory(event.altKey, event.shiftKey, true) ?? TRAJECTORY_DEFAULT);
-                                }}
-                                onContextMenu={event =>
-                                {
-                                    if (isOwn)
-                                    {
-                                        event.preventDefault();
-                                        event.stopPropagation();
-                                        return;
-                                    }
-                                    throwAtOpponent(event, getAirTrajectory(event.altKey, event.shiftKey, true) ?? TRAJECTORY_DEFAULT);
-                                }}
-                            >
-                                <div aria-hidden="true" className="snowwar-avatar__hitbox" />
+                            const swap = ghostRotation === 2 || ghostRotation === 6;
+                            const effW = Math.max(1, (swap ? ghostFurni.tileSizeY : ghostFurni.tileSizeX) || 1);
+                            const effL = Math.max(1, (swap ? ghostFurni.tileSizeX : ghostFurni.tileSizeY) || 1);
+                            const front = toScreen(hoverTile.x + effW - 1, hoverTile.y + effL - 1);
+                            const originY = toScreen(hoverTile.x, hoverTile.y).y + TILE_HALF_H;
+                            return (
                                 <div
-                                    className={'snowwar-avatar__name' + (isOwn ? ' snowwar-avatar__name--own' : '')}
-                                    style={{ color: TEAM_COLORS[avatar.teamId % TEAM_COLORS.length] }}
+                                    className="snowwar-furni snowwar-furni--ghost"
+                                    style={{ left: front.x, top: front.y + (TILE_HALF_H * 2), zIndex: 100 + Math.round(originY), opacity: 0.8, pointerEvents: 'none' }}
                                 >
-                                    {avatar.name}
+                                    <LayoutFurniImageView
+                                        direction={ghostRotation}
+                                        productClassId={ghostFurni.id}
+                                        productType="s"
+                                        state={ghostState}
+                                        style={{ position: 'absolute', transformOrigin: 'center bottom', transform: `translate(-50%, -100%) scale(${SNOWWAR_FURNI_SCALE})` }}
+                                    />
                                 </div>
-                                <span className="snowwar-avatar__body">
-                                    <SnowWarAvatarView
-                                        figure={avatar.figure}
-                                        gender={avatar.gender}
-                                        teamId={avatar.teamId}
-                                        direction={avatar.rotation}
-                                        walking={walking && !stunned}
-                                        stunned={stunned}
-                                        stunElapsedMs={(STUN_TIME - avatar.activityTimer) * SUBTURN_MS}
-                                        picking={avatar.activityState === SNOWWAR_STATE_CREATING}
-                                        throwing={throwing && !stunned}
-                                        throwProgress={throwProgress}
-                                        frameNow={frameNow}
-                                        scale={SNOWWAR_FURNI_SCALE}
-                                    />
-                                </span>
-                            </div>
-                        );
-                    })}
+                            );
+                        })()}
 
-                    {editorWalker && (() =>
-                    {
-                        // Client-side preview avatar shown only in the editor (the
-                        // game simulation is empty here). Anchored the same way as an
-                        // in-game avatar so it lines up with the tiles it walks.
-                        const { x, y } = toScreen(editorWalker.x + 0.5, editorWalker.y + 0.5);
-                        return (
+                        {/* Tall classic props (trees / snowman / fences / blocks) as
+                            per-tile sprites, depth-sorted with the avatars so one
+                            standing behind a prop is occluded, like hotel furni. */}
+                        {displayItems
+                            .filter(item => isClassicItem(item.name) && !isFlatFloorProp(item.name) && !item.name.startsWith('snowball_machine'))
+                            .map((item, index) =>
+                            {
+                                const { x: screenX, y: screenY } = toScreen(item.x, item.y);
+                                return (
+                                    <div
+                                        key={`classic-${index}`}
+                                        className="snowwar-classic-prop"
+                                        data-snowwar-item={item.name}
+                                        data-snowwar-x={item.x}
+                                        data-snowwar-y={item.y}
+                                        style={{ left: screenX - (PROP_BOX_W / 2), top: screenY - PROP_ANCHOR_Y, zIndex: 100 + Math.round(screenY + TILE_HALF_H) }}
+                                    >
+                                        <ClassicPropSprite name={item.name} rotation={item.rotation} />
+                                    </div>
+                                );
+                            })}
+
+                        {editing && paletteSel && isClassicItem(paletteSel) && !isFlatFloorProp(paletteSel) && !paletteSel.startsWith('snowball_machine') && hoverTile && (() =>
+                        {
+                            const { x: screenX, y: screenY } = toScreen(hoverTile.x, hoverTile.y);
+                            return (
+                                <div
+                                    className="snowwar-classic-prop"
+                                    style={{ left: screenX - (PROP_BOX_W / 2), top: screenY - PROP_ANCHOR_Y, zIndex: 100 + Math.round(screenY + TILE_HALF_H) }}
+                                >
+                                    <ClassicPropSprite name={paletteSel} rotation={0} opacity={0.55} />
+                                </div>
+                            );
+                        })()}
+
+                        {!editing && levelData.machines.map(machine =>
+                        {
+                            const state = simulation.machines.get(machine.objectId);
+                            const { x, y } = toScreen(machine.x, machine.y);
+                            const snowballCount = Math.max(0, Math.min(5, state?.snowballCount ?? 0));
+                            const indicatorFrame = Math.floor(frameNow / 250) % 2;
+
+                            return (
+                                <div
+                                    key={machine.objectId}
+                                    // Depth-sort the original machine like a floor furni (origin-tile
+                                    // anchor, same formula as avatars/furni) so it draws in
+                                    // front of anyone behind it and behind anyone in front,
+                                    // and sorts correctly against normal furniture too.
+                                    className="snowwar-machine"
+                                    // Depth anchor = tile CENTRE (+ TILE_HALF_H) to match the
+                                    // avatar reference, so the machine sorts cleanly at corners.
+                                    style={{ left: x, top: y + (TILE_HALF_H * 2), zIndex: 100 + Math.round(y + TILE_HALF_H), transform: `scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
+                                    title={localizeWithFallback('snowwar.machine.hint', 'Walk here to collect snowballs')}
+                                    // Clicking the machine walks you to its pickup tile (the
+                                    // tile in front of its left cell), where the server's
+                                    // auto-collect tops you up - it isn't an instant click
+                                    // grab, so give the player the one-click "go get ammo".
+                                    onClick={event =>
+                                    {
+                                        event.stopPropagation();
+                                        walkTo(tileToWorld(machine.x), tileToWorld(machine.y + 1));
+                                    }}
+                                >
+                                    <img
+                                        alt=""
+                                        className="snowwar-machine__official-shadow"
+                                        draggable={false}
+                                        height={26}
+                                        src={getOfficialSnowWarAssetUrl('s_snowball_machine_32_sd.png')}
+                                        width={56}
+                                    />
+                                    <img
+                                        alt=""
+                                        className="snowwar-machine__official-body"
+                                        draggable={false}
+                                        height={57}
+                                        src={getOfficialSnowWarAssetUrl(`s_snowball_machine_32_a_0_${snowballCount}.png`)}
+                                        width={41}
+                                    />
+                                    <img
+                                        alt=""
+                                        className="snowwar-machine__official-indicator"
+                                        draggable={false}
+                                        height={38}
+                                        src={getOfficialSnowWarAssetUrl(`s_snowball_machine_32_b_0_${indicatorFrame}.png`)}
+                                        width={32}
+                                    />
+                                    <div className="snowwar-machine__count">{state?.snowballCount ?? 0}</div>
+                                </div>
+                            );
+                        })}
+
+                        {editing && editItems.map((item, index) => item.imageUrl
+                            ? (() =>
+                            {
+                                const { x, y } = toScreen(item.x, item.y);
+                                return <div key={`admarker-${index}`} className="snowwar-edit-admarker" style={{ left: x, top: y + TILE_HALF_H }}>🖼</div>;
+                            })()
+                            : null)}
+
+                        {editing && selectedIndex >= 0 && editItems[selectedIndex] && !movingSelected && (() =>
+                        {
+                            // Hidden while the ghost is following the cursor (a move in
+                            // progress) - the ghost is the indicator then, so the box
+                            // isn't left floating at the old/empty tile.
+                            // Outline the WHOLE footprint as one isometric parallelogram
+                            // (rotation swaps width/length) so the selection follows the
+                            // tile angle instead of a grid of axis-aligned boxes.
+                            const sel = editItems[selectedIndex];
+                            const swap = sel.rotation === 2 || sel.rotation === 6;
+                            const effW = Math.max(1, (swap ? sel.length : sel.width) ?? 1);
+                            const effL = Math.max(1, (swap ? sel.width : sel.length) ?? 1);
+                            // The four extreme tile-diamond vertices of the footprint.
+                            const topV = toScreen(sel.x, sel.y);
+                            const rightV = toScreen(sel.x + effW - 1, sel.y);
+                            const bottomV = toScreen(sel.x + effW - 1, sel.y + effL - 1);
+                            const leftV = toScreen(sel.x, sel.y + effL - 1);
+                            const corners = [
+                                { x: topV.x, y: topV.y },
+                                { x: rightV.x + TILE_HALF_W, y: rightV.y + TILE_HALF_H },
+                                { x: bottomV.x, y: bottomV.y + (TILE_HALF_H * 2) },
+                                { x: leftV.x - TILE_HALF_W, y: leftV.y + TILE_HALF_H },
+                            ];
+                            const minX = Math.min(...corners.map(c => c.x));
+                            const minY = Math.min(...corners.map(c => c.y));
+                            const boxW = Math.max(...corners.map(c => c.x)) - minX;
+                            const boxH = Math.max(...corners.map(c => c.y)) - minY;
+                            const points = corners.map(c => `${c.x - minX},${c.y - minY}`).join(' ');
+                            return (
+                                <svg className="snowwar-edit-selection" width={boxW} height={boxH} style={{ left: minX, top: minY }}>
+                                    <polygon points={points} />
+                                </svg>
+                            );
+                        })()}
+
+                        {[...simulation.snowballs.values()].map(ball =>
+                        {
+                            const lx = ball.prevLocH + (ball.locH - ball.prevLocH) * alpha;
+                            const ly = ball.prevLocV + (ball.locV - ball.prevLocV) * alpha;
+                            const lh = Math.max(0, ball.prevHeight + (ball.height - ball.prevHeight) * alpha);
+                            const { x, y } = worldToScreen(lx, ly);
+                            const rise = snowballRise(lh);
+                            return (
+                                <div
+                                    key={ball.objectId}
+                                    className="snowwar-snowball"
+                                    style={{ left: x, top: y, transform: `scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
+                                >
+                                    <img alt="" className="snowwar-snowball__shadow" src={SNOWWAR_SNOWBALL_SHADOW} />
+                                    <img alt="" className="snowwar-snowball__ball" src={SNOWWAR_SNOWBALL_IMAGE} style={{ transform: `translateY(${-rise}px)` }} />
+                                </div>
+                            );
+                        })}
+
+                        {splashes.map(splash =>
                             <div
-                                className="snowwar-avatar snowwar-avatar--preview"
-                                style={{ left: x, top: y, zIndex: 100 + Math.round(y) }}
+                                key={splash.id}
+                                className="snowwar-splash"
+                                style={{ left: splash.x, top: splash.y, transform: `translate(-50%, -50%) scale(${SNOWWAR_GAME_SPRITE_SCALE})` }}
+                                onAnimationEnd={() => setSplashes(list => list.filter(item => item.id !== splash.id))}
                             >
-                                <span className="snowwar-avatar__body">
-                                    <SnowWarAvatarView
-                                        figure={editorWalkerFigure}
-                                        gender={editorWalkerGender}
-                                        direction={editorWalker.dir}
-                                        walking={editorWalker.walking}
-                                        throwing={false}
-                                        throwProgress={0}
-                                        frameNow={frameNow}
-                                        scale={SNOWWAR_FURNI_SCALE}
-                                    />
-                                </span>
+                                {SNOWWAR_SPLASH_FRAMES.map((frame, index) =>
+                                    <img alt="" className={`snowwar-splash__frame snowwar-splash__frame--${index + 1}`} key={frame} src={frame} />)}
                             </div>
-                        );
-                    })()}
-                    </div>
-                </div>
-            </div>
-            </div>
+                        )}
 
-            {!editing && visibleChatMessages.map(({ avatar, message, stackIndex }) => (
-                <div
-                    key={message.id}
-                    className={`snowwar-chat-bubble snowwar-chat-bubble--${avatar.teamId === 1 ? 'blue' : 'red'}`}
-                    style={{
-                        left: `calc(50% + ${avatar.teamId === 1 ? -300 : 300}px)`,
-                        top: `calc(25% - ${stackIndex * 36}px)`,
-                    }}
-                >
-                    <div className="snowwar-chat-bubble__face">
-                        <LayoutAvatarImageView
-                            compactHead
-                            compactHeadPadding={0}
-                            compactHeadSize={22}
-                            direction={2}
-                            figure={avatar.figure}
-                            gender={avatar.gender}
-                            headOnly
-                        />
-                    </div>
-                    <span className="snowwar-chat-bubble__text"><b>{avatar.name}: </b>{message.message}</span>
-                </div>
-            ))}
-
-            {!editing && (
-                // AIR keeps the room chat input in a game session (RoomChatInputView,
-                // centred at desktop height - 104, no style menu) and sends its text as
-                // Game2GameChat. Same skin as the room chat bar; the style button is inert.
-                // Typing does not grab focus here, so the QWEADZXC movement keys keep working.
-                <div className="snowwar-chat-input">
-                    <div className="octane-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible">
-                        <div aria-hidden="true" className="swf-chat-style-trigger flex items-center select-none">
-                            <svg className="swf-chat-style-arrow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} />
-                            </svg>
-                            <div className="swf-chat-style-icon" />
-                        </div>
-                        <div className="flex-1 items-center input-sizer swf-chat-input-sizer" data-value={chatInput}>
-                            <input
-                                ref={chatInputRef}
-                                aria-label={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
-                                className="swf-chat-input-field w-full border-none bg-transparent"
-                                maxLength={100}
-                                placeholder={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
-                                type="text"
-                                value={chatInput}
-                                onChange={event => setChatInput(event.target.value)}
-                                onKeyDown={event =>
+                        {!editing && [...simulation.avatars.values()].map(avatar =>
+                        {
+                            const ax = avatar.prevWorldX + (avatar.worldX - avatar.prevWorldX) * alpha;
+                            const ay = avatar.prevWorldY + (avatar.worldY - avatar.prevWorldY) * alpha;
+                            const { x, y } = worldToScreen(ax, ay);
+                            const isOwn = avatar.userId === ownUserId;
+                            const walking = (avatar.worldX !== avatar.prevWorldX) || (avatar.worldY !== avatar.prevWorldY);
+                            const throwUntil = throwPoseUntilRef.current.get(avatar.objectId) ?? 0;
+                            const throwing = frameNow < throwUntil;
+                            const throwProgress = throwing ? 1 - (throwUntil - frameNow) / SNOWWAR_THROW_POSE_MS : 0;
+                            const stunned = avatar.activityState === SNOWWAR_STATE_STUNNED;
+                            const invincible = avatar.activityState === SNOWWAR_STATE_INVINCIBLE;
+                            const throwAtOpponent = (event: MouseEvent<HTMLDivElement>, trajectory: number) =>
+                            {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                if (!ownAvatar || avatar.teamId === ownAvatar.teamId) return;
+                                if (!isThrowInRange(ownAvatar.worldX, ownAvatar.worldY, avatar.worldX, avatar.worldY, trajectory))
                                 {
-                                    if ((event.key === 'Enter') || (event.key === 'NumpadEnter'))
-                                    {
-                                        event.preventDefault();
-                                        submitChat();
+                                    setRangeWarningAt(Date.now());
+                                    return;
+                                }
+                                throwAtPlayer(avatar.objectId, trajectory);
+                            };
+
+                            return (
+                                <div
+                                    key={avatar.objectId}
+                                    className={
+                                        'snowwar-avatar' +
+                                        (stunned ? ' snowwar-avatar--stunned' : '') +
+                                        (invincible ? ' snowwar-avatar--invincible' : '')
                                     }
-                                    else if (event.key === 'Escape')
+                                    style={{ left: x, top: y, zIndex: 100 + Math.round(y) }}
+                                    onClick={event =>
                                     {
-                                        event.currentTarget.blur();
-                                    }
-                                }}
+                                        if (isOwn)
+                                        {
+                                            event.stopPropagation();
+                                            createSnowball();
+                                            return;
+                                        }
+                                        throwAtOpponent(event, getAirTrajectory(event.altKey, event.shiftKey, true) ?? TRAJECTORY_DEFAULT);
+                                    }}
+                                    onContextMenu={event =>
+                                    {
+                                        if (isOwn)
+                                        {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            return;
+                                        }
+                                        throwAtOpponent(event, getAirTrajectory(event.altKey, event.shiftKey, true) ?? TRAJECTORY_DEFAULT);
+                                    }}
+                                >
+                                    <div aria-hidden="true" className="snowwar-avatar__hitbox" />
+                                    <div
+                                        className={'snowwar-avatar__name' + (isOwn ? ' snowwar-avatar__name--own' : '')}
+                                        style={{ color: TEAM_COLORS[avatar.teamId % TEAM_COLORS.length] }}
+                                    >
+                                        {avatar.name}
+                                    </div>
+                                    <span className="snowwar-avatar__body">
+                                        <SnowWarAvatarView
+                                            figure={avatar.figure}
+                                            gender={avatar.gender}
+                                            teamId={avatar.teamId}
+                                            direction={avatar.rotation}
+                                            walking={walking && !stunned}
+                                            stunned={stunned}
+                                            stunElapsedMs={(STUN_TIME - avatar.activityTimer) * SUBTURN_MS}
+                                            picking={avatar.activityState === SNOWWAR_STATE_CREATING}
+                                            throwing={throwing && !stunned}
+                                            throwProgress={throwProgress}
+                                            frameNow={frameNow}
+                                            scale={SNOWWAR_FURNI_SCALE}
+                                        />
+                                    </span>
+                                </div>
+                            );
+                        })}
+
+                        {editorWalker && (() =>
+                        {
+                            // Client-side preview avatar shown only in the editor (the
+                            // game simulation is empty here). Anchored the same way as an
+                            // in-game avatar so it lines up with the tiles it walks.
+                            const { x, y } = toScreen(editorWalker.x + 0.5, editorWalker.y + 0.5);
+                            return (
+                                <div
+                                    className="snowwar-avatar snowwar-avatar--preview"
+                                    style={{ left: x, top: y, zIndex: 100 + Math.round(y) }}
+                                >
+                                    <span className="snowwar-avatar__body">
+                                        <SnowWarAvatarView
+                                            figure={editorWalkerFigure}
+                                            gender={editorWalkerGender}
+                                            direction={editorWalker.dir}
+                                            walking={editorWalker.walking}
+                                            throwing={false}
+                                            throwProgress={0}
+                                            frameNow={frameNow}
+                                            scale={SNOWWAR_FURNI_SCALE}
+                                        />
+                                    </span>
+                                </div>
+                            );
+                        })()}
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                {!editing && visibleChatMessages.map(({ avatar, message, stackIndex }) => (
+                    <div
+                        key={message.id}
+                        className={`snowwar-chat-bubble snowwar-chat-bubble--${avatar.teamId === 1 ? 'blue' : 'red'}`}
+                        style={{
+                            left: `calc(50% + ${avatar.teamId === 1 ? -300 : 300}px)`,
+                            top: `calc(25% - ${stackIndex * 36}px)`,
+                        }}
+                    >
+                        <div className="snowwar-chat-bubble__face">
+                            <LayoutAvatarImageView
+                                compactHead
+                                compactHeadPadding={0}
+                                compactHeadSize={22}
+                                direction={2}
+                                figure={avatar.figure}
+                                gender={avatar.gender}
+                                headOnly
                             />
                         </div>
+                        <span className="snowwar-chat-bubble__text"><b>{avatar.name}: </b>{message.message}</span>
                     </div>
-                </div>
-            )}
+                ))}
 
-            <div className="snowwar-help">
-                {editing
-                    ? localizeWithFallback('snowwar.editor.help', 'Editor: click to place • Ctrl/Cmd + drag paints • Shift + drag fills an area • one piece per occupied tile')
-                    : localizeWithFallback('snowwar.help', 'Click: walk • Enemy: adaptive throw • Shift: quick • Alt: long lob • Alt+Shift: short lob • Arrows/QWEADZXC: move • Right-click: quick')}
+                {!editing && (
+                    // AIR keeps the room chat input in a game session (RoomChatInputView,
+                    // centred at desktop height - 104, no style menu) and sends its text as
+                    // Game2GameChat. Same skin as the room chat bar; the style button is inert.
+                    // Typing does not grab focus here, so the QWEADZXC movement keys keep working.
+                    <div className="snowwar-chat-input">
+                        <div className="octane-chat-input-container swf-chat-input relative flex w-full items-center justify-start overflow-visible">
+                            <div aria-hidden="true" className="swf-chat-style-trigger flex items-center select-none">
+                                <svg className="swf-chat-style-arrow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} />
+                                </svg>
+                                <div className="swf-chat-style-icon" />
+                            </div>
+                            <div className="flex-1 items-center input-sizer swf-chat-input-sizer" data-value={chatInput}>
+                                <input
+                                    ref={chatInputRef}
+                                    aria-label={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
+                                    className="swf-chat-input-field w-full border-none bg-transparent"
+                                    maxLength={100}
+                                    placeholder={localizeWithFallback('widgets.chatinput.default', 'Click here to chat')}
+                                    type="text"
+                                    value={chatInput}
+                                    onChange={event => setChatInput(event.target.value)}
+                                    onKeyDown={event =>
+                                    {
+                                        if ((event.key === 'Enter') || (event.key === 'NumpadEnter'))
+                                        {
+                                            event.preventDefault();
+                                            submitChat();
+                                        }
+                                        else if (event.key === 'Escape')
+                                        {
+                                            event.currentTarget.blur();
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="snowwar-help">
+                    {editing
+                        ? localizeWithFallback('snowwar.editor.help', 'Editor: click to place • Ctrl/Cmd + drag paints • Shift + drag fills an area • one piece per occupied tile')
+                        : localizeWithFallback('snowwar.help', 'Click: walk • Enemy: adaptive throw • Shift: quick • Alt: long lob • Alt+Shift: short lob • Arrows/QWEADZXC: move • Right-click: quick')}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

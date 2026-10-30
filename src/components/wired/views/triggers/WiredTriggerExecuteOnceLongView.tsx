@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { FriendlyTime, LocalizeText, WiredFurniType } from '../../../../api';
 import { Slider, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 
@@ -21,11 +22,13 @@ export const WiredTriggerExecuteOnceLongView: FC<{}> = () => {
     }, [trigger]);
 
     return (
-        <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.setlongtime', ['time'], [FriendlyTime.format(time * STEP_SECONDS).toString()])}</Text>
-                <Slider max={120} min={1} value={time} onChange={(value) => setTime(value)} />
-            </div>
-        </WiredTriggerBaseView>
+        <NativeTextTree>
+            <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.setlongtime', ['time'], [FriendlyTime.format(time * STEP_SECONDS).toString()])}</Text>
+                    <Slider max={120} min={1} value={time} onChange={(value) => setTime(value)} />
+                </div>
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

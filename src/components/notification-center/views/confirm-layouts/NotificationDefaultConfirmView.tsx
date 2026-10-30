@@ -2,6 +2,7 @@ import { CSSProperties, FC } from 'react';
 import { NotificationAlertType, NotificationConfirmItem } from '../../../../api';
 import { Button, LayoutNotificationAlertView, LayoutNotificationAlertViewProps } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export interface NotificationDefaultConfirmViewProps extends LayoutNotificationAlertViewProps {
     item: NotificationConfirmItem;
@@ -27,21 +28,23 @@ export const NotificationDefaultConfirmView: FC<NotificationDefaultConfirmViewPr
     };
 
     return (
-        <LayoutNotificationAlertView
-            title={title}
-            onClose={onClose}
-            classNames={['octane-confirm-window']}
-            style={titleBarColor ? ({ '--octane-confirm-title-bar': titleBarColor } as CSSProperties) : undefined}
-            {...rest}
-            type={NotificationAlertType.ALERT}
-        >
-            <div className="octane-confirm-window__text whitespace-pre-line">{message}</div>
-            <div className="octane-confirm-actions">
-                <BaseButton className="octane-confirm-actions__cancel" type="button" onClick={cancel}>
-                    {cancelText}
-                </BaseButton>
-                <Button onClick={confirm}>{confirmText}</Button>
-            </div>
-        </LayoutNotificationAlertView>
+        <NativeTextTree>
+            <LayoutNotificationAlertView
+                title={title}
+                onClose={onClose}
+                classNames={['octane-confirm-window']}
+                style={titleBarColor ? ({ '--octane-confirm-title-bar': titleBarColor } as CSSProperties) : undefined}
+                {...rest}
+                type={NotificationAlertType.ALERT}
+            >
+                <div className="octane-confirm-window__text whitespace-pre-line">{message}</div>
+                <div className="octane-confirm-actions">
+                    <BaseButton className="octane-confirm-actions__cancel" type="button" onClick={cancel}>
+                        {cancelText}
+                    </BaseButton>
+                    <Button onClick={confirm}>{confirmText}</Button>
+                </div>
+            </LayoutNotificationAlertView>
+        </NativeTextTree>
     );
 };

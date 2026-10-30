@@ -1,6 +1,7 @@
 import { GetTickerTime } from '@octane/renderer';
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react';
 import { CatalogType, FriendlyTime, GetConfigurationValue, LocalizeText, localizeWithFallback } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useCatalogData, useCatalogUiState } from '../../../../hooks';
 
 /**
@@ -74,10 +75,12 @@ export const CatalogBuildersClubStatusView: FC = () => {
     if (!buildersClubEnabled || currentType !== CatalogType.BUILDER) return null;
 
     return (
-        <>
-            <div className="octane-catalog-standard-header-title">{title}</div>
-            <div className="octane-catalog-standard-header-description is-builder-membership">{durationText}</div>
-            <div className="octane-catalog-standard-header-description is-builder-limit">{limitText}</div>
-        </>
+        <NativeTextTree>
+            <>
+                <div className="octane-catalog-standard-header-title">{title}</div>
+                <div className="octane-catalog-standard-header-description is-builder-membership">{durationText}</div>
+                <div className="octane-catalog-standard-header-description is-builder-limit">{limitText}</div>
+            </>
+        </NativeTextTree>
     );
 };

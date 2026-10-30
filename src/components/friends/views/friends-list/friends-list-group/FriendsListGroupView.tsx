@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { MessengerFriend } from '../../../../../api';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { FriendsListGroupItemView } from './FriendsListGroupItemView';
 
 interface FriendsListGroupViewProps {
@@ -16,16 +17,18 @@ export const FriendsListGroupView: FC<FriendsListGroupViewProps> = (props) => {
     if (!list || !list.length) return null;
 
     return (
-        <>
-            {list.map((item, index) => (
-                <FriendsListGroupItemView
-                    key={index}
-                    friend={item}
-                    odd={(firstRowIndex + index) % 2 === 1}
-                    selected={selectedFriendsIds && selectedFriendsIds.indexOf(item.id) >= 0}
-                    selectFriend={selectFriend}
-                />
-            ))}
-        </>
+        <NativeTextTree>
+            <>
+                {list.map((item, index) => (
+                    <FriendsListGroupItemView
+                        key={index}
+                        friend={item}
+                        odd={(firstRowIndex + index) % 2 === 1}
+                        selected={selectedFriendsIds && selectedFriendsIds.indexOf(item.id) >= 0}
+                        selectFriend={selectFriend}
+                    />
+                ))}
+            </>
+        </NativeTextTree>
     );
 };

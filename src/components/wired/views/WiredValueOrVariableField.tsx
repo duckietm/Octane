@@ -1,4 +1,5 @@
 import { FC, useMemo } from 'react';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useWired, useWiredTools } from '../../../hooks';
 import { WiredFurniSelectionSourceRow } from './WiredFurniSelectionSourceRow';
 import { sortWiredSourceOptions, useAvailableUserSources, WiredSourceOption } from './WiredSourcesSelector';
@@ -152,47 +153,49 @@ export const WiredValueOrVariableField: FC<WiredValueOrVariableFieldProps> = (pr
     const sourceValue = !holderSource ? 0 : targetKey === 'furni' ? holderSource.furniSource : targetKey === 'user' ? holderSource.userSource : 0;
 
     return (
-        <WiredValueOrVariableInput
-            disabled={disabled}
-            entries={entries}
-            isVariable={isVariable}
-            label={label}
-            literal={literal}
-            max={max}
-            min={min}
-            target={targetKey}
-            targets={targetKeys}
-            token={token}
-            renderSource={
-                holderSource
-                    ? ({ typeSelector }) => (
-                          // ValueOrVariablePopupPreset.attachInputSource: "Variable source:" with the type selector in its header.
-                          <fieldset className="octane-wired__value-popup-locked" disabled={disabled}>
-                              <WiredFurniSelectionSourceRow
-                                  headerContent={typeSelector}
-                                  options={sourceOptions}
-                                  selectionActive={false}
-                                  selectionCount={0}
-                                  selectionEnabledValues={[]}
-                                  selectionKind="secondary"
-                                  selectionLimit={0}
-                                  showSelectionToggle={false}
-                                  title="wiredfurni.params.sources.merged.title.variables"
-                                  value={sourceValue}
-                                  onChange={(source) => {
-                                      if (targetKey === 'furni') holderSource.onFurniSourceChange(source);
-                                      else if (targetKey === 'user') holderSource.onUserSourceChange(source);
-                                  }}
-                              />
-                          </fieldset>
-                      )
-                    : undefined
-            }
-            onIsVariableChange={props.onIsVariableChange}
-            onLiteralChange={props.onLiteralChange}
-            onTargetChange={(key) => props.onTargetChange(wiredValueTargetValue(key))}
-            onTokenChange={props.onTokenChange}
-            onValidityChange={props.onValidityChange}
-        />
+        <NativeTextTree>
+            <WiredValueOrVariableInput
+                disabled={disabled}
+                entries={entries}
+                isVariable={isVariable}
+                label={label}
+                literal={literal}
+                max={max}
+                min={min}
+                target={targetKey}
+                targets={targetKeys}
+                token={token}
+                renderSource={
+                    holderSource
+                        ? ({ typeSelector }) => (
+                              // ValueOrVariablePopupPreset.attachInputSource: "Variable source:" with the type selector in its header.
+                              <fieldset className="octane-wired__value-popup-locked" disabled={disabled}>
+                                  <WiredFurniSelectionSourceRow
+                                      headerContent={typeSelector}
+                                      options={sourceOptions}
+                                      selectionActive={false}
+                                      selectionCount={0}
+                                      selectionEnabledValues={[]}
+                                      selectionKind="secondary"
+                                      selectionLimit={0}
+                                      showSelectionToggle={false}
+                                      title="wiredfurni.params.sources.merged.title.variables"
+                                      value={sourceValue}
+                                      onChange={(source) => {
+                                          if (targetKey === 'furni') holderSource.onFurniSourceChange(source);
+                                          else if (targetKey === 'user') holderSource.onUserSourceChange(source);
+                                      }}
+                                  />
+                              </fieldset>
+                          )
+                        : undefined
+                }
+                onIsVariableChange={props.onIsVariableChange}
+                onLiteralChange={props.onLiteralChange}
+                onTargetChange={(key) => props.onTargetChange(wiredValueTargetValue(key))}
+                onTokenChange={props.onTokenChange}
+                onValidityChange={props.onValidityChange}
+            />
+        </NativeTextTree>
     );
 };

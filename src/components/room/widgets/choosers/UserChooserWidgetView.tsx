@@ -1,6 +1,7 @@
 import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '@octane/renderer';
 import { FC, useEffect } from 'react';
 import { chooserSelectionVisualizer, LocalizeText } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useUserChooserWidget } from '../../../../hooks';
 import { ChooserWidgetView } from './ChooserWidgetView';
 
@@ -28,16 +29,18 @@ export const UserChooserWidgetView: FC<{}> = (props) => {
     if (!items) return null;
 
     return (
-        <ChooserWidgetView
-            title={LocalizeText('widget.chooser.user.title')}
-            items={items}
-            selectItem={selectItem}
-            onClose={() => {
-                chooserSelectionVisualizer.clearAll();
-                onClose();
-            }}
-            pickallFurni={false}
-            type="users"
-        />
+        <NativeTextTree>
+            <ChooserWidgetView
+                title={LocalizeText('widget.chooser.user.title')}
+                items={items}
+                selectItem={selectItem}
+                onClose={() => {
+                    chooserSelectionVisualizer.clearAll();
+                    onClose();
+                }}
+                pickallFurni={false}
+                type="users"
+            />
+        </NativeTextTree>
     );
 };

@@ -13,6 +13,7 @@ import {
 import { UseHabbiconIcon } from '../../../../assets/images/habbicons';
 import { LayoutHabbiconImageView, LayoutItemCountView, Popover, PopoverContent, PopoverTrigger } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Hint } from '../../../../common/Tooltip';
 
 type SelectorSection = {
@@ -104,71 +105,73 @@ export const ChatInputHabbiconSelectorView: FC = () => {
     };
 
     return (
-        <Popover
-            open={selectorVisible}
-            onOpenChange={(open) => {
-                setSelectorVisible(open);
-                if (!open) setSearch('');
-            }}
-        >
-            <PopoverTrigger className="habbicon-chat-trigger" title={localizeWithFallback('habbicons.hud.title', 'Habicons')} type="button">
-                {catalog.lastUsedCollectionId ? (
-                    <LayoutHabbiconImageView collection outlined id={catalog.lastUsedCollectionId} size={22} />
-                ) : (
-                    <img alt="" src={UseHabbiconIcon} />
-                )}
-                {!selectorVisible && catalog.unseenCount > 0 && <span className="habbicon-unseen-count">{catalog.unseenCount}</span>}
-            </PopoverTrigger>
-            <PopoverContent align="start" avoidCollisions={false} className="habbicon-selector-popover" side="top" sideOffset={17}>
-                <div className="habbicon-selector-window" style={{ height: windowHeight }}>
-                    <div className="habbicon-selector-controls">
-                        <div className="habbicon-selector-search">
-                            <input maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
-                            {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
-                            {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
-                        </div>
-                        <BaseButton
-                            className="habbicon-selector-book-button"
-                            type="button"
-                            onClick={() => {
-                                catalog.setBookVisible(true);
-                                setSelectorVisible(false);
-                            }}
-                        >
-                            {localizeWithFallback('habbicons.hud.get_more', 'Get more')}
-                        </BaseButton>
-                    </div>
-                    {sections.length > 0 ? (
-                        <div className="habbicon-selector-sections has-classic-scrollbar" style={{ height: listHeight }}>
-                            {sections.map((section) => (
-                                <section className="habbicon-selector-section" key={section.id}>
-                                    <div className="habbicon-selector-section-title">{section.title}</div>
-                                    <div className="habbicon-selector-grid">
-                                        {padHabbiconRow(section.entries).map((entry, index) =>
-                                            entry ? (
-                                                <Hint key={entry.id} content={localizeHabbiconName(entry)}>
-                                                    <BaseButton aria-label={localizeHabbiconName(entry)}
-                                                        className="habbicon-selector-item filled"
-                                                        type="button"
-                                                        onClick={(event) => void applyHabbicon(entry.id, event.shiftKey)}
-                                                    >
-                                                        <LayoutHabbiconImageView id={entry.id} size={30} />
-                                                        {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -5, right: -5 }} />}
-                                                    </BaseButton>
-                                                </Hint>
-                                            ) : (
-                                                <div className="habbicon-selector-item empty" key={`empty-${section.id}-${index}`} />
-                                            )
-                                        )}
-                                    </div>
-                                </section>
-                            ))}
-                        </div>
+        <NativeTextTree>
+            <Popover
+                open={selectorVisible}
+                onOpenChange={(open) => {
+                    setSelectorVisible(open);
+                    if (!open) setSearch('');
+                }}
+            >
+                <PopoverTrigger className="habbicon-chat-trigger" title={localizeWithFallback('habbicons.hud.title', 'Habicons')} type="button">
+                    {catalog.lastUsedCollectionId ? (
+                        <LayoutHabbiconImageView collection outlined id={catalog.lastUsedCollectionId} size={22} />
                     ) : (
-                        <div className="habbicon-selector-empty">{localizeWithFallback('habbicons.no_habbicons', 'No Habicons')}</div>
+                        <img alt="" src={UseHabbiconIcon} />
                     )}
-                </div>
-            </PopoverContent>
-        </Popover>
+                    {!selectorVisible && catalog.unseenCount > 0 && <span className="habbicon-unseen-count">{catalog.unseenCount}</span>}
+                </PopoverTrigger>
+                <PopoverContent align="start" avoidCollisions={false} className="habbicon-selector-popover" side="top" sideOffset={17}>
+                    <div className="habbicon-selector-window" style={{ height: windowHeight }}>
+                        <div className="habbicon-selector-controls">
+                            <div className="habbicon-selector-search">
+                                <input maxLength={24} value={search} onChange={(event) => setSearch(event.target.value)} />
+                                {!search && <span>{localizeWithFallback('generic.search', 'Search')}</span>}
+                                {search && <BaseButton aria-label="Clear" type="button" onClick={() => setSearch('')} />}
+                            </div>
+                            <BaseButton
+                                className="habbicon-selector-book-button"
+                                type="button"
+                                onClick={() => {
+                                    catalog.setBookVisible(true);
+                                    setSelectorVisible(false);
+                                }}
+                            >
+                                {localizeWithFallback('habbicons.hud.get_more', 'Get more')}
+                            </BaseButton>
+                        </div>
+                        {sections.length > 0 ? (
+                            <div className="habbicon-selector-sections has-classic-scrollbar" style={{ height: listHeight }}>
+                                {sections.map((section) => (
+                                    <section className="habbicon-selector-section" key={section.id}>
+                                        <div className="habbicon-selector-section-title">{section.title}</div>
+                                        <div className="habbicon-selector-grid">
+                                            {padHabbiconRow(section.entries).map((entry, index) =>
+                                                entry ? (
+                                                    <Hint key={entry.id} content={localizeHabbiconName(entry)}>
+                                                        <BaseButton aria-label={localizeHabbiconName(entry)}
+                                                            className="habbicon-selector-item filled"
+                                                            type="button"
+                                                            onClick={(event) => void applyHabbicon(entry.id, event.shiftKey)}
+                                                        >
+                                                            <LayoutHabbiconImageView id={entry.id} size={30} />
+                                                            {catalog.isUnseen(entry.id) && <LayoutItemCountView count={1} style={{ top: -5, right: -5 }} />}
+                                                        </BaseButton>
+                                                    </Hint>
+                                                ) : (
+                                                    <div className="habbicon-selector-item empty" key={`empty-${section.id}-${index}`} />
+                                                )
+                                            )}
+                                        </div>
+                                    </section>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="habbicon-selector-empty">{localizeWithFallback('habbicons.no_habbicons', 'No Habicons')}</div>
+                        )}
+                    </div>
+                </PopoverContent>
+            </Popover>
+        </NativeTextTree>
     );
 };

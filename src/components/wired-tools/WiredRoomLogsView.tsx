@@ -8,6 +8,7 @@ import { WiredPagedTable, WiredTableCell, WiredTableColumn } from './WiredPagedT
 import { calculateLastPage, NO_PAGE } from './WiredPaging.helpers';
 import { Checkbox } from '../../common/Checkbox';
 import { Select } from '../../common/Select';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** Rows per page, as the official log list shows them. */
 export const WIRED_ROOM_LOGS_PAGE_SIZE = 50;
@@ -171,110 +172,112 @@ export const WiredRoomLogsView = ({ onClose }: WiredRoomLogsViewProps) => {
     };
 
     return (
-        <OctaneCardView
-            className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[560px]"
-            theme="primary-slim"
-            uniqueKey="wired-room-logs"
-            windowPosition={DraggableWindowPosition.TOP_LEFT}
-            offsetLeft={560}
-            offsetTop={40}
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.logs_overview.title', 'Wired room logs')} onCloseClick={onClose} />
-            <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
-                <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
-                    <Text className="whitespace-pre-line">
-                        {localizeWithFallback(
-                            'wiredmenu.logs_overview.info',
-                            'Every line the wired engine wrote for this room, newest first. Filter by text, source or level.'
-                        ).replace(/\\n/g, '\n')}
-                    </Text>
-                    <label className="flex items-center gap-1 text-[12px] whitespace-nowrap">
-                        <Checkbox checked={autoRefresh} onCheckedChange={(nextChecked) => setAutoRefresh(nextChecked)} />
-                        {localizeWithFallback('wiredmenu.logs_overview.auto_refresh', 'Auto refresh')}
-                    </label>
-                    <Button variant="secondary" onClick={() => requests.refresh()}>
-                        {localizeWithFallback('wiredmenu.logs_overview.refresh', 'Refresh')}
-                    </Button>
-                </div>
-                <div className="flex flex-wrap items-center gap-4 text-[12px]">
-                    <label className="flex items-center gap-2">
-                        <Text bold>{localizeWithFallback('wiredmenu.logs_overview.filter', 'Filter:')}</Text>
-                        <input
-                            className="w-[240px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                            type="text"
-                            maxLength={FILTER_MAX_CHARS}
-                            value={query}
-                            onChange={(event) => setQuery(event.target.value)}
-                            onKeyDown={(event) => {
-                                if (event.key !== 'Enter') return;
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-wired-menu min-w-[760px] max-w-[760px] max-h-[560px]"
+                theme="primary-slim"
+                uniqueKey="wired-room-logs"
+                windowPosition={DraggableWindowPosition.TOP_LEFT}
+                offsetLeft={560}
+                offsetTop={40}
+            >
+                <OctaneCardHeaderView headerText={localizeWithFallback('wiredmenu.logs_overview.title', 'Wired room logs')} onCloseClick={onClose} />
+                <OctaneCardContentView className="text-black bg-[#f4efe3] p-3 flex flex-col gap-3" overflow="hidden">
+                    <div className="rounded border border-[#c8c2b2] bg-white p-3 flex items-center justify-between gap-3">
+                        <Text className="whitespace-pre-line">
+                            {localizeWithFallback(
+                                'wiredmenu.logs_overview.info',
+                                'Every line the wired engine wrote for this room, newest first. Filter by text, source or level.'
+                            ).replace(/\\n/g, '\n')}
+                        </Text>
+                        <label className="flex items-center gap-1 text-[12px] whitespace-nowrap">
+                            <Checkbox checked={autoRefresh} onCheckedChange={(nextChecked) => setAutoRefresh(nextChecked)} />
+                            {localizeWithFallback('wiredmenu.logs_overview.auto_refresh', 'Auto refresh')}
+                        </label>
+                        <Button variant="secondary" onClick={() => requests.refresh()}>
+                            {localizeWithFallback('wiredmenu.logs_overview.refresh', 'Refresh')}
+                        </Button>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-4 text-[12px]">
+                        <label className="flex items-center gap-2">
+                            <Text bold>{localizeWithFallback('wiredmenu.logs_overview.filter', 'Filter:')}</Text>
+                            <input
+                                className="w-[240px] rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                type="text"
+                                maxLength={FILTER_MAX_CHARS}
+                                value={query}
+                                onChange={(event) => setQuery(event.target.value)}
+                                onKeyDown={(event) => {
+                                    if (event.key !== 'Enter') return;
 
-                                event.preventDefault();
-                                updateFilters();
-                            }}
-                        />
-                    </label>
-                    <label className="flex items-center gap-2">
-                        <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_source', 'Log source:')}</Text>
-                        <Select
-                            className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                            value={source}
-                            onChange={(event) => {
-                                const next = Number(event.target.value);
+                                    event.preventDefault();
+                                    updateFilters();
+                                }}
+                            />
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_source', 'Log source:')}</Text>
+                            <Select
+                                className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                value={source}
+                                onChange={(event) => {
+                                    const next = Number(event.target.value);
 
-                                // AIR refuses the menu selection while the limiter holds requests back.
-                                if (!requests.canRequestNewPage(false)) return;
+                                    // AIR refuses the menu selection while the limiter holds requests back.
+                                    if (!requests.canRequestNewPage(false)) return;
 
-                                setSource(next);
-                                updateFilters({ source: next });
-                            }}
-                        >
-                            <option value={-1}>{localizeWithFallback('wiredmenu.logs_overview.log_source.all', 'All')}</option>
-                            {WIRED_LOG_SOURCES.map((name, index) => (
-                                <option key={name} value={index}>
-                                    {wiredLogSourceLabel(index)}
-                                </option>
-                            ))}
-                        </Select>
-                    </label>
-                    <label className="flex items-center gap-2">
-                        <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_level', 'Log level:')}</Text>
-                        <Select
-                            className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
-                            value={level}
-                            onChange={(event) => {
-                                const next = Number(event.target.value);
+                                    setSource(next);
+                                    updateFilters({ source: next });
+                                }}
+                            >
+                                <option value={-1}>{localizeWithFallback('wiredmenu.logs_overview.log_source.all', 'All')}</option>
+                                {WIRED_LOG_SOURCES.map((name, index) => (
+                                    <option key={name} value={index}>
+                                        {wiredLogSourceLabel(index)}
+                                    </option>
+                                ))}
+                            </Select>
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <Text bold>{localizeWithFallback('wiredmenu.logs_overview.log_level', 'Log level:')}</Text>
+                            <Select
+                                className="rounded border border-[#b8b2a4] bg-white px-2 py-[2px] text-[12px]"
+                                value={level}
+                                onChange={(event) => {
+                                    const next = Number(event.target.value);
 
-                                // AIR refuses the menu selection while the limiter holds requests back.
-                                if (!requests.canRequestNewPage(false)) return;
+                                    // AIR refuses the menu selection while the limiter holds requests back.
+                                    if (!requests.canRequestNewPage(false)) return;
 
-                                setLevel(next);
-                                updateFilters({ level: next });
-                            }}
-                        >
-                            <option value={-1}>{localizeWithFallback('wiredmenu.logs_overview.log_level.all', 'All')}</option>
-                            {WIRED_LOG_LEVELS.map((name, index) => (
-                                <option key={name} value={index}>
-                                    {wiredLogLevelLabel(index)}
-                                </option>
-                            ))}
-                        </Select>
-                    </label>
-                </div>
-                <WiredPagedTable
-                    columns={columns}
-                    rows={page?.entries ?? []}
-                    getRowId={(entry) => String(entry.id)}
-                    getCell={getCell}
-                    currentPage={currentPage}
-                    totalEntries={page?.totalEntries ?? 0}
-                    lastPage={lastPage}
-                    requests={requests}
-                    emptyText={localizeWithFallback('wiredmenu.logs_overview.empty', 'No log lines match the current filters')}
-                    pagingTextKey="wiredmenu.logs_overview.bottom_text"
-                    scrollResetKey={scrollKey}
-                    bodyClassName="h-[320px]"
-                />
-            </OctaneCardContentView>
-        </OctaneCardView>
+                                    setLevel(next);
+                                    updateFilters({ level: next });
+                                }}
+                            >
+                                <option value={-1}>{localizeWithFallback('wiredmenu.logs_overview.log_level.all', 'All')}</option>
+                                {WIRED_LOG_LEVELS.map((name, index) => (
+                                    <option key={name} value={index}>
+                                        {wiredLogLevelLabel(index)}
+                                    </option>
+                                ))}
+                            </Select>
+                        </label>
+                    </div>
+                    <WiredPagedTable
+                        columns={columns}
+                        rows={page?.entries ?? []}
+                        getRowId={(entry) => String(entry.id)}
+                        getCell={getCell}
+                        currentPage={currentPage}
+                        totalEntries={page?.totalEntries ?? 0}
+                        lastPage={lastPage}
+                        requests={requests}
+                        emptyText={localizeWithFallback('wiredmenu.logs_overview.empty', 'No log lines match the current filters')}
+                        pagingTextKey="wiredmenu.logs_overview.bottom_text"
+                        scrollResetKey={scrollKey}
+                        bodyClassName="h-[320px]"
+                    />
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

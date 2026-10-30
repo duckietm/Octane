@@ -21,6 +21,7 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { BaseButton } from '../../../../common/BaseButton';
 import { CollapsibleSection } from '../../../../common/CollapsibleSection';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 type VariableTargetType = 'user' | 'furni' | 'global';
 
@@ -227,86 +228,88 @@ export const WiredTriggerVariableChangedView: FC<{}> = () => {
     // AIR VariableUpdate: the mode, the variable (off in mode 1), then the options and the origins, both collapsed.
     // forceFurniSelection: the variable boxes are always pickable; mode 1 watches them.
     return (
-        <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save}>
-            <div className="octane-wired__give-var octane-wired__give-var--trigger-variable">
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeWithFallback('wiredfurni.params.variables.trigger_mode', 'Choose the variable by:')}</Text>
-                    {MODES.map((option) => (
-                        <label key={option.value} className="flex items-center gap-1">
-                            <Radio checked={mode === option.value} name="variableChangedTriggerMode" onCheckedChange={() => setMode(option.value)} />
-                            <Text>{localizeWithFallback(option.key, option.fallback)}</Text>
-                        </label>
-                    ))}
-                </div>
-
-                <div className="octane-wired__divider" />
-
-                <fieldset className={`flex flex-col gap-1 border-0 p-0 m-0 ${pickedBoxes ? 'opacity-50' : ''}`} data-testid="variable-selection" disabled={pickedBoxes}>
-                    <div className="octane-wired__give-var-heading">
-                        <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
-                        <div className="octane-wired__give-var-targets">
-                            {TARGET_BUTTONS.map((button) => (
-                                <BaseButton
-                                    key={button.key}
-                                    type="button"
-                                    disabled={pickedBoxes}
-                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
-                                    onClick={() => {
-                                        if (targetType === button.key) return;
-
-                                        setTargetType(button.key);
-                                        setVariableToken('');
-                                    }}
-                                >
-                                    <img src={button.icon} alt={button.key} />
-                                </BaseButton>
-                            ))}
-                        </div>
-                    </div>
-
-                    <WiredVariablePicker
-                        entries={resolvedVariableEntries}
-                        recentScope="variable-triggers"
-                        selectedToken={variableToken}
-                        onSelect={(entry) => setVariableToken(entry.token)}
-                    />
-                </fieldset>
-
-                <div className="octane-wired__divider" />
-
-                <CollapsibleSection className="flex flex-col gap-1" title={<Text bold>{LocalizeText('wiredfurni.params.variables.trigger_options')}</Text>}>
+        <NativeTextTree>
+            <WiredTriggerBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID} save={save}>
+                <div className="octane-wired__give-var octane-wired__give-var--trigger-variable">
                     <div className="flex flex-col gap-1">
-                        {optionRow(effectiveCreatedEnabled, !canCreateAndDelete, 'wiredfurni.params.variables.trigger_options.0', setCreatedEnabled)}
-                        {optionRow(valueChangedEnabled && canChangeValue, !canChangeValue, 'wiredfurni.params.variables.trigger_options.1', setValueChangedEnabled)}
-                        <div className="ml-3 flex flex-col gap-1">
-                            {optionRow(effectiveIncreasedEnabled, !valueChangedEnabled || !canChangeValue, 'wiredfurni.params.variables.trigger_options.1.0', setIncreasedEnabled)}
-                            {optionRow(effectiveDecreasedEnabled, !valueChangedEnabled || !canChangeValue, 'wiredfurni.params.variables.trigger_options.1.1', setDecreasedEnabled)}
-                            {optionRow(effectiveUnchangedEnabled, !valueChangedEnabled || !canChangeValue, 'wiredfurni.params.variables.trigger_options.1.2', setUnchangedEnabled)}
-                        </div>
-                        {optionRow(effectiveDeletedEnabled, !canCreateAndDelete, 'wiredfurni.params.variables.trigger_options.2', setDeletedEnabled)}
-                    </div>
-                </CollapsibleSection>
-
-                <div className="octane-wired__divider" />
-
-                <CollapsibleSection className="flex flex-col gap-1" title={<Text bold>{localizeWithFallback('wiredfurni.params.variables.trigger_origin', 'Allow the trigger from:')}</Text>}>
-                    <div className="flex flex-col gap-1">
-                        {ORIGIN_OPTIONS.map((option) => (
-                            <div key={option.bit} className="flex flex-col">
-                                <label className="flex items-center gap-1">
-                                    <Checkbox checked={isOriginChecked(option.bit)} disabled={isOriginDisabled(option.bit)} onCheckedChange={(nextChecked) => toggleOrigin(option.bit, nextChecked)} />
-                                    <Text>{localizeWithFallback(`wiredfurni.params.variables.trigger_origin.${option.bit}`, option.fallback)}</Text>
-                                </label>
-                                {option.info && (
-                                    <Text small className="ml-5 text-black/60 whitespace-pre-line">
-                                        {localizeWithFallback(`wiredfurni.params.variables.trigger_origin.${option.bit}.info`, option.info)}
-                                    </Text>
-                                )}
-                            </div>
+                        <Text bold>{localizeWithFallback('wiredfurni.params.variables.trigger_mode', 'Choose the variable by:')}</Text>
+                        {MODES.map((option) => (
+                            <label key={option.value} className="flex items-center gap-1">
+                                <Radio checked={mode === option.value} name="variableChangedTriggerMode" onCheckedChange={() => setMode(option.value)} />
+                                <Text>{localizeWithFallback(option.key, option.fallback)}</Text>
+                            </label>
                         ))}
                     </div>
-                </CollapsibleSection>
-            </div>
-        </WiredTriggerBaseView>
+
+                    <div className="octane-wired__divider" />
+
+                    <fieldset className={`flex flex-col gap-1 border-0 p-0 m-0 ${pickedBoxes ? 'opacity-50' : ''}`} data-testid="variable-selection" disabled={pickedBoxes}>
+                        <div className="octane-wired__give-var-heading">
+                            <Text>{LocalizeText('wiredfurni.params.variables.variable_selection')}</Text>
+                            <div className="octane-wired__give-var-targets">
+                                {TARGET_BUTTONS.map((button) => (
+                                    <BaseButton
+                                        key={button.key}
+                                        type="button"
+                                        disabled={pickedBoxes}
+                                        className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${targetType === button.key ? 'is-active' : ''}`}
+                                        onClick={() => {
+                                            if (targetType === button.key) return;
+
+                                            setTargetType(button.key);
+                                            setVariableToken('');
+                                        }}
+                                    >
+                                        <img src={button.icon} alt={button.key} />
+                                    </BaseButton>
+                                ))}
+                            </div>
+                        </div>
+
+                        <WiredVariablePicker
+                            entries={resolvedVariableEntries}
+                            recentScope="variable-triggers"
+                            selectedToken={variableToken}
+                            onSelect={(entry) => setVariableToken(entry.token)}
+                        />
+                    </fieldset>
+
+                    <div className="octane-wired__divider" />
+
+                    <CollapsibleSection className="flex flex-col gap-1" title={<Text bold>{LocalizeText('wiredfurni.params.variables.trigger_options')}</Text>}>
+                        <div className="flex flex-col gap-1">
+                            {optionRow(effectiveCreatedEnabled, !canCreateAndDelete, 'wiredfurni.params.variables.trigger_options.0', setCreatedEnabled)}
+                            {optionRow(valueChangedEnabled && canChangeValue, !canChangeValue, 'wiredfurni.params.variables.trigger_options.1', setValueChangedEnabled)}
+                            <div className="ml-3 flex flex-col gap-1">
+                                {optionRow(effectiveIncreasedEnabled, !valueChangedEnabled || !canChangeValue, 'wiredfurni.params.variables.trigger_options.1.0', setIncreasedEnabled)}
+                                {optionRow(effectiveDecreasedEnabled, !valueChangedEnabled || !canChangeValue, 'wiredfurni.params.variables.trigger_options.1.1', setDecreasedEnabled)}
+                                {optionRow(effectiveUnchangedEnabled, !valueChangedEnabled || !canChangeValue, 'wiredfurni.params.variables.trigger_options.1.2', setUnchangedEnabled)}
+                            </div>
+                            {optionRow(effectiveDeletedEnabled, !canCreateAndDelete, 'wiredfurni.params.variables.trigger_options.2', setDeletedEnabled)}
+                        </div>
+                    </CollapsibleSection>
+
+                    <div className="octane-wired__divider" />
+
+                    <CollapsibleSection className="flex flex-col gap-1" title={<Text bold>{localizeWithFallback('wiredfurni.params.variables.trigger_origin', 'Allow the trigger from:')}</Text>}>
+                        <div className="flex flex-col gap-1">
+                            {ORIGIN_OPTIONS.map((option) => (
+                                <div key={option.bit} className="flex flex-col">
+                                    <label className="flex items-center gap-1">
+                                        <Checkbox checked={isOriginChecked(option.bit)} disabled={isOriginDisabled(option.bit)} onCheckedChange={(nextChecked) => toggleOrigin(option.bit, nextChecked)} />
+                                        <Text>{localizeWithFallback(`wiredfurni.params.variables.trigger_origin.${option.bit}`, option.fallback)}</Text>
+                                    </label>
+                                    {option.info && (
+                                        <Text small className="ml-5 text-black/60 whitespace-pre-line">
+                                            {localizeWithFallback(`wiredfurni.params.variables.trigger_origin.${option.bit}.info`, option.info)}
+                                        </Text>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </CollapsibleSection>
+                </div>
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

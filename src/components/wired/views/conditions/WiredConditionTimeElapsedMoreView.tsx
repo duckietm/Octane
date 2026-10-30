@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { GetWiredTimeLocale, LocalizeText, localizeWithFallback, WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { PULSES_TO_SECONDS, SECONDS_TO_PULSES, WiredSliderSection } from '../WiredSliderSection';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
@@ -24,17 +25,19 @@ export const WiredConditionTimeElapsedMoreView: FC<{}> = () => {
     const seconds = GetWiredTimeLocale(time);
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
-            <WiredSliderSection
-                displayStep={0.5}
-                fromDisplay={SECONDS_TO_PULSES}
-                max={MAX_PULSES}
-                min={MIN_PULSES}
-                title={localizeWithFallback('wiredfurni.params.allowafter2', LocalizeText('wiredfurni.params.allowafter', ['seconds'], [seconds]), ['seconds'], [seconds])}
-                toDisplay={PULSES_TO_SECONDS}
-                value={time}
-                onChange={setTime}
-            />
-        </WiredConditionBaseView>
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save}>
+                <WiredSliderSection
+                    displayStep={0.5}
+                    fromDisplay={SECONDS_TO_PULSES}
+                    max={MAX_PULSES}
+                    min={MIN_PULSES}
+                    title={localizeWithFallback('wiredfurni.params.allowafter2', LocalizeText('wiredfurni.params.allowafter', ['seconds'], [seconds]), ['seconds'], [seconds])}
+                    toDisplay={PULSES_TO_SECONDS}
+                    value={time}
+                    onChange={setTime}
+                />
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

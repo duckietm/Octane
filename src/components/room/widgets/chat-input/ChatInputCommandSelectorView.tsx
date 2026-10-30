@@ -1,5 +1,6 @@
 import { FC, useEffect, useRef } from 'react';
 import { CommandDefinition } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface ChatInputCommandSelectorViewProps {
     commands: CommandDefinition[];
@@ -21,25 +22,27 @@ export const ChatInputCommandSelectorView: FC<ChatInputCommandSelectorViewProps>
     }, [selectedIndex]);
 
     return (
-        <div className="chat-input-command-popover octane-card-shell octane-card-frame-3">
-            <div className="octane-card-header-shell">
-                <span className="octane-card-title">: Command</span>
-            </div>
-            <div ref={listRef} className="chat-input-command-popover-list has-classic-scrollbar" role="listbox">
-                {commands.map((cmd, index) => {
-                    const isSelected = index === selectedIndex;
-                    const rowClass = ['chat-input-command-row', isSelected ? 'is-selected' : ''].filter(Boolean).join(' ');
+        <NativeTextTree>
+            <div className="chat-input-command-popover octane-card-shell octane-card-frame-3">
+                <div className="octane-card-header-shell">
+                    <span className="octane-card-title">: Command</span>
+                </div>
+                <div ref={listRef} className="chat-input-command-popover-list has-classic-scrollbar" role="listbox">
+                    {commands.map((cmd, index) => {
+                        const isSelected = index === selectedIndex;
+                        const rowClass = ['chat-input-command-row', isSelected ? 'is-selected' : ''].filter(Boolean).join(' ');
 
-                    return (
-                        <div key={cmd.key} aria-selected={isSelected} className={rowClass} role="option" onClick={() => onSelect(cmd)} onMouseEnter={() => onHover(index)}>
-                            <div className="chat-input-command-row-body">
-                                <span className="chat-input-command-row-name">:{cmd.key}</span>
-                                {cmd.description && <span className="chat-input-command-row-desc">{cmd.description}</span>}
+                        return (
+                            <div key={cmd.key} aria-selected={isSelected} className={rowClass} role="option" onClick={() => onSelect(cmd)} onMouseEnter={() => onHover(index)}>
+                                <div className="chat-input-command-row-body">
+                                    <span className="chat-input-command-row-name">:{cmd.key}</span>
+                                    {cmd.description && <span className="chat-input-command-row-desc">{cmd.description}</span>}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

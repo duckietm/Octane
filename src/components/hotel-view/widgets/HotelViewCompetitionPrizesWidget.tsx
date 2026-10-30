@@ -6,6 +6,7 @@ import { getPrizeRankLimits, getPrizesUserRankKey } from '../../../api/hotel-vie
 import { BaseButton } from '../../../common/BaseButton';
 import { LayoutAvatarImageView, LayoutBadgeImageView } from '../../../common';
 import { useCommunityGoalEarnedPrizes, useCommunityGoalProgress, useUserDataSnapshot } from '../../../hooks';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const PRIZE_LEVELS = [1, 2, 3];
 
@@ -27,30 +28,32 @@ const getPrizeName = (prize: PrizeData): string => {
  * "Your final rank was %rank%, you earned %prize%") with the redeem button.
  */
 const EarnedPrizesView: FC<{ prizes: PrizeData[]; redeeming: number; redeem: (communityGoalId: number) => void }> = ({ prizes, redeeming, redeem }) => (
-    <div className="hotelview-competition-earned-prizes">
-        {prizes.map((prize) => {
-            const name = getPrizeName(prize);
+    <NativeTextTree>
+        <div className="hotelview-competition-earned-prizes">
+            {prizes.map((prize) => {
+                const name = getPrizeName(prize);
 
-            return (
-                <div key={prize.communityGoalId} className="hotelview-competition-earned-prize">
-                    {prize.badge && <LayoutBadgeImageView badgeCode={prize.rewardCode} />}
-                    <div className="hotelview-competition-earned-prize-copy">
-                        <p>
-                            {localizeWithFallback(
-                                `landing.view.competition.redeemprize.${prize.communityGoalCode}`,
-                                'Your final rank in the challenge was %rank%. You earned %prize%. Well done!',
-                                ['rank', 'prize'],
-                                [String(prize.userRank), name]
-                            )}
-                        </p>
-                        <BaseButton type="button" className="hotelview-widget-button" disabled={redeeming === prize.communityGoalId} onClick={() => redeem(prize.communityGoalId)}>
-                            {localizeWithFallback('landing.view.competition.redeemprize.redeem', 'Claim your prize!')}
-                        </BaseButton>
+                return (
+                    <div key={prize.communityGoalId} className="hotelview-competition-earned-prize">
+                        {prize.badge && <LayoutBadgeImageView badgeCode={prize.rewardCode} />}
+                        <div className="hotelview-competition-earned-prize-copy">
+                            <p>
+                                {localizeWithFallback(
+                                    `landing.view.competition.redeemprize.${prize.communityGoalCode}`,
+                                    'Your final rank in the challenge was %rank%. You earned %prize%. Well done!',
+                                    ['rank', 'prize'],
+                                    [String(prize.userRank), name]
+                                )}
+                            </p>
+                            <BaseButton type="button" className="hotelview-widget-button" disabled={redeeming === prize.communityGoalId} onClick={() => redeem(prize.communityGoalId)}>
+                                {localizeWithFallback('landing.view.competition.redeemprize.redeem', 'Claim your prize!')}
+                            </BaseButton>
+                        </div>
                     </div>
-                </div>
-            );
-        })}
-    </div>
+                );
+            })}
+        </div>
+    </NativeTextTree>
 );
 
 /**
@@ -81,55 +84,57 @@ export const HotelViewCompetitionPrizesWidget: FC<{ fallback: ReactNode }> = ({ 
     const rankFallbacks = { yourfinalrank: 'Your final rank: %rank%', yourrank: 'Your current rank: %rank%', youarenotranked: 'You are not ranked' };
 
     return (
-        <div className="hotelview-competition-prizes">
-            {earned}
-            <h2>{goalText('caption', 'Competition prizes')}</h2>
-            <p>{goalText('info', '')}</p>
-            <div className="hotelview-competition-prizes-box">
-                <img
-                    className="hotelview-competition-prizes-reward"
-                    src={`${imageLibraryUrl}reception/${code}Reward.png`}
-                    alt=""
-                    draggable={false}
-                    onError={(event) => {
-                        event.currentTarget.style.visibility = 'hidden';
-                    }}
-                />
-                <div className="hotelview-competition-prizes-reward-copy">
-                    <strong>{goalText('rewardname', '')}</strong>
-                    <p>{goalText('rewardinfo', '')}</p>
-                    <div className="hotelview-competition-prizes-ranks">
-                        {PRIZE_LEVELS.map((level) => {
-                            const { start, end } = getPrizeRankLimits(level, goal.rewardUserLimits);
-                            const single = start === end;
+        <NativeTextTree>
+            <div className="hotelview-competition-prizes">
+                {earned}
+                <h2>{goalText('caption', 'Competition prizes')}</h2>
+                <p>{goalText('info', '')}</p>
+                <div className="hotelview-competition-prizes-box">
+                    <img
+                        className="hotelview-competition-prizes-reward"
+                        src={`${imageLibraryUrl}reception/${code}Reward.png`}
+                        alt=""
+                        draggable={false}
+                        onError={(event) => {
+                            event.currentTarget.style.visibility = 'hidden';
+                        }}
+                    />
+                    <div className="hotelview-competition-prizes-reward-copy">
+                        <strong>{goalText('rewardname', '')}</strong>
+                        <p>{goalText('rewardinfo', '')}</p>
+                        <div className="hotelview-competition-prizes-ranks">
+                            {PRIZE_LEVELS.map((level) => {
+                                const { start, end } = getPrizeRankLimits(level, goal.rewardUserLimits);
+                                const single = start === end;
 
-                            return (
-                                <div key={level} className="hotelview-competition-prizes-rank">
-                                    <strong>{goalText(`rank${level}`, `#${level}`)}</strong>
-                                    <span>
-                                        {localizeWithFallback(prizesKey(single ? 'rank' : 'ranks'), single ? 'Rank %start%' : 'Ranks %start%-%end%', ['start', 'end'], [String(start), String(end)])}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-                {(!goal.hasGoalExpired || rank > 0) && (
-                    <div className="hotelview-competition-prizes-user">
-                        <LayoutAvatarImageView classNames={['hotelview-competition-prizes-head']} figure={userData?.figure || GetSessionDataManager()?.figure} headOnly direction={2} />
-                        <div>
-                            <strong>{localizeWithFallback(prizesKey(rankKey), rankFallbacks[rankKey], ['rank'], [String(rank)])}</strong>
-                            {!goal.hasGoalExpired && (
-                                <p>
-                                    {rank > 0
-                                        ? goalText('yourrankinfo', 'You are almost there! Keep going!', ['points'], [String(goal.personalContributionScore)])
-                                        : goalText('youarenotrankedinfo', 'Take part to get into the ranking.')}
-                                </p>
-                            )}
+                                return (
+                                    <div key={level} className="hotelview-competition-prizes-rank">
+                                        <strong>{goalText(`rank${level}`, `#${level}`)}</strong>
+                                        <span>
+                                            {localizeWithFallback(prizesKey(single ? 'rank' : 'ranks'), single ? 'Rank %start%' : 'Ranks %start%-%end%', ['start', 'end'], [String(start), String(end)])}
+                                        </span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
-                )}
+                    {(!goal.hasGoalExpired || rank > 0) && (
+                        <div className="hotelview-competition-prizes-user">
+                            <LayoutAvatarImageView classNames={['hotelview-competition-prizes-head']} figure={userData?.figure || GetSessionDataManager()?.figure} headOnly direction={2} />
+                            <div>
+                                <strong>{localizeWithFallback(prizesKey(rankKey), rankFallbacks[rankKey], ['rank'], [String(rank)])}</strong>
+                                {!goal.hasGoalExpired && (
+                                    <p>
+                                        {rank > 0
+                                            ? goalText('yourrankinfo', 'You are almost there! Keep going!', ['points'], [String(goal.personalContributionScore)])
+                                            : goalText('youarenotrankedinfo', 'Take part to get into the ranking.')}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -20,6 +20,7 @@ import { BaseButton } from '../../../../common/BaseButton';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { useNotification, usePollActions, useUiEvent } from '../../../../hooks';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 interface PollOffer {
     id: number;
@@ -178,27 +179,29 @@ export const PollWidgetView: FC = () => {
 
     if (offer) {
         return (
-            <OctaneCardView className="octane-widget-poll octane-poll" theme="primary-slim">
-                <OctaneCardHeaderView headerText={localizeWithFallback('poll_offer_window', 'Poll')} onCloseClick={rejectOffer} />
-                <OctaneCardContentView gap={0} overflow="hidden">
-                    <div className="octane-poll-header is-offer">
-                        <img alt="" className="octane-poll-header__image is-offer" src={offerImage} draggable={false} />
-                        <div className="octane-poll-header__headline">{offer.headline || localizeWithFallback('poll_offer_title', 'Poll')}</div>
-                    </div>
-                    <div className="octane-poll-body">{offer.summary || localizeWithFallback('poll.default.summary', "We'd like to ask something...")}</div>
-                    <div className="octane-poll-footer">
-                        <BaseButton className="octane-poll-link" disabled={offer.starting} type="button" onClick={rejectOffer}>
-                            {localizeWithFallback('generic.cancel', 'Cancel')}...
-                        </BaseButton>
-                        <BaseButton className="octane-poll-link is-later" type="button" onClick={() => setOffer(null)}>
-                            {localizeWithFallback('poll_offer_later', 'Later')}
-                        </BaseButton>
-                        <BaseButton className="octane-poll-ok" disabled={offer.starting} type="button" onClick={acceptOffer}>
-                            {localizeWithFallback('generic.ok', 'OK')}
-                        </BaseButton>
-                    </div>
-                </OctaneCardContentView>
-            </OctaneCardView>
+            <NativeTextTree>
+                <OctaneCardView className="octane-widget-poll octane-poll" theme="primary-slim">
+                    <OctaneCardHeaderView headerText={localizeWithFallback('poll_offer_window', 'Poll')} onCloseClick={rejectOffer} />
+                    <OctaneCardContentView gap={0} overflow="hidden">
+                        <div className="octane-poll-header is-offer">
+                            <img alt="" className="octane-poll-header__image is-offer" src={offerImage} draggable={false} />
+                            <div className="octane-poll-header__headline">{offer.headline || localizeWithFallback('poll_offer_title', 'Poll')}</div>
+                        </div>
+                        <div className="octane-poll-body">{offer.summary || localizeWithFallback('poll.default.summary', "We'd like to ask something...")}</div>
+                        <div className="octane-poll-footer">
+                            <BaseButton className="octane-poll-link" disabled={offer.starting} type="button" onClick={rejectOffer}>
+                                {localizeWithFallback('generic.cancel', 'Cancel')}...
+                            </BaseButton>
+                            <BaseButton className="octane-poll-link is-later" type="button" onClick={() => setOffer(null)}>
+                                {localizeWithFallback('poll_offer_later', 'Later')}
+                            </BaseButton>
+                            <BaseButton className="octane-poll-ok" disabled={offer.starting} type="button" onClick={acceptOffer}>
+                                {localizeWithFallback('generic.ok', 'OK')}
+                            </BaseButton>
+                        </div>
+                    </OctaneCardContentView>
+                </OctaneCardView>
+            </NativeTextTree>
         );
     }
 
@@ -209,56 +212,58 @@ export const PollWidgetView: FC = () => {
     const pageNumber = Math.min(content.cursor.index + 1, Math.max(content.pageCount, 1));
 
     return (
-        <OctaneCardView className="octane-widget-poll octane-poll" theme="primary-slim">
-            <OctaneCardHeaderView headerText={localizeWithFallback('poll_question_title', 'Poll')} onCloseClick={cancelContent} />
-            <OctaneCardContentView gap={0} overflow="hidden">
-                <div className="octane-poll-header">
-                    <img alt="" className="octane-poll-header__image" src={questionImage} draggable={false} />
-                    <div className="octane-poll-header__headline">{content.startMessage || localizeWithFallback('poll_question_headline', 'Poll')}</div>
-                </div>
-                <div className="octane-poll-body is-question">
-                    <div className="octane-poll-question">{question.questionText}</div>
-                    <div className="octane-poll-answers">
-                        {isChoice &&
-                            (question.questionChoices ?? []).map((choice, index) => (
-                                <label key={index} className="octane-poll-answer">
-                                    {question.questionType === POLL_QUESTION_CHECKBOX ? (
-                                        <Checkbox checked={selected.includes(index)} onCheckedChange={() => toggleChoice(index)} />
-                                    ) : (
-                                        <Radio checked={selected.includes(index)} name={`poll-${content.id}-${question.questionId}`} onCheckedChange={() => toggleChoice(index)} />
-                                    )}
-                                    <span>{choice.choiceText}</span>
-                                </label>
-                            ))}
-                        {!isChoice && (
-                            <input
-                                className="octane-poll-text"
-                                maxLength={MAX_TEXT_ANSWER_LENGTH}
-                                type="text"
-                                value={text}
-                                onChange={(event) => setText(event.target.value)}
-                                onKeyDown={(event) => event.key === 'Enter' && submitAnswer()}
-                            />
-                        )}
+        <NativeTextTree>
+            <OctaneCardView className="octane-widget-poll octane-poll" theme="primary-slim">
+                <OctaneCardHeaderView headerText={localizeWithFallback('poll_question_title', 'Poll')} onCloseClick={cancelContent} />
+                <OctaneCardContentView gap={0} overflow="hidden">
+                    <div className="octane-poll-header">
+                        <img alt="" className="octane-poll-header__image" src={questionImage} draggable={false} />
+                        <div className="octane-poll-header__headline">{content.startMessage || localizeWithFallback('poll_question_headline', 'Poll')}</div>
                     </div>
-                </div>
-                <div className="octane-poll-footer">
-                    <span className="octane-poll-number">
-                        {localizeWithFallback(
-                            'poll_question_number',
-                            `Question ${pageNumber}/${content.pageCount}`,
-                            ['number', 'count'],
-                            [pageNumber.toString(), content.pageCount.toString()]
-                        )}
-                    </span>
-                    <BaseButton className="octane-poll-link" type="button" onClick={cancelContent}>
-                        {localizeWithFallback('generic.cancel', 'Cancel')}
-                    </BaseButton>
-                    <BaseButton className="octane-poll-ok" type="button" onClick={submitAnswer}>
-                        {localizeWithFallback('generic.ok', 'OK')}
-                    </BaseButton>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                    <div className="octane-poll-body is-question">
+                        <div className="octane-poll-question">{question.questionText}</div>
+                        <div className="octane-poll-answers">
+                            {isChoice &&
+                                (question.questionChoices ?? []).map((choice, index) => (
+                                    <label key={index} className="octane-poll-answer">
+                                        {question.questionType === POLL_QUESTION_CHECKBOX ? (
+                                            <Checkbox checked={selected.includes(index)} onCheckedChange={() => toggleChoice(index)} />
+                                        ) : (
+                                            <Radio checked={selected.includes(index)} name={`poll-${content.id}-${question.questionId}`} onCheckedChange={() => toggleChoice(index)} />
+                                        )}
+                                        <span>{choice.choiceText}</span>
+                                    </label>
+                                ))}
+                            {!isChoice && (
+                                <input
+                                    className="octane-poll-text"
+                                    maxLength={MAX_TEXT_ANSWER_LENGTH}
+                                    type="text"
+                                    value={text}
+                                    onChange={(event) => setText(event.target.value)}
+                                    onKeyDown={(event) => event.key === 'Enter' && submitAnswer()}
+                                />
+                            )}
+                        </div>
+                    </div>
+                    <div className="octane-poll-footer">
+                        <span className="octane-poll-number">
+                            {localizeWithFallback(
+                                'poll_question_number',
+                                `Question ${pageNumber}/${content.pageCount}`,
+                                ['number', 'count'],
+                                [pageNumber.toString(), content.pageCount.toString()]
+                            )}
+                        </span>
+                        <BaseButton className="octane-poll-link" type="button" onClick={cancelContent}>
+                            {localizeWithFallback('generic.cancel', 'Cancel')}
+                        </BaseButton>
+                        <BaseButton className="octane-poll-ok" type="button" onClick={submitAnswer}>
+                            {localizeWithFallback('generic.ok', 'OK')}
+                        </BaseButton>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, NotificationAlertItem, OpenUrl } from '../../../../api';
 import { AutoGrid, Button, Column, Flex, LayoutNotificationAlertView, LayoutNotificationAlertViewProps } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { OctaneInput } from '../../../../layout';
 
 interface NotificationDefaultAlertViewProps extends LayoutNotificationAlertViewProps {
@@ -33,28 +34,30 @@ export const NotificationSeachAlertView: FC<NotificationDefaultAlertViewProps> =
     const isAction = item.clickUrl && item.clickUrl.startsWith('event:');
 
     return (
-        <LayoutNotificationAlertView title={title} onClose={onClose} {...rest}>
-            <Flex fullWidth alignItems="center" position="relative">
-                <OctaneInput
-                    placeholder={LocalizeText('generic.search')}
-                    type="text"
-                    value={searchValue}
-                    onChange={(event) => updateSearchValue(event.target.value)}
-                />
-            </Flex>
-            <Column fullHeight className="py-1" overflow="hidden">
-                <AutoGrid columnCount={1} gap={1}>
-                    {results &&
-                        results.map((n, index) => {
-                            return <span key={index}>{n}</span>;
-                        })}
-                </AutoGrid>
-            </Column>
-            <hr className="my-2" />
-            <Column center alignItems="center" gap={1}>
-                {!isAction && !item.clickUrl && <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>}
-                {item.clickUrl && item.clickUrl.length > 0 && <Button onClick={visitUrl}>{LocalizeText(item.clickUrlText)}</Button>}
-            </Column>
-        </LayoutNotificationAlertView>
+        <NativeTextTree>
+            <LayoutNotificationAlertView title={title} onClose={onClose} {...rest}>
+                <Flex fullWidth alignItems="center" position="relative">
+                    <OctaneInput
+                        placeholder={LocalizeText('generic.search')}
+                        type="text"
+                        value={searchValue}
+                        onChange={(event) => updateSearchValue(event.target.value)}
+                    />
+                </Flex>
+                <Column fullHeight className="py-1" overflow="hidden">
+                    <AutoGrid columnCount={1} gap={1}>
+                        {results &&
+                            results.map((n, index) => {
+                                return <span key={index}>{n}</span>;
+                            })}
+                    </AutoGrid>
+                </Column>
+                <hr className="my-2" />
+                <Column center alignItems="center" gap={1}>
+                    {!isAction && !item.clickUrl && <Button onClick={onClose}>{LocalizeText('generic.close')}</Button>}
+                    {item.clickUrl && item.clickUrl.length > 0 && <Button onClick={visitUrl}>{LocalizeText(item.clickUrlText)}</Button>}
+                </Column>
+            </LayoutNotificationAlertView>
+        </NativeTextTree>
     );
 };

@@ -7,6 +7,7 @@ import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MODE_GIVE = 0;
 const MODE_TAKE = 1;
@@ -36,29 +37,31 @@ export const WiredActionGiveOrTakeFurniView: FC<{}> = props =>
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE }
-            save={ save }
-            footer={ <WiredSourcesSelector showUsers={ true } userSource={ userSource } onChangeUsers={ setUserSource } /> }>
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.base_item_id', 'Base item ID') }</Text>
-                <NumberInput className="form-control form-control-sm" min={ 1 } value={ baseItemId } onChange={ event => setBaseItemId(parseInt(event.target.value, 10) || 0) } />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.count', 'Quantity', [ 'count' ], [ quantity.toString() ]) }</Text>
-                <NumberInput className="form-control form-control-sm" min={ 1 } max={ 100 } value={ quantity } onChange={ event => setQuantity(parseInt(event.target.value, 10) || 0) } />
-            </div>
-            <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1">
-                    <Radio name="giveOrTake" checked={ giveOrTake === MODE_GIVE } onCheckedChange={() => setGiveOrTake(MODE_GIVE)} />
-                    <Text>{ localizeWithFallback('wiredfurni.params.give', 'Give') }</Text>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE }
+                save={ save }
+                footer={ <WiredSourcesSelector showUsers={ true } userSource={ userSource } onChangeUsers={ setUserSource } /> }>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.base_item_id', 'Base item ID') }</Text>
+                    <NumberInput className="form-control form-control-sm" min={ 1 } value={ baseItemId } onChange={ event => setBaseItemId(parseInt(event.target.value, 10) || 0) } />
                 </div>
-                <div className="flex items-center gap-1">
-                    <Radio name="giveOrTake" checked={ giveOrTake === MODE_TAKE } onCheckedChange={() => setGiveOrTake(MODE_TAKE)} />
-                    <Text>{ localizeWithFallback('wiredfurni.params.take', 'Take') }</Text>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.count', 'Quantity', [ 'count' ], [ quantity.toString() ]) }</Text>
+                    <NumberInput className="form-control form-control-sm" min={ 1 } max={ 100 } value={ quantity } onChange={ event => setQuantity(parseInt(event.target.value, 10) || 0) } />
                 </div>
-            </div>
-        </WiredActionBaseView>
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                        <Radio name="giveOrTake" checked={ giveOrTake === MODE_GIVE } onCheckedChange={() => setGiveOrTake(MODE_GIVE)} />
+                        <Text>{ localizeWithFallback('wiredfurni.params.give', 'Give') }</Text>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Radio name="giveOrTake" checked={ giveOrTake === MODE_TAKE } onCheckedChange={() => setGiveOrTake(MODE_TAKE)} />
+                        <Text>{ localizeWithFallback('wiredfurni.params.take', 'Take') }</Text>
+                    </div>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

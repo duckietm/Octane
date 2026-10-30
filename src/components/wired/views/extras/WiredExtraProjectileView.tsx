@@ -59,6 +59,7 @@ import { Checkbox as BaseCheckbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const DIRECTIONAL_SYSTEMS: Array<{ fallback: string; value: number }> = [
     { fallback: '8 directions, straight', value: 0 },
@@ -120,16 +121,18 @@ const ProjectileSection: FC<PropsWithChildren<{ title: string; open: boolean; fi
     const { title, open, first = false, onToggle, children } = props;
 
     return (
-        <>
-            {!first && <div className="octane-wired__divider" />}
-            <Collapsible.Root className="octane-wired__projectile-section" open={open} onOpenChange={() => onToggle()}>
-                <Collapsible.Trigger className="octane-wired__projectile-section-header">
-                    <Text bold>{title}</Text>
-                    {open ? <FaChevronUp className="octane-wired__projectile-chevron" /> : <FaChevronDown className="octane-wired__projectile-chevron" />}
-                </Collapsible.Trigger>
-                <Collapsible.Panel className="octane-wired__projectile-section-body">{children}</Collapsible.Panel>
-            </Collapsible.Root>
-        </>
+        <NativeTextTree>
+            <>
+                {!first && <div className="octane-wired__divider" />}
+                <Collapsible.Root className="octane-wired__projectile-section" open={open} onOpenChange={() => onToggle()}>
+                    <Collapsible.Trigger className="octane-wired__projectile-section-header">
+                        <Text bold>{title}</Text>
+                        {open ? <FaChevronUp className="octane-wired__projectile-chevron" /> : <FaChevronDown className="octane-wired__projectile-chevron" />}
+                    </Collapsible.Trigger>
+                    <Collapsible.Panel className="octane-wired__projectile-section-body">{children}</Collapsible.Panel>
+                </Collapsible.Root>
+            </>
+        </NativeTextTree>
     );
 };
 
@@ -137,31 +140,37 @@ const Checkbox: FC<{ checked: boolean; disabled?: boolean; label: string; onChan
     const { checked, disabled = false, label, onChange } = props;
 
     return (
-        <label className={`flex items-center gap-1 ${disabled ? 'opacity-50' : 'cursor-pointer'}`}>
-            <BaseCheckbox checked={checked} disabled={disabled} onCheckedChange={onChange} />
-            <Text small>{label}</Text>
-        </label>
+        <NativeTextTree>
+            <label className={`flex items-center gap-1 ${disabled ? 'opacity-50' : 'cursor-pointer'}`}>
+                <BaseCheckbox checked={checked} disabled={disabled} onCheckedChange={onChange} />
+                <Text small>{label}</Text>
+            </label>
+        </NativeTextTree>
     );
 };
 
 const NumberField: FC<{ disabled?: boolean; label: string; value: number; onChange: (value: number) => void }> = ({ disabled = false, label, value, onChange }) => (
-    <label className={`flex items-center justify-between gap-2 ${disabled ? 'opacity-50' : ''}`}>
-        <Text small>{label}</Text>
-        <NumberInput className="form-control form-control-sm octane-wired__projectile-number" disabled={disabled} value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))} />
-    </label>
+    <NativeTextTree>
+        <label className={`flex items-center justify-between gap-2 ${disabled ? 'opacity-50' : ''}`}>
+            <Text small>{label}</Text>
+            <NumberInput className="form-control form-control-sm octane-wired__projectile-number" disabled={disabled} value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))} />
+        </label>
+    </NativeTextTree>
 );
 
 const SourceSelect: FC<{ label: string; options: WiredSourceOption[]; value: number; onChange: (value: number) => void }> = ({ label, options, value, onChange }) => (
-    <label className="flex items-center justify-between gap-2">
-        <Text small>{label}</Text>
-        <Select aria-label={label} className="form-select form-select-sm" value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))}>
-            {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                    {LocalizeText(option.label)}
-                </option>
-            ))}
-        </Select>
-    </label>
+    <NativeTextTree>
+        <label className="flex items-center justify-between gap-2">
+            <Text small>{label}</Text>
+            <Select aria-label={label} className="form-select form-select-sm" value={value} onChange={(event) => onChange(parseInt(event.target.value, 10))}>
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {LocalizeText(option.label)}
+                    </option>
+                ))}
+            </Select>
+        </label>
+    </NativeTextTree>
 );
 
 interface ValueOrVariableProps {
@@ -207,43 +216,45 @@ const ValueOrVariable: FC<ValueOrVariableProps> = (props) => {
     }, [contextVariableDefinitions, furniVariableDefinitions, roomVariableDefinitions, targetKey, token, userVariableDefinitions]);
 
     return (
-        <div className="flex flex-col gap-1">
-            <label className="flex items-center gap-1 cursor-pointer">
-                <Radio checked={!fromVariable} name={name} onCheckedChange={() => props.onFromVariable(false)} />
-                <Text small>{label}</Text>
-                <NumberInput aria-label={label} className="form-control form-control-sm octane-wired__projectile-number ms-auto" disabled={fromVariable} value={value} onChange={(event) => props.onValue(parseInt(event.target.value, 10))} />
-            </label>
-            <label className="flex items-center gap-1 cursor-pointer">
-                <Radio checked={fromVariable} name={name} onCheckedChange={() => props.onFromVariable(true)} />
-                <Text small>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
-            </label>
-            {fromVariable && (
-                <div className="flex flex-col gap-1 octane-wired__projectile-indent">
-                    <Select
-                        aria-label={`${label} variable type`}
-                        className="form-select form-select-sm"
-                        value={target}
-                        onChange={(event) => {
-                            props.onTarget(parseInt(event.target.value, 10));
-                            props.onToken('');
-                        }}
-                    >
-                        {VARIABLE_TARGETS.map((option) => (
-                            <option key={option.key} value={option.value}>
-                                {text(`variable_target.${option.key}`, option.fallback)}
-                            </option>
-                        ))}
-                    </Select>
-                    <WiredVariablePicker entries={entries} recentScope="projectile-reference" selectedToken={token} onSelect={(entry) => props.onToken(entry.token)} />
-                    {targetKey === 'user' && (
-                        <SourceSelect label={text('variable_source', 'Read it from:')} options={userSources} value={userSource} onChange={props.onUserSource} />
-                    )}
-                    {targetKey === 'furni' && (
-                        <SourceSelect label={text('variable_source', 'Read it from:')} options={FURNI_SOURCES} value={furniSource} onChange={props.onFurniSource} />
-                    )}
-                </div>
-            )}
-        </div>
+        <NativeTextTree>
+            <div className="flex flex-col gap-1">
+                <label className="flex items-center gap-1 cursor-pointer">
+                    <Radio checked={!fromVariable} name={name} onCheckedChange={() => props.onFromVariable(false)} />
+                    <Text small>{label}</Text>
+                    <NumberInput aria-label={label} className="form-control form-control-sm octane-wired__projectile-number ms-auto" disabled={fromVariable} value={value} onChange={(event) => props.onValue(parseInt(event.target.value, 10))} />
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                    <Radio checked={fromVariable} name={name} onCheckedChange={() => props.onFromVariable(true)} />
+                    <Text small>{LocalizeText('wiredfurni.params.variables.reference_value.from_variable')}</Text>
+                </label>
+                {fromVariable && (
+                    <div className="flex flex-col gap-1 octane-wired__projectile-indent">
+                        <Select
+                            aria-label={`${label} variable type`}
+                            className="form-select form-select-sm"
+                            value={target}
+                            onChange={(event) => {
+                                props.onTarget(parseInt(event.target.value, 10));
+                                props.onToken('');
+                            }}
+                        >
+                            {VARIABLE_TARGETS.map((option) => (
+                                <option key={option.key} value={option.value}>
+                                    {text(`variable_target.${option.key}`, option.fallback)}
+                                </option>
+                            ))}
+                        </Select>
+                        <WiredVariablePicker entries={entries} recentScope="projectile-reference" selectedToken={token} onSelect={(entry) => props.onToken(entry.token)} />
+                        {targetKey === 'user' && (
+                            <SourceSelect label={text('variable_source', 'Read it from:')} options={userSources} value={userSource} onChange={props.onUserSource} />
+                        )}
+                        {targetKey === 'furni' && (
+                            <SourceSelect label={text('variable_source', 'Read it from:')} options={FURNI_SOURCES} value={furniSource} onChange={props.onFurniSource} />
+                        )}
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -292,181 +303,183 @@ export const WiredExtraProjectileView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView
-            footer={<WiredFurniSelectorView />}
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            showSelection={false}
-            validate={() => !(scalesTime && timeFromVariable && !timeToken) && !(distanceMode !== PROJECTILE_DISTANCE_NORMAL && distanceFromVariable && !distanceToken)}
-        >
-            <div className="octane-wired__projectile">
-                <ProjectileSection first open={openSections.info} title={text('info', 'Usage info:')} onToggle={() => toggleSection('info')}>
-                    <Text small>
-                        {text(
-                            'info.desc',
-                            'This box is meant for projectile furni. Use it to add extra features to a projectile that is already being moved by Wired.'
-                        )}
-                    </Text>
-                </ProjectileSection>
-
-                <ProjectileSection open={openSections.direction} title={text('direction', 'Projectile direction:')} onToggle={() => toggleSection('direction')}>
-                    <Checkbox
-                        checked={rotates}
-                        label={text('rotate', 'Rotate the projectile in the moving direction')}
-                        onChange={(checked) => setFlag(PROJECTILE_PARAM_ROTATE, checked)}
-                    />
-                    <div className="flex flex-col gap-1">
-                        <Text small>{text('system', 'System:')}</Text>
-                        <Select
-                            aria-label={text('system', 'System:')}
-                            className="form-select form-select-sm"
-                            disabled={!rotates && !changesShooter}
-                            value={params[PROJECTILE_PARAM_DIRECTIONAL_SYSTEM]}
-                            onChange={(event) => setParam(PROJECTILE_PARAM_DIRECTIONAL_SYSTEM, parseInt(event.target.value, 10))}
-                        >
-                            {DIRECTIONAL_SYSTEMS.map((system) => (
-                                <option key={system.value} value={system.value}>
-                                    {text(`system.${system.value}`, system.fallback)}
-                                </option>
-                            ))}
-                        </Select>
-                    </div>
-                    <WiredProjectileDirectionGrid disabled={!rotates && !changesShooter} system={params[PROJECTILE_PARAM_DIRECTIONAL_SYSTEM]} />
-                    <Checkbox
-                        checked={changesShooter}
-                        label={text('shooter', "Visually change the shooter's direction")}
-                        onChange={(checked) => setFlag(PROJECTILE_PARAM_CHANGE_SHOOTER_DIRECTION, checked)}
-                    />
-                    <div className="flex flex-col gap-1 octane-wired__projectile-indent">
-                        <Checkbox
-                            checked={params[PROJECTILE_PARAM_BUNNY_HOP] === 1}
-                            disabled={!changesShooter}
-                            label={text('bunny_hop', 'Do a little hop when shooting sideways')}
-                            onChange={(checked) => setFlag(PROJECTILE_PARAM_BUNNY_HOP, checked)}
-                        />
-                        {changesShooter && (
-                            <SourceSelect
-                                label={text('shooter.source', 'Shooter:')}
-                                options={userSources}
-                                value={params[PROJECTILE_PARAM_SHOOTER_SOURCE]}
-                                onChange={(value) => setParam(PROJECTILE_PARAM_SHOOTER_SOURCE, value)}
-                            />
-                        )}
-                    </div>
-                </ProjectileSection>
-
-                <ProjectileSection open={openSections.trajectory} title={text('trajectory', 'Animation trajectory:')} onToggle={() => toggleSection('trajectory')}>
-                    <div className="flex flex-col gap-1">
-                        {DISTANCE_MODES.map((mode) => (
-                            <label key={mode.value} className="flex items-center gap-1 cursor-pointer">
-                                <Radio checked={distanceMode === mode.value} name="projectileDistanceMode" onCheckedChange={() => setParam(PROJECTILE_PARAM_DISTANCE_MODE, mode.value)} />
-                                <Text small>{text(`distance.${mode.key}`, mode.fallback)}</Text>
-                            </label>
-                        ))}
-                    </div>
-                    {distanceMode !== PROJECTILE_DISTANCE_NORMAL && (
-                        <div className="octane-wired__projectile-indent">
-                            <ValueOrVariable
-                                fromVariable={distanceFromVariable}
-                                furniSource={params[PROJECTILE_PARAM_DISTANCE_FURNI_SOURCE]}
-                                label={text('distance.tiles', 'Tiles:')}
-                                name="projectileDistanceValue"
-                                target={params[PROJECTILE_PARAM_DISTANCE_TARGET]}
-                                token={distanceToken}
-                                userSource={params[PROJECTILE_PARAM_DISTANCE_USER_SOURCE]}
-                                userSources={userSources}
-                                value={params[PROJECTILE_PARAM_DISTANCE_TILES]}
-                                onFromVariable={(fromVariable) => setFlag(PROJECTILE_PARAM_DISTANCE_IS_VARIABLE, fromVariable)}
-                                onFurniSource={(source) => setParam(PROJECTILE_PARAM_DISTANCE_FURNI_SOURCE, source)}
-                                onTarget={(target) => setParam(PROJECTILE_PARAM_DISTANCE_TARGET, target)}
-                                onToken={setDistanceToken}
-                                onUserSource={(source) => setParam(PROJECTILE_PARAM_DISTANCE_USER_SOURCE, source)}
-                                onValue={(value) => setParam(PROJECTILE_PARAM_DISTANCE_TILES, value)}
-                            />
-                        </div>
-                    )}
-                    <div className="flex flex-col gap-1">
+        <NativeTextTree>
+            <WiredExtraBaseView
+                footer={<WiredFurniSelectorView />}
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                showSelection={false}
+                validate={() => !(scalesTime && timeFromVariable && !timeToken) && !(distanceMode !== PROJECTILE_DISTANCE_NORMAL && distanceFromVariable && !distanceToken)}
+            >
+                <div className="octane-wired__projectile">
+                    <ProjectileSection first open={openSections.info} title={text('info', 'Usage info:')} onToggle={() => toggleSection('info')}>
                         <Text small>
-                            {text('curve', 'Curve strength: %value%', ['value'], [String(params[PROJECTILE_PARAM_CURVE_STRENGTH])]).replace(
-                                '%value%',
-                                String(params[PROJECTILE_PARAM_CURVE_STRENGTH])
+                            {text(
+                                'info.desc',
+                                'This box is meant for projectile furni. Use it to add extra features to a projectile that is already being moved by Wired.'
                             )}
                         </Text>
-                        <Slider
-                            max={1000}
-                            min={-1000}
-                            step={10}
-                            value={params[PROJECTILE_PARAM_CURVE_STRENGTH]}
-                            onChange={(value) => setParam(PROJECTILE_PARAM_CURVE_STRENGTH, value as number)}
-                        />
-                    </div>
-                </ProjectileSection>
+                    </ProjectileSection>
 
-                <ProjectileSection open={openSections.time} title={text('time', 'Animation time:')} onToggle={() => toggleSection('time')}>
-                    <Checkbox
-                        checked={scalesTime}
-                        label={text('time.scale', 'Scale the animation time with the distance')}
-                        onChange={(checked) => setFlag(PROJECTILE_PARAM_SCALE_TIME_WITH_DISTANCE, checked)}
-                    />
-                    {scalesTime && (
-                        <>
-                            <ValueOrVariable
-                                fromVariable={timeFromVariable}
-                                furniSource={params[PROJECTILE_PARAM_TIME_FURNI_SOURCE]}
-                                label={text('time.per_tile', 'Time per tile (ms):')}
-                                name="projectileTimeValue"
-                                target={params[PROJECTILE_PARAM_TIME_TARGET]}
-                                token={timeToken}
-                                userSource={params[PROJECTILE_PARAM_TIME_USER_SOURCE]}
-                                userSources={userSources}
-                                value={params[PROJECTILE_PARAM_TIME_PER_TILE]}
-                                onFromVariable={(fromVariable) => setFlag(PROJECTILE_PARAM_TIME_IS_VARIABLE, fromVariable)}
-                                onFurniSource={(source) => setParam(PROJECTILE_PARAM_TIME_FURNI_SOURCE, source)}
-                                onTarget={(target) => setParam(PROJECTILE_PARAM_TIME_TARGET, target)}
-                                onToken={setTimeToken}
-                                onUserSource={(source) => setParam(PROJECTILE_PARAM_TIME_USER_SOURCE, source)}
-                                onValue={(value) => setParam(PROJECTILE_PARAM_TIME_PER_TILE, value)}
-                            />
-                            <Text small>{text('time.distance_by', 'Measure the distance by:')}</Text>
-                            <div className="flex items-center gap-3 octane-wired__projectile-indent">
-                                {DISTANCE_AXES.map((axis) => (
-                                    <Checkbox
-                                        key={axis.key}
-                                        checked={params[axis.param] === 1}
-                                        label={text(`time.distance_by.${axis.key}`, axis.fallback)}
-                                        onChange={(checked) => setFlag(axis.param, checked)}
-                                    />
-                                ))}
-                            </div>
-                            <NumberField
-                                label={text('time.speed_increase', 'Speed increase (ms):')}
-                                value={params[PROJECTILE_PARAM_SPEED_INCREASE]}
-                                onChange={(value) => setParam(PROJECTILE_PARAM_SPEED_INCREASE, value)}
-                            />
-                        </>
-                    )}
-                </ProjectileSection>
-
-                <ProjectileSection
-                    open={openSections.rotation}
-                    title={text('rotation_offset', 'Shift the rotation by %value%', ['value'], [String(rotationOffset)]).replace('%value%', String(rotationOffset))}
-                    onToggle={() => toggleSection('rotation')}
-                >
-                    <Slider max={7} min={0} step={1} value={rotationOffset} onChange={(value) => setParam(PROJECTILE_PARAM_ROTATION_OFFSET, value as number)} />
-                </ProjectileSection>
-
-                <ProjectileSection open={openSections.variables} title={text('variables', 'Projectile internal variables:')} onToggle={() => toggleSection('variables')}>
-                    {PROJECTILE_INTERNAL_VARIABLES.map((variable, bit) => (
+                    <ProjectileSection open={openSections.direction} title={text('direction', 'Projectile direction:')} onToggle={() => toggleSection('direction')}>
                         <Checkbox
-                            key={variable}
-                            checked={isProjectileVariableEnabled(variablesMask, bit)}
-                            label={variable}
-                            onChange={(checked) => setParam(PROJECTILE_PARAM_INTERNAL_VARIABLES, toggleProjectileVariable(variablesMask, bit, checked))}
+                            checked={rotates}
+                            label={text('rotate', 'Rotate the projectile in the moving direction')}
+                            onChange={(checked) => setFlag(PROJECTILE_PARAM_ROTATE, checked)}
                         />
-                    ))}
-                </ProjectileSection>
-            </div>
-        </WiredExtraBaseView>
+                        <div className="flex flex-col gap-1">
+                            <Text small>{text('system', 'System:')}</Text>
+                            <Select
+                                aria-label={text('system', 'System:')}
+                                className="form-select form-select-sm"
+                                disabled={!rotates && !changesShooter}
+                                value={params[PROJECTILE_PARAM_DIRECTIONAL_SYSTEM]}
+                                onChange={(event) => setParam(PROJECTILE_PARAM_DIRECTIONAL_SYSTEM, parseInt(event.target.value, 10))}
+                            >
+                                {DIRECTIONAL_SYSTEMS.map((system) => (
+                                    <option key={system.value} value={system.value}>
+                                        {text(`system.${system.value}`, system.fallback)}
+                                    </option>
+                                ))}
+                            </Select>
+                        </div>
+                        <WiredProjectileDirectionGrid disabled={!rotates && !changesShooter} system={params[PROJECTILE_PARAM_DIRECTIONAL_SYSTEM]} />
+                        <Checkbox
+                            checked={changesShooter}
+                            label={text('shooter', "Visually change the shooter's direction")}
+                            onChange={(checked) => setFlag(PROJECTILE_PARAM_CHANGE_SHOOTER_DIRECTION, checked)}
+                        />
+                        <div className="flex flex-col gap-1 octane-wired__projectile-indent">
+                            <Checkbox
+                                checked={params[PROJECTILE_PARAM_BUNNY_HOP] === 1}
+                                disabled={!changesShooter}
+                                label={text('bunny_hop', 'Do a little hop when shooting sideways')}
+                                onChange={(checked) => setFlag(PROJECTILE_PARAM_BUNNY_HOP, checked)}
+                            />
+                            {changesShooter && (
+                                <SourceSelect
+                                    label={text('shooter.source', 'Shooter:')}
+                                    options={userSources}
+                                    value={params[PROJECTILE_PARAM_SHOOTER_SOURCE]}
+                                    onChange={(value) => setParam(PROJECTILE_PARAM_SHOOTER_SOURCE, value)}
+                                />
+                            )}
+                        </div>
+                    </ProjectileSection>
+
+                    <ProjectileSection open={openSections.trajectory} title={text('trajectory', 'Animation trajectory:')} onToggle={() => toggleSection('trajectory')}>
+                        <div className="flex flex-col gap-1">
+                            {DISTANCE_MODES.map((mode) => (
+                                <label key={mode.value} className="flex items-center gap-1 cursor-pointer">
+                                    <Radio checked={distanceMode === mode.value} name="projectileDistanceMode" onCheckedChange={() => setParam(PROJECTILE_PARAM_DISTANCE_MODE, mode.value)} />
+                                    <Text small>{text(`distance.${mode.key}`, mode.fallback)}</Text>
+                                </label>
+                            ))}
+                        </div>
+                        {distanceMode !== PROJECTILE_DISTANCE_NORMAL && (
+                            <div className="octane-wired__projectile-indent">
+                                <ValueOrVariable
+                                    fromVariable={distanceFromVariable}
+                                    furniSource={params[PROJECTILE_PARAM_DISTANCE_FURNI_SOURCE]}
+                                    label={text('distance.tiles', 'Tiles:')}
+                                    name="projectileDistanceValue"
+                                    target={params[PROJECTILE_PARAM_DISTANCE_TARGET]}
+                                    token={distanceToken}
+                                    userSource={params[PROJECTILE_PARAM_DISTANCE_USER_SOURCE]}
+                                    userSources={userSources}
+                                    value={params[PROJECTILE_PARAM_DISTANCE_TILES]}
+                                    onFromVariable={(fromVariable) => setFlag(PROJECTILE_PARAM_DISTANCE_IS_VARIABLE, fromVariable)}
+                                    onFurniSource={(source) => setParam(PROJECTILE_PARAM_DISTANCE_FURNI_SOURCE, source)}
+                                    onTarget={(target) => setParam(PROJECTILE_PARAM_DISTANCE_TARGET, target)}
+                                    onToken={setDistanceToken}
+                                    onUserSource={(source) => setParam(PROJECTILE_PARAM_DISTANCE_USER_SOURCE, source)}
+                                    onValue={(value) => setParam(PROJECTILE_PARAM_DISTANCE_TILES, value)}
+                                />
+                            </div>
+                        )}
+                        <div className="flex flex-col gap-1">
+                            <Text small>
+                                {text('curve', 'Curve strength: %value%', ['value'], [String(params[PROJECTILE_PARAM_CURVE_STRENGTH])]).replace(
+                                    '%value%',
+                                    String(params[PROJECTILE_PARAM_CURVE_STRENGTH])
+                                )}
+                            </Text>
+                            <Slider
+                                max={1000}
+                                min={-1000}
+                                step={10}
+                                value={params[PROJECTILE_PARAM_CURVE_STRENGTH]}
+                                onChange={(value) => setParam(PROJECTILE_PARAM_CURVE_STRENGTH, value as number)}
+                            />
+                        </div>
+                    </ProjectileSection>
+
+                    <ProjectileSection open={openSections.time} title={text('time', 'Animation time:')} onToggle={() => toggleSection('time')}>
+                        <Checkbox
+                            checked={scalesTime}
+                            label={text('time.scale', 'Scale the animation time with the distance')}
+                            onChange={(checked) => setFlag(PROJECTILE_PARAM_SCALE_TIME_WITH_DISTANCE, checked)}
+                        />
+                        {scalesTime && (
+                            <>
+                                <ValueOrVariable
+                                    fromVariable={timeFromVariable}
+                                    furniSource={params[PROJECTILE_PARAM_TIME_FURNI_SOURCE]}
+                                    label={text('time.per_tile', 'Time per tile (ms):')}
+                                    name="projectileTimeValue"
+                                    target={params[PROJECTILE_PARAM_TIME_TARGET]}
+                                    token={timeToken}
+                                    userSource={params[PROJECTILE_PARAM_TIME_USER_SOURCE]}
+                                    userSources={userSources}
+                                    value={params[PROJECTILE_PARAM_TIME_PER_TILE]}
+                                    onFromVariable={(fromVariable) => setFlag(PROJECTILE_PARAM_TIME_IS_VARIABLE, fromVariable)}
+                                    onFurniSource={(source) => setParam(PROJECTILE_PARAM_TIME_FURNI_SOURCE, source)}
+                                    onTarget={(target) => setParam(PROJECTILE_PARAM_TIME_TARGET, target)}
+                                    onToken={setTimeToken}
+                                    onUserSource={(source) => setParam(PROJECTILE_PARAM_TIME_USER_SOURCE, source)}
+                                    onValue={(value) => setParam(PROJECTILE_PARAM_TIME_PER_TILE, value)}
+                                />
+                                <Text small>{text('time.distance_by', 'Measure the distance by:')}</Text>
+                                <div className="flex items-center gap-3 octane-wired__projectile-indent">
+                                    {DISTANCE_AXES.map((axis) => (
+                                        <Checkbox
+                                            key={axis.key}
+                                            checked={params[axis.param] === 1}
+                                            label={text(`time.distance_by.${axis.key}`, axis.fallback)}
+                                            onChange={(checked) => setFlag(axis.param, checked)}
+                                        />
+                                    ))}
+                                </div>
+                                <NumberField
+                                    label={text('time.speed_increase', 'Speed increase (ms):')}
+                                    value={params[PROJECTILE_PARAM_SPEED_INCREASE]}
+                                    onChange={(value) => setParam(PROJECTILE_PARAM_SPEED_INCREASE, value)}
+                                />
+                            </>
+                        )}
+                    </ProjectileSection>
+
+                    <ProjectileSection
+                        open={openSections.rotation}
+                        title={text('rotation_offset', 'Shift the rotation by %value%', ['value'], [String(rotationOffset)]).replace('%value%', String(rotationOffset))}
+                        onToggle={() => toggleSection('rotation')}
+                    >
+                        <Slider max={7} min={0} step={1} value={rotationOffset} onChange={(value) => setParam(PROJECTILE_PARAM_ROTATION_OFFSET, value as number)} />
+                    </ProjectileSection>
+
+                    <ProjectileSection open={openSections.variables} title={text('variables', 'Projectile internal variables:')} onToggle={() => toggleSection('variables')}>
+                        {PROJECTILE_INTERNAL_VARIABLES.map((variable, bit) => (
+                            <Checkbox
+                                key={variable}
+                                checked={isProjectileVariableEnabled(variablesMask, bit)}
+                                label={variable}
+                                onChange={(checked) => setParam(PROJECTILE_PARAM_INTERNAL_VARIABLES, toggleProjectileVariable(variablesMask, bit, checked))}
+                            />
+                        ))}
+                    </ProjectileSection>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { LocalizeText } from '../../../api';
 import { Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../hooks';
 
 export const WiredFurniSelectorView: FC<{}> = () => {
@@ -16,13 +17,15 @@ export const WiredFurniSelectorView: FC<{}> = () => {
     const caption = /\d+\s*\/\s*\d+/.test(rawCaption) ? rawCaption : rawCaption.replace(/\[\s*\//, `[${count}/`);
 
     return (
-        <div className="flex flex-col gap-1 octane-wired__furni-selector">
-            <Text bold className="octane-wired__furni-selector-title">
-                {caption}
-            </Text>
-            <Text small className="octane-wired__furni-selector-description">
-                {LocalizeText('wiredfurni.pickfurnis.desc')}
-            </Text>
-        </div>
+        <NativeTextTree>
+            <div className="flex flex-col gap-1 octane-wired__furni-selector">
+                <Text bold className="octane-wired__furni-selector-title">
+                    {caption}
+                </Text>
+                <Text small className="octane-wired__furni-selector-description">
+                    {LocalizeText('wiredfurni.pickfurnis.desc')}
+                </Text>
+            </div>
+        </NativeTextTree>
     );
 };

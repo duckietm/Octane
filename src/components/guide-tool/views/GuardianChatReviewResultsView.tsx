@@ -9,6 +9,7 @@ import decisionVeryBad from '../../../assets/images/guide-tool/chat-review/decis
 import decisionWaiting1 from '../../../assets/images/guide-tool/chat-review/decision-waiting-1.png';
 import decisionWaiting2 from '../../../assets/images/guide-tool/chat-review/decision-waiting-2.png';
 import { Button } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { GuardianAnimatedIcon } from './GuardianAnimatedIcon';
 
 /** help_chat_review_decision_<status>, the animated ones with their two frames. */
@@ -46,40 +47,42 @@ export const GuardianChatReviewResultsView: FC<GuardianChatReviewResultsViewProp
     const resultStatus = statusFromVote(winningVote);
 
     return (
-        <div className="octane-guardian-results">
-            {final ? (
-                <div className="octane-guardian-results__verdict">
-                    <StatusIcon status={resultStatus} />
-                    <span>{guardianResultText(resultStatus)}</span>
-                </div>
-            ) : (
-                <div className="octane-guardian-results__waiting">
-                    <div className="octane-guardian-results__waiting-title">{guardianText('guide.bully.request.guide.results.waiting.title')}</div>
-                    <div>{guardianText('guide.bully.request.guide.results.waiting.description')}</div>
-                </div>
-            )}
-            <div className="octane-guardian-results__heading">
-                {guardianText(final ? 'guide.bully.request.guide.results.final.votes' : 'guide.bully.request.guide.results.votes')}
-            </div>
-            <div className="octane-guardian-results__list">
-                <div className="octane-guardian-results__row is-own">
-                    <span>{guardianStatusText(ownStatus)}</span>
-                    <StatusIcon status={ownStatus} />
-                    <span className="octane-guardian-results__balloon">{guardianText('guide.bully.request.guide.results.your_vote')}</span>
-                </div>
-                {statuses.map((status, index) => (
-                    <div key={index} className="octane-guardian-results__row">
-                        <span>{guardianStatusText(status)}</span>
-                        <StatusIcon status={status} />
+        <NativeTextTree>
+            <div className="octane-guardian-results">
+                {final ? (
+                    <div className="octane-guardian-results__verdict">
+                        <StatusIcon status={resultStatus} />
+                        <span>{guardianResultText(resultStatus)}</span>
                     </div>
-                ))}
-            </div>
-            <div className="octane-guardian-results__footer">
-                <div className={final ? 'font-bold' : ''}>
-                    {guardianText(final ? 'guide.bully.request.guide.results.thanks' : 'guide.bully.request.guide.results.wait')}
+                ) : (
+                    <div className="octane-guardian-results__waiting">
+                        <div className="octane-guardian-results__waiting-title">{guardianText('guide.bully.request.guide.results.waiting.title')}</div>
+                        <div>{guardianText('guide.bully.request.guide.results.waiting.description')}</div>
+                    </div>
+                )}
+                <div className="octane-guardian-results__heading">
+                    {guardianText(final ? 'guide.bully.request.guide.results.final.votes' : 'guide.bully.request.guide.results.votes')}
                 </div>
-                <Button onClick={onClose}>{guardianText('alert.close.button')}</Button>
+                <div className="octane-guardian-results__list">
+                    <div className="octane-guardian-results__row is-own">
+                        <span>{guardianStatusText(ownStatus)}</span>
+                        <StatusIcon status={ownStatus} />
+                        <span className="octane-guardian-results__balloon">{guardianText('guide.bully.request.guide.results.your_vote')}</span>
+                    </div>
+                    {statuses.map((status, index) => (
+                        <div key={index} className="octane-guardian-results__row">
+                            <span>{guardianStatusText(status)}</span>
+                            <StatusIcon status={status} />
+                        </div>
+                    ))}
+                </div>
+                <div className="octane-guardian-results__footer">
+                    <div className={final ? 'font-bold' : ''}>
+                        {guardianText(final ? 'guide.bully.request.guide.results.thanks' : 'guide.bully.request.guide.results.wait')}
+                    </div>
+                    <Button onClick={onClose}>{guardianText('alert.close.button')}</Button>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -12,6 +12,7 @@ import { flattenWiredVariablePickerEntries, IWiredVariablePickerEntry, WiredVari
 import { BaseButton } from '../../../common/BaseButton';
 import { Checkbox } from '../../../common/Checkbox';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 /*
  * AIR WIN63-202610131318-860371703, roomevents/wired_setup/uibuilder/presets:
@@ -268,88 +269,90 @@ export const WiredValueOrVariableInput: FC<WiredValueOrVariableInputProps> = (pr
     const showTargetIndicator = isVariable && targets.length > 1;
 
     return (
-        <div className="octane-wired__value-field">
-            <div ref={anchorRef} className={`octane-wired__value-input ${showError ? 'is-invalid' : ''} ${disabled ? 'is-disabled' : ''}`}>
-                <input aria-label={label} aria-invalid={showError} disabled={disabled} type="text" value={text} onChange={(event) => onChangeText(event.target.value)} />
-                {showTargetIndicator && (
-                    <span className="octane-wired__value-input-target" title={LocalizeText(`wiredfurni.params.sourcetype.${TARGET_TYPE_NAMES[target]}`)}>
-                        <img alt={target} draggable={false} src={WIRED_VALUE_TARGET_ICONS[target]} style={{ filter: `drop-shadow(0 0 2px ${TARGET_GLOW_COLORS[target]})` }} />
-                    </span>
-                )}
-                <Hint content={LocalizeText('wiredfurni.params.variables.reference_value.popup')}>
-                    <BaseButton
-                        aria-expanded={open}
-                        aria-label={LocalizeText('wiredfurni.params.variables.reference_value.popup')}
-                        className="octane-wired__value-input-button"
-                        disabled={disabled}
-                        type="button"
-                        onClick={toggle}
-                    >
-                        <img alt="" draggable={false} src={variableReferenceIcon} />
-                    </BaseButton>
-                </Hint>
-                {showError && (
-                    <div className="octane-wired__value-input-error" role="alert">
-                        {errorText}
-                    </div>
-                )}
-            </div>
-            {open &&
-                portalTarget &&
-                createPortal(
-                    <div className="octane-wired octane-wired__variable-picker-portal">
-                        <div
-                            ref={popupRef}
-                            aria-label={label}
-                            className="octane-wired__vpicker-expanded octane-wired__value-popup"
-                            role="dialog"
-                            style={{ left: popupRect.left, top: popupRect.top, width: popupRect.width }}
+        <NativeTextTree>
+            <div className="octane-wired__value-field">
+                <div ref={anchorRef} className={`octane-wired__value-input ${showError ? 'is-invalid' : ''} ${disabled ? 'is-disabled' : ''}`}>
+                    <input aria-label={label} aria-invalid={showError} disabled={disabled} type="text" value={text} onChange={(event) => onChangeText(event.target.value)} />
+                    {showTargetIndicator && (
+                        <span className="octane-wired__value-input-target" title={LocalizeText(`wiredfurni.params.sourcetype.${TARGET_TYPE_NAMES[target]}`)}>
+                            <img alt={target} draggable={false} src={WIRED_VALUE_TARGET_ICONS[target]} style={{ filter: `drop-shadow(0 0 2px ${TARGET_GLOW_COLORS[target]})` }} />
+                        </span>
+                    )}
+                    <Hint content={LocalizeText('wiredfurni.params.variables.reference_value.popup')}>
+                        <BaseButton
+                            aria-expanded={open}
+                            aria-label={LocalizeText('wiredfurni.params.variables.reference_value.popup')}
+                            className="octane-wired__value-input-button"
+                            disabled={disabled}
+                            type="button"
+                            onClick={toggle}
                         >
-                            <div className="octane-wired__value-popup-header">
-                                {renderSource ? (
-                                    <>
-                                        <div className="octane-wired__value-popup-source">{renderSource({ typeSelector, locked: sourceLocked })}</div>
-                                        <div className="octane-wired__divider" />
-                                    </>
-                                ) : (
-                                    typeSelector && (
-                                        // Without a claimed source the type selector is a section of its own, with no splitter (L396-412).
-                                        <div className="octane-wired__value-popup-source octane-wired__value-popup-target">
-                                            <Text>{localizeWithFallback('wiredfurni.params.variables.reference_value.target', LocalizeText('wiredfurni.params.sources.merged.title.variables'))}</Text>
-                                            {typeSelector}
-                                        </div>
-                                    )
-                                )}
-                                {onSameHolderChange && (
-                                    <>
-                                        <label className={`octane-wired__value-popup-same-holder ${sameHolderEligible ? '' : 'is-disabled'}`}>
-                                            <Checkbox checked={sameHolder} disabled={!sameHolderEligible} onCheckedChange={ nextChecked => {
-                                                    onSameHolderChange(nextChecked);
-                                                    // onReferenceVariableOnTargetChanged -> onPopupVariableChanged(selected, checked) (L443-451, 421-424).
-                                                    if (nextChecked) onIsVariableChange(true);
-                                                } } />
-                                            <Text>{LocalizeText('wiredfurni.params.variables.reference_value.same_holder')}</Text>
-                                        </label>
-                                        <div className="octane-wired__divider" />
-                                    </>
-                                )}
-                            </div>
-                            <WiredVariablePicker
-                                embedded={{ width: popupRect.width, onClose: () => setPopupRect(null) }}
-                                entries={entries}
-                                selectedToken={token}
-                                onSelect={(entry) => {
-                                    publish(true, literal, entry.token);
-                                    setEdit(null);
-                                    onIsVariableChange(true);
-                                    onTokenChange(entry.token);
-                                    setPopupRect(null);
-                                }}
-                            />
+                            <img alt="" draggable={false} src={variableReferenceIcon} />
+                        </BaseButton>
+                    </Hint>
+                    {showError && (
+                        <div className="octane-wired__value-input-error" role="alert">
+                            {errorText}
                         </div>
-                    </div>,
-                    portalTarget
-                )}
-        </div>
+                    )}
+                </div>
+                {open &&
+                    portalTarget &&
+                    createPortal(
+                        <div className="octane-wired octane-wired__variable-picker-portal">
+                            <div
+                                ref={popupRef}
+                                aria-label={label}
+                                className="octane-wired__vpicker-expanded octane-wired__value-popup"
+                                role="dialog"
+                                style={{ left: popupRect.left, top: popupRect.top, width: popupRect.width }}
+                            >
+                                <div className="octane-wired__value-popup-header">
+                                    {renderSource ? (
+                                        <>
+                                            <div className="octane-wired__value-popup-source">{renderSource({ typeSelector, locked: sourceLocked })}</div>
+                                            <div className="octane-wired__divider" />
+                                        </>
+                                    ) : (
+                                        typeSelector && (
+                                            // Without a claimed source the type selector is a section of its own, with no splitter (L396-412).
+                                            <div className="octane-wired__value-popup-source octane-wired__value-popup-target">
+                                                <Text>{localizeWithFallback('wiredfurni.params.variables.reference_value.target', LocalizeText('wiredfurni.params.sources.merged.title.variables'))}</Text>
+                                                {typeSelector}
+                                            </div>
+                                        )
+                                    )}
+                                    {onSameHolderChange && (
+                                        <>
+                                            <label className={`octane-wired__value-popup-same-holder ${sameHolderEligible ? '' : 'is-disabled'}`}>
+                                                <Checkbox checked={sameHolder} disabled={!sameHolderEligible} onCheckedChange={ nextChecked => {
+                                                        onSameHolderChange(nextChecked);
+                                                        // onReferenceVariableOnTargetChanged -> onPopupVariableChanged(selected, checked) (L443-451, 421-424).
+                                                        if (nextChecked) onIsVariableChange(true);
+                                                    } } />
+                                                <Text>{LocalizeText('wiredfurni.params.variables.reference_value.same_holder')}</Text>
+                                            </label>
+                                            <div className="octane-wired__divider" />
+                                        </>
+                                    )}
+                                </div>
+                                <WiredVariablePicker
+                                    embedded={{ width: popupRect.width, onClose: () => setPopupRect(null) }}
+                                    entries={entries}
+                                    selectedToken={token}
+                                    onSelect={(entry) => {
+                                        publish(true, literal, entry.token);
+                                        setEdit(null);
+                                        onIsVariableChange(true);
+                                        onTokenChange(entry.token);
+                                        setPopupRect(null);
+                                    }}
+                                />
+                            </div>
+                        </div>,
+                        portalTarget
+                    )}
+            </div>
+        </NativeTextTree>
     );
 };

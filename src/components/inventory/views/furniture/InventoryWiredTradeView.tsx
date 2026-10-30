@@ -47,6 +47,7 @@ import requirementsIcon from '../../../../assets/images/inventory/air/wired-trad
 import requirementsMetIcon from '../../../../assets/images/inventory/air/wired-trading-requirements-met.png';
 import requirementsNotMetIcon from '../../../../assets/images/inventory/air/wired-trading-requirements-not-met.png';
 import { InventoryFurnitureSearchView } from './InventoryFurnitureSearchView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** AIR inventory_trading_wired: both grids are 3 x 3 slots of one kind each. */
 const GRID_SLOTS = 9;
@@ -310,183 +311,185 @@ export const InventoryWiredTradeView: FC<{}> = () => {
     );
 
     return (
-        <div className="octane-wired-trade">
-            <Column className="octane-wired-trade-inventory" overflow="hidden" gap={1}>
-                <InventoryFurnitureSearchView groupItems={groupItems} setGroupItems={setFilteredGroupItems} />
-                <Flex column fullHeight gap={2} justifyContent="between" overflow="hidden">
-                    <AutoGrid columnCount={3}>
-                        {filteredGroupItems.map((group, index) => {
-                            const offerable = canOffer(group);
-                            const count = group.getUnlockedCount();
+        <NativeTextTree>
+            <div className="octane-wired-trade">
+                <Column className="octane-wired-trade-inventory" overflow="hidden" gap={1}>
+                    <InventoryFurnitureSearchView groupItems={groupItems} setGroupItems={setFilteredGroupItems} />
+                    <Flex column fullHeight gap={2} justifyContent="between" overflow="hidden">
+                        <AutoGrid columnCount={3}>
+                            {filteredGroupItems.map((group, index) => {
+                                const offerable = canOffer(group);
+                                const count = group.getUnlockedCount();
 
-                            return (
-                                <LayoutGridItem
-                                    key={index}
-                                    className={offerable ? '' : 'opacity-50'}
-                                    component="div"
-                                    itemActive={groupItem === group}
-                                    itemCount={count}
-                                    itemImage={group.iconUrl}
-                                    itemUniqueNumber={group.stuffData.uniqueNumber}
-                                    onClick={() => offerable && setGroupItem(group)}
-                                    onDoubleClick={() => offer(group, 1)}
+                                return (
+                                    <LayoutGridItem
+                                        key={index}
+                                        className={offerable ? '' : 'opacity-50'}
+                                        component="div"
+                                        itemActive={groupItem === group}
+                                        itemCount={count}
+                                        itemImage={group.iconUrl}
+                                        itemUniqueNumber={group.stuffData.uniqueNumber}
+                                        onClick={() => offerable && setGroupItem(group)}
+                                        onDoubleClick={() => offer(group, 1)}
+                                    >
+                                        {offerable && groupItem === group && canChangeOffer && (
+                                            <Button
+                                                className="bottom-1 inset-e-1 z-[5] min-h-0 text-[8px] px-[2px] py-[1px]"
+                                                position="absolute"
+                                                variant="success"
+                                                onClick={() => offer(group, 1)}
+                                            >
+                                                <FaChevronRight className="fa-icon" />
+                                            </Button>
+                                        )}
+                                    </LayoutGridItem>
+                                );
+                            })}
+                        </AutoGrid>
+                        <Column gap={1}>
+                            <Flex gap={1} alignItems="center">
+                                <NumberInput
+                                    className="octane-wired-trade-amount form-control-sm"
+                                    disabled={!canOffer(groupItem) || !canChangeOffer}
+                                    min={1}
+                                    max={Math.max(1, groupItem?.getUnlockedCount() ?? 1)}
+                                    value={quantity}
+                                    onChange={(event) => setQuantity(event.target.valueAsNumber)}
+                                />
+                                <Button
+                                    className="grow"
+                                    disabled={!canOffer(groupItem) || !canChangeOffer}
+                                    variant="secondary"
+                                    onClick={() => offer(groupItem, quantity)}
                                 >
-                                    {offerable && groupItem === group && canChangeOffer && (
-                                        <Button
-                                            className="bottom-1 inset-e-1 z-[5] min-h-0 text-[8px] px-[2px] py-[1px]"
-                                            position="absolute"
-                                            variant="success"
-                                            onClick={() => offer(group, 1)}
-                                        >
-                                            <FaChevronRight className="fa-icon" />
-                                        </Button>
-                                    )}
-                                </LayoutGridItem>
-                            );
-                        })}
-                    </AutoGrid>
-                    <Column gap={1}>
-                        <Flex gap={1} alignItems="center">
-                            <NumberInput
-                                className="octane-wired-trade-amount form-control-sm"
-                                disabled={!canOffer(groupItem) || !canChangeOffer}
-                                min={1}
-                                max={Math.max(1, groupItem?.getUnlockedCount() ?? 1)}
-                                value={quantity}
-                                onChange={(event) => setQuantity(event.target.valueAsNumber)}
-                            />
-                            <Button
-                                className="grow"
-                                disabled={!canOffer(groupItem) || !canChangeOffer}
-                                variant="secondary"
-                                onClick={() => offer(groupItem, quantity)}
-                            >
-                                {localizeWithFallback('inventory.trading.offer', 'Offer')}
-                            </Button>
-                        </Flex>
-                        <div className="badge bg-muted w-full truncate">{groupItem ? groupItem.name : LocalizeText('catalog_selectproduct')}</div>
-                    </Column>
-                </Flex>
-            </Column>
+                                    {localizeWithFallback('inventory.trading.offer', 'Offer')}
+                                </Button>
+                            </Flex>
+                            <div className="badge bg-muted w-full truncate">{groupItem ? groupItem.name : LocalizeText('catalog_selectproduct')}</div>
+                        </Column>
+                    </Flex>
+                </Column>
 
-            <div className="octane-wired-trade-panel">
-                <div className="octane-wired-trade-container">
-                    <div className="octane-wired-trade-info">{infoText}</div>
-                    <BaseButton
-                        aria-label={localizeWithFallback('inventory.wired_trading.requirements.title', `${ tradeType } requirements`, ['type'], [tradeType])}
-                        aria-pressed={showRequirements}
-                        className={`octane-wired-trade-requirements-button${ highlighted ? ' is-highlighted' : '' }`}
-                        data-highlighted={highlighted ? 'true' : undefined}
-                        onClick={() => setShowRequirements(!showRequirements)}
-                    >
-                        <img alt="" src={requirementsIcon} />
-                    </BaseButton>
+                <div className="octane-wired-trade-panel">
+                    <div className="octane-wired-trade-container">
+                        <div className="octane-wired-trade-info">{infoText}</div>
+                        <BaseButton
+                            aria-label={localizeWithFallback('inventory.wired_trading.requirements.title', `${ tradeType } requirements`, ['type'], [tradeType])}
+                            aria-pressed={showRequirements}
+                            className={`octane-wired-trade-requirements-button${ highlighted ? ' is-highlighted' : '' }`}
+                            data-highlighted={highlighted ? 'true' : undefined}
+                            onClick={() => setShowRequirements(!showRequirements)}
+                        >
+                            <img alt="" src={requirementsIcon} />
+                        </BaseButton>
 
-                    <div className="octane-wired-trade-offers is-own">
-                        <div className="octane-wired-trade-title">{localizeWithFallback('inventory.wired_trading.offering', 'You offer')}</div>
-                        {renderSlots(ownSlots, true)}
-                        {countTexts(offeredItems.length, offeredCredits)}
-                    </div>
+                        <div className="octane-wired-trade-offers is-own">
+                            <div className="octane-wired-trade-title">{localizeWithFallback('inventory.wired_trading.offering', 'You offer')}</div>
+                            {renderSlots(ownSlots, true)}
+                            {countTexts(offeredItems.length, offeredCredits)}
+                        </div>
 
-                    <img alt="" className="octane-wired-trade-lock" src={canChangeOffer ? unlockedIcon : lockedIcon} />
-                    <img alt="" className="octane-wired-trade-splitter" src={paymentOnly ? arrowIcon : splitIcon} />
+                        <img alt="" className="octane-wired-trade-lock" src={canChangeOffer ? unlockedIcon : lockedIcon} />
+                        <img alt="" className="octane-wired-trade-splitter" src={paymentOnly ? arrowIcon : splitIcon} />
 
-                    {paymentOnly
-                        ? (
-                            <div className="octane-wired-trade-offers is-payment">
-                                <img alt="" src={PAYMENT_IMAGES[wiredTradePaymentLayout(layoutType)]} />
-                            </div>
-                        )
-                        : (
-                            <div className="octane-wired-trade-offers is-receive">
-                                <div className="octane-wired-trade-title">{localizeWithFallback('inventory.wired_trading.receiving', 'You receive')}</div>
-                                {renderSlots(rewardSlots, false)}
-                                {countTexts(rewardItems.length, rewardCredits)}
-                            </div>
-                        )}
-
-                    {showRequirements && (
-                        <div className={`octane-wired-trade-bubble${ highlighted ? ' is-highlighted' : '' }`} role="dialog">
-                            <div className="octane-wired-trade-bubble-title">
-                                {localizeWithFallback('inventory.wired_trading.requirements.title', `${ tradeType } requirements`, ['type'], [tradeType])}
-                            </div>
-                            <div className="octane-wired-trade-bubble-columns">
-                                <div className="octane-wired-trade-bubble-column">
-                                    <div className="octane-wired-trade-bubble-heading">
-                                        {localizeWithFallback('inventory.wired_trading.requirements.offering', 'You give:')}
-                                    </div>
-                                    <div className="octane-wired-trade-bubble-definition">
-                                        {hasRules
-                                            ? giveRules.map(renderRule)
-                                            : localizeWithFallback(...(ANY_REQUIREMENT_TEXTS[requirementType] ?? ANY_REQUIREMENT_TEXTS[WIRED_TRADE_REQUIREMENT_ANY]))}
-                                    </div>
+                        {paymentOnly
+                            ? (
+                                <div className="octane-wired-trade-offers is-payment">
+                                    <img alt="" src={PAYMENT_IMAGES[wiredTradePaymentLayout(layoutType)]} />
                                 </div>
-                                {showYouGet && (
+                            )
+                            : (
+                                <div className="octane-wired-trade-offers is-receive">
+                                    <div className="octane-wired-trade-title">{localizeWithFallback('inventory.wired_trading.receiving', 'You receive')}</div>
+                                    {renderSlots(rewardSlots, false)}
+                                    {countTexts(rewardItems.length, rewardCredits)}
+                                </div>
+                            )}
+
+                        {showRequirements && (
+                            <div className={`octane-wired-trade-bubble${ highlighted ? ' is-highlighted' : '' }`} role="dialog">
+                                <div className="octane-wired-trade-bubble-title">
+                                    {localizeWithFallback('inventory.wired_trading.requirements.title', `${ tradeType } requirements`, ['type'], [tradeType])}
+                                </div>
+                                <div className="octane-wired-trade-bubble-columns">
                                     <div className="octane-wired-trade-bubble-column">
                                         <div className="octane-wired-trade-bubble-heading">
-                                            {localizeWithFallback('inventory.wired_trading.requirements.receiving', 'You receive:')}
+                                            {localizeWithFallback('inventory.wired_trading.requirements.offering', 'You give:')}
                                         </div>
                                         <div className="octane-wired-trade-bubble-definition">
-                                            {getRule && getRule.nodes.length > 0 ? renderRule(getRule, 0) : youGetText}
+                                            {hasRules
+                                                ? giveRules.map(renderRule)
+                                                : localizeWithFallback(...(ANY_REQUIREMENT_TEXTS[requirementType] ?? ANY_REQUIREMENT_TEXTS[WIRED_TRADE_REQUIREMENT_ANY]))}
                                         </div>
                                     </div>
+                                    {showYouGet && (
+                                        <div className="octane-wired-trade-bubble-column">
+                                            <div className="octane-wired-trade-bubble-heading">
+                                                {localizeWithFallback('inventory.wired_trading.requirements.receiving', 'You receive:')}
+                                            </div>
+                                            <div className="octane-wired-trade-bubble-definition">
+                                                {getRule && getRule.nodes.length > 0 ? renderRule(getRule, 0) : youGetText}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="octane-wired-trade-bubble-met">
+                                    <span dangerouslySetInnerHTML={{ __html: SanitizeHtml(indicatorText) }} />
+                                    <img alt="" src={canAccept ? requirementsMetIcon : requirementsNotMetIcon} />
+                                </div>
+                                {rulesType === WIRED_TRADE_RULES_AUTO && (
+                                    <div
+                                        className="octane-wired-trade-bubble-note"
+                                        dangerouslySetInnerHTML={{
+                                            __html: SanitizeHtml(localizeWithFallback(
+                                                paymentOnly
+                                                    ? 'inventory.wired_trading.requirements.auto_mode_hint_payment'
+                                                    : 'inventory.wired_trading.requirements.auto_mode_hint_trade',
+                                                `You can keep adding items to run this ${ tradeTypeLower } several times (max ${ autoMultiplierMax }x)`,
+                                                ['amount'],
+                                                [String(autoMultiplierMax)],
+                                            )),
+                                        }}
+                                    />
+                                )}
+                                {paymentOnly && showYouGet && (
+                                    <div
+                                        className="octane-wired-trade-bubble-note is-disclaimer"
+                                        dangerouslySetInnerHTML={{
+                                            __html: SanitizeHtml(localizeWithFallback(
+                                                'inventory.wired_trading.requirements.receive_text_disclaimer',
+                                                'Disclaimer: the creator can write any text in the "you receive" box.',
+                                                ['you_get_name'],
+                                                [localizeWithFallback('inventory.wired_trading.requirements.receiving', 'You receive')],
+                                            )),
+                                        }}
+                                    />
                                 )}
                             </div>
-                            <div className="octane-wired-trade-bubble-met">
-                                <span dangerouslySetInnerHTML={{ __html: SanitizeHtml(indicatorText) }} />
-                                <img alt="" src={canAccept ? requirementsMetIcon : requirementsNotMetIcon} />
-                            </div>
-                            {rulesType === WIRED_TRADE_RULES_AUTO && (
-                                <div
-                                    className="octane-wired-trade-bubble-note"
-                                    dangerouslySetInnerHTML={{
-                                        __html: SanitizeHtml(localizeWithFallback(
-                                            paymentOnly
-                                                ? 'inventory.wired_trading.requirements.auto_mode_hint_payment'
-                                                : 'inventory.wired_trading.requirements.auto_mode_hint_trade',
-                                            `You can keep adding items to run this ${ tradeTypeLower } several times (max ${ autoMultiplierMax }x)`,
-                                            ['amount'],
-                                            [String(autoMultiplierMax)],
-                                        )),
-                                    }}
-                                />
-                            )}
-                            {paymentOnly && showYouGet && (
-                                <div
-                                    className="octane-wired-trade-bubble-note is-disclaimer"
-                                    dangerouslySetInnerHTML={{
-                                        __html: SanitizeHtml(localizeWithFallback(
-                                            'inventory.wired_trading.requirements.receive_text_disclaimer',
-                                            'Disclaimer: the creator can write any text in the "you receive" box.',
-                                            ['you_get_name'],
-                                            [localizeWithFallback('inventory.wired_trading.requirements.receiving', 'You receive')],
-                                        )),
-                                    }}
-                                />
-                            )}
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
 
-                <div className="octane-wired-trade-buttons">
-                    <Button className="octane-wired-trade-accept" disabled={acceptDisabled} variant="secondary" onClick={progress}>
-                        {acceptCaption}
-                    </Button>
-                    {timeLeft && (
-                        <span className="octane-wired-trade-time">
-                            {localizeWithFallback(
-                                'inventory.wired_trading.seconds_left',
-                                `Time left: ${ timeLeft.time }`,
-                                ['minutes', 'seconds', 'time'],
-                                [timeLeft.minutes, timeLeft.seconds, timeLeft.time],
-                            )}
-                        </span>
-                    )}
-                    <Button className="octane-wired-trade-cancel" variant="secondary" onClick={cancel}>
-                        {localizeWithFallback('generic.cancel', 'Cancel')}
-                    </Button>
+                    <div className="octane-wired-trade-buttons">
+                        <Button className="octane-wired-trade-accept" disabled={acceptDisabled} variant="secondary" onClick={progress}>
+                            {acceptCaption}
+                        </Button>
+                        {timeLeft && (
+                            <span className="octane-wired-trade-time">
+                                {localizeWithFallback(
+                                    'inventory.wired_trading.seconds_left',
+                                    `Time left: ${ timeLeft.time }`,
+                                    ['minutes', 'seconds', 'time'],
+                                    [timeLeft.minutes, timeLeft.seconds, timeLeft.time],
+                                )}
+                            </span>
+                        )}
+                        <Button className="octane-wired-trade-cancel" variant="secondary" onClick={cancel}>
+                            {localizeWithFallback('generic.cancel', 'Cancel')}
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

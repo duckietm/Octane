@@ -1,6 +1,7 @@
 import { FC, ReactNode, useState } from 'react';
 import { FaBullhorn, FaFilter, FaShieldAlt, FaSync, FaTools } from 'react-icons/fa';
 import { LocalizeText } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { HousekeepingSubTabs } from '../common/HousekeepingSubTabs';
 import { HousekeepingHotelAlertView } from './HousekeepingHotelAlertView';
 import { HousekeepingMaintenanceView } from './HousekeepingMaintenanceView';
@@ -23,17 +24,19 @@ export const HousekeepingHotelTab: FC = () => {
     const [section, setSection] = useState<HotelToolsSection>('alert');
 
     return (
-        <div className="flex flex-col gap-2">
-            <HousekeepingSubTabs<HotelToolsSection>
-                active={section}
-                tabs={SECTIONS.map(({ id, icon }) => ({ id, icon, label: LocalizeText(`housekeeping.hotel.section.${id}`) }))}
-                onChange={setSection}
-            />
-            {section === 'alert' && <HousekeepingHotelAlertView />}
-            {section === 'maintenance' && <HousekeepingMaintenanceView />}
-            {section === 'reload' && <HousekeepingReloadView />}
-            {section === 'wordfilter' && <HousekeepingWordFilterView />}
-            {section === 'security' && <HousekeepingSecurityView />}
-        </div>
+        <NativeTextTree>
+            <div className="flex flex-col gap-2">
+                <HousekeepingSubTabs<HotelToolsSection>
+                    active={section}
+                    tabs={SECTIONS.map(({ id, icon }) => ({ id, icon, label: LocalizeText(`housekeeping.hotel.section.${id}`) }))}
+                    onChange={setSection}
+                />
+                {section === 'alert' && <HousekeepingHotelAlertView />}
+                {section === 'maintenance' && <HousekeepingMaintenanceView />}
+                {section === 'reload' && <HousekeepingReloadView />}
+                {section === 'wordfilter' && <HousekeepingWordFilterView />}
+                {section === 'security' && <HousekeepingSecurityView />}
+            </div>
+        </NativeTextTree>
     );
 };

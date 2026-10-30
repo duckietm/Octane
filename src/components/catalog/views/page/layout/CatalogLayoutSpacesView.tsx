@@ -3,6 +3,7 @@ import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { IPurchasableOffer, LocalizeText } from '../../../../../api';
 import { AutoGrid, LayoutRoomPreviewerView } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData, useCatalogUiState, useInventoryFurni } from '../../../../../hooks';
 import { CatalogGridOfferView } from '../common/CatalogGridOfferView';
 import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView';
@@ -85,43 +86,45 @@ export const CatalogLayoutSpacesView: FC<CatalogLayoutProps> = (props) => {
     };
 
     return (
-        <div className="octane-catalog-air-spaces">
-            <div className="octane-catalog-air-spaces__preview">
-                {!!roomPreviewer && <LayoutRoomPreviewerView fitParent roomPreviewer={roomPreviewer} />}
-            </div>
-            <div className="octane-catalog-air-spaces__tabs" role="tablist">
-                {SPACES_GROUPS.map((group, index) => (
-                    <BaseButton
-                        key={group.tab}
-                        role="tab"
-                        aria-selected={groupIndex === index}
-                        className={`octane-catalog-air-spaces__tab ${groupIndex === index ? 'is-active' : ''}`}
-                        onClick={() => setGroupIndex(index)}
-                    >
-                        {LocalizeText(`catalog.spaces.tab.${group.tab}`)}
-                    </BaseButton>
-                ))}
-            </div>
-            <div className="octane-catalog-air-spaces__grid">
-                <AutoGrid columnCount={7} columnMinHeight={48} columnMinWidth={48} innerRef={gridRef}>
-                    {offers.map((offer) => (
-                        <CatalogGridOfferView
-                            key={offer.offerId}
-                            itemActive={!!currentOffer && currentOffer === offer}
-                            offer={offer}
-                            selectOffer={choose}
-                            inventoryVisible={inventoryVisible}
-                        />
-                    ))}
-                </AutoGrid>
-            </div>
-            {!!currentOffer && (
-                <div className="octane-catalog-air-spaces__purchase">
-                    <span className="octane-catalog-air-spaces__name">{currentOffer.localizationName}</span>
-                    <CatalogTotalPriceWidget alignItems="end" />
-                    <CatalogPurchaseWidgetView />
+        <NativeTextTree>
+            <div className="octane-catalog-air-spaces">
+                <div className="octane-catalog-air-spaces__preview">
+                    {!!roomPreviewer && <LayoutRoomPreviewerView fitParent roomPreviewer={roomPreviewer} />}
                 </div>
-            )}
-        </div>
+                <div className="octane-catalog-air-spaces__tabs" role="tablist">
+                    {SPACES_GROUPS.map((group, index) => (
+                        <BaseButton
+                            key={group.tab}
+                            role="tab"
+                            aria-selected={groupIndex === index}
+                            className={`octane-catalog-air-spaces__tab ${groupIndex === index ? 'is-active' : ''}`}
+                            onClick={() => setGroupIndex(index)}
+                        >
+                            {LocalizeText(`catalog.spaces.tab.${group.tab}`)}
+                        </BaseButton>
+                    ))}
+                </div>
+                <div className="octane-catalog-air-spaces__grid">
+                    <AutoGrid columnCount={7} columnMinHeight={48} columnMinWidth={48} innerRef={gridRef}>
+                        {offers.map((offer) => (
+                            <CatalogGridOfferView
+                                key={offer.offerId}
+                                itemActive={!!currentOffer && currentOffer === offer}
+                                offer={offer}
+                                selectOffer={choose}
+                                inventoryVisible={inventoryVisible}
+                            />
+                        ))}
+                    </AutoGrid>
+                </div>
+                {!!currentOffer && (
+                    <div className="octane-catalog-air-spaces__purchase">
+                        <span className="octane-catalog-air-spaces__name">{currentOffer.localizationName}</span>
+                        <CatalogTotalPriceWidget alignItems="end" />
+                        <CatalogPurchaseWidgetView />
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

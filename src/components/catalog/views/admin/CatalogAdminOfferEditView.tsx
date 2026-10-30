@@ -13,6 +13,7 @@ import { Checkbox } from '../../../../common/Checkbox';
 import { Select } from '../../../../common/Select';
 import { NumberInput } from '../../../../common/NumberInput';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 export const isCatalogAdminNewOffer = (offer: IPurchasableOffer | null): boolean =>
     offer?.offerId === -1;
@@ -295,207 +296,209 @@ export const CatalogAdminOfferEditView: FC<{}> = () => {
         : null;
 
     return (
-        <CatalogAdminModalView
-            title={isNewOffer ? LocalizeText('catalog.admin.offer.new') : localizeWithFallback('catalog.admin.edit.offer', 'Edit offer')}
-            widthClassName="w-[500px]"
-            onClose={smartSave.requestClose}
-        >
-            <div className="octane-catalog-admin-form">
-                <div className="octane-catalog-admin-form-sheet">
-                    <div className="octane-catalog-admin-form-scroll">
-                        <div className="octane-catalog-admin-form-hero">
-                            <span className="octane-catalog-admin-offer-preview-icon">
-                                {previewIconUrl ? (
-                                    <img
-                                        alt=""
-                                        draggable={false}
-                                        src={previewIconUrl}
-                                        onError={(event) => {
-                                            if (previewFallbackIcon && event.currentTarget.src !== previewFallbackIcon)
-                                                event.currentTarget.src = previewFallbackIcon;
-                                            else event.currentTarget.style.visibility = 'hidden';
-                                        }}
-                                    />
-                                ) : (
-                                    <FaCubes className="octane-catalog-admin-offer-preview-icon-empty" />
-                                )}
-                            </span>
-                            <div className="octane-catalog-admin-offer-preview-info">
-                                <span className="octane-catalog-admin-offer-preview-name" title={previewName}>
-                                    {previewName}
+        <NativeTextTree>
+            <CatalogAdminModalView
+                title={isNewOffer ? LocalizeText('catalog.admin.offer.new') : localizeWithFallback('catalog.admin.edit.offer', 'Edit offer')}
+                widthClassName="w-[500px]"
+                onClose={smartSave.requestClose}
+            >
+                <div className="octane-catalog-admin-form">
+                    <div className="octane-catalog-admin-form-sheet">
+                        <div className="octane-catalog-admin-form-scroll">
+                            <div className="octane-catalog-admin-form-hero">
+                                <span className="octane-catalog-admin-offer-preview-icon">
+                                    {previewIconUrl ? (
+                                        <img
+                                            alt=""
+                                            draggable={false}
+                                            src={previewIconUrl}
+                                            onError={(event) => {
+                                                if (previewFallbackIcon && event.currentTarget.src !== previewFallbackIcon)
+                                                    event.currentTarget.src = previewFallbackIcon;
+                                                else event.currentTarget.style.visibility = 'hidden';
+                                            }}
+                                        />
+                                    ) : (
+                                        <FaCubes className="octane-catalog-admin-offer-preview-icon-empty" />
+                                    )}
                                 </span>
-                                <span className="octane-catalog-admin-offer-preview-sub">
-                                    {isNewOffer
-                                        ? localizeWithFallback('catalog.admin.offer.new', 'New offer')
-                                        : `${localizeWithFallback('catalog.admin.offer.id', 'Offer ID')} #${effectiveOfferId}`}
-                                    {amount > 1 ? ` · x${amount}` : ''}
-                                </span>
-                                <span className="octane-catalog-admin-offer-preview-price">
-                                    <CatalogAdminOfferPriceView credits={costCredits} points={costPoints} pointsType={pointsType} />
-                                    {costCredits <= 0 && costPoints <= 0 && <span className="is-free">{localizeWithFallback('generic.free', 'Free')}</span>}
-                                </span>
+                                <div className="octane-catalog-admin-offer-preview-info">
+                                    <span className="octane-catalog-admin-offer-preview-name" title={previewName}>
+                                        {previewName}
+                                    </span>
+                                    <span className="octane-catalog-admin-offer-preview-sub">
+                                        {isNewOffer
+                                            ? localizeWithFallback('catalog.admin.offer.new', 'New offer')
+                                            : `${localizeWithFallback('catalog.admin.offer.id', 'Offer ID')} #${effectiveOfferId}`}
+                                        {amount > 1 ? ` · x${amount}` : ''}
+                                    </span>
+                                    <span className="octane-catalog-admin-offer-preview-price">
+                                        <CatalogAdminOfferPriceView credits={costCredits} points={costPoints} pointsType={pointsType} />
+                                        {costCredits <= 0 && costPoints <= 0 && <span className="is-free">{localizeWithFallback('generic.free', 'Free')}</span>}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
 
-                        <section className="octane-catalog-admin-form-section">
-                            <div className="octane-catalog-admin-section-title">{localizeWithFallback('catalog.admin.offer.section.details', 'Details')}</div>
-                            <div className="octane-catalog-admin-form-field">
-                                <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.name')}</label>
-                                <input
-                                    ref={catalogNameInputRef}
-                                    aria-invalid={!!smartSave.fieldErrors.catalogName}
-                                    className={inputClass}
-                                    placeholder={localizeWithFallback('catalog.admin.offer.name.placeholder', 'e.g. rare_dragon_lamp')}
-                                    type="text"
-                                    value={catalogName}
-                                    onChange={(e) => setCatalogName(e.target.value)}
-                                />
-                                {smartSave.fieldErrors.catalogName && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.catalogName}</span>}
-                            </div>
-                            <div className="octane-catalog-admin-form-grid is-3col">
-                                <div className="octane-catalog-admin-form-field is-span-3">
-                                    <label className="octane-catalog-admin-label is-field">
-                                        {localizeWithFallback('catalog.admin.offer.item.ids', 'Item IDs')}
-                                    </label>
+                            <section className="octane-catalog-admin-form-section">
+                                <div className="octane-catalog-admin-section-title">{localizeWithFallback('catalog.admin.offer.section.details', 'Details')}</div>
+                                <div className="octane-catalog-admin-form-field">
+                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.name')}</label>
                                     <input
-                                        ref={itemIdsInputRef}
-                                        aria-invalid={!!smartSave.fieldErrors.itemIds}
+                                        ref={catalogNameInputRef}
+                                        aria-invalid={!!smartSave.fieldErrors.catalogName}
                                         className={inputClass}
-                                        placeholder={localizeWithFallback('catalog.admin.offer.item.ids.placeholder', '1234 or 100;200')}
+                                        placeholder={localizeWithFallback('catalog.admin.offer.name.placeholder', 'e.g. rare_dragon_lamp')}
                                         type="text"
-                                        value={itemIds}
-                                        onChange={(e) => setItemIds(e.target.value)}
+                                        value={catalogName}
+                                        onChange={(e) => setCatalogName(e.target.value)}
                                     />
-                                    {smartSave.fieldErrors.itemIds && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.itemIds}</span>}
+                                    {smartSave.fieldErrors.catalogName && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.catalogName}</span>}
                                 </div>
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.quantity')}</label>
-                                    <NumberInput ref={limitedStackInputRef} aria-invalid={!!smartSave.fieldErrors.limitedStack} className={inputClass} min={1} value={amount} onChange={(e) => setAmount(parseInt(e.target.value) || 1)} />
+                                <div className="octane-catalog-admin-form-grid is-3col">
+                                    <div className="octane-catalog-admin-form-field is-span-3">
+                                        <label className="octane-catalog-admin-label is-field">
+                                            {localizeWithFallback('catalog.admin.offer.item.ids', 'Item IDs')}
+                                        </label>
+                                        <input
+                                            ref={itemIdsInputRef}
+                                            aria-invalid={!!smartSave.fieldErrors.itemIds}
+                                            className={inputClass}
+                                            placeholder={localizeWithFallback('catalog.admin.offer.item.ids.placeholder', '1234 or 100;200')}
+                                            type="text"
+                                            value={itemIds}
+                                            onChange={(e) => setItemIds(e.target.value)}
+                                        />
+                                        {smartSave.fieldErrors.itemIds && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.itemIds}</span>}
+                                    </div>
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.quantity')}</label>
+                                        <NumberInput ref={limitedStackInputRef} aria-invalid={!!smartSave.fieldErrors.limitedStack} className={inputClass} min={1} value={amount} onChange={(e) => setAmount(parseInt(e.target.value) || 1)} />
+                                    </div>
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
+                                        <NumberInput className={inputClass} value={orderNumber} onChange={(e) => setOrderNumber(parseInt(e.target.value) || 0)} />
+                                    </div>
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.offer.id', 'Offer ID')}</label>
+                                        <NumberInput className={inputClass} value={offerId} onChange={(e) => setOfferIdGroup(parseInt(e.target.value) || -1)} />
+                                    </div>
                                 </div>
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.order')}</label>
-                                    <NumberInput className={inputClass} value={orderNumber} onChange={(e) => setOrderNumber(parseInt(e.target.value) || 0)} />
-                                </div>
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{localizeWithFallback('catalog.admin.offer.id', 'Offer ID')}</label>
-                                    <NumberInput className={inputClass} value={offerId} onChange={(e) => setOfferIdGroup(parseInt(e.target.value) || -1)} />
-                                </div>
-                            </div>
-                        </section>
+                            </section>
 
-                        <section className="octane-catalog-admin-form-section">
-                            <div className="octane-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.prices')}</div>
-                            <div className="octane-catalog-admin-form-grid is-3col">
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.credits')}</label>
-                                    <NumberInput className={inputClass} min={0} value={costCredits} onChange={(e) => setCostCredits(parseInt(e.target.value) || 0)} />
+                            <section className="octane-catalog-admin-form-section">
+                                <div className="octane-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.prices')}</div>
+                                <div className="octane-catalog-admin-form-grid is-3col">
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.credits')}</label>
+                                        <NumberInput className={inputClass} min={0} value={costCredits} onChange={(e) => setCostCredits(parseInt(e.target.value) || 0)} />
+                                    </div>
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points')}</label>
+                                        <NumberInput className={inputClass} min={0} value={costPoints} onChange={(e) => setCostPoints(parseInt(e.target.value) || 0)} />
+                                    </div>
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points.type')}</label>
+                                        <Select className={inputClass} value={pointsType} onChange={(e) => setPointsType(parseInt(e.target.value))}>
+                                            {currencyTypes.map((type) => (
+                                                <option key={type} value={type}>
+                                                    {localizeWithFallback(`purse.seasonal.currency.${type}`, `Currency ${type}`)} ({type})
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </div>
                                 </div>
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points')}</label>
-                                    <NumberInput className={inputClass} min={0} value={costPoints} onChange={(e) => setCostPoints(parseInt(e.target.value) || 0)} />
-                                </div>
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.points.type')}</label>
-                                    <Select className={inputClass} value={pointsType} onChange={(e) => setPointsType(parseInt(e.target.value))}>
-                                        {currencyTypes.map((type) => (
-                                            <option key={type} value={type}>
-                                                {localizeWithFallback(`purse.seasonal.currency.${type}`, `Currency ${type}`)} ({type})
-                                            </option>
-                                        ))}
-                                    </Select>
-                                </div>
-                            </div>
-                        </section>
+                            </section>
 
-                        <section className="octane-catalog-admin-form-section">
-                            <div className="octane-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.options')}</div>
-                            <div className="octane-catalog-admin-form-grid is-3col">
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.club.only')}</label>
-                                    <Select className={inputClass} value={clubOnly} onChange={(e) => setClubOnly(e.target.value)}>
-                                        <option value="0">{localizeWithFallback('generic.no', 'No')}</option>
-                                        <option value="1">{localizeWithFallback('generic.yes', 'Yes')}</option>
-                                    </Select>
-                                </div>
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">
-                                        {localizeWithFallback('catalog.admin.offer.limited.stack', 'Limited stack')}
-                                    </label>
-                                    <NumberInput className={inputClass} min={0} value={limitedStack} onChange={(e) => setLimitedStack(parseInt(e.target.value) || 0)} />
-                                    {smartSave.fieldErrors.limitedStack && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.limitedStack}</span>}
-                                </div>
-                                {!isNewOffer && (
+                            <section className="octane-catalog-admin-form-section">
+                                <div className="octane-catalog-admin-section-title">{LocalizeText('catalog.admin.offer.options')}</div>
+                                <div className="octane-catalog-admin-form-grid is-3col">
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.club.only')}</label>
+                                        <Select className={inputClass} value={clubOnly} onChange={(e) => setClubOnly(e.target.value)}>
+                                            <option value="0">{localizeWithFallback('generic.no', 'No')}</option>
+                                            <option value="1">{localizeWithFallback('generic.yes', 'Yes')}</option>
+                                        </Select>
+                                    </div>
                                     <div className="octane-catalog-admin-form-field">
                                         <label className="octane-catalog-admin-label is-field">
-                                            {localizeWithFallback('catalog.admin.offer.limited.sold', 'Already sold')}
+                                            {localizeWithFallback('catalog.admin.offer.limited.stack', 'Limited stack')}
                                         </label>
-                                        <NumberInput className={inputClass} readOnly value={limitedSells} />
+                                        <NumberInput className={inputClass} min={0} value={limitedStack} onChange={(e) => setLimitedStack(parseInt(e.target.value) || 0)} />
+                                        {smartSave.fieldErrors.limitedStack && <span className="octane-catalog-admin-field-error">{smartSave.fieldErrors.limitedStack}</span>}
                                     </div>
-                                )}
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.extradata')}</label>
-                                    <input
-                                        className={inputClass}
-                                        placeholder={LocalizeText('catalog.admin.offer.extradata')}
-                                        type="text"
-                                        value={extradata}
-                                        onChange={(e) => setExtradata(e.target.value)}
-                                    />
+                                    {!isNewOffer && (
+                                        <div className="octane-catalog-admin-form-field">
+                                            <label className="octane-catalog-admin-label is-field">
+                                                {localizeWithFallback('catalog.admin.offer.limited.sold', 'Already sold')}
+                                            </label>
+                                            <NumberInput className={inputClass} readOnly value={limitedSells} />
+                                        </div>
+                                    )}
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">{LocalizeText('catalog.admin.offer.extradata')}</label>
+                                        <input
+                                            className={inputClass}
+                                            placeholder={LocalizeText('catalog.admin.offer.extradata')}
+                                            type="text"
+                                            value={extradata}
+                                            onChange={(e) => setExtradata(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="octane-catalog-admin-form-field">
+                                        <label className="octane-catalog-admin-label is-field">
+                                            {localizeWithFallback('catalog.admin.offer.song.id', 'Song ID')}
+                                        </label>
+                                        <NumberInput className={inputClass} min={0} value={songId} onChange={(e) => setSongId(parseInt(e.target.value) || 0)} />
+                                    </div>
                                 </div>
-                                <div className="octane-catalog-admin-form-field">
-                                    <label className="octane-catalog-admin-label is-field">
-                                        {localizeWithFallback('catalog.admin.offer.song.id', 'Song ID')}
-                                    </label>
-                                    <NumberInput className={inputClass} min={0} value={songId} onChange={(e) => setSongId(parseInt(e.target.value) || 0)} />
-                                </div>
-                            </div>
-                            <label className="octane-catalog-admin-form-toggle">
-                                <Checkbox checked={haveOffer === '1'} id="haveOffer" onCheckedChange={(nextChecked) => setHaveOffer(nextChecked ? '1' : '0')} />
-                                <span>{LocalizeText('catalog.admin.offer.have.offer')}</span>
-                            </label>
-                        </section>
-                    </div>
-
-                    <div className={`octane-catalog-admin-savebar is-${smartSave.status}`}>
-                        <div className="octane-catalog-admin-savebar-status" aria-live="polite">
-                            <span>{validationError || smartSave.message || interaction.message || saveStatusText}</span>
-                            <small>Ctrl+S</small>
+                                <label className="octane-catalog-admin-form-toggle">
+                                    <Checkbox checked={haveOffer === '1'} id="haveOffer" onCheckedChange={(nextChecked) => setHaveOffer(nextChecked ? '1' : '0')} />
+                                    <span>{LocalizeText('catalog.admin.offer.have.offer')}</span>
+                                </label>
+                            </section>
                         </div>
-                        <div className="octane-catalog-admin-savebar-actions">
-                            {!isNewOffer && (
-                                <BaseButton className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
-                                    <FaTrash className="text-[8px]" /> {LocalizeText('catalog.admin.delete')}
+
+                        <div className={`octane-catalog-admin-savebar is-${smartSave.status}`}>
+                            <div className="octane-catalog-admin-savebar-status" aria-live="polite">
+                                <span>{validationError || smartSave.message || interaction.message || saveStatusText}</span>
+                                <small>Ctrl+S</small>
+                            </div>
+                            <div className="octane-catalog-admin-savebar-actions">
+                                {!isNewOffer && (
+                                    <BaseButton className="octane-catalog-admin-button is-danger" type="button" onClick={handleDelete}>
+                                        <FaTrash className="text-[8px]" /> {LocalizeText('catalog.admin.delete')}
+                                    </BaseButton>
+                                )}
+                                <BaseButton
+                                    className="octane-catalog-admin-button is-muted"
+                                    disabled={!smartSave.isDirty || !!smartSave.inFlight}
+                                    type="button"
+                                    onClick={smartSave.reset}
+                                >
+                                    <FaUndo className="text-[8px]" /> Reset
                                 </BaseButton>
-                            )}
-                            <BaseButton
-                                className="octane-catalog-admin-button is-muted"
-                                disabled={!smartSave.isDirty || !!smartSave.inFlight}
-                                type="button"
-                                onClick={smartSave.reset}
-                            >
-                                <FaUndo className="text-[8px]" /> Reset
-                            </BaseButton>
-                            <BaseButton
-                                className="octane-catalog-admin-button is-muted"
-                                disabled={!canSubmit}
-                                type="button"
-                                onClick={() => handleSave(true)}
-                            >
-                                Save and close
-                            </BaseButton>
-                            <BaseButton
-                                className="octane-catalog-admin-button is-primary"
-                                disabled={!canSubmit}
-                                type="button"
-                                onClick={() => handleSave(false)}
-                            >
-                                {smartSave.status === 'saving' ? <FaSpinner className="text-[8px] animate-spin" /> : <FaSave className="text-[8px]" />}{' '}
-                                {isNewOffer ? LocalizeText('catalog.admin.create') : LocalizeText('catalog.admin.save')}
-                            </BaseButton>
+                                <BaseButton
+                                    className="octane-catalog-admin-button is-muted"
+                                    disabled={!canSubmit}
+                                    type="button"
+                                    onClick={() => handleSave(true)}
+                                >
+                                    Save and close
+                                </BaseButton>
+                                <BaseButton
+                                    className="octane-catalog-admin-button is-primary"
+                                    disabled={!canSubmit}
+                                    type="button"
+                                    onClick={() => handleSave(false)}
+                                >
+                                    {smartSave.status === 'saving' ? <FaSpinner className="text-[8px] animate-spin" /> : <FaSave className="text-[8px]" />}{' '}
+                                    {isNewOffer ? LocalizeText('catalog.admin.create') : LocalizeText('catalog.admin.save')}
+                                </BaseButton>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </CatalogAdminModalView>
+            </CatalogAdminModalView>
+        </NativeTextTree>
     );
 };

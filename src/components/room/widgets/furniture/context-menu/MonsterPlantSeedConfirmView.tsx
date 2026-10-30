@@ -2,6 +2,7 @@ import { IFurnitureData, RoomObjectCategory } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { FurniCategory, GetFurnitureDataForRoomObject, LocalizeText } from '../../../../../api';
 import { Button, Column, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useRoom } from '../../../../../hooks';
 
 interface MonsterPlantSeedConfirmViewProps {
@@ -53,31 +54,33 @@ export const MonsterPlantSeedConfirmView: FC<MonsterPlantSeedConfirmViewProps> =
     if (mode === MODE_DEFAULT) return null;
 
     return (
-        <OctaneCardView className="octane-use-product-confirmation">
-            <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.plant_seed', ['name'], [furniData.name])} onCloseClick={onClose} />
-            <OctaneCardContentView center>
-                <div className="flex gap-2 overflow-hidden">
-                    <div className="flex flex-col">
-                        <div className="product-preview">
-                            <div className="monsterplant-image" />
+        <NativeTextTree>
+            <OctaneCardView className="octane-use-product-confirmation">
+                <OctaneCardHeaderView headerText={LocalizeText('useproduct.widget.title.plant_seed', ['name'], [furniData.name])} onCloseClick={onClose} />
+                <OctaneCardContentView center>
+                    <div className="flex gap-2 overflow-hidden">
+                        <div className="flex flex-col">
+                            <div className="product-preview">
+                                <div className="monsterplant-image" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-between overflow-auto">
+                            <Column gap={2}>
+                                <Text>{LocalizeText('useproduct.widget.text.plant_seed', ['productName'], [furniData.name])}</Text>
+                                <Text>{LocalizeText('useproduct.widget.info.plant_seed')}</Text>
+                            </Column>
+                            <div className="flex items-center justify-between">
+                                <Button variant="danger" onClick={onClose}>
+                                    {LocalizeText('useproduct.widget.cancel')}
+                                </Button>
+                                <Button variant="success" onClick={useProduct}>
+                                    {LocalizeText('widget.monsterplant_seed.button.use')}
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                    <div className="flex flex-col justify-between overflow-auto">
-                        <Column gap={2}>
-                            <Text>{LocalizeText('useproduct.widget.text.plant_seed', ['productName'], [furniData.name])}</Text>
-                            <Text>{LocalizeText('useproduct.widget.info.plant_seed')}</Text>
-                        </Column>
-                        <div className="flex items-center justify-between">
-                            <Button variant="danger" onClick={onClose}>
-                                {LocalizeText('useproduct.widget.cancel')}
-                            </Button>
-                            <Button variant="success" onClick={useProduct}>
-                                {LocalizeText('widget.monsterplant_seed.button.use')}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { localizeWithFallback } from '../../../../api';
 import { OctaneCardHeaderView, OctaneCardView } from '../../../../common';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useEpicPopup } from '../../../../hooks/friends/useEpicPopup';
 
 /**
@@ -15,17 +16,19 @@ export const EpicPopupView: FC = () => {
     if (!imageUrl) return null;
 
     return (
-        <OctaneCardView key={imageUrl} classNames={['octane-epic-popup']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="epic-popup">
-            <OctaneCardHeaderView headerText="" onCloseClick={close} />
-            <div className="octane-epic-popup-content" data-testid="epic-popup">
-                <div className="octane-epic-popup-image">
-                    <img src={imageUrl} alt="" draggable={false} />
+        <NativeTextTree>
+            <OctaneCardView key={imageUrl} classNames={['octane-epic-popup']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="epic-popup">
+                <OctaneCardHeaderView headerText="" onCloseClick={close} />
+                <div className="octane-epic-popup-content" data-testid="epic-popup">
+                    <div className="octane-epic-popup-image">
+                        <img src={imageUrl} alt="" draggable={false} />
+                    </div>
+                    <div className="octane-epic-popup-separator" />
+                    <BaseButton className="octane-epic-popup-close" onClick={close}>
+                        {localizeWithFallback('alert.close.button', 'Close')}
+                    </BaseButton>
                 </div>
-                <div className="octane-epic-popup-separator" />
-                <BaseButton className="octane-epic-popup-close" onClick={close}>
-                    {localizeWithFallback('alert.close.button', 'Close')}
-                </BaseButton>
-            </div>
-        </OctaneCardView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

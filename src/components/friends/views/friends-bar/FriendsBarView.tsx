@@ -10,6 +10,7 @@ import { useFriendBarNotificationsStore } from '../../../../hooks/friends/friend
 import { FriendBarItemView } from './FriendBarItemView';
 import { FriendBarRequestsView } from './FriendBarRequestsView';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const AIR_TAB_WIDTH = 127;
 const AIR_TAB_SPACING = 3;
@@ -92,61 +93,63 @@ export const FriendBarView: FC<{ onlineFriends: MessengerFriend[]; requestsCount
     const findFriendsSlotCount = Math.max(0, Math.min(AIR_MIN_VISIBLE_SLOTS, maxVisible) - visibleFriends.length);
 
     return (
-        <motion.div
-            ref={elementRef}
-            className="friend-bar flex h-[40px] items-center gap-[3px] px-[2px] py-[3px]"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-        >
-            {maxVisible > 0 && requestsCount > 0 && (
-                <motion.div variants={itemVariants}>
-                    <FriendBarRequestsView />
-                </motion.div>
-            )}
-            {showArrows && (
-                <motion.div variants={itemVariants}>
-                    <BaseButton
-                        type="button"
-                        disabled={!canScrollLeft}
-                        aria-label={localizeWithFallback('friendbar.scroll.left', 'Previous friends')}
-                        className={`friend-bar-button left ${!canScrollLeft ? 'is-disabled' : ''}`}
-                        onClick={() => setIndexOffset(safeOffset - 1)}
-                    >
-                        <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
-                        <img src={friendsBrowseArrowLeft} alt="" className="friend-bar-browse-arrow" />
-                    </BaseButton>
-                </motion.div>
-            )}
-
-            <AnimatePresence mode="popLayout">
-                {visibleFriends.map((friend) => (
-                    <motion.div key={friend.id} variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
-                        <FriendBarItemView friend={friend} />
+        <NativeTextTree>
+            <motion.div
+                ref={elementRef}
+                className="friend-bar flex h-[40px] items-center gap-[3px] px-[2px] py-[3px]"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+            >
+                {maxVisible > 0 && requestsCount > 0 && (
+                    <motion.div variants={itemVariants}>
+                        <FriendBarRequestsView />
                     </motion.div>
-                ))}
-                {Array.from({ length: findFriendsSlotCount }, (_, index) => (
-                    <motion.div key={`friend-search-${index}`} variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
-                        <FriendBarItemView friend={null} />
+                )}
+                {showArrows && (
+                    <motion.div variants={itemVariants}>
+                        <BaseButton
+                            type="button"
+                            disabled={!canScrollLeft}
+                            aria-label={localizeWithFallback('friendbar.scroll.left', 'Previous friends')}
+                            className={`friend-bar-button left ${!canScrollLeft ? 'is-disabled' : ''}`}
+                            onClick={() => setIndexOffset(safeOffset - 1)}
+                        >
+                            <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
+                            <img src={friendsBrowseArrowLeft} alt="" className="friend-bar-browse-arrow" />
+                        </BaseButton>
                     </motion.div>
-                ))}
-            </AnimatePresence>
+                )}
 
-            {showArrows && (
-                <motion.div variants={itemVariants}>
-                    <BaseButton
-                        type="button"
-                        disabled={!canScrollRight}
-                        aria-label={localizeWithFallback('friendbar.scroll.right', 'Next friends')}
-                        className={`friend-bar-button right ${!canScrollRight ? 'is-disabled' : ''}`}
-                        onClick={() => setIndexOffset(safeOffset + 1)}
-                    >
-                        <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
-                        <img src={friendsBrowseArrowRight} alt="" className="friend-bar-browse-arrow" />
-                    </BaseButton>
-                </motion.div>
-            )}
-        </motion.div>
+                <AnimatePresence mode="popLayout">
+                    {visibleFriends.map((friend) => (
+                        <motion.div key={friend.id} variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
+                            <FriendBarItemView friend={friend} />
+                        </motion.div>
+                    ))}
+                    {Array.from({ length: findFriendsSlotCount }, (_, index) => (
+                        <motion.div key={`friend-search-${index}`} variants={itemVariants} layout initial="hidden" animate="visible" exit="exit">
+                            <FriendBarItemView friend={null} />
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+
+                {showArrows && (
+                    <motion.div variants={itemVariants}>
+                        <BaseButton
+                            type="button"
+                            disabled={!canScrollRight}
+                            aria-label={localizeWithFallback('friendbar.scroll.right', 'Next friends')}
+                            className={`friend-bar-button right ${!canScrollRight ? 'is-disabled' : ''}`}
+                            onClick={() => setIndexOffset(safeOffset + 1)}
+                        >
+                            <img src={friendsBrowseBg} alt="" className="friend-bar-browse-bg" />
+                            <img src={friendsBrowseArrowRight} alt="" className="friend-bar-browse-arrow" />
+                        </BaseButton>
+                    </motion.div>
+                )}
+            </motion.div>
+        </NativeTextTree>
     );
 };

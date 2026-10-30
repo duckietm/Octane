@@ -7,6 +7,7 @@ import { getNextEmptyCameraSlot, willFillLastCameraSlot } from '../CameraAirUtil
 import { CameraCenteredText, CameraNativeText } from './CameraNativeText';
 import { BaseButton } from '../../../common/BaseButton';
 import { Hint } from '../../../common/Tooltip';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 export interface CameraWidgetCaptureViewProps {
     onClose: () => void;
@@ -231,98 +232,100 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = (props)
     const hasPictures = cameraRoll.some((picture) => !!picture);
 
     return (
-        <DraggableWindow>
-            <Column center className="octane-camera-capture" gap={0}>
-                <div className="octane-camera-capture__body drag-handler">
-                    <div className="octane-camera-capture__title">
-                        <CameraCenteredText
-                            background={0x000000}
-                            color={0xffffff}
-                            text={LocalizeText('camera.interface.title')}
-                            textStyle="u_frame_title"
-                            width={340}
-                        />
-                    </div>
-                    <BaseButton type="button" className="octane-camera-capture__help" aria-label={LocalizeText('generic.help')} onClick={() => CreateLinkEvent('habbopages/camera')} />
-                    <BaseButton type="button" className="octane-camera-capture__close" aria-label={LocalizeText('generic.close')} onClick={onClose} />
-                    <div className="octane-camera-viewfinder">
-                        {!selectedPicture && (
-                            <>
-                                <canvas ref={elementRef} className="octane-camera-viewfinder__fallback" width={320} height={320} />
-                                <video ref={videoRef} className="octane-camera-viewfinder__stream" aria-hidden="true" muted playsInline />
-                            </>
-                        )}
-                        {selectedPicture && <img alt="" className="octane-camera-viewfinder__photo" src={selectedPicture.imageUrl} />}
-                    </div>
-                    {!selectedPicture && <div className="octane-camera-capture__crosshair" aria-hidden="true" />}
-                    <div ref={flashRef} className="octane-camera-capture__flash" aria-hidden="true" />
-                    {selectedPicture && (
-                        <div className="octane-camera-capture__preview-actions">
-                            {/* A real <BaseButton>: the drag handle lets only native controls take the mouse. */}
-                            <Hint content={LocalizeText('camera.editor.button.tooltip')}>
-                                <BaseButton
-                                    className="habbo-btn-primary octane-camera-capture__editor-button"
-                                    aria-label={LocalizeText('camera.editor.button.tooltip')}
-                                    type="button"
-                                    onClick={onEdit}
-                                >
-                                    <CameraNativeText
-                                        background={0x000000}
-                                        color={0xffffff}
-                                        style={{ mixBlendMode: 'screen' }}
-                                        text={LocalizeText('camera.editor.button.text')}
-                                        textStyle="button_shiny_bold"
-                                    />
-                                </BaseButton>
-                            </Hint>
+        <NativeTextTree>
+            <DraggableWindow>
+                <Column center className="octane-camera-capture" gap={0}>
+                    <div className="octane-camera-capture__body drag-handler">
+                        <div className="octane-camera-capture__title">
+                            <CameraCenteredText
+                                background={0x000000}
+                                color={0xffffff}
+                                text={LocalizeText('camera.interface.title')}
+                                textStyle="u_frame_title"
+                                width={340}
+                            />
                         </div>
-                    )}
-                    <Hint content={LocalizeText('camera.take.photo.button.tooltip')}>
-                        <BaseButton
-                            type="button"
-                            className="octane-camera-capture__shutter"
-                            aria-label={LocalizeText('camera.take.photo.button.tooltip')}
-                            onClick={takePicture}
-                        />
-                    </Hint>
-                </div>
-                <div className={`octane-camera-roll${hasPictures ? '' : ' octane-camera-roll--hidden'}`} aria-hidden={!hasPictures}>
-                    {Array.from({ length: CAMERA_ROLL_LIMIT }, (_, index) => {
-                        const picture = cameraRoll[index];
-                        const isActive = index === activeSlotIndex;
-
-                        return (
-                            <div key={index} className={`octane-camera-roll__slot${isActive ? ' octane-camera-roll__slot--active' : ''}`}>
-                                <BaseButton
-                                    type="button"
-                                    className="octane-camera-roll__slot-button"
-                                    aria-label={picture ? LocalizeText('camera.editor.button.tooltip') : LocalizeText('camera.take.photo.button.tooltip')}
-                                    onClick={() => {
-                                        if (isTakingPictureRef.current) return;
-
-                                        setActivePictureSlotIndex(index);
-                                        setSelectedPictureIndex(picture ? index : -1);
-                                    }}
-                                >
-                                    {picture && <img alt="" src={picture.imageUrl} />}
-                                </BaseButton>
-                                {picture && selectedPictureIndex === index && (
-                                    <Hint content={LocalizeText('camera.delete.button.text')}>
-                                        <BaseButton
-                                            type="button"
-                                            className="octane-camera-roll__delete"
-                                            aria-label={LocalizeText('camera.delete.button.text')}
-                                            onClick={() => {
-                                                if (!isTakingPictureRef.current) onDelete();
-                                            }}
+                        <BaseButton type="button" className="octane-camera-capture__help" aria-label={LocalizeText('generic.help')} onClick={() => CreateLinkEvent('habbopages/camera')} />
+                        <BaseButton type="button" className="octane-camera-capture__close" aria-label={LocalizeText('generic.close')} onClick={onClose} />
+                        <div className="octane-camera-viewfinder">
+                            {!selectedPicture && (
+                                <>
+                                    <canvas ref={elementRef} className="octane-camera-viewfinder__fallback" width={320} height={320} />
+                                    <video ref={videoRef} className="octane-camera-viewfinder__stream" aria-hidden="true" muted playsInline />
+                                </>
+                            )}
+                            {selectedPicture && <img alt="" className="octane-camera-viewfinder__photo" src={selectedPicture.imageUrl} />}
+                        </div>
+                        {!selectedPicture && <div className="octane-camera-capture__crosshair" aria-hidden="true" />}
+                        <div ref={flashRef} className="octane-camera-capture__flash" aria-hidden="true" />
+                        {selectedPicture && (
+                            <div className="octane-camera-capture__preview-actions">
+                                {/* A real <BaseButton>: the drag handle lets only native controls take the mouse. */}
+                                <Hint content={LocalizeText('camera.editor.button.tooltip')}>
+                                    <BaseButton
+                                        className="habbo-btn-primary octane-camera-capture__editor-button"
+                                        aria-label={LocalizeText('camera.editor.button.tooltip')}
+                                        type="button"
+                                        onClick={onEdit}
+                                    >
+                                        <CameraNativeText
+                                            background={0x000000}
+                                            color={0xffffff}
+                                            style={{ mixBlendMode: 'screen' }}
+                                            text={LocalizeText('camera.editor.button.text')}
+                                            textStyle="button_shiny_bold"
                                         />
-                                    </Hint>
-                                )}
+                                    </BaseButton>
+                                </Hint>
                             </div>
-                        );
-                    })}
-                </div>
-            </Column>
-        </DraggableWindow>
+                        )}
+                        <Hint content={LocalizeText('camera.take.photo.button.tooltip')}>
+                            <BaseButton
+                                type="button"
+                                className="octane-camera-capture__shutter"
+                                aria-label={LocalizeText('camera.take.photo.button.tooltip')}
+                                onClick={takePicture}
+                            />
+                        </Hint>
+                    </div>
+                    <div className={`octane-camera-roll${hasPictures ? '' : ' octane-camera-roll--hidden'}`} aria-hidden={!hasPictures}>
+                        {Array.from({ length: CAMERA_ROLL_LIMIT }, (_, index) => {
+                            const picture = cameraRoll[index];
+                            const isActive = index === activeSlotIndex;
+
+                            return (
+                                <div key={index} className={`octane-camera-roll__slot${isActive ? ' octane-camera-roll__slot--active' : ''}`}>
+                                    <BaseButton
+                                        type="button"
+                                        className="octane-camera-roll__slot-button"
+                                        aria-label={picture ? LocalizeText('camera.editor.button.tooltip') : LocalizeText('camera.take.photo.button.tooltip')}
+                                        onClick={() => {
+                                            if (isTakingPictureRef.current) return;
+
+                                            setActivePictureSlotIndex(index);
+                                            setSelectedPictureIndex(picture ? index : -1);
+                                        }}
+                                    >
+                                        {picture && <img alt="" src={picture.imageUrl} />}
+                                    </BaseButton>
+                                    {picture && selectedPictureIndex === index && (
+                                        <Hint content={LocalizeText('camera.delete.button.text')}>
+                                            <BaseButton
+                                                type="button"
+                                                className="octane-camera-roll__delete"
+                                                aria-label={LocalizeText('camera.delete.button.text')}
+                                                onClick={() => {
+                                                    if (!isTakingPictureRef.current) onDelete();
+                                                }}
+                                            />
+                                        </Hint>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </Column>
+            </DraggableWindow>
+        </NativeTextTree>
     );
 };

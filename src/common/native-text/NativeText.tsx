@@ -1,7 +1,7 @@
-import { CSSProperties, FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { CSSProperties, FC, useLayoutEffect, useRef, useState } from 'react';
 import { compositeRetainedToOpaque, resolveLineMetrics } from './NativeTextRenderer';
 import { renderCanvasSpacedText, supportsCanvasSpacedText } from './CanvasSpacedText';
-import { loadNativeFont, measureNativeText, NativeFontStyle, supportsNativeText, unpremultiplyPixels } from './NativeFont';
+import { loadNativeFont, measureNativeText, NativeFontStyle, peekNativeFont, supportsNativeText, unpremultiplyPixels } from './NativeFont';
 import { useNativeTextSampling, useNativeTextScale } from './NativeTextScale';
 import { NativeTextStyleName, nativeTextStyles } from './NativeTextStyles';
 
@@ -104,13 +104,13 @@ export const NativeText: FC<NativeTextProps> = ({
     const scale = nativeResolution ? 1 : displayScale;
     const onRasterRef = useRef(onRaster);
 
-    // Refreshed before the render effect below runs, like the other callback refs of the code base (never written during render).
+    // Refreshed before the render effect below runs (declared first, so it runs first), like the other callback refs of the code base.
     useLayoutEffect(() =>
     {
         onRasterRef.current = onRaster;
     });
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         let disposed = false;
         setSize(null);
         onRasterRef.current?.(null);
@@ -157,7 +157,8 @@ export const NativeText: FC<NativeTextProps> = ({
                 }
             }
 
-            const loaded = await loadNativeFont(fontStyle);
+            // An already loaded font draws without awaiting, inside this layout effect, so a remounted label never shows a frame of browser text.
+            const loaded = peekNativeFont(fontStyle) ?? (await loadNativeFont(fontStyle));
             if (disposed || !supportsNativeText(loaded.font, text.replace(/[\r\n]/g, ''))) return;
             const measure = (value: string) => measureNativeText(loaded.font, value, fontStyle);
             const width = maxWidth === undefined ? Infinity : Math.max(1, maxWidth - 4);
@@ -242,7 +243,7 @@ export const NativeText: FC<NativeTextProps> = ({
                 style={
                     size
                         ? { position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'pre' }
-                        : { lineHeight: 'normal', whiteSpace: 'pre-wrap' }
+                        : { font: 'inherit', color: 'inherit', lineHeight: 'normal', whiteSpace: 'pre-wrap' }
                 }
             >
                 {text}

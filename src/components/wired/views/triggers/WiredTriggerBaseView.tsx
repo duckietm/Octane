@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren, ReactNode } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { WiredBaseView } from '../WiredBaseView';
 
 export interface WiredTriggerBaseViewProps {
@@ -33,19 +34,21 @@ export const WiredTriggerBaseView: FC<PropsWithChildren<WiredTriggerBaseViewProp
     const onSave = () => save && save();
 
     return (
-        <WiredBaseView
-            hasSpecialInput={hasSpecialInput}
-            requiresFurni={requiresFurni}
-            save={onSave}
-            validate={validate}
-            wiredType="trigger"
-            footer={footer}
-            footerCollapsible={footerCollapsible}
-            selectionPreview={selectionPreview}
-            widthModifier={widthModifier}
-            allowScrolling={allowScrolling}
-        >
-            {children}
-        </WiredBaseView>
+        <NativeTextTree>
+            <WiredBaseView
+                hasSpecialInput={hasSpecialInput}
+                requiresFurni={requiresFurni}
+                save={onSave}
+                validate={validate}
+                wiredType="trigger"
+                footer={footer}
+                footerCollapsible={footerCollapsible}
+                selectionPreview={selectionPreview}
+                widthModifier={widthModifier}
+                allowScrolling={allowScrolling}
+            >
+                {children}
+            </WiredBaseView>
+        </NativeTextTree>
     );
 };

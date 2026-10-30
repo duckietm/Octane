@@ -7,6 +7,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotFurniSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MAX_DISTANCE = 20;
 
@@ -57,42 +58,44 @@ export const WiredActionRelativeMoveView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
-        >
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.movement.horizontal.selection')}</Text>
-                <div className="flex gap-2">
-                    {HORIZONTAL_OPTIONS.map((option) => {
-                        return (
-                            <label key={option.value} className="flex items-center gap-1">
-                                <Radio checked={horizontalDirection === option.value} name="relativeMoveHorizontal" onCheckedChange={() => setHorizontalDirection(option.value)} />
-                                <Text>{option.icon}</Text>
-                            </label>
-                        );
-                    })}
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                footer={<WiredSourcesSelector showFurni={true} furniSource={furniSource} onChangeFurni={setFurniSource} />}
+            >
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.movement.horizontal.selection')}</Text>
+                    <div className="flex gap-2">
+                        {HORIZONTAL_OPTIONS.map((option) => {
+                            return (
+                                <label key={option.value} className="flex items-center gap-1">
+                                    <Radio checked={horizontalDirection === option.value} name="relativeMoveHorizontal" onCheckedChange={() => setHorizontalDirection(option.value)} />
+                                    <Text>{option.icon}</Text>
+                                </label>
+                            );
+                        })}
+                    </div>
+                    <Text>{LocalizeText('wiredfurni.params.movement.horizontal.distance', ['distance'], [horizontalDistance.toString()])}</Text>
+                    <Slider max={MAX_DISTANCE} min={0} step={1} value={horizontalDistance} onChange={(value) => setHorizontalDistance(value as number)} />
                 </div>
-                <Text>{LocalizeText('wiredfurni.params.movement.horizontal.distance', ['distance'], [horizontalDistance.toString()])}</Text>
-                <Slider max={MAX_DISTANCE} min={0} step={1} value={horizontalDistance} onChange={(value) => setHorizontalDistance(value as number)} />
-            </div>
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.movement.vertical.selection')}</Text>
-                <div className="flex gap-2">
-                    {VERTICAL_OPTIONS.map((option) => {
-                        return (
-                            <label key={option.value} className="flex items-center gap-1">
-                                <Radio checked={verticalDirection === option.value} name="relativeMoveVertical" onCheckedChange={() => setVerticalDirection(option.value)} />
-                                <Text>{option.icon}</Text>
-                            </label>
-                        );
-                    })}
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.movement.vertical.selection')}</Text>
+                    <div className="flex gap-2">
+                        {VERTICAL_OPTIONS.map((option) => {
+                            return (
+                                <label key={option.value} className="flex items-center gap-1">
+                                    <Radio checked={verticalDirection === option.value} name="relativeMoveVertical" onCheckedChange={() => setVerticalDirection(option.value)} />
+                                    <Text>{option.icon}</Text>
+                                </label>
+                            );
+                        })}
+                    </div>
+                    <Text>{LocalizeText('wiredfurni.params.movement.vertical.distance', ['distance'], [verticalDistance.toString()])}</Text>
+                    <Slider max={MAX_DISTANCE} min={0} step={1} value={verticalDistance} onChange={(value) => setVerticalDistance(value as number)} />
                 </div>
-                <Text>{LocalizeText('wiredfurni.params.movement.vertical.distance', ['distance'], [verticalDistance.toString()])}</Text>
-                <Slider max={MAX_DISTANCE} min={0} step={1} value={verticalDistance} onChange={(value) => setVerticalDistance(value as number)} />
-            </div>
-        </WiredActionBaseView>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

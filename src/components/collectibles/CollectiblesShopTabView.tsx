@@ -9,6 +9,7 @@ import { useNotification } from '../../hooks/notification';
 import emeraldIcon from '../../assets/images/collectibles/pursearea_tiny_emerald_icon.png';
 import { CollectibleProductImageView } from './CollectibleProductImageView';
 import { CollectiblesLoadingView } from './CollectiblesLoadingView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** `ShopTab`: the shop's categories, the offers of the picked one, and the picked offer's preview and price. */
 export const CollectiblesShopTabView: FC = () => {
@@ -54,86 +55,88 @@ export const CollectiblesShopTabView: FC = () => {
     };
 
     return (
-        <div className="octane-collectibles-split" data-testid="collectibles-shop">
-            <div className="octane-collectibles-side">
-                <div className="octane-collectibles-navigation is-tall">
-                    {groups.map((entry) => (
-                        <ToggleButton
-                            key={entry.categoryKey}
-                            className={`octane-collectibles-navigation-item${group?.categoryKey === entry.categoryKey ? ' is-active' : ''}`}
-                            pressed={group?.categoryKey === entry.categoryKey}
-                            onClick={() => {
-                                setCategoryKey(entry.categoryKey);
-                                setSelectedCode(null);
-                            }}
-                        >
-                            <span className="octane-collectibles-navigation-title">
-                                {localizeWithFallback(entry.categoryKey, SHOP_CATEGORY_FALLBACKS[entry.categoryKey] ?? entry.categoryKey)}
-                            </span>
-                        </ToggleButton>
-                    ))}
-                </div>
-            </div>
-            <div className="octane-collectibles-collection">
-                <div className="octane-collectibles-preview is-shop">
-                    <div className="octane-collectibles-preview-star" />
-                    <div className="octane-collectibles-preview-image">{offer && <CollectibleProductImageView product={offer.product} />}</div>
-                    {offer && (
-                        <>
-                            <div className="octane-collectibles-preview-name" data-testid="collectibles-shop-name">
-                                {getCollectibleProductName(offer.product)}
-                            </div>
-                            <div className="octane-collectibles-preview-info is-shop">
-                                <div>
-                                    <span>{localizeWithFallback('collectibles.item.type', 'Type')}</span>
-                                    <span>
-                                        {localizeWithFallback(
-                                            productTypeKey(offer.product.productTypeId),
-                                            PRODUCT_TYPE_FALLBACKS[productTypeKey(offer.product.productTypeId)] ?? ''
-                                        )}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span>{localizeWithFallback('collectibles.item.rarity', 'Rarity')}</span>
-                                    <span>{offer.product.rarity}</span>
-                                </div>
-                                <div>
-                                    <span>{localizeWithFallback('collectibles.item.xp', 'XP')}</span>
-                                    <span>{offer.product.score}</span>
-                                </div>
-                            </div>
-                            <div className="octane-collectibles-buy-bar">
-                                {offer.mintLimit > 0 && (
-                                    <span className="octane-collectibles-mint-limit" data-testid="collectibles-mint-limit">
-                                        {`${offer.mintedCount}/${offer.mintLimit}`}
-                                    </span>
-                                )}
-                                <span className="octane-collectibles-price">
-                                    {offer.emeraldPrice}
-                                    <img alt="" draggable={false} src={emeraldIcon} />
+        <NativeTextTree>
+            <div className="octane-collectibles-split" data-testid="collectibles-shop">
+                <div className="octane-collectibles-side">
+                    <div className="octane-collectibles-navigation is-tall">
+                        {groups.map((entry) => (
+                            <ToggleButton
+                                key={entry.categoryKey}
+                                className={`octane-collectibles-navigation-item${group?.categoryKey === entry.categoryKey ? ' is-active' : ''}`}
+                                pressed={group?.categoryKey === entry.categoryKey}
+                                onClick={() => {
+                                    setCategoryKey(entry.categoryKey);
+                                    setSelectedCode(null);
+                                }}
+                            >
+                                <span className="octane-collectibles-navigation-title">
+                                    {localizeWithFallback(entry.categoryKey, SHOP_CATEGORY_FALLBACKS[entry.categoryKey] ?? entry.categoryKey)}
                                 </span>
-                                <BaseButton className="octane-collectibles-button is-green" disabled={!(offer.mintLimit === -1 || offer.mintedCount < offer.mintLimit) || purchasePending} onClick={buy}>
-                                    {localizeWithFallback('generic.buy', 'Buy')}
-                                </BaseButton>
-                            </div>
-                        </>
-                    )}
+                            </ToggleButton>
+                        ))}
+                    </div>
                 </div>
-                <div className="octane-collectibles-item-grid">
-                    {group?.offers.map((entry) => (
-                        <ToggleButton
-                            key={entry.productCode}
-                            aria-label={getCollectibleProductName(entry.product)}
-                            className={`octane-collectibles-item${offer?.productCode === entry.productCode ? ' is-selected' : ''}`}
-                            pressed={offer?.productCode === entry.productCode}
-                            onClick={() => setSelectedCode(entry.productCode)}
-                        >
-                            <CollectibleProductImageView icon product={entry.product} />
-                            <span className="octane-collectibles-item-amount">{entry.emeraldPrice}</span>
-                        </ToggleButton>
-                    ))}
+                <div className="octane-collectibles-collection">
+                    <div className="octane-collectibles-preview is-shop">
+                        <div className="octane-collectibles-preview-star" />
+                        <div className="octane-collectibles-preview-image">{offer && <CollectibleProductImageView product={offer.product} />}</div>
+                        {offer && (
+                            <>
+                                <div className="octane-collectibles-preview-name" data-testid="collectibles-shop-name">
+                                    {getCollectibleProductName(offer.product)}
+                                </div>
+                                <div className="octane-collectibles-preview-info is-shop">
+                                    <div>
+                                        <span>{localizeWithFallback('collectibles.item.type', 'Type')}</span>
+                                        <span>
+                                            {localizeWithFallback(
+                                                productTypeKey(offer.product.productTypeId),
+                                                PRODUCT_TYPE_FALLBACKS[productTypeKey(offer.product.productTypeId)] ?? ''
+                                            )}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span>{localizeWithFallback('collectibles.item.rarity', 'Rarity')}</span>
+                                        <span>{offer.product.rarity}</span>
+                                    </div>
+                                    <div>
+                                        <span>{localizeWithFallback('collectibles.item.xp', 'XP')}</span>
+                                        <span>{offer.product.score}</span>
+                                    </div>
+                                </div>
+                                <div className="octane-collectibles-buy-bar">
+                                    {offer.mintLimit > 0 && (
+                                        <span className="octane-collectibles-mint-limit" data-testid="collectibles-mint-limit">
+                                            {`${offer.mintedCount}/${offer.mintLimit}`}
+                                        </span>
+                                    )}
+                                    <span className="octane-collectibles-price">
+                                        {offer.emeraldPrice}
+                                        <img alt="" draggable={false} src={emeraldIcon} />
+                                    </span>
+                                    <BaseButton className="octane-collectibles-button is-green" disabled={!(offer.mintLimit === -1 || offer.mintedCount < offer.mintLimit) || purchasePending} onClick={buy}>
+                                        {localizeWithFallback('generic.buy', 'Buy')}
+                                    </BaseButton>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <div className="octane-collectibles-item-grid">
+                        {group?.offers.map((entry) => (
+                            <ToggleButton
+                                key={entry.productCode}
+                                aria-label={getCollectibleProductName(entry.product)}
+                                className={`octane-collectibles-item${offer?.productCode === entry.productCode ? ' is-selected' : ''}`}
+                                pressed={offer?.productCode === entry.productCode}
+                                onClick={() => setSelectedCode(entry.productCode)}
+                            >
+                                <CollectibleProductImageView icon product={entry.product} />
+                                <span className="octane-collectibles-item-amount">{entry.emeraldPrice}</span>
+                            </ToggleButton>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -18,6 +18,7 @@ import {
     SendMessageComposer
 } from '../../../../../../api';
 import { BaseButton, ClassicScrollAreaView } from '../../../../../../common';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useNotification, usePurse } from '../../../../../../hooks';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { CatalogLayoutMarketplaceItemView, PUBLIC_OFFER } from './CatalogLayoutMarketplaceItemView';
@@ -255,51 +256,55 @@ export const CatalogLayoutMarketplacePublicItemsView: FC<CatalogLayoutMarketplac
     // AIR hides the list (window child 0) under the details panel instead of rebuilding it, so the
     // search form keeps its state and does not search again on the way back.
     return (
-        <div className="octane-marketplace-page is-public">
-            {detailsOffer && <CatalogLayoutMarketplaceOfferDetailsView offerData={detailsOffer} onBack={() => setDetailsOffer(null)} onBuy={purchaseItem} />}
-            <div className="octane-marketplace-main" style={{ display: detailsOffer ? 'none' : undefined }}>
-                <div className="octane-marketplace-selector" role="tablist">
-                    {SEARCH_TABS.map((tab) => (
-                        <BaseButton
-                            key={tab.type}
-                            aria-selected={searchType === tab.type}
-                            className={`octane-marketplace-group-button ${tab.position}${searchType === tab.type ? ' is-selected' : ''}`}
-                            role="tab"
-                            onClick={() => selectSearchType(tab.type)}
-                        >
-                            {localizeWithFallback(tab.key, tab.fallback)}
-                        </BaseButton>
-                    ))}
-                </div>
-                <div className="octane-marketplace-search-container">
-                    <SearchFormView
-                        key={searchType}
-                        combineUniques={combineUniques}
-                        form={form}
-                        searchType={searchType}
-                        sortType={sortType}
-                        sortTypes={sortTypes}
-                        onCombineUniquesChange={changeCombineUniques}
-                        onFormChange={setForm}
-                        onSearch={() => doSearch()}
-                        onSortChange={changeSort}
-                    />
-                </div>
-                <span className="octane-marketplace-status" data-testid="marketplace-status" role="status">
-                    {status}
-                </span>
-                <ClassicScrollAreaView className="octane-marketplace-list" contentClassName="octane-marketplace-list-content">
-                    {Array.from(offers.values()).map((entry) => (
-                        <CatalogLayoutMarketplaceItemView
-                            key={entry.offerId}
-                            offerData={entry}
-                            type={PUBLIC_OFFER}
-                            onClick={purchaseItem}
-                            onMore={setDetailsOffer}
+        <NativeTextTree>
+            <div className="octane-marketplace-page is-public">
+                {detailsOffer && (
+                    <CatalogLayoutMarketplaceOfferDetailsView offerData={detailsOffer} onBack={() => setDetailsOffer(null)} onBuy={purchaseItem} />
+                )}
+                <div className="octane-marketplace-main" style={{ display: detailsOffer ? 'none' : undefined }}>
+                    <div className="octane-marketplace-selector" role="tablist">
+                        {SEARCH_TABS.map((tab) => (
+                            <BaseButton
+                                key={tab.type}
+                                aria-selected={searchType === tab.type}
+                                className={`octane-marketplace-group-button ${tab.position}${searchType === tab.type ? ' is-selected' : ''}`}
+                                role="tab"
+                                onClick={() => selectSearchType(tab.type)}
+                            >
+                                {localizeWithFallback(tab.key, tab.fallback)}
+                            </BaseButton>
+                        ))}
+                    </div>
+                    <div className="octane-marketplace-search-container">
+                        <SearchFormView
+                            key={searchType}
+                            combineUniques={combineUniques}
+                            form={form}
+                            searchType={searchType}
+                            sortType={sortType}
+                            sortTypes={sortTypes}
+                            onCombineUniquesChange={changeCombineUniques}
+                            onFormChange={setForm}
+                            onSearch={() => doSearch()}
+                            onSortChange={changeSort}
                         />
-                    ))}
-                </ClassicScrollAreaView>
+                    </div>
+                    <span className="octane-marketplace-status" data-testid="marketplace-status" role="status">
+                        {status}
+                    </span>
+                    <ClassicScrollAreaView className="octane-marketplace-list" contentClassName="octane-marketplace-list-content">
+                        {Array.from(offers.values()).map((entry) => (
+                            <CatalogLayoutMarketplaceItemView
+                                key={entry.offerId}
+                                offerData={entry}
+                                type={PUBLIC_OFFER}
+                                onClick={purchaseItem}
+                                onMore={setDetailsOffer}
+                            />
+                        ))}
+                    </ClassicScrollAreaView>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

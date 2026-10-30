@@ -1,6 +1,7 @@
 import { WiredActionDefinition } from '@octane/renderer';
 import { CSSProperties, FC, PropsWithChildren, ReactNode, useEffect } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredBaseView } from '../WiredBaseView';
 
@@ -44,22 +45,24 @@ export const WiredExtraBaseView: FC<PropsWithChildren<WiredExtraBaseViewProps>> 
     }, [trigger, setActionDelay]);
 
     return (
-        <WiredBaseView
-            hasSpecialInput={hasSpecialInput}
-            requiresFurni={requiresFurni}
-            save={save}
-            validate={validate}
-            wiredType="extra"
-            cardStyle={cardStyle}
-            footer={footer}
-            footerCollapsible={footerCollapsible}
-            selectionPreview={selectionPreview}
-            widthModifier={widthModifier}
-            allowScrolling={allowScrolling}
-            showSelection={showSelection}
-            confirmSave={confirmSave}
-        >
-            {children}
-        </WiredBaseView>
+        <NativeTextTree>
+            <WiredBaseView
+                hasSpecialInput={hasSpecialInput}
+                requiresFurni={requiresFurni}
+                save={save}
+                validate={validate}
+                wiredType="extra"
+                cardStyle={cardStyle}
+                footer={footer}
+                footerCollapsible={footerCollapsible}
+                selectionPreview={selectionPreview}
+                widthModifier={widthModifier}
+                allowScrolling={allowScrolling}
+                showSelection={showSelection}
+                confirmSave={confirmSave}
+            >
+                {children}
+            </WiredBaseView>
+        </NativeTextTree>
     );
 };

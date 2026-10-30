@@ -5,6 +5,7 @@ import { Button, Text } from '../../../../common';
 import { useWired, useWiredTools } from '../../../../hooks';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** The official category checkboxes (AIR {@code §_-jt§}), in int param order. */
 export const WIRED_ADDON_SHARING_CATEGORIES = [
@@ -50,25 +51,27 @@ const WiredExtraVariableAddonSharingView: FC<WiredExtraVariableAddonSharingViewP
     const canWrite = !!roomSettings?.canModify;
 
     return (
-        <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save }>
-            <div className="flex flex-col gap-2">
-                <Text small className="whitespace-pre-line">{ LocalizeText(usageInfoKey).replace(/\\n/g, '\n') }</Text>
-                <div className="octane-wired__divider" />
-                <div className="flex flex-col gap-1">
-                    <Text bold>{ LocalizeText('wiredfurni.params.variables.addon_sharing.categories') }</Text>
-                    { WIRED_ADDON_SHARING_CATEGORIES.map((key, index) => (
-                        <label key={ key } className="flex cursor-pointer items-center gap-1">
-                            <Checkbox checked={ categories[index] } onCheckedChange={ nextChecked => toggle(index, nextChecked) } />
-                            <Text small>{ LocalizeText(key) }</Text>
-                        </label>
-                    )) }
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={ true } requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } save={ save }>
+                <div className="flex flex-col gap-2">
+                    <Text small className="whitespace-pre-line">{ LocalizeText(usageInfoKey).replace(/\\n/g, '\n') }</Text>
+                    <div className="octane-wired__divider" />
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{ LocalizeText('wiredfurni.params.variables.addon_sharing.categories') }</Text>
+                        { WIRED_ADDON_SHARING_CATEGORIES.map((key, index) => (
+                            <label key={ key } className="flex cursor-pointer items-center gap-1">
+                                <Checkbox checked={ categories[index] } onCheckedChange={ nextChecked => toggle(index, nextChecked) } />
+                                <Text small>{ LocalizeText(key) }</Text>
+                            </label>
+                        )) }
+                    </div>
+                    { synchronize &&
+                        <Button disabled={ !canWrite || !trigger } variant="secondary" onClick={ () => trigger && SendMessageComposer(new WiredAddonShareSynchronizeComposer(trigger.id)) }>
+                            { LocalizeText('wiredfurni.params.variables.addon_share.synchronize') }
+                        </Button> }
                 </div>
-                { synchronize &&
-                    <Button disabled={ !canWrite || !trigger } variant="secondary" onClick={ () => trigger && SendMessageComposer(new WiredAddonShareSynchronizeComposer(trigger.id)) }>
-                        { LocalizeText('wiredfurni.params.variables.addon_share.synchronize') }
-                    </Button> }
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };
 

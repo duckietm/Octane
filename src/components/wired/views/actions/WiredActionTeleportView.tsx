@@ -8,6 +8,7 @@ import { slotFurniSource, slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Teleport (official [fast]), our walk to furni (laid out the same), move furni to user (official: no
@@ -45,45 +46,47 @@ export const WiredActionTeleportView: FC<{}> = () => {
     const usersTitle = isFurniToUserEffect ? 'wiredfurni.params.sources.furni.title.mv_user' : isUserToFurniEffect ? 'wiredfurni.params.sources.furni.title.mv_user2' : undefined;
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            // Official: move furni to user and move user to furni keep the advanced section open.
-            footerCollapsible={!isFurniToUserEffect && !isUserToFurniEffect}
-            footer={
-                <WiredSourcesSelector
-                    showFurni={true}
-                    showUsers={true}
-                    furniSource={furniSource}
-                    furniTitle={furniTitle}
-                    userSource={userSource}
-                    usersTitle={usersTitle}
-                    onChangeFurni={setFurniSource}
-                    onChangeUsers={setUserSource}
-                />
-            }
-        >
-            {isTeleportEffect && (
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.teleport.options')}</Text>
-                    <label className="flex items-center gap-1">
-                        <Checkbox checked={fastTeleport} onCheckedChange={(nextChecked) => setFastTeleport(nextChecked)} />
-                        <Text>{LocalizeText('wiredfurni.params.teleport.options.0')}</Text>
-                    </label>
-                </div>
-            )}
-            {isUserToFurniEffect && (
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.user_move.walkmode')}</Text>
-                    {[0, 1, 2].map((option) => (
-                        <label key={option} className="flex items-center gap-1 cursor-pointer">
-                            <Radio checked={walkMode === option} name="userWalkMode" onCheckedChange={() => setWalkMode(option)} />
-                            <Text>{LocalizeText(`wiredfurni.params.user_move.walkmode.${option}`)}</Text>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                // Official: move furni to user and move user to furni keep the advanced section open.
+                footerCollapsible={!isFurniToUserEffect && !isUserToFurniEffect}
+                footer={
+                    <WiredSourcesSelector
+                        showFurni={true}
+                        showUsers={true}
+                        furniSource={furniSource}
+                        furniTitle={furniTitle}
+                        userSource={userSource}
+                        usersTitle={usersTitle}
+                        onChangeFurni={setFurniSource}
+                        onChangeUsers={setUserSource}
+                    />
+                }
+            >
+                {isTeleportEffect && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.teleport.options')}</Text>
+                        <label className="flex items-center gap-1">
+                            <Checkbox checked={fastTeleport} onCheckedChange={(nextChecked) => setFastTeleport(nextChecked)} />
+                            <Text>{LocalizeText('wiredfurni.params.teleport.options.0')}</Text>
                         </label>
-                    ))}
-                </div>
-            )}
-        </WiredActionBaseView>
+                    </div>
+                )}
+                {isUserToFurniEffect && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.user_move.walkmode')}</Text>
+                        {[0, 1, 2].map((option) => (
+                            <label key={option} className="flex items-center gap-1 cursor-pointer">
+                                <Radio checked={walkMode === option} name="userWalkMode" onCheckedChange={() => setWalkMode(option)} />
+                                <Text>{LocalizeText(`wiredfurni.params.user_move.walkmode.${option}`)}</Text>
+                            </label>
+                        ))}
+                    </div>
+                )}
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

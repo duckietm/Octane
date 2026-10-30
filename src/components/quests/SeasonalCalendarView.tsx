@@ -41,6 +41,7 @@ import { BaseButton } from '../../common/BaseButton';
 import { getSeasonalCalendarSettings, getSeasonalQuestRoomIds, usePurse, useQuests, useRoom, useSeasonalCalendar } from '../../hooks';
 import { OctaneCard } from '../../layout';
 import { QuestEntryView } from './QuestEntryView';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 /** Hold an arrow and the strip keeps moving, one day per step (Calendar.update). */
 const SCROLL_REPEAT_MS = 150;
@@ -89,21 +90,23 @@ const SeasonalArrow: FC<{ direction: 'back' | 'next'; active: boolean; onStep: (
     };
 
     return (
-        <BaseButton
-            type="button"
-            className={`octane-seasonal-arrow octane-seasonal-arrow-${direction}${pressed ? ' octane-seasonal-arrow-pressed' : ''}`}
-            aria-label={direction === 'back' ? 'Previous days' : 'Next days'}
-            disabled={!active}
-            onPointerDown={onPointerDown}
-            onPointerUp={stop}
-            onPointerLeave={() => {
-                setHover(false);
-                stop();
-            }}
-            onPointerEnter={() => setHover(true)}
-        >
-            <img src={image} alt="" draggable={false} />
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton
+                type="button"
+                className={`octane-seasonal-arrow octane-seasonal-arrow-${direction}${pressed ? ' octane-seasonal-arrow-pressed' : ''}`}
+                aria-label={direction === 'back' ? 'Previous days' : 'Next days'}
+                disabled={!active}
+                onPointerDown={onPointerDown}
+                onPointerUp={stop}
+                onPointerLeave={() => {
+                    setHover(false);
+                    stop();
+                }}
+                onPointerEnter={() => setHover(true)}
+            >
+                <img src={image} alt="" draggable={false} />
+            </BaseButton>
+        </NativeTextTree>
     );
 };
 
@@ -131,32 +134,34 @@ const SeasonalDayView: FC<{
     useEffect(() => setImageFailed(false), [imageHost, day.day, day.state]);
 
     return (
-        <div className={`octane-seasonal-day octane-seasonal-day-state-${day.state}`} style={style}>
-            {!imageFailed && (
-                <img
-                    className="octane-seasonal-day-image"
-                    src={`${imageHost}${getSeasonalDayImageName(day.day, day.state)}.png`}
-                    alt=""
-                    draggable={false}
-                    onError={() => setImageFailed(true)}
-                />
-            )}
-            <div className="octane-seasonal-day-indicator-edge" />
-            <div className={`octane-seasonal-day-indicator${flashing ? ' octane-seasonal-day-indicator-flash' : ''}`}>
-                <span className="octane-seasonal-day-indicator-text">{label}</span>
-                {day.state === SEASONAL_DAY_COMPLETED && <img className="octane-seasonal-day-indicator-status" src={questCompleteIcon} alt="" />}
+        <NativeTextTree>
+            <div className={`octane-seasonal-day octane-seasonal-day-state-${day.state}`} style={style}>
+                {!imageFailed && (
+                    <img
+                        className="octane-seasonal-day-image"
+                        src={`${imageHost}${getSeasonalDayImageName(day.day, day.state)}.png`}
+                        alt=""
+                        draggable={false}
+                        onError={() => setImageFailed(true)}
+                    />
+                )}
+                <div className="octane-seasonal-day-indicator-edge" />
+                <div className={`octane-seasonal-day-indicator${flashing ? ' octane-seasonal-day-indicator-flash' : ''}`}>
+                    <span className="octane-seasonal-day-indicator-text">{label}</span>
+                    {day.state === SEASONAL_DAY_COMPLETED && <img className="octane-seasonal-day-indicator-status" src={questCompleteIcon} alt="" />}
+                </div>
+                {clickable && (
+                    <BaseButton
+                        type="button"
+                        className="octane-seasonal-day-region"
+                        aria-label={label}
+                        onClick={() => onOpen(day.quest)}
+                        onPointerEnter={() => setHover(true)}
+                        onPointerLeave={() => setHover(false)}
+                    />
+                )}
             </div>
-            {clickable && (
-                <BaseButton
-                    type="button"
-                    className="octane-seasonal-day-region"
-                    aria-label={label}
-                    onClick={() => onOpen(day.quest)}
-                    onPointerEnter={() => setHover(true)}
-                    onPointerLeave={() => setHover(false)}
-                />
-            )}
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -184,29 +189,31 @@ const SeasonalCatalogPromoView: FC<{ currency: number }> = ({ currency }) => {
     }, [offer, product, productType]);
 
     return (
-        <div className="octane-seasonal-promo">
-            <div className="octane-seasonal-promo-preview">
-                {product && (productType === 's' || productType === 'i') && (
-                    <LayoutFurniImageView productType={product.productType} productClassId={product.furniClassId} extraData={product.extraParam} direction={2} />
-                )}
-            </div>
-            <div className="octane-seasonal-promo-info">
-                <div className="octane-seasonal-promo-header">{localizeWithFallback('quests.seasonalcalendar.promo.header', 'Offer of the day')}</div>
-                <div className="octane-seasonal-promo-name">{productName}</div>
-                <div className="octane-seasonal-promo-balance">
-                    <span>{localizeWithFallback('quests.seasonalcalendar.promo.balance', 'You have: %amount%', ['amount'], [String(balance)])}</span>
-                    <LayoutCurrencyIcon type={currency} />
+        <NativeTextTree>
+            <div className="octane-seasonal-promo">
+                <div className="octane-seasonal-promo-preview">
+                    {product && (productType === 's' || productType === 'i') && (
+                        <LayoutFurniImageView productType={product.productType} productClassId={product.furniClassId} extraData={product.extraParam} direction={2} />
+                    )}
                 </div>
-                <Button
-                    className="octane-seasonal-promo-buy"
-                    variant="success"
-                    disabled={!offer}
-                    onClick={() => offer && CreateLinkEvent(`catalog/open/offerId/${offer.offerId}`)}
-                >
-                    {localizeWithFallback('quests.seasonalcalendar.promo.buy', 'To the Shop')}
-                </Button>
+                <div className="octane-seasonal-promo-info">
+                    <div className="octane-seasonal-promo-header">{localizeWithFallback('quests.seasonalcalendar.promo.header', 'Offer of the day')}</div>
+                    <div className="octane-seasonal-promo-name">{productName}</div>
+                    <div className="octane-seasonal-promo-balance">
+                        <span>{localizeWithFallback('quests.seasonalcalendar.promo.balance', 'You have: %amount%', ['amount'], [String(balance)])}</span>
+                        <LayoutCurrencyIcon type={currency} />
+                    </div>
+                    <Button
+                        className="octane-seasonal-promo-buy"
+                        variant="success"
+                        disabled={!offer}
+                        onClick={() => offer && CreateLinkEvent(`catalog/open/offerId/${offer.offerId}`)}
+                    >
+                        {localizeWithFallback('quests.seasonalcalendar.promo.buy', 'To the Shop')}
+                    </Button>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -218,28 +225,30 @@ const SeasonalRareTeaserView: FC<{ highestDay: number; imageHost: string }> = ({
     const { locked, daysUntilNext } = getRareTeaserState(days.slice(0, 3), highestDay);
 
     return (
-        <div className="octane-seasonal-teaser">
-            <div className="octane-seasonal-teaser-header">{localizeWithFallback('quests.seasonalcalendar.rareteaser.header', 'Unlocked items')}</div>
-            <div className="octane-seasonal-teaser-rares">
-                {locked.map((isLocked, index) => (
-                    <BaseButton
-                        key={index}
-                        type="button"
-                        className={`octane-seasonal-teaser-rare${isLocked ? ' octane-seasonal-teaser-rare-locked' : ''}`}
-                        disabled={isLocked || !pages[index]}
-                        aria-label={isLocked ? 'Locked' : (pages[index] ?? '')}
-                        onClick={() => pages[index] && CreateLinkEvent(`catalog/open/${pages[index]}`)}
-                    >
-                        {isLocked ? <span className="octane-seasonal-teaser-lock" /> : images[index] && <img src={`${imageHost}${images[index]}.png`} alt="" draggable={false} />}
-                    </BaseButton>
-                ))}
-            </div>
-            {daysUntilNext !== -1 && (
-                <div className="octane-seasonal-teaser-info">
-                    {localizeWithFallback('quests.seasonalcalendar.rareteaser.info', '%days% days until the next unlock.', ['days'], [String(daysUntilNext)])}
+        <NativeTextTree>
+            <div className="octane-seasonal-teaser">
+                <div className="octane-seasonal-teaser-header">{localizeWithFallback('quests.seasonalcalendar.rareteaser.header', 'Unlocked items')}</div>
+                <div className="octane-seasonal-teaser-rares">
+                    {locked.map((isLocked, index) => (
+                        <BaseButton
+                            key={index}
+                            type="button"
+                            className={`octane-seasonal-teaser-rare${isLocked ? ' octane-seasonal-teaser-rare-locked' : ''}`}
+                            disabled={isLocked || !pages[index]}
+                            aria-label={isLocked ? 'Locked' : (pages[index] ?? '')}
+                            onClick={() => pages[index] && CreateLinkEvent(`catalog/open/${pages[index]}`)}
+                        >
+                            {isLocked ? <span className="octane-seasonal-teaser-lock" /> : images[index] && <img src={`${imageHost}${images[index]}.png`} alt="" draggable={false} />}
+                        </BaseButton>
+                    ))}
                 </div>
-            )}
-        </div>
+                {daysUntilNext !== -1 && (
+                    <div className="octane-seasonal-teaser-info">
+                        {localizeWithFallback('quests.seasonalcalendar.rareteaser.info', '%days% days until the next unlock.', ['days'], [String(daysUntilNext)])}
+                    </div>
+                )}
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -295,69 +304,71 @@ export const SeasonalCalendarView: FC<{}> = () => {
     const hasRoomLink = getSeasonalQuestRoomIds(prefix).length > 0;
 
     return (
-        <>
-            {isVisible && (
-                <OctaneCard className="octane-seasonal-calendar" uniqueKey="seasonal-calendar" windowPosition={DraggableWindowPosition.CENTER}>
-                    <OctaneCard.Header headerText={localizeWithFallback(`quests.${prefix}.title`, localizeWithFallback('quests.list.caption', 'Quests'))} onCloseClick={() => close && close()} />
-                    <OctaneCard.Content className="octane-seasonal-calendar-content">
-                        <div className="octane-seasonal-strip-window">
-                            <div className="octane-seasonal-strip" style={{ transform: `translateX(-${currentOffset * SEASONAL_ENTITY_SPACING}px)` }}>
-                                {Array.from({ length: backgroundCount }, (_, index) => (
-                                    <img
-                                        key={`background-${index}`}
-                                        className="octane-seasonal-background"
-                                        style={{ left: `${index * SEASONAL_BACKGROUND_WIDTH}px` }}
-                                        src={`${imageHost}background_${index + 1}.png`}
-                                        alt=""
-                                        draggable={false}
-                                        onError={(event) => {
-                                            event.currentTarget.style.visibility = 'hidden';
-                                        }}
-                                    />
-                                ))}
-                                {days.map((day) => (
-                                    <SeasonalDayView key={day.day} day={day} imageHost={imageHost} prefix={prefix} flashing={day.day === flashingDay} onOpen={setDetailsQuest} />
-                                ))}
+        <NativeTextTree>
+            <>
+                {isVisible && (
+                    <OctaneCard className="octane-seasonal-calendar" uniqueKey="seasonal-calendar" windowPosition={DraggableWindowPosition.CENTER}>
+                        <OctaneCard.Header headerText={localizeWithFallback(`quests.${prefix}.title`, localizeWithFallback('quests.list.caption', 'Quests'))} onCloseClick={() => close && close()} />
+                        <OctaneCard.Content className="octane-seasonal-calendar-content">
+                            <div className="octane-seasonal-strip-window">
+                                <div className="octane-seasonal-strip" style={{ transform: `translateX(-${currentOffset * SEASONAL_ENTITY_SPACING}px)` }}>
+                                    {Array.from({ length: backgroundCount }, (_, index) => (
+                                        <img
+                                            key={`background-${index}`}
+                                            className="octane-seasonal-background"
+                                            style={{ left: `${index * SEASONAL_BACKGROUND_WIDTH}px` }}
+                                            src={`${imageHost}background_${index + 1}.png`}
+                                            alt=""
+                                            draggable={false}
+                                            onError={(event) => {
+                                                event.currentTarget.style.visibility = 'hidden';
+                                            }}
+                                        />
+                                    ))}
+                                    {days.map((day) => (
+                                        <SeasonalDayView key={day.day} day={day} imageHost={imageHost} prefix={prefix} flashing={day.day === flashingDay} onOpen={setDetailsQuest} />
+                                    ))}
+                                </div>
+                                <img className="octane-seasonal-stripe-mask octane-seasonal-stripe-mask-left" src={stripeMaskLeft} alt="" draggable={false} />
+                                <img className="octane-seasonal-stripe-mask octane-seasonal-stripe-mask-right" src={stripeMaskRight} alt="" draggable={false} />
+                                <SeasonalArrow direction="back" active={canScrollBack} onStep={scrollBack} />
+                                <SeasonalArrow direction="next" active={canScrollForward} onStep={scrollForward} />
                             </div>
-                            <img className="octane-seasonal-stripe-mask octane-seasonal-stripe-mask-left" src={stripeMaskLeft} alt="" draggable={false} />
-                            <img className="octane-seasonal-stripe-mask octane-seasonal-stripe-mask-right" src={stripeMaskRight} alt="" draggable={false} />
-                            <SeasonalArrow direction="back" active={canScrollBack} onStep={scrollBack} />
-                            <SeasonalArrow direction="next" active={canScrollForward} onStep={scrollForward} />
-                        </div>
-                        <div className="octane-seasonal-footer">
-                            <SeasonalCatalogPromoView currency={currency} />
-                            <SeasonalRareTeaserView highestDay={highestDay} imageHost={imageHost} />
-                        </div>
-                    </OctaneCard.Content>
-                </OctaneCard>
-            )}
-            {detailsQuest && (
-                <OctaneCard className="octane-quest-details" uniqueKey="seasonal-quest-details" windowPosition={DraggableWindowPosition.CENTER}>
-                    <OctaneCard.Header headerText={localizeWithFallback('quests.details.caption', 'Quest details')} onCloseClick={() => setDetailsQuest(null)} />
-                    <OctaneCard.Content className="octane-quest-details-content">
-                        <QuestEntryView
-                            quest={detailsQuest}
-                            showHint
-                            onAccept={(quest) => {
-                                // QuestDetails opened from the calendar: accept, close the calendar, go to a quest room.
-                                acceptQuest && acceptQuest(quest.id);
-                                setDetailsQuest(null);
-                                close && close();
-                                if (hasRoomLink && goToQuestRoom) goToQuestRoom();
-                            }}
-                            onReject={(quest) => {
-                                rejectQuest && rejectQuest(quest.id);
-                                setDetailsQuest(null);
-                            }}
-                        />
-                        {hasRoomLink && detailsQuest.waitPeriodSeconds < 1 && (
-                            <BaseButton className="octane-quest-link" onClick={() => goToQuestRoom && goToQuestRoom()}>
-                                {localizeWithFallback('quests.gotocampaignroom', 'Go to the campaign room')}
-                            </BaseButton>
-                        )}
-                    </OctaneCard.Content>
-                </OctaneCard>
-            )}
-        </>
+                            <div className="octane-seasonal-footer">
+                                <SeasonalCatalogPromoView currency={currency} />
+                                <SeasonalRareTeaserView highestDay={highestDay} imageHost={imageHost} />
+                            </div>
+                        </OctaneCard.Content>
+                    </OctaneCard>
+                )}
+                {detailsQuest && (
+                    <OctaneCard className="octane-quest-details" uniqueKey="seasonal-quest-details" windowPosition={DraggableWindowPosition.CENTER}>
+                        <OctaneCard.Header headerText={localizeWithFallback('quests.details.caption', 'Quest details')} onCloseClick={() => setDetailsQuest(null)} />
+                        <OctaneCard.Content className="octane-quest-details-content">
+                            <QuestEntryView
+                                quest={detailsQuest}
+                                showHint
+                                onAccept={(quest) => {
+                                    // QuestDetails opened from the calendar: accept, close the calendar, go to a quest room.
+                                    acceptQuest && acceptQuest(quest.id);
+                                    setDetailsQuest(null);
+                                    close && close();
+                                    if (hasRoomLink && goToQuestRoom) goToQuestRoom();
+                                }}
+                                onReject={(quest) => {
+                                    rejectQuest && rejectQuest(quest.id);
+                                    setDetailsQuest(null);
+                                }}
+                            />
+                            {hasRoomLink && detailsQuest.waitPeriodSeconds < 1 && (
+                                <BaseButton className="octane-quest-link" onClick={() => goToQuestRoom && goToQuestRoom()}>
+                                    {localizeWithFallback('quests.gotocampaignroom', 'Go to the campaign room')}
+                                </BaseButton>
+                            )}
+                        </OctaneCard.Content>
+                    </OctaneCard>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

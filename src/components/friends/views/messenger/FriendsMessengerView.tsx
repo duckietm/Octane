@@ -14,6 +14,7 @@ import { FriendsMessengerThreadView } from './messenger-thread/FriendsMessengerT
 import { BaseButton } from '../../../../common/BaseButton';
 import { TabBar, TabBarTab } from '../../../../common/TabBar';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MESSENGER_VISIBLE_AVATARS = 7;
 /** How long the window keeps its place for an older history page that was asked for. */
@@ -278,154 +279,156 @@ export const FriendsMessengerView: FC<{}> = (props) => {
     if (!isVisible) return null;
 
     return (
-        <>
-        <DraggableWindow handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
-            <div className="messenger-window">
-                <div className="messenger-drag" />
-                <BaseButton className="messenger-minimize" onClick={() => setIsVisible(false)} />
-                <div className="messenger-open-title">{LocalizeText('messenger.window.title', ['OPEN_CHAT_COUNT'], [visibleThreads.length.toString()])}</div>
-                <div className="messenger-avatar-navigation">
-                    <BaseButton
-                        type="button"
-                        className="messenger-avatar-scroll left"
-                        data-action="scroll-left"
-                        aria-label={LocalizeText('generic.previous')}
-                        disabled={avatarStartIndex === 0}
-                        onClick={() => scrollAvatars(-1)}
-                    />
-                    <TabBar className="messenger-avatar-bar" value={activeThread?.threadId ?? null}>
-                        {displayedThreads.map((thread) => {
-                            const isStaff = isStaffChatIdentity(thread.participant);
-                            const liveFriend = thread.participant.id > 0 ? getFriend(thread.participant.id) : null;
-                            const figure = resolveAvatarFigure(
-                                liveFriend?.figure || thread.participant.figure,
-                                liveFriend?.gender ?? thread.participant.gender
-                            );
+        <NativeTextTree>
+            <>
+            <DraggableWindow handleSelector=".messenger-drag" windowPosition={DraggableWindowPosition.TOP_CENTER} offsetTop={8}>
+                <div className="messenger-window">
+                    <div className="messenger-drag" />
+                    <BaseButton className="messenger-minimize" onClick={() => setIsVisible(false)} />
+                    <div className="messenger-open-title">{LocalizeText('messenger.window.title', ['OPEN_CHAT_COUNT'], [visibleThreads.length.toString()])}</div>
+                    <div className="messenger-avatar-navigation">
+                        <BaseButton
+                            type="button"
+                            className="messenger-avatar-scroll left"
+                            data-action="scroll-left"
+                            aria-label={LocalizeText('generic.previous')}
+                            disabled={avatarStartIndex === 0}
+                            onClick={() => scrollAvatars(-1)}
+                        />
+                        <TabBar className="messenger-avatar-bar" value={activeThread?.threadId ?? null}>
+                            {displayedThreads.map((thread) => {
+                                const isStaff = isStaffChatIdentity(thread.participant);
+                                const liveFriend = thread.participant.id > 0 ? getFriend(thread.participant.id) : null;
+                                const figure = resolveAvatarFigure(
+                                    liveFriend?.figure || thread.participant.figure,
+                                    liveFriend?.gender ?? thread.participant.gender
+                                );
 
-                            // AIR MainView: hovering a head shows the friend's name.
-                            return (
-                                <Hint key={thread.threadId} content={thread.participant.name}>
-                                    <TabBarTab
-                                        value={thread.threadId}
-                                        data-participant-id={thread.participant.id}
-                                        className={'messenger-avatar-tab' + (activeThread === thread ? ' active' : '') + (thread.unread ? ' unread' : '')}
-                                        aria-label={thread.participant.name}
-                                        onClick={() => setActiveThreadId(thread.threadId)}
-                                    >
-                                        {isStaff ? (
-                                            <StaffChatFrankIconView size={35} className="staff-chat-frank" />
-                                        ) : (
-                                            <LayoutAvatarImageView
-                                                figure={figure}
-                                                headOnly={true}
-                                                compactHead={true}
-                                                compactHeadSize={35}
-                                                compactHeadPadding={0}
-                                                direction={thread.participant.id < 0 ? 3 : 2}
-                                            />
-                                        )}
-                                    </TabBarTab>
-                                </Hint>
-                            );
-                        })}
-                    </TabBar>
-                    <BaseButton
-                        type="button"
-                        className="messenger-avatar-scroll right"
-                        data-action="scroll-right"
-                        aria-label={LocalizeText('generic.next')}
-                        disabled={avatarStartIndex >= maximumAvatarStart}
-                        onClick={() => scrollAvatars(1)}
-                    />
-                </div>
+                                // AIR MainView: hovering a head shows the friend's name.
+                                return (
+                                    <Hint key={thread.threadId} content={thread.participant.name}>
+                                        <TabBarTab
+                                            value={thread.threadId}
+                                            data-participant-id={thread.participant.id}
+                                            className={'messenger-avatar-tab' + (activeThread === thread ? ' active' : '') + (thread.unread ? ' unread' : '')}
+                                            aria-label={thread.participant.name}
+                                            onClick={() => setActiveThreadId(thread.threadId)}
+                                        >
+                                            {isStaff ? (
+                                                <StaffChatFrankIconView size={35} className="staff-chat-frank" />
+                                            ) : (
+                                                <LayoutAvatarImageView
+                                                    figure={figure}
+                                                    headOnly={true}
+                                                    compactHead={true}
+                                                    compactHeadSize={35}
+                                                    compactHeadPadding={0}
+                                                    direction={thread.participant.id < 0 ? 3 : 2}
+                                                />
+                                            )}
+                                        </TabBarTab>
+                                    </Hint>
+                                );
+                            })}
+                        </TabBar>
+                        <BaseButton
+                            type="button"
+                            className="messenger-avatar-scroll right"
+                            data-action="scroll-right"
+                            aria-label={LocalizeText('generic.next')}
+                            disabled={avatarStartIndex >= maximumAvatarStart}
+                            onClick={() => scrollAvatars(1)}
+                        />
+                    </div>
 
-                {activeThread && (
-                    <>
-                        <div className="messenger-thread-header">
-                            <span className="messenger-thread-name">
-                                {LocalizeText('messenger.window.separator', ['FRIEND_NAME'], [activeThread.participant.name])}
-                            </span>
-                            <div className="messenger-actions">
-                                {activeThread.participant.id > 0 && (
-                                    <>
-                                        <Hint content={LocalizeText('messenger.followfriend.tooltip')}>
-                                            <BaseButton
-                                                className="messenger-btn icon-btn follow"
-                                                aria-label={LocalizeText('messenger.followfriend.tooltip')}
-                                                onClick={followFriend}
-                                            />
-                                        </Hint>
-                                        <Hint content={LocalizeText('infostand.profile.link.tooltip')}>
-                                            <BaseButton
-                                                className="messenger-btn icon-btn profile"
-                                                aria-label={LocalizeText('infostand.profile.link.tooltip')}
-                                                onClick={openProfile}
-                                            />
-                                        </Hint>
-                                        <Hint content={LocalizeText('messenger.window.button.report.tooltip')}>
-                                            <BaseButton
-                                                className="messenger-btn danger"
-                                                onClick={() => report(ReportType.IM, { reportedUserId: activeThread.participant.id })}
-                                            >
-                                                {LocalizeText('messenger.window.button.report')}
-                                            </BaseButton>
-                                        </Hint>
-                                    </>
-                                )}
-                                <BaseButton className="messenger-btn close-btn" onClick={(event) => closeThread(activeThread.threadId)}>
-                                    <FaTimes />
+                    {activeThread && (
+                        <>
+                            <div className="messenger-thread-header">
+                                <span className="messenger-thread-name">
+                                    {LocalizeText('messenger.window.separator', ['FRIEND_NAME'], [activeThread.participant.name])}
+                                </span>
+                                <div className="messenger-actions">
+                                    {activeThread.participant.id > 0 && (
+                                        <>
+                                            <Hint content={LocalizeText('messenger.followfriend.tooltip')}>
+                                                <BaseButton
+                                                    className="messenger-btn icon-btn follow"
+                                                    aria-label={LocalizeText('messenger.followfriend.tooltip')}
+                                                    onClick={followFriend}
+                                                />
+                                            </Hint>
+                                            <Hint content={LocalizeText('infostand.profile.link.tooltip')}>
+                                                <BaseButton
+                                                    className="messenger-btn icon-btn profile"
+                                                    aria-label={LocalizeText('infostand.profile.link.tooltip')}
+                                                    onClick={openProfile}
+                                                />
+                                            </Hint>
+                                            <Hint content={LocalizeText('messenger.window.button.report.tooltip')}>
+                                                <BaseButton
+                                                    className="messenger-btn danger"
+                                                    onClick={() => report(ReportType.IM, { reportedUserId: activeThread.participant.id })}
+                                                >
+                                                    {LocalizeText('messenger.window.button.report')}
+                                                </BaseButton>
+                                            </Hint>
+                                        </>
+                                    )}
+                                    <BaseButton className="messenger-btn close-btn" onClick={(event) => closeThread(activeThread.threadId)}>
+                                        <FaTimes />
+                                    </BaseButton>
+                                </div>
+                            </div>
+
+                            <div ref={messagesBox} className="chat-messages" onScroll={onMessagesScroll}>
+                                <FriendsMessengerThreadView thread={activeThread} />
+                            </div>
+
+                            {activeThread.participant && activeThread.participant.id > 0 && typingUserIds.indexOf(activeThread.participant.id) >= 0 && (
+                                <div className="messenger-typing-indicator">
+                                    {LocalizeText('messenger.typing', ['FRIEND_NAME'], [activeThread.participant.name])}
+                                </div>
+                            )}
+
+                            <div className="messenger-input-row">
+                                {/* AIR illumina_input: the Say button sits inside the input's border, on its right. */}
+                                <div className="messenger-input-box">
+                                    <input
+                                        maxLength={120}
+                                        placeholder={LocalizeText('messenger.window.input.default', ['FRIEND_NAME'], [activeThread.participant.name])}
+                                        type="text"
+                                        value={messageText}
+                                        onChange={(event) => handleInputChange(event.target.value)}
+                                        onKeyDown={onKeyDown}
+                                    />
+                                    <BaseButton className="messenger-btn send" onClick={() => void send()}>
+                                        {LocalizeText('widgets.chatinput.say')}
+                                    </BaseButton>
+                                </div>
+                                <BaseButton
+                                    className="messenger-btn habbicon"
+                                    aria-label={LocalizeText('messenger.habbicons.tooltip')}
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={() => setIsHabbiconPickerVisible((value) => !value)}
+                                >
+                                    <img alt="" src={HabbiconsDmIcon} />
                                 </BaseButton>
                             </div>
-                        </div>
-
-                        <div ref={messagesBox} className="chat-messages" onScroll={onMessagesScroll}>
-                            <FriendsMessengerThreadView thread={activeThread} />
-                        </div>
-
-                        {activeThread.participant && activeThread.participant.id > 0 && typingUserIds.indexOf(activeThread.participant.id) >= 0 && (
-                            <div className="messenger-typing-indicator">
-                                {LocalizeText('messenger.typing', ['FRIEND_NAME'], [activeThread.participant.name])}
-                            </div>
-                        )}
-
-                        <div className="messenger-input-row">
-                            {/* AIR illumina_input: the Say button sits inside the input's border, on its right. */}
-                            <div className="messenger-input-box">
-                                <input
-                                    maxLength={120}
-                                    placeholder={LocalizeText('messenger.window.input.default', ['FRIEND_NAME'], [activeThread.participant.name])}
-                                    type="text"
-                                    value={messageText}
-                                    onChange={(event) => handleInputChange(event.target.value)}
-                                    onKeyDown={onKeyDown}
+                            {isHabbiconPickerVisible && (
+                                <FriendsMessengerHabbiconPickerView
+                                    onClose={() => setIsHabbiconPickerVisible(false)}
+                                    onOpenHub={() => {
+                                        setIsHabbiconPickerVisible(false);
+                                        habbiconCatalog.setBookVisible(true);
+                                    }}
+                                    onSelect={sendHabbicon}
                                 />
-                                <BaseButton className="messenger-btn send" onClick={() => void send()}>
-                                    {LocalizeText('widgets.chatinput.say')}
-                                </BaseButton>
-                            </div>
-                            <BaseButton
-                                className="messenger-btn habbicon"
-                                aria-label={LocalizeText('messenger.habbicons.tooltip')}
-                                onMouseDown={(event) => event.stopPropagation()}
-                                onClick={() => setIsHabbiconPickerVisible((value) => !value)}
-                            >
-                                <img alt="" src={HabbiconsDmIcon} />
-                            </BaseButton>
-                        </div>
-                        {isHabbiconPickerVisible && (
-                            <FriendsMessengerHabbiconPickerView
-                                onClose={() => setIsHabbiconPickerVisible(false)}
-                                onOpenHub={() => {
-                                    setIsHabbiconPickerVisible(false);
-                                    habbiconCatalog.setBookVisible(true);
-                                }}
-                                onSelect={sendHabbicon}
-                            />
-                        )}
-                    </>
-                )}
-            </div>
-        </DraggableWindow>
-        </>
+                            )}
+                        </>
+                    )}
+                </div>
+            </DraggableWindow>
+            </>
+        </NativeTextTree>
     );
 };

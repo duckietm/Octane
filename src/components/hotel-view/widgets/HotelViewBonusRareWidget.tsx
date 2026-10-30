@@ -4,6 +4,7 @@ import { localizeWithFallback } from '../../../api';
 import { getBonusRareProgressPercent } from '../../../api/hotel-view/LandingViewWidgets';
 import { LayoutFurniImageView } from '../../../common';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useBonusRareInfo } from '../../../hooks';
 
 /** The name of the bonus rare: product data by class name, then the floor furni data. */
@@ -37,36 +38,42 @@ export const HotelViewBonusRareWidget: FC<{ fallback: ReactNode; buttonText: str
     const remaining = Math.max(0, info.coinsStillRequiredToBuy);
 
     return (
-        <div className="hotelview-bonus-rare">
-            {showPreview && (
-                <div className="hotelview-bonus-rare-preview">
-                    <LayoutFurniImageView productType="s" productClassId={info.productClassId} direction={2} />
-                </div>
-            )}
-            <div className="hotelview-bonus-rare-copy">
-                <h2>
-                    {localizeWithFallback(
-                        'landing.view.bonus.rare.header',
-                        '%rarename% for every %amount% credits!',
-                        ['rarename', 'amount'],
-                        [rareName, String(info.totalCoinsForBonus)]
-                    )}
-                </h2>
-                <div className="hotelview-progress hotelview-bonus-rare-progress">
-                    <span style={{ width: `${getBonusRareProgressPercent(info.totalCoinsForBonus, remaining)}%` }} />
-                    <em>
+        <NativeTextTree>
+            <div className="hotelview-bonus-rare">
+                {showPreview && (
+                    <div className="hotelview-bonus-rare-preview">
+                        <LayoutFurniImageView productType="s" productClassId={info.productClassId} direction={2} />
+                    </div>
+                )}
+                <div className="hotelview-bonus-rare-copy">
+                    <h2>
                         {localizeWithFallback(
-                            'landing.view.bonus.rare.status',
-                            'Only %amount%/%total% credits to go!',
-                            ['amount', 'total'],
-                            [String(remaining), String(info.totalCoinsForBonus)]
+                            'landing.view.bonus.rare.header',
+                            '%rarename% for every %amount% credits!',
+                            ['rarename', 'amount'],
+                            [rareName, String(info.totalCoinsForBonus)]
                         )}
-                    </em>
+                    </h2>
+                    <div className="hotelview-progress hotelview-bonus-rare-progress">
+                        <span style={{ width: `${getBonusRareProgressPercent(info.totalCoinsForBonus, remaining)}%` }} />
+                        <em>
+                            {localizeWithFallback(
+                                'landing.view.bonus.rare.status',
+                                'Only %amount%/%total% credits to go!',
+                                ['amount', 'total'],
+                                [String(remaining), String(info.totalCoinsForBonus)]
+                            )}
+                        </em>
+                    </div>
+                    <BaseButton
+                        type="button"
+                        className="hotelview-widget-button"
+                        onClick={() => (link ? onLink(link) : CreateLinkEvent('catalog/open/credits'))}
+                    >
+                        {buttonText || localizeWithFallback('landing.view.bonus.rare.open.credits.page', 'Get credits!')}
+                    </BaseButton>
                 </div>
-                <BaseButton type="button" className="hotelview-widget-button" onClick={() => (link ? onLink(link) : CreateLinkEvent('catalog/open/credits'))}>
-                    {buttonText || localizeWithFallback('landing.view.bonus.rare.open.credits.page', 'Get credits!')}
-                </BaseButton>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -8,6 +8,7 @@ import { NavigatorRoomSettingsBasicTabView } from './NavigatorRoomSettingsBasicT
 import { NavigatorRoomSettingsModTabView } from './NavigatorRoomSettingsModTabView';
 import { NavigatorRoomSettingsRightsTabView } from './NavigatorRoomSettingsRightsTabView';
 import { NavigatorRoomSettingsVipChatTabView } from './NavigatorRoomSettingsVipChatTabView';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const TABS: string[] = [
     'navigator.roomsettings.tab.1',
@@ -241,37 +242,39 @@ export const NavigatorRoomSettingsView: FC<{}> = (props) => {
     if (!roomData) return null;
 
     return (
-        <OctaneCardView
-            className="octane-room-settings min-w-0 w-[min(341px,calc(100vw-16px))] h-[min(520px,calc(100vh-16px))] max-w-[calc(100vw-16px)]"
-            isResizable={false}
-            uniqueKey="octane-room-settings"
-        >
-            <OctaneCardHeaderView
-                headerText={LocalizeText('navigator.roomsettings')}
-                isInfoToHabboPages={currentTab === TABS[3]}
-                onClickInfoHabboPages={() => {
-                    if (currentTab === TABS[3]) CreateLinkEvent('habbopages/chat/options');
-                }}
-                onCloseClick={onClose}
-            />
-            <OctaneCardTabsView>
-                {TABS.map((tab) => {
-                    return (
-                        <OctaneCardTabsItemView key={tab} isActive={currentTab === tab} onClick={(event) => setCurrentTab(tab)}>
-                            {LocalizeText(tab)}
-                        </OctaneCardTabsItemView>
-                    );
-                })}
-            </OctaneCardTabsView>
-            <OctaneCardContentView overflow="auto">
-                {currentTab === TABS[0] && (
-                    <NavigatorRoomSettingsBasicTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} onClose={onClose} />
-                )}
-                {currentTab === TABS[1] && <NavigatorRoomSettingsAccessTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
-                {currentTab === TABS[2] && <NavigatorRoomSettingsRightsTabView handleChange={handleChange} roomData={roomData} />}
-                {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
-                {currentTab === TABS[4] && <NavigatorRoomSettingsModTabView handleChange={handleChange} roomData={roomData} />}
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-room-settings min-w-0 w-[min(341px,calc(100vw-16px))] h-[min(520px,calc(100vh-16px))] max-w-[calc(100vw-16px)]"
+                isResizable={false}
+                uniqueKey="octane-room-settings"
+            >
+                <OctaneCardHeaderView
+                    headerText={LocalizeText('navigator.roomsettings')}
+                    isInfoToHabboPages={currentTab === TABS[3]}
+                    onClickInfoHabboPages={() => {
+                        if (currentTab === TABS[3]) CreateLinkEvent('habbopages/chat/options');
+                    }}
+                    onCloseClick={onClose}
+                />
+                <OctaneCardTabsView>
+                    {TABS.map((tab) => {
+                        return (
+                            <OctaneCardTabsItemView key={tab} isActive={currentTab === tab} onClick={(event) => setCurrentTab(tab)}>
+                                {LocalizeText(tab)}
+                            </OctaneCardTabsItemView>
+                        );
+                    })}
+                </OctaneCardTabsView>
+                <OctaneCardContentView overflow="auto">
+                    {currentTab === TABS[0] && (
+                        <NavigatorRoomSettingsBasicTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} onClose={onClose} />
+                    )}
+                    {currentTab === TABS[1] && <NavigatorRoomSettingsAccessTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
+                    {currentTab === TABS[2] && <NavigatorRoomSettingsRightsTabView handleChange={handleChange} roomData={roomData} />}
+                    {currentTab === TABS[3] && <NavigatorRoomSettingsVipChatTabView errors={fieldErrors} handleChange={handleChange} roomData={roomData} />}
+                    {currentTab === TABS[4] && <NavigatorRoomSettingsModTabView handleChange={handleChange} roomData={roomData} />}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

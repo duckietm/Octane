@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { IPurchasableOffer } from '../../../../../api';
 import { LayoutGridItemProps } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogUiState } from '../../../../../hooks';
 import { CatalogOfferTileView } from './CatalogOfferTileView';
 
@@ -18,6 +19,8 @@ export const CatalogGridOfferView: FC<CatalogGridOfferViewProps> = (props) => {
     const { currentType } = useCatalogUiState();
 
     return (
-        <CatalogOfferTileView {...props} requestOfferToMover={requestOfferToMover} currentType={currentType} />
+        <NativeTextTree>
+            <CatalogOfferTileView {...props} requestOfferToMover={requestOfferToMover} currentType={currentType} />
+        </NativeTextTree>
     );
 };

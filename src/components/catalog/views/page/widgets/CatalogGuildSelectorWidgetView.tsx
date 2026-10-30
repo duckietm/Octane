@@ -4,6 +4,7 @@ import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Flex } from '../../../../../common';
 import { useCatalogData, useCatalogUiState, useUserGroups } from '../../../../../hooks';
 import { Select } from '../../../../../common/Select';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 interface CatalogGuildSelectorWidgetViewProps {
     /** GuildForumSelectorCatalogWidget: the selector of the group forum page (layout guild_forum). */
@@ -85,32 +86,36 @@ export const CatalogGuildSelectorWidgetView: FC<CatalogGuildSelectorWidgetViewPr
     // leaves nothing shows an empty drop menu, and the purchase waits for a group.
     if (!allGroups || !allGroups.length) {
         return (
-            <div className="bg-[#5da0aa] rounded-lg p-2 text-black text-center">
-                {LocalizeText('catalog.guild_selector.members_only')}
-                <div className="mt-1">
-                    <Button classNames={['octane-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
-                        {LocalizeText('catalog.guild_selector.find_groups')}
-                    </Button>
+            <NativeTextTree>
+                <div className="bg-[#5da0aa] rounded-lg p-2 text-black text-center">
+                    {LocalizeText('catalog.guild_selector.members_only')}
+                    <div className="mt-1">
+                        <Button classNames={['octane-catalog-guild-join-btn']} onClick={() => CreateLinkEvent('navigator/search/hotel_view/group:')}>
+                            {LocalizeText('catalog.guild_selector.find_groups')}
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            </NativeTextTree>
         );
     }
 
     return (
-        <div className="flex gap-1">
-            {!!selectedGroup && (
-                <Flex className="rounded border" overflow="hidden">
-                    <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorA }} />
-                    <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorB }} />
-                </Flex>
-            )}
-            <Select className="form-select form-select-sm" value={selectedIndex} onChange={(event) => setPickedIndex(parseInt(event.target.value))}>
-                {groups.map((group, index) => (
-                    <option key={group.groupId} value={index}>
-                        {group.groupName}
-                    </option>
-                ))}
-            </Select>
-        </div>
+        <NativeTextTree>
+            <div className="flex gap-1">
+                {!!selectedGroup && (
+                    <Flex className="rounded border" overflow="hidden">
+                        <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorA }} />
+                        <div className="h-full" style={{ width: '20px', backgroundColor: '#' + selectedGroup.colorB }} />
+                    </Flex>
+                )}
+                <Select className="form-select form-select-sm" value={selectedIndex} onChange={(event) => setPickedIndex(parseInt(event.target.value))}>
+                    {groups.map((group, index) => (
+                        <option key={group.groupId} value={index}>
+                            {group.groupName}
+                        </option>
+                    ))}
+                </Select>
+            </div>
+        </NativeTextTree>
     );
 };

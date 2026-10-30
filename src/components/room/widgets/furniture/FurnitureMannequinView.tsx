@@ -6,6 +6,7 @@ import { useFurnitureMannequinWidget, useHasPermission } from '../../../../hooks
 import { OctaneInput } from '../../../../layout';
 import { BaseButton } from '../../../../common/BaseButton';
 import '../../../../css/room/FurniWindowsAAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MODE_NONE: number = -1;
 const MODE_CONTROLLER: number = 0;
@@ -89,72 +90,74 @@ export const FurnitureMannequinView: FC<{}> = (props) => {
     if (objectId === -1) return null;
 
     return (
-        <OctaneCardView className="octane-mannequin no-resize" theme="primary-slim">
-            <OctaneCardHeaderView headerText={LocalizeText('mannequin.widget.title')} onCloseClick={onClose} />
-            <OctaneCardContentView center>
-                <div className="flex w-full gap-2 overflow-hidden">
-                    <div className="flex flex-col">
-                        <div className="relative mannequin-preview">
-                            <LayoutAvatarImageView direction={2} figure={renderedFigure} position="absolute" />
-                            {clubLevel > 0 && <LayoutCurrencyIcon className="absolute inset-e-2 bottom-2" type="hc" />}
+        <NativeTextTree>
+            <OctaneCardView className="octane-mannequin no-resize" theme="primary-slim">
+                <OctaneCardHeaderView headerText={LocalizeText('mannequin.widget.title')} onCloseClick={onClose} />
+                <OctaneCardContentView center>
+                    <div className="flex w-full gap-2 overflow-hidden">
+                        <div className="flex flex-col">
+                            <div className="relative mannequin-preview">
+                                <LayoutAvatarImageView direction={2} figure={renderedFigure} position="absolute" />
+                                {clubLevel > 0 && <LayoutCurrencyIcon className="absolute inset-e-2 bottom-2" type="hc" />}
+                            </div>
                         </div>
-                    </div>
-                    <Column grow justifyContent="between" overflow="auto">
-                        {mode === MODE_CONTROLLER && (
-                            <>
-                                <OctaneInput className="octane-mannequin__name-input" type="text" value={name} onBlur={saveName} onChange={(event) => setName(event.target.value)} />
-                                <div className="flex flex-col gap-1">
-                                    <Button variant="success" onClick={(event) => setMode(MODE_UPDATE)}>
-                                        {LocalizeText('mannequin.widget.style')}
-                                    </Button>
+                        <Column grow justifyContent="between" overflow="auto">
+                            {mode === MODE_CONTROLLER && (
+                                <>
+                                    <OctaneInput className="octane-mannequin__name-input" type="text" value={name} onBlur={saveName} onChange={(event) => setName(event.target.value)} />
+                                    <div className="flex flex-col gap-1">
+                                        <Button variant="success" onClick={(event) => setMode(MODE_UPDATE)}>
+                                            {LocalizeText('mannequin.widget.style')}
+                                        </Button>
+                                        <Button variant="success" onClick={wearFigure}>
+                                            {LocalizeText('mannequin.widget.wear')}
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                            {mode === MODE_UPDATE && (
+                                <>
+                                    <div className="flex flex-col gap-1">
+                                        <Text bold className="octane-mannequin__name">
+                                            {name}
+                                        </Text>
+                                        <Text wrap className="octane-mannequin__text">
+                                            {LocalizeText('mannequin.widget.savetext')}
+                                        </Text>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <Text component={BaseButton} type="button" pointer underline className="octane-mannequin__back" onClick={(event) => setMode(MODE_CONTROLLER)}>
+                                            {LocalizeText('mannequin.widget.back')}
+                                        </Text>
+                                        <Button variant="success" onClick={saveFigure}>
+                                            {LocalizeText('mannequin.widget.save')}
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                            {mode === MODE_PEER && (
+                                <>
+                                    <div className="flex flex-col gap-1">
+                                        <Text italics className="octane-mannequin__name octane-mannequin__name--peer">
+                                            {name}
+                                        </Text>
+                                        <Text className="octane-mannequin__text">{LocalizeText('mannequin.widget.weartext')}</Text>
+                                    </div>
                                     <Button variant="success" onClick={wearFigure}>
                                         {LocalizeText('mannequin.widget.wear')}
                                     </Button>
+                                </>
+                            )}
+                            {mode === MODE_NO_CLUB && (
+                                <div className="flex justify-center items-center grow!">
+                                    <Text className="octane-mannequin__notice">{LocalizeText('mannequin.widget.clubnotification')}</Text>
                                 </div>
-                            </>
-                        )}
-                        {mode === MODE_UPDATE && (
-                            <>
-                                <div className="flex flex-col gap-1">
-                                    <Text bold className="octane-mannequin__name">
-                                        {name}
-                                    </Text>
-                                    <Text wrap className="octane-mannequin__text">
-                                        {LocalizeText('mannequin.widget.savetext')}
-                                    </Text>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <Text component={BaseButton} type="button" pointer underline className="octane-mannequin__back" onClick={(event) => setMode(MODE_CONTROLLER)}>
-                                        {LocalizeText('mannequin.widget.back')}
-                                    </Text>
-                                    <Button variant="success" onClick={saveFigure}>
-                                        {LocalizeText('mannequin.widget.save')}
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                        {mode === MODE_PEER && (
-                            <>
-                                <div className="flex flex-col gap-1">
-                                    <Text italics className="octane-mannequin__name octane-mannequin__name--peer">
-                                        {name}
-                                    </Text>
-                                    <Text className="octane-mannequin__text">{LocalizeText('mannequin.widget.weartext')}</Text>
-                                </div>
-                                <Button variant="success" onClick={wearFigure}>
-                                    {LocalizeText('mannequin.widget.wear')}
-                                </Button>
-                            </>
-                        )}
-                        {mode === MODE_NO_CLUB && (
-                            <div className="flex justify-center items-center grow!">
-                                <Text className="octane-mannequin__notice">{LocalizeText('mannequin.widget.clubnotification')}</Text>
-                            </div>
-                        )}
-                        {mode === MODE_WRONG_GENDER && <Text className="octane-mannequin__text">{LocalizeText('mannequin.widget.wronggender')}</Text>}
-                    </Column>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                            )}
+                            {mode === MODE_WRONG_GENDER && <Text className="octane-mannequin__text">{LocalizeText('mannequin.widget.wronggender')}</Text>}
+                        </Column>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

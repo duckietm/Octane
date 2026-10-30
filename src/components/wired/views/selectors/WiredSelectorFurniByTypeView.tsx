@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { hasWiredAdvancedSources, WiredAdvancedSourceRows } from '../WiredAdvancedSourceRows';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 
 export const WiredSelectorFurniByTypeView: FC<{}> = () => {
@@ -33,21 +34,23 @@ export const WiredSelectorFurniByTypeView: FC<{}> = () => {
     const requiresFurni = !hasSourceRows || furniSource === 100 ? WiredFurniType.STUFF_SELECTION_OPTION_BY_ID : WiredFurniType.STUFF_SELECTION_OPTION_NONE;
 
     return (
-        <WiredSelectorBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            hideDelay={true}
-            cardStyle={{ width: 400 }}
-            footer={hasSourceRows ? <WiredAdvancedSourceRows onFurniSourceChange={(slot, value) => slot === 0 && setFurniSource(value)} /> : null}
-        >
-            <div className="flex flex-col gap-2">
-                <label className="flex items-center gap-2">
-                    <Checkbox checked={matchState} onCheckedChange={(nextChecked) => setMatchState(nextChecked)} />
-                    <Text small>{LocalizeText('wiredfurni.params.state_match')}</Text>
-                </label>
+        <NativeTextTree>
+            <WiredSelectorBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                hideDelay={true}
+                cardStyle={{ width: 400 }}
+                footer={hasSourceRows ? <WiredAdvancedSourceRows onFurniSourceChange={(slot, value) => slot === 0 && setFurniSource(value)} /> : null}
+            >
+                <div className="flex flex-col gap-2">
+                    <label className="flex items-center gap-2">
+                        <Checkbox checked={matchState} onCheckedChange={(nextChecked) => setMatchState(nextChecked)} />
+                        <Text small>{LocalizeText('wiredfurni.params.state_match')}</Text>
+                    </label>
 
-            </div>
-        </WiredSelectorBaseView>
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

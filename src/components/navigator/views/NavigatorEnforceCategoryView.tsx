@@ -5,6 +5,7 @@ import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../
 import { useMessageEvent, useNavigatorData, useUserDataSnapshot, useUserPermissions } from '../../../hooks';
 import { OctaneButton } from '../../../layout';
 import { Select } from '../../../common/Select';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 /** Selection types of RoomCategorySelectionEnforcement: after creating a room, after saving its settings. */
 const SELECTION_ROOM_CREATED = 1;
@@ -59,36 +60,38 @@ export const NavigatorEnforceCategoryView: FC<{}> = () => {
     };
 
     return (
-        <OctaneCardView className="octane-navigator-enforce-category min-w-0 w-[min(320px,calc(100vw-16px))] max-w-[calc(100vw-16px)]" uniqueKey="navigator-enforce-category">
-            <OctaneCardHeaderView headerText={localizeWithFallback('navigator.enforcecategory.title', 'Choose a category')} onCloseClick={() => setRoomId(0)} />
-            <OctaneCardContentView className="text-black" gap={2}>
-                <p className="m-0 text-sm">
-                    {localizeWithFallback('navigator.enforcecategory.info', 'Your room needs a category before others can find it. Pick one below.')}
-                </p>
-                <label className="flex flex-col gap-1 text-sm">
-                    <span className="font-bold">{localizeWithFallback('navigator.category', 'Category')}</span>
-                    <Select className="form-select form-select-sm" value={categoryId} onChange={(event) => setCategoryId(Number(event.target.value))}>
-                        {selectableCategories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {localizeWithFallback(category.name, category.name)}
-                            </option>
-                        ))}
-                    </Select>
-                </label>
-                <label className="flex flex-col gap-1 text-sm">
-                    <span className="font-bold">{localizeWithFallback('navigator.roomsettings.trade_settings', 'Trading')}</span>
-                    <Select className="form-select form-select-sm" value={tradeMode} onChange={(event) => setTradeMode(Number(event.target.value))}>
-                        {TRADE_OPTIONS.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {localizeWithFallback(option.key, option.fallback)}
-                            </option>
-                        ))}
-                    </Select>
-                </label>
-                <OctaneButton disabled={categoryId < 0} onClick={save}>
-                    {localizeWithFallback('generic.ok', 'OK')}
-                </OctaneButton>
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView className="octane-navigator-enforce-category min-w-0 w-[min(320px,calc(100vw-16px))] max-w-[calc(100vw-16px)]" uniqueKey="navigator-enforce-category">
+                <OctaneCardHeaderView headerText={localizeWithFallback('navigator.enforcecategory.title', 'Choose a category')} onCloseClick={() => setRoomId(0)} />
+                <OctaneCardContentView className="text-black" gap={2}>
+                    <p className="m-0 text-sm">
+                        {localizeWithFallback('navigator.enforcecategory.info', 'Your room needs a category before others can find it. Pick one below.')}
+                    </p>
+                    <label className="flex flex-col gap-1 text-sm">
+                        <span className="font-bold">{localizeWithFallback('navigator.category', 'Category')}</span>
+                        <Select className="form-select form-select-sm" value={categoryId} onChange={(event) => setCategoryId(Number(event.target.value))}>
+                            {selectableCategories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {localizeWithFallback(category.name, category.name)}
+                                </option>
+                            ))}
+                        </Select>
+                    </label>
+                    <label className="flex flex-col gap-1 text-sm">
+                        <span className="font-bold">{localizeWithFallback('navigator.roomsettings.trade_settings', 'Trading')}</span>
+                        <Select className="form-select form-select-sm" value={tradeMode} onChange={(event) => setTradeMode(Number(event.target.value))}>
+                            {TRADE_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {localizeWithFallback(option.key, option.fallback)}
+                                </option>
+                            ))}
+                        </Select>
+                    </label>
+                    <OctaneButton disabled={categoryId < 0} onClick={save}>
+                        {localizeWithFallback('generic.ok', 'OK')}
+                    </OctaneButton>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

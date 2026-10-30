@@ -8,6 +8,7 @@ import {
 import { FC } from 'react';
 import { ChatEntryPlainText, GoToDesktop, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
 import { Button, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { useHelp } from '../../../hooks';
 
 export const ReportSummaryView: FC<{}> = (props) => {
@@ -69,14 +70,16 @@ export const ReportSummaryView: FC<{}> = (props) => {
     };
 
     return (
-        <>
-            <div className="flex flex-col gap-1">
-                <Text fontSize={4}>{LocalizeText('help.cfh.button.send')}</Text>
-                <Text>{LocalizeText('help.main.summary')}</Text>
-            </div>
-            <Button variant="danger" onClick={submitReport}>
-                {LocalizeText('guide.help.request.emergency.submit.button')}
-            </Button>
-        </>
+        <NativeTextTree>
+            <>
+                <div className="flex flex-col gap-1">
+                    <Text fontSize={4}>{LocalizeText('help.cfh.button.send')}</Text>
+                    <Text>{LocalizeText('help.main.summary')}</Text>
+                </div>
+                <Button variant="danger" onClick={submitReport}>
+                    {LocalizeText('guide.help.request.emergency.submit.button')}
+                </Button>
+            </>
+        </NativeTextTree>
     );
 };

@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo } from 'react';
 import { CatalogType, getCatalogNodeKey, ICatalogNode, LocalizeText } from '../../../../api';
 import { ClassicScrollAreaView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useCatalogActions, useCatalogData } from '../../../../hooks';
 import { useCatalogAdmin } from '../../CatalogAdminContext';
 import { CatalogNavigationItemView } from './CatalogNavigationItemView';
@@ -56,18 +57,20 @@ export const CatalogNavigationView: FC<CatalogNavigationViewProps> = (props) => 
     );
 
     return (
-        <ClassicScrollAreaView
-            aria-label="Catalog categories"
-            className="octane-catalog-navigation-scroll-area"
-            contentClassName={`octane-catalog-navigation-list ${catalogType === CatalogType.BUILDER ? 'is-builders-club' : 'is-normal'}`}
-            role="tree"
-        >
-            {searchResult &&
-                searchResult.filteredNodes.length > 0 &&
-                searchResult.filteredNodes.map((n, index) => {
-                    return <CatalogNavigationItemView key={getCatalogNodeKey(n, index)} node={n} runtime={runtime} />;
-                })}
-            {!searchResult && <CatalogNavigationSetView node={node} runtime={runtime} />}
-        </ClassicScrollAreaView>
+        <NativeTextTree>
+            <ClassicScrollAreaView
+                aria-label="Catalog categories"
+                className="octane-catalog-navigation-scroll-area"
+                contentClassName={`octane-catalog-navigation-list ${catalogType === CatalogType.BUILDER ? 'is-builders-club' : 'is-normal'}`}
+                role="tree"
+            >
+                {searchResult &&
+                    searchResult.filteredNodes.length > 0 &&
+                    searchResult.filteredNodes.map((n, index) => {
+                        return <CatalogNavigationItemView key={getCatalogNodeKey(n, index)} node={n} runtime={runtime} />;
+                    })}
+                {!searchResult && <CatalogNavigationSetView node={node} runtime={runtime} />}
+            </ClassicScrollAreaView>
+        </NativeTextTree>
     );
 };

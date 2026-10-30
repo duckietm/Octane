@@ -7,6 +7,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** The times slider runs 1..11; 11 is "unlimited" and goes out as 0. */
 const TIMES_UNLIMITED = 11;
@@ -52,49 +53,51 @@ export const WiredActionGiveScoreBaseView: FC<WiredActionGiveScoreBaseViewProps>
     const timesText = times >= TIMES_UNLIMITED ? localizeWithFallback('wiredfurni.params.unlimited', 'Unlimited') : String(times);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={toTeam ? null : <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-        >
-            <WiredSliderSection
-                max={1000}
-                min={1}
-                title={localizeWithFallback('wiredfurni.params.setpoints2', LocalizeText('wiredfurni.params.setpoints', ['points'], [points.toString()]), ['points'], [points.toString()])}
-                value={points}
-                onChange={setPoints}
-            />
-            <WiredSliderSection
-                max={TIMES_UNLIMITED}
-                min={1}
-                numberInput={false}
-                title={localizeWithFallback('wiredfurni.params.settimesingame', `Times in game: ${timesText}`, ['times'], [timesText])}
-                value={times}
-                onChange={setTimes}
-            />
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.points_operation')}</Text>
-                {[0, 1].map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <Radio checked={operation === value} name="pointsOperation" onCheckedChange={() => setOperation(value)} />
-                        <Text>{LocalizeText(`wiredfurni.params.points_operation.${value}`)}</Text>
-                    </label>
-                ))}
-            </div>
-            {toTeam && (
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={toTeam ? null : <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+            >
+                <WiredSliderSection
+                    max={1000}
+                    min={1}
+                    title={localizeWithFallback('wiredfurni.params.setpoints2', LocalizeText('wiredfurni.params.setpoints', ['points'], [points.toString()]), ['points'], [points.toString()])}
+                    value={points}
+                    onChange={setPoints}
+                />
+                <WiredSliderSection
+                    max={TIMES_UNLIMITED}
+                    min={1}
+                    numberInput={false}
+                    title={localizeWithFallback('wiredfurni.params.settimesingame', `Times in game: ${timesText}`, ['times'], [timesText])}
+                    value={times}
+                    onChange={setTimes}
+                />
                 <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
-                    <div className="grid grid-cols-2 gap-1">
-                        {[1, 2, 3, 4].map((value) => (
-                            <label key={value} className="flex items-center gap-1">
-                                <Radio checked={team === value} name="scoreTeam" onCheckedChange={() => setTeam(value)} />
-                                <Text>{LocalizeText(`wiredfurni.params.team.${value}`)}</Text>
-                            </label>
-                        ))}
-                    </div>
+                    <Text bold>{LocalizeText('wiredfurni.params.points_operation')}</Text>
+                    {[0, 1].map((value) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio checked={operation === value} name="pointsOperation" onCheckedChange={() => setOperation(value)} />
+                            <Text>{LocalizeText(`wiredfurni.params.points_operation.${value}`)}</Text>
+                        </label>
+                    ))}
                 </div>
-            )}
-        </WiredActionBaseView>
+                {toTeam && (
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
+                        <div className="grid grid-cols-2 gap-1">
+                            {[1, 2, 3, 4].map((value) => (
+                                <label key={value} className="flex items-center gap-1">
+                                    <Radio checked={team === value} name="scoreTeam" onCheckedChange={() => setTeam(value)} />
+                                    <Text>{LocalizeText(`wiredfurni.params.team.${value}`)}</Text>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

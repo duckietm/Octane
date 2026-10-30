@@ -5,6 +5,7 @@ import { Column, Flex, LayoutCurrencyIcon, LayoutImage, Text } from '../../commo
 import { useRareValues } from '../../hooks';
 import { OctaneCard, OctaneInput } from '../../layout';
 import '../../css/rare-values/RareValuesAirText.css';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const PAGE_SIZE = 50;
 
@@ -117,76 +118,78 @@ export const RareValuesView: FC<{}> = () => {
     const hasMore = visibleCount < filtered.length;
 
     return (
-        <OctaneCard className="octane-rare-values-window w-[460px] h-[520px]" uniqueKey="rare-values">
-            <OctaneCard.Header headerText={LocalizeText('rarevalues.title')} onCloseClick={() => setIsVisible(false)} />
-            <OctaneCard.Content>
-                <Column gap={2} className="h-full p-2">
-                    <Flex alignItems="center" gap={2} className="rounded border border-black/10 bg-white px-2 py-1 shadow-inner">
-                        <span className="text-black/40">🔍</span>
-                        <OctaneInput
-                            placeholder={LocalizeText('generic.search')}
-                            value={searchValue}
-                            onChange={(event) => setSearchValue(event.target.value)}
-                            className="grow !border-0 !bg-transparent !p-0 !shadow-none focus:!ring-0 text-[12px] font-normal"
-                        />
-                    </Flex>
-                    {loaded && (
-                        <Flex alignItems="center" justifyContent="between" className="px-1 text-[11px] text-black/55">
-                            <span>
-                                {filtered.length} {LocalizeText('rarevalues.title').toLowerCase()}
-                            </span>
-                            {hasMore && (
-                                <span>
-                                    {visibleRows.length} / {filtered.length}
-                                </span>
-                            )}
+        <NativeTextTree>
+            <OctaneCard className="octane-rare-values-window w-[460px] h-[520px]" uniqueKey="rare-values">
+                <OctaneCard.Header headerText={LocalizeText('rarevalues.title')} onCloseClick={() => setIsVisible(false)} />
+                <OctaneCard.Content>
+                    <Column gap={2} className="h-full p-2">
+                        <Flex alignItems="center" gap={2} className="rounded border border-black/10 bg-white px-2 py-1 shadow-inner">
+                            <span className="text-black/40">🔍</span>
+                            <OctaneInput
+                                placeholder={LocalizeText('generic.search')}
+                                value={searchValue}
+                                onChange={(event) => setSearchValue(event.target.value)}
+                                className="grow !border-0 !bg-transparent !p-0 !shadow-none focus:!ring-0 text-[12px] font-normal"
+                            />
                         </Flex>
-                    )}
-                    <div
-                        ref={scrollRef}
-                        className="grow overflow-auto rounded border border-black/10 bg-gradient-to-b from-[#f6f8fb] to-[#eaf1f6] shadow-inner"
-                    >
-                        {!loaded && (
-                            <div className="p-6 text-center">
-                                <Text className="text-black/55">{LocalizeText('rarevalues.loading')}</Text>
-                            </div>
-                        )}
-                        {loaded && !filtered.length && (
-                            <div className="p-6 text-center">
-                                <Text className="text-black/55">{LocalizeText('rarevalues.empty')}</Text>
-                            </div>
-                        )}
-                        {visibleRows.map((row, index) => (
-                            <Flex
-                                key={row.spriteId}
-                                alignItems="center"
-                                gap={2}
-                                className={`border-b border-black/[0.06] px-2 py-1.5 transition-colors hover:bg-[#cfe4f1] ${index % 2 ? 'bg-white/60' : 'bg-[#e9f1f7]'}`}
-                            >
-                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded border border-black/10 bg-white shadow-sm">
-                                    <LayoutImage imageUrl={row.iconUrl} className="h-9 w-9 bg-contain bg-center bg-no-repeat" />
-                                </div>
-                                <Text truncate className="grow text-[12px] text-black">
-                                    {row.name}
-                                </Text>
-                                <Flex alignItems="center" gap={1} className="shrink-0 rounded-full bg-white/80 px-2 py-0.5 shadow-sm">
-                                    <Text bold textEnd className="text-[12px] text-[#2f6f95]">
-                                        {LocalizeFormattedNumber(row.value.points)}
-                                    </Text>
-                                    <LayoutCurrencyIcon type={row.value.pointsType} />
-                                </Flex>
+                        {loaded && (
+                            <Flex alignItems="center" justifyContent="between" className="px-1 text-[11px] text-black/55">
+                                <span>
+                                    {filtered.length} {LocalizeText('rarevalues.title').toLowerCase()}
+                                </span>
+                                {hasMore && (
+                                    <span>
+                                        {visibleRows.length} / {filtered.length}
+                                    </span>
+                                )}
                             </Flex>
-                        ))}
-                        {hasMore && (
-                            <div ref={sentinelRef} className="flex items-center justify-center py-3">
-                                <Text className="text-[11px] text-black/45">
-                                    {LocalizeText('rarevalues.loading.more')}
-                                </Text>
-                            </div>
                         )}
-                    </div>
-                </Column>
-            </OctaneCard.Content>
-        </OctaneCard>
+                        <div
+                            ref={scrollRef}
+                            className="grow overflow-auto rounded border border-black/10 bg-gradient-to-b from-[#f6f8fb] to-[#eaf1f6] shadow-inner"
+                        >
+                            {!loaded && (
+                                <div className="p-6 text-center">
+                                    <Text className="text-black/55">{LocalizeText('rarevalues.loading')}</Text>
+                                </div>
+                            )}
+                            {loaded && !filtered.length && (
+                                <div className="p-6 text-center">
+                                    <Text className="text-black/55">{LocalizeText('rarevalues.empty')}</Text>
+                                </div>
+                            )}
+                            {visibleRows.map((row, index) => (
+                                <Flex
+                                    key={row.spriteId}
+                                    alignItems="center"
+                                    gap={2}
+                                    className={`border-b border-black/[0.06] px-2 py-1.5 transition-colors hover:bg-[#cfe4f1] ${index % 2 ? 'bg-white/60' : 'bg-[#e9f1f7]'}`}
+                                >
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded border border-black/10 bg-white shadow-sm">
+                                        <LayoutImage imageUrl={row.iconUrl} className="h-9 w-9 bg-contain bg-center bg-no-repeat" />
+                                    </div>
+                                    <Text truncate className="grow text-[12px] text-black">
+                                        {row.name}
+                                    </Text>
+                                    <Flex alignItems="center" gap={1} className="shrink-0 rounded-full bg-white/80 px-2 py-0.5 shadow-sm">
+                                        <Text bold textEnd className="text-[12px] text-[#2f6f95]">
+                                            {LocalizeFormattedNumber(row.value.points)}
+                                        </Text>
+                                        <LayoutCurrencyIcon type={row.value.pointsType} />
+                                    </Flex>
+                                </Flex>
+                            ))}
+                            {hasMore && (
+                                <div ref={sentinelRef} className="flex items-center justify-center py-3">
+                                    <Text className="text-[11px] text-black/45">
+                                        {LocalizeText('rarevalues.loading.more')}
+                                    </Text>
+                                </div>
+                            )}
+                        </div>
+                    </Column>
+                </OctaneCard.Content>
+            </OctaneCard>
+        </NativeTextTree>
     );
 };

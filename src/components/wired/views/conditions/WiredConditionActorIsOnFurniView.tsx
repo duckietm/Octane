@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredConditionBaseView } from './WiredConditionBaseView';
@@ -27,20 +28,22 @@ export const WiredConditionActorIsOnFurniView: FC = () => {
     const requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_BY_ID;
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={requiresFurni}
-            save={save}
-            footer={
-                <WiredSourcesSelector
-                    showFurni={true}
-                    showUsers={true}
-                    furniSource={furniSource}
-                    userSource={userSource}
-                    onChangeFurni={onChangeFurniSource}
-                    onChangeUsers={setUserSource}
-                />
-            }
-        />
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={requiresFurni}
+                save={save}
+                footer={
+                    <WiredSourcesSelector
+                        showFurni={true}
+                        showUsers={true}
+                        furniSource={furniSource}
+                        userSource={userSource}
+                        onChangeFurni={onChangeFurniSource}
+                        onChangeUsers={setUserSource}
+                    />
+                }
+            />
+        </NativeTextTree>
     );
 };

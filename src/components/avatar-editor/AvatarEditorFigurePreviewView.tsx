@@ -5,6 +5,7 @@ import { LayoutAvatarImageView } from '../../common';
 import { AvatarEffectPreviewView } from '../avatar-effects/AvatarEffectPreviewView';
 import { useAvatarEditor } from '../../hooks';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const DEFAULT_DIRECTION: number = 4;
 const AVATAR_DIRECTIONS: number = 8;
@@ -19,19 +20,21 @@ export const AvatarEditorFigurePreviewView: FC<{ effectType?: number }> = (props
     };
 
     return (
-        <div className="octane-avatar-editor-preview-shell">
-            <div className="figure-preview-container">
-                {effectType > 0 ? (
-                    <div className="octane-avatar-editor-effect-preview">
-                        <AvatarEffectPreviewView direction={direction} effect={effectType} figure={getFigureString} gender={gender} height={210} />
-                    </div>
-                ) : (
-                    <LayoutAvatarImageView direction={direction} figure={getFigureString} gender={gender} />
-                )}
+        <NativeTextTree>
+            <div className="octane-avatar-editor-preview-shell">
+                <div className="figure-preview-container">
+                    {effectType > 0 ? (
+                        <div className="octane-avatar-editor-effect-preview">
+                            <AvatarEffectPreviewView direction={direction} effect={effectType} figure={getFigureString} gender={gender} height={210} />
+                        </div>
+                    ) : (
+                        <LayoutAvatarImageView direction={direction} figure={getFigureString} gender={gender} />
+                    )}
+                </div>
+                <BaseButton type="button" className="octane-avatar-editor-rotate" aria-label="Rotate avatar" onClick={rotateFigure}>
+                    <img src={rotateSrc} alt="" draggable={false} />
+                </BaseButton>
             </div>
-            <BaseButton type="button" className="octane-avatar-editor-rotate" aria-label="Rotate avatar" onClick={rotateFigure}>
-                <img src={rotateSrc} alt="" draggable={false} />
-            </BaseButton>
-        </div>
+        </NativeTextTree>
     );
 };

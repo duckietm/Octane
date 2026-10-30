@@ -3,6 +3,7 @@ import userClassificationXml from '../../../assets/mod-tools/xml/userclassificat
 import { NativeWindowShell } from '../native/NativeWindowShell';
 import { findNativeNode, nativeCaption, nativeNumber, NativeNode, parseNativeLayout } from '../native/NativeLayout';
 import { Native0Frame, Native0Rows, Native0Scrollbar, Native0Text } from '../native/NativeWindow0';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const rectOf = (node: NativeNode) => ({ x: nativeNumber(node, 'x'), y: nativeNumber(node, 'y'), width: nativeNumber(node, 'width'), height: nativeNumber(node, 'height') });
 const SHADE = 0xa2d6ea;
@@ -45,22 +46,24 @@ export const UserClassificationView: FC<UserClassificationProps> = ({ entries, x
     const clamped = Math.max(0, Math.min(Math.max(0, contentHeight - viewHeight), offset));
 
     return (
-        <NativeWindowShell type="userClassification" windowKey="1" x={x} y={y}>
-            <Native0Frame caption="" height={height} width={width} onClose={onClose} onResize={onResize}>
-                <div className="native0-list" style={{ left: 0, top: 0, width: listWidth, height: viewHeight }} onWheel={(event) => setOffset(Math.max(0, Math.min(Math.max(0, contentHeight - viewHeight), clamped + event.deltaY * 0.75)))}>
-                    <div style={{ position: 'absolute', left: 0, top: -clamped, width: listWidth, height: contentHeight }}>
-                        <Native0Rows colors={rowColors} height={contentHeight} rowHeight={row.height} width={listWidth} />
-                        {entries.map((entry, index) => (
-                            <div key={entry.userId} style={{ position: 'absolute', left: 0, top: index * row.height, width: listWidth, height: row.height }}>
-                                <Native0Text bold clip height={row.height} text={entry.userName} underline width={userName.width} x={userName.x} y={0} onClick={() => onOpenUserInfo(entry.userId)} />
-                                <Native0Text clip height={row.height} text={entry.classType} width={classType.width} x={classType.x} y={0} />
-                                <Native0Text bold height={row.height} text={visitCaption} underline width={visit.width} x={visit.x} y={0} />
-                            </div>
-                        ))}
+        <NativeTextTree>
+            <NativeWindowShell type="userClassification" windowKey="1" x={x} y={y}>
+                <Native0Frame caption="" height={height} width={width} onClose={onClose} onResize={onResize}>
+                    <div className="native0-list" style={{ left: 0, top: 0, width: listWidth, height: viewHeight }} onWheel={(event) => setOffset(Math.max(0, Math.min(Math.max(0, contentHeight - viewHeight), clamped + event.deltaY * 0.75)))}>
+                        <div style={{ position: 'absolute', left: 0, top: -clamped, width: listWidth, height: contentHeight }}>
+                            <Native0Rows colors={rowColors} height={contentHeight} rowHeight={row.height} width={listWidth} />
+                            {entries.map((entry, index) => (
+                                <div key={entry.userId} style={{ position: 'absolute', left: 0, top: index * row.height, width: listWidth, height: row.height }}>
+                                    <Native0Text bold clip height={row.height} text={entry.userName} underline width={userName.width} x={userName.x} y={0} onClick={() => onOpenUserInfo(entry.userId)} />
+                                    <Native0Text clip height={row.height} text={entry.classType} width={classType.width} x={classType.x} y={0} />
+                                    <Native0Text bold height={row.height} text={visitCaption} underline width={visit.width} x={visit.x} y={0} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-                {overflow && <Native0Scrollbar contentHeight={contentHeight} height={viewHeight} offset={clamped} viewHeight={viewHeight} x={clientWidth - 17} y={0} onOffset={setOffset} />}
-            </Native0Frame>
-        </NativeWindowShell>
+                    {overflow && <Native0Scrollbar contentHeight={contentHeight} height={viewHeight} offset={clamped} viewHeight={viewHeight} x={clientWidth - 17} y={0} onOffset={setOffset} />}
+                </Native0Frame>
+            </NativeWindowShell>
+        </NativeTextTree>
     );
 };

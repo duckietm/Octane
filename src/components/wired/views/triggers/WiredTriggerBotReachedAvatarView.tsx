@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WiredFurniType } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -31,24 +32,26 @@ export const WiredTriggerBotReachedAvatarView: FC<{}> = (props) => {
     }, [trigger]);
 
     return (
-        <WiredTriggerBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={
-                <WiredSourcesSelector
-                    showUsers={true}
-                    userSource={botSource}
-                    userSources={BOT_SOURCE_OPTIONS}
-                    usersTitle="wiredfurni.params.sources.users.title.bots"
-                    onChangeUsers={setBotSource}
-                />
-            }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
-                <OctaneInput maxLength={32} title={LocalizeText('wiredfurni.tooltip.botname')} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
-            </div>
-        </WiredTriggerBaseView>
+        <NativeTextTree>
+            <WiredTriggerBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={
+                    <WiredSourcesSelector
+                        showUsers={true}
+                        userSource={botSource}
+                        userSources={BOT_SOURCE_OPTIONS}
+                        usersTitle="wiredfurni.params.sources.users.title.bots"
+                        onChangeUsers={setBotSource}
+                    />
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
+                    <OctaneInput maxLength={32} title={LocalizeText('wiredfurni.tooltip.botname')} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
+                </div>
+            </WiredTriggerBaseView>
+        </NativeTextTree>
     );
 };

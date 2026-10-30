@@ -8,6 +8,7 @@ import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { WiredConditionQuantifierSection } from './WiredConditionQuantifierSection';
 import { Radio } from '../../../../common/Radio';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 // 0 is the triggering user's team, as officially.
 const TEAM_OPTIONS = [0, 1, 2, 3, 4];
@@ -90,70 +91,72 @@ export const WiredConditionTeamHasScoreView: FC<WiredConditionTeamHasScoreViewPr
     };
 
     return (
-        <WiredConditionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footerCollapsible={false}
-            showQuantifier={false}
-            footer={
-                <div className="flex flex-col gap-2">
-                    <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
-                        {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
-                    </BaseButton>
-                    {showAdvanced && (
-                        <>
-                            <WiredConditionQuantifierSection />
-                            <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />
-                        </>
-                    )}
-                </div>
-            }
-        >
-            {!scoped && <WiredComparisonOperator name="userAmountComparison" value={comparison} onChange={setComparison} />}
-            {scoped && (
-                <>
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
-                        {TEAM_OPTIONS.map((value) => {
-                            return (
-                                <div key={value} className="flex items-center gap-1">
-                                    <Radio checked={team === value} id={`teamHasScore${value}`} name="teamHasScore" onCheckedChange={() => setTeam(value)} />
-                                    <Text>{LocalizeText(value === 0 ? 'wiredfurni.params.team.triggerer' : `wiredfurni.params.team.${value}`)}</Text>
-                                </div>
-                            );
-                        })}
+        <NativeTextTree>
+            <WiredConditionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footerCollapsible={false}
+                showQuantifier={false}
+                footer={
+                    <div className="flex flex-col gap-2">
+                        <BaseButton className="btn btn-link p-0 align-self-start" type="button" onClick={() => setShowAdvanced((value) => !value)}>
+                            {LocalizeText(showAdvanced ? 'wiredfurni.params.sources.collapse' : 'wiredfurni.params.sources.expand')}
+                        </BaseButton>
+                        {showAdvanced && (
+                            <>
+                                <WiredConditionQuantifierSection />
+                                <WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />
+                            </>
+                        )}
                     </div>
-                    <div className="flex flex-col gap-1">
-                        <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                        {COMPARISON_OPTIONS.map((value) => {
-                            return (
-                                <div key={value} className="flex items-center gap-1">
-                                    <Radio checked={comparison === value} id={`teamScoreComparison${value}`} name="teamScoreComparison" onCheckedChange={() => setComparison(value)} />
-                                    <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </>
-            )}
-            <div className="flex flex-col gap-1">
-                <Text bold>{scoped ? LocalizeText('wiredfurni.params.setscore2') : localizeWithFallback('wiredfurni.params.user_amount', 'Amount:')}</Text>
-                <input
-                    className="form-control form-control-sm"
-                    inputMode="numeric"
-                    type="text"
-                    value={scoreInput}
-                    onBlur={() => setScoreInput(clampScore(score, ceiling).toString())}
-                    onChange={(event) => updateScoreInput(event.target.value)}
-                />
-            </div>
-            {scoped && (
+                }
+            >
+                {!scoped && <WiredComparisonOperator name="userAmountComparison" value={comparison} onChange={setComparison} />}
+                {scoped && (
+                    <>
+                        <div className="flex flex-col gap-1">
+                            <Text bold>{LocalizeText('wiredfurni.params.team')}</Text>
+                            {TEAM_OPTIONS.map((value) => {
+                                return (
+                                    <div key={value} className="flex items-center gap-1">
+                                        <Radio checked={team === value} id={`teamHasScore${value}`} name="teamHasScore" onCheckedChange={() => setTeam(value)} />
+                                        <Text>{LocalizeText(value === 0 ? 'wiredfurni.params.team.triggerer' : `wiredfurni.params.team.${value}`)}</Text>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                            {COMPARISON_OPTIONS.map((value) => {
+                                return (
+                                    <div key={value} className="flex items-center gap-1">
+                                        <Radio checked={comparison === value} id={`teamScoreComparison${value}`} name="teamScoreComparison" onCheckedChange={() => setComparison(value)} />
+                                        <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </>
+                )}
                 <div className="flex flex-col gap-1">
-                    <Slider max={MAX_SCORE} min={MIN_SCORE} step={1} value={score} onChange={(event) => updateScore(event as number)} />
-                    <Text small>{score}</Text>
+                    <Text bold>{scoped ? LocalizeText('wiredfurni.params.setscore2') : localizeWithFallback('wiredfurni.params.user_amount', 'Amount:')}</Text>
+                    <input
+                        className="form-control form-control-sm"
+                        inputMode="numeric"
+                        type="text"
+                        value={scoreInput}
+                        onBlur={() => setScoreInput(clampScore(score, ceiling).toString())}
+                        onChange={(event) => updateScoreInput(event.target.value)}
+                    />
                 </div>
-            )}
-        </WiredConditionBaseView>
+                {scoped && (
+                    <div className="flex flex-col gap-1">
+                        <Slider max={MAX_SCORE} min={MIN_SCORE} step={1} value={score} onChange={(event) => updateScore(event as number)} />
+                        <Text small>{score}</Text>
+                    </div>
+                )}
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

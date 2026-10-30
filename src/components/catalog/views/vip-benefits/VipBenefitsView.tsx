@@ -2,6 +2,7 @@ import { AddLinkEventTracker, ILinkEventTracker, RemoveLinkEventTracker } from '
 import { FC, useEffect, useState } from 'react';
 import { flashFontTagsToSpans, GetConfigurationValue, localizeWithFallback, SanitizeHtml } from '../../../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** English fallbacks for the AIR texts, used only when the external texts lack the key. */
 const FALLBACKS: Record<string, string> = {
@@ -57,21 +58,23 @@ export const VipBenefitsView: FC<{}> = () => {
     const imageLibrary = GetConfigurationValue<string>('image.library.url', '');
 
     return (
-        <OctaneCardView classNames={['octane-vip-benefits']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vip-benefits">
-            <OctaneCardHeaderView headerText={text('vip.benefits.caption')} onCloseClick={() => setIsVisible(false)} />
-            <OctaneCardContentView classNames={['octane-vip-benefits-content']} overflow="hidden">
-                <img alt="" className="octane-vip-benefits-header" src={`${imageLibrary}directVipBuy/hc_benefits_header.png`} />
-                <img alt="" className="octane-vip-benefits-teaser" src={`${imageLibrary}directVipBuy/hc_benefits_teaser.png`} />
-                <span className="octane-vip-benefits-title" data-testid="vip-benefits-title">
-                    {text('vip.benefits.title')}
-                </span>
-                <div
-                    className="octane-vip-benefits-description"
-                    dangerouslySetInnerHTML={html('vip.benefits.description')}
-                    data-testid="vip-benefits-description"
-                />
-                <div className="octane-vip-benefits-details" dangerouslySetInnerHTML={html('vip.benefits.details')} />
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView classNames={['octane-vip-benefits']} frameStyle={3} isResizable={false} theme="primary-slim" uniqueKey="vip-benefits">
+                <OctaneCardHeaderView headerText={text('vip.benefits.caption')} onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardContentView classNames={['octane-vip-benefits-content']} overflow="hidden">
+                    <img alt="" className="octane-vip-benefits-header" src={`${imageLibrary}directVipBuy/hc_benefits_header.png`} />
+                    <img alt="" className="octane-vip-benefits-teaser" src={`${imageLibrary}directVipBuy/hc_benefits_teaser.png`} />
+                    <span className="octane-vip-benefits-title" data-testid="vip-benefits-title">
+                        {text('vip.benefits.title')}
+                    </span>
+                    <div
+                        className="octane-vip-benefits-description"
+                        dangerouslySetInnerHTML={html('vip.benefits.description')}
+                        data-testid="vip-benefits-description"
+                    />
+                    <div className="octane-vip-benefits-details" dangerouslySetInnerHTML={html('vip.benefits.details')} />
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

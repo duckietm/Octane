@@ -21,6 +21,7 @@ import { useMessageEvent, useNotification, useWired } from '../../../../hooks';
 import { useVariablesExplorerStore } from '../../../../state/variablesExplorer';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /** The server takes one key request per box every 2 s. */
 const GENERATE_COOLDOWN_MS = 2000;
@@ -130,88 +131,92 @@ export const WiredExtraVariableWebApiView: FC<{}> = () => {
         const pending = pendingKey === (isReadKey ? 'read' : 'write');
 
         return (
-            <div className="flex flex-col gap-1">
-                <Text bold>
-                    {isReadKey
-                        ? localizeText('wiredfurni.params.web_api.read.title', 'API key for reading:')
-                        : localizeText('wiredfurni.params.web_api.write.title', 'API key for writing:')}
-                </Text>
-                <input
-                    aria-label={isReadKey ? 'Read key' : 'Write key'}
-                    className="form-control form-control-sm font-mono"
-                    readOnly
-                    spellCheck={false}
-                    type="text"
-                    value={key}
-                    onFocus={(event) => event.currentTarget.select()}
-                />
-                <div className="flex gap-1">
-                    <Button disabled={!isOwner || pending} fullWidth variant="secondary" onClick={() => generate(isReadKey)}>
-                        {key
-                            ? localizeText('wiredfurni.params.web_api.regenerate', 'Regenerate')
-                            : localizeText('wiredfurni.params.web_api.generate', 'Generate')}
-                    </Button>
-                    <Button disabled={!key} fullWidth variant="secondary" onClick={() => clearKey(isReadKey)}>
-                        {localizeText('wiredfurni.params.web_api.clear', 'Clear')}
-                    </Button>
-                    <Button disabled={!key} fullWidth variant="secondary" onClick={() => void copyKey(key)}>
-                        {localizeText('wiredfurni.params.web_api.copy', 'Copy')}
-                    </Button>
+            <NativeTextTree>
+                <div className="flex flex-col gap-1">
+                    <Text bold>
+                        {isReadKey
+                            ? localizeText('wiredfurni.params.web_api.read.title', 'API key for reading:')
+                            : localizeText('wiredfurni.params.web_api.write.title', 'API key for writing:')}
+                    </Text>
+                    <input
+                        aria-label={isReadKey ? 'Read key' : 'Write key'}
+                        className="form-control form-control-sm font-mono"
+                        readOnly
+                        spellCheck={false}
+                        type="text"
+                        value={key}
+                        onFocus={(event) => event.currentTarget.select()}
+                    />
+                    <div className="flex gap-1">
+                        <Button disabled={!isOwner || pending} fullWidth variant="secondary" onClick={() => generate(isReadKey)}>
+                            {key
+                                ? localizeText('wiredfurni.params.web_api.regenerate', 'Regenerate')
+                                : localizeText('wiredfurni.params.web_api.generate', 'Generate')}
+                        </Button>
+                        <Button disabled={!key} fullWidth variant="secondary" onClick={() => clearKey(isReadKey)}>
+                            {localizeText('wiredfurni.params.web_api.clear', 'Clear')}
+                        </Button>
+                        <Button disabled={!key} fullWidth variant="secondary" onClick={() => void copyKey(key)}>
+                            {localizeText('wiredfurni.params.web_api.copy', 'Copy')}
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            </NativeTextTree>
         );
     };
 
     const docsUrl = GetWebApiDocsUrl();
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            widthModifier={1.4}
-            footerCollapsible={false}
-            footer={
-                <div className="flex gap-1">
-                    <Button disabled={!docsUrl} fullWidth variant="secondary" onClick={() => OpenUrl(docsUrl)}>
-                        {localizeText('wiredfurni.params.web_api.link', 'Open API documentation')}
-                    </Button>
-                    <Button
-                        fullWidth
-                        variant="secondary"
-                        onClick={() => openExplorer({ roomId: GetRoomSession()?.roomId, readKey: readKey || undefined, writeKey: writeKey || undefined })}
-                    >
-                        {localizeText('wiredfurni.params.web_api.open_explorer', 'Open explorer')}
-                    </Button>
-                </div>
-            }
-        >
-            <div className="flex flex-col gap-2">
-                <Text className="whitespace-pre-line">
-                    {localizeText(
-                        'wiredfurni.params.web_api.usage_info',
-                        "Create API keys for reading and writing variables from dedicated HTTPS endpoints.\nNobody else can see the contents of this box, and you should not share these keys with anyone you don't trust.\n\nAfter changing variable configurations in the room, you may need to reload the room for the API to work properly."
-                    )}
-                </Text>
-                <div className="octane-wired__divider" />
-                {keySection(true)}
-                <div className="octane-wired__divider" />
-                {keySection(false)}
-                <div className="octane-wired__divider" />
-                <div className="flex flex-col gap-1">
-                    <Text bold>{localizeText('wiredfurni.params.web_api.permissions', 'Extra permissions:')}</Text>
-                    <label className={`flex items-center gap-1 ${canAllowBulkDelete(writeKey) ? 'cursor-pointer' : 'opacity-60'}`}>
-                        <Checkbox checked={bulkDelete && canAllowBulkDelete(writeKey)} disabled={!canAllowBulkDelete(writeKey)} onCheckedChange={(nextChecked) => toggleBulkDelete(nextChecked)} />
-                        <Text>{localizeText('wiredfurni.params.web_api.permissions.bulk_delete', 'Allow mass deletion')}</Text>
-                    </label>
-                    <Text small className="text-[#6b6659]">
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                widthModifier={1.4}
+                footerCollapsible={false}
+                footer={
+                    <div className="flex gap-1">
+                        <Button disabled={!docsUrl} fullWidth variant="secondary" onClick={() => OpenUrl(docsUrl)}>
+                            {localizeText('wiredfurni.params.web_api.link', 'Open API documentation')}
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="secondary"
+                            onClick={() => openExplorer({ roomId: GetRoomSession()?.roomId, readKey: readKey || undefined, writeKey: writeKey || undefined })}
+                        >
+                            {localizeText('wiredfurni.params.web_api.open_explorer', 'Open explorer')}
+                        </Button>
+                    </div>
+                }
+            >
+                <div className="flex flex-col gap-2">
+                    <Text className="whitespace-pre-line">
                         {localizeText(
-                            'wiredfurni.params.web_api.permissions.bulk_delete.info',
-                            'Enables access to the /variables/bulk-delete endpoint. Use with caution!'
+                            'wiredfurni.params.web_api.usage_info',
+                            "Create API keys for reading and writing variables from dedicated HTTPS endpoints.\nNobody else can see the contents of this box, and you should not share these keys with anyone you don't trust.\n\nAfter changing variable configurations in the room, you may need to reload the room for the API to work properly."
                         )}
                     </Text>
+                    <div className="octane-wired__divider" />
+                    {keySection(true)}
+                    <div className="octane-wired__divider" />
+                    {keySection(false)}
+                    <div className="octane-wired__divider" />
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{localizeText('wiredfurni.params.web_api.permissions', 'Extra permissions:')}</Text>
+                        <label className={`flex items-center gap-1 ${canAllowBulkDelete(writeKey) ? 'cursor-pointer' : 'opacity-60'}`}>
+                            <Checkbox checked={bulkDelete && canAllowBulkDelete(writeKey)} disabled={!canAllowBulkDelete(writeKey)} onCheckedChange={(nextChecked) => toggleBulkDelete(nextChecked)} />
+                            <Text>{localizeText('wiredfurni.params.web_api.permissions.bulk_delete', 'Allow mass deletion')}</Text>
+                        </label>
+                        <Text small className="text-[#6b6659]">
+                            {localizeText(
+                                'wiredfurni.params.web_api.permissions.bulk_delete.info',
+                                'Enables access to the /variables/bulk-delete endpoint. Use with caution!'
+                            )}
+                        </Text>
+                    </div>
                 </div>
-            </div>
-        </WiredExtraBaseView>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

@@ -3,6 +3,7 @@ import { localizeWithFallback, WiredFurniType, WiredSelectionVisualizer } from '
 import { Text } from '../../../../common';
 import { Checkbox } from '../../../../common/Checkbox';
 import { NumberInput } from '../../../../common/NumberInput';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { Radio } from '../../../../common/Radio';
 import { useWired } from '../../../../hooks';
 import { WiredFurniSelectionSourceRow } from '../WiredFurniSelectionSourceRow';
@@ -211,93 +212,95 @@ export const WiredActionInitTransactionView: FC<{}> = () => {
 
     // AIR forceHidePickFurniInstructions and advancedAlwaysVisible: the two source rows are the whole selection.
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
-            save={save}
-            validate={validate}
-            footerCollapsible={false}
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} userSlot={0} onChangeUsers={setUserSource} />}
-            selectionPreview={
-                <div className="flex flex-col gap-2">
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.chests"
-                        options={FURNI_SOURCES}
-                        value={chestSource}
-                        selectionKind="primary"
-                        selectionActive={selectionMode === 'chests'}
-                        selectionCount={chestIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SELECTED]}
-                        onChange={setChestSource}
-                        onSelectionActivate={() => switchSelection('chests')}
-                    />
-                    <WiredFurniSelectionSourceRow
-                        title="wiredfurni.params.sources.furni.title.contracts"
-                        options={CONTRACT_SOURCES}
-                        value={contractSource}
-                        selectionKind="secondary"
-                        selectionActive={selectionMode === 'contracts'}
-                        selectionCount={contractIds.length}
-                        selectionLimit={selectionLimit}
-                        selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
-                        onChange={(value) => setContractSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
-                        onSelectionActivate={() => switchSelection('contracts')}
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID}
+                save={save}
+                validate={validate}
+                footerCollapsible={false}
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} userSlot={0} onChangeUsers={setUserSource} />}
+                selectionPreview={
+                    <div className="flex flex-col gap-2">
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.chests"
+                            options={FURNI_SOURCES}
+                            value={chestSource}
+                            selectionKind="primary"
+                            selectionActive={selectionMode === 'chests'}
+                            selectionCount={chestIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SELECTED]}
+                            onChange={setChestSource}
+                            onSelectionActivate={() => switchSelection('chests')}
+                        />
+                        <WiredFurniSelectionSourceRow
+                            title="wiredfurni.params.sources.furni.title.contracts"
+                            options={CONTRACT_SOURCES}
+                            value={contractSource}
+                            selectionKind="secondary"
+                            selectionActive={selectionMode === 'contracts'}
+                            selectionCount={contractIds.length}
+                            selectionLimit={selectionLimit}
+                            selectionEnabledValues={[SOURCE_SECONDARY_SELECTED]}
+                            onChange={(value) => setContractSource(value === SOURCE_SELECTED ? SOURCE_SECONDARY_SELECTED : value)}
+                            onSelectionActivate={() => switchSelection('contracts')}
+                        />
+                    </div>
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.contract.mode', 'Transaction method:')}</Text>
+                    {MODES.map((value) => (
+                        <label key={value} className="flex items-center gap-1">
+                            <Radio name="transactionMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
+                            <Text>{localizeWithFallback(`wiredfurni.params.contract.mode.${value}`, MODE_LABELS[value])}</Text>
+                        </label>
+                    ))}
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{multiplierTitle}</Text>
+                    {/* AIR class_4135: createValueOrVariableSection(0, global/context, multiplier_selection, 1, 500); the title
+                        switches to multiplier_selection2 in auto mode and the section is disabled in normal mode. */}
+                    <WiredValueOrVariableField
+                        disabled={!multiplierUsed}
+                        holderSource={WIRED_FIXED_HOLDER_SOURCE}
+                        isVariable={isVariable}
+                        label={multiplierTitle}
+                        literal={multiplier}
+                        max={TRANSACTION_MULTIPLIER_MAX}
+                        min={TRANSACTION_MULTIPLIER_MIN}
+                        target={target}
+                        targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
+                        token={token}
+                        onIsVariableChange={setIsVariable}
+                        onLiteralChange={setMultiplier}
+                        onTargetChange={setTarget}
+                        onTokenChange={setToken}
+                        onValidityChange={setMultiplierValid}
                     />
                 </div>
-            }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.contract.mode', 'Transaction method:')}</Text>
-                {MODES.map((value) => (
-                    <label key={value} className="flex items-center gap-1">
-                        <Radio name="transactionMode" checked={mode === value} onCheckedChange={() => setMode(value)} />
-                        <Text>{localizeWithFallback(`wiredfurni.params.contract.mode.${value}`, MODE_LABELS[value])}</Text>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.contract.timeout', 'Timeout:')}</Text>
+                    <label className="flex items-center gap-1">
+                        <Checkbox checked={timeoutEnabled} onCheckedChange={(nextChecked) => setTimeoutEnabled(nextChecked)} />
+                        <Text>{localizeWithFallback('wiredfurni.params.contract.timeout.desc', 'Cancel a trade automatically on timeout')}</Text>
                     </label>
-                ))}
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{multiplierTitle}</Text>
-                {/* AIR class_4135: createValueOrVariableSection(0, global/context, multiplier_selection, 1, 500); the title
-                    switches to multiplier_selection2 in auto mode and the section is disabled in normal mode. */}
-                <WiredValueOrVariableField
-                    disabled={!multiplierUsed}
-                    holderSource={WIRED_FIXED_HOLDER_SOURCE}
-                    isVariable={isVariable}
-                    label={multiplierTitle}
-                    literal={multiplier}
-                    max={TRANSACTION_MULTIPLIER_MAX}
-                    min={TRANSACTION_MULTIPLIER_MIN}
-                    target={target}
-                    targets={[GLOBAL_TARGET, CONTEXT_TARGET]}
-                    token={token}
-                    onIsVariableChange={setIsVariable}
-                    onLiteralChange={setMultiplier}
-                    onTargetChange={setTarget}
-                    onTokenChange={setToken}
-                    onValidityChange={setMultiplierValid}
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.contract.timeout', 'Timeout:')}</Text>
-                <label className="flex items-center gap-1">
-                    <Checkbox checked={timeoutEnabled} onCheckedChange={(nextChecked) => setTimeoutEnabled(nextChecked)} />
-                    <Text>{localizeWithFallback('wiredfurni.params.contract.timeout.desc', 'Cancel a trade automatically on timeout')}</Text>
-                </label>
-                <label className="flex items-center gap-1">
-                    <Text>{localizeWithFallback('wiredfurni.params.contract.timeout.selection', 'Timeout (seconds):')}</Text>
-                    <NumberInput
-                        allowOutOfRange
-                        aria-label="timeout seconds"
-                        className="form-control form-control-sm"
-                        max={TRANSACTION_TIMEOUT_MAX}
-                        min={TRANSACTION_TIMEOUT_MIN}
-                        value={timeoutSeconds}
-                        onBlur={() => setTimeoutSeconds(String(clampTimeout(parseInt(timeoutSeconds, 10))))}
-                        onChange={(event) => setTimeoutSeconds(event.target.value)}
-                    />
-                </label>
-            </div>
-        </WiredActionBaseView>
+                    <label className="flex items-center gap-1">
+                        <Text>{localizeWithFallback('wiredfurni.params.contract.timeout.selection', 'Timeout (seconds):')}</Text>
+                        <NumberInput
+                            allowOutOfRange
+                            aria-label="timeout seconds"
+                            className="form-control form-control-sm"
+                            max={TRANSACTION_TIMEOUT_MAX}
+                            min={TRANSACTION_TIMEOUT_MIN}
+                            value={timeoutSeconds}
+                            onBlur={() => setTimeoutSeconds(String(clampTimeout(parseInt(timeoutSeconds, 10))))}
+                            onChange={(event) => setTimeoutSeconds(event.target.value)}
+                        />
+                    </label>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

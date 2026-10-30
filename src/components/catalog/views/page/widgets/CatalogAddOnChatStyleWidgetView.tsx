@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import chatStyleBackgroundSrc from '../../../../../assets/images/catalog/air/catalogue-chatstyle-background.png';
 import { LayoutChatStyleImageView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData } from '../../../../../hooks';
 
 interface CatalogAddOnChatStyleWidgetViewProps {
@@ -19,9 +20,11 @@ export const CatalogAddOnChatStyleWidgetView: FC<CatalogAddOnChatStyleWidgetView
     if (!currentOffer || currentOffer.badgeCode?.length || !currentOffer.chatStyleId?.length) return null;
 
     return (
-        <div className={`octane-catalog-addon-chat-style ${className}`.trim()}>
-            <img alt="" className="octane-catalog-addon-chat-style-background" draggable={false} src={chatStyleBackgroundSrc} />
-            <LayoutChatStyleImageView styleId={currentOffer.chatStyleId} />
-        </div>
+        <NativeTextTree>
+            <div className={`octane-catalog-addon-chat-style ${className}`.trim()}>
+                <img alt="" className="octane-catalog-addon-chat-style-background" draggable={false} src={chatStyleBackgroundSrc} />
+                <LayoutChatStyleImageView styleId={currentOffer.chatStyleId} />
+            </div>
+        </NativeTextTree>
     );
 };

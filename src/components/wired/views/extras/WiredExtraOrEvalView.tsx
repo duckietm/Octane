@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { WiredSourceOption, WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MODE_ALL = 0;
 const MODE_AT_LEAST_ONE = 1;
@@ -88,52 +89,54 @@ export const WiredExtraOrEvalView: FC<{}> = () => {
     };
 
     return (
-        <WiredExtraBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            cardStyle={{ width: 360 }}
-            footer={
-                <WiredSourcesSelector
-                    showFurni={true}
-                    furniSource={furniSource}
-                    furniSources={FURNI_SOURCES}
-                    onChangeFurni={(value) => setFurniSource(normalizeFurniSource(value))}
-                />
-            }
-        >
-            <div className="flex flex-col gap-2">
-                <Text>{LocalizeText('wiredfurni.params.eval_mode')}</Text>
-                {MODE_OPTIONS.map((mode) => {
-                    return (
-                        <label key={mode} className="flex items-center gap-1 cursor-pointer">
-                            <Radio checked={evaluationMode === mode} name="wiredExtraOrEvalMode" onCheckedChange={() => setEvaluationMode(mode)} />
-                            <Text>{LocalizeText(`wiredfurni.params.eval_mode.${mode}`)}</Text>
-                        </label>
-                    );
-                })}
-                {COMPARISON_OPTIONS.map((mode) => {
-                    const isSelected = evaluationMode === mode;
+        <NativeTextTree>
+            <WiredExtraBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                cardStyle={{ width: 360 }}
+                footer={
+                    <WiredSourcesSelector
+                        showFurni={true}
+                        furniSource={furniSource}
+                        furniSources={FURNI_SOURCES}
+                        onChangeFurni={(value) => setFurniSource(normalizeFurniSource(value))}
+                    />
+                }
+            >
+                <div className="flex flex-col gap-2">
+                    <Text>{LocalizeText('wiredfurni.params.eval_mode')}</Text>
+                    {MODE_OPTIONS.map((mode) => {
+                        return (
+                            <label key={mode} className="flex items-center gap-1 cursor-pointer">
+                                <Radio checked={evaluationMode === mode} name="wiredExtraOrEvalMode" onCheckedChange={() => setEvaluationMode(mode)} />
+                                <Text>{LocalizeText(`wiredfurni.params.eval_mode.${mode}`)}</Text>
+                            </label>
+                        );
+                    })}
+                    {COMPARISON_OPTIONS.map((mode) => {
+                        const isSelected = evaluationMode === mode;
 
-                    return (
-                        <label key={mode} className="flex items-center gap-2 cursor-pointer">
-                            <Radio checked={isSelected} name="wiredExtraOrEvalMode" onCheckedChange={() => setEvaluationMode(mode)} />
-                            <Text>{LocalizeText(`wiredfurni.params.eval_mode.cmp.${mode - MODE_LESS_THAN}`)}</Text>
-                            <input
-                                className="form-control form-control-sm w-16"
-                                inputMode="numeric"
-                                max={MAX_COMPARE_VALUE}
-                                min={MIN_COMPARE_VALUE}
-                                type="text"
-                                value={compareValueInput}
-                                onBlur={() => setCompareValueInput(normalizeCompareValue(compareValue).toString())}
-                                onChange={(event) => updateCompareValueInput(event.target.value)}
-                                onFocus={() => setEvaluationMode(mode)}
-                            />
-                        </label>
-                    );
-                })}
-            </div>
-        </WiredExtraBaseView>
+                        return (
+                            <label key={mode} className="flex items-center gap-2 cursor-pointer">
+                                <Radio checked={isSelected} name="wiredExtraOrEvalMode" onCheckedChange={() => setEvaluationMode(mode)} />
+                                <Text>{LocalizeText(`wiredfurni.params.eval_mode.cmp.${mode - MODE_LESS_THAN}`)}</Text>
+                                <input
+                                    className="form-control form-control-sm w-16"
+                                    inputMode="numeric"
+                                    max={MAX_COMPARE_VALUE}
+                                    min={MIN_COMPARE_VALUE}
+                                    type="text"
+                                    value={compareValueInput}
+                                    onBlur={() => setCompareValueInput(normalizeCompareValue(compareValue).toString())}
+                                    onChange={(event) => updateCompareValueInput(event.target.value)}
+                                    onFocus={() => setEvaluationMode(mode)}
+                                />
+                            </label>
+                        );
+                    })}
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

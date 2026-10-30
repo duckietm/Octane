@@ -2,6 +2,7 @@ import { IPartColor } from '@octane/renderer';
 import { ButtonHTMLAttributes, CSSProperties, FC } from 'react';
 import { ColorUtils, GetClubMemberLevel, GetConfigurationValue } from '../../../api';
 import hcSmallSrc from '../../../assets/images/avatareditor/air/hc-small.png';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { ToggleButton } from '../../../common/ToggleButton';
 
 export const AvatarEditorPaletteSetItem: FC<
@@ -18,15 +19,17 @@ export const AvatarEditorPaletteSetItem: FC<
     const isLocked = isHC && GetClubMemberLevel() < partColor.clubLevel;
 
     return (
-        <ToggleButton
-            type="button" pressed={isSelected}
-            className={`avatar-editor-palette-item${isSelected ? ' is-selected' : ''}${isLocked ? ' is-locked' : ''}${className ? ` ${className}` : ''}`}
-            style={style as CSSProperties}
-            {...(rest as Record<string, unknown>)}
-        >
-            <span className="avatar-editor-palette-color" style={{ backgroundColor: ColorUtils.makeColorNumberHex(partColor.rgb & 0xffffff) }} />
-            <span className="avatar-editor-palette-frame" />
-            {isHC && <img className="avatar-editor-palette-hc" src={hcSmallSrc} alt="" draggable={false} />}
-        </ToggleButton>
+        <NativeTextTree>
+            <ToggleButton
+                type="button" pressed={isSelected}
+                className={`avatar-editor-palette-item${isSelected ? ' is-selected' : ''}${isLocked ? ' is-locked' : ''}${className ? ` ${className}` : ''}`}
+                style={style as CSSProperties}
+                {...(rest as Record<string, unknown>)}
+            >
+                <span className="avatar-editor-palette-color" style={{ backgroundColor: ColorUtils.makeColorNumberHex(partColor.rgb & 0xffffff) }} />
+                <span className="avatar-editor-palette-frame" />
+                {isHC && <img className="avatar-editor-palette-hc" src={hcSmallSrc} alt="" draggable={false} />}
+            </ToggleButton>
+        </NativeTextTree>
     );
 };

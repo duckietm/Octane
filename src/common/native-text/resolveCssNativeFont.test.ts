@@ -61,5 +61,6 @@ describe('resolveCssNativeFont', () => {
         expect(resolveCssNativeFont(css({ letterSpacing: '1px' }))).toBeNull();
         expect(resolveCssNativeFont(css({ fontSize: '64px' }))).toBeNull();
         expect(resolveCssNativeFont(css({ fontFamily: 'Volter', fontStyle: 'italic' }))).toBeNull();
+        expect(resolveCssNativeFont(css({ fontFamily: 'Volter', textDecorationLine: 'underline' }))).toBeNull();
     });
 });

@@ -2,6 +2,7 @@ import { GroupInformationComposer, GroupInformationEvent, GroupInformationParser
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, SanitizeHtml, SendMessageComposer, ToggleFavoriteGroup } from '../../api';
 import { Column, GridProps, LayoutBadgeImageView, LayoutGridItem } from '../../common';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 import { useMessageEvent } from '../../hooks';
 import { GroupInformationView } from '../groups/views/GroupInformationView';
 
@@ -46,51 +47,57 @@ export const GroupsContainerView: FC<GroupsContainerViewProps> = (props) => {
 
     if (!groups || !groups.length) {
         return (
-            <Column center fullHeight className="octane-extended-profile-groups">
-                <div className="flex justify-center gap-2">
-                    <div className="no-group-spritesheet image-1" />
-                    <div className="no-group-spritesheet image-2" />
-                    <div className="no-group-spritesheet image-3" />
-                </div>
-            </Column>
+            <NativeTextTree>
+                <Column center fullHeight className="octane-extended-profile-groups">
+                    <div className="flex justify-center gap-2">
+                        <div className="no-group-spritesheet image-1" />
+                        <div className="no-group-spritesheet image-2" />
+                        <div className="no-group-spritesheet image-3" />
+                    </div>
+                </Column>
+            </NativeTextTree>
         );
     }
 
     return (
-        <div className="octane-extended-profile-groups">
-            <div className="octane-extended-profile-groups__sidebar">
-                <div
-                    className="octane-extended-profile-groups__count"
-                    dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('extendedprofile.groups.count', ['count'], [groups.length.toString()])) }}
-                />
-                <div className="octane-extended-profile-groups__list">
-                    {groups.map((group, index) => {
-                        return (
-                            <LayoutGridItem
-                                key={index}
-                                className="octane-extended-profile-groups__item p-1"
-                                itemActive={selectedGroupId === group.groupId}
-                                overflow="unset"
-                                onClick={() => setSelectedGroupId(group.groupId)}
-                            >
-                                {itsMe && (
-                                    <i
-                                        className={'absolute inset-e-0 top-0 z-20 octane-icon icon-group-' + (group.favourite ? 'favorite' : 'not-favorite')}
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            ToggleFavoriteGroup(group);
-                                        }}
-                                    />
-                                )}
-                                <LayoutBadgeImageView badgeCode={group.badgeCode} isGroup={true} />
-                            </LayoutGridItem>
-                        );
-                    })}
+        <NativeTextTree>
+            <div className="octane-extended-profile-groups">
+                <div className="octane-extended-profile-groups__sidebar">
+                    <div
+                        className="octane-extended-profile-groups__count"
+                        dangerouslySetInnerHTML={{ __html: SanitizeHtml(LocalizeText('extendedprofile.groups.count', ['count'], [groups.length.toString()])) }}
+                    />
+                    <div className="octane-extended-profile-groups__list">
+                        {groups.map((group, index) => {
+                            return (
+                                <LayoutGridItem
+                                    key={index}
+                                    className="octane-extended-profile-groups__item p-1"
+                                    itemActive={selectedGroupId === group.groupId}
+                                    overflow="unset"
+                                    onClick={() => setSelectedGroupId(group.groupId)}
+                                >
+                                    {itsMe && (
+                                        <i
+                                            className={
+                                                'absolute inset-e-0 top-0 z-20 octane-icon icon-group-' + (group.favourite ? 'favorite' : 'not-favorite')
+                                            }
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                ToggleFavoriteGroup(group);
+                                            }}
+                                        />
+                                    )}
+                                    <LayoutBadgeImageView badgeCode={group.badgeCode} isGroup={true} />
+                                </LayoutGridItem>
+                            );
+                        })}
+                    </div>
+                </div>
+                <div className="octane-extended-profile-groups__details">
+                    {groupInformation && <GroupInformationView groupInformation={groupInformation} onClose={onLeaveGroup} />}
                 </div>
             </div>
-            <div className="octane-extended-profile-groups__details">
-                {groupInformation && <GroupInformationView groupInformation={groupInformation} onClose={onLeaveGroup} />}
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

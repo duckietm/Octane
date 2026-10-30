@@ -3,6 +3,7 @@ import { GetConfigurationValue, localizeWithFallback } from '../../../../api';
 import { Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../../common';
 import { ROOM_QUEUE_TARGET_SPECTATOR, useRoomQueueWidget } from '../../../../hooks';
 import '../../../../css/room/RoomWidgetsSweepAir.css';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const positionKey = (target: number, isClubQueue: boolean): string => {
     const base = target === ROOM_QUEUE_TARGET_SPECTATOR ? 'room.queue.spectator.position' : 'room.queue.position';
@@ -29,28 +30,30 @@ export const RoomQueueWidgetView: FC = () => {
     const infoText = localizeWithFallback(positionKey(status.target, status.isClubQueue), positionFallback(status.target, status.position), ['position'], [position]);
 
     return (
-        <OctaneCardView className="octane-room-queue-widget" theme="primary-slim" uniqueKey="room-queue">
-            <OctaneCardHeaderView headerText={localizeWithFallback('room.queue.title', 'Queue')} onCloseClick={leaveQueue} />
-            <OctaneCardContentView alignItems="center" gap={2}>
-                <Text bold center className="octane-room-queue-info">
-                    {infoText}
-                </Text>
-                <Button className="octane-room-queue-button" variant="secondary" onClick={leaveQueue}>
-                    {localizeWithFallback('room.queue.button.exit', 'Leave the queue')}
-                </Button>
-                {showSpectatorSwitch && (
-                    <>
-                        <Text center small className="octane-room-queue-spectator-info">
-                            {localizeWithFallback('room.queue.spectator.info', 'Spectate the room without going in.')}
-                        </Text>
-                        <Button className="octane-room-queue-button" variant="secondary" onClick={changeQueue}>
-                            {status.target === ROOM_QUEUE_TARGET_SPECTATOR
-                                ? localizeWithFallback('room.queue.back', 'Back to the queue')
-                                : localizeWithFallback('room.queue.spectatormode', 'Spectate')}
-                        </Button>
-                    </>
-                )}
-            </OctaneCardContentView>
-        </OctaneCardView>
+        <NativeTextTree>
+            <OctaneCardView className="octane-room-queue-widget" theme="primary-slim" uniqueKey="room-queue">
+                <OctaneCardHeaderView headerText={localizeWithFallback('room.queue.title', 'Queue')} onCloseClick={leaveQueue} />
+                <OctaneCardContentView alignItems="center" gap={2}>
+                    <Text bold center className="octane-room-queue-info">
+                        {infoText}
+                    </Text>
+                    <Button className="octane-room-queue-button" variant="secondary" onClick={leaveQueue}>
+                        {localizeWithFallback('room.queue.button.exit', 'Leave the queue')}
+                    </Button>
+                    {showSpectatorSwitch && (
+                        <>
+                            <Text center small className="octane-room-queue-spectator-info">
+                                {localizeWithFallback('room.queue.spectator.info', 'Spectate the room without going in.')}
+                            </Text>
+                            <Button className="octane-room-queue-button" variant="secondary" onClick={changeQueue}>
+                                {status.target === ROOM_QUEUE_TARGET_SPECTATOR
+                                    ? localizeWithFallback('room.queue.back', 'Back to the queue')
+                                    : localizeWithFallback('room.queue.spectatormode', 'Spectate')}
+                            </Button>
+                        </>
+                    )}
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

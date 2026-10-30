@@ -12,6 +12,7 @@ import {
 } from '../../api';
 import { OctaneCardContentView, OctaneCardHeaderView, OctaneCardView } from '../../common';
 import { BaseButton } from '../../common/BaseButton';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 type EmuStatsSection = 'overview' | 'system' | 'wiredInsights' | 'users' | 'rooms' | 'wired';
 
@@ -108,67 +109,69 @@ const MemoryChart: FC<{ history: EmuStatsMemoryPoint[] }> = ({ history }) => {
     };
 
     return (
-        <div className="octane-emustats__chart-card">
-            <div className="octane-emustats__section-header">
-                <div>
-                    <h3>Realtime Memory Usage</h3>
-                    <p>Rolling history from the emulator process.</p>
+        <NativeTextTree>
+            <div className="octane-emustats__chart-card">
+                <div className="octane-emustats__section-header">
+                    <div>
+                        <h3>Realtime Memory Usage</h3>
+                        <p>Rolling history from the emulator process.</p>
+                    </div>
+                    <div className="octane-emustats__chart-meta">
+                        <span>Peak {chart.peak} MB</span>
+                        <strong>{chart.latest} MB</strong>
+                    </div>
                 </div>
-                <div className="octane-emustats__chart-meta">
-                    <span>Peak {chart.peak} MB</span>
-                    <strong>{chart.latest} MB</strong>
-                </div>
-            </div>
-            <div className="octane-emustats__chart-shell">
-                <div className="octane-emustats__chart-axis">
-                    {chart.gridValues.map((value, index) => (
-                        <span key={`${value}-${index}`}>{value} MB</span>
-                    ))}
-                    <span>0 MB</span>
-                </div>
-                <div className="octane-emustats__chart-canvas">
-                    <svg
-                        viewBox="0 0 100 100"
-                        preserveAspectRatio="none"
-                        className="octane-emustats__chart"
-                        onMouseLeave={() => setHoveredIndex(-1)}
-                        onMouseMove={onMouseMove}
-                    >
-                        <defs>
-                            <linearGradient id="emuStatsArea" x1="0" x2="0" y1="0" y2="1">
-                                <stop offset="0%" stopColor="rgba(99,102,241,0.45)" />
-                                <stop offset="100%" stopColor="rgba(99,102,241,0.02)" />
-                            </linearGradient>
-                        </defs>
-                        <line x1="0" y1="20" x2="100" y2="20" className="octane-emustats__chart-grid" />
-                        <line x1="0" y1="40" x2="100" y2="40" className="octane-emustats__chart-grid" />
-                        <line x1="0" y1="60" x2="100" y2="60" className="octane-emustats__chart-grid" />
-                        <line x1="0" y1="80" x2="100" y2="80" className="octane-emustats__chart-grid" />
-                        {!!chart.areaPoints.length && <polygon points={chart.areaPoints} fill="url(#emuStatsArea)" />}
-                        {!!chart.linePoints.length && <polyline points={chart.linePoints} className="octane-emustats__chart-line" />}
-                        {hoveredPoint && (
-                            <>
-                                <line x1={hoveredPoint.x} y1="0" x2={hoveredPoint.x} y2="100" className="octane-emustats__chart-hover-line" />
-                                <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="1.8" className="octane-emustats__chart-hover-point" />
-                            </>
-                        )}
-                    </svg>
-                    {hoveredPoint && (
-                        <div
-                            className="octane-emustats__chart-tooltip"
-                            style={{
-                                left: `${Math.min(88, Math.max(6, hoveredPoint.x))}%`,
-                                top: `${Math.min(72, Math.max(6, hoveredPoint.y - 10))}%`
-                            }}
+                <div className="octane-emustats__chart-shell">
+                    <div className="octane-emustats__chart-axis">
+                        {chart.gridValues.map((value, index) => (
+                            <span key={`${value}-${index}`}>{value} MB</span>
+                        ))}
+                        <span>0 MB</span>
+                    </div>
+                    <div className="octane-emustats__chart-canvas">
+                        <svg
+                            viewBox="0 0 100 100"
+                            preserveAspectRatio="none"
+                            className="octane-emustats__chart"
+                            onMouseLeave={() => setHoveredIndex(-1)}
+                            onMouseMove={onMouseMove}
                         >
-                            <strong>{hoveredPoint.usedMb} MB</strong>
-                            <span>{hoveredPoint.usagePercent.toFixed(1)}%</span>
-                            <small>{formatDateTime(hoveredPoint.timestamp)}</small>
-                        </div>
-                    )}
+                            <defs>
+                                <linearGradient id="emuStatsArea" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stopColor="rgba(99,102,241,0.45)" />
+                                    <stop offset="100%" stopColor="rgba(99,102,241,0.02)" />
+                                </linearGradient>
+                            </defs>
+                            <line x1="0" y1="20" x2="100" y2="20" className="octane-emustats__chart-grid" />
+                            <line x1="0" y1="40" x2="100" y2="40" className="octane-emustats__chart-grid" />
+                            <line x1="0" y1="60" x2="100" y2="60" className="octane-emustats__chart-grid" />
+                            <line x1="0" y1="80" x2="100" y2="80" className="octane-emustats__chart-grid" />
+                            {!!chart.areaPoints.length && <polygon points={chart.areaPoints} fill="url(#emuStatsArea)" />}
+                            {!!chart.linePoints.length && <polyline points={chart.linePoints} className="octane-emustats__chart-line" />}
+                            {hoveredPoint && (
+                                <>
+                                    <line x1={hoveredPoint.x} y1="0" x2={hoveredPoint.x} y2="100" className="octane-emustats__chart-hover-line" />
+                                    <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="1.8" className="octane-emustats__chart-hover-point" />
+                                </>
+                            )}
+                        </svg>
+                        {hoveredPoint && (
+                            <div
+                                className="octane-emustats__chart-tooltip"
+                                style={{
+                                    left: `${Math.min(88, Math.max(6, hoveredPoint.x))}%`,
+                                    top: `${Math.min(72, Math.max(6, hoveredPoint.y - 10))}%`
+                                }}
+                            >
+                                <strong>{hoveredPoint.usedMb} MB</strong>
+                                <span>{hoveredPoint.usagePercent.toFixed(1)}%</span>
+                                <small>{formatDateTime(hoveredPoint.timestamp)}</small>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -182,49 +185,53 @@ const StatsTable = <TRow extends object>({
     rowKey: (row: TRow, index: number) => string;
 }) => {
     return (
-        <div className="octane-emustats__table-shell">
-            <table className="octane-emustats__table">
-                <thead>
-                    <tr>
-                        {columns.map((column) => (
-                            <th key={String(column.key)} className={column.className}>
-                                {column.label}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows.length === 0 && (
+        <NativeTextTree>
+            <div className="octane-emustats__table-shell">
+                <table className="octane-emustats__table">
+                    <thead>
                         <tr>
-                            <td colSpan={columns.length} className="octane-emustats__table-empty">
-                                Nothing to show right now.
-                            </td>
-                        </tr>
-                    )}
-                    {rows.map((row, index) => (
-                        <tr key={rowKey(row, index)}>
                             {columns.map((column) => (
-                                <td key={String(column.key)} className={column.className}>
-                                    {column.render ? column.render(row) : (row[column.key] as ReactNode)}
-                                </td>
+                                <th key={String(column.key)} className={column.className}>
+                                    {column.label}
+                                </th>
                             ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {rows.length === 0 && (
+                            <tr>
+                                <td colSpan={columns.length} className="octane-emustats__table-empty">
+                                    Nothing to show right now.
+                                </td>
+                            </tr>
+                        )}
+                        {rows.map((row, index) => (
+                            <tr key={rowKey(row, index)}>
+                                {columns.map((column) => (
+                                    <td key={String(column.key)} className={column.className}>
+                                        {column.render ? column.render(row) : (row[column.key] as ReactNode)}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </NativeTextTree>
     );
 };
 
 const DetailPanel: FC<{ title: string; description?: string; children: ReactNode }> = ({ title, description = '', children }) => {
     return (
-        <div className="octane-emustats__detail-panel">
-            <div className="octane-emustats__detail-panel-header">
-                <h3>{title}</h3>
-                {!!description.length && <p>{description}</p>}
+        <NativeTextTree>
+            <div className="octane-emustats__detail-panel">
+                <div className="octane-emustats__detail-panel-header">
+                    <h3>{title}</h3>
+                    {!!description.length && <p>{description}</p>}
+                </div>
+                {children}
             </div>
-            {children}
-        </div>
+        </NativeTextTree>
     );
 };
 
@@ -245,75 +252,81 @@ const SystemSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) => {
     const { databasePool, garbageCollector, network, overview, scheduler } = snapshot;
 
     return (
-        <div className="octane-emustats__detail-layout">
-            <DetailPanel title="Database Pool" description="Current Hikari pool pressure and connection availability.">
-                <KeyValueGrid
-                    items={[
-                        { label: 'Active', value: formatCompactNumber(databasePool.activeConnections) },
-                        { label: 'Idle', value: formatCompactNumber(databasePool.idleConnections) },
-                        { label: 'Total', value: formatCompactNumber(databasePool.totalConnections) },
-                        { label: 'Max', value: formatCompactNumber(databasePool.maxConnections) },
-                        {
-                            label: 'Waiting Threads',
-                            value: formatCompactNumber(databasePool.waitingThreads),
-                            tone: databasePool.waitingThreads > 0 ? 'warn' : 'good'
-                        }
-                    ]}
-                />
-            </DetailPanel>
-            <DetailPanel title="Network Throughput" description="Realtime rates sampled from incoming and outgoing packet pipelines.">
-                <KeyValueGrid
-                    items={[
-                        { label: 'Incoming Packets/s', value: formatThroughput(network.incomingPacketsPerSecond, 'pkt') },
-                        { label: 'Outgoing Packets/s', value: formatThroughput(network.outgoingPacketsPerSecond, 'pkt') },
-                        { label: 'Incoming KB/s', value: formatThroughput(network.incomingKilobytesPerSecond, 'KB') },
-                        { label: 'Outgoing KB/s', value: formatThroughput(network.outgoingKilobytesPerSecond, 'KB') },
-                        { label: 'Total Incoming', value: formatCompactNumber(network.totalIncomingPackets) },
-                        { label: 'Total Outgoing', value: formatCompactNumber(network.totalOutgoingPackets) }
-                    ]}
-                />
-            </DetailPanel>
-            <DetailPanel title="Scheduler" description="Executor load behind delayed tasks and internal service work.">
-                <KeyValueGrid
-                    items={[
-                        { label: 'Queued Tasks', value: formatCompactNumber(scheduler.queuedTasks), tone: scheduler.queuedTasks > 0 ? 'warn' : 'good' },
-                        { label: 'Active Threads', value: formatCompactNumber(scheduler.activeThreads) },
-                        { label: 'Pool Size', value: formatCompactNumber(scheduler.poolSize) },
-                        { label: 'Completed Tasks', value: formatCompactNumber(scheduler.completedTasks) },
-                        { label: 'Running', value: formatBoolean(scheduler.running), tone: scheduler.running ? 'good' : 'warn' }
-                    ]}
-                />
-            </DetailPanel>
-            <DetailPanel title="Garbage Collection" description="Observed JVM collection activity since emulator startup.">
-                <KeyValueGrid
-                    items={[
-                        { label: 'Total Collections', value: formatCompactNumber(garbageCollector.totalCollections) },
-                        { label: 'Collections This Sample', value: formatCompactNumber(garbageCollector.collectionsSinceLastSample) },
-                        { label: 'Total Pause Time', value: `${formatCompactNumber(garbageCollector.totalCollectionTimeMs)} ms` },
-                        {
-                            label: 'Last Observed Pause',
-                            value: `${formatCompactNumber(garbageCollector.lastObservedPauseMs)} ms`,
-                            tone: garbageCollector.lastObservedPauseMs > 250 ? 'warn' : 'default'
-                        },
-                        { label: 'Sampled At', value: formatDateTime(garbageCollector.sampledAtEpochMs) }
-                    ]}
-                />
-            </DetailPanel>
-            <DetailPanel title="Cycle Health" description="Aggregated timing from the active room update loop.">
-                <KeyValueGrid
-                    items={[
-                        { label: 'Average Room Cycle', value: formatMs(overview.averageRoomCycleMs) },
-                        { label: 'Worst Room Cycle', value: formatMs(overview.worstRoomCycleMs), tone: overview.worstRoomCycleMs > 20 ? 'warn' : 'default' },
-                        { label: 'Worst Room', value: formatRoomLabel(overview.worstRoomCycleRoomId, overview.worstRoomCycleRoomName) },
-                        {
-                            label: 'WebSocket Sessions',
-                            value: `${formatCompactNumber(overview.activeWebSocketSessions)} / ${formatCompactNumber(overview.peakWebSocketSessions)} peak`
-                        }
-                    ]}
-                    columns={1}
-                />
-            </DetailPanel>
-        </div>
+        <NativeTextTree>
+            <div className="octane-emustats__detail-layout">
+                <DetailPanel title="Database Pool" description="Current Hikari pool pressure and connection availability.">
+                    <KeyValueGrid
+                        items={[
+                            { label: 'Active', value: formatCompactNumber(databasePool.activeConnections) },
+                            { label: 'Idle', value: formatCompactNumber(databasePool.idleConnections) },
+                            { label: 'Total', value: formatCompactNumber(databasePool.totalConnections) },
+                            { label: 'Max', value: formatCompactNumber(databasePool.maxConnections) },
+                            {
+                                label: 'Waiting Threads',
+                                value: formatCompactNumber(databasePool.waitingThreads),
+                                tone: databasePool.waitingThreads > 0 ? 'warn' : 'good'
+                            }
+                        ]}
+                    />
+                </DetailPanel>
+                <DetailPanel title="Network Throughput" description="Realtime rates sampled from incoming and outgoing packet pipelines.">
+                    <KeyValueGrid
+                        items={[
+                            { label: 'Incoming Packets/s', value: formatThroughput(network.incomingPacketsPerSecond, 'pkt') },
+                            { label: 'Outgoing Packets/s', value: formatThroughput(network.outgoingPacketsPerSecond, 'pkt') },
+                            { label: 'Incoming KB/s', value: formatThroughput(network.incomingKilobytesPerSecond, 'KB') },
+                            { label: 'Outgoing KB/s', value: formatThroughput(network.outgoingKilobytesPerSecond, 'KB') },
+                            { label: 'Total Incoming', value: formatCompactNumber(network.totalIncomingPackets) },
+                            { label: 'Total Outgoing', value: formatCompactNumber(network.totalOutgoingPackets) }
+                        ]}
+                    />
+                </DetailPanel>
+                <DetailPanel title="Scheduler" description="Executor load behind delayed tasks and internal service work.">
+                    <KeyValueGrid
+                        items={[
+                            { label: 'Queued Tasks', value: formatCompactNumber(scheduler.queuedTasks), tone: scheduler.queuedTasks > 0 ? 'warn' : 'good' },
+                            { label: 'Active Threads', value: formatCompactNumber(scheduler.activeThreads) },
+                            { label: 'Pool Size', value: formatCompactNumber(scheduler.poolSize) },
+                            { label: 'Completed Tasks', value: formatCompactNumber(scheduler.completedTasks) },
+                            { label: 'Running', value: formatBoolean(scheduler.running), tone: scheduler.running ? 'good' : 'warn' }
+                        ]}
+                    />
+                </DetailPanel>
+                <DetailPanel title="Garbage Collection" description="Observed JVM collection activity since emulator startup.">
+                    <KeyValueGrid
+                        items={[
+                            { label: 'Total Collections', value: formatCompactNumber(garbageCollector.totalCollections) },
+                            { label: 'Collections This Sample', value: formatCompactNumber(garbageCollector.collectionsSinceLastSample) },
+                            { label: 'Total Pause Time', value: `${formatCompactNumber(garbageCollector.totalCollectionTimeMs)} ms` },
+                            {
+                                label: 'Last Observed Pause',
+                                value: `${formatCompactNumber(garbageCollector.lastObservedPauseMs)} ms`,
+                                tone: garbageCollector.lastObservedPauseMs > 250 ? 'warn' : 'default'
+                            },
+                            { label: 'Sampled At', value: formatDateTime(garbageCollector.sampledAtEpochMs) }
+                        ]}
+                    />
+                </DetailPanel>
+                <DetailPanel title="Cycle Health" description="Aggregated timing from the active room update loop.">
+                    <KeyValueGrid
+                        items={[
+                            { label: 'Average Room Cycle', value: formatMs(overview.averageRoomCycleMs) },
+                            {
+                                label: 'Worst Room Cycle',
+                                value: formatMs(overview.worstRoomCycleMs),
+                                tone: overview.worstRoomCycleMs > 20 ? 'warn' : 'default'
+                            },
+                            { label: 'Worst Room', value: formatRoomLabel(overview.worstRoomCycleRoomId, overview.worstRoomCycleRoomName) },
+                            {
+                                label: 'WebSocket Sessions',
+                                value: `${formatCompactNumber(overview.activeWebSocketSessions)} / ${formatCompactNumber(overview.peakWebSocketSessions)} peak`
+                            }
+                        ]}
+                        columns={1}
+                    />
+                </DetailPanel>
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -321,53 +334,61 @@ const WiredInsightsSection: FC<{ snapshot: EmuStatsSnapshot }> = ({ snapshot }) 
     const { overview } = snapshot;
 
     return (
-        <div className="octane-emustats__detail-layout">
-            <DetailPanel title="Wired Pressure" description="Live summary of tick load, delayed actions and heavy rooms.">
-                <KeyValueGrid
-                    items={[
-                        { label: 'Tickables', value: formatCompactNumber(overview.wiredTickables) },
-                        {
-                            label: 'Delayed Events',
-                            value: formatCompactNumber(overview.delayedEventsPending),
-                            tone: overview.delayedEventsPending > 0 ? 'warn' : 'good'
-                        },
-                        { label: 'Heavy Rooms', value: formatCompactNumber(overview.heavyWiredRooms), tone: overview.heavyWiredRooms > 0 ? 'warn' : 'good' },
-                        {
-                            label: 'Overloaded Rooms',
-                            value: formatCompactNumber(overview.overloadedWiredRooms),
-                            tone: overview.overloadedWiredRooms > 0 ? 'warn' : 'good'
-                        },
-                        { label: 'Activity / Second', value: formatThroughput(overview.wiredActivityPerSecond, 'ops') }
-                    ]}
-                />
-            </DetailPanel>
-            <DetailPanel title="Top Wired Rooms" description="Highest usage rooms in the current diagnostics window.">
-                <StatsTable<EmuStatsWiredTopRoomRow>
-                    columns={[
-                        { key: 'roomId', label: 'Room', className: 'is-xs' },
-                        { key: 'name', label: 'Name' },
-                        { key: 'usagePercent', label: 'Usage', className: 'is-xs', render: (row) => `${row.usagePercent}%` },
-                        { key: 'averageTickMs', label: 'Avg Tick', className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
-                        { key: 'peakTickMs', label: 'Peak Tick', className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
-                        { key: 'delayedEventsPending', label: 'Delayed', className: 'is-xs' },
-                        { key: 'activityPerSecond', label: 'Ops/s', className: 'is-sm', render: (row) => row.activityPerSecond.toFixed(1) },
-                        { key: 'heavy', label: 'Heavy', className: 'is-sm', render: (row) => formatBoolean(row.heavy) }
-                    ]}
-                    rowKey={(row) => `wired-top-${row.roomId}`}
-                    rows={snapshot.wiredTopRooms}
-                />
-            </DetailPanel>
-        </div>
+        <NativeTextTree>
+            <div className="octane-emustats__detail-layout">
+                <DetailPanel title="Wired Pressure" description="Live summary of tick load, delayed actions and heavy rooms.">
+                    <KeyValueGrid
+                        items={[
+                            { label: 'Tickables', value: formatCompactNumber(overview.wiredTickables) },
+                            {
+                                label: 'Delayed Events',
+                                value: formatCompactNumber(overview.delayedEventsPending),
+                                tone: overview.delayedEventsPending > 0 ? 'warn' : 'good'
+                            },
+                            {
+                                label: 'Heavy Rooms',
+                                value: formatCompactNumber(overview.heavyWiredRooms),
+                                tone: overview.heavyWiredRooms > 0 ? 'warn' : 'good'
+                            },
+                            {
+                                label: 'Overloaded Rooms',
+                                value: formatCompactNumber(overview.overloadedWiredRooms),
+                                tone: overview.overloadedWiredRooms > 0 ? 'warn' : 'good'
+                            },
+                            { label: 'Activity / Second', value: formatThroughput(overview.wiredActivityPerSecond, 'ops') }
+                        ]}
+                    />
+                </DetailPanel>
+                <DetailPanel title="Top Wired Rooms" description="Highest usage rooms in the current diagnostics window.">
+                    <StatsTable<EmuStatsWiredTopRoomRow>
+                        columns={[
+                            { key: 'roomId', label: 'Room', className: 'is-xs' },
+                            { key: 'name', label: 'Name' },
+                            { key: 'usagePercent', label: 'Usage', className: 'is-xs', render: (row) => `${row.usagePercent}%` },
+                            { key: 'averageTickMs', label: 'Avg Tick', className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
+                            { key: 'peakTickMs', label: 'Peak Tick', className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
+                            { key: 'delayedEventsPending', label: 'Delayed', className: 'is-xs' },
+                            { key: 'activityPerSecond', label: 'Ops/s', className: 'is-sm', render: (row) => row.activityPerSecond.toFixed(1) },
+                            { key: 'heavy', label: 'Heavy', className: 'is-sm', render: (row) => formatBoolean(row.heavy) }
+                        ]}
+                        rowKey={(row) => `wired-top-${row.roomId}`}
+                        rows={snapshot.wiredTopRooms}
+                    />
+                </DetailPanel>
+            </div>
+        </NativeTextTree>
     );
 };
 
 const MetricCard: FC<{ title: string; value: string; subtitle?: string; accent?: string }> = ({ title, value, subtitle = '', accent }) => {
     return (
-        <div className="octane-emustats__metric-card" style={accent ? ({ '--emustats-accent': accent } as CSSProperties) : undefined}>
-            <span>{title}</span>
-            <strong>{value}</strong>
-            {!!subtitle.length && <small>{subtitle}</small>}
-        </div>
+        <NativeTextTree>
+            <div className="octane-emustats__metric-card" style={accent ? ({ '--emustats-accent': accent } as CSSProperties) : undefined}>
+                <span>{title}</span>
+                <strong>{value}</strong>
+                {!!subtitle.length && <small>{subtitle}</small>}
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -463,79 +484,87 @@ export const EmuStatsView: FC<{}> = () => {
                 return <WiredInsightsSection snapshot={snapshot} />;
             case 'users':
                 return (
-                    <StatsTable<EmuStatsUserRow>
-                        columns={[
-                            { key: 'id', label: 'ID', className: 'is-xs' },
-                            { key: 'username', label: 'Username' },
-                            { key: 'rank', label: 'Rank' },
-                            { key: 'credits', label: 'Credits', className: 'is-sm' },
-                            { key: 'roomId', label: 'Room ID', className: 'is-sm' }
-                        ]}
-                        rowKey={(row) => `user-${row.id}`}
-                        rows={snapshot.users}
-                    />
+                    <NativeTextTree>
+                        <StatsTable<EmuStatsUserRow>
+                            columns={[
+                                { key: 'id', label: 'ID', className: 'is-xs' },
+                                { key: 'username', label: 'Username' },
+                                { key: 'rank', label: 'Rank' },
+                                { key: 'credits', label: 'Credits', className: 'is-sm' },
+                                { key: 'roomId', label: 'Room ID', className: 'is-sm' }
+                            ]}
+                            rowKey={(row) => `user-${row.id}`}
+                            rows={snapshot.users}
+                        />
+                    </NativeTextTree>
                 );
             case 'rooms':
                 return (
-                    <StatsTable<EmuStatsRoomRow>
-                        columns={[
-                            { key: 'roomId', label: 'Room', className: 'is-xs' },
-                            { key: 'name', label: 'Name' },
-                            { key: 'players', label: 'Players', className: 'is-xs' },
-                            { key: 'items', label: 'Items', className: 'is-xs' },
-                            { key: 'tickables', label: 'Tickables', className: 'is-xs' },
-                            { key: 'cpuMs', label: 'CPU (ms)', className: 'is-sm', render: (row) => row.cpuMs.toFixed(2) },
-                            { key: 'estimatedRamKb', label: 'RAM (KB)', className: 'is-sm' },
-                            { key: 'thread', label: 'Thread', className: 'is-md' }
-                        ]}
-                        rowKey={(row) => `room-${row.roomId}`}
-                        rows={snapshot.rooms}
-                    />
+                    <NativeTextTree>
+                        <StatsTable<EmuStatsRoomRow>
+                            columns={[
+                                { key: 'roomId', label: 'Room', className: 'is-xs' },
+                                { key: 'name', label: 'Name' },
+                                { key: 'players', label: 'Players', className: 'is-xs' },
+                                { key: 'items', label: 'Items', className: 'is-xs' },
+                                { key: 'tickables', label: 'Tickables', className: 'is-xs' },
+                                { key: 'cpuMs', label: 'CPU (ms)', className: 'is-sm', render: (row) => row.cpuMs.toFixed(2) },
+                                { key: 'estimatedRamKb', label: 'RAM (KB)', className: 'is-sm' },
+                                { key: 'thread', label: 'Thread', className: 'is-md' }
+                            ]}
+                            rowKey={(row) => `room-${row.roomId}`}
+                            rows={snapshot.rooms}
+                        />
+                    </NativeTextTree>
                 );
             case 'wired':
                 return (
-                    <StatsTable<EmuStatsWiredRow>
-                        columns={[
-                            { key: 'roomId', label: 'Room', className: 'is-xs' },
-                            { key: 'averageTickMs', label: 'Avg Tick', className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
-                            { key: 'peakTickMs', label: 'Peak Tick', className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
-                            { key: 'usagePercent', label: 'Usage', className: 'is-xs', render: (row) => `${row.usagePercent}%` },
-                            { key: 'delayedEventsPending', label: 'Delayed', className: 'is-xs' },
-                            { key: 'overloaded', label: 'Overloaded', className: 'is-sm', render: (row) => formatBoolean(row.overloaded) },
-                            { key: 'heavy', label: 'Heavy', className: 'is-sm', render: (row) => formatBoolean(row.heavy) }
-                        ]}
-                        rowKey={(row) => `wired-${row.roomId}`}
-                        rows={snapshot.wired}
-                    />
+                    <NativeTextTree>
+                        <StatsTable<EmuStatsWiredRow>
+                            columns={[
+                                { key: 'roomId', label: 'Room', className: 'is-xs' },
+                                { key: 'averageTickMs', label: 'Avg Tick', className: 'is-sm', render: (row) => `${row.averageTickMs} ms` },
+                                { key: 'peakTickMs', label: 'Peak Tick', className: 'is-sm', render: (row) => `${row.peakTickMs} ms` },
+                                { key: 'usagePercent', label: 'Usage', className: 'is-xs', render: (row) => `${row.usagePercent}%` },
+                                { key: 'delayedEventsPending', label: 'Delayed', className: 'is-xs' },
+                                { key: 'overloaded', label: 'Overloaded', className: 'is-sm', render: (row) => formatBoolean(row.overloaded) },
+                                { key: 'heavy', label: 'Heavy', className: 'is-sm', render: (row) => formatBoolean(row.heavy) }
+                            ]}
+                            rowKey={(row) => `wired-${row.roomId}`}
+                            rows={snapshot.wired}
+                        />
+                    </NativeTextTree>
                 );
             case 'overview':
             default:
                 return (
-                    <div className="octane-emustats__overview">
-                        <div className="octane-emustats__overview-cards">
-                            <MetricCard title="Uptime" accent="#6366f1" value={formatUptime(overview.uptimeSeconds)} />
-                            <MetricCard title="Last Refresh" accent="#22c55e" value={formatDateTime(overview.lastRefreshEpochMs)} />
-                            <MetricCard title="GUI Status" accent="#f59e0b" value={overview.guiStatus} />
-                            <MetricCard
-                                title="Memory Allocation"
-                                value={formatMemory(overview.memoryUsedMb, overview.memoryMaxMb)}
-                                subtitle={`${overview.memoryAllocatedMb} MB allocated`}
-                            />
-                            <MetricCard title="CPU Load" value={formatCpu(overview.cpuLoadPercent)} />
-                            <MetricCard title="Active OS Threads" value={String(overview.activeOsThreads)} />
-                            <MetricCard title="Connected Players" value={String(overview.connectedPlayers)} />
-                            <MetricCard title="Peak Players" value={String(overview.peakPlayers)} />
-                            <MetricCard title="Loaded Rooms" value={String(overview.loadedRooms)} />
-                            <MetricCard title="Wired Tickables" value={String(overview.wiredTickables)} />
-                            <MetricCard
-                                title="WS Sessions"
-                                value={`${overview.activeWebSocketSessions} / ${overview.peakWebSocketSessions}`}
-                                subtitle="current / peak"
-                            />
-                            <MetricCard title="Avg Room Cycle" value={formatMs(overview.averageRoomCycleMs)} />
+                    <NativeTextTree>
+                        <div className="octane-emustats__overview">
+                            <div className="octane-emustats__overview-cards">
+                                <MetricCard title="Uptime" accent="#6366f1" value={formatUptime(overview.uptimeSeconds)} />
+                                <MetricCard title="Last Refresh" accent="#22c55e" value={formatDateTime(overview.lastRefreshEpochMs)} />
+                                <MetricCard title="GUI Status" accent="#f59e0b" value={overview.guiStatus} />
+                                <MetricCard
+                                    title="Memory Allocation"
+                                    value={formatMemory(overview.memoryUsedMb, overview.memoryMaxMb)}
+                                    subtitle={`${overview.memoryAllocatedMb} MB allocated`}
+                                />
+                                <MetricCard title="CPU Load" value={formatCpu(overview.cpuLoadPercent)} />
+                                <MetricCard title="Active OS Threads" value={String(overview.activeOsThreads)} />
+                                <MetricCard title="Connected Players" value={String(overview.connectedPlayers)} />
+                                <MetricCard title="Peak Players" value={String(overview.peakPlayers)} />
+                                <MetricCard title="Loaded Rooms" value={String(overview.loadedRooms)} />
+                                <MetricCard title="Wired Tickables" value={String(overview.wiredTickables)} />
+                                <MetricCard
+                                    title="WS Sessions"
+                                    value={`${overview.activeWebSocketSessions} / ${overview.peakWebSocketSessions}`}
+                                    subtitle="current / peak"
+                                />
+                                <MetricCard title="Avg Room Cycle" value={formatMs(overview.averageRoomCycleMs)} />
+                            </div>
+                            <MemoryChart history={snapshot.memoryHistory} />
                         </div>
-                        <MemoryChart history={snapshot.memoryHistory} />
-                    </div>
+                    </NativeTextTree>
                 );
         }
     }, [overview, section, snapshot]);
@@ -543,58 +572,60 @@ export const EmuStatsView: FC<{}> = () => {
     if (!isVisible) return null;
 
     return (
-        <OctaneCardView className="octane-emustats-window w-[980px] h-[620px]" isResizable={false} theme="primary-slim" uniqueKey="emu-stats">
-            <OctaneCardHeaderView headerText="Emulator Stats" onCloseClick={() => setIsVisible(false)} />
-            <OctaneCardContentView classNames={['octane-emustats-window__content']}>
-                <div className="octane-emustats">
-                    <aside className="octane-emustats__sidebar">
-                        <div className="octane-emustats__sidebar-brand">
-                            <h2>Arcturus</h2>
-                            <p>{session?.userName || 'Operator'}</p>
-                        </div>
-                        <nav className="octane-emustats__nav">
-                            {navItems.map((item) => (
-                                <BaseButton
-                                    key={item.key}
-                                    className={`octane-emustats__nav-button ${section === item.key ? 'is-active' : ''}`}
-                                    onClick={() => setSection(item.key)}
-                                    type="button"
-                                >
-                                    <span>{item.label}</span>
-                                    {typeof item.count === 'number' && <strong>{item.count}</strong>}
-                                </BaseButton>
-                            ))}
-                        </nav>
-                        <div className="octane-emustats__sidebar-footer">
-                            <BaseButton className="octane-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
-                                Refresh now
-                            </BaseButton>
-                            <p>Auto refresh every {REFRESH_INTERVAL_MS / 1000}s</p>
-                        </div>
-                    </aside>
-                    <section className="octane-emustats__main">
-                        <div className="octane-emustats__header">
-                            <div>
-                                <h1>{navItems.find((item) => item.key === section)?.label || 'Overview'}</h1>
-                                <p>Live operational view of emulator health, activity and wired performance.</p>
+        <NativeTextTree>
+            <OctaneCardView className="octane-emustats-window w-[980px] h-[620px]" isResizable={false} theme="primary-slim" uniqueKey="emu-stats">
+                <OctaneCardHeaderView headerText="Emulator Stats" onCloseClick={() => setIsVisible(false)} />
+                <OctaneCardContentView classNames={['octane-emustats-window__content']}>
+                    <div className="octane-emustats">
+                        <aside className="octane-emustats__sidebar">
+                            <div className="octane-emustats__sidebar-brand">
+                                <h2>Arcturus</h2>
+                                <p>{session?.userName || 'Operator'}</p>
                             </div>
-                            {overview && (
-                                <div className="octane-emustats__status-pill" data-status={overview.guiStatus.toLowerCase().replace(/\s+/g, '-')}>
-                                    {overview.guiStatus}
+                            <nav className="octane-emustats__nav">
+                                {navItems.map((item) => (
+                                    <BaseButton
+                                        key={item.key}
+                                        className={`octane-emustats__nav-button ${section === item.key ? 'is-active' : ''}`}
+                                        onClick={() => setSection(item.key)}
+                                        type="button"
+                                    >
+                                        <span>{item.label}</span>
+                                        {typeof item.count === 'number' && <strong>{item.count}</strong>}
+                                    </BaseButton>
+                                ))}
+                            </nav>
+                            <div className="octane-emustats__sidebar-footer">
+                                <BaseButton className="octane-emustats__refresh-button" onClick={() => setVersion((value) => value + 1)} type="button">
+                                    Refresh now
+                                </BaseButton>
+                                <p>Auto refresh every {REFRESH_INTERVAL_MS / 1000}s</p>
+                            </div>
+                        </aside>
+                        <section className="octane-emustats__main">
+                            <div className="octane-emustats__header">
+                                <div>
+                                    <h1>{navItems.find((item) => item.key === section)?.label || 'Overview'}</h1>
+                                    <p>Live operational view of emulator health, activity and wired performance.</p>
+                                </div>
+                                {overview && (
+                                    <div className="octane-emustats__status-pill" data-status={overview.guiStatus.toLowerCase().replace(/\s+/g, '-')}>
+                                        {overview.guiStatus}
+                                    </div>
+                                )}
+                            </div>
+                            {error && <div className="octane-emustats__error">{error}</div>}
+                            {isLoading && !snapshot && <div className="octane-emustats__empty">Loading emulator stats...</div>}
+                            {!isLoading && !snapshot && !error && <div className="octane-emustats__empty">No emulator stats available yet.</div>}
+                            {snapshot && (
+                                <div className="octane-emustats__body" style={{ '--emustats-section': `"${section}"` } as CSSProperties}>
+                                    {content}
                                 </div>
                             )}
-                        </div>
-                        {error && <div className="octane-emustats__error">{error}</div>}
-                        {isLoading && !snapshot && <div className="octane-emustats__empty">Loading emulator stats...</div>}
-                        {!isLoading && !snapshot && !error && <div className="octane-emustats__empty">No emulator stats available yet.</div>}
-                        {snapshot && (
-                            <div className="octane-emustats__body" style={{ '--emustats-section': `"${section}"` } as CSSProperties}>
-                                {content}
-                            </div>
-                        )}
-                    </section>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        </section>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

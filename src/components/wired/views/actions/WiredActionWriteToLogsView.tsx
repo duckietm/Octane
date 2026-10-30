@@ -6,6 +6,7 @@ import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { slotUserSource } from '../WiredSourceSlots';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 /**
  * Habbo's "write to logs" (`wf_act_log`, and `wf_act_neg_log` for when the conditions fail): a
@@ -48,32 +49,38 @@ export const WiredActionWriteToLogsView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.write_to_logs.log_level.title', 'Log level')}</Text>
-                <Select className="form-select form-select-sm" value={level} onChange={(event) => setLevel(normalizeLevel(parseInt(event.target.value, 10)))}>
-                    {WRITE_TO_LOGS_LEVELS.map((entry) => (
-                        <option key={entry.value} value={entry.value}>
-                            {localizeWithFallback(`wiredfurni.params.write_to_logs.log_level.${entry.value}`, entry.fallback)}
-                        </option>
-                    ))}
-                </Select>
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.write_to_logs.log_message.title', 'Message')}</Text>
-                <input
-                    className="form-control form-control-sm"
-                    maxLength={WRITE_TO_LOGS_MESSAGE_MAX_LENGTH}
-                    type="text"
-                    value={message}
-                    onChange={(event) => setMessage(event.target.value)}
-                />
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                footer={<WiredSourcesSelector showUsers={true} userSource={userSource} onChangeUsers={setUserSource} />}
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.write_to_logs.log_level.title', 'Log level')}</Text>
+                    <Select
+                        className="form-select form-select-sm"
+                        value={level}
+                        onChange={(event) => setLevel(normalizeLevel(parseInt(event.target.value, 10)))}
+                    >
+                        {WRITE_TO_LOGS_LEVELS.map((entry) => (
+                            <option key={entry.value} value={entry.value}>
+                                {localizeWithFallback(`wiredfurni.params.write_to_logs.log_level.${entry.value}`, entry.fallback)}
+                            </option>
+                        ))}
+                    </Select>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.write_to_logs.log_message.title', 'Message')}</Text>
+                    <input
+                        className="form-control form-control-sm"
+                        maxLength={WRITE_TO_LOGS_MESSAGE_MAX_LENGTH}
+                        type="text"
+                        value={message}
+                        onChange={(event) => setMessage(event.target.value)}
+                    />
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

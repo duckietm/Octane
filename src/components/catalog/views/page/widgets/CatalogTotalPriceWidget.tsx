@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { Column, ColumnProps } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { useCatalogData } from '../../../../../hooks';
 import { CatalogPriceDisplayWidgetView } from './CatalogPriceDisplayWidgetView';
 
@@ -9,8 +10,10 @@ export const CatalogTotalPriceWidget: FC<CatalogSimplePriceWidgetViewProps> = (p
     const { currentOffer = null } = useCatalogData();
 
     return (
-        <Column gap={gap} {...rest}>
-            <CatalogPriceDisplayWidgetView offer={currentOffer} separator />
-        </Column>
+        <NativeTextTree>
+            <Column gap={gap} {...rest}>
+                <CatalogPriceDisplayWidgetView offer={currentOffer} separator />
+            </Column>
+        </NativeTextTree>
     );
 };

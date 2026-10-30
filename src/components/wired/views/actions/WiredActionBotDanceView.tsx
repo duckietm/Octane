@@ -5,6 +5,7 @@ import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { WiredActionBaseView } from './WiredActionBaseView';
 import { Select } from '../../../../common/Select';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const DANCE_TYPES = [
     { value: 0, key: null, label: 'Stop dancing' },
@@ -35,25 +36,27 @@ export const WiredActionBotDanceView: FC<{}> = props =>
     };
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={ true }
-            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE }
-            save={ save }>
-            <div className="flex flex-col gap-1">
-                <Text bold>{ localizeWithFallback('wiredfurni.params.bot.name', 'Bot name') }</Text>
-                <OctaneInput maxLength={ 32 } type="text" value={ botName } onChange={ event => setBotName(event.target.value) } />
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>Dance</Text>
-                <Select
-                    className="form-select form-select-sm"
-                    value={ danceType }
-                    onChange={ event => setDanceType(parseInt(event.target.value, 10) || 0) }>
-                    { DANCE_TYPES.map(option => (
-                        <option key={ option.value } value={ option.value }>{ option.key ? localizeWithFallback(option.key, option.label) : option.label }</option>
-                    )) }
-                </Select>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={ true }
+                requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE }
+                save={ save }>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{ localizeWithFallback('wiredfurni.params.bot.name', 'Bot name') }</Text>
+                    <OctaneInput maxLength={ 32 } type="text" value={ botName } onChange={ event => setBotName(event.target.value) } />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>Dance</Text>
+                    <Select
+                        className="form-select form-select-sm"
+                        value={ danceType }
+                        onChange={ event => setDanceType(parseInt(event.target.value, 10) || 0) }>
+                        { DANCE_TYPES.map(option => (
+                            <option key={ option.value } value={ option.value }>{ option.key ? localizeWithFallback(option.key, option.label) : option.label }</option>
+                        )) }
+                    </Select>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

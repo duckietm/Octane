@@ -20,6 +20,7 @@ import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { BaseButton } from '../../../../common/BaseButton';
 import { Hint } from '../../../../common/Tooltip';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) => {
     const item = groupItem.getLastItem();
@@ -139,125 +140,127 @@ export const InventoryFurnitureView: FC<{
     }
 
     return (
-        <div className="octane-inventory-furni">
-            <div className="octane-inventory-furni-grid">
-                <InfiniteGrid<GroupItem>
-                    squareItems
-                    classicScrollbar
-                    columnCount={6}
-                    columnGap={2}
-                    rowGap={2}
-                    itemKey={getGroupItemKey}
-                    itemRender={(item) => <InventoryFurnitureItemView groupItem={item} isActive={item === selectedItem} onSelect={setSelectedItem} />}
-                    items={filteredGroupItems.slice(currentPage * 200, (currentPage + 1) * 200)}
-                />
-                {pageCount > 1 && (
-                    <div className="octane-inventory-pages">
-                        {Array.from({ length: pageCount }, (_, index) => (
-                            <BaseButton key={index} type="button" aria-current={index === currentPage ? 'page' : undefined} onClick={() => setPage(index)}>
-                                {index}
-                            </BaseButton>
-                        ))}
-                    </div>
-                )}
-            </div>
-            <div className="octane-inventory-furni-preview">
-                <div
-                    className="octane-inventory-furni-preview-stage"
-                    onPointerDown={(event) => {
-                        if (event.button !== 0 || !roomSession || !selectedItem) return;
-                        if ([FurniCategory.FLOOR, FurniCategory.WALL_PAPER, FurniCategory.LANDSCAPE].includes(selectedItem.category)) return;
-                        attemptItemPlacement(selectedItem);
-                    }}
-                >
-                    <LayoutRoomPreviewerView
-                        fitParent
-                        roomPreviewer={roomPreviewer}
-                        onPreviewClick={() => {
-                            if (roomSession) attemptItemPlacement(selectedItem);
-                        }}
+        <NativeTextTree>
+            <div className="octane-inventory-furni">
+                <div className="octane-inventory-furni-grid">
+                    <InfiniteGrid<GroupItem>
+                        squareItems
+                        classicScrollbar
+                        columnCount={6}
+                        columnGap={2}
+                        rowGap={2}
+                        itemKey={getGroupItemKey}
+                        itemRender={(item) => <InventoryFurnitureItemView groupItem={item} isActive={item === selectedItem} onSelect={setSelectedItem} />}
+                        items={filteredGroupItems.slice(currentPage * 200, (currentPage + 1) * 200)}
                     />
-                    {selectedItem && (
-                        <div className="octane-inventory-furni-status">
-                            <div
-                                className={`octane-inventory-furni-status-icon ${tradeableCount > 0 ? 'is-trade' : 'is-no-trade'}`}
-                                title={
-                                    tradeableCount > 0
-                                        ? LocalizeText('inventory.furni.trading.is_tradable', ['amount'], [String(tradeableCount)])
-                                        : LocalizeText('inventory.furni.trading.is_not_tradable')
-                                }
-                            >
-                                {tradeableCount > 0 && <span className="octane-inventory-furni-status-count is-trade-count">{tradeableCount}</span>}
-                            </div>
-                            <div
-                                className={`octane-inventory-furni-status-icon ${recyclableCount > 0 ? 'is-recycle' : 'is-no-recycle'}`}
-                                title={
-                                    recyclableCount > 0
-                                        ? LocalizeText('inventory.furni.recycling.is_recyclable', ['amount'], [String(recyclableCount)])
-                                        : LocalizeText('inventory.furni.recycling.is_not_recyclable')
-                                }
-                            >
-                                {recyclableCount > 0 && <span className="octane-inventory-furni-status-count is-recycle-count">{recyclableCount}</span>}
-                            </div>
+                    {pageCount > 1 && (
+                        <div className="octane-inventory-pages">
+                            {Array.from({ length: pageCount }, (_, index) => (
+                                <BaseButton key={index} type="button" aria-current={index === currentPage ? 'page' : undefined} onClick={() => setPage(index)}>
+                                    {index}
+                                </BaseButton>
+                            ))}
                         </div>
-                    )}
-                    {selectedItem && (
-                        <Hint content={LocalizeText('generic.delete')}>
-                            <BaseButton
-                                type="button"
-                                className="octane-inventory-preview-delete"
-                                aria-label={LocalizeText('generic.delete')}
-                                onPointerDown={(event) => event.stopPropagation()}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    attemptDeleteItem(selectedItem);
-                                }}
-                            >
-                                <FaTrashAlt aria-hidden="true" />
-                            </BaseButton>
-                        </Hint>
-                    )}
-                    {selectedItem && selectedItem.stuffData.isUnique && (
-                        <LayoutLimitedEditionCompactPlateView
-                            className="top-2 inset-e-2"
-                            position="absolute"
-                            uniqueNumber={selectedItem.stuffData.uniqueNumber}
-                            uniqueSeries={selectedItem.stuffData.uniqueSeries}
-                        />
-                    )}
-                    {selectedItem && selectedItem.stuffData.rarityLevel > -1 && (
-                        <LayoutRarityLevelView className="top-2 inset-e-2" level={selectedItem.stuffData.rarityLevel} position="absolute" />
                     )}
                 </div>
-                {selectedItem && (
-                    <div className="octane-inventory-furni-details">
-                        <div className="octane-inventory-furni-name">{selectedItem.name}</div>
-                        {selectedItem.description && <div className="octane-inventory-furni-desc">{selectedItem.description}</div>}
-                        <div className="octane-inventory-furni-actions">
-                            <OctaneButton
-                                disabled={!roomSession || !selectedItem.getUnlockedCount() || playTestRestricted}
-                                className="octane-inventory-btn-place"
-                                onClick={() => attemptItemPlacement(selectedItem)}
-                            >
-                                {LocalizeText('inventory.furni.placetoroom')}
-                            </OctaneButton>
-                            <div className="octane-inventory-preview-controls">
-                                <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectDirection()}>
-                                    {localizeWithFallback('widget.furniture.button.rotate', 'Rotate')}
-                                </BaseButton>
-                                <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectState()}>
-                                    {localizeWithFallback('widget.furniture.button.use', 'Use')}
-                                </BaseButton>
+                <div className="octane-inventory-furni-preview">
+                    <div
+                        className="octane-inventory-furni-preview-stage"
+                        onPointerDown={(event) => {
+                            if (event.button !== 0 || !roomSession || !selectedItem) return;
+                            if ([FurniCategory.FLOOR, FurniCategory.WALL_PAPER, FurniCategory.LANDSCAPE].includes(selectedItem.category)) return;
+                            attemptItemPlacement(selectedItem);
+                        }}
+                    >
+                        <LayoutRoomPreviewerView
+                            fitParent
+                            roomPreviewer={roomPreviewer}
+                            onPreviewClick={() => {
+                                if (roomSession) attemptItemPlacement(selectedItem);
+                            }}
+                        />
+                        {selectedItem && (
+                            <div className="octane-inventory-furni-status">
+                                <div
+                                    className={`octane-inventory-furni-status-icon ${tradeableCount > 0 ? 'is-trade' : 'is-no-trade'}`}
+                                    title={
+                                        tradeableCount > 0
+                                            ? LocalizeText('inventory.furni.trading.is_tradable', ['amount'], [String(tradeableCount)])
+                                            : LocalizeText('inventory.furni.trading.is_not_tradable')
+                                    }
+                                >
+                                    {tradeableCount > 0 && <span className="octane-inventory-furni-status-count is-trade-count">{tradeableCount}</span>}
+                                </div>
+                                <div
+                                    className={`octane-inventory-furni-status-icon ${recyclableCount > 0 ? 'is-recycle' : 'is-no-recycle'}`}
+                                    title={
+                                        recyclableCount > 0
+                                            ? LocalizeText('inventory.furni.recycling.is_recyclable', ['amount'], [String(recyclableCount)])
+                                            : LocalizeText('inventory.furni.recycling.is_not_recyclable')
+                                    }
+                                >
+                                    {recyclableCount > 0 && <span className="octane-inventory-furni-status-count is-recycle-count">{recyclableCount}</span>}
+                                </div>
                             </div>
-                            {selectedItem.isSellable && (
-                                <OctaneButton className="octane-inventory-btn-sell" onClick={() => attemptPlaceMarketplaceOffer(selectedItem)}>
-                                    {LocalizeText('inventory.marketplace.sell')}
-                                </OctaneButton>
-                            )}
-                        </div>
+                        )}
+                        {selectedItem && (
+                            <Hint content={LocalizeText('generic.delete')}>
+                                <BaseButton
+                                    type="button"
+                                    className="octane-inventory-preview-delete"
+                                    aria-label={LocalizeText('generic.delete')}
+                                    onPointerDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        attemptDeleteItem(selectedItem);
+                                    }}
+                                >
+                                    <FaTrashAlt aria-hidden="true" />
+                                </BaseButton>
+                            </Hint>
+                        )}
+                        {selectedItem && selectedItem.stuffData.isUnique && (
+                            <LayoutLimitedEditionCompactPlateView
+                                className="top-2 inset-e-2"
+                                position="absolute"
+                                uniqueNumber={selectedItem.stuffData.uniqueNumber}
+                                uniqueSeries={selectedItem.stuffData.uniqueSeries}
+                            />
+                        )}
+                        {selectedItem && selectedItem.stuffData.rarityLevel > -1 && (
+                            <LayoutRarityLevelView className="top-2 inset-e-2" level={selectedItem.stuffData.rarityLevel} position="absolute" />
+                        )}
                     </div>
-                )}
+                    {selectedItem && (
+                        <div className="octane-inventory-furni-details">
+                            <div className="octane-inventory-furni-name">{selectedItem.name}</div>
+                            {selectedItem.description && <div className="octane-inventory-furni-desc">{selectedItem.description}</div>}
+                            <div className="octane-inventory-furni-actions">
+                                <OctaneButton
+                                    disabled={!roomSession || !selectedItem.getUnlockedCount() || playTestRestricted}
+                                    className="octane-inventory-btn-place"
+                                    onClick={() => attemptItemPlacement(selectedItem)}
+                                >
+                                    {LocalizeText('inventory.furni.placetoroom')}
+                                </OctaneButton>
+                                <div className="octane-inventory-preview-controls">
+                                    <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectDirection()}>
+                                        {localizeWithFallback('widget.furniture.button.rotate', 'Rotate')}
+                                    </BaseButton>
+                                    <BaseButton type="button" onClick={() => roomPreviewer?.changeRoomObjectState()}>
+                                        {localizeWithFallback('widget.furniture.button.use', 'Use')}
+                                    </BaseButton>
+                                </div>
+                                {selectedItem.isSellable && (
+                                    <OctaneButton className="octane-inventory-btn-sell" onClick={() => attemptPlaceMarketplaceOffer(selectedItem)}>
+                                        {LocalizeText('inventory.marketplace.sell')}
+                                    </OctaneButton>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };

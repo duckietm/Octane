@@ -1,5 +1,6 @@
 import { Children, FC, isValidElement, ReactNode } from 'react';
 import { ListSelect } from '../../../common/ListSelect';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface InventoryFilterSelectProps {
     value?: string | number;
@@ -19,20 +20,22 @@ export const InventoryFilterSelect: FC<InventoryFilterSelectProps> = ({ value, d
     const selected = options.find((option) => option.value === String(value ?? '')) ?? options[0];
 
     return (
-        <span className="octane-inventory-filter-choice">
-            <ListSelect
-                aria-label={label}
-                disabled={disabled || !options.length}
-                itemClassName="octane-inventory-filter-option"
-                options={options}
-                popupClassName="octane-inventory-filter-menu"
-                scaleWithTrigger
-                // The list opens over the trigger, like the AIR client's drop menu.
-                sideOffset={({ anchor }) => -anchor.height}
-                triggerClassName="octane-inventory-filter-select"
-                value={selected?.value ?? ''}
-                onValueChange={(next) => onChange?.(next)}
-            />
-        </span>
+        <NativeTextTree>
+            <span className="octane-inventory-filter-choice">
+                <ListSelect
+                    aria-label={label}
+                    disabled={disabled || !options.length}
+                    itemClassName="octane-inventory-filter-option"
+                    options={options}
+                    popupClassName="octane-inventory-filter-menu"
+                    scaleWithTrigger
+                    // The list opens over the trigger, like the AIR client's drop menu.
+                    sideOffset={({ anchor }) => -anchor.height}
+                    triggerClassName="octane-inventory-filter-select"
+                    value={selected?.value ?? ''}
+                    onValueChange={(next) => onChange?.(next)}
+                />
+            </span>
+        </NativeTextTree>
     );
 };

@@ -9,6 +9,7 @@ import { sortWiredSourceOptions, useAvailableUserSources } from '../WiredSources
 import { WiredConditionBaseView } from './WiredConditionBaseView';
 import { Radio } from '../../../../common/Radio';
 import { BaseButton } from '../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const SOURCE_GROUP_USERS = 0;
 const SOURCE_GROUP_FURNI = 1;
@@ -157,61 +158,63 @@ export const WiredConditionSelectionQuantityView: FC<{}> = () => {
     };
 
     return (
-        <WiredConditionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save}>
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
-                {COMPARISON_OPTIONS.map((value) => {
-                    return (
-                        <label key={value} className="flex items-center gap-1">
-                            <Radio checked={comparison === value} name="selectionQuantityComparison" onCheckedChange={() => setComparison(value)} />
-                            <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                        </label>
-                    );
-                })}
-            </div>
-            <div className="flex flex-col gap-2">
-                <input
-                    className="form-control form-control-sm"
-                    inputMode="numeric"
-                    max={MAX_QUANTITY}
-                    min={MIN_QUANTITY}
-                    type="text"
-                    value={quantityInput}
-                    onBlur={() => setQuantityInput(clampQuantity(quantity).toString())}
-                    onChange={(event) => updateQuantityInput(event.target.value)}
+        <NativeTextTree>
+            <WiredConditionBaseView hasSpecialInput={true} requiresFurni={requiresFurni} save={save}>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.comparison_selection')}</Text>
+                    {COMPARISON_OPTIONS.map((value) => {
+                        return (
+                            <label key={value} className="flex items-center gap-1">
+                                <Radio checked={comparison === value} name="selectionQuantityComparison" onCheckedChange={() => setComparison(value)} />
+                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                            </label>
+                        );
+                    })}
+                </div>
+                <div className="flex flex-col gap-2">
+                    <input
+                        className="form-control form-control-sm"
+                        inputMode="numeric"
+                        max={MAX_QUANTITY}
+                        min={MIN_QUANTITY}
+                        type="text"
+                        value={quantityInput}
+                        onBlur={() => setQuantityInput(clampQuantity(quantity).toString())}
+                        onChange={(event) => updateQuantityInput(event.target.value)}
+                    />
+                    <Slider max={MAX_QUANTITY} min={MIN_QUANTITY} step={1} value={quantity} onChange={(event) => updateQuantity(event as number)} />
+                    <Text small>{quantity}</Text>
+                </div>
+                <WiredFurniSelectionSourceRow
+                    title="wiredfurni.params.sources.merged.title"
+                    options={activeSources}
+                    value={activeSource}
+                    selectionKind={isUserGroup ? 'primary' : 'secondary'}
+                    selectionActive={!isUserGroup && furniSource === SOURCE_SELECTED}
+                    selectionCount={furniIds.length}
+                    selectionLimit={trigger?.maximumItemSelectionCount ?? 20}
+                    selectionEnabledValues={[SOURCE_SELECTED]}
+                    showSelectionToggle={false}
+                    headerContent={
+                        <div className="octane-wired__give-var-targets">
+                            {SOURCE_GROUP_BUTTONS.map((button) => (
+                                <BaseButton
+                                    key={button.key}
+                                    type="button"
+                                    className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${isUserGroup === button.isUserGroup ? 'is-active' : ''}`}
+                                    onClick={() => changeGroup(button.isUserGroup)}
+                                >
+                                    <img src={button.icon} alt={button.key} />
+                                </BaseButton>
+                            ))}
+                        </div>
+                    }
+                    onChange={(value) => {
+                        if (isUserGroup) setUserSource(value);
+                        else setFurniSource(value);
+                    }}
                 />
-                <Slider max={MAX_QUANTITY} min={MIN_QUANTITY} step={1} value={quantity} onChange={(event) => updateQuantity(event as number)} />
-                <Text small>{quantity}</Text>
-            </div>
-            <WiredFurniSelectionSourceRow
-                title="wiredfurni.params.sources.merged.title"
-                options={activeSources}
-                value={activeSource}
-                selectionKind={isUserGroup ? 'primary' : 'secondary'}
-                selectionActive={!isUserGroup && furniSource === SOURCE_SELECTED}
-                selectionCount={furniIds.length}
-                selectionLimit={trigger?.maximumItemSelectionCount ?? 20}
-                selectionEnabledValues={[SOURCE_SELECTED]}
-                showSelectionToggle={false}
-                headerContent={
-                    <div className="octane-wired__give-var-targets">
-                        {SOURCE_GROUP_BUTTONS.map((button) => (
-                            <BaseButton
-                                key={button.key}
-                                type="button"
-                                className={`octane-wired__give-var-target octane-wired__give-var-target--${button.key} ${isUserGroup === button.isUserGroup ? 'is-active' : ''}`}
-                                onClick={() => changeGroup(button.isUserGroup)}
-                            >
-                                <img src={button.icon} alt={button.key} />
-                            </BaseButton>
-                        ))}
-                    </div>
-                }
-                onChange={(value) => {
-                    if (isUserGroup) setUserSource(value);
-                    else setFurniSource(value);
-                }}
-            />
-        </WiredConditionBaseView>
+            </WiredConditionBaseView>
+        </NativeTextTree>
     );
 };

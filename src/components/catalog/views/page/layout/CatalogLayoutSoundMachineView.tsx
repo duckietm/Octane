@@ -2,6 +2,7 @@ import { GetOfficialSongIdMessageComposer, GetSoundManager, MusicPriorities, Off
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { LocalizeText, SendMessageComposer } from '../../../../../api';
 import { LayoutFurniImageView } from '../../../../../common';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { getCatalogGridMetrics, useCatalogData, useCatalogDisplayPreferences, useMessageEvent, useOctaneEvent } from '../../../../../hooks';
 import { OctaneButton } from '../../../../../layout';
 import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
@@ -99,51 +100,53 @@ export const CatalogLayoutSoundMachineView: FC<CatalogLayoutProps> = (props) => 
     }, [songLength]);
 
     return (
-        <div className="octane-catalog-sound-layout">
-            <section className="octane-catalog-sound-product">
-                {currentOffer ? (
-                    <>
-                        <strong className="octane-catalog-sound-title">{currentOffer.localizationName}</strong>
-                        <span className="octane-catalog-sound-description">{currentOffer.localizationDescription}</span>
-                        <span className="octane-catalog-sound-length">{formattedSongLength}</span>
-                        <div className="octane-catalog-sound-product-render">
-                            <LayoutFurniImageView
-                                direction={2}
-                                extraData={currentOffer.product.extraParam}
-                                productClassId={currentOffer.product.productClassId}
-                                productType={currentOffer.product.productType}
-                            />
-                        </div>
-                        <div className="octane-catalog-sound-price">
-                            <CatalogPriceDisplayWidgetView offer={currentOffer} />
-                        </div>
-                        {currentOffer.product.extraParam.length > 0 && (
-                            <div className="octane-catalog-sound-listen-panel">
-                                <span>{LocalizeText('play_preview')}</span>
-                                <OctaneButton
-                                    className="octane-catalog-sound-listen-button"
-                                    disabled={songId <= 0 || songLength === null}
-                                    onClick={() => previewSong(songId)}
-                                >
-                                    {LocalizeText('play_preview_button')}
-                                </OctaneButton>
+        <NativeTextTree>
+            <div className="octane-catalog-sound-layout">
+                <section className="octane-catalog-sound-product">
+                    {currentOffer ? (
+                        <>
+                            <strong className="octane-catalog-sound-title">{currentOffer.localizationName}</strong>
+                            <span className="octane-catalog-sound-description">{currentOffer.localizationDescription}</span>
+                            <span className="octane-catalog-sound-length">{formattedSongLength}</span>
+                            <div className="octane-catalog-sound-product-render">
+                                <LayoutFurniImageView
+                                    direction={2}
+                                    extraData={currentOffer.product.extraParam}
+                                    productClassId={currentOffer.product.productClassId}
+                                    productType={currentOffer.product.productType}
+                                />
                             </div>
-                        )}
-                    </>
-                ) : (
-                    <span className="octane-catalog-sound-select-product">{LocalizeText('catalog_selectproduct')}</span>
-                )}
-            </section>
+                            <div className="octane-catalog-sound-price">
+                                <CatalogPriceDisplayWidgetView offer={currentOffer} />
+                            </div>
+                            {currentOffer.product.extraParam.length > 0 && (
+                                <div className="octane-catalog-sound-listen-panel">
+                                    <span>{LocalizeText('play_preview')}</span>
+                                    <OctaneButton
+                                        className="octane-catalog-sound-listen-button"
+                                        disabled={songId <= 0 || songLength === null}
+                                        onClick={() => previewSong(songId)}
+                                    >
+                                        {LocalizeText('play_preview_button')}
+                                    </OctaneButton>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <span className="octane-catalog-sound-select-product">{LocalizeText('catalog_selectproduct')}</span>
+                    )}
+                </section>
 
-            <div className="octane-catalog-sound-grid">
-                <CatalogItemGridWidgetView
-                    className={`octane-catalog-grid octane-catalog-grid-density-${density}`}
-                    showPrices={showTilePrices}
-                    {...gridMetrics}
-                />
+                <div className="octane-catalog-sound-grid">
+                    <CatalogItemGridWidgetView
+                        className={`octane-catalog-grid octane-catalog-grid-density-${density}`}
+                        showPrices={showTilePrices}
+                        {...gridMetrics}
+                    />
+                </div>
+
+                <div className="octane-catalog-sound-purchase">{currentOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
             </div>
-
-            <div className="octane-catalog-sound-purchase">{currentOffer ? <CatalogPurchaseWidgetView /> : <CatalogPurchaseSelectionPrompt />}</div>
-        </div>
+        </NativeTextTree>
     );
 };

@@ -2,6 +2,7 @@ import { GuideSessionReportMessageComposer } from '@octane/renderer';
 import { FC, useState } from 'react';
 import { localizeWithFallback, SendMessageComposer } from '../../../api';
 import { BaseButton, Button, OctaneCardContentView, OctaneCardHeaderView, OctaneCardView, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface GuideToolReportViewProps {
     onClose: () => void;
@@ -27,45 +28,50 @@ export const GuideToolReportView: FC<GuideToolReportViewProps> = ({ onClose }) =
     };
 
     return (
-        <OctaneCardView
-            className="octane-guide-tool octane-guide-report min-w-0 w-[min(282px,calc(100vw-16px))]"
-            theme="primary-slim"
-            uniqueKey="guide-tool-report"
-        >
-            <OctaneCardHeaderView headerText={localizeWithFallback('guide.help.request.emergency.title', 'Emergency help request')} onCloseClick={onClose} />
-            <OctaneCardContentView className="text-black">
-                <div className="flex flex-col gap-1">
-                    <Text>
-                        {localizeWithFallback(
-                            'guide.help.request.emergency.desc',
-                            'Tell us what happened. The more details you give, the quicker we can help you.'
-                        )}
-                    </Text>
-                    {showError && (
-                        <Text className="octane-guide-tool__error" role="alert">
-                            {localizeWithFallback('guide.help.request.emergency.desc.error', 'The description cannot be empty.')}
+        <NativeTextTree>
+            <OctaneCardView
+                className="octane-guide-tool octane-guide-report min-w-0 w-[min(282px,calc(100vw-16px))]"
+                theme="primary-slim"
+                uniqueKey="guide-tool-report"
+            >
+                <OctaneCardHeaderView
+                    headerText={localizeWithFallback('guide.help.request.emergency.title', 'Emergency help request')}
+                    onCloseClick={onClose}
+                />
+                <OctaneCardContentView className="text-black">
+                    <div className="flex flex-col gap-1">
+                        <Text>
+                            {localizeWithFallback(
+                                'guide.help.request.emergency.desc',
+                                'Tell us what happened. The more details you give, the quicker we can help you.'
+                            )}
                         </Text>
-                    )}
-                    <textarea
-                        className="request-message"
-                        placeholder={localizeWithFallback('guide.help.request.emergency.input.empty', 'Describe what happened')}
-                        value={message}
-                        onChange={(event) => {
-                            setMessage(event.target.value);
-                            setShowError(false);
-                        }}
-                    ></textarea>
-                    <Text bold className="octane-guide-tool__urgent-title">
-                        {localizeWithFallback('guide.help.request.emergency.help.title', 'An emergency help request is only meant for urgent problems.')}
-                    </Text>
-                    <Button fullWidth variant="success" onClick={submit}>
-                        {localizeWithFallback('guide.help.request.user.create.input.button', 'Send')}
-                    </Button>
-                    <BaseButton className="cursor-pointer border-0 bg-transparent p-0 text-center underline" onClick={onClose}>
-                        {localizeWithFallback('guide.help.request.user.create.cancel.link', 'Cancel help request')}
-                    </BaseButton>
-                </div>
-            </OctaneCardContentView>
-        </OctaneCardView>
+                        {showError && (
+                            <Text className="octane-guide-tool__error" role="alert">
+                                {localizeWithFallback('guide.help.request.emergency.desc.error', 'The description cannot be empty.')}
+                            </Text>
+                        )}
+                        <textarea
+                            className="request-message"
+                            placeholder={localizeWithFallback('guide.help.request.emergency.input.empty', 'Describe what happened')}
+                            value={message}
+                            onChange={(event) => {
+                                setMessage(event.target.value);
+                                setShowError(false);
+                            }}
+                        ></textarea>
+                        <Text bold className="octane-guide-tool__urgent-title">
+                            {localizeWithFallback('guide.help.request.emergency.help.title', 'An emergency help request is only meant for urgent problems.')}
+                        </Text>
+                        <Button fullWidth variant="success" onClick={submit}>
+                            {localizeWithFallback('guide.help.request.user.create.input.button', 'Send')}
+                        </Button>
+                        <BaseButton className="cursor-pointer border-0 bg-transparent p-0 text-center underline" onClick={onClose}>
+                            {localizeWithFallback('guide.help.request.user.create.cancel.link', 'Cancel help request')}
+                        </BaseButton>
+                    </div>
+                </OctaneCardContentView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

@@ -4,6 +4,7 @@ import { AchievementUtilities } from '../../../api';
 import { useAchievements } from '../../../hooks';
 import { AchievementBadgeView } from '../AchievementBadgeView';
 import { BaseButton } from '../../../common/BaseButton';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 interface AchievementListItemViewProps {
     achievement: AchievementData | null;
@@ -15,15 +16,17 @@ export const AchievementListItemView: FC<AchievementListItemViewProps> = (props)
 
     if (!achievement) {
         return (
-            <div
-                className="air-achievement-tile air-achievement-tile--empty"
-                style={
-                    {
-                        '--air-achievement-tile-background': `url(${AchievementUtilities.getAchievementImageUrl('achievement_inactive')})`
-                    } as CSSProperties
-                }
-                aria-hidden="true"
-            />
+            <NativeTextTree>
+                <div
+                    className="air-achievement-tile air-achievement-tile--empty"
+                    style={
+                        {
+                            '--air-achievement-tile-background': `url(${AchievementUtilities.getAchievementImageUrl('achievement_inactive')})`
+                        } as CSSProperties
+                    }
+                    aria-hidden="true"
+                />
+            </NativeTextTree>
         );
     }
 

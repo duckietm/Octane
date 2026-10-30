@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { GetConfigurationValue, GetDiskColor, LocalizeText } from '../../../../../api';
 import { Button, Text } from '../../../../../common';
 import { BaseButton } from '../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 
 export interface SongPlaylistViewProps {
     furniId: number;
@@ -25,66 +26,68 @@ export const SongPlaylistView: FC<SongPlaylistViewProps> = (props) => {
     };
 
     return (
-        <>
-            <div className="bg-primary py-3 container-fluid justify-center flex rounded">
-                <img alt="" className="playlist-img" src={GetConfigurationValue('image.library.url') + 'playlist/title_playlist.gif'} />
-                <h2 className="octane-playlist__title ms-4">{LocalizeText('playlist.editor.playlist')}</h2>
-            </div>
-            <div className="h-full overflow-y-scroll py-2">
-                <div className="flex flex-col gap-2">
-                    {playlist &&
-                        playlist.map((songInfo, index) => {
-                            return (
-                                <div
-                                    key={index}
-                                    className={
-                                        'octane-playlist__song flex gap-1 items-center text-black cursor-pointer ' +
-                                        (selectedItem === index ? 'border border-muted border-2 rounded' : 'border-2')
-                                    }
-                                    onClick={() => setSelectedItem((prev) => (prev === index ? -1 : index))}
-                                >
-                                    <BaseButton type="button"
-                                        className={'disk-2 ' + (selectedItem === index ? 'selected-song' : '')}
-                                        style={{ backgroundColor: selectedItem === index ? '' : GetDiskColor(songInfo.songData) }}
-                                        onClick={() => action(index)}
-                                    />
-                                    {songInfo.name}
-                                </div>
-                            );
-                        })}
+        <NativeTextTree>
+            <>
+                <div className="bg-primary py-3 container-fluid justify-center flex rounded">
+                    <img alt="" className="playlist-img" src={GetConfigurationValue('image.library.url') + 'playlist/title_playlist.gif'} />
+                    <h2 className="octane-playlist__title ms-4">{LocalizeText('playlist.editor.playlist')}</h2>
                 </div>
-            </div>
-            {(!playlist || playlist.length === 0) && (
-                <>
-                    <div className="playlist-bottom text-black p-1 ms-12">
-                        <h5 className="octane-playlist__subtitle">{LocalizeText('playlist.editor.add.songs.to.your.playlist')}</h5>
-                        <div>{LocalizeText('playlist.editor.text.click.song.to.choose.click.again.to.move')}</div>
+                <div className="h-full overflow-y-scroll py-2">
+                    <div className="flex flex-col gap-2">
+                        {playlist &&
+                            playlist.map((songInfo, index) => {
+                                return (
+                                    <div
+                                        key={index}
+                                        className={
+                                            'octane-playlist__song flex gap-1 items-center text-black cursor-pointer ' +
+                                            (selectedItem === index ? 'border border-muted border-2 rounded' : 'border-2')
+                                        }
+                                        onClick={() => setSelectedItem((prev) => (prev === index ? -1 : index))}
+                                    >
+                                        <BaseButton type="button"
+                                            className={'disk-2 ' + (selectedItem === index ? 'selected-song' : '')}
+                                            style={{ backgroundColor: selectedItem === index ? '' : GetDiskColor(songInfo.songData) }}
+                                            onClick={() => action(index)}
+                                        />
+                                        {songInfo.name}
+                                    </div>
+                                );
+                            })}
                     </div>
-                    <img alt="" className="add-songs" src={GetConfigurationValue('image.library.url') + 'playlist/background_add_songs.gif'} />
-                </>
-            )}
-            {playlist && playlist.length > 0 && (
-                <>
-                    {currentPlayingIndex === -1 && (
-                        <Button size="lg" variant="success" onClick={() => playPause(furniId, selectedItem)}>
-                            {LocalizeText('playlist.editor.button.play.now')}
-                        </Button>
-                    )}
-                    {currentPlayingIndex !== -1 && (
-                        <div className="flex gap-1">
-                            <Button variant="danger" onClick={() => playPause(furniId, selectedItem)}>
-                                <div className="pause-song" />
-                            </Button>
-                            <div className="flex flex-col">
-                                <Text bold display="block" className="octane-playlist__subtitle">
-                                    {LocalizeText('playlist.editor.text.now.playing.in.your.room')}
-                                </Text>
-                                <Text>{playlist[currentPlayingIndex]?.name + ' - ' + playlist[currentPlayingIndex]?.creator}</Text>
-                            </div>
+                </div>
+                {(!playlist || playlist.length === 0) && (
+                    <>
+                        <div className="playlist-bottom text-black p-1 ms-12">
+                            <h5 className="octane-playlist__subtitle">{LocalizeText('playlist.editor.add.songs.to.your.playlist')}</h5>
+                            <div>{LocalizeText('playlist.editor.text.click.song.to.choose.click.again.to.move')}</div>
                         </div>
-                    )}
-                </>
-            )}
-        </>
+                        <img alt="" className="add-songs" src={GetConfigurationValue('image.library.url') + 'playlist/background_add_songs.gif'} />
+                    </>
+                )}
+                {playlist && playlist.length > 0 && (
+                    <>
+                        {currentPlayingIndex === -1 && (
+                            <Button size="lg" variant="success" onClick={() => playPause(furniId, selectedItem)}>
+                                {LocalizeText('playlist.editor.button.play.now')}
+                            </Button>
+                        )}
+                        {currentPlayingIndex !== -1 && (
+                            <div className="flex gap-1">
+                                <Button variant="danger" onClick={() => playPause(furniId, selectedItem)}>
+                                    <div className="pause-song" />
+                                </Button>
+                                <div className="flex flex-col">
+                                    <Text bold display="block" className="octane-playlist__subtitle">
+                                        {LocalizeText('playlist.editor.text.now.playing.in.your.room')}
+                                    </Text>
+                                    <Text>{playlist[currentPlayingIndex]?.name + ' - ' + playlist[currentPlayingIndex]?.creator}</Text>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </>
+        </NativeTextTree>
     );
 };

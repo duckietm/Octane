@@ -4,6 +4,7 @@ import { LocalizeText } from '../../../../api';
 import { LayoutPetImageView } from '../../../../common';
 import { DraggableWindow } from '../../../../common/draggable-window';
 import { NativeText } from '../../../../common/native-text/NativeText';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useMessageEvent, useRoom, useSessionInfo } from '../../../../hooks';
 import { Native3Button, Native3Frame } from '../../../mod-tools/native/NativeWindow3';
 
@@ -71,30 +72,32 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = (props) => {
     const title = LocalizeText('widgets.pet.commands.title');
 
     return (
-        <DraggableWindow handleSelector=".native3-title" initialPosition={DEFAULT_LOCATION}>
-            <Native3Frame color={FRAME_COLOR} height={commandsHeight + CHROME_HEIGHT} title={title} width={WIDTH} onClose={() => setPetTrainInformation(null)}>
-                <div style={{ position: 'absolute', left: 5, top: 7, width: 71, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                    <LayoutPetImageView direction={2} figure={petData.figure} posture="std" />
-                </div>
-                <div style={{ position: 'absolute', left: 76, top: 43 }}>
-                    <NativeText background={BODY_COLOR} maxWidth={WIDTH - 12 - 76} text={petData.name} textStyle="u_regular" />
-                </div>
-                {commands.map((command, index) => {
-                    const label = LocalizeText(`pet.command.${command}`);
+        <NativeTextTree>
+            <DraggableWindow handleSelector=".native3-title" initialPosition={DEFAULT_LOCATION}>
+                <Native3Frame color={FRAME_COLOR} height={commandsHeight + CHROME_HEIGHT} title={title} width={WIDTH} onClose={() => setPetTrainInformation(null)}>
+                    <div style={{ position: 'absolute', left: 5, top: 7, width: 71, height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                        <LayoutPetImageView direction={2} figure={petData.figure} posture="std" />
+                    </div>
+                    <div style={{ position: 'absolute', left: 76, top: 43 }}>
+                        <NativeText background={BODY_COLOR} maxWidth={WIDTH - 12 - 76} text={petData.name} textStyle="u_regular" />
+                    </div>
+                    {commands.map((command, index) => {
+                        const label = LocalizeText(`pet.command.${command}`);
 
-                    return (
-                        <Native3Button
-                            key={command}
-                            enabled={!cooling && petTrainInformation.enabledCommands.includes(command)}
-                            label={label}
-                            width={BUTTON_WIDTH}
-                            x={COMMANDS_X + (index % 2 === 1 ? COLUMN_X : 0)}
-                            y={COMMANDS_Y + Math.floor(index / 2) * ROW_STEP}
-                            onClick={() => processPetAction(petData.name, label)}
-                        />
-                    );
-                })}
-            </Native3Frame>
-        </DraggableWindow>
+                        return (
+                            <Native3Button
+                                key={command}
+                                enabled={!cooling && petTrainInformation.enabledCommands.includes(command)}
+                                label={label}
+                                width={BUTTON_WIDTH}
+                                x={COMMANDS_X + (index % 2 === 1 ? COLUMN_X : 0)}
+                                y={COMMANDS_Y + Math.floor(index / 2) * ROW_STEP}
+                                onClick={() => processPetAction(petData.name, label)}
+                            />
+                        );
+                    })}
+                </Native3Frame>
+            </DraggableWindow>
+        </NativeTextTree>
     );
 };

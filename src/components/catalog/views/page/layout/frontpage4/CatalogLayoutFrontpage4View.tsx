@@ -2,6 +2,7 @@ import { CreateLinkEvent, FrontPageItem } from '@octane/renderer';
 import { FC, useCallback, useEffect, useRef } from 'react';
 import { GetConfigurationValue } from '../../../../../../api';
 import { BaseButton } from '../../../../../../common/BaseButton';
+import { NativeTextTree } from '../../../../../../common/native-text/NativeTextTree';
 import { useCatalogData } from '../../../../../../hooks';
 import { CatalogRedeemVoucherView } from '../../common/CatalogRedeemVoucherView';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
@@ -11,9 +12,11 @@ const FeaturedItem: FC<{ item: FrontPageItem; className: string; onSelect: (item
     const imageUrl = `${GetConfigurationValue<string>('image.library.url', '')}${item.itemPromoImage}`;
 
     return (
-        <BaseButton className={className} style={{ backgroundImage: `url(${imageUrl})` }} onClick={() => onSelect(item)}>
-            <span className="octane-catalog-air-frontpage__title">{item.itemName}</span>
-        </BaseButton>
+        <NativeTextTree>
+            <BaseButton className={className} style={{ backgroundImage: `url(${imageUrl})` }} onClick={() => onSelect(item)}>
+                <span className="octane-catalog-air-frontpage__title">{item.itemName}</span>
+            </BaseButton>
+        </NativeTextTree>
     );
 };
 
@@ -50,17 +53,19 @@ export const CatalogLayoutFrontpage4View: FC<CatalogLayoutProps> = (props) => {
     }, [page]);
 
     return (
-        <div className="octane-catalog-air-frontpage">
-            {!!firstItem && <FeaturedItem className="octane-catalog-air-frontpage__first" item={firstItem} onSelect={selectItem} />}
-            <div className="octane-catalog-air-frontpage__list">
-                {otherItems.map((item, index) => (
-                    <FeaturedItem key={`${item.itemName}-${index}`} className="octane-catalog-air-frontpage__item" item={item} onSelect={selectItem} />
-                ))}
+        <NativeTextTree>
+            <div className="octane-catalog-air-frontpage">
+                {!!firstItem && <FeaturedItem className="octane-catalog-air-frontpage__first" item={firstItem} onSelect={selectItem} />}
+                <div className="octane-catalog-air-frontpage__list">
+                    {otherItems.map((item, index) => (
+                        <FeaturedItem key={`${item.itemName}-${index}`} className="octane-catalog-air-frontpage__item" item={item} onSelect={selectItem} />
+                    ))}
+                </div>
+                <div className="octane-catalog-air-frontpage__voucher">
+                    <div className="octane-catalog-air-frontpage__voucher-label">{page?.localization?.getText(1) ?? ''}</div>
+                    <CatalogRedeemVoucherView text="" />
+                </div>
             </div>
-            <div className="octane-catalog-air-frontpage__voucher">
-                <div className="octane-catalog-air-frontpage__voucher-label">{page?.localization?.getText(1) ?? ''}</div>
-                <CatalogRedeemVoucherView text="" />
-            </div>
-        </div>
+        </NativeTextTree>
     );
 };

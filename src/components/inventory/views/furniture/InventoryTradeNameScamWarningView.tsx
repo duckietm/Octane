@@ -2,6 +2,7 @@ import { IRoomUserData, RoomObjectType } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { findLookalikeNames, GetUserProfile, localizeWithFallback, MessengerFriend } from '../../../../api';
 import { LayoutAvatarImageView, OctaneCardHeaderView, OctaneCardView } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useFriendsState, useInventoryTrade, useRoomUserListSnapshot } from '../../../../hooks';
 import { OctaneButton } from '../../../../layout';
 
@@ -71,60 +72,62 @@ export const InventoryTradeNameScamWarningView: FC<{}> = () => {
     };
 
     return (
-        <OctaneCardView className="min-w-0 w-[min(356px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" uniqueKey="trade-name-scam">
-            <OctaneCardHeaderView headerText={localizeWithFallback('inventory.trading.namescam.title', 'Check who you are trading with')} onCloseClick={close} />
-            <div className="octane-trade-name-scam-body flex flex-col gap-2 bg-[#DFDFDF] p-2">
-                <p className="m-0">
-                    {localizeWithFallback(
-                        'inventory.trading.namescam.warning',
-                        `The name ${warning.userName} looks a lot like someone you know. Make sure this is the person you meant to trade with.`,
-                        ['trader_name'],
-                        [warning.userName]
+        <NativeTextTree>
+            <OctaneCardView className="min-w-0 w-[min(356px,calc(100vw-16px))] max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)]" uniqueKey="trade-name-scam">
+                <OctaneCardHeaderView headerText={localizeWithFallback('inventory.trading.namescam.title', 'Check who you are trading with')} onCloseClick={close} />
+                <div className="octane-trade-name-scam-body flex flex-col gap-2 bg-[#DFDFDF] p-2">
+                    <p className="m-0">
+                        {localizeWithFallback(
+                            'inventory.trading.namescam.warning',
+                            `The name ${warning.userName} looks a lot like someone you know. Make sure this is the person you meant to trade with.`,
+                            ['trader_name'],
+                            [warning.userName]
+                        )}
+                    </p>
+                    <div className="flex items-center gap-2 rounded bg-white p-1">
+                        <div className="h-[64px] w-[48px] shrink-0 overflow-hidden">
+                            {warning.figure && <LayoutAvatarImageView direction={2} figure={warning.figure} headOnly />}
+                        </div>
+                        <div className="flex min-w-0 flex-1 flex-col">
+                            <span className="octane-trade-name-scam-muted">{localizeWithFallback('inventory.trading.namescam.trader', 'Trading with')}</span>
+                            <span className="octane-trade-name-scam-trader truncate">{warning.userName}</span>
+                        </div>
+                        <OctaneButton className="octane-trade-button shrink-0" onClick={() => GetUserProfile(warning.userId)}>
+                            {localizeWithFallback('inventory.trading.namescam.open_profile', 'Profile')}
+                        </OctaneButton>
+                    </div>
+                    {warning.similarInRoom.length > 0 && (
+                        <div>
+                            <span className="font-bold">{localizeWithFallback('inventory.trading.namescam.similar_in_room', 'Similar names in this room')}</span>
+                            <ul className="m-0 pl-4">
+                                {warning.similarInRoom.map((name) => (
+                                    <li key={name}>{name}</li>
+                                ))}
+                            </ul>
+                        </div>
                     )}
-                </p>
-                <div className="flex items-center gap-2 rounded bg-white p-1">
-                    <div className="h-[64px] w-[48px] shrink-0 overflow-hidden">
-                        {warning.figure && <LayoutAvatarImageView direction={2} figure={warning.figure} headOnly />}
-                    </div>
-                    <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="octane-trade-name-scam-muted">{localizeWithFallback('inventory.trading.namescam.trader', 'Trading with')}</span>
-                        <span className="octane-trade-name-scam-trader truncate">{warning.userName}</span>
-                    </div>
-                    <OctaneButton className="octane-trade-button shrink-0" onClick={() => GetUserProfile(warning.userId)}>
-                        {localizeWithFallback('inventory.trading.namescam.open_profile', 'Profile')}
-                    </OctaneButton>
-                </div>
-                {warning.similarInRoom.length > 0 && (
-                    <div>
-                        <span className="font-bold">{localizeWithFallback('inventory.trading.namescam.similar_in_room', 'Similar names in this room')}</span>
-                        <ul className="m-0 pl-4">
-                            {warning.similarInRoom.map((name) => (
-                                <li key={name}>{name}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-                {warning.similarInFriends.length > 0 && (
-                    <div>
-                        <span className="font-bold">{localizeWithFallback('inventory.trading.namescam.similar_in_friends', 'Similar names in your friends')}</span>
-                        <ul className="m-0 pl-4">
-                            {warning.similarInFriends.map((name) => (
-                                <li key={name}>{name}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-                <div className="flex items-center justify-end gap-2">
-                    {lockSeconds > 0 && (
-                        <span className="octane-trade-name-scam-muted">
-                            {localizeWithFallback('inventory.trading.namescam.close_countdown', `You can close this in ${lockSeconds} s`, ['seconds'], [String(lockSeconds)])}
-                        </span>
+                    {warning.similarInFriends.length > 0 && (
+                        <div>
+                            <span className="font-bold">{localizeWithFallback('inventory.trading.namescam.similar_in_friends', 'Similar names in your friends')}</span>
+                            <ul className="m-0 pl-4">
+                                {warning.similarInFriends.map((name) => (
+                                    <li key={name}>{name}</li>
+                                ))}
+                            </ul>
+                        </div>
                     )}
-                    <OctaneButton className="octane-trade-button" disabled={lockSeconds > 0} onClick={close}>
-                        {localizeWithFallback('inventory.trading.namescam.close', 'OK')}
-                    </OctaneButton>
+                    <div className="flex items-center justify-end gap-2">
+                        {lockSeconds > 0 && (
+                            <span className="octane-trade-name-scam-muted">
+                                {localizeWithFallback('inventory.trading.namescam.close_countdown', `You can close this in ${lockSeconds} s`, ['seconds'], [String(lockSeconds)])}
+                            </span>
+                        )}
+                        <OctaneButton className="octane-trade-button" disabled={lockSeconds > 0} onClick={close}>
+                            {localizeWithFallback('inventory.trading.namescam.close', 'OK')}
+                        </OctaneButton>
+                    </div>
                 </div>
-            </div>
-        </OctaneCardView>
+            </OctaneCardView>
+        </NativeTextTree>
     );
 };

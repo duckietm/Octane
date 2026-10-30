@@ -8,6 +8,7 @@ import {
     WiredFurniType
 } from '../../../../api';
 import { Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { WiredSourcesSelector } from '../WiredSourcesSelector';
 import { WiredActionBaseView } from './WiredActionBaseView';
@@ -45,44 +46,46 @@ export const WiredActionTeleportToRoomView: FC<{}> = () => {
     };
 
     return (
-        <WiredActionBaseView
-            footer={
-                <WiredSourcesSelector
-                    furniSource={furniSource}
-                    showFurni={true}
-                    showUsers={true}
-                    userSource={userSource}
-                    onChangeFurni={setFurniSource}
-                    onChangeUsers={setUserSource}
-                />
-            }
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
-            save={save}
-            validate={() => (roomId.length ? isValidTeleportRoomId(roomId) : hasFurni)}
-        >
-            <div className="flex flex-col gap-1">
-                <Text small>
-                    {localizeWithFallback(
-                        'wiredfurni.params.teleport_to_room.furni',
-                        'Pick a teleporter to arrive on its pair, or a room link to go to its room.'
-                    )}
-                </Text>
-            </div>
-            <div className="flex flex-col gap-1">
-                <Text bold>{localizeWithFallback('wiredfurni.params.teleport_to_room.room_id', 'Room id')}</Text>
-                <input
-                    className="form-control form-control-sm"
-                    inputMode="numeric"
-                    maxLength={TELEPORT_TO_ROOM_ID_MAX_LENGTH}
-                    type="text"
-                    value={roomId}
-                    onChange={(event) => setRoomId(sanitizeTeleportRoomId(event.target.value))}
-                />
-                <Text small>
-                    {localizeWithFallback('wiredfurni.params.teleport_to_room.room_id.hint', 'Used when no picked furni leads anywhere. Leave empty to only use furni.')}
-                </Text>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                footer={
+                    <WiredSourcesSelector
+                        furniSource={furniSource}
+                        showFurni={true}
+                        showUsers={true}
+                        userSource={userSource}
+                        onChangeFurni={setFurniSource}
+                        onChangeUsers={setUserSource}
+                    />
+                }
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_BY_ID_BY_TYPE_OR_FROM_CONTEXT}
+                save={save}
+                validate={() => (roomId.length ? isValidTeleportRoomId(roomId) : hasFurni)}
+            >
+                <div className="flex flex-col gap-1">
+                    <Text small>
+                        {localizeWithFallback(
+                            'wiredfurni.params.teleport_to_room.furni',
+                            'Pick a teleporter to arrive on its pair, or a room link to go to its room.'
+                        )}
+                    </Text>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Text bold>{localizeWithFallback('wiredfurni.params.teleport_to_room.room_id', 'Room id')}</Text>
+                    <input
+                        className="form-control form-control-sm"
+                        inputMode="numeric"
+                        maxLength={TELEPORT_TO_ROOM_ID_MAX_LENGTH}
+                        type="text"
+                        value={roomId}
+                        onChange={(event) => setRoomId(sanitizeTeleportRoomId(event.target.value))}
+                    />
+                    <Text small>
+                        {localizeWithFallback('wiredfurni.params.teleport_to_room.room_id.hint', 'Used when no picked furni leads anywhere. Leave empty to only use furni.')}
+                    </Text>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

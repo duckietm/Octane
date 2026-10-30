@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { GetConfigurationValue, handleInternalLinkClick, SanitizeHtmlWithInternalLinks } from '../../../../../api';
+import { NativeTextTree } from '../../../../../common/native-text/NativeTextTree';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 /**
@@ -12,20 +13,22 @@ export const CatalogLayoutInfoLoyaltyView: FC<CatalogLayoutProps> = (props) => {
     const imageLibraryUrl = GetConfigurationValue<string>('image.library.url', '');
 
     return (
-        <div className="octane-catalog-layout-info-loyalty">
-            <div
-                className="octane-catalog-layout-info-loyalty__description"
-                onClick={handleInternalLinkClick}
-                dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(0) ?? '') }}
-            />
-            {!!imageLibraryUrl && (
-                <img
-                    alt=""
-                    draggable={false}
-                    className="octane-catalog-layout-info-loyalty__illustration"
-                    src={`${imageLibraryUrl}catalogue/diamond_info_illustration.gif`}
+        <NativeTextTree>
+            <div className="octane-catalog-layout-info-loyalty">
+                <div
+                    className="octane-catalog-layout-info-loyalty__description"
+                    onClick={handleInternalLinkClick}
+                    dangerouslySetInnerHTML={{ __html: SanitizeHtmlWithInternalLinks(page?.localization?.getText(0) ?? '') }}
                 />
-            )}
-        </div>
+                {!!imageLibraryUrl && (
+                    <img
+                        alt=""
+                        draggable={false}
+                        className="octane-catalog-layout-info-loyalty__illustration"
+                        src={`${imageLibraryUrl}catalogue/diamond_info_illustration.gif`}
+                    />
+                )}
+            </div>
+        </NativeTextTree>
     );
 };

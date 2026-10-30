@@ -2,6 +2,7 @@ import { GetSessionDataManager } from '@octane/renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, WIRED_STRING_DELIMETER, WiredFurniType } from '../../../../api';
 import { Button, LayoutAvatarImageView, Text } from '../../../../common';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 import { useWired } from '../../../../hooks';
 import { OctaneInput } from '../../../../layout';
 import { BOT_SOURCES, WiredSourcesSelector } from '../WiredSourcesSelector';
@@ -34,29 +35,31 @@ export const WiredActionBotChangeFigureView: FC<{}> = (props) => {
     }, [trigger]);
 
     return (
-        <WiredActionBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            footer={
-                <WiredSourcesSelector
-                    showUsers={true}
-                    userSource={botSource}
-                    userSources={BOT_SOURCES}
-                    usersTitle="wiredfurni.params.sources.users.title.bots"
-                    onChangeUsers={(value) => setBotSource(normalizeBotSource(value, botName.length > 0))}
-                />
-            }
-        >
-            <div className="flex flex-col gap-1">
-                <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
-                <OctaneInput maxLength={32} title={LocalizeText('wiredfurni.tooltip.bot.name')} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
-            </div>
-            <Text bold>{LocalizeText('wiredfurni.params.capture.figure')}</Text>
-            <div className="flex items-center justify-center">
-                {figure && <LayoutAvatarImageView direction={4} figure={figure} />}
-                <Button onClick={(event) => setFigure(GetSessionDataManager().figure)}>{LocalizeText('wiredfurni.params.capture.figure')}</Button>
-            </div>
-        </WiredActionBaseView>
+        <NativeTextTree>
+            <WiredActionBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                footer={
+                    <WiredSourcesSelector
+                        showUsers={true}
+                        userSource={botSource}
+                        userSources={BOT_SOURCES}
+                        usersTitle="wiredfurni.params.sources.users.title.bots"
+                        onChangeUsers={(value) => setBotSource(normalizeBotSource(value, botName.length > 0))}
+                    />
+                }
+            >
+                <div className="flex flex-col gap-1">
+                    <Text bold>{LocalizeText('wiredfurni.params.bot.name')}</Text>
+                    <OctaneInput maxLength={32} title={LocalizeText('wiredfurni.tooltip.bot.name')} type="text" value={botName} onChange={(event) => setBotName(event.target.value)} />
+                </div>
+                <Text bold>{LocalizeText('wiredfurni.params.capture.figure')}</Text>
+                <div className="flex items-center justify-center">
+                    {figure && <LayoutAvatarImageView direction={4} figure={figure} />}
+                    <Button onClick={(event) => setFigure(GetSessionDataManager().figure)}>{LocalizeText('wiredfurni.params.capture.figure')}</Button>
+                </div>
+            </WiredActionBaseView>
+        </NativeTextTree>
     );
 };

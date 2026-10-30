@@ -4,6 +4,7 @@ import { Slider, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredSelectorBaseView } from './WiredSelectorBaseView';
 import { Radio } from '../../../../common/Radio';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MIN_ALTITUDE = 0;
 const MAX_ALTITUDE = 80;
@@ -77,43 +78,45 @@ export const WiredSelectorFurniAltitudeView: FC<{}> = () => {
     }, [altitude, comparison, setIntParams, setStringParam]);
 
     return (
-        <WiredSelectorBaseView
-            hasSpecialInput={true}
-            requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
-            save={save}
-            hideDelay={true}
-            cardStyle={{ width: 400 }}
-        >
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    {[0, 1, 2].map((value) => {
-                        return (
-                            <label key={value} className="flex items-center gap-1">
-                                <Radio checked={comparison === value} name="furniAltitudeComparison" onCheckedChange={() => setComparison(value)} />
-                                <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
-                            </label>
-                        );
-                    })}
-                </div>
+        <NativeTextTree>
+            <WiredSelectorBaseView
+                hasSpecialInput={true}
+                requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE}
+                save={save}
+                hideDelay={true}
+                cardStyle={{ width: 400 }}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                        {[0, 1, 2].map((value) => {
+                            return (
+                                <label key={value} className="flex items-center gap-1">
+                                    <Radio checked={comparison === value} name="furniAltitudeComparison" onCheckedChange={() => setComparison(value)} />
+                                    <Text>{LocalizeText(`wiredfurni.params.comparison.${value}`)}</Text>
+                                </label>
+                            );
+                        })}
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Text bold>{LocalizeText('wiredfurni.params.setaltitude')}</Text>
-                    <input
-                        className="form-control form-control-sm"
-                        inputMode="decimal"
-                        type="text"
-                        value={altitudeInput}
-                        onBlur={() => setAltitudeInput(formatAltitude(altitude))}
-                        onChange={(event) => updateAltitudeInput(event.target.value)}
-                    />
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <Text bold>{LocalizeText('wiredfurni.params.setaltitude')}</Text>
+                        <input
+                            className="form-control form-control-sm"
+                            inputMode="decimal"
+                            type="text"
+                            value={altitudeInput}
+                            onBlur={() => setAltitudeInput(formatAltitude(altitude))}
+                            onChange={(event) => updateAltitudeInput(event.target.value)}
+                        />
+                    </div>
 
-                <div className="flex flex-col gap-1">
-                    <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
-                    <Text small>{formatAltitude(altitude)}</Text>
-                </div>
+                    <div className="flex flex-col gap-1">
+                        <Slider max={MAX_ALTITUDE} min={MIN_ALTITUDE} step={ALTITUDE_STEP} value={altitude} onChange={(event) => updateAltitude(event as number)} />
+                        <Text small>{formatAltitude(altitude)}</Text>
+                    </div>
 
-            </div>
-        </WiredSelectorBaseView>
+                </div>
+            </WiredSelectorBaseView>
+        </NativeTextTree>
     );
 };

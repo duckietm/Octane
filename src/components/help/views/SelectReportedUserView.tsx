@@ -2,6 +2,7 @@ import { ChatReviewSessionCreateMessageComposer, GetSessionDataManager, RoomObje
 import { FC, useMemo, useState } from 'react';
 import { ChatEntryType, GetRoomSession, guardianText, IReportedUser, LocalizeText, ReportState, ReportType, SendMessageComposer } from '../../../api';
 import { AutoGrid, Button, Column, Flex, LayoutAvatarImageView, LayoutGridItem, Text } from '../../../common';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 import { isGuardiansEnabled, useChatHistory, useHelp } from '../../../hooks';
 
 export const SelectReportedUserView: FC<{}> = (props) => {
@@ -69,38 +70,40 @@ export const SelectReportedUserView: FC<{}> = (props) => {
     };
 
     return (
-        <>
-            <div className="flex flex-col gap-1">
-                <Text fontSize={4}>{isGuardianReport ? guardianText('help.bully.subtitle') : LocalizeText('help.emergency.main.step.two.title')}</Text>
-                {availableUsers.length > 0 && <Text>{isGuardianReport ? guardianText('help.bully.description') : LocalizeText('report.user.pick.user')}</Text>}
-            </div>
-            <Column gap={1} overflow="hidden">
-                {!!!availableUsers.length && <Text>{LocalizeText('report.user.error.nolist')}</Text>}
-                {availableUsers.length > 0 && (
-                    <AutoGrid columnCount={1} columnMinHeight={25} gap={1}>
-                        {availableUsers.map((user, index) => {
-                            return (
-                                <LayoutGridItem key={user.id} itemActive={selectedUserId === user.id} onClick={(event) => selectUser(user.id)}>
-                                    <span className="octane-help-user">
-                                        <span className="octane-help-user__avatar">
-                                            <LayoutAvatarImageView headOnly compactHead compactHeadSize={30} compactHeadPadding={0} direction={2} figure={user.look ?? ''} />
+        <NativeTextTree>
+            <>
+                <div className="flex flex-col gap-1">
+                    <Text fontSize={4}>{isGuardianReport ? guardianText('help.bully.subtitle') : LocalizeText('help.emergency.main.step.two.title')}</Text>
+                    {availableUsers.length > 0 && <Text>{isGuardianReport ? guardianText('help.bully.description') : LocalizeText('report.user.pick.user')}</Text>}
+                </div>
+                <Column gap={1} overflow="hidden">
+                    {!!!availableUsers.length && <Text>{LocalizeText('report.user.error.nolist')}</Text>}
+                    {availableUsers.length > 0 && (
+                        <AutoGrid columnCount={1} columnMinHeight={25} gap={1}>
+                            {availableUsers.map((user, index) => {
+                                return (
+                                    <LayoutGridItem key={user.id} itemActive={selectedUserId === user.id} onClick={(event) => selectUser(user.id)}>
+                                        <span className="octane-help-user">
+                                            <span className="octane-help-user__avatar">
+                                                <LayoutAvatarImageView headOnly compactHead compactHeadSize={30} compactHeadPadding={0} direction={2} figure={user.look ?? ''} />
+                                            </span>
+                                            <span className="octane-help-user__name">{user.username}</span>
                                         </span>
-                                        <span className="octane-help-user__name">{user.username}</span>
-                                    </span>
-                                </LayoutGridItem>
-                            );
-                        })}
-                    </AutoGrid>
-                )}
-            </Column>
-            <Flex gap={2} justifyContent="between">
-                <Button variant="secondary" onClick={back}>
-                    {LocalizeText('generic.back')}
-                </Button>
-                <Button disabled={selectedUserId <= 0} onClick={() => submitUser(selectedUserId)}>
-                    {isGuardianReport ? guardianText('help.bully.submit') : LocalizeText('help.emergency.main.submit.button')}
-                </Button>
-            </Flex>
-        </>
+                                    </LayoutGridItem>
+                                );
+                            })}
+                        </AutoGrid>
+                    )}
+                </Column>
+                <Flex gap={2} justifyContent="between">
+                    <Button variant="secondary" onClick={back}>
+                        {LocalizeText('generic.back')}
+                    </Button>
+                    <Button disabled={selectedUserId <= 0} onClick={() => submitUser(selectedUserId)}>
+                        {isGuardianReport ? guardianText('help.bully.submit') : LocalizeText('help.emergency.main.submit.button')}
+                    </Button>
+                </Flex>
+            </>
+        </NativeTextTree>
     );
 };

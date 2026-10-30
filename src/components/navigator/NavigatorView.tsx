@@ -44,6 +44,7 @@ import { NavigatorSearchView } from './views/search/NavigatorSearchView';
 import { TabBar, TabBarTab } from '../../common/TabBar';
 import { BaseButton } from '../../common/BaseButton';
 import { Hint } from '../../common/Tooltip';
+import { NativeTextTree } from '../../common/native-text/NativeTextTree';
 
 const persistNavigatorBounds = (element: HTMLElement | null) => {
     if (!element) return;
@@ -275,207 +276,209 @@ export const NavigatorView: FC<{}> = () => {
     };
 
     return (
-        <>
-            {isVisible && (
-                <DraggableWindow uniqueKey="navigator" handleSelector=".octane-navigator-air__caption">
-                    <div
-                        ref={frameRef}
-                        className={`octane-navigator-air max-w-[calc(100vw-16px)]${isOpenSavesSearches ? ' is-quick-links' : ''}`}
-                        data-air-frame="ubuntu-3"
-                        style={{ '--navigator-height': `${windowHeight || 628}px` } as CSSProperties}
-                    >
-                        <div className="octane-navigator-air__skin" aria-hidden="true" />
-                        <div className="octane-navigator-air__tab-shelf" aria-hidden="true" />
-                        <div className="octane-navigator-air__caption">
-                            <div className="octane-navigator-air__history">
-                                <Hint content={localizeWithFallback('navigator.back', 'back')}><BaseButton
-                                    type="button"
-                                    className="octane-navigator-air__history-button"
-                                    aria-label={localizeWithFallback('navigator.back', 'back')}
-                                    disabled={!canGoBack}
-                                    onClick={() => useNavigatorUiStore.getState().goBack()}
-                                >
-                                    ‹
-                                </BaseButton></Hint>
-                                <Hint content={localizeWithFallback('navigator.forward', 'forward')}><BaseButton
-                                    type="button"
-                                    className="octane-navigator-air__history-button"
-                                    aria-label={localizeWithFallback('navigator.forward', 'forward')}
-                                    disabled={!canGoForward}
-                                    onClick={() => useNavigatorUiStore.getState().goForward()}
-                                >
-                                    ›
-                                </BaseButton></Hint>
-                            </div>
-                            <span className="octane-navigator-air__title">{headerText}</span>
-                            <BaseButton
-                                type="button"
-                                className="octane-navigator-air__close octane-navigator-air__help"
-                                aria-label={LocalizeText('generic.help')}
-                                onClick={() => CreateLinkEvent('habbopages/navigator')}
-                            />
-                            <BaseButton
-                                type="button"
-                                className="octane-navigator-air__close"
-                                aria-label={LocalizeText('generic.close')}
-                                onClick={() => useNavigatorUiStore.getState().hide()}
-                            />
-                        </div>
-                        <BaseButton
-                            type="button"
-                            className="octane-navigator-air__quick-toggle"
-                            aria-label={quickLinksToggleLabel}
-                            aria-expanded={isOpenSavesSearches}
-                            onClick={onToggleQuickLinks}
+        <NativeTextTree>
+            <>
+                {isVisible && (
+                    <DraggableWindow uniqueKey="navigator" handleSelector=".octane-navigator-air__caption">
+                        <div
+                            ref={frameRef}
+                            className={`octane-navigator-air max-w-[calc(100vw-16px)]${isOpenSavesSearches ? ' is-quick-links' : ''}`}
+                            data-air-frame="ubuntu-3"
+                            style={{ '--navigator-height': `${windowHeight || 628}px` } as CSSProperties}
                         >
-                            <img src={quicklinkAdd} alt="" width={18} height={18} />
-                        </BaseButton>
-                        <TabBar
-                            ref={tabsRef}
-                            className="octane-navigator-air__tabs"
-                            value={isCreatorOpen ? null : ((currentTabCode ? currentTabCode : topLevelContext?.code) ?? null)}
-                        >
-                            {topLevelContexts &&
-                                topLevelContexts.length > 0 &&
-                                topLevelContexts.map((context) => {
-                                    const active = (currentTabCode ? currentTabCode === context.code : topLevelContext === context) && !isCreatorOpen;
-
-                                    return (
-                                        <TabBarTab
-                                            key={context.code}
-                                            value={context.code}
-                                            className={`octane-navigator-air__tab${active ? ' is-active' : ''}`}
-                                            onClick={() => {
-                                                useNavigatorRoomInfoPopupStore.getState().hide();
-                                                useNavigatorUiStore.getState().setTab(context.code);
-                                            }}
-                                        >
-                                            <span className="octane-navigator-air__tab-label">{LocalizeText('navigator.toplevelview.' + context.code)}</span>
-                                        </TabBarTab>
-                                    );
-                                })}
-                        </TabBar>
-                        <div className="octane-navigator-air__body">
-                            {!isCreatorOpen && (
-                                <div className="octane-navigator-air__workspace">
-                                    {isOpenSavesSearches && (
-                                        <nav className="octane-navigator-air__quick-links" aria-label={quickLinksLabel}>
-                                            <NavigatorSearchSavesResultView searches={navigatorSearches || []} />
-                                        </nav>
-                                    )}
-                                    <main className="octane-navigator-air__main" aria-label={navigatorLabel}>
-                                        <NavigatorSearchView searchResult={searchResult} />
-                                        <div ref={elementRef} className="octane-navigator-air__results has-air-scrollbar" data-scrollable={resultsScrollable}>
-                                            {isFetching && <div className="octane-navigator-air__busy-mask" aria-hidden="true" />}
-                                            {searchResult?.code === NAVIGATOR_LIFTED_VIEW_CODE && !searchResult.data && <NavigatorLiftedRoomsView rooms={liftedRooms} />}
-                                            {searchResult &&
-                                                searchResult.results.map((result, index) => (
-                                                    <NavigatorSearchResultView
-                                                        key={result.code || index}
-                                                        searchResult={result}
-                                                        parentCode={searchResult.code}
-                                                        parentFilter={searchResult.data}
-                                                        forceOpen={searchResult.results.length === 1}
-                                                    />
-                                                ))}
-                                            {searchResult && (!searchResult.results || searchResult.results.length === 0) && (
-                                                <NavigatorEmptyStateView code={searchResult.code} />
-                                            )}
-                                        </div>
-                                        <div className="octane-navigator-air__actions">
-                                            <BaseButton
-                                                type="button"
-                                                className="octane-navigator-air__action octane-navigator-air__action--create"
-                                                onClick={onCreateRoom}
-                                            >
-                                                <div className="octane-navigator-air__action-content">
-                                                    <img src={createRoomImg} alt="" />
-                                                    <span>{localizeWithFallback('navigator.create.room', LocalizeText('navigator.createroom.create'))}</span>
-                                                </div>
-                                                <i className="octane-navigator-air__action-border" aria-hidden="true" />
-                                            </BaseButton>
-                                            {!showPromote && (
-                                                <BaseButton
-                                                    type="button"
-                                                    className="octane-navigator-air__action octane-navigator-air__action--random"
-                                                    onClick={onRandomRoom}
-                                                >
-                                                    <div className="octane-navigator-air__action-content">
-                                                        <img src={randomRoomImg} alt="" />
-                                                        <span>{LocalizeText('navigator.random.room')}</span>
-                                                    </div>
-                                                    <i className="octane-navigator-air__action-border" aria-hidden="true" />
-                                                </BaseButton>
-                                            )}
-                                            {showPromote && (
-                                                <BaseButton
-                                                    type="button"
-                                                    className="octane-navigator-air__action octane-navigator-air__action--promote"
-                                                    onClick={onPromoteRoom}
-                                                >
-                                                    <div className="octane-navigator-air__action-content">
-                                                        <img src={promoteRoomImg} alt="" />
-                                                        <span>{LocalizeText('navigator.promote.room')}</span>
-                                                    </div>
-                                                    <i className="octane-navigator-air__action-border" aria-hidden="true" />
-                                                </BaseButton>
-                                            )}
-                                        </div>
-                                    </main>
+                            <div className="octane-navigator-air__skin" aria-hidden="true" />
+                            <div className="octane-navigator-air__tab-shelf" aria-hidden="true" />
+                            <div className="octane-navigator-air__caption">
+                                <div className="octane-navigator-air__history">
+                                    <Hint content={localizeWithFallback('navigator.back', 'back')}><BaseButton
+                                        type="button"
+                                        className="octane-navigator-air__history-button"
+                                        aria-label={localizeWithFallback('navigator.back', 'back')}
+                                        disabled={!canGoBack}
+                                        onClick={() => useNavigatorUiStore.getState().goBack()}
+                                    >
+                                        ‹
+                                    </BaseButton></Hint>
+                                    <Hint content={localizeWithFallback('navigator.forward', 'forward')}><BaseButton
+                                        type="button"
+                                        className="octane-navigator-air__history-button"
+                                        aria-label={localizeWithFallback('navigator.forward', 'forward')}
+                                        disabled={!canGoForward}
+                                        onClick={() => useNavigatorUiStore.getState().goForward()}
+                                    >
+                                        ›
+                                    </BaseButton></Hint>
                                 </div>
-                            )}
-                            {isCreatorOpen && (
-                                <WidgetErrorBoundary name="NavigatorRoomCreator">
-                                    <NavigatorRoomCreatorView />
-                                </WidgetErrorBoundary>
-                            )}
-                        </div>
-                        <BaseButton
-                            type="button"
-                            className="octane-navigator-air__resize"
-                            aria-label={localizeWithFallback('navigator.resize', 'Resize Navigator')}
-                            onPointerDown={onResizeStart}
-                            onPointerMove={onResizeMove}
-                            onPointerUp={onResizeEnd}
-                            onPointerCancel={onResizeEnd}
-                            onLostPointerCapture={onResizeEnd}
-                            onKeyDown={(event) => {
-                                if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+                                <span className="octane-navigator-air__title">{headerText}</span>
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__close octane-navigator-air__help"
+                                    aria-label={LocalizeText('generic.help')}
+                                    onClick={() => CreateLinkEvent('habbopages/navigator')}
+                                />
+                                <BaseButton
+                                    type="button"
+                                    className="octane-navigator-air__close"
+                                    aria-label={LocalizeText('generic.close')}
+                                    onClick={() => useNavigatorUiStore.getState().hide()}
+                                />
+                            </div>
+                            <BaseButton
+                                type="button"
+                                className="octane-navigator-air__quick-toggle"
+                                aria-label={quickLinksToggleLabel}
+                                aria-expanded={isOpenSavesSearches}
+                                onClick={onToggleQuickLinks}
+                            >
+                                <img src={quicklinkAdd} alt="" width={18} height={18} />
+                            </BaseButton>
+                            <TabBar
+                                ref={tabsRef}
+                                className="octane-navigator-air__tabs"
+                                value={isCreatorOpen ? null : ((currentTabCode ? currentTabCode : topLevelContext?.code) ?? null)}
+                            >
+                                {topLevelContexts &&
+                                    topLevelContexts.length > 0 &&
+                                    topLevelContexts.map((context) => {
+                                        const active = (currentTabCode ? currentTabCode === context.code : topLevelContext === context) && !isCreatorOpen;
 
-                                event.preventDefault();
-                                const height = Math.max(500, (windowHeight || 628) + (event.key === 'ArrowUp' ? -10 : 10));
-                                useNavigatorUiStore.setState({ windowHeight: height });
-                            }}
-                            onKeyUp={(event) => {
-                                if (event.key === 'ArrowUp' || event.key === 'ArrowDown') persistNavigatorBounds(frameRef.current);
-                            }}
-                        />
-                    </div>
-                </DraggableWindow>
-            )}
-            <NavigatorRoomInfoPopupView />
-            <WidgetErrorBoundary name="NavigatorDoorState">
-                <NavigatorDoorStateView />
-            </WidgetErrorBoundary>
-            {isRoomInfoOpen && (
-                <WidgetErrorBoundary name="NavigatorRoomInfo">
-                    <NavigatorRoomInfoView onCloseClick={() => useNavigatorUiStore.getState().setRoomInfoOpen(false)} />
+                                        return (
+                                            <TabBarTab
+                                                key={context.code}
+                                                value={context.code}
+                                                className={`octane-navigator-air__tab${active ? ' is-active' : ''}`}
+                                                onClick={() => {
+                                                    useNavigatorRoomInfoPopupStore.getState().hide();
+                                                    useNavigatorUiStore.getState().setTab(context.code);
+                                                }}
+                                            >
+                                                <span className="octane-navigator-air__tab-label">{LocalizeText('navigator.toplevelview.' + context.code)}</span>
+                                            </TabBarTab>
+                                        );
+                                    })}
+                            </TabBar>
+                            <div className="octane-navigator-air__body">
+                                {!isCreatorOpen && (
+                                    <div className="octane-navigator-air__workspace">
+                                        {isOpenSavesSearches && (
+                                            <nav className="octane-navigator-air__quick-links" aria-label={quickLinksLabel}>
+                                                <NavigatorSearchSavesResultView searches={navigatorSearches || []} />
+                                            </nav>
+                                        )}
+                                        <main className="octane-navigator-air__main" aria-label={navigatorLabel}>
+                                            <NavigatorSearchView searchResult={searchResult} />
+                                            <div ref={elementRef} className="octane-navigator-air__results has-air-scrollbar" data-scrollable={resultsScrollable}>
+                                                {isFetching && <div className="octane-navigator-air__busy-mask" aria-hidden="true" />}
+                                                {searchResult?.code === NAVIGATOR_LIFTED_VIEW_CODE && !searchResult.data && <NavigatorLiftedRoomsView rooms={liftedRooms} />}
+                                                {searchResult &&
+                                                    searchResult.results.map((result, index) => (
+                                                        <NavigatorSearchResultView
+                                                            key={result.code || index}
+                                                            searchResult={result}
+                                                            parentCode={searchResult.code}
+                                                            parentFilter={searchResult.data}
+                                                            forceOpen={searchResult.results.length === 1}
+                                                        />
+                                                    ))}
+                                                {searchResult && (!searchResult.results || searchResult.results.length === 0) && (
+                                                    <NavigatorEmptyStateView code={searchResult.code} />
+                                                )}
+                                            </div>
+                                            <div className="octane-navigator-air__actions">
+                                                <BaseButton
+                                                    type="button"
+                                                    className="octane-navigator-air__action octane-navigator-air__action--create"
+                                                    onClick={onCreateRoom}
+                                                >
+                                                    <div className="octane-navigator-air__action-content">
+                                                        <img src={createRoomImg} alt="" />
+                                                        <span>{localizeWithFallback('navigator.create.room', LocalizeText('navigator.createroom.create'))}</span>
+                                                    </div>
+                                                    <i className="octane-navigator-air__action-border" aria-hidden="true" />
+                                                </BaseButton>
+                                                {!showPromote && (
+                                                    <BaseButton
+                                                        type="button"
+                                                        className="octane-navigator-air__action octane-navigator-air__action--random"
+                                                        onClick={onRandomRoom}
+                                                    >
+                                                        <div className="octane-navigator-air__action-content">
+                                                            <img src={randomRoomImg} alt="" />
+                                                            <span>{LocalizeText('navigator.random.room')}</span>
+                                                        </div>
+                                                        <i className="octane-navigator-air__action-border" aria-hidden="true" />
+                                                    </BaseButton>
+                                                )}
+                                                {showPromote && (
+                                                    <BaseButton
+                                                        type="button"
+                                                        className="octane-navigator-air__action octane-navigator-air__action--promote"
+                                                        onClick={onPromoteRoom}
+                                                    >
+                                                        <div className="octane-navigator-air__action-content">
+                                                            <img src={promoteRoomImg} alt="" />
+                                                            <span>{LocalizeText('navigator.promote.room')}</span>
+                                                        </div>
+                                                        <i className="octane-navigator-air__action-border" aria-hidden="true" />
+                                                    </BaseButton>
+                                                )}
+                                            </div>
+                                        </main>
+                                    </div>
+                                )}
+                                {isCreatorOpen && (
+                                    <WidgetErrorBoundary name="NavigatorRoomCreator">
+                                        <NavigatorRoomCreatorView />
+                                    </WidgetErrorBoundary>
+                                )}
+                            </div>
+                            <BaseButton
+                                type="button"
+                                className="octane-navigator-air__resize"
+                                aria-label={localizeWithFallback('navigator.resize', 'Resize Navigator')}
+                                onPointerDown={onResizeStart}
+                                onPointerMove={onResizeMove}
+                                onPointerUp={onResizeEnd}
+                                onPointerCancel={onResizeEnd}
+                                onLostPointerCapture={onResizeEnd}
+                                onKeyDown={(event) => {
+                                    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+
+                                    event.preventDefault();
+                                    const height = Math.max(500, (windowHeight || 628) + (event.key === 'ArrowUp' ? -10 : 10));
+                                    useNavigatorUiStore.setState({ windowHeight: height });
+                                }}
+                                onKeyUp={(event) => {
+                                    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') persistNavigatorBounds(frameRef.current);
+                                }}
+                            />
+                        </div>
+                    </DraggableWindow>
+                )}
+                <NavigatorRoomInfoPopupView />
+                <WidgetErrorBoundary name="NavigatorDoorState">
+                    <NavigatorDoorStateView />
                 </WidgetErrorBoundary>
-            )}
-            {isRoomLinkOpen && (
-                <WidgetErrorBoundary name="NavigatorRoomLink">
-                    <NavigatorRoomLinkView onCloseClick={() => useNavigatorUiStore.getState().setRoomLinkOpen(false)} />
+                {isRoomInfoOpen && (
+                    <WidgetErrorBoundary name="NavigatorRoomInfo">
+                        <NavigatorRoomInfoView onCloseClick={() => useNavigatorUiStore.getState().setRoomInfoOpen(false)} />
+                    </WidgetErrorBoundary>
+                )}
+                {isRoomLinkOpen && (
+                    <WidgetErrorBoundary name="NavigatorRoomLink">
+                        <NavigatorRoomLinkView onCloseClick={() => useNavigatorUiStore.getState().setRoomLinkOpen(false)} />
+                    </WidgetErrorBoundary>
+                )}
+                <WidgetErrorBoundary name="NavigatorRoomSettings">
+                    <NavigatorRoomSettingsView />
                 </WidgetErrorBoundary>
-            )}
-            <WidgetErrorBoundary name="NavigatorRoomSettings">
-                <NavigatorRoomSettingsView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="NavigatorRaidProtection">
-                <NavigatorRaidProtectionView />
-            </WidgetErrorBoundary>
-            <WidgetErrorBoundary name="NavigatorEnforceCategory">
-                <NavigatorEnforceCategoryView />
-            </WidgetErrorBoundary>
-        </>
+                <WidgetErrorBoundary name="NavigatorRaidProtection">
+                    <NavigatorRaidProtectionView />
+                </WidgetErrorBoundary>
+                <WidgetErrorBoundary name="NavigatorEnforceCategory">
+                    <NavigatorEnforceCategoryView />
+                </WidgetErrorBoundary>
+            </>
+        </NativeTextTree>
     );
 };

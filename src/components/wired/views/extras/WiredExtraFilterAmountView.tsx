@@ -7,6 +7,7 @@ import { readWiredVariableToken, toWiredVariableId, wiredVariableIdList } from '
 import { getCustomVariableItemId } from '../WiredVariablePickerData';
 import { WiredExtraBaseView } from './WiredExtraBaseView';
 import { Checkbox } from '../../../../common/Checkbox';
+import { NativeTextTree } from '../../../../common/native-text/NativeTextTree';
 
 const MIN_FILTER = 1;
 const MAX_FILTER = 1000;
@@ -54,30 +55,32 @@ export const WiredExtraFilterAmountView: FC<{}> = () => {
     const validate = () => amountValid && (!fromVariable || getCustomVariableItemId(token) > 0);
 
     return (
-        <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 360 }}>
-            <div className="flex flex-col gap-2">
-                <Text bold>{LocalizeText('wiredfurni.params.setfilter')}</Text>
-                {/* AIR SelectorFilter / VariableFilter: createValueOrVariableSection(0, mergedSourceOptions(0), setfilter, 1, 1000).
-                    The server reads the variable on the triggering holder, so the popup offers the type selector only. */}
-                <WiredValueOrVariableField
-                    isVariable={fromVariable}
-                    label={LocalizeText('wiredfurni.params.setfilter')}
-                    literal={amount}
-                    max={MAX_FILTER}
-                    min={MIN_FILTER}
-                    target={target}
-                    token={token}
-                    onIsVariableChange={setFromVariable}
-                    onLiteralChange={setAmount}
-                    onTargetChange={setTarget}
-                    onTokenChange={setToken}
-                    onValidityChange={setAmountValid}
-                />
-                <label className="flex items-center gap-1">
-                    <Checkbox checked={randomPick} onCheckedChange={(nextChecked) => setRandomPick(nextChecked)} />
-                    <Text>{localizeWithFallback('wiredfurni.params.filter.random', 'Pick at random (off: the first N)')}</Text>
-                </label>
-            </div>
-        </WiredExtraBaseView>
+        <NativeTextTree>
+            <WiredExtraBaseView hasSpecialInput={true} requiresFurni={WiredFurniType.STUFF_SELECTION_OPTION_NONE} save={save} validate={validate} cardStyle={{ width: 360 }}>
+                <div className="flex flex-col gap-2">
+                    <Text bold>{LocalizeText('wiredfurni.params.setfilter')}</Text>
+                    {/* AIR SelectorFilter / VariableFilter: createValueOrVariableSection(0, mergedSourceOptions(0), setfilter, 1, 1000).
+                        The server reads the variable on the triggering holder, so the popup offers the type selector only. */}
+                    <WiredValueOrVariableField
+                        isVariable={fromVariable}
+                        label={LocalizeText('wiredfurni.params.setfilter')}
+                        literal={amount}
+                        max={MAX_FILTER}
+                        min={MIN_FILTER}
+                        target={target}
+                        token={token}
+                        onIsVariableChange={setFromVariable}
+                        onLiteralChange={setAmount}
+                        onTargetChange={setTarget}
+                        onTokenChange={setToken}
+                        onValidityChange={setAmountValid}
+                    />
+                    <label className="flex items-center gap-1">
+                        <Checkbox checked={randomPick} onCheckedChange={(nextChecked) => setRandomPick(nextChecked)} />
+                        <Text>{localizeWithFallback('wiredfurni.params.filter.random', 'Pick at random (off: the first N)')}</Text>
+                    </label>
+                </div>
+            </WiredExtraBaseView>
+        </NativeTextTree>
     );
 };

@@ -19,6 +19,7 @@ import { Hint } from '../../../common/Tooltip';
 import { BaseButton } from '../../../common/BaseButton';
 import { GuardianAnimatedIcon } from './GuardianAnimatedIcon';
 import { GuardianCountdownView } from './GuardianCountdownView';
+import { NativeTextTree } from '../../../common/native-text/NativeTextTree';
 
 const PROGRESS_FRAMES = [progress1, progress2, progress3, progress4];
 
@@ -44,26 +45,28 @@ const GuardianVoteButton: FC<GuardianVoteButtonProps> = ({ images, label, toolti
     const image = !disabled && down && over ? images[2] : !disabled && over ? images[1] : images[0];
 
     return (
-        <div className="octane-guardian-vote__choice">
-            <Hint content={tooltip} delay={0} disabled={disabled}>
-                <BaseButton
-                    aria-label={label}
-                    className="octane-guardian-vote__button"
-                    disabled={disabled}
-                    onClick={onVote}
-                    onMouseDown={() => setDown(true)}
-                    onMouseEnter={() => setOver(true)}
-                    onMouseLeave={() => {
-                        setOver(false);
-                        setDown(false);
-                    }}
-                    onMouseUp={() => setDown(false)}
-                >
-                    <img alt="" draggable={false} src={image} />
-                </BaseButton>
-            </Hint>
-            <div className="octane-guardian-vote__label">{label}</div>
-        </div>
+        <NativeTextTree>
+            <div className="octane-guardian-vote__choice">
+                <Hint content={tooltip} delay={0} disabled={disabled}>
+                    <BaseButton
+                        aria-label={label}
+                        className="octane-guardian-vote__button"
+                        disabled={disabled}
+                        onClick={onVote}
+                        onMouseDown={() => setDown(true)}
+                        onMouseEnter={() => setOver(true)}
+                        onMouseLeave={() => {
+                            setOver(false);
+                            setDown(false);
+                        }}
+                        onMouseUp={() => setDown(false)}
+                    >
+                        <img alt="" draggable={false} src={image} />
+                    </BaseButton>
+                </Hint>
+                <div className="octane-guardian-vote__label">{label}</div>
+            </div>
+        </NativeTextTree>
     );
 };
 
@@ -94,57 +97,59 @@ export const GuardianChatReviewVoteView: FC<GuardianChatReviewVoteViewProps> = (
     const incidentTime = waiting || !record ? null : `(${FriendlyTime.format(secondsSinceIncident(record.incidentTime, now), '.ago')})`;
 
     return (
-        <div className="octane-guardian-vote">
-            <div className="octane-guardian-vote__countdown">
-                <GuardianCountdownView countdownId={countdownId} seconds={countdownSeconds} />
-            </div>
-            <div className="octane-guardian-vote__subtitle">
-                <span>{guardianText('guide.bully.request.guide.vote.subtitle')}</span>
-                {incidentTime && <span className="octane-guardian-vote__time">{incidentTime}</span>}
-            </div>
-            <div className="octane-guardian-vote__log">
-                {waiting && (
-                    <div className="octane-guardian-vote__waiting">
-                        <div>{guardianText('guide.bully.request.guide.vote.waiting')}</div>
-                        <GuardianAnimatedIcon frames={PROGRESS_FRAMES} />
-                    </div>
-                )}
-                {!waiting &&
-                    record?.lines.map((line, index) => {
-                        const isSuspect = line.userIndex === 0;
-                        const name = isSuspect
-                            ? guardianText('guide.bully.request.guide.vote.perpetrator')
-                            : guardianText('guide.bully.request.guide.vote.anonymous', ['id'], [String(line.userIndex)]);
-
-                        return (
-                            <div key={index} className={`octane-guardian-vote__line${isSuspect ? ' is-suspect' : ''}`}>
-                                <img alt="" draggable={false} src={isSuspect ? avatarPerpetrator : avatarAnonymous} />
-                                <div className="octane-guardian-vote__message">
-                                    <b>{name}:</b> {line.messages.join('\n')}
-                                </div>
-                            </div>
-                        );
-                    })}
-            </div>
-            <div className={`octane-guardian-vote__panel${waiting ? ' is-waiting' : ''}`}>
-                <div className="octane-guardian-vote__question">{guardianText('guide.bully.request.guide.vote.question')}</div>
-                <div className="octane-guardian-vote__choices">
-                    {VOTES.map((vote) => (
-                        <GuardianVoteButton
-                            key={vote.key}
-                            disabled={waiting}
-                            images={vote.images}
-                            label={guardianText(`guide.bully.request.guide.vote.${vote.key}`)}
-                            tooltip={guardianText(`guide.bully.request.guide.vote.${vote.key}.tooltip`)}
-                            onVote={() => onVote(vote.code)}
-                        />
-                    ))}
+        <NativeTextTree>
+            <div className="octane-guardian-vote">
+                <div className="octane-guardian-vote__countdown">
+                    <GuardianCountdownView countdownId={countdownId} seconds={countdownSeconds} />
                 </div>
-                <hr className="octane-guardian-separator" />
-                <BaseButton className="octane-guardian-link octane-guardian-vote__close" onClick={onClose}>
-                    {guardianText('guide.bully.request.guide.vote.close')}
-                </BaseButton>
+                <div className="octane-guardian-vote__subtitle">
+                    <span>{guardianText('guide.bully.request.guide.vote.subtitle')}</span>
+                    {incidentTime && <span className="octane-guardian-vote__time">{incidentTime}</span>}
+                </div>
+                <div className="octane-guardian-vote__log">
+                    {waiting && (
+                        <div className="octane-guardian-vote__waiting">
+                            <div>{guardianText('guide.bully.request.guide.vote.waiting')}</div>
+                            <GuardianAnimatedIcon frames={PROGRESS_FRAMES} />
+                        </div>
+                    )}
+                    {!waiting &&
+                        record?.lines.map((line, index) => {
+                            const isSuspect = line.userIndex === 0;
+                            const name = isSuspect
+                                ? guardianText('guide.bully.request.guide.vote.perpetrator')
+                                : guardianText('guide.bully.request.guide.vote.anonymous', ['id'], [String(line.userIndex)]);
+
+                            return (
+                                <div key={index} className={`octane-guardian-vote__line${isSuspect ? ' is-suspect' : ''}`}>
+                                    <img alt="" draggable={false} src={isSuspect ? avatarPerpetrator : avatarAnonymous} />
+                                    <div className="octane-guardian-vote__message">
+                                        <b>{name}:</b> {line.messages.join('\n')}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                </div>
+                <div className={`octane-guardian-vote__panel${waiting ? ' is-waiting' : ''}`}>
+                    <div className="octane-guardian-vote__question">{guardianText('guide.bully.request.guide.vote.question')}</div>
+                    <div className="octane-guardian-vote__choices">
+                        {VOTES.map((vote) => (
+                            <GuardianVoteButton
+                                key={vote.key}
+                                disabled={waiting}
+                                images={vote.images}
+                                label={guardianText(`guide.bully.request.guide.vote.${vote.key}`)}
+                                tooltip={guardianText(`guide.bully.request.guide.vote.${vote.key}.tooltip`)}
+                                onVote={() => onVote(vote.code)}
+                            />
+                        ))}
+                    </div>
+                    <hr className="octane-guardian-separator" />
+                    <BaseButton className="octane-guardian-link octane-guardian-vote__close" onClick={onClose}>
+                        {guardianText('guide.bully.request.guide.vote.close')}
+                    </BaseButton>
+                </div>
             </div>
-        </div>
+        </NativeTextTree>
     );
 };
