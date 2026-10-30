@@ -216,7 +216,8 @@ const useNotificationStore = () => {
 
         if (configuration) for (const key in configuration) options.set(key, configuration[key]);
 
-        if (type === 'floorplan_editor.error') options.set('message', options.get('message').replace(/[^a-zA-Z._ ]/g, ''));
+        // A floor plan error without a message used to throw here and lose the notification.
+        if (type === 'floorplan_editor.error') options.set('message', (options.get('message') ?? '').replace(/[^a-zA-Z._ ]/g, ''));
 
         const title = getNotificationPart(options, type, 'title', true);
         const message = getNotificationPart(options, type, 'message', true).replace(/\\r/g, '\r');
