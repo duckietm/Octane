@@ -108,6 +108,7 @@ import {
 } from './WiredCreatorTools.constants';
 import {
     buildMonitorLogs,
+    clampWiredVariableValue,
     exceedsVariableHighlightLimit,
     formatMonitorHistoryOccurrence,
     formatMonitorSource,
@@ -116,6 +117,7 @@ import {
     getHotelTimeFormatter,
     isStackOnlyVariable,
     normalizeMonitorReason,
+    parseWiredVariableValue,
     resolveMonitorErrorDescription,
     resolveMonitorRoomCounters,
     splitMonitorStatLine,
@@ -2353,7 +2355,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (variablesType === 'context') return;
 
         const parsedValue = Number(editingManagedHolderValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? Math.trunc(parsedValue) : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         switch (variablesType) {
             case 'user':
@@ -2383,7 +2385,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (variablesType === 'global' || variablesType === 'context') return;
 
         const parsedValue = Number(managedGiveValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? Math.trunc(parsedValue) : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         if (variablesType === 'user') assignUserVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
         else assignFurniVariable(selectedManagedVariableEntry.entityId, selectedManagedGiveDefinition.itemId, nextValue);
@@ -2475,7 +2477,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 return;
             }
 
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
 
             if (Number.isNaN(parsed)) {
                 cancelVariableEdit();
@@ -2500,7 +2502,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
             const customDefinition = selectedUserCustomVariableDefinitionMap.get(editingVariable);
 
             if (customDefinition?.hasValue && !customDefinition.isReadOnly) {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     cancelVariableEdit();
@@ -2540,7 +2542,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
             switch (editingVariable) {
                 case '@position_x': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2551,7 +2553,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     break;
                 }
                 case '@position_y': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2562,7 +2564,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                     break;
                 }
                 case '@direction': {
-                    const parsed = parseInt(editingValue.trim(), 10);
+                    const parsed = parseWiredVariableValue(editingValue);
 
                     if (Number.isNaN(parsed)) {
                         isValid = false;
@@ -2623,7 +2625,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         const customFurniDefinition = selectedFurniCustomVariableDefinitionMap.get(editingVariable);
 
         if (customFurniDefinition?.hasValue && !customFurniDefinition.isReadOnly) {
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
 
             if (Number.isNaN(parsed)) {
                 cancelVariableEdit();
@@ -2660,7 +2662,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         }
 
         if (editingVariable === '@gravity') {
-            const parsed = parseInt(editingValue.trim(), 10);
+            const parsed = parseWiredVariableValue(editingValue);
             if (!selectedFurni || !roomSession || (parsed !== 0 && parsed !== 1)) {
                 cancelVariableEdit();
                 return;
@@ -2698,7 +2700,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
 
         switch (editingVariable) {
             case '@position_x': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2709,7 +2711,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@position_y': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2720,7 +2722,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@rotation': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2731,7 +2733,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@altitude': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2742,7 +2744,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@state': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2753,7 +2755,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@opacity': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2764,7 +2766,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
                 break;
             }
             case '@gravity': {
-                const parsed = parseInt(editingValue.trim(), 10);
+                const parsed = parseWiredVariableValue(editingValue);
 
                 if (Number.isNaN(parsed)) {
                     isValid = false;
@@ -2996,7 +2998,7 @@ export const WiredCreatorToolsView: FC<{}> = () => {
         if (!canManageInspectionVariableAssignments || !selectedInspectionGiveDefinition) return;
 
         const parsedValue = Number(inspectionGiveValue.trim());
-        const nextValue = Number.isFinite(parsedValue) ? parsedValue : 0;
+        const nextValue = clampWiredVariableValue(parsedValue);
 
         if (inspectionType === 'user' && selectedUser) {
             assignUserVariable(selectedUserHolderKey, selectedInspectionGiveDefinition.itemId, nextValue);
