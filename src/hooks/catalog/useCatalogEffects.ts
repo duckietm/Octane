@@ -64,7 +64,7 @@ import {
     cacheLateCatalogPage,
     cloneCachedCatalogPages,
     dropCatalogCache,
-    invalidateCatalogIndex,
+    invalidateAllCatalogIndexes,
     invalidateCatalogPage,
     invalidateCatalogPages,
     prefetchCatalogIndex,
@@ -293,7 +293,8 @@ export const useCatalogEffects = (): void => {
     useMessageEvent<CatalogPublishedMessageEvent>(CatalogPublishedMessageEvent, () => {
         if (!connectionState.authenticated) return;
 
-        invalidateCatalogIndex(useCatalogStore.getState().currentType);
+        // Every type: a publish while one catalog is open left the other types' indexes stale.
+        invalidateAllCatalogIndexes();
         invalidateCatalogPages();
     });
 
