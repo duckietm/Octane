@@ -15,7 +15,7 @@ import {
     TriggerHabbiconComposer
 } from '@octane/renderer';
 import { useCallback } from 'react';
-import { CanOpenFurniChooser, CanOpenUserChooser,ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, SendMessageComposer, WIRED_PLAYTEST_TOGGLE_LINK } from '../../../api';
+import { CanOpenFurniChooser, CanOpenUserChooser,ChatMessageTypeEnum, GetClubMemberLevel, GetConfigurationValue, IsAnyRoomController, LocalizeText, parseSignId, SendMessageComposer, WIRED_PLAYTEST_TOGGLE_LINK } from '../../../api';
 import { useNotification } from '../../notification';
 import { useTranslation } from '../../translation';
 import { useRoom } from '../useRoom';
@@ -121,10 +121,13 @@ export const useChatInputActions = () => {
                         roomSession?.sendExpressionMessage(AvatarExpressionEnum.RESPECT.ordinal);
 
                         return null;
-                    case ':sign':
-                        roomSession?.sendSignMessage(parseInt(secondPart));
+                    case ':sign': {
+                        const signId = parseSignId(secondPart);
+
+                        if (signId !== null) roomSession?.sendSignMessage(signId);
 
                         return null;
+                    }
                     case ':habbicon': {
                         const habbiconId = parseInt(secondPart);
 
